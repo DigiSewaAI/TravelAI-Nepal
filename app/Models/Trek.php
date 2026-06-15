@@ -14,6 +14,7 @@ class Trek extends Model
         'name',
         'duration_days',
         'difficulty',
+        'category',        // ✅ नयाँ थपियो
         'price',
         'itinerary',
         'cover_image',

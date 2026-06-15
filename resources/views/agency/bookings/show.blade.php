@@ -1,60 +1,114 @@
-@extends('agency.layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking #{{ $booking->id }} | TravelAI Nepal Agency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-blue-600 px-6 py-4">
+                <h1 class="text-2xl font-bold text-white">Booking Details</h1>
+                <p class="text-blue-100">ID: #{{ $booking->id }}</p>
+            </div>
+            <div class="p-6">
+                <!-- Trek Information -->
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Trek / Tour Details</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-500">Name</p>
+                        <p class="font-medium">{{ $booking->trek->name ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Duration</p>
+                        <p class="font-medium">{{ $booking->trek->duration_days ?? '-' }} days</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Difficulty</p>
+                        <p class="font-medium capitalize">{{ $booking->trek->difficulty ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Price</p>
+                        <p class="font-medium">${{ number_format($booking->trek->price ?? 0, 2) }}</p>
+                    </div>
+                </div>
 
-@section('title', 'Booking Details')
-@section('header', 'Booking #' . $booking->id)
+                <!-- Trekker Information -->
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Trekker Details</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-500">Full Name</p>
+                        <p class="font-medium">{{ $booking->trekker->name ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium">{{ $booking->trekker->email ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Phone</p>
+                        <p class="font-medium">{{ $booking->trekker->phone ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Passport Number</p>
+                        <p class="font-medium">{{ $booking->trekker->passport_number ?? '-' }}</p>
+                    </div>
+                </div>
 
-@section('content')
-<div class="bg-white rounded-xl shadow p-6 max-w-3xl">
-    <div class="grid grid-cols-2 gap-4 mb-6">
-        <div>
-            <p class="text-gray-500 text-sm">Trekker</p>
-            <p class="font-medium">{{ $booking->trekker->name }}</p>
-            <p class="text-gray-600">{{ $booking->trekker->email }}<br>{{ $booking->trekker->phone }}</p>
+                <!-- Booking Meta -->
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Booking Meta</h2>
+                <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-500">Booking Date</p>
+                        <p class="font-medium">{{ $booking->booking_date ? \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y') : '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Start Date</p>
+                        <p class="font-medium">{{ $booking->start_date ? \Carbon\Carbon::parse($booking->start_date)->format('M d, Y') : '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status</p>
+                        <p>
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                @if($booking->status == 'confirmed') bg-green-100 text-green-800
+                                @elseif($booking->status == 'pending') bg-yellow-100 text-yellow-800
+                                @elseif($booking->status == 'cancelled') bg-red-100 text-red-800
+                                @elseif($booking->status == 'completed') bg-blue-100 text-blue-800
+                                @else bg-gray-100 text-gray-800
+                                @endif">
+                                {{ ucfirst($booking->status) }}
+                            </span>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">QR Code</p>
+                        <p class="font-mono text-xs">{{ $booking->qr_code ?? 'Not generated' }}</p>
+                    </div>
+                </div>
+
+                <!-- QR Code Image (optional) -->
+                @if($booking->qr_code)
+                <div class="mb-6 text-center">
+                    <p class="text-sm text-gray-500 mb-2">Check-in QR Code</p>
+                    <img src="{{ route('booking.qr', $booking->id) }}" alt="QR Code" class="mx-auto border p-2 rounded-lg w-40 h-40">
+                </div>
+                @endif
+
+                <div class="flex justify-between items-center mt-6 pt-4 border-t">
+                    <a href="{{ route('agency.bookings.index') }}" class="text-blue-600 hover:underline">← Back to Bookings</a>
+                    @if($booking->status == 'pending')
+                    <form method="POST" action="{{ route('agency.bookings.updateStatus', $booking) }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" value="confirmed">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Confirm Booking</button>
+                    </form>
+                    @endif
+                </div>
+            </div>
         </div>
-        <div>
-            <p class="text-gray-500 text-sm">Trek Details</p>
-            <p class="font-medium">{{ $booking->trek->name }}</p>
-            <p>{{ $booking->trek->duration_days }} days | {{ ucfirst($booking->trek->difficulty) }} | ${{ $booking->trek->price }}</p>
-        </div>
     </div>
-
-    <div class="border-t pt-4 mb-4">
-        <p><strong>Start Date:</strong> {{ $booking->start_date->format('Y-m-d') }}</p>
-        <p><strong>Booking Date:</strong> {{ $booking->booking_date->format('Y-m-d') }}</p>
-        <p><strong>Status:</strong> 
-            <form action="{{ route('agency.bookings.updateStatus', $booking) }}" method="POST" class="inline">
-    @csrf
-    @method('PATCH')
-                <select name="status" class="border rounded px-2 py-1 text-sm" onchange="this.form.submit()">
-                    <option value="pending" {{ $booking->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="confirmed" {{ $booking->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                    <option value="completed" {{ $booking->status == 'completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="cancelled" {{ $booking->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                </select>
-            </form>
-        </p>
-    </div>
-
-    <div class="border-t pt-4">
-        <p class="font-semibold mb-2">QR Code for Check-in</p>
-        <div class="bg-gray-100 p-4 rounded-lg text-center">
-            <p class="font-mono text-sm break-all">{{ $booking->qr_code }}</p>
-<a href="{{ route('scan.checkin', $booking->id) }}" target="_blank" class="inline-block mt-2 bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Simulate Scan</a>        </div>
-    </div>
-
-    @if($scans->count())
-    <div class="border-t pt-4 mt-4">
-        <p class="font-semibold mb-2">Check-in History</p>
-        <ul class="list-disc list-inside text-sm">
-            @foreach($scans as $scan)
-            <li>{{ $scan->checkpoint_name }} – {{ $scan->scanned_at->format('Y-m-d H:i') }} ({{ $scan->latitude }}, {{ $scan->longitude }})</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
-    <div class="mt-6">
-        <a href="{{ route('agency.bookings.index') }}" class="text-blue-600 hover:underline">← Back to Bookings</a>
-    </div>
-</div>
-@endsection
+</body>
+</html>

@@ -32,27 +32,41 @@
             </div>
         </div>
 
+        {{-- NEW: Category field --}}
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2">Category *</label>
+            <select name="category" required class="w-full border rounded-lg px-3 py-2">
+                <option value="trek" {{ old('category', $trek->category) == 'trek' ? 'selected' : '' }}>🏔️ Trek</option>
+                <option value="tour" {{ old('category', $trek->category) == 'tour' ? 'selected' : '' }}>🚐 Tour</option>
+                <option value="hotel" {{ old('category', $trek->category) == 'hotel' ? 'selected' : '' }}>🏨 Hotel</option>
+            </select>
+            @error('category') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div class="mb-4">
             <label class="block text-gray-700 font-medium mb-2">Price (USD)</label>
             <input type="number" step="0.01" name="price" value="{{ old('price', $trek->price) }}" required class="w-full border rounded-lg px-3 py-2">
             @error('price') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Itinerary field – correctly decoded and pretty-printed --}}
+        {{-- Itinerary – simple one day per line (no JSON required) --}}
         <div class="mb-4">
-            <label class="block text-gray-700 font-medium mb-2">Itinerary (JSON array)</label>
+            <label class="block text-gray-700 font-medium mb-2">Itinerary (one day per line)</label>
             @php
-                $currentItinerary = old('itinerary');
-                if (is_null($currentItinerary) && $trek->itinerary) {
+                $itineraryText = '';
+                if ($trek->itinerary) {
                     $decoded = json_decode($trek->itinerary, true);
-                    $currentItinerary = $decoded ? json_encode($decoded, JSON_PRETTY_PRINT) : '[]';
-                } elseif (is_null($currentItinerary)) {
-                    $currentItinerary = '[]';
+                    if (is_array($decoded)) {
+                        $itineraryText = implode("\n", $decoded);
+                    } else {
+                        $itineraryText = '';
+                    }
                 }
+                $oldItinerary = old('itinerary_lines', $itineraryText);
             @endphp
-            <textarea name="itinerary" rows="6" class="w-full border rounded-lg px-3 py-2 font-mono text-sm">{{ $currentItinerary }}</textarea>
-            <p class="text-gray-400 text-xs mt-1">Valid JSON array of strings. Example: <code>["Day 1: Arrival", "Day 2: Trek to ABC"]</code></p>
-            @error('itinerary') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            <textarea name="itinerary_lines" rows="6" class="w-full border rounded-lg px-3 py-2 font-mono text-sm">{{ $oldItinerary }}</textarea>
+            <p class="text-gray-400 text-xs mt-1">Each line = one day. Example:<br>Day 1: Arrival in Kathmandu<br>Day 2: Drive to Pokhara<br>Day 3: Start trek...</p>
+            @error('itinerary_lines') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         {{-- Cover Image --}}

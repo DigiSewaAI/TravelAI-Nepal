@@ -10,6 +10,9 @@ use App\Http\Controllers\Agency\Auth\RegisterController;
 use App\Http\Controllers\Agency\DashboardController;
 use App\Http\Controllers\Agency\TrekController as AgencyTrekController;
 use App\Http\Controllers\Agency\BookingController;
+use App\Http\Controllers\PublicTrekController;
+use App\Http\Controllers\PageController;
+
 
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -20,6 +23,11 @@ use App\Models\Booking;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/features', [PageController::class, 'features'])->name('pages.features');
+Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('pages.how-it-works');
+Route::get('/agencies', [PageController::class, 'agencies'])->name('pages.agencies');
+
+Route::get('/treks', [PublicTrekController::class, 'index'])->name('treks.index');
 
 // Home page (dynamic data from HomeController)
 Route::get('/', [HomeController::class, 'index'])->name('home');

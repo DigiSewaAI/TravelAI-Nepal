@@ -29,24 +29,26 @@ class TrekController extends Controller
             'name'          => 'required|string|max:255',
             'duration_days' => 'required|integer|min:1',
             'difficulty'    => 'required|in:easy,moderate,hard',
+            'category'      => 'required|in:trek,tour,hotel',   // ✅ NEW
             'price'         => 'required|numeric|min:0',
-            'itinerary'     => 'nullable|string',
+            'itinerary_lines' => 'nullable|string',
             'cover_image'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gallery.*'     => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $validated['agency_id'] = Auth::guard('agency')->id();
 
-        // Handle itinerary JSON (same logic as update)
-        if ($request->filled('itinerary')) {
-            $itinerary = json_decode($request->itinerary, true);
-            if (json_last_error() !== JSON_ERROR_NONE || !is_array($itinerary)) {
-                return back()->withErrors(['itinerary' => 'Please enter a valid JSON array.'])->withInput();
-            }
-            $validated['itinerary'] = json_encode($itinerary);
+        // Convert itinerary lines to JSON
+        if ($request->filled('itinerary_lines')) {
+            $lines = explode("\n", trim($request->itinerary_lines));
+            $lines = array_filter(array_map('trim', $lines));
+            $validated['itinerary'] = json_encode($lines);
         } else {
             $validated['itinerary'] = null;
         }
+
+        // Remove the temporary field so it doesn't cause SQL error
+        unset($validated['itinerary_lines']);
 
         // Handle cover image
         if ($request->hasFile('cover_image')) {
@@ -69,71 +71,77 @@ class TrekController extends Controller
     }
 
     public function edit(Trek $trek)
-{
-    if ($trek->agency_id !== Auth::guard('agency')->id()) {
-        abort(403);
-    }
-    $itinerary = $trek->itinerary 
-        ? json_encode(json_decode($trek->itinerary, true), JSON_PRETTY_PRINT) 
-        : '';
-    return view('agency.treks.edit', compact('trek', 'itinerary'));
-}
-
-    public function update(Request $request, Trek $trek)
-{
-    if ($trek->agency_id !== Auth::guard('agency')->id()) {
-        abort(403);
-    }
-
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'duration_days' => 'required|integer|min:1',
-        'difficulty' => 'required|in:easy,moderate,hard',
-        'price' => 'required|numeric|min:0',
-        'itinerary' => 'nullable|string',
-        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    $data = $request->only(['name', 'duration_days', 'difficulty', 'price']);
-
-    // Correct itinerary handling
-    if ($request->filled('itinerary')) {
-        $itinerary = json_decode($request->itinerary, true);
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($itinerary)) {
-            return back()->withErrors(['itinerary' => 'Please enter a valid JSON array.'])->withInput();
+    {
+        if ($trek->agency_id !== Auth::guard('agency')->id()) {
+            abort(403);
         }
-        $data['itinerary'] = json_encode($itinerary);
-    } else {
-        $data['itinerary'] = null;
-    }
 
-    // Handle cover image
-    if ($request->hasFile('cover_image')) {
-        if ($trek->cover_image) {
-            Storage::disk('public')->delete($trek->cover_image);
-        }
-        $data['cover_image'] = $request->file('cover_image')->store('trek-covers', 'public');
-    }
-
-    // Handle gallery
-    if ($request->hasFile('gallery')) {
-        if ($trek->gallery) {
-            $old = json_decode($trek->gallery, true);
-            foreach ($old as $img) {
-                Storage::disk('public')->delete($img);
+        // Convert stored JSON itinerary to plain lines for the textarea
+        $itineraryLines = '';
+        if ($trek->itinerary) {
+            $days = json_decode($trek->itinerary, true);
+            if (is_array($days)) {
+                $itineraryLines = implode("\n", $days);
             }
         }
-        $galleryPaths = [];
-        foreach ($request->file('gallery') as $img) {
-            $galleryPaths[] = $img->store('trek-galleries', 'public');
-        }
-        $data['gallery'] = json_encode($galleryPaths);
+
+        return view('agency.treks.edit', compact('trek', 'itineraryLines'));
     }
 
-    $trek->update($data);
-    return redirect()->route('agency.treks.index')->with('success', 'Trek updated successfully.');
-}
+    public function update(Request $request, Trek $trek)
+    {
+        if ($trek->agency_id !== Auth::guard('agency')->id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'duration_days' => 'required|integer|min:1',
+            'difficulty' => 'required|in:easy,moderate,hard',
+            'category' => 'required|in:trek,tour,hotel',   // ✅ NEW
+            'price' => 'required|numeric|min:0',
+            'itinerary_lines' => 'nullable|string',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'duration_days', 'difficulty', 'category', 'price']);  // ✅ added 'category'
+
+        // Convert itinerary lines to JSON
+        if ($request->filled('itinerary_lines')) {
+            $lines = explode("\n", trim($request->itinerary_lines));
+            $lines = array_filter(array_map('trim', $lines));
+            $data['itinerary'] = json_encode($lines);
+        } else {
+            $data['itinerary'] = null;
+        }
+
+        // Handle cover image
+        if ($request->hasFile('cover_image')) {
+            if ($trek->cover_image) {
+                Storage::disk('public')->delete($trek->cover_image);
+            }
+            $data['cover_image'] = $request->file('cover_image')->store('trek-covers', 'public');
+        }
+
+        // Handle gallery
+        if ($request->hasFile('gallery')) {
+            if ($trek->gallery) {
+                $old = json_decode($trek->gallery, true);
+                foreach ($old as $img) {
+                    Storage::disk('public')->delete($img);
+                }
+            }
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $img) {
+                $galleryPaths[] = $img->store('trek-galleries', 'public');
+            }
+            $data['gallery'] = json_encode($galleryPaths);
+        }
+
+        $trek->update($data);
+        return redirect()->route('agency.treks.index')->with('success', 'Trek updated successfully.');
+    }
 
     public function destroy(Trek $trek)
     {

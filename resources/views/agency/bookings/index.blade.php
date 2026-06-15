@@ -34,7 +34,8 @@
                 <td class="px-6 py-4">
                     <button onclick="openQRModal('{{ route('booking.qr', $booking->id) }}')" class="text-blue-600 hover:underline">Show QR</button>
                 </td>
-                <td class="px-6 py-4 text-right">
+                <td class="px-6 py-4 text-right space-x-2">
+                    <a href="{{ route('scan.checkin', $booking->id) }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs inline-block">Check‑in</a>
                     <a href="{{ route('agency.bookings.show', $booking) }}" class="text-blue-600 hover:underline">Details</a>
                 </td>
             </tr>

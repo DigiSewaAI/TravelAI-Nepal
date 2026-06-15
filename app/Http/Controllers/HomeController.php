@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Trek;
 use App\Models\Booking;
 use App\Models\Agency;
+use App\Models\QrScan;
 
 class HomeController extends Controller
 {
@@ -34,7 +35,25 @@ class HomeController extends Controller
             ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
         ];
 
-        // Return view with both required variables
-        return view('home', compact('featuredTreks', 'stats'));
+        // Fetch latest 10 check-ins with related trek, agency, trekker, and cover image
+        $recentCheckins = QrScan::with(['booking.trek.agency', 'booking.trekker'])
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($scan) {
+                $trek = $scan->booking->trek;
+                $agency = $trek->agency ?? null;
+                return [
+                    'checkpoint'   => $scan->checkpoint_name,
+                    'trek_name'    => $trek->name ?? 'Unknown Trek',
+                    'agency_name'  => $agency->name ?? 'Independent',
+                    'trekker_name' => $scan->booking->trekker->name ?? 'Guest',
+                    'time_ago'     => $scan->scanned_at->diffForHumans(),
+                    'cover_image'  => $trek->cover_image ? asset('storage/' . $trek->cover_image) : null,
+                ];
+            });
+
+        // Return view with all required variables
+        return view('home', compact('featuredTreks', 'stats', 'recentCheckins'));
     }
 }
