@@ -9,11 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -27,5 +26,32 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // ===== Relationships =====
+    public function providers()
+    {
+        return $this->hasMany(Provider::class, 'user_id');
+    }
+
+    public function staff()
+    {
+        return $this->hasMany(ProviderStaff::class);
+    }
+
+    // ===== Helper methods =====
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isProviderOwner(): bool
+    {
+        return $this->role === 'provider_owner';
+    }
+
+    public function isTraveler(): bool
+    {
+        return $this->role === 'traveler';
     }
 }
