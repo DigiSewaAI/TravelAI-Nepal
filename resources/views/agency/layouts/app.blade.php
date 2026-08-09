@@ -23,6 +23,9 @@
                 <a href="{{ route('agency.dashboard') }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 {{ request()->routeIs('agency.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-700' }}">
                     <i class="fas fa-chart-line w-5"></i><span>Dashboard</span>
                 </a>
+                <a href="{{ route('agency.agencies.index') }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 {{ request()->routeIs('agency.agencies.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700' }}">
+    <i class="fas fa-building w-5"></i><span>Agencies</span>
+</a>
                 <a href="{{ route('agency.treks.index') }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 {{ request()->routeIs('agency.treks.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700' }}">
                     <i class="fas fa-hiking w-5"></i><span>Treks</span>
                 </a>

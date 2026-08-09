@@ -10,6 +10,7 @@ use App\Http\Controllers\Agency\Auth\RegisterController;
 use App\Http\Controllers\Agency\DashboardController;
 use App\Http\Controllers\Agency\TrekController as AgencyTrekController;
 use App\Http\Controllers\Agency\BookingController;
+use App\Http\Controllers\Agency\AgencyController;
 use App\Http\Controllers\PublicTrekController;
 use App\Http\Controllers\PageController;
 
@@ -63,11 +64,36 @@ Route::prefix('agency')->name('agency.')->group(function () {
 
     // Authenticated agency routes
     Route::middleware('auth:agency')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-        Route::resource('treks', AgencyTrekController::class);
-        Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
-        Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-        Route::match(['put', 'patch'], 'bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
-    });
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Logout
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    
+    // Treks Management
+    Route::resource('treks', AgencyTrekController::class);
+    
+    // Bookings Management
+    Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::match(['put', 'patch'], 'bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+    
+    // ========== 🆕 SUPER ADMIN को लागि Agency Management ==========
+    // यी रूटहरू super admin ले मात्र प्रयोग गर्न सक्छन्
+    Route::prefix('agencies')->name('agencies.')->group(function () {
+    Route::get('/', [AgencyController::class, 'index'])->name('index');
+    Route::get('/create', [AgencyController::class, 'create'])->name('create');
+    Route::post('/', [AgencyController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [AgencyController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [AgencyController::class, 'update'])->name('update');
+    Route::delete('/{id}', [AgencyController::class, 'destroy'])->name('destroy');
+    Route::patch('/{id}/toggle-status', [AgencyController::class, 'toggleStatus'])->name('toggle-status');
+    Route::get('/{id}', [AgencyController::class, 'show'])->name('show');  // ✅ थप्नुहोस्
+});
+    // ============================================================
+    
+    // ========== 🆕 Reports (रिपोर्ट डाउनलोड) ==========
+    Route::get('/reports/bookings', [DashboardController::class, 'exportBookings'])->name('reports.bookings');
+    // =================================================
+});
 });
