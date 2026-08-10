@@ -54,4 +54,24 @@ class User extends Authenticatable
     {
         return $this->role === 'traveler';
     }
+
+    /**
+     * Phase 2: Get IDs of providers this user can manage.
+     * Super admin gets all, owners get their own, staff gets assigned.
+     */
+    public function accessibleProviderIds(): array
+    {
+        if ($this->isSuperAdmin()) {
+            return Provider::pluck('id')->toArray();
+        }
+
+        $ids = $this->providers()->pluck('id')->toArray();
+
+        if ($this->role === 'staff' || $this->role === 'manager') {
+            $staffProviders = $this->staff()->pluck('provider_id')->toArray();
+            $ids = array_merge($ids, $staffProviders);
+        }
+
+        return array_unique($ids);
+    }
 }

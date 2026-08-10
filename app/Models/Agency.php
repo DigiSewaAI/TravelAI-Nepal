@@ -22,7 +22,8 @@ class Agency extends Authenticatable
         'phone',
         'address',
         'logo_url',
-        'role',          // ✅ नयाँ: role (super_admin, admin, agency)
+        'role',          // ✅ role (super_admin, admin, agency)
+        'user_id',       // ✅ Phase 2: foreign key to users
     ];
 
     /**
@@ -73,6 +74,14 @@ class Agency extends Authenticatable
         );
     }
 
+    /**
+     * Phase 2: User relationship (provider owner)
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // ---------------------------
     // सहायक विधिहरू (Helpers)
     // ---------------------------
@@ -93,7 +102,9 @@ class Agency extends Authenticatable
         return in_array($this->role, ['super_admin', 'admin']);
     }
 
-    // यदि तपाईंलाई सामान्य एजेन्सी पहिचान गर्नु छ भने:
+    /**
+     * सामान्य एजेन्सी हो?
+     */
     public function isRegularAgency(): bool
     {
         return $this->role === 'agency' || is_null($this->role);
