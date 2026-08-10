@@ -14,7 +14,6 @@ use App\Http\Controllers\Agency\AgencyController;
 use App\Http\Controllers\PublicTrekController;
 use App\Http\Controllers\PageController;
 
-
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
@@ -24,13 +23,14 @@ use App\Models\Booking;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// ========================
+// 1. PUBLIC PAGES & TREKS
+// ========================
 Route::get('/features', [PageController::class, 'features'])->name('pages.features');
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('pages.how-it-works');
 Route::get('/agencies', [PageController::class, 'agencies'])->name('pages.agencies');
-
 Route::get('/treks', [PublicTrekController::class, 'index'])->name('treks.index');
-
-// Home page (dynamic data from HomeController)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Public trek details page (view details from homepage)
@@ -52,7 +52,26 @@ Route::get('/booking/qr/{booking}', function ($id) {
 Route::get('/scan/{booking}', [CheckinController::class, 'show'])->name('scan.checkin');
 Route::post('/scan/{booking}', [CheckinController::class, 'checkin']);
 
-// Agency Authentication & Dashboard
+// =======================================
+// 2. NEW AUTHENTICATION ROUTES (User Guard)
+// =======================================
+// These use the default 'web' guard and the User model.
+Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+
+Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
+
+// Password reset routes (optional – uncomment if you have views)
+// Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+// Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+// Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+// Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+
+// =======================================
+// 3. AGENCY ROUTES (Legacy – still active)
+// =======================================
 Route::prefix('agency')->name('agency.')->group(function () {
     // Guest routes (not logged in as agency)
     Route::middleware('guest:agency')->group(function () {
@@ -64,36 +83,35 @@ Route::prefix('agency')->name('agency.')->group(function () {
 
     // Authenticated agency routes
     Route::middleware('auth:agency')->group(function () {
-    // Dashboard
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Logout
-    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-    
-    // Treks Management
-    Route::resource('treks', AgencyTrekController::class);
-    
-    // Bookings Management
-    Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::match(['put', 'patch'], 'bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
-    
-    // ========== 🆕 SUPER ADMIN को लागि Agency Management ==========
-    // यी रूटहरू super admin ले मात्र प्रयोग गर्न सक्छन्
-    Route::prefix('agencies')->name('agencies.')->group(function () {
-    Route::get('/', [AgencyController::class, 'index'])->name('index');
-    Route::get('/create', [AgencyController::class, 'create'])->name('create');
-    Route::post('/', [AgencyController::class, 'store'])->name('store');
-    Route::get('/{id}/edit', [AgencyController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [AgencyController::class, 'update'])->name('update');
-    Route::delete('/{id}', [AgencyController::class, 'destroy'])->name('destroy');
-    Route::patch('/{id}/toggle-status', [AgencyController::class, 'toggleStatus'])->name('toggle-status');
-    Route::get('/{id}', [AgencyController::class, 'show'])->name('show');  // ✅ थप्नुहोस्
-});
-    // ============================================================
-    
-    // ========== 🆕 Reports (रिपोर्ट डाउनलोड) ==========
-    Route::get('/reports/bookings', [DashboardController::class, 'exportBookings'])->name('reports.bookings');
-    // =================================================
-});
+        // Dashboard
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Logout
+        Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+        // Treks Management
+        Route::resource('treks', AgencyTrekController::class);
+
+        // Bookings Management
+        Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+        Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+        Route::match(['put', 'patch'], 'bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+
+        // ========== 🆕 SUPER ADMIN को लागि Agency Management ==========
+        Route::prefix('agencies')->name('agencies.')->group(function () {
+            Route::get('/', [AgencyController::class, 'index'])->name('index');
+            Route::get('/create', [AgencyController::class, 'create'])->name('create');
+            Route::post('/', [AgencyController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [AgencyController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [AgencyController::class, 'update'])->name('update');
+            Route::delete('/{id}', [AgencyController::class, 'destroy'])->name('destroy');
+            Route::patch('/{id}/toggle-status', [AgencyController::class, 'toggleStatus'])->name('toggle-status');
+            Route::get('/{id}', [AgencyController::class, 'show'])->name('show');
+        });
+        // ============================================================
+
+        // ========== 🆕 Reports (रिपोर्ट डाउनलोड) ==========
+        Route::get('/reports/bookings', [DashboardController::class, 'exportBookings'])->name('reports.bookings');
+        // =================================================
+    });
 });

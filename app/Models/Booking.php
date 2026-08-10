@@ -17,6 +17,8 @@ class Booking extends Model
         'status',
         'qr_code',
         'invoice_url',
+        'traveler_id', // ✅ Phase 4
+        'service_id',  // ✅ Phase 4
     ];
 
     protected $casts = [
@@ -24,25 +26,33 @@ class Booking extends Model
         'start_date' => 'date',
     ];
 
-    // Belongs to a trekker
+    // Old relationships (keep for backward compatibility)
     public function trekker()
     {
         return $this->belongsTo(Trekker::class);
     }
 
-    // Belongs to a trek
     public function trek()
     {
         return $this->belongsTo(Trek::class);
     }
 
-    // Has many QR scans (checkpoints)
+    // ✅ Phase 4: New relationships
+    public function traveler()
+    {
+        return $this->belongsTo(User::class, 'traveler_id');
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id');
+    }
+
     public function qrScans()
     {
         return $this->hasMany(QrScan::class);
     }
 
-    // Has one SOS alert? Actually SOS belongs to booking and trekker
     public function sosAlert()
     {
         return $this->hasOne(SosAlert::class);

@@ -2,24 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phone', 'avatar'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'phone',
+        'avatar',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -28,7 +32,7 @@ class User extends Authenticatable
         ];
     }
 
-    // ===== Relationships =====
+    // Relationships
     public function providers()
     {
         return $this->hasMany(Provider::class, 'user_id');
@@ -39,7 +43,12 @@ class User extends Authenticatable
         return $this->hasMany(ProviderStaff::class);
     }
 
-    // ===== Helper methods =====
+    public function travelerBookings()
+    {
+        return $this->hasMany(Booking::class, 'traveler_id');
+    }
+
+    // Helper methods
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';
@@ -55,10 +64,6 @@ class User extends Authenticatable
         return $this->role === 'traveler';
     }
 
-    /**
-     * Phase 2: Get IDs of providers this user can manage.
-     * Super admin gets all, owners get their own, staff gets assigned.
-     */
     public function accessibleProviderIds(): array
     {
         if ($this->isSuperAdmin()) {

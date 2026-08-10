@@ -27,4 +27,8 @@ class Trekker extends Model
     {
         return $this->hasMany(SosAlert::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'email', 'email');
+}
 }

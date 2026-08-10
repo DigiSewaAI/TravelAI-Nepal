@@ -14,11 +14,12 @@ class Trek extends Model
         'name',
         'duration_days',
         'difficulty',
-        'category',        // ✅ नयाँ थपियो
+        'category',
         'price',
         'itinerary',
         'cover_image',
         'gallery',
+        'service_id', // ✅ Phase 3
     ];
 
     protected $casts = [
@@ -27,15 +28,19 @@ class Trek extends Model
         'price' => 'decimal:2',
     ];
 
-    // Belongs to an agency
     public function agency()
     {
         return $this->belongsTo(Agency::class);
     }
 
-    // Has many bookings
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    // ✅ Phase 3: New relationship
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }
