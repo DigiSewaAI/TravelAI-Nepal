@@ -24,6 +24,13 @@ use App\Http\Controllers\Provider\ProfileController as ProviderProfileController
 use App\Http\Controllers\Provider\ServiceController as ProviderServiceController;
 use App\Http\Controllers\Provider\BookingController as ProviderBookingController;
 
+// ✅ Phase 8 – Provider Subscription & Verification
+use App\Http\Controllers\Provider\SubscriptionController;
+use App\Http\Controllers\Provider\VerificationController;
+
+// ✅ Phase 8 – Admin Controllers
+use App\Http\Controllers\Admin\ProviderController as AdminProviderController;
+
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
@@ -144,9 +151,10 @@ Route::prefix('agency')->name('agency.')->group(function () {
 });
 
 // =======================================
-// 5. PROVIDER DASHBOARD ROUTES (NEW – Phase 6)
+// 5. PROVIDER DASHBOARD ROUTES (NEW – Phase 6 & 8)
 // =======================================
 Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
 
     // Profile
@@ -161,4 +169,25 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [ProviderBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{booking}/status', [ProviderBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+
+    // Subscriptions (Phase 8)
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscriptions.upgrade');
+    Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+
+    // Verification (Phase 8)
+    Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
+    Route::post('/verification', [VerificationController::class, 'store'])->name('verification.store');
+    Route::delete('/verification/{document}', [VerificationController::class, 'destroy'])->name('verification.destroy');
+});
+
+// =======================================
+// 6. ADMIN ROUTES (Super Admin – Phase 8)
+// =======================================
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/providers', [AdminProviderController::class, 'index'])->name('providers.index');
+    Route::get('/providers/{provider}', [AdminProviderController::class, 'show'])->name('providers.show');
+    Route::patch('/providers/{provider}/verify', [AdminProviderController::class, 'verify'])->name('providers.verify');
+    Route::patch('/providers/{provider}/toggle', [AdminProviderController::class, 'toggleActive'])->name('providers.toggle');
+    Route::delete('/providers/{provider}', [AdminProviderController::class, 'destroy'])->name('providers.destroy');
 });
