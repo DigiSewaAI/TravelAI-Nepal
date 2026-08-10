@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Trek;
+use App\Models\Service;
 use App\Models\Booking;
-use App\Models\Agency;
+use App\Models\Provider;
 use App\Models\QrScan;
 
 class HomeController extends Controller
@@ -16,44 +16,45 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Fetch featured treks (latest 6, with agency relationship)
-        $featuredTreks = Trek::with('agency')
+        // Fetch featured services (latest 6, with provider relationship)
+        $featuredServices = Service::with(['provider', 'category', 'trekDetail'])
+            ->where('status', 'active')
             ->latest()
             ->take(6)
             ->get();
 
         // Real-time stats from database
-        $totalTreks = Trek::count();
-        $totalAgencies = Agency::count();
+        $totalServices = Service::count();
+        $totalProviders = Provider::count();
         $totalBookings = Booking::count();
 
-        // Stats array for the banner (matches the Blade template's @foreach)
+        // Stats array for the banner
         $stats = [
-            ['value' => $totalTreks . '+', 'label' => 'Trek Packages'],
-            ['value' => $totalAgencies, 'label' => 'Trusted Agencies'],
-            ['value' => $totalBookings, 'label' => 'Happy Trekkers'],
+            ['value' => $totalServices . '+', 'label' => 'Tourism Services'],
+            ['value' => $totalProviders, 'label' => 'Trusted Providers'],
+            ['value' => $totalBookings, 'label' => 'Happy Travelers'],
             ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
         ];
 
-        // Fetch latest 10 check-ins with related trek, agency, trekker, and cover image
-        $recentCheckins = QrScan::with(['booking.trek.agency', 'booking.trekker'])
+        // Fetch latest 10 check-ins with related data
+        $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
             ->latest()
             ->take(10)
             ->get()
             ->map(function ($scan) {
-                $trek = $scan->booking->trek;
-                $agency = $trek->agency ?? null;
+                $service = $scan->booking->service;
+                $provider = $service->provider ?? null;
                 return [
                     'checkpoint'   => $scan->checkpoint_name,
-                    'trek_name'    => $trek->name ?? 'Unknown Trek',
-                    'agency_name'  => $agency->name ?? 'Independent',
-                    'trekker_name' => $scan->booking->trekker->name ?? 'Guest',
+                    'service_name' => $service->name ?? 'Unknown Service',
+                    'provider_name' => $provider->name ?? 'Independent',
+                    'traveler_name' => $scan->booking->traveler->name ?? 'Guest',
                     'time_ago'     => $scan->scanned_at->diffForHumans(),
-                    'cover_image'  => $trek->cover_image ? asset('storage/' . $trek->cover_image) : null,
+                    'cover_image'  => $service->cover_image ? asset('storage/' . $service->cover_image) : null,
                 ];
             });
 
         // Return view with all required variables
-        return view('home', compact('featuredTreks', 'stats', 'recentCheckins'));
+        return view('home', compact('featuredServices', 'stats', 'recentCheckins'));
     }
 }

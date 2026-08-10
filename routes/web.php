@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TrekController;               // Frontend Trek details
-use App\Http\Controllers\TrekBookingController;        // Booking system
+use App\Http\Controllers\TrekController;               // Frontend Trek details (LEGACY)
+use App\Http\Controllers\TrekBookingController;        // LEGACY Booking system
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\Agency\Auth\LoginController;
 use App\Http\Controllers\Agency\Auth\RegisterController;
@@ -13,6 +13,10 @@ use App\Http\Controllers\Agency\BookingController;
 use App\Http\Controllers\Agency\AgencyController;
 use App\Http\Controllers\PublicTrekController;
 use App\Http\Controllers\PageController;
+
+// ✅ Phase 7 – New Public Controllers
+use App\Http\Controllers\Public\ServiceController;
+use App\Http\Controllers\Public\BookingController as PublicBookingController;
 
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -25,7 +29,7 @@ use App\Models\Booking;
 */
 
 // ========================
-// 1. PUBLIC PAGES & TREKS
+// 1. PUBLIC PAGES & TREKS (LEGACY)
 // ========================
 Route::get('/features', [PageController::class, 'features'])->name('pages.features');
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('pages.how-it-works');
@@ -33,10 +37,10 @@ Route::get('/agencies', [PageController::class, 'agencies'])->name('pages.agenci
 Route::get('/treks', [PublicTrekController::class, 'index'])->name('treks.index');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Public trek details page (view details from homepage)
+// Public trek details page (view details from homepage) - LEGACY
 Route::get('/trek/{trek}', [TrekController::class, 'show'])->name('trek.show');
 
-// Public booking routes (no authentication required)
+// Public booking routes (no authentication required) - LEGACY
 Route::get('/trek/{trek}/book', [TrekBookingController::class, 'create'])->name('trek.book');
 Route::post('/trek/{trek}/book', [TrekBookingController::class, 'store']);
 Route::get('/booking/confirmation/{booking}', [TrekBookingController::class, 'confirmation'])->name('booking.confirmation');
@@ -52,10 +56,28 @@ Route::get('/booking/qr/{booking}', function ($id) {
 Route::get('/scan/{booking}', [CheckinController::class, 'show'])->name('scan.checkin');
 Route::post('/scan/{booking}', [CheckinController::class, 'checkin']);
 
+// =============================================
+// 2. PHASE 7 – PUBLIC MARKETPLACE (NEW)
+// =============================================
+Route::prefix('explore')->name('public.')->group(function () {
+    Route::get('/', [ServiceController::class, 'index'])->name('services.index');
+    Route::get('/category/{slug}', [ServiceController::class, 'category'])->name('services.category');
+    Route::get('/service/{slug}', [ServiceController::class, 'show'])->name('services.show');
+    Route::get('/service/{slug}/book', [PublicBookingController::class, 'create'])->name('services.book');
+    Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
+});
+
+// Provider profile route
+Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.providers.show');
+
+// New booking confirmation for services
+Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
+    ->name('public.booking.confirmation');
+
+
 // =======================================
-// 2. NEW AUTHENTICATION ROUTES (User Guard)
+// 3. NEW AUTHENTICATION ROUTES (User Guard)
 // =======================================
-// These use the default 'web' guard and the User model.
 Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
@@ -70,7 +92,7 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
 
 // =======================================
-// 3. AGENCY ROUTES (Legacy – still active)
+// 4. AGENCY ROUTES (Legacy – still active)
 // =======================================
 Route::prefix('agency')->name('agency.')->group(function () {
     // Guest routes (not logged in as agency)
