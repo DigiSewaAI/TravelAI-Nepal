@@ -18,6 +18,12 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\BookingController as PublicBookingController;
 
+// ✅ Phase 6 – Provider Dashboard Controllers
+use App\Http\Controllers\Provider\DashboardController as ProviderDashboardController;
+use App\Http\Controllers\Provider\ProfileController as ProviderProfileController;
+use App\Http\Controllers\Provider\ServiceController as ProviderServiceController;
+use App\Http\Controllers\Provider\BookingController as ProviderBookingController;
+
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
@@ -70,10 +76,9 @@ Route::prefix('explore')->name('public.')->group(function () {
 // Provider profile route
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.providers.show');
 
-// New booking confirmation for services
+// New booking confirmation for services (URI changed to avoid conflict)
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');
-
 
 // =======================================
 // 3. NEW AUTHENTICATION ROUTES (User Guard)
@@ -136,4 +141,24 @@ Route::prefix('agency')->name('agency.')->group(function () {
         Route::get('/reports/bookings', [DashboardController::class, 'exportBookings'])->name('reports.bookings');
         // =================================================
     });
+});
+
+// =======================================
+// 5. PROVIDER DASHBOARD ROUTES (NEW – Phase 6)
+// =======================================
+Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
+    Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
+
+    // Profile
+    Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProviderProfileController::class, 'update'])->name('profile.update');
+
+    // Services
+    Route::resource('services', ProviderServiceController::class);
+
+    // Bookings
+    Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [ProviderBookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/status', [ProviderBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 });
