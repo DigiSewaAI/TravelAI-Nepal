@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// 🔥 Add this import for Provider model (used in accessibleProviderIds)
+use App\Models\Provider;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -64,6 +67,9 @@ class User extends Authenticatable
         return $this->role === 'traveler';
     }
 
+    /**
+     * Get all provider IDs this user can access.
+     */
     public function accessibleProviderIds(): array
     {
         if ($this->isSuperAdmin()) {
@@ -78,5 +84,14 @@ class User extends Authenticatable
         }
 
         return array_unique($ids);
+    }
+
+    /**
+     * Get the provider this user owns (for non-staff, non-super admin).
+     * Returns null if user doesn't own a provider directly.
+     */
+    public function ownProvider()
+    {
+        return $this->providers()->first();
     }
 }
