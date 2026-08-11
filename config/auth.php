@@ -40,10 +40,7 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'agency' => [
-            'driver' => 'session',
-            'provider' => 'agencies',
-        ],
+        // 'agency' guard removed (Phase 12 cleanup)
     ],
 
     /*
@@ -68,10 +65,7 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-        'agencies' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Agency::class,
-        ],
+        // 'agencies' provider removed (Phase 12 cleanup)
 
         // 'users' => [
         //     'driver' => 'database',
@@ -105,12 +99,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
-        'agencies' => [
-            'provider' => 'agencies',
-            'table' => 'agency_password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
+        // 'agencies' password broker removed (Phase 12 cleanup)
     ],
 
     /*
