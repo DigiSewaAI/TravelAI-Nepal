@@ -47,7 +47,6 @@ class Service extends Model
     // Polymorphic relation for details based on category
     public function details()
     {
-        // We will define this based on category; for now we'll use separate relations
         return $this->morphTo();
     }
 
@@ -67,9 +66,30 @@ class Service extends Model
         return $this->hasOne(HotelDetail::class);
     }
 
-    // Bookings (future)
+    // Bookings
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    // ========== REVIEW RELATIONS (Phase 10) ==========
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 'approved');
+    }
+
+    public function allReviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function ratingsCount()
+    {
+        return $this->reviews()->count();
     }
 }

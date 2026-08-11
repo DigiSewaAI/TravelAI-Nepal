@@ -43,10 +43,23 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">{{ $service->name }}</h1>
             
-            <div class="flex items-center gap-2 mt-2">
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+                <!-- Category Badge -->
                 <span class="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
                     {{ $service->category->name ?? 'N/A' }}
                 </span>
+
+                <!-- 🔥 NEW: Rating Display (Phase 10) -->
+                @if($service->averageRating() > 0)
+                    <span class="flex items-center text-sm">
+                        @for($i=1; $i<=5; $i++)
+                            <span class="text-yellow-400 {{ $i <= floor($service->averageRating()) ? 'fas fa-star' : 'far fa-star' }}"></span>
+                        @endfor
+                        <span class="ml-1 text-gray-600">{{ number_format($service->averageRating(), 1) }} ({{ $service->ratingsCount() }})</span>
+                    </span>
+                @endif
+
+                <!-- Verified Provider Badge -->
                 @if($service->provider->verification_status === 'verified')
                     <span class="px-2 py-1 text-sm rounded-full bg-green-100 text-green-700">
                         <i class="fas fa-check-circle"></i> Verified Provider

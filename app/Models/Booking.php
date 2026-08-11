@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+// 🔥 Import Review model
+use App\Models\Review;
+
 class Booking extends Model
 {
     use HasFactory;
@@ -26,7 +29,7 @@ class Booking extends Model
         'start_date' => 'date',
     ];
 
-    // Old relationships (keep for backward compatibility)
+    // ========== OLD RELATIONSHIPS ==========
     public function trekker()
     {
         return $this->belongsTo(Trekker::class);
@@ -37,7 +40,7 @@ class Booking extends Model
         return $this->belongsTo(Trek::class);
     }
 
-    // ✅ Phase 4: New relationships
+    // ========== PHASE 4 RELATIONSHIPS ==========
     public function traveler()
     {
         return $this->belongsTo(User::class, 'traveler_id');
@@ -56,5 +59,11 @@ class Booking extends Model
     public function sosAlert()
     {
         return $this->hasOne(SosAlert::class);
+    }
+
+    // ========== PHASE 10: REVIEW RELATION ==========
+    public function review()
+    {
+        return $this->hasOne(Review::class);
     }
 }

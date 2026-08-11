@@ -7,6 +7,8 @@ use App\Models\Booking;
 use App\Models\Trek;
 use App\Models\Agency;
 use App\Models\Trekker;
+use App\Models\User;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -16,8 +18,22 @@ class DashboardController extends Controller
     {
         $agency = Auth::guard('agency')->user();
 
+        // ========================================================
+        // 🔥 REDIRECT: यदि agency को user_id छ र User provider_owner हो भने provider dashboard मा पठाऊ
+        // ========================================================
+        if ($agency->user_id) {
+            $user = User::find($agency->user_id);
+            if ($user && $user->isProviderOwner()) {
+                return redirect()->route('provider.dashboard')
+                    ->with('info', 'Welcome to your new Provider Dashboard!');
+            }
+        }
+
+        // ========================================================
+        // SUPER ADMIN DASHBOARD
+        // ========================================================
         if ($agency->role === 'super_admin') {
-            // --- Super Admin Dashboard ---
+            // Basic stats (new structure)
             $totalTreks = Trek::count();
             $totalBookings = Booking::count();
             $pendingBookings = Booking::where('status', 'pending')->count();
@@ -25,45 +41,49 @@ class DashboardController extends Controller
             $totalTrekkers = Trekker::count();
             $todayBookings = Booking::whereDate('start_date', today())->count();
 
-            // हालैका ५ बुकिङ्ग
-            $recentBookings = Booking::with(['trekker', 'trek'])
+            // Recent bookings with traveler & service
+            $recentBookings = Booking::with(['traveler', 'service'])
                 ->latest()
                 ->take(5)
                 ->get();
 
-            // सबै एजेन्सीको तथ्याङ्क
-            $agencies = Agency::withCount(['treks', 'bookings'])->get();
+            // Agencies with treks count (bookings count via services)
+            $agencies = Agency::withCount('treks')->get();
+            foreach ($agencies as $agt) {
+                // Get all service_ids from this agency's treks
+                $serviceIds = Trek::where('agency_id', $agt->id)
+                    ->whereNotNull('service_id')
+                    ->pluck('service_id');
+                $agt->bookings_count = Booking::whereIn('service_id', $serviceIds)->count();
+            }
 
-            // Top 5 Treks (सबैभन्दा धेरै बुकिङ्ग भएका)
-            $topTreks = Trek::withCount('bookings')
-                ->orderBy('bookings_count', 'desc')
-                ->take(5)
-                ->get();
+            // Top 5 Treks by bookings (via service)
+            $topTreks = Trek::withCount(['bookings' => function($q) {
+                $q->whereHas('service', function($sq) {
+                    // no extra filter needed
+                });
+            }])->orderBy('bookings_count', 'desc')->take(5)->get();
 
-            // पछिल्लो ३० दिनको बुकिङ्ग ट्रेन्ड (प्रति दिन)
+            // Bookings trend (last 30 days)
             $bookingsTrend = Booking::selectRaw('DATE(start_date) as date, COUNT(*) as total')
                 ->where('start_date', '>=', now()->subDays(30))
                 ->groupBy('date')
                 ->orderBy('date', 'asc')
                 ->get();
 
-            // हालैका गतिविधिहरू (यहाँ हामी बुकिङ्ग र एजेन्सी सिर्जनालाई गतिविधि मान्छौं, तर यदि छुट्टै activity log छैन भने, हामी पछिल्ला बुकिङ्ग र नयाँ एजेन्सीहरू मिलाउँछौं)
-            $recentActivities = collect();
-
-            // हालैका बुकिङ्ग (अन्तिम ५)
-            $recentBookingsForActivity = Booking::with('trekker', 'trek')
+            // Recent activities (simplified: merge recent bookings and agencies)
+            $recentBookingsForActivity = Booking::with(['traveler', 'service'])
                 ->latest()
                 ->take(5)
                 ->get()
                 ->map(function ($b) {
                     return (object) [
                         'type' => 'booking',
-                        'description' => $b->trekker->name . ' booked ' . $b->trek->name,
+                        'description' => ($b->traveler->name ?? 'Guest') . ' booked ' . ($b->service->name ?? 'Service'),
                         'created_at' => $b->created_at,
                     ];
                 });
 
-            // हालैका एजेन्सीहरू (अन्तिम ५)
             $recentAgencies = Agency::latest()
                 ->take(5)
                 ->get()
@@ -75,7 +95,6 @@ class DashboardController extends Controller
                     ];
                 });
 
-            // मर्ज गरेर मिति अनुसार क्रमबद्ध
             $recentActivities = $recentBookingsForActivity->concat($recentAgencies)
                 ->sortByDesc('created_at')
                 ->take(10);
@@ -96,24 +115,28 @@ class DashboardController extends Controller
             ));
         }
 
-        // --- सामान्य एजेन्सीको लागि (पहिलेको जस्तै) ---
+        // ========================================================
+        // REGULAR AGENCY DASHBOARD (सामान्य एजेन्सी)
+        // ========================================================
         $totalTreks = $agency->treks()->count();
 
-        $totalBookings = $agency->treks()
-            ->withCount('bookings')
-            ->get()
-            ->sum('bookings_count');
+        // Get all service_ids from this agency's treks
+        $serviceIds = $agency->treks()->whereNotNull('service_id')->pluck('service_id');
 
-        $recentBookings = Booking::whereHas('trek', function ($query) use ($agency) {
-            $query->where('agency_id', $agency->id);
-        })->with(['trekker', 'trek'])
-          ->latest()
-          ->take(5)
-          ->get();
+        // Total bookings via those services
+        $totalBookings = Booking::whereIn('service_id', $serviceIds)->count();
 
-        $pendingBookings = Booking::whereHas('trek', function ($query) use ($agency) {
-            $query->where('agency_id', $agency->id);
-        })->where('status', 'pending')->count();
+        // Pending bookings
+        $pendingBookings = Booking::whereIn('service_id', $serviceIds)
+            ->where('status', 'pending')
+            ->count();
+
+        // Recent bookings (5)
+        $recentBookings = Booking::whereIn('service_id', $serviceIds)
+            ->with(['traveler', 'service'])
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('agency.dashboard', compact(
             'totalTreks',
@@ -123,17 +146,19 @@ class DashboardController extends Controller
             'agency'
         ));
     }
+
+    /**
+     * Export bookings (super admin only)
+     */
     public function exportBookings()
-{
-    // यदि super admin हो भने मात्र
-    if (Auth::guard('agency')->user()->role !== 'super_admin') {
-        abort(403, 'Unauthorized');
+    {
+        if (Auth::guard('agency')->user()->role !== 'super_admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $bookings = Booking::with(['traveler', 'service', 'service.provider'])->get();
+
+        // For now just return JSON, but you can implement Excel export later
+        return response()->json($bookings);
     }
-    
-    $bookings = Booking::with(['trekker', 'trek', 'trek.agency'])->get();
-    
-    // Excel वा CSV export गर्ने कोड
-    // (Laravel Excel package प्रयोग गर्न सक्नुहुन्छ)
-    return response()->json($bookings); // अहिलेको लागि JSON
-}
 }

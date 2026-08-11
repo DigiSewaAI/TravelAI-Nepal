@@ -15,7 +15,6 @@ use App\Http\Controllers\PublicTrekController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
-
 // ✅ Phase 7 – New Public Controllers
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\BookingController as PublicBookingController;
@@ -85,7 +84,6 @@ Route::prefix('explore')->name('public.')->group(function () {
     Route::get('/service/{slug}/book', [PublicBookingController::class, 'create'])->name('services.book');
     Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
 });
-
 
 // New booking confirmation for services (URI changed to avoid conflict)
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
@@ -186,15 +184,15 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/verification/{document}', [VerificationController::class, 'destroy'])->name('verification.destroy');
 
     // Payment routes (Phase 9) – FIXED
-Route::get('/payments', [PaymentController::class, 'history'])->name('payments.index');
-Route::get('/payments/{id}', [PaymentController::class, 'showPayment'])->name('payments.detail');  // ✅ Changed
-Route::get('/payments/subscription/{subscription}', [PaymentController::class, 'show'])->name('payments.show');
-Route::post('/payments/subscription/{subscription}', [PaymentController::class, 'createPayment'])->name('payments.create');
-Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
+    Route::get('/payments', [PaymentController::class, 'history'])->name('payments.index');
+    Route::get('/payments/{id}', [PaymentController::class, 'showPayment'])->name('payments.detail');  // ✅ Changed
+    Route::get('/payments/subscription/{subscription}', [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/subscription/{subscription}', [PaymentController::class, 'createPayment'])->name('payments.create');
+    Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
 });
 
 // =======================================
-// 6. ADMIN ROUTES (Super Admin – Phase 8)
+// 6. ADMIN ROUTES (Super Admin – Phase 8 & Phase 10)
 // =======================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
@@ -207,36 +205,66 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/providers/{provider}/toggle', [AdminProviderController::class, 'toggleActive'])->name('providers.toggle');
     Route::delete('/providers/{provider}', [AdminProviderController::class, 'destroy'])->name('providers.destroy');
 
-    // ✅ ADD THESE PLACEHOLDER ROUTES FOR SIDEBAR
-    Route::get('/users', function () {
-        return view('admin.placeholder', ['title' => 'Users Management']);
-    })->name('users.index');
+    // Users
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['show']);
+    Route::get('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
 
-    Route::get('/services', function () {
-        return view('admin.placeholder', ['title' => 'Services Management']);
-    })->name('services.index');
+    // Services
+    Route::get('/services', [App\Http\Controllers\Admin\ServiceController::class, 'index'])->name('services.index');
+    Route::get('/services/{service}', [App\Http\Controllers\Admin\ServiceController::class, 'show'])->name('services.show');
+    Route::post('/services/{service}/toggle', [App\Http\Controllers\Admin\ServiceController::class, 'toggleStatus'])->name('services.toggle');
+    Route::delete('/services/{service}', [App\Http\Controllers\Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
-    Route::get('/bookings', function () {
-        return view('admin.placeholder', ['title' => 'Bookings Management']);
-    })->name('bookings.index');
+    // Bookings
+    Route::get('/bookings', [App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/status', [App\Http\Controllers\Admin\BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+    Route::delete('/bookings/{booking}', [App\Http\Controllers\Admin\BookingController::class, 'destroy'])->name('bookings.destroy');
 
-    Route::get('/subscriptions', function () {
-        return view('admin.placeholder', ['title' => 'Subscriptions Management']);
-    })->name('subscriptions.index');
+    // Subscriptions
+    Route::get('/subscriptions', [App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/{subscription}', [App\Http\Controllers\Admin\SubscriptionController::class, 'show'])->name('subscriptions.show');
+    Route::post('/subscriptions/{subscription}/status', [App\Http\Controllers\Admin\SubscriptionController::class, 'updateStatus'])->name('subscriptions.updateStatus');
+    Route::delete('/subscriptions/{subscription}', [App\Http\Controllers\Admin\SubscriptionController::class, 'destroy'])->name('subscriptions.destroy');
 
-    Route::get('/payments', function () {
-        return view('admin.placeholder', ['title' => 'Payments Management']);
-    })->name('payments.index');
+    // Payments
+    Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{payment}/refund', [App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('payments.refund');
+    Route::delete('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'destroy'])->name('payments.destroy');
 
-    Route::get('/reports', function () {
-        return view('admin.placeholder', ['title' => 'Reports']);
-    })->name('reports.index');
+    // Reports
+    Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/bookings', [App\Http\Controllers\Admin\ReportController::class, 'bookings'])->name('reports.bookings');
+    Route::get('/reports/payments', [App\Http\Controllers\Admin\ReportController::class, 'payments'])->name('reports.payments');
+    Route::get('/reports/providers', [App\Http\Controllers\Admin\ReportController::class, 'providers'])->name('reports.providers');
 
-    Route::get('/settings', function () {
-        return view('admin.placeholder', ['title' => 'Settings']);
-    })->name('settings.index');
+    // Settings
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
+    // ========== 🔥 PHASE 10: Admin Review Management ==========
+    Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{review}/approve', [App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
+// =======================================
+// 9. TRAVELER ROUTES (Phase 10)
+// =======================================
+Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
+
+    // Reviews
+    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+
+    // Optional: Notifications page (can be added later)
+    // Route::get('/notifications', [App\Http\Controllers\Traveler\NotificationController::class, 'index'])->name('notifications');
+    // Route::post('/notifications/{id}/mark-read', [App\Http\Controllers\Traveler\NotificationController::class, 'markRead'])->name('notifications.mark-read');
+});
 
 // =======================================
 // 7. WEBHOOK ROUTES (No Auth – Phase 9)

@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// 🔥 Add this import for Provider model (used in accessibleProviderIds)
+// 🔥 Add these imports if not already present
 use App\Models\Provider;
+use App\Models\Review; // 👈 Added for reviews relation
 
 class User extends Authenticatable
 {
@@ -35,7 +36,7 @@ class User extends Authenticatable
         ];
     }
 
-    // Relationships
+    // ========== RELATIONSHIPS ==========
     public function providers()
     {
         return $this->hasMany(Provider::class, 'user_id');
@@ -51,7 +52,13 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'traveler_id');
     }
 
-    // Helper methods
+    // 🔥 NEW: Reviews left by this user (Phase 10)
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // ========== HELPER METHODS ==========
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';

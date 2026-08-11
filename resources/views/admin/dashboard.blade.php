@@ -168,10 +168,7 @@
         </a>
         @endif
 
-        <!-- Legacy -->
-        <a href="{{ route('agency.dashboard') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition">
-            <i class="fas fa-history mr-1"></i> Legacy Dashboard
-        </a>
+        
     </div>
 </div>
 

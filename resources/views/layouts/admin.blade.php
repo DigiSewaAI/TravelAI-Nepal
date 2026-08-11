@@ -14,6 +14,8 @@
         .sidebar-link.active { background: #eff6ff; color: #2563eb; }
         .stat-card { transition: all 0.2s ease; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        /* ✅ Footer style */
+        .admin-footer { border-top: 1px solid #e5e7eb; background: white; padding: 0.75rem 1.5rem; }
     </style>
 </head>
 <body>
@@ -106,18 +108,6 @@
                     <span>Settings</span>
                 </a>
                 @endif
-
-                <!-- Divider -->
-                <div class="border-t my-2 pt-2"></div>
-
-                <!-- Legacy Agency -->
-                @if(Route::has('agency.dashboard'))
-                <a href="{{ route('agency.dashboard') }}" 
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-500 hover:bg-gray-100">
-                    <i class="fas fa-archive w-5"></i>
-                    <span>Legacy Agency</span>
-                </a>
-                @endif
             </nav>
 
             <!-- Logout -->
@@ -136,6 +126,7 @@
                 <h1 class="text-xl font-semibold text-gray-800">@yield('header', 'Admin Panel')</h1>
                 <span class="text-sm text-gray-600">{{ Auth::user()->name ?? 'Admin' }}</span>
             </header>
+
             <main class="flex-1 overflow-y-auto p-6">
                 @if(session('success'))
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4 rounded">{{ session('success') }}</div>
@@ -145,6 +136,12 @@
                 @endif
                 @yield('content')
             </main>
+
+            <!-- ✅ Footer -->
+            <footer class="border-t border-gray-200 bg-white px-6 py-3 flex justify-between items-center text-xs text-gray-500">
+                <span>© {{ date('Y') }} TravelAI Nepal · All rights reserved.</span>
+                <span>TravelAI OS v1.0</span>
+            </footer>
         </div>
     </div>
 </body>
