@@ -13,6 +13,8 @@ use App\Http\Controllers\Agency\BookingController;
 use App\Http\Controllers\Agency\AgencyController;
 use App\Http\Controllers\PublicTrekController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+
 
 // ✅ Phase 7 – New Public Controllers
 use App\Http\Controllers\Public\ServiceController;
@@ -27,6 +29,10 @@ use App\Http\Controllers\Provider\BookingController as ProviderBookingController
 // ✅ Phase 8 – Provider Subscription & Verification
 use App\Http\Controllers\Provider\SubscriptionController;
 use App\Http\Controllers\Provider\VerificationController;
+
+// ✅ Phase 9 – Payment Controllers
+use App\Http\Controllers\Provider\PaymentController;
+use App\Http\Controllers\WebhookController;
 
 // ✅ Phase 8 – Admin Controllers
 use App\Http\Controllers\Admin\ProviderController as AdminProviderController;
@@ -80,8 +86,6 @@ Route::prefix('explore')->name('public.')->group(function () {
     Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
 });
 
-// Provider profile route
-Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.providers.show');
 
 // New booking confirmation for services (URI changed to avoid conflict)
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
@@ -151,7 +155,7 @@ Route::prefix('agency')->name('agency.')->group(function () {
 });
 
 // =======================================
-// 5. PROVIDER DASHBOARD ROUTES (NEW – Phase 6 & 8)
+// 5. PROVIDER DASHBOARD ROUTES (NEW – Phase 6, 8 & 9)
 // =======================================
 Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
     // Dashboard
@@ -172,6 +176,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
 
     // Subscriptions (Phase 8)
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store'); // ✅ Added
     Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscriptions.upgrade');
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
@@ -179,15 +184,66 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
     Route::post('/verification', [VerificationController::class, 'store'])->name('verification.store');
     Route::delete('/verification/{document}', [VerificationController::class, 'destroy'])->name('verification.destroy');
+
+    // Payment routes (Phase 9) – FIXED
+Route::get('/payments', [PaymentController::class, 'history'])->name('payments.index');
+Route::get('/payments/{id}', [PaymentController::class, 'showPayment'])->name('payments.detail');  // ✅ Changed
+Route::get('/payments/subscription/{subscription}', [PaymentController::class, 'show'])->name('payments.show');
+Route::post('/payments/subscription/{subscription}', [PaymentController::class, 'createPayment'])->name('payments.create');
+Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
 });
 
 // =======================================
 // 6. ADMIN ROUTES (Super Admin – Phase 8)
 // =======================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Providers
     Route::get('/providers', [AdminProviderController::class, 'index'])->name('providers.index');
     Route::get('/providers/{provider}', [AdminProviderController::class, 'show'])->name('providers.show');
     Route::patch('/providers/{provider}/verify', [AdminProviderController::class, 'verify'])->name('providers.verify');
     Route::patch('/providers/{provider}/toggle', [AdminProviderController::class, 'toggleActive'])->name('providers.toggle');
     Route::delete('/providers/{provider}', [AdminProviderController::class, 'destroy'])->name('providers.destroy');
+
+    // ✅ ADD THESE PLACEHOLDER ROUTES FOR SIDEBAR
+    Route::get('/users', function () {
+        return view('admin.placeholder', ['title' => 'Users Management']);
+    })->name('users.index');
+
+    Route::get('/services', function () {
+        return view('admin.placeholder', ['title' => 'Services Management']);
+    })->name('services.index');
+
+    Route::get('/bookings', function () {
+        return view('admin.placeholder', ['title' => 'Bookings Management']);
+    })->name('bookings.index');
+
+    Route::get('/subscriptions', function () {
+        return view('admin.placeholder', ['title' => 'Subscriptions Management']);
+    })->name('subscriptions.index');
+
+    Route::get('/payments', function () {
+        return view('admin.placeholder', ['title' => 'Payments Management']);
+    })->name('payments.index');
+
+    Route::get('/reports', function () {
+        return view('admin.placeholder', ['title' => 'Reports']);
+    })->name('reports.index');
+
+    Route::get('/settings', function () {
+        return view('admin.placeholder', ['title' => 'Settings']);
+    })->name('settings.index');
 });
+
+
+// =======================================
+// 7. WEBHOOK ROUTES (No Auth – Phase 9)
+// =======================================
+Route::post('/webhook/stripe', [WebhookController::class, 'stripe'])->name('webhook.stripe');
+
+// =======================================
+// 8. PRICING PAGE (Phase 8)
+// =======================================
+Route::get('/pricing', [PageController::class, 'pricing'])->name('pages.pricing');

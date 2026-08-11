@@ -42,35 +42,57 @@
 
             <!-- Navigation -->
             <nav class="flex-1 space-y-1">
-                @if(isset($menu) && is_array($menu))
-                    @foreach($menu as $item)
-                        @if(isset($item['capability']) && !auth()->user()->can($item['capability']))
-                            @continue
-                        @endif
-                        <a href="{{ $item['route'] ?? '#' }}"
-                           class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs($item['route_name'] ?? '') ? 'active' : '' }}">
-                            <i class="{{ $item['icon'] ?? 'fas fa-circle' }} w-5"></i>
-                            <span>{{ $item['label'] }}</span>
-                        </a>
-                    @endforeach
-                @endif
+                <!-- Dashboard -->
+                <a href="{{ route('provider.dashboard') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Dashboard</span>
+                </a>
 
-                <!-- Common menu items -->
-                <a href="{{ route('provider.dashboard') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-chart-line w-5"></i><span>Dashboard</span>
+                <!-- Services -->
+                <a href="{{ route('provider.services.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
+                    <i class="fas fa-list w-5"></i>
+                    <span>Services</span>
                 </a>
-                <a href="{{ route('provider.services.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
-                    <i class="fas fa-list w-5"></i><span>Services</span>
+
+                <!-- Bookings -->
+                <a href="{{ route('provider.bookings.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-check w-5"></i>
+                    <span>Bookings</span>
                 </a>
-                <a href="{{ route('provider.bookings.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-check w-5"></i><span>Bookings</span>
+
+                <!-- Subscriptions (Phase 8) -->
+                <a href="{{ route('provider.subscriptions.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}">
+                    <i class="fas fa-crown w-5"></i>
+                    <span>Subscriptions</span>
                 </a>
-                <a href="{{ route('provider.profile') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
-                    <i class="fas fa-user w-5"></i><span>Profile</span>
+
+                <!-- Verification (Phase 8) -->
+                <a href="{{ route('provider.verification.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}">
+                    <i class="fas fa-shield-alt w-5"></i>
+                    <span>Verification</span>
+                </a>
+
+                <!-- Payments (Phase 9) -->
+                <a href="{{ route('provider.payments.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.payments.*') ? 'active' : '' }}">
+                    <i class="fas fa-credit-card w-5"></i>
+                    <span>Payments</span>
+                </a>
+
+                <!-- Profile -->
+                <a href="{{ route('provider.profile') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
+                    <i class="fas fa-user w-5"></i>
+                    <span>Profile</span>
                 </a>
             </nav>
 
-            <!-- Footer -->
+            <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                 @csrf
                 <button type="submit" class="flex items-center space-x-2 w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg">
@@ -103,6 +125,11 @@
                 @if(session('error'))
                     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
                         {{ session('error') }}
+                    </div>
+                @endif
+                @if(session('info'))
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 mb-4 rounded">
+                        {{ session('info') }}
                     </div>
                 @endif
                 @yield('content')

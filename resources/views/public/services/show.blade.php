@@ -23,10 +23,15 @@
                     <i class="fas fa-mountain text-6xl text-white/80"></i>
                 </div>
             @endif
-            
-            @if($service->gallery && count($service->gallery) > 0)
+
+            @php
+                // Handle gallery safely – cast to array if it's JSON string
+                $gallery = is_array($service->gallery) ? $service->gallery : json_decode($service->gallery, true) ?? [];
+            @endphp
+
+            @if(count($gallery) > 0)
                 <div class="grid grid-cols-4 gap-2 mt-2">
-                    @foreach(array_slice($service->gallery, 0, 4) as $image)
+                    @foreach(array_slice($gallery, 0, 4) as $image)
                         <img src="{{ asset('storage/' . $image) }}" 
                              class="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75">
                     @endforeach

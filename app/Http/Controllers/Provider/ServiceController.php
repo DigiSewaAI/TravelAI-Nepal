@@ -7,10 +7,13 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $provider = Auth::user()->ownProvider();
@@ -33,11 +36,18 @@ class ServiceController extends Controller
             'service_category_id' => 'required|exists:service_categories,id',
             'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
+            'cover_image' => 'nullable|image|max:2048',
+            'status' => 'nullable|in:active,inactive',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('services', 'public');
+            $validated['cover_image'] = $path;
+        }
 
         $validated['provider_id'] = $provider->id;
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
-        $validated['status'] = 'active';
+        $validated['status'] = $validated['status'] ?? 'active';
 
         Service::create($validated);
 
@@ -60,8 +70,17 @@ class ServiceController extends Controller
             'service_category_id' => 'required|exists:service_categories,id',
             'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
-            'status' => 'in:active,inactive',
+            'cover_image' => 'nullable|image|max:2048',
+            'status' => 'nullable|in:active,inactive',
         ]);
+
+        if ($request->hasFile('cover_image')) {
+            if ($service->cover_image) {
+                \Storage::disk('public')->delete($service->cover_image);
+            }
+            $path = $request->file('cover_image')->store('services', 'public');
+            $validated['cover_image'] = $path;
+        }
 
         $service->update($validated);
 
@@ -71,7 +90,13 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         $this->authorize('delete', $service);
+
+        if ($service->cover_image) {
+            \Storage::disk('public')->delete($service->cover_image);
+        }
+
         $service->delete();
+
         return redirect()->route('provider.services.index')->with('success', 'Service deleted successfully.');
     }
 }

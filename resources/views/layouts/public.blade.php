@@ -43,7 +43,7 @@
             <div class="flex flex-wrap gap-5 text-gray-700 font-medium mt-3 md:mt-0 items-center">
                 <a href="{{ url('/') }}" class="nav-link text-sm md:text-base">Home</a>
                 <a href="{{ url('/features') }}" class="nav-link text-sm md:text-base">Features</a>
-                <a href="{{ url('/treks') }}" class="nav-link text-sm md:text-base">Explore</a>
+                <a href="{{ route('public.services.index') }}" class="nav-link text-sm md:text-base">Explore</a>
                 <a href="{{ url('/how-it-works') }}" class="nav-link text-sm md:text-base">How it works</a>
                 <a href="{{ url('/agencies') }}" class="nav-link text-sm md:text-base">Agencies</a>
                 <a href="{{ url('/#early-access') }}" class="nav-link text-sm md:text-base text-blue-600">Get Early Access</a>

@@ -15,7 +15,7 @@
             One ecosystem connecting travelers, agencies & local partners — AI itineraries, offline friendly, trusted local support.
           </p>
           <div class="flex flex-wrap gap-4 mt-8">
-            <a href="{{ url('/treks') }}" class="bg-gray-900 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-xl flex items-center gap-2"><i class="fas fa-map-marked-alt"></i> Explore Trips</a>
+            <a href="{{ route('public.services.index') }}" class="bg-gray-900 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-xl flex items-center gap-2"><i class="fas fa-map-marked-alt"></i> Explore Trips</a>
             <a href="{{ route('agency.register') }}" class="border border-gray-300 hover:border-blue-400 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl transition-all hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-handshake"></i> Become Partner</a>
           </div>
           <div class="flex flex-wrap gap-6 mt-10 text-sm text-gray-500">

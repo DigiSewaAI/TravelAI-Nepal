@@ -31,4 +31,9 @@ class PageController extends Controller
 
         return view('pages.agencies', compact('agencies'));
     }
+    public function pricing()
+{
+    $plans = \App\Models\Plan::all();
+    return view('public.pricing', compact('plans'));
+}
 }

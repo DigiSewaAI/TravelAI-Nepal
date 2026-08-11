@@ -34,6 +34,16 @@
                     </span>
                 </div>
             </div>
+            @if($currentSubscription->status === 'active')
+                <div class="mt-4">
+                    <form method="POST" action="{{ route('provider.subscriptions.cancel') }}">
+                        @csrf
+                        <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                            <i class="fas fa-times-circle mr-1"></i> Cancel Subscription
+                        </button>
+                    </form>
+                </div>
+            @endif
         @else
             <p class="text-gray-500">No active subscription. Please choose a plan.</p>
         @endif
@@ -74,19 +84,16 @@
                         <span class="mt-3 inline-block bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-lg w-full text-center">
                             Current Plan
                         </span>
-                    @elseif($plan->slug === 'free' && $currentSubscription)
-                        <form method="POST" action="{{ route('provider.subscriptions.cancel') }}" class="mt-3">
-                            @csrf
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg transition">
-                                <i class="fas fa-times mr-1"></i> Cancel & Switch to Free
-                            </button>
-                        </form>
                     @else
-                        <form method="POST" action="{{ route('provider.subscriptions.upgrade') }}" class="mt-3">
+                        <form method="POST" action="{{ $currentSubscription ? route('provider.subscriptions.upgrade') : route('provider.subscriptions.store') }}" class="mt-3">
                             @csrf
                             <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition">
-                                <i class="fas fa-arrow-right mr-1"></i> Choose {{ $plan->name }}
+                                @if($currentSubscription)
+                                    <i class="fas fa-arrow-right mr-1"></i> Switch to {{ $plan->name }}
+                                @else
+                                    <i class="fas fa-arrow-right mr-1"></i> Choose {{ $plan->name }}
+                                @endif
                             </button>
                         </form>
                     @endif

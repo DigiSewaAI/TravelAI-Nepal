@@ -42,6 +42,16 @@ class Provider extends Model
         return $this->hasMany(ProviderStaff::class);
     }
 
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasManyThrough(Booking::class, Service::class);
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
@@ -52,5 +62,19 @@ class Provider extends Model
         return $this->hasMany(VerificationDocument::class);
     }
 
-    // Future services will be added later
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    // Helper methods
+    public function isVerified(): bool
+    {
+        return $this->verification_status === 'verified';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->verification_status === 'pending';
+    }
 }
