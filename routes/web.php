@@ -189,6 +189,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/payments/subscription/{subscription}', [PaymentController::class, 'show'])->name('payments.show');
     Route::post('/payments/subscription/{subscription}', [PaymentController::class, 'createPayment'])->name('payments.create');
     Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
+        // ========== 🔥 PHASE 11: Provider Analytics ==========
+    Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/export', [App\Http\Controllers\Provider\AnalyticsController::class, 'export'])->name('analytics.export');
 });
 
 // =======================================
@@ -249,6 +252,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/reviews/{review}/approve', [App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{review}/reject', [App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
+        // ========== 🔥 PHASE 11: Admin Analytics ==========
+    Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
 });
 
 // =======================================

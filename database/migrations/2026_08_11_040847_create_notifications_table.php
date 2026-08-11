@@ -6,25 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
-        Schema::create('reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('booking_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('rating')->unsigned()->comment('1-5 stars');
-            $table->text('comment')->nullable();
-            $table->string('status')->default('pending')->comment('pending, approved, rejected');
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
-
-            $table->index(['service_id', 'status']);
-            $table->unique(['booking_id', 'user_id']); // एक booking मा एक review मात्र
         });
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('notifications');
     }
 };

@@ -42,4 +42,20 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    // ========== 🔥 PHASE 11: SMS Configuration ==========
+    'sms' => [
+        'gateway' => env('SMS_GATEWAY', 'twilio'),
+    ],
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+    'nepal_sms' => [
+        'api_key' => env('NEPAL_SMS_API_KEY'),
+        'sender_id' => env('NEPAL_SMS_SENDER_ID'),
+    ],
+
 ];
