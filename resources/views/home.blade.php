@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'TravelAI Nepal | Plan Entire Nepal Journey')
+@section('title', 'Plan Entire Nepal Journey')
 
 @section('content')
   <!-- Hero Section -->
@@ -16,7 +16,7 @@
           </p>
           <div class="flex flex-wrap gap-4 mt-8">
             <a href="{{ route('public.services.index') }}" class="bg-gray-900 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-xl flex items-center gap-2"><i class="fas fa-map-marked-alt"></i> Explore Trips</a>
-            <a href="{{ route('agency.register') }}" class="border border-gray-300 hover:border-blue-400 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl transition-all hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-handshake"></i> Become Partner</a>
+            <a href="{{ route('register') }}" class="border border-gray-300 hover:border-blue-400 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl transition-all hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-handshake"></i> Become Partner</a>
           </div>
           <div class="flex flex-wrap gap-6 mt-10 text-sm text-gray-500">
             <div class="flex items-center gap-1"><i class="fas fa-check-circle text-green-500"></i> No hidden fees</div>
@@ -130,6 +130,22 @@
       </a>
     </div>
   </section>
+
+  {{-- ========== PRICING CTA SECTION ========== --}}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">Ready to Scale Your Business?</h2>
+        <p class="text-blue-100 text-lg max-w-2xl mx-auto">Choose a plan that fits your needs. Start free, upgrade anytime.</p>
+        <div class="flex flex-wrap justify-center gap-4 mt-6">
+            <a href="{{ route('pages.pricing') }}" class="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl transition shadow-lg">
+                View Pricing →
+            </a>
+            <a href="{{ route('register') }}" class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold px-8 py-3 rounded-xl transition">
+                Get Started Free
+            </a>
+        </div>
+    </div>
+</div>
 
   <!-- फिचर ग्रिड (Core intelligence) -->
   <section id="features" class="py-20 px-6 md:px-10 max-w-7xl mx-auto">

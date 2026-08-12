@@ -64,7 +64,7 @@
             {{-- Link to old agency login --}}
             <div class="mt-4 text-center text-sm">
                 <span class="text-gray-400">or</span>
-                <a href="{{ route('agency.login') }}" class="text-blue-600 hover:underline ml-1">Agency Login (Legacy)</a>
+{{-- <a href="{{ route('agency.login') }}" class="text-blue-600 hover:underline ml-1">Agency Login (Legacy)</a> --}}
             </div>
         </div>
     </div>

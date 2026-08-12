@@ -15,6 +15,7 @@ use App\Http\Controllers\Provider\DashboardController as ProviderDashboardContro
 use App\Http\Controllers\Provider\ProfileController as ProviderProfileController;
 use App\Http\Controllers\Provider\ServiceController as ProviderServiceController;
 use App\Http\Controllers\Provider\BookingController as ProviderBookingController;
+use App\Http\Controllers\Public\ProviderController;
 
 // ✅ Phase 8 – Provider Subscription & Verification
 use App\Http\Controllers\Provider\SubscriptionController;
@@ -44,6 +45,14 @@ Route::get('/features', [PageController::class, 'features'])->name('pages.featur
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('pages.how-it-works');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('pages.pricing');
+// Footer Pages (Company & Legal)
+Route::get('/about', [PageController::class, 'about'])->name('pages.about');
+Route::get('/careers', [PageController::class, 'careers'])->name('pages.careers');
+Route::get('/press', [PageController::class, 'press'])->name('pages.press');
+Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
+Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
+Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');
 
 // =============================================
 // 2. PUBLIC MARKETPLACE (Phase 7)
@@ -56,12 +65,18 @@ Route::prefix('explore')->name('public.')->group(function () {
     Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
 });
 
+// =============================================
+// 2.5. PROVIDER DIRECTORY (Phase 12) – बाहिर
+// =============================================
+Route::get('/providers', [App\Http\Controllers\Public\ProviderController::class, 'index'])->name('public.providers.index');
+Route::get('/providers/{provider:slug}', [App\Http\Controllers\Public\ProviderController::class, 'show'])->name('public.providers.show');
+
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');
 
-// Provider profile page
-Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.providers.show');
+// Provider profile page (old, but keep for now)
+Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
 
 // =======================================
 // 3. AUTH ROUTES (User Guard)
@@ -186,6 +201,11 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
 // 7. WEBHOOK ROUTES
 // =======================================
 Route::post('/webhook/stripe', [WebhookController::class, 'stripe'])->name('webhook.stripe');
+
+// Redirect old agencies URL to new providers page
+Route::get('/agencies', function () {
+    return redirect()->route('public.providers.index', 301);
+});
 
 // =======================================
 // 8. QR CODE & CHECK-IN ROUTES (still needed for both legacy and new bookings)

@@ -15,17 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User factory (existing)
+        // Create a test user (for development)
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
 
-        // Call the new seeders for Phase 1
+        // Call all seeders in correct order
         $this->call([
-            ProviderTypeSeeder::class,
-            ServiceCategorySeeder::class,
-            PlanSeeder::class,
+            ProviderTypeSeeder::class,      // Phase 1: Provider types
+            ServiceCategorySeeder::class,   // Phase 1: Service categories
+            PlanSeeder::class,              // Phase 8: Subscription plans
+            TourismProvidersSeeder::class,  // 🔥 NEW: Demo providers with services, bookings & reviews
         ]);
     }
 }
