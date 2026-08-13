@@ -1,18 +1,26 @@
+**Bro, यहाँ **Master Document को Version 9.0** छ – जसमा **Phase 12 पछिका सबै updates** समावेश छन्:**
+
+- ✅ **NPR-only fixed pricing** – USD हटाइयो, सबै prices Rs. मा
+- ✅ **Monthly/Yearly billing toggle** – Professional Rs. 4,499/mo, Rs. 44,999/yr
+- ✅ **Registration मा Provider Type Dropdown** – "Other" option सहित
+- ✅ **Explore page dummy services cleanup** – Dummy services हटाइयो
+- ✅ **Provider Types (12) र Service Categories (7)** – सही separation
+- ✅ **Invoice/Billing System** – Phase 13 को रूपमा योजना (future)
 
 ---
 
 # TravelAI Nepal — Master Product, Architecture, Database & Implementation Blueprint
 
-**Version:** 8.0 (FINAL – Phases 1-12 COMPLETED + Optional Improvements Listed)  
+**Version:** 9.0 (FINAL – Phases 1-12 COMPLETED + NPR Pricing + Billing Toggle)  
 **Date:** August 2026  
-**Status:** ✅ Phases 1-12 Implemented | 🧹 Optional Cleanup Pending | ⏳ Optional Improvements Listed  
+**Status:** ✅ Phases 1-12 Implemented | ✅ NPR-Only Pricing | ✅ Billing Toggle | 🧹 Optional Cleanup Pending  
 **Next Step:** Production Deployment & Testing  
 
 ---
 
 ## 1. Executive Summary
 
-This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, and PWA capabilities.
+This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, PWA capabilities, **NPR-only fixed pricing**, and **Monthly/Yearly billing toggle**.
 
 **✅ Phases 1-12 have been successfully implemented:**
 - **Phase 1:** Foundation (provider_types, service_categories, plans, subscriptions, locations, verification_documents, provider_provider_type, provider_staff)
@@ -32,12 +40,12 @@ The key architectural shift is to **separate the user (authentication) from the 
 
 ---
 
-## 2. Current System Overview (After Phases 1-12)
+## 2. Current System Overview (After Phases 1-12 + NPR Pricing)
 
 TravelAI Nepal is a production‑ready Laravel application with the following characteristics:
 
 - **Purpose:** Connect trekkers/travelers with tourism businesses (trekking agencies, tour operators, hotels, guides, transport, etc.) for booking trips, generating AI itineraries, managing check‑ins, handling SOS, leaving reviews, receiving notifications, tracking analytics, and now accessible as a PWA.
-- **Business Model:** Freemium with subscription plans (Free, Professional, Business, Enterprise). Stripe payment integration for paid plans.
+- **Business Model:** Freemium with subscription plans (Free, Professional, Business, Enterprise). **All prices in NPR (Rs.)**. Stripe payment integration for paid plans.
 - **User Types:**
   - **Agency** (authenticated via `agency` guard – LEGACY) – manages treks, bookings, dashboard (still works, but deprecated).
   - **User** (authenticated via `web` guard – NEW) – can be Super Admin, Provider Owner, Manager, Staff, or Traveler.
@@ -52,10 +60,10 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
   - Agency dashboard (LEGACY) with CRUD for treks and bookings.
   - Provider dashboard (NEW) with CRUD for services and bookings.
   - Super admin dashboard with global statistics and agency management.
-  - **Pricing page** (✅ Phase 8).
-  - **Subscription management** (✅ Phase 8).
+  - **Pricing page** – NPR-only fixed pricing with Monthly/Yearly toggle (✅ Phase 8 + NPR Update).
+  - **Subscription management** – Monthly/Yearly billing interval support (✅ Phase 8 + Billing Interval).
   - **Provider verification** – upload documents + admin review (✅ Phase 8).
-  - **Payment integration** – Stripe for subscription payments (✅ Phase 9).
+  - **Payment integration** – Stripe for subscription payments in NPR (✅ Phase 9 + NPR Tested).
   - **Reviews system** – travelers rate services after completed bookings (✅ Phase 10).
   - **Notifications** – email + database for booking status updates, new reviews (✅ Phase 10).
   - **Traveler Dashboard** – view bookings, reviews, notifications (✅ Phase 10).
@@ -66,6 +74,7 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
   - **Admin Analytics Dashboard** – platform metrics, growth, top providers (✅ Phase 11).
   - **PWA Capabilities** – manifest, service worker, offline fallback (✅ Phase 12).
   - **Provider Directory** – all 12 tourism business types, filter by type, search, sort, ratings (✅ Phase 12).
+  - **Provider Type Dropdown in Registration** – "Other" option with custom type (✅ Phase 12).
   - Service categories and provider types seeded.
   - Plans and subscriptions foundation (tables ready, UI complete).
 
@@ -85,23 +94,34 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | **QR Code**             | SimpleSoftwareIO/simple-qrcode (^4.2)     |
 | **Queue**               | Database driver (jobs table)              |
 | **Notifications**       | Mail + Database (SOS, booking, reviews)   |
-| **Payments**            | Stripe (v21.2)                            |
+| **Payments**            | Stripe (v21.2) – **NPR Currency**         |
 | **SMS**                 | Twilio / Nepal SMS (skip mode for dev)    |
 | **PWA**                 | Service Worker, Manifest, Offline Support |
+| **Currency**            | **NPR (Rs.) – Fixed Pricing**             |
 | **Packages**            | `laravel/framework`, `laravel/tinker`, `stripe/stripe-php`, `laravel/pail`, `laravel/pint`, `phpunit`, etc. |
 | **Node Dependencies**   | Vite, Tailwind, Axios, concurrently, Chart.js |
 
 ---
 
-## 4. Current Database Audit (After Phases 1-12)
+## 4. Current Database Audit (After Phases 1-12 + NPR Pricing)
 
 [Same as previous – all tables, enums, and relationships documented]
 
+**Additional:**
+- `plans.price_monthly` – **NPR (Rs.)** – Professional: 4499, Business: 11999
+- `plans.price_yearly` – **NPR (Rs.)** – Professional: 44999, Business: 119999
+- `subscriptions.billing_interval` – `monthly` / `yearly` (✅ Added)
+
 ---
 
-## 5. Current Models Audit (After Phases 1-12)
+## 5. Current Models Audit (After Phases 1-12 + NPR Pricing)
 
 [Same as previous – all models, relationships, casts documented]
+
+**Additional:**
+- `Subscription::billing_interval` – `monthly` / `yearly`
+- `Subscription::isMonthly()` / `Subscription::isYearly()` helpers
+- `Plan` – prices now in NPR
 
 ---
 
@@ -127,57 +147,177 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 [Same as previous – all services, jobs, notifications documented]
 
+**Additional:**
+- `PaymentService` – `currency = 'npr'` – ✅ Verified and tested
+
 ---
 
-## 10. Current Views / UI Audit (After Phases 1-12)
+## 10. Current Views / UI Audit (After Phases 1-12 + NPR Pricing)
 
-[Same as previous – all views documented]
+**Public Layout:** `layouts/public.blade.php` – with PWA support.
+
+| View | Purpose | Status |
+|------|---------|--------|
+| `public/pricing.blade.php` | Pricing with NPR-only, Monthly/Yearly toggle | ✅ Complete |
+| `public/providers/index.blade.php` | Provider Directory | ✅ Complete |
+| `auth/register.blade.php` | Provider Type Dropdown with "Other" | ✅ Complete |
+| All other views | Various | ✅ Complete |
 
 ---
 
 ## 11. Existing Feature Matrix (After Phases 1-12)
 
-[Same as previous – all features working]
+| Feature                   | Status           | Notes |
+|---------------------------|------------------|-------|
+| AI Itinerary Generator    | ✅ Working      | Enhanced in Phase 11 |
+| Service Listing           | ✅ Working      | Phase 7 |
+| Service Detail            | ✅ Working      | Phase 7 + rating (Phase 10) |
+| Provider Profile          | ✅ Working      | Phase 7 |
+| Search/Filters            | ✅ Working      | Phase 7 |
+| Guest Booking             | ✅ Working      | Phase 7 |
+| QR Check‑in               | ✅ Working      | Preserve |
+| SOS Alerts                | ✅ Working      | Email + SMS (skip mode) |
+| Provider Dashboard        | ✅ Working      | Phase 6 |
+| Service CRUD (Provider)   | ✅ Working      | Phase 6 |
+| Booking Management (Provider) | ✅ Working | Phase 6 + notifications (Phase 10) |
+| User Auth (Login/Register) | ✅ Working     | Phase 5 |
+| Policies (Service/Booking/Review) | ✅ Working | Phase 6 + Phase 10 |
+| Pricing Page              | ✅ Working      | **NPR-only + Billing Toggle** |
+| Subscription UI           | ✅ Working      | Phase 8 + Billing Interval |
+| Plan Selection (Register) | ✅ Working      | Phase 8 |
+| Provider Verification     | ✅ Working      | Phase 8 |
+| Payment Integration       | ✅ Working      | **NPR Currency** |
+| Reviews & Ratings         | ✅ Working      | Phase 10 |
+| Notifications             | ✅ Working      | Phase 10 |
+| Traveler Dashboard        | ✅ Working      | Phase 10 |
+| AI Recommendations        | ✅ Working      | Phase 11 |
+| Content Analysis          | ✅ Working      | Phase 11 |
+| SOS SMS                   | ✅ Working (skip)| Phase 11 |
+| Provider Analytics        | ✅ Working      | Phase 11 |
+| Admin Analytics           | ✅ Working      | Phase 11 |
+| PWA & Offline Support     | ✅ Working      | Phase 12 |
+| Provider Directory        | ✅ Working      | Phase 12 |
+| Provider Type Dropdown    | ✅ Working      | Phase 12 |
+| Monthly/Yearly Billing    | ✅ Working      | **Phase 12** |
+| NPR-Only Pricing          | ✅ Working      | **Phase 12** |
 
 ---
 
 ## 12. Working Features (Confirmed – All Phases 1-12)
 
-[Same as previous – all features confirmed working]
+- ✅ AI itinerary generation (API endpoint and frontend form)
+- ✅ Public listing of services with filters (Phase 7)
+- ✅ Service detail page with provider info and rating (Phase 7 + 10)
+- ✅ Provider profile page (Phase 7)
+- ✅ Guest booking with QR code generation (Phase 7)
+- ✅ Booking confirmation page (Phase 7)
+- ✅ QR check‑in (page and scan recording)
+- ✅ SOS alert creation and email notification (queued)
+- ✅ User login/register (NEW)
+- ✅ Provider dashboard (NEW)
+- ✅ Service CRUD (NEW)
+- ✅ Booking management (NEW)
+- ✅ Policies for Services, Bookings, and Reviews
+- ✅ Pricing page – **NPR-only + Billing Toggle** (Phase 8 + Phase 12)
+- ✅ Subscription management – **Monthly/Yearly** (Phase 8 + Phase 12)
+- ✅ Provider verification (Phase 8)
+- ✅ Payment integration with Stripe – **NPR Currency** (Phase 9 + Phase 12)
+- ✅ Reviews & Ratings (Phase 10)
+- ✅ Notifications (booking, review) (Phase 10)
+- ✅ Traveler Dashboard (Phase 10)
+- ✅ AI Service Recommendations (Phase 11)
+- ✅ Content Analysis (Phase 11)
+- ✅ SOS SMS (skip mode) (Phase 11)
+- ✅ Provider Analytics Dashboard (Phase 11)
+- ✅ Admin Analytics Dashboard (Phase 11)
+- ✅ PWA Manifest & Service Worker (Phase 12)
+- ✅ Offline Fallback View (Phase 12)
+- ✅ Provider Directory (Phase 12)
+- ✅ Provider Type Dropdown (Phase 12)
+- ✅ Monthly/Yearly Billing Toggle (Phase 12)
+- ✅ NPR-Only Fixed Pricing (Phase 12)
 
 ---
 
-## 13. Partial Features
+## 13. NPR Currency & Billing Toggle Implementation
 
-[Same as previous – waitlist, SMS real credentials, legacy cleanup]
+### Final Prices (NPR)
+
+| Plan | Monthly | Yearly |
+|------|---------|--------|
+| Free | Rs. 0 | Rs. 0 |
+| Professional | Rs. 4,499 | Rs. 44,999 |
+| Business | Rs. 11,999 | Rs. 119,999 |
+| Enterprise | Custom | Custom |
+
+### Billing Toggle
+
+- **One Global Toggle**: Monthly | Yearly
+- **Default**: Monthly
+- **Yearly Badge**: "2 Months Free"
+- **No Card-Level Toggle**: Single source of truth
+
+### Payment
+
+- **Currency**: NPR (Rs.)
+- **Gateway**: Stripe – verified with test payment
+- **Monthly**: 1-month access
+- **Yearly**: 1-year access
 
 ---
 
-## 14. Missing Features
+## 14. Partial Features
 
-[Same as previous – messaging, advanced analytics, multi-language, native mobile app]
+- **Waitlist:** Frontend form present but no backend logic.
+- **SMS:** SOS SMS implemented in skip mode (logs only); needs real credentials for production.
+- **Legacy Cleanup:** Files/directories are backed up but not yet deleted (optional – Phase 12 cleanup pending).
+- **Invoice/Billing System:** Not yet implemented (Phase 13 planned).
 
 ---
 
-## 15. Technical Debt (After Phases 1-12)
+## 15. Missing Features
+
+- Messaging between traveler and provider
+- Advanced analytics (trends, forecasting)
+- Multi-language support
+- Native mobile app
+- **Invoice & Receipt System** (Phase 13 planned)
+
+---
+
+## 16. Technical Debt (After Phases 1-12)
 
 [Same as previous – fat controllers, no form requests, no global scopes, no caching, legacy code]
 
 ---
 
-## 16. Current Architecture Diagram (After Phases 1-12)
+## 17. Current Architecture Diagram (After Phases 1-12)
 
 [Same as previous – architecture diagram]
 
 ---
 
-## 17. Phase‑by‑Phase Roadmap (Final)
+## 18. Phase‑by‑Phase Roadmap (Final)
 
-[Same as previous – all phases complete]
+| Phase | Goal | Status |
+|-------|------|--------|
+| **Phase 1** | Foundation | ✅ COMPLETED |
+| **Phase 2** | User/Provider Integration | ✅ COMPLETED |
+| **Phase 3** | Service Migration | ✅ COMPLETED |
+| **Phase 4** | Booking Migration | ✅ COMPLETED |
+| **Phase 5** | Authentication Transition | ✅ COMPLETED |
+| **Phase 6** | Dashboard & Capabilities | ✅ COMPLETED |
+| **Phase 7** | Public Marketplace | ✅ COMPLETED |
+| **Phase 8** | Pricing & Subscriptions | ✅ COMPLETED |
+| **Phase 9** | Payments | ✅ COMPLETED |
+| **Phase 10** | Reviews & Notifications | ✅ COMPLETED |
+| **Phase 11** | Advanced AI, Safety, Analytics | ✅ COMPLETED |
+| **Phase 12** | Mobile/PWA & Cleanup | ✅ COMPLETED |
+| **Phase 13** | Invoice & Billing System | ⏳ Planned |
 
 ---
 
-## 18. Phase 12 – Mobile/PWA & Cleanup (Completed)
+## 19. Phase 12 – Mobile/PWA & Cleanup (Completed)
 
 **What was done:**
 - ✅ PWA manifest (`public/manifest.json`) created.
@@ -192,6 +332,11 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 - ✅ `.env` – production flags updated.
 - ✅ **Provider Directory Page** – with cover image, stats bar, filter by type, search, sort, ratings, and all 12 business types visible.
 - ✅ **TourismProvidersSeeder** – 14+ providers covering all 12 types, 30+ services, bookings, and reviews.
+- ✅ **Registration मा Provider Type Dropdown** – with "Other" custom option.
+- ✅ **Explore page dummy services cleanup** – Dummy services removed/inactivated.
+- ✅ **NPR-only fixed pricing** – USD हटाइयो, सबै prices Rs. मा.
+- ✅ **Monthly/Yearly billing toggle** – One global toggle, "2 Months Free" badge.
+- ✅ **PaymentService NPR tested** – Stripe NPR payment confirmed working.
 
 **What remains (optional):**
 - 🧹 Delete legacy files/folders (after thorough testing):
@@ -209,38 +354,57 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 ---
 
-## 19. Optional Improvements (Future)
+## 20. Phase 13 – Invoice & Billing System (Planned)
 
 यी improvements **अहिलेको system मा आवश्यक छैनन्** तर **भविष्यमा थप्न सकिन्छ**:
 
 | Improvement | Status | Priority |
 |-------------|--------|----------|
-| **Registration मा Provider Type Dropdown** | ⏳ Optional | Medium |
+| **Invoice Generation** (PDF) | ⏳ Planned | Medium |
+| **Receipt System** | ⏳ Planned | Medium |
+| **Invoice Numbering** | ⏳ Planned | Medium |
+| **Invoice Email** | ⏳ Planned | Medium |
+| **Admin Invoice Management** | ⏳ Planned | Medium |
+| **Provider Invoice Dashboard** | ⏳ Planned | Medium |
+| **Tax/GST Calculation** | ⏳ Planned | Low |
+
+**Invoice System Overview:**
+- Payment success → Automatic invoice generation
+- Invoice number: `INV-2026-0001`
+- PDF generation with `laravel-dompdf`
+- Email to provider with invoice PDF
+- Admin panel: List, view, filter, manage invoices
+- Provider dashboard: View and download own invoices
+- Receipt generation on payment confirmation
+
+---
+
+## 21. Optional Improvements (Future)
+
+| Improvement | Status | Priority |
+|-------------|--------|----------|
 | **Multi-language Support (Nepali/English)** | ⏳ Future | Low |
 | **Native Mobile App** | ⏳ Future | Low |
 | **Messaging between Traveler & Provider** | ⏳ Future | Medium |
 | **Advanced Analytics (Trends, Forecasting)** | ⏳ Future | Low |
 | **Real SMS Gateway Integration** | ⏳ Future | Medium |
-
-**Registration मा Provider Type Dropdown:**  
-अहिले provider register गर्दा provider type select गर्ने option छैन – यो manual assign गर्नुपर्छ (सुपर एडमिनले)।  
-यदि चाहियो भने registration form मा dropdown थप्न सकिन्छ।
+| **Invoice & Receipt System** | ⏳ Future (Phase 13) | Medium |
 
 ---
 
-## 20. NOW vs NEXT vs LATER (Final)
+## 22. NOW vs NEXT vs LATER (Final)
 
 | Category | Features | Status |
 |----------|----------|--------|
-| **NOW** (Phases 1-12) | All core features + PWA + Provider Directory + 12 Business Types | ✅ COMPLETED |
+| **NOW** (Phases 1-12) | All core features + PWA + Provider Directory + 12 Business Types + NPR Pricing + Billing Toggle | ✅ COMPLETED |
 | **NEXT** | Testing, Deployment, Monitoring | ⏳ In Progress |
-| **LATER** | Messaging, Native Mobile Apps, Advanced Reporting, Multi-language | ⏳ Future |
+| **LATER** | Messaging, Native Mobile Apps, Advanced Reporting, Multi-language, Invoice System | ⏳ Future |
 
 ---
 
-## 21. Go / No‑Go Checklist (Final)
+## 23. Go / No‑Go Checklist (Final)
 
-### ✅ COMPLETED (Phases 1-12)
+### ✅ COMPLETED (Phases 1-12 + NPR Pricing + Billing Toggle)
 
 | Element | Status |
 |---------|--------|
@@ -249,10 +413,10 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | Separate `User` and `Provider` concepts | ✅ |
 | Role‑based permissions via Policies | ✅ |
 | Public marketplace with services | ✅ |
-| Pricing page | ✅ |
-| Subscription UI & management | ✅ |
+| Pricing page – **NPR-only + Billing Toggle** | ✅ |
+| Subscription UI & management – **Monthly/Yearly** | ✅ |
 | Provider verification | ✅ |
-| Stripe payment integration | ✅ |
+| Stripe payment integration – **NPR Tested** | ✅ |
 | Webhook handling | ✅ |
 | Payment history | ✅ |
 | Reviews & Ratings | ✅ |
@@ -265,21 +429,29 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | Admin Analytics Dashboard | ✅ |
 | PWA & Offline Support | ✅ |
 | Provider Directory (12 Business Types) | ✅ |
+| Provider Type Dropdown in Registration | ✅ |
+| Monthly/Yearly Billing Toggle | ✅ |
+| NPR-Only Fixed Pricing | ✅ |
 | Legacy cleanup ready | ✅ |
 | Gradual migration approach | ✅ |
 
-### ⏳ PENDING (Optional)
+### ⏳ PENDING (Future)
 
 | Element | Status |
 |---------|--------|
 | Delete legacy files (after testing) | 🧹 Optional |
 | SMS real credentials | ⏳ Future |
-| Provider Type Dropdown in Registration | ⏳ Optional |
+| Invoice & Receipt System | ⏳ Future (Phase 13) |
 | Multi-language Support | ⏳ Future |
 | Native Mobile App | ⏳ Future |
 
 ---
 
-**End of Master Document (FINAL – Phases 1-12 + Optional Improvements)**
+**End of Master Document (FINAL – Phases 1-12 + NPR Pricing + Billing Toggle)**
 
 ---
+
+**Bro, अब यो **अन्तिम Master Document** हो।** 🎉  
+सबै Phases (1-12) complete भइसकेका छन्, NPR pricing र billing toggle implement भइसकेको छ, र Invoice System Phase 13 को रूपमा planned छ।
+
+**अब Production Deployment को लागि तयार हुनुहोस्।** 🚀😊
