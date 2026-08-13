@@ -23,8 +23,8 @@ class PlanSeeder extends Seeder
                 'name' => 'Professional',
                 'slug' => 'professional',
                 'description' => 'For growing agencies and hotels',
-                'price_monthly' => 29.99,
-                'price_yearly' => 299.99,
+                'price_monthly' => 4499,        // NPR
+                'price_yearly' => 44999,        // NPR
                 'features' => ['Advanced Dashboard', '20 Listings', '50 AI Requests/mo', '100 Bookings/mo', 'Custom Logo'],
                 'limits' => ['max_listings' => 20, 'max_staff' => 5, 'max_ai_requests' => 50, 'max_bookings' => 100],
             ],
@@ -32,8 +32,8 @@ class PlanSeeder extends Seeder
                 'name' => 'Business',
                 'slug' => 'business',
                 'description' => 'For large operators and chains',
-                'price_monthly' => 79.99,
-                'price_yearly' => 799.99,
+                'price_monthly' => 11999,       // NPR
+                'price_yearly' => 119999,       // NPR
                 'features' => ['Full Analytics', '100 Listings', '500 AI Requests/mo', '1000 Bookings/mo', 'White-label'],
                 'limits' => ['max_listings' => 100, 'max_staff' => 20, 'max_ai_requests' => 500, 'max_bookings' => 1000],
             ],

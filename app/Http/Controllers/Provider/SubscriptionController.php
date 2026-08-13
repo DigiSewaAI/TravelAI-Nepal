@@ -41,6 +41,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
+            'billing_interval' => 'sometimes|in:monthly,yearly', // ✅ New
         ]);
 
         $user = Auth::user();
@@ -51,6 +52,7 @@ class SubscriptionController extends Controller
         }
 
         $plan = Plan::findOrFail($request->plan_id);
+        $billingInterval = $request->input('billing_interval', 'monthly');
 
         // Check if already has an active subscription
         $existing = $provider->subscriptions()
@@ -66,6 +68,7 @@ class SubscriptionController extends Controller
             'provider_id' => $provider->id,
             'plan_id' => $plan->id,
             'status' => 'pending',
+            'billing_interval' => $billingInterval, // ✅ Store interval
             'start_date' => null,
             'end_date' => null,
         ]);
@@ -76,7 +79,7 @@ class SubscriptionController extends Controller
         if ($isFree) {
             $subscription->status = 'active';
             $subscription->start_date = now();
-            $subscription->end_date = now()->addYear();
+            $subscription->end_date = now()->addYear(); // Free plans usually yearly
             $subscription->save();
 
             return redirect()->route('provider.subscriptions.index')
@@ -97,6 +100,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
+            'billing_interval' => 'sometimes|in:monthly,yearly', // ✅ New
         ]);
 
         $user = Auth::user();
@@ -107,6 +111,7 @@ class SubscriptionController extends Controller
         }
 
         $plan = Plan::findOrFail($request->plan_id);
+        $billingInterval = $request->input('billing_interval', 'monthly');
 
         // Check if already on this plan
         $current = $provider->subscriptions()
@@ -130,6 +135,7 @@ class SubscriptionController extends Controller
             'provider_id' => $provider->id,
             'plan_id' => $plan->id,
             'status' => 'pending',
+            'billing_interval' => $billingInterval, // ✅ Store interval
             'start_date' => null,
             'end_date' => null,
         ]);
@@ -214,10 +220,12 @@ class SubscriptionController extends Controller
         }
 
         // For paid plans, create a new subscription and redirect to payment
+        // Use existing billing_interval or default to monthly
         $newSubscription = Subscription::create([
             'provider_id' => $provider->id,
             'plan_id' => $plan->id,
             'status' => 'pending',
+            'billing_interval' => $subscription->billing_interval ?? 'monthly',
             'start_date' => null,
             'end_date' => null,
         ]);

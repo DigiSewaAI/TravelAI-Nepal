@@ -25,16 +25,17 @@ class PaymentService
     {
         $plan = $subscription->plan;
         $provider = $subscription->provider;
+        $interval = $subscription->billing_interval ?? 'monthly'; // ✅ Get interval
+
+        // Determine price based on interval
+        $amount = ($interval === 'yearly') ? $plan->price_yearly : $plan->price_monthly;
+
+        if (is_null($amount) || $amount == 0) {
+            // Free plan - no payment needed
+            return $this->createPaymentRecord($subscription, 'free', 0);
+        }
 
         try {
-            // For yearly plans, use yearly price; fallback to monthly
-            $amount = $plan->price_yearly ?? $plan->price_monthly ?? 0;
-
-            if ($amount <= 0) {
-                // Free plan - no payment needed
-                return $this->createPaymentRecord($subscription, 'free', $amount);
-            }
-
             // Create Stripe payment intent
             $stripePayment = $this->stripe->paymentIntents->create([
                 'amount' => $amount * 100, // in cents/paisa
@@ -43,8 +44,9 @@ class PaymentService
                     'subscription_id' => $subscription->id,
                     'provider_id' => $provider->id,
                     'plan_name' => $plan->name,
+                    'billing_interval' => $interval, // ✅ Store interval in metadata
                 ],
-                'description' => "Subscription: {$plan->name} for {$provider->name}",
+                'description' => "Subscription: {$plan->name} ({$interval}) for {$provider->name}",
                 'payment_method_types' => ['card'],
             ]);
 
@@ -56,6 +58,7 @@ class PaymentService
                 [
                     'payment_intent_id' => $stripePayment->id,
                     'client_secret' => $stripePayment->client_secret,
+                    'billing_interval' => $interval,
                     'plan_name' => $plan->name,
                     'provider_name' => $provider->name,
                 ]
@@ -82,7 +85,6 @@ class PaymentService
      */
     protected function createPaymentRecord(Subscription $subscription, string $gateway, float $amount, array $metadata = [])
     {
-        // Generate a unique payment ID for free plans
         $paymentId = $metadata['payment_intent_id'] ?? 'free_' . uniqid() . '_' . time();
 
         return Payment::create([
@@ -123,10 +125,16 @@ class PaymentService
                     if ($subscription) {
                         $subscription->status = 'active';
                         $subscription->start_date = now();
-                        $subscription->end_date = now()->addYear(); // yearly subscription
+
+                        // ✅ Set end_date based on billing interval
+                        $interval = $subscription->billing_interval ?? 'monthly';
+                        $subscription->end_date = ($interval === 'yearly')
+                            ? now()->addYear()
+                            : now()->addMonth();
+
                         $subscription->save();
 
-                        Log::info("Subscription activated: {$subscription->id} for provider {$subscription->provider_id}");
+                        Log::info("Subscription activated: {$subscription->id} for provider {$subscription->provider_id}, interval: {$interval}");
                     }
                 }
 

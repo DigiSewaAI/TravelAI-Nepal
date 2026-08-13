@@ -9,7 +9,14 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['provider_id', 'plan_id', 'start_date', 'end_date', 'status'];
+    protected $fillable = [
+        'provider_id',
+        'plan_id',
+        'start_date',
+        'end_date',
+        'status',
+        'billing_interval', // ✅ New
+    ];
 
     protected $casts = [
         'start_date' => 'date',
@@ -67,5 +74,16 @@ class Subscription extends Model
     public function isFree(): bool
     {
         return ($this->plan->price_monthly ?? 0) == 0 && ($this->plan->price_yearly ?? 0) == 0;
+    }
+
+    // ✅ Billing interval helpers
+    public function isMonthly(): bool
+    {
+        return $this->billing_interval === 'monthly';
+    }
+
+    public function isYearly(): bool
+    {
+        return $this->billing_interval === 'yearly';
     }
 }

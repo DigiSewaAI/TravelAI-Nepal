@@ -35,6 +35,7 @@
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
+                <input type="hidden" name="billing_interval" value="{{ request('billing_interval', 'monthly') }}">
 
                 <!-- Basic Fields -->
                 <div class="mb-4">

@@ -13,6 +13,15 @@
 
 <div class="max-w-7xl mx-auto px-4 py-12">
 
+    {{-- ========== GLOBAL BILLING TOGGLE ========== --}}
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center bg-gray-100 rounded-full p-1 shadow-sm" role="group" aria-label="Billing interval">
+            <button type="button" class="billing-toggle px-6 py-2 rounded-full text-sm font-semibold transition bg-blue-600 text-white" data-interval="monthly" aria-pressed="true">Monthly</button>
+            <button type="button" class="billing-toggle px-6 py-2 rounded-full text-sm font-semibold transition text-gray-600 hover:bg-gray-200" data-interval="yearly" aria-pressed="false">Yearly</button>
+        </div>
+        <div id="billing-badge" class="mt-2 text-green-600 text-sm font-medium hidden">🎁 2 Months Free</div>
+    </div>
+
     {{-- ========== PLANS GRID ========== --}}
     <div class="grid md:grid-cols-4 gap-6">
         @foreach($plans as $plan)
@@ -34,19 +43,36 @@
                 <p class="text-gray-500 text-sm mt-1">{{ $plan->description }}</p>
             </div>
 
-            <div class="mt-4">
-                @if($plan->price_monthly === null)
-                    <span class="text-3xl font-bold text-gray-900">Custom</span>
-                @elseif($plan->price_monthly == 0)
-                    <span class="text-3xl font-bold text-green-600">Free</span>
-                @else
-                    <span class="text-3xl font-bold text-gray-900">${{ number_format($plan->price_monthly, 2) }}</span>
-                    <span class="text-gray-500 text-sm">/ month</span>
-                    <div class="text-sm text-gray-400 mt-1">
-                        or <span class="font-semibold">${{ number_format($plan->price_yearly, 2) }}</span> / year
-                    </div>
-                @endif
-            </div>
+            {{-- Price display with toggle support --}}
+<div class="mt-4">
+    {{-- Monthly price --}}
+    <div class="price-amount" data-interval="monthly">
+        @if($plan->price_monthly === null)
+            <span class="text-3xl font-bold text-gray-900">Custom</span>
+        @elseif($plan->price_monthly == 0)
+            <span class="text-3xl font-bold text-green-600">Free</span>
+        @else
+            <span class="text-3xl font-bold text-gray-900">Rs. {{ number_format($plan->price_monthly, 0) }}</span>
+            <span class="text-gray-500 text-sm">/ month</span>
+        @endif
+    </div>
+
+    {{-- Yearly price --}}
+    <div class="price-amount hidden" data-interval="yearly">
+        @if($plan->price_yearly === null)
+            <span class="text-3xl font-bold text-gray-900">Custom</span>
+        @elseif($plan->price_yearly == 0)
+            <span class="text-3xl font-bold text-green-600">Free</span>
+        @else
+            <span class="text-3xl font-bold text-gray-900">Rs. {{ number_format($plan->price_yearly, 0) }}</span>
+            <span class="text-gray-500 text-sm">/ year</span>
+            @if($plan->price_monthly !== null && $plan->price_monthly > 0)
+                <div class="text-sm text-gray-400 mt-1">≈ Rs. {{ number_format($plan->price_yearly / 12, 0) }}/month</div>
+                <div class="text-xs text-green-600 font-medium">🟢 Save 2 Months</div>
+            @endif
+        @endif
+    </div>
+</div>
 
             {{-- Features --}}
             <ul class="mt-6 space-y-2 text-sm">
@@ -75,30 +101,22 @@
                 </div>
             @endif
 
-            {{-- CTA Button --}}
+            {{-- CTA Button with interval --}}
             <div class="mt-6">
                 @if($plan->slug === 'free')
-                    <a href="{{ route('register') }}" 
-                       class="w-full block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 rounded-xl transition">
-                        Get Started Free
-                    </a>
+                    <a href="{{ route('register') }}" class="w-full block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 rounded-xl transition">Get Started Free</a>
                 @elseif($plan->slug === 'enterprise')
-                    <a href="mailto:sales@travelai.com?subject=Enterprise%20Plan%20Inquiry" 
-                       class="w-full block text-center bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition shadow-md">
-                        Contact for Pricing
-                    </a>
+                    <a href="mailto:sales@travelai.com?subject=Enterprise%20Plan%20Inquiry" class="w-full block text-center bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition shadow-md">Contact for Pricing</a>
                 @else
-                    <a href="{{ route('register', ['plan' => $plan->slug]) }}" 
-                       class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md">
-                        Choose {{ $plan->name }}
-                    </a>
+                    <a href="{{ route('register', ['plan' => $plan->slug, 'billing_interval' => 'monthly']) }}" class="cta-button w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md" data-interval="monthly">Choose {{ $plan->name }}</a>
+                    <a href="{{ route('register', ['plan' => $plan->slug, 'billing_interval' => 'yearly']) }}" class="cta-button hidden w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md" data-interval="yearly">Choose {{ $plan->name }}</a>
                 @endif
             </div>
         </div>
         @endforeach
     </div>
 
-    {{-- ========== PRICING COMPARISON TABLE ========== --}}
+    {{-- ========== PLAN COMPARISON TABLE ========== --}}
     <div class="mt-16 bg-white rounded-2xl shadow-lg border overflow-hidden">
         <div class="bg-gray-50 px-6 py-4 border-b">
             <h3 class="text-xl font-bold text-gray-800">📊 Plan Comparison</h3>
@@ -115,16 +133,26 @@
                 </thead>
                 <tbody>
                     <tr class="border-b">
-                        <td class="py-3 text-gray-600">Price</td>
-                        @foreach($plans as $plan)
-                            <td class="text-center py-3 font-medium">
-                                @if($plan->price_monthly === null) Custom
-                                @elseif($plan->price_monthly == 0) Free
-                                @else ${{ number_format($plan->price_monthly, 0) }}/mo
-                                @endif
-                            </td>
-                        @endforeach
-                    </tr>
+    <td class="py-3 text-gray-600">Price</td>
+    @foreach($plans as $plan)
+        <td class="text-center py-3 font-medium">
+            {{-- Monthly price --}}
+            <span class="price-amount" data-interval="monthly">
+                @if($plan->price_monthly === null) Custom
+                @elseif($plan->price_monthly == 0) Free
+                @else Rs. {{ number_format($plan->price_monthly, 0) }}/mo
+                @endif
+            </span>
+            {{-- Yearly price --}}
+            <span class="price-amount hidden" data-interval="yearly">
+                @if($plan->price_yearly === null) Custom
+                @elseif($plan->price_yearly == 0) Free
+                @else Rs. {{ number_format($plan->price_yearly, 0) }}/yr
+                @endif
+            </span>
+        </td>
+    @endforeach
+</tr>
                     <tr class="border-b">
                         <td class="py-3 text-gray-600">Services</td>
                         @foreach($plans as $plan)
@@ -183,4 +211,45 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtns = document.querySelectorAll('.billing-toggle');
+        const badge = document.getElementById('billing-badge');
+
+        function setInterval(interval) {
+            // Update toggle buttons active state
+            toggleBtns.forEach(btn => {
+                const isActive = btn.dataset.interval === interval;
+                btn.classList.toggle('bg-blue-600', isActive);
+                btn.classList.toggle('text-white', isActive);
+                btn.classList.toggle('text-gray-600', !isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+
+            // Show/hide price and CTA based on interval
+            document.querySelectorAll('.price-amount').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.interval !== interval);
+            });
+            document.querySelectorAll('.cta-button').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.interval !== interval);
+            });
+
+            // Show/hide "2 Months Free" badge
+            badge.classList.toggle('hidden', interval !== 'yearly');
+
+            // Update comparison table price rows (already using the same data-attribute logic)
+            // The table rows also have .price-amount with data-interval, so they are auto-updated.
+        }
+
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                setInterval(this.dataset.interval);
+            });
+        });
+
+        // Default monthly
+        setInterval('monthly');
+    });
+</script>
 @endsection
