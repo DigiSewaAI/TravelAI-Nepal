@@ -174,6 +174,45 @@
                 @endif
             </div>
 
+            {{-- My Trek History (QR Check-ins) --}}
+<div class="bg-white rounded-xl shadow-sm border p-6">
+    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
+        <i class="fas fa-route text-green-600"></i> My Trek History
+    </h3>
+    @if($qrScans->count() > 0)
+        <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+            @foreach($qrScans as $scan)
+                <div class="flex justify-between items-center border-b border-gray-100 pb-2 last:border-0">
+                    <div>
+                        <p class="font-medium text-sm text-gray-800">{{ $scan->booking->service->name ?? 'N/A' }}</p>
+                        <p class="text-xs text-gray-400">
+                            <i class="fas fa-map-pin mr-1 text-blue-500"></i> 
+                            {{ $scan->checkpoint_name ?? 'Check-in' }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-medium text-green-600">
+                            <i class="fas fa-check-circle mr-1"></i> Checked In
+                        </span>
+                        <p class="text-[10px] text-gray-400">{{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y H:i') : 'N/A' }}</p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        @if($qrScans->count() > 10)
+            <div class="mt-3 text-center">
+                <a href="#" class="text-blue-600 hover:underline text-sm">View All History →</a>
+            </div>
+        @endif
+    @else
+        <div class="text-center py-4">
+            <i class="fas fa-route text-3xl text-gray-300 mb-2"></i>
+            <p class="text-gray-400 text-sm">No trek history yet.</p>
+            <p class="text-xs text-gray-400">Check-in at a trek checkpoint to start your journey.</p>
+        </div>
+    @endif
+</div>
+
             {{-- 🔥 AI Travel Planner (Prominent Card) --}}
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition">
                 <div class="flex items-start gap-4">

@@ -16,8 +16,8 @@
             <div class="bg-gray-50 rounded-xl p-4 mb-6">
                 <h2 class="font-semibold text-gray-800">Booking Details</h2>
                 <p class="text-sm text-gray-600 mt-1">
-                    <strong>Trek:</strong> {{ $booking->trek->name ?? 'N/A' }}<br>
-                    <strong>Trekker:</strong> {{ $booking->trekker->name ?? 'N/A' }}<br>
+                    <strong>Service:</strong> {{ $booking->service->name ?? 'N/A' }}<br>
+                    <strong>Traveler:</strong> {{ $booking->traveler->name ?? 'N/A' }}<br>
                     <strong>Start Date:</strong> {{ $booking->start_date ? $booking->start_date->format('Y-m-d') : 'N/A' }}
                 </p>
             </div>
@@ -119,7 +119,6 @@
             if (data.success) {
                 showMessage('✅ Check‑in successful!', 'green');
                 form.reset();
-                // Optionally reset location
             } else {
                 showMessage(data.message || 'Something went wrong.', 'red');
             }

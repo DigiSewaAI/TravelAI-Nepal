@@ -121,6 +121,9 @@ Route::prefix('provider')->name('provider.')->group(function () {
     // Analytics (Phase 11)
     Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/export', [App\Http\Controllers\Provider\AnalyticsController::class, 'export'])->name('analytics.export');
+
+        Route::get('/checkins', [App\Http\Controllers\Provider\CheckinController::class, 'index'])->name('checkins.index');
+    Route::get('/checkins/{scan}', [App\Http\Controllers\Provider\CheckinController::class, 'show'])->name('checkins.show');
 });
 // Provider profile page (old, but keep for now)
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');

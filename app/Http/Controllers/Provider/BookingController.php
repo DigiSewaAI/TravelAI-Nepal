@@ -6,15 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // ✅ Import trait
 
 // 🔥 Import the notification class
 use App\Notifications\BookingStatusUpdated;
 
 class BookingController extends Controller
 {
+    use AuthorizesRequests; // ✅ Use trait for authorization
+
     public function index()
     {
         $provider = Auth::user()->ownProvider();
+
+        if (!$provider) {
+            abort(403, 'No provider found.');
+        }
 
         $bookings = Booking::whereHas('service', function ($query) use ($provider) {
             $query->where('provider_id', $provider->id);

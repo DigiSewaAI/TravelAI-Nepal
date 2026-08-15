@@ -12,14 +12,41 @@ use App\Models\TourDetail;
 use App\Models\HotelDetail;
 use App\Models\Booking;
 use App\Models\Review;
+use App\Models\QrScan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class TourismProvidersSeeder extends Seeder
 {
     public function run(): void
     {
-        // ========== 1. Define Providers with realistic USD prices ==========
+        // =====================================================
+        // STEP 1: CLEANUP DUMMY DATA
+        // =====================================================
+        $this->command->info('🧹 Cleaning up dummy data...');
+
+        // Delete services with "Dummy" in name
+        $deletedServices = Service::where('name', 'like', '%Dummy%')->delete();
+        $this->command->info("   ✅ Deleted {$deletedServices} dummy services");
+
+        // Delete bookings that reference dummy services (if any left)
+        $deletedBookings = Booking::whereDoesntHave('service')->delete();
+        $this->command->info("   ✅ Deleted {$deletedBookings} orphan bookings");
+
+        // Update Guest travelers to "Traveler" (optional)
+        $updatedUsers = User::where('name', 'like', 'Guest%')->update(['name' => 'Traveler']);
+        $this->command->info("   ✅ Updated {$updatedUsers} guest users to 'Traveler'");
+
+        // Delete orphan QR scans
+        $deletedScans = QrScan::whereDoesntHave('booking')->delete();
+        $this->command->info("   ✅ Deleted {$deletedScans} orphan QR scans");
+
+        $this->command->info('✅ Cleanup complete. Now seeding realistic data...');
+
+        // =====================================================
+        // STEP 2: DEFINE REALISTIC PROVIDERS & SERVICES
+        // =====================================================
         $providersData = [
             // Trekking Agencies
             [
@@ -27,9 +54,9 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['trekking-agency'],
                 'description' => 'Expert guides for Everest, Annapurna & Langtang. 20+ years experience.',
                 'services' => [
-                    ['name' => 'Everest Base Camp Trek', 'category' => 'trek', 'price' => 1250, 'duration' => 14, 'difficulty' => 'hard'],
-                    ['name' => 'Annapurna Circuit Trek', 'category' => 'trek', 'price' => 1000, 'duration' => 12, 'difficulty' => 'moderate'],
-                    ['name' => 'Langtang Valley Trek', 'category' => 'trek', 'price' => 700, 'duration' => 8, 'difficulty' => 'moderate'],
+                    ['name' => 'Everest Base Camp Trek', 'category' => 'trek', 'price' => 1250, 'currency' => 'USD', 'duration' => 14, 'difficulty' => 'hard'],
+                    ['name' => 'Annapurna Circuit Trek', 'category' => 'trek', 'price' => 1000, 'currency' => 'USD', 'duration' => 12, 'difficulty' => 'moderate'],
+                    ['name' => 'Langtang Valley Trek', 'category' => 'trek', 'price' => 700, 'currency' => 'USD', 'duration' => 8, 'difficulty' => 'moderate'],
                 ]
             ],
             [
@@ -37,8 +64,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['trekking-agency'],
                 'description' => 'Premier trekking company for Everest region expeditions.',
                 'services' => [
-                    ['name' => 'Everest Base Camp with Helicopter Return', 'category' => 'trek', 'price' => 2500, 'duration' => 10, 'difficulty' => 'hard'],
-                    ['name' => 'Gokyo Lakes Trek', 'category' => 'trek', 'price' => 1500, 'duration' => 12, 'difficulty' => 'moderate'],
+                    ['name' => 'Everest Base Camp with Helicopter Return', 'category' => 'trek', 'price' => 2500, 'currency' => 'USD', 'duration' => 10, 'difficulty' => 'hard'],
+                    ['name' => 'Gokyo Lakes Trek', 'category' => 'trek', 'price' => 1500, 'currency' => 'USD', 'duration' => 12, 'difficulty' => 'moderate'],
                 ]
             ],
             [
@@ -46,8 +73,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['trekking-agency'],
                 'description' => 'Sustainable treks in the Annapurna region with local guides.',
                 'services' => [
-                    ['name' => 'Annapurna Base Camp Trek', 'category' => 'trek', 'price' => 750, 'duration' => 9, 'difficulty' => 'moderate'],
-                    ['name' => 'Mardi Himal Trek', 'category' => 'trek', 'price' => 450, 'duration' => 6, 'difficulty' => 'easy'],
+                    ['name' => 'Annapurna Base Camp Trek', 'category' => 'trek', 'price' => 750, 'currency' => 'USD', 'duration' => 9, 'difficulty' => 'moderate'],
+                    ['name' => 'Mardi Himal Trek', 'category' => 'trek', 'price' => 450, 'currency' => 'USD', 'duration' => 6, 'difficulty' => 'easy'],
                 ]
             ],
             // Tour Agencies
@@ -56,8 +83,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['tour-agency'],
                 'description' => 'Cultural tours to UNESCO world heritage sites in Nepal.',
                 'services' => [
-                    ['name' => 'Kathmandu Valley Heritage Tour', 'category' => 'tour', 'price' => 150, 'duration' => 5],
-                    ['name' => 'Lumbini & Pokhara Tour', 'category' => 'tour', 'price' => 300, 'duration' => 7],
+                    ['name' => 'Kathmandu Valley Heritage Tour', 'category' => 'tour', 'price' => 150, 'currency' => 'USD', 'duration' => 5],
+                    ['name' => 'Lumbini & Pokhara Tour', 'category' => 'tour', 'price' => 300, 'currency' => 'USD', 'duration' => 7],
                 ]
             ],
             [
@@ -65,7 +92,7 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['tour-agency'],
                 'description' => 'Tailored tours combining culture, nature and adventure.',
                 'services' => [
-                    ['name' => 'Nepal Adventure Tour', 'category' => 'tour', 'price' => 350, 'duration' => 10],
+                    ['name' => 'Nepal Adventure Tour', 'category' => 'tour', 'price' => 350, 'currency' => 'USD', 'duration' => 10],
                 ]
             ],
             // Hotels
@@ -74,8 +101,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['hotel'],
                 'description' => 'Luxury hotel with stunning mountain views in Pokhara.',
                 'services' => [
-                    ['name' => 'Deluxe Room with Mountain View', 'category' => 'hotel', 'price' => 85, 'star_rating' => 4],
-                    ['name' => 'Suite Room', 'category' => 'hotel', 'price' => 150, 'star_rating' => 4],
+                    ['name' => 'Deluxe Room with Mountain View', 'category' => 'hotel', 'price' => 85, 'currency' => 'USD', 'star_rating' => 4],
+                    ['name' => 'Suite Room', 'category' => 'hotel', 'price' => 150, 'currency' => 'USD', 'star_rating' => 4],
                 ]
             ],
             [
@@ -83,8 +110,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['hotel'],
                 'description' => 'Heritage hotel in the heart of Kathmandu.',
                 'services' => [
-                    ['name' => 'Standard Room', 'category' => 'hotel', 'price' => 50, 'star_rating' => 3],
-                    ['name' => 'Executive Suite', 'category' => 'hotel', 'price' => 120, 'star_rating' => 3],
+                    ['name' => 'Standard Room', 'category' => 'hotel', 'price' => 50, 'currency' => 'USD', 'star_rating' => 3],
+                    ['name' => 'Executive Suite', 'category' => 'hotel', 'price' => 120, 'currency' => 'USD', 'star_rating' => 3],
                 ]
             ],
             [
@@ -92,8 +119,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['resort'],
                 'description' => 'Peaceful resort by Fewa Lake with spa and wellness center.',
                 'services' => [
-                    ['name' => 'Lake View Room', 'category' => 'hotel', 'price' => 120, 'star_rating' => 5],
-                    ['name' => 'Villa with Private Pool', 'category' => 'hotel', 'price' => 250, 'star_rating' => 5],
+                    ['name' => 'Lake View Room', 'category' => 'hotel', 'price' => 120, 'currency' => 'USD', 'star_rating' => 5],
+                    ['name' => 'Villa with Private Pool', 'category' => 'hotel', 'price' => 250, 'currency' => 'USD', 'star_rating' => 5],
                 ]
             ],
             // Guide
@@ -102,8 +129,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['guide'],
                 'description' => 'Certified and experienced guides for trekking and tours.',
                 'services' => [
-                    ['name' => 'Private Guide Service', 'category' => 'guide', 'price' => 40],
-                    ['name' => 'Group Guide Service', 'category' => 'guide', 'price' => 25],
+                    ['name' => 'Private Guide Service', 'category' => 'guide', 'price' => 40, 'currency' => 'USD'],
+                    ['name' => 'Group Guide Service', 'category' => 'guide', 'price' => 25, 'currency' => 'USD'],
                 ]
             ],
             // Transport
@@ -112,8 +139,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['transport-provider'],
                 'description' => 'Reliable transport for trekkers and tourists across Nepal.',
                 'services' => [
-                    ['name' => 'Jeep Rental', 'category' => 'transport', 'price' => 90],
-                    ['name' => 'Bus Charter', 'category' => 'transport', 'price' => 250],
+                    ['name' => 'Jeep Rental', 'category' => 'transport', 'price' => 90, 'currency' => 'USD'],
+                    ['name' => 'Bus Charter', 'category' => 'transport', 'price' => 250, 'currency' => 'USD'],
                 ]
             ],
             // Activity
@@ -122,8 +149,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['activity-provider'],
                 'description' => 'Thrilling activities including paragliding, rafting and bungee.',
                 'services' => [
-                    ['name' => 'Paragliding in Pokhara', 'category' => 'activity', 'price' => 120],
-                    ['name' => 'Trishuli River Rafting', 'category' => 'activity', 'price' => 70],
+                    ['name' => 'Paragliding in Pokhara', 'category' => 'activity', 'price' => 120, 'currency' => 'USD'],
+                    ['name' => 'Trishuli River Rafting', 'category' => 'activity', 'price' => 70, 'currency' => 'USD'],
                 ]
             ],
             // Homestay + Local Experience
@@ -132,8 +159,8 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['homestay', 'local-experience'],
                 'description' => 'Authentic Nepali homestay with local families.',
                 'services' => [
-                    ['name' => 'Homestay Experience', 'category' => 'experience', 'price' => 25],
-                    ['name' => 'Cooking Class with Family', 'category' => 'experience', 'price' => 15],
+                    ['name' => 'Homestay Experience', 'category' => 'experience', 'price' => 25, 'currency' => 'USD'],
+                    ['name' => 'Cooking Class with Family', 'category' => 'experience', 'price' => 15, 'currency' => 'USD'],
                 ]
             ],
             // Photographer
@@ -142,13 +169,15 @@ class TourismProvidersSeeder extends Seeder
                 'types' => ['photographer'],
                 'description' => 'Professional photography services for trekkers and travelers.',
                 'services' => [
-                    ['name' => 'Trekking Photography Package', 'category' => 'experience', 'price' => 180],
-                    ['name' => 'Portrait Session', 'category' => 'experience', 'price' => 40],
+                    ['name' => 'Trekking Photography Package', 'category' => 'experience', 'price' => 180, 'currency' => 'USD'],
+                    ['name' => 'Portrait Session', 'category' => 'experience', 'price' => 40, 'currency' => 'USD'],
                 ]
             ],
         ];
 
-        // ========== 2. Loop and create/update ==========
+        // =====================================================
+        // STEP 3: LOOP TO CREATE/UPDATE
+        // =====================================================
         foreach ($providersData as $index => $pData) {
             // User
             $email = strtolower(str_replace(' ', '.', $pData['name'])) . '@travelai.com';
@@ -157,13 +186,13 @@ class TourismProvidersSeeder extends Seeder
                 $user = User::create([
                     'name' => $pData['name'],
                     'email' => $email,
-                    'password' => bcrypt('password123'),
+                    'password' => bcrypt('Himalayan@1980'),
                     'role' => 'provider_owner',
                     'phone' => '98' . rand(10000000, 99999999),
                 ]);
                 $this->command->info("✅ Created user: {$pData['name']}");
             } else {
-                $this->command->info("⏩ User already exists: {$pData['name']}, skipping user creation.");
+                $this->command->info("⏩ User already exists: {$pData['name']}");
             }
 
             // Provider
@@ -184,7 +213,7 @@ class TourismProvidersSeeder extends Seeder
                     'verification_status' => 'verified',
                     'is_active' => true,
                 ]);
-                $this->command->info("⏩ Provider already exists: {$pData['name']}, updating details.");
+                $this->command->info("⏩ Updated provider: {$pData['name']}");
             }
 
             // Assign types
@@ -196,7 +225,8 @@ class TourismProvidersSeeder extends Seeder
                 $category = ServiceCategory::where('slug', $sData['category'])->first();
                 if (!$category) continue;
 
-                // 🔥 Use updateOrCreate to update existing or create new
+                $currency = $sData['currency'] ?? 'USD';
+
                 $service = Service::updateOrCreate(
                     [
                         'provider_id' => $provider->id,
@@ -207,13 +237,13 @@ class TourismProvidersSeeder extends Seeder
                         'slug' => Str::slug($sData['name']) . '-' . Str::random(6),
                         'description' => $sData['name'] . ' offered by ' . $pData['name'],
                         'price' => $sData['price'],
-                        'currency' => 'USD',      // ✅ Set USD
+                        'currency' => $currency,
                         'status' => 'active',
                     ]
                 );
-                $this->command->info("   ✅ " . ($service->wasRecentlyCreated ? 'Created' : 'Updated') . " service: {$sData['name']} with price \${$sData['price']}");
+                $this->command->info("   ✅ Service: {$sData['name']} ({$currency} " . number_format($sData['price'], 0) . ")");
 
-                // Update or create detail based on category
+                // Create detail based on category
                 if ($sData['category'] === 'trek') {
                     TrekDetail::updateOrCreate(
                         ['service_id' => $service->id],
@@ -246,15 +276,15 @@ class TourismProvidersSeeder extends Seeder
                     );
                 }
 
-                // Create a booking if not exists (for demo)
+                // Create a booking (realistic demo)
                 $booking = Booking::firstOrCreate(
                     [
                         'traveler_id' => $user->id,
                         'service_id' => $service->id,
                     ],
                     [
-                        'booking_date' => now(),
-                        'start_date' => now()->addDays(rand(5, 30)),
+                        'booking_date' => now()->subDays(rand(5, 30)),
+                        'start_date' => now()->subDays(rand(1, 10)),
                         'status' => 'completed',
                         'qr_code' => Str::random(40),
                     ]
@@ -265,28 +295,29 @@ class TourismProvidersSeeder extends Seeder
                 $comment = '';
                 if ($index % 2 == 0) {
                     $rating = rand(4, 5);
-                    $comment = 'Great experience! Highly recommended.';
+                    $comment = 'Amazing experience! The guides were professional and the views were breathtaking.';
                 } elseif ($index % 3 == 0) {
                     $rating = rand(3, 4);
-                    $comment = 'Good service, but could improve a bit.';
+                    $comment = 'Good value for money. Some logistics could be improved, but overall enjoyable.';
+                } else {
+                    $rating = rand(4, 5);
+                    $comment = 'Perfect trip! Everything was well-organized and exceeded expectations.';
                 }
-                if ($rating > 0) {
-                    Review::firstOrCreate(
-                        [
-                            'booking_id' => $booking->id,
-                            'user_id' => $user->id,
-                        ],
-                        [
-                            'service_id' => $service->id,
-                            'rating' => $rating,
-                            'comment' => $comment,
-                            'status' => 'approved',
-                        ]
-                    );
-                }
+                Review::firstOrCreate(
+                    [
+                        'booking_id' => $booking->id,
+                        'user_id' => $user->id,
+                    ],
+                    [
+                        'service_id' => $service->id,
+                        'rating' => $rating,
+                        'comment' => $comment,
+                        'status' => 'approved',
+                    ]
+                );
             }
         }
 
-        $this->command->info("🎉 Seeding/Updating completed successfully!");
+        $this->command->info('🎉 Seeding completed successfully! All dummy data replaced with realistic data.');
     }
 }

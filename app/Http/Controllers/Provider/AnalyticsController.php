@@ -24,7 +24,7 @@ class AnalyticsController extends Controller
         $serviceIds = $provider->services()->pluck('id');
 
         // Total Revenue
-        $totalRevenue = Payment::whereIn('provider_id', [$provider->id])
+        $totalRevenue = Payment::where('provider_id', $provider->id)
             ->where('status', 'success')
             ->sum('amount');
 
@@ -72,9 +72,10 @@ class AnalyticsController extends Controller
             ->distinct('traveler_id')
             ->count('traveler_id');
 
-        // Average booking value
+        // 🔥 Average booking value (join with services table)
         $avgBookingValue = Booking::whereIn('service_id', $serviceIds)
-            ->avg('price') ?? 0;
+            ->join('services', 'bookings.service_id', '=', 'services.id')
+            ->avg('services.price') ?? 0;
 
         // Conversion rate (views to bookings - approximated)
         $totalServices = $serviceIds->count();
@@ -115,22 +116,22 @@ class AnalyticsController extends Controller
         ];
 
         $callback = function () use ($bookings) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Booking ID', 'Traveler', 'Service', 'Start Date', 'Status', 'Price']);
+    $handle = fopen('php://output', 'w');
+    fputcsv($handle, ['Booking ID', 'Traveler', 'Service', 'Start Date', 'Status', 'Price', 'Currency']); // ✅ Currency added
 
-            foreach ($bookings as $booking) {
-                fputcsv($handle, [
-                    $booking->id,
-                    $booking->traveler->name ?? 'Guest',
-                    $booking->service->name ?? 'N/A',
-                    $booking->start_date->format('Y-m-d'),
-                    $booking->status,
-                    $booking->service->price ?? 0,
-                ]);
-            }
-
-            fclose($handle);
-        };
+    foreach ($bookings as $booking) {
+        fputcsv($handle, [
+            $booking->id,
+            $booking->traveler->name ?? 'Guest',
+            $booking->service->name ?? 'N/A',
+            $booking->start_date->format('Y-m-d'),
+            $booking->status,
+            $booking->service->price ?? 0,
+            $booking->service->currency ?? 'USD', // ✅ Currency column
+        ]);
+    }
+    fclose($handle);
+};
 
         return response()->stream($callback, 200, $headers);
     }

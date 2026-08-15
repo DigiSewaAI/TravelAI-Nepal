@@ -5,7 +5,7 @@
 
 @section('content')
 <!-- Stats Cards -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
     <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
         <p class="text-gray-500 text-xs">Revenue</p>
         <p class="text-2xl font-bold">Rs. {{ number_format($totalRevenue, 0) }}</p>
@@ -19,6 +19,10 @@
         <p class="text-2xl font-bold">{{ $totalBookings }}</p>
     </div>
     <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
+        <p class="text-gray-500 text-xs">Avg. Booking Value</p>
+        <p class="text-2xl font-bold">Rs. {{ number_format($avgBookingValue, 0) }}</p>
+    </div>
+    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-pink-500">
         <p class="text-gray-500 text-xs">Conversion Rate</p>
         <p class="text-2xl font-bold">{{ $conversionRate }}%</p>
     </div>

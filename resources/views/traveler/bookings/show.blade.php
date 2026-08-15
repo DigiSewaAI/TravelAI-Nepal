@@ -14,9 +14,7 @@
         <div class="flex justify-between items-start">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Booking #{{ $booking->id }}</h1>
-                <p class="text-gray-500 text-sm mt-1">
-                    {{ $booking->service->name ?? 'N/A' }}
-                </p>
+                <p class="text-gray-500 text-sm mt-1">{{ $booking->service->name ?? 'N/A' }}</p>
             </div>
             <span class="px-3 py-1 rounded-full text-sm font-semibold
                 @if($booking->status === 'pending') bg-yellow-100 text-yellow-800
@@ -39,6 +37,17 @@
             <div class="col-span-2">
                 <p class="text-sm text-gray-500">Service Provider</p>
                 <p class="font-medium">{{ $booking->service->provider->name ?? 'N/A' }}</p>
+            </div>
+        </div>
+
+        {{-- 🔥 QR Code Section --}}
+        <div class="mt-6 border-t pt-4">
+            <h3 class="font-semibold text-gray-700">📱 QR Code for Check-in</h3>
+            <div class="mt-2">
+                <img src="{{ route('booking.qr', $booking->id) }}" 
+                     alt="QR Code" 
+                     class="w-32 h-32 border rounded-lg">
+                <p class="text-xs text-gray-400 mt-1">Scan this QR code at the checkpoint to record your check-in</p>
             </div>
         </div>
 

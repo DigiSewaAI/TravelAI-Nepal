@@ -109,6 +109,13 @@
                     <i class="fas fa-chart-bar w-5"></i>
                     <span>Analytics</span>
                 </a>
+
+                <!-- Check-ins (Phase 12) -->
+<a href="{{ route('provider.checkins.index') }}" 
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
+    <i class="fas fa-qrcode w-5"></i>
+    <span>Check-ins</span>
+</a>
             </nav>
 
             <!-- Logout -->

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traveler;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\QrScan;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -25,13 +26,17 @@ class DashboardController extends Controller
         $completedBookings = $bookings->where('status', 'completed')->count();
         $activeBookings = $bookings->where('status', 'confirmed')->count();
         
-        // Active trip (first confirmed booking)
+        // Active trip
         $activeTrip = $bookings->where('status', 'confirmed')->first();
         
         // Reviews
         $reviews = $user->reviews()->with('service')->latest()->get();
         
-        // Booking stats for dashboard
+        // 🔥 QR Scan History (Check-ins)
+        $qrScans = QrScan::whereHas('booking', function ($q) use ($user) {
+            $q->where('traveler_id', $user->id);
+        })->with(['booking.service'])->latest('scanned_at')->take(10)->get();
+        
         $bookingStats = [
             'total' => $totalBookings,
             'upcoming' => $upcomingBookings,
@@ -39,10 +44,8 @@ class DashboardController extends Controller
             'active' => $activeBookings,
         ];
         
-        // Check if user has any booking
         $hasBookings = $totalBookings > 0;
         
-        // Greeting based on time
         $hour = Carbon::now()->hour;
         if ($hour < 12) {
             $greeting = 'Morning';
@@ -56,6 +59,7 @@ class DashboardController extends Controller
             'user',
             'bookings',
             'reviews',
+            'qrScans',
             'bookingStats',
             'activeTrip',
             'hasBookings',
