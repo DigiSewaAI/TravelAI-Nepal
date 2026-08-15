@@ -17,15 +17,17 @@
         <div>
             @if($service->cover_image)
                 <img src="{{ asset('storage/' . $service->cover_image) }}" 
+                     alt="{{ $service->name }}"
                      class="w-full rounded-xl shadow-lg object-cover h-96">
             @else
-                <div class="w-full h-96 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-mountain text-6xl text-white/80"></i>
+                <div class="w-full h-96 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center overflow-hidden">
+                    <img src="{{ asset('images/logo.png') }}" 
+                         alt="TravelAI Nepal"
+                         class="w-48 h-48 object-contain opacity-50">
                 </div>
             @endif
 
             @php
-                // Handle gallery safely – cast to array if it's JSON string
                 $gallery = is_array($service->gallery) ? $service->gallery : json_decode($service->gallery, true) ?? [];
             @endphp
 
@@ -33,6 +35,7 @@
                 <div class="grid grid-cols-4 gap-2 mt-2">
                     @foreach(array_slice($gallery, 0, 4) as $image)
                         <img src="{{ asset('storage/' . $image) }}" 
+                             alt="Gallery image"
                              class="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75">
                     @endforeach
                 </div>
@@ -44,12 +47,10 @@
             <h1 class="text-3xl font-bold text-gray-900">{{ $service->name }}</h1>
             
             <div class="flex items-center gap-2 mt-2 flex-wrap">
-                <!-- Category Badge -->
                 <span class="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
                     {{ $service->category->name ?? 'N/A' }}
                 </span>
 
-                <!-- 🔥 NEW: Rating Display (Phase 10) -->
                 @if($service->averageRating() > 0)
                     <span class="flex items-center text-sm">
                         @for($i=1; $i<=5; $i++)
@@ -59,7 +60,6 @@
                     </span>
                 @endif
 
-                <!-- Verified Provider Badge -->
                 @if($service->provider->verification_status === 'verified')
                     <span class="px-2 py-1 text-sm rounded-full bg-green-100 text-green-700">
                         <i class="fas fa-check-circle"></i> Verified Provider
@@ -67,11 +67,33 @@
                 @endif
             </div>
 
+            {{-- 🔥 Main Price Display – प्रतिस्थापन गरियो --}}
+            @php
+                $currencyService = app(\App\Services\CurrencyService::class);
+                $displayCurrency = $currencyService->getDisplayCurrency();
+                $baseCurrency = $service->currency ?? 'USD';
+                $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
+                $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                $showBaseNote = ($baseCurrency !== $displayCurrency);
+            @endphp
+
             <div class="mt-4">
                 <p class="text-3xl font-bold text-blue-600">
-                    Rs. {{ number_format($service->price, 0) }}
-                    <span class="text-sm font-normal text-gray-500">/ {{ $service->trekDetail->duration_days ?? '1' }} day(s)</span>
+                    {{ $formattedPrice }}
+                    @if($service->trekDetail)
+                        <span class="text-sm font-normal text-gray-500">/ pax</span>
+                        <span class="text-sm font-normal text-gray-400 ml-2">({{ $service->trekDetail->duration_days ?? '1' }} days)</span>
+                    @elseif($service->hotelDetail)
+                        <span class="text-sm font-normal text-gray-500">/ night</span>
+                    @elseif($service->tourDetail)
+                        <span class="text-sm font-normal text-gray-500">/ person</span>
+                    @else
+                        <span class="text-sm font-normal text-gray-500">/ person</span>
+                    @endif
                 </p>
+                @if($showBaseNote)
+                    <p class="text-xs text-gray-400 mt-1">Base price: {{ $currencyService->format($service->price, $baseCurrency) }}</p>
+                @endif
             </div>
 
             <!-- Trek Details -->
@@ -115,14 +137,15 @@
                 <div class="flex items-center gap-3 mt-2">
                     @if($service->provider->logo_url)
                         <img src="{{ asset('storage/' . $service->provider->logo_url) }}" 
-                             class="w-12 h-12 rounded-full object-cover">
+                             alt="{{ $service->provider->name }} logo"
+                             class="w-14 h-14 rounded-full object-cover border-2 border-gray-200">
                     @else
-                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-building text-blue-600"></i>
+                        <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-building text-blue-600 text-xl"></i>
                         </div>
                     @endif
                     <div>
-                        <a href="{{ route('public.providers.show', $service->provider->slug) }}" 
+                        <a href="{{ route('public.providers.show', $service->provider->slug ?? $service->provider->id) }}" 
                            class="font-medium text-gray-800 hover:text-blue-600">
                             {{ $service->provider->name }}
                         </a>
@@ -147,19 +170,31 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Related Services</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 @foreach($relatedServices as $related)
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-                        <div class="h-32 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                    {{-- 🔥 Related Service Price – प्रतिस्थापन गरियो --}}
+                    @php
+                        $relBaseCurrency = $related->currency ?? 'USD';
+                        $relDisplayPrice = $currencyService->convert($related->price, $relBaseCurrency, $displayCurrency);
+                        $relFormatted = $currencyService->format($relDisplayPrice, $displayCurrency);
+                    @endphp
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition border border-gray-100 group">
+                        <div class="h-40 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
                             @if($related->cover_image)
-                                <img src="{{ asset('storage/' . $related->cover_image) }}" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . $related->cover_image) }}" 
+                                     alt="{{ $related->name }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @else
-                                <i class="fas fa-mountain text-3xl text-white/80"></i>
+                                <img src="{{ asset('images/logo.png') }}" 
+                                     alt="TravelAI Nepal"
+                                     class="w-20 h-20 object-contain opacity-50 group-hover:scale-105 transition-transform duration-300">
                             @endif
                         </div>
                         <div class="p-3">
-                            <h4 class="font-semibold text-gray-800 text-sm">{{ $related->name }}</h4>
-                            <p class="text-blue-600 font-bold text-sm">Rs. {{ number_format($related->price, 0) }}</p>
+                            <h4 class="font-semibold text-gray-800 text-sm truncate">{{ $related->name }}</h4>
+                            <p class="text-blue-600 font-bold text-sm">{{ $relFormatted }}</p>
                             <a href="{{ route('public.services.show', $related->slug) }}" 
-                               class="text-xs text-blue-600 hover:text-blue-800">View →</a>
+                               class="text-xs text-blue-600 hover:text-blue-800 font-medium group-hover:underline">
+                                View Details →
+                            </a>
                         </div>
                     </div>
                 @endforeach

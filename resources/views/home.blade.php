@@ -91,7 +91,6 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($featuredServices as $service)
         @php
-            // Reference exchange rate: 1 USD = 140 NPR
             $exchangeRate = 140;
             $priceNPR = $service->price * $exchangeRate;
         @endphp
@@ -106,14 +105,18 @@
             <div class="p-5">
                 <div class="flex justify-between items-start">
                     <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
-                    <div class="text-right">
-                        <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full block">
-                            ${{ number_format($service->price, 0) }}
-                        </span>
-                        <span class="text-xs text-gray-400 block mt-1">
-                            ≈ Rs. {{ number_format($priceNPR, 0) }}
-                        </span>
-                    </div>
+                    @php
+    $currencyService = app(\App\Services\CurrencyService::class);
+    $displayCurrency = $currencyService->getDisplayCurrency();
+    $baseCurrency = $service->currency ?? 'USD';
+    $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
+    $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+@endphp
+<div class="text-right">
+    <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full block">
+        {{ $formattedPrice }}
+    </span>
+</div>
                 </div>
                 <div class="flex flex-wrap gap-2 mt-2 text-sm text-gray-500">
                     <span><i class="far fa-calendar-alt"></i> {{ $service->trekDetail->duration_days ?? 'N/A' }} days</span>

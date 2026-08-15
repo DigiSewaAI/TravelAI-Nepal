@@ -28,31 +28,32 @@ class ServiceController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $provider = Auth::user()->ownProvider();
+{
+    $provider = Auth::user()->ownProvider();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'service_category_id' => 'required|exists:service_categories,id',
-            'price' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:2048',
-            'status' => 'nullable|in:active,inactive',
-        ]);
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'service_category_id' => 'required|exists:service_categories,id',
+        'price' => 'nullable|numeric|min:0',
+        'currency' => 'required|in:USD,NPR',  // ✅ Added
+        'description' => 'nullable|string',
+        'cover_image' => 'nullable|image|max:2048',
+        'status' => 'nullable|in:active,inactive',
+    ]);
 
-        if ($request->hasFile('cover_image')) {
-            $path = $request->file('cover_image')->store('services', 'public');
-            $validated['cover_image'] = $path;
-        }
-
-        $validated['provider_id'] = $provider->id;
-        $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
-        $validated['status'] = $validated['status'] ?? 'active';
-
-        Service::create($validated);
-
-        return redirect()->route('provider.services.index')->with('success', 'Service created successfully.');
+    if ($request->hasFile('cover_image')) {
+        $path = $request->file('cover_image')->store('services', 'public');
+        $validated['cover_image'] = $path;
     }
+
+    $validated['provider_id'] = $provider->id;
+    $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(6);
+    $validated['status'] = $validated['status'] ?? 'active';
+
+    Service::create($validated);
+
+    return redirect()->route('provider.services.index')->with('success', 'Service created successfully.');
+}
 
     public function edit(Service $service)
     {
@@ -62,30 +63,31 @@ class ServiceController extends Controller
     }
 
     public function update(Request $request, Service $service)
-    {
-        $this->authorize('update', $service);
+{
+    $this->authorize('update', $service);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'service_category_id' => 'required|exists:service_categories,id',
-            'price' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:2048',
-            'status' => 'nullable|in:active,inactive',
-        ]);
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'service_category_id' => 'required|exists:service_categories,id',
+        'price' => 'nullable|numeric|min:0',
+        'currency' => 'required|in:USD,NPR',  // ✅ Added
+        'description' => 'nullable|string',
+        'cover_image' => 'nullable|image|max:2048',
+        'status' => 'nullable|in:active,inactive',
+    ]);
 
-        if ($request->hasFile('cover_image')) {
-            if ($service->cover_image) {
-                \Storage::disk('public')->delete($service->cover_image);
-            }
-            $path = $request->file('cover_image')->store('services', 'public');
-            $validated['cover_image'] = $path;
+    if ($request->hasFile('cover_image')) {
+        if ($service->cover_image) {
+            \Storage::disk('public')->delete($service->cover_image);
         }
-
-        $service->update($validated);
-
-        return redirect()->route('provider.services.index')->with('success', 'Service updated successfully.');
+        $path = $request->file('cover_image')->store('services', 'public');
+        $validated['cover_image'] = $path;
     }
+
+    $service->update($validated);
+
+    return redirect()->route('provider.services.index')->with('success', 'Service updated successfully.');
+}
 
     public function destroy(Service $service)
     {

@@ -84,6 +84,28 @@
                 <a href="{{ route('public.providers.index') }}" class="nav-link text-sm md:text-base">Providers</a>
                 <a href="{{ url('/#early-access') }}" class="nav-link text-sm md:text-base text-blue-600">Get Early Access</a>
 
+                <!-- Currency Selector -->
+<div class="relative inline-block ml-4">
+    <select id="currency-selector" class="bg-transparent border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="USD" {{ session('display_currency', 'USD') === 'USD' ? 'selected' : '' }}>🇺🇸 USD</option>
+        <option value="NPR" {{ session('display_currency', 'USD') === 'NPR' ? 'selected' : '' }}>🇳🇵 NPR</option>
+    </select>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selector = document.getElementById('currency-selector');
+    if (selector) {
+        selector.addEventListener('change', function() {
+            const url = '{{ route('currency.switch') }}?currency=' + this.value;
+            // Preserve current query parameters
+            const currentParams = new URLSearchParams(window.location.search);
+            const newUrl = url + '&' + currentParams.toString();
+            window.location.href = newUrl;
+        });
+    }
+});
+</script>
                 @auth
     @if(auth()->user()->isSuperAdmin())
         <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Dashboard</a>

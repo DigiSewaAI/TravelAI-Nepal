@@ -25,14 +25,15 @@
                    placeholder="Search services..." 
                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
+        {{-- 🔥 मुद्रा अनुसार Placeholder अपडेट गरियो --}}
         <div>
             <input type="number" name="min_price" value="{{ request('min_price') }}" 
-                   placeholder="Min Price (USD)" 
+                   placeholder="Min Price ({{ session('display_currency', 'USD') }})" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
             <input type="number" name="max_price" value="{{ request('max_price') }}" 
-                   placeholder="Max Price (USD)" 
+                   placeholder="Max Price ({{ session('display_currency', 'USD') }})" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
@@ -65,28 +66,32 @@
     <!-- Services Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($services as $service)
-        @php
-            // Reference exchange rate: 1 USD = 140 NPR (adjust as needed)
-            $exchangeRate = 140;
-            $priceNPR = $service->price * $exchangeRate;
-        @endphp
         <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition border border-gray-100">
-            <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+            <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
                 @if($service->cover_image)
-                    <img src="{{ asset('storage/' . $service->cover_image) }}" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/' . $service->cover_image) }}" 
+                         alt="{{ $service->name }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 @else
-                    <i class="fas fa-mountain text-5xl text-white/80"></i>
+                    <img src="{{ asset('images/logo.png') }}" 
+                         alt="TravelAI Nepal"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 @endif
             </div>
             <div class="p-5">
                 <div class="flex justify-between items-start">
                     <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
+                    {{-- 🔥 Price Display को ठाउँमा CurrencyService प्रयोग गरियो --}}
                     <div class="text-right">
+                        @php
+                            $currencyService = app(\App\Services\CurrencyService::class);
+                            $displayCurrency = $currencyService->getDisplayCurrency();
+                            $baseCurrency = $service->currency ?? 'USD';
+                            $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
+                            $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                        @endphp
                         <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full block">
-                            ${{ number_format($service->price, 0) }}
-                        </span>
-                        <span class="text-xs text-gray-400 block mt-1">
-                            ≈ Rs. {{ number_format($priceNPR, 0) }}
+                            {{ $formattedPrice }}
                         </span>
                     </div>
                 </div>

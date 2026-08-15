@@ -10,32 +10,81 @@
         @method('PUT')
 
         <div class="space-y-4">
+            <!-- 🔥 Logo Upload -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Logo</label>
+                @if($provider->logo_url)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                             class="h-20 w-20 object-cover rounded-full border-2 border-gray-200">
+                    </div>
+                @endif
+                <input type="file" name="logo" accept="image/*" 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">Square image (recommended: 500x500px, max 2MB)</p>
+                @error('logo')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- 🔥 Cover Image Upload -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Cover Image</label>
+                @if($provider->cover_image)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $provider->cover_image) }}" 
+                             class="w-full h-32 object-cover rounded-lg border-2 border-gray-200">
+                    </div>
+                @endif
+                <input type="file" name="cover_image" accept="image/*" 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">Banner image (recommended: 1200x400px, max 5MB)</p>
+                @error('cover_image')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Business Name</label>
                 <input type="text" name="name" value="{{ old('name', $provider->name) }}" required
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('name')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Contact Email</label>
                 <input type="email" name="contact_email" value="{{ old('contact_email', $provider->contact_email) }}"
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('contact_email')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Contact Phone</label>
                 <input type="text" name="contact_phone" value="{{ old('contact_phone', $provider->contact_phone) }}"
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('contact_phone')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Address</label>
                 <textarea name="address" rows="2" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('address', $provider->address) }}</textarea>
+                @error('address')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Description</label>
                 <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description', $provider->description) }}</textarea>
+                @error('description')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
         </div>
 

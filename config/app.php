@@ -69,6 +69,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Exchange Rate (USD to NPR)
+    |--------------------------------------------------------------------------
+    |
+    | This value is used for display currency conversion only.
+    | It does NOT affect stored service prices.
+    |
+    */
+    'exchange_rate' => env('EXCHANGE_RATE_USD_NPR', 152.60),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

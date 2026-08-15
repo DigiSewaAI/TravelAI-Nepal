@@ -37,7 +37,6 @@ use App\Models\Booking;
 | Web Routes
 |--------------------------------------------------------------------------
 */
-
 // ========================
 // 1. PUBLIC PAGES
 // ========================
@@ -75,8 +74,6 @@ Route::get('/providers/{provider:slug}', [App\Http\Controllers\Public\ProviderCo
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');
 
-// Provider profile page (old, but keep for now)
-Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
 
 // =======================================
 // 3. AUTH ROUTES (User Guard)
@@ -91,7 +88,7 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // =======================================
 // 4. PROVIDER DASHBOARD ROUTES
 // =======================================
-Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
+Route::prefix('provider')->name('provider.')->group(function () {
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
@@ -125,6 +122,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/export', [App\Http\Controllers\Provider\AnalyticsController::class, 'export'])->name('analytics.export');
 });
+// Provider profile page (old, but keep for now)
+Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
 
 // =======================================
 // 5. ADMIN ROUTES (Super Admin)
@@ -220,3 +219,18 @@ Route::get('/booking/qr/{booking}', function ($id) {
 // QR Check-in Routes
 Route::get('/scan/{booking}', [CheckinController::class, 'show'])->name('scan.checkin');
 Route::post('/scan/{booking}', [CheckinController::class, 'checkin']);
+
+// =======================================
+// CURRENCY SWITCH (Multi-Currency Display)
+// =======================================
+Route::get('/currency/switch', function (Illuminate\Http\Request $request) {
+    $currency = $request->input('currency', 'USD');
+    $allowed = ['USD', 'NPR'];
+    
+    if (in_array($currency, $allowed)) {
+        session(['display_currency' => $currency]);
+    }
+    
+    return redirect()->back();
+})->name('currency.switch');
+

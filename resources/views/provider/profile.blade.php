@@ -7,7 +7,8 @@
 <div class="bg-white rounded-xl shadow-sm border p-6 max-w-3xl mx-auto">
     <div class="flex items-center space-x-4 mb-6">
         @if($provider->logo_url)
-            <img src="{{ asset('storage/' . $provider->logo_url) }}" class="w-20 h-20 rounded-full object-cover">
+            <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                 class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
         @else
             <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
                 <i class="fas fa-building text-blue-600 text-3xl"></i>
@@ -15,10 +16,12 @@
         @endif
         <div>
             <h2 class="text-2xl font-bold">{{ $provider->name }}</h2>
-            <span class="text-sm text-gray-500">ID: #{{ $provider->id }}</span>
-            @if($provider->verification_status === 'verified')
-                <span class="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Verified ✅</span>
-            @endif
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-sm text-gray-500">ID: #{{ $provider->id }}</span>
+                @if($provider->verification_status === 'verified')
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Verified ✅</span>
+                @endif
+            </div>
         </div>
     </div>
 

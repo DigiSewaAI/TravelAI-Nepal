@@ -25,18 +25,30 @@
                 <span class="font-bold text-gray-800 text-lg">TravelAI Nepal</span>
             </div>
 
-            <!-- Provider Info -->
+            <!-- Provider Info with Logo -->
             @if(isset($provider) && $provider)
                 <div class="bg-gray-50 rounded-lg p-3 mb-4">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-building text-gray-500"></i>
-                        <span class="font-semibold text-sm text-gray-700">{{ $provider->name }}</span>
+                    <div class="flex items-center space-x-3">
+                        <!-- 🔥 Provider Logo -->
+                        @if($provider->logo_url)
+                            <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                                 alt="{{ $provider->name }} logo"
+                                 class="w-10 h-10 rounded-full object-cover border border-gray-200"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-building text-blue-600 text-sm"></i>
+                            </div>
+                        @endif
+                        <div class="flex-1 min-w-0">
+                            <span class="font-semibold text-sm text-gray-700 truncate block">{{ $provider->name }}</span>
+                            @if($provider->verification_status === 'verified')
+                                <span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Verified</span>
+                            @else
+                                <span class="text-xs text-yellow-600"><i class="fas fa-clock"></i> {{ ucfirst($provider->verification_status) }}</span>
+                            @endif
+                        </div>
                     </div>
-                    @if($provider->verification_status === 'verified')
-                        <span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Verified</span>
-                    @else
-                        <span class="text-xs text-yellow-600"><i class="fas fa-clock"></i> {{ ucfirst($provider->verification_status) }}</span>
-                    @endif
                 </div>
             @endif
 
@@ -89,6 +101,13 @@
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
                     <i class="fas fa-user w-5"></i>
                     <span>Profile</span>
+                </a>
+
+                <!-- Analytics (Phase 11) -->
+                <a href="{{ route('provider.analytics.index') }}" 
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span>Analytics</span>
                 </a>
             </nav>
 

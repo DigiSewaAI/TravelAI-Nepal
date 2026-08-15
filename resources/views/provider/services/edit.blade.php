@@ -28,10 +28,17 @@
                 </select>
             </div>
 
+            {{-- 🔥 यहाँ Price फिल्ड प्रतिस्थापन गरिएको छ --}}
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Price (NPR)</label>
-                <input type="number" name="price" value="{{ old('price', $service->price) }}" step="0.01"
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label class="block text-gray-700 font-semibold mb-1">Price</label>
+                <div class="flex gap-2">
+                    <input type="number" name="price" value="{{ old('price', $service->price) }}" step="0.01"
+                           class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="currency" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="USD" {{ old('currency', $service->currency ?? 'USD') == 'USD' ? 'selected' : '' }}>USD</option>
+                        <option value="NPR" {{ old('currency', $service->currency ?? 'USD') == 'NPR' ? 'selected' : '' }}>NPR</option>
+                    </select>
+                </div>
             </div>
 
             <div>

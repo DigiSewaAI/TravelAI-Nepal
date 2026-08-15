@@ -15,6 +15,7 @@ class Provider extends Model
         'slug',
         'description',
         'logo_url',
+        'cover_image',
         'contact_email',
         'contact_phone',
         'address',

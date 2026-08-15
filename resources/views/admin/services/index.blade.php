@@ -26,7 +26,14 @@
                         <td class="py-3 text-sm font-medium">{{ $service->name }}</td>
                         <td class="py-3 text-sm">{{ $service->provider->name ?? 'N/A' }}</td>
                         <td class="py-3 text-sm">{{ $service->category->name ?? 'N/A' }}</td>
-                        <td class="py-3 text-sm">Rs. {{ number_format($service->price, 0) }}</td>
+                        {{-- 🔥 यहाँ Price को <td> प्रतिस्थापन गरिएको छ --}}
+                        <td class="py-3 text-sm">
+                            @if($service->currency === 'USD')
+                                ${{ number_format($service->price, 0) }}
+                            @else
+                                Rs. {{ number_format($service->price, 0) }}
+                            @endif
+                        </td>
                         <td class="py-3 text-sm">
                             <span class="px-2 py-1 text-xs rounded-full
                                 @if($service->status === 'active') bg-green-100 text-green-800
@@ -41,12 +48,12 @@
                             </a>
 
                             <!-- Toggle Status (Active/Inactive) -->
-<form method="POST" action="{{ route('admin.services.toggle', $service) }}" class="inline mr-2">
-    @csrf
-    <button type="submit" class="text-yellow-600 hover:text-yellow-800" title="Toggle Status">
-        <i class="fas fa-toggle-on"></i>
-    </button>
-</form>
+                            <form method="POST" action="{{ route('admin.services.toggle', $service) }}" class="inline mr-2">
+                                @csrf
+                                <button type="submit" class="text-yellow-600 hover:text-yellow-800" title="Toggle Status">
+                                    <i class="fas fa-toggle-on"></i>
+                                </button>
+                            </form>
 
                             <!-- Delete -->
                             <form method="POST" action="{{ route('admin.services.destroy', $service) }}" class="inline"
