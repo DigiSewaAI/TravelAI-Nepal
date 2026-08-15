@@ -67,66 +67,69 @@
 <body class="antialiased">
 
     <!-- ======================= HEADER ======================= -->
-    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/70 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 md:px-10 py-2 flex flex-wrap justify-between items-center">
-            <!-- Logo लाई होम पेजमा लिंक गरियो -->
-            <a href="{{ url('/') }}" class="flex items-center space-x-0 group">
-                <img src="{{ asset('images/logo.png') }}" alt="TravelAI Nepal" class="h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-2xl text-blue-600\'></i>'">
-                <span class="font-extrabold text-2xl tracking-tight text-gray-800 hidden sm:inline">TravelAI <span class="text-blue-600">Nepal</span></span>
-                <span class="ml-2 bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200">OS v1.0</span>
-            </a>
-            <div class="flex flex-wrap gap-5 text-gray-700 font-medium mt-3 md:mt-0 items-center">
-                <a href="{{ url('/') }}" class="nav-link text-sm md:text-base">Home</a>
-                <a href="{{ url('/features') }}" class="nav-link text-sm md:text-base">Features</a>
-                <a href="{{ route('public.services.index') }}" class="nav-link text-sm md:text-base">Explore</a>
-                <a href="{{ route('pages.pricing') }}" class="nav-link text-sm md:text-base">Pricing</a>
-                <a href="{{ url('/how-it-works') }}" class="nav-link text-sm md:text-base">How it works</a>
-                <a href="{{ route('public.providers.index') }}" class="nav-link text-sm md:text-base">Providers</a>
-                <a href="{{ url('/#early-access') }}" class="nav-link text-sm md:text-base text-blue-600">Get Early Access</a>
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/70 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-2 flex flex-wrap justify-between items-center">
+        <!-- Logo -->
+        <a href="{{ url('/') }}" class="flex items-center space-x-0 group">
+            <img src="{{ asset('images/logo.png') }}" alt="TravelAI Nepal" class="h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-2xl text-blue-600\'></i>'">
+            <span class="font-extrabold text-2xl tracking-tight text-gray-800 hidden sm:inline">TravelAI <span class="text-blue-600">Nepal</span></span>
+        </a>
 
-                <!-- Currency Selector -->
-<div class="relative inline-block ml-4">
-    <select id="currency-selector" class="bg-transparent border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <!-- Right side: Navigation + Currency + Auth -->
+        <div class="flex flex-wrap gap-3 md:gap-4 text-gray-700 font-medium mt-3 md:mt-0 items-center">
+            <!-- Navigation Links -->
+            <a href="{{ url('/') }}" class="nav-link text-sm md:text-base">Home</a>
+            <a href="{{ url('/features') }}" class="nav-link text-sm md:text-base">Features</a>
+            <a href="{{ route('public.services.index') }}" class="nav-link text-sm md:text-base">Explore</a>
+            <a href="{{ route('pages.pricing') }}" class="nav-link text-sm md:text-base">Pricing</a>
+            <a href="{{ url('/how-it-works') }}" class="nav-link text-sm md:text-base">How it works</a>
+            <a href="{{ route('public.providers.index') }}" class="nav-link text-sm md:text-base">Providers</a>
+            <a href="{{ url('/#early-access') }}" class="nav-link text-sm md:text-base text-blue-600">Get Early Access</a>
+
+            <!-- Currency Selector -->
+<div class="flex items-center">
+    <select id="currency-selector" class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:border-blue-400 transition">
         <option value="USD" {{ session('display_currency', 'USD') === 'USD' ? 'selected' : '' }}>🇺🇸 USD</option>
         <option value="NPR" {{ session('display_currency', 'USD') === 'NPR' ? 'selected' : '' }}>🇳🇵 NPR</option>
     </select>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selector = document.getElementById('currency-selector');
-    if (selector) {
-        selector.addEventListener('change', function() {
-            const url = '{{ route('currency.switch') }}?currency=' + this.value;
-            // Preserve current query parameters
-            const currentParams = new URLSearchParams(window.location.search);
-            const newUrl = url + '&' + currentParams.toString();
-            window.location.href = newUrl;
-        });
-    }
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        const selector = document.getElementById('currency-selector');
+        if (selector) {
+            selector.addEventListener('change', function() {
+                // Hardcoded absolute URL – यसले सधैं काम गर्छ
+                const baseUrl = '{{ url('/') }}';
+                window.location.href = baseUrl + '/currency/switch?currency=' + this.value;
+            });
+        }
+    });
 </script>
-                @auth
-    @if(auth()->user()->isSuperAdmin())
-        <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Dashboard</a>
-    @elseif(auth()->user()->isProviderOwner())
-        <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Dashboard</a>
-    @elseif(auth()->user()->isTraveler())
-        <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Dashboard</a>
-    @else
-        <a href="{{ route('home') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Home</a>
-    @endif
-    <form method="POST" action="{{ route('logout') }}" class="inline">
-        @csrf
-        <button type="submit" class="border border-red-500 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-semibold transition">Logout</button>
-    </form>
-@else
-    <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Login</a>
-    <a href="{{ route('register') }}" class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-semibold transition">Register</a>
-@endauth
-            </div>
+
+
+            <!-- Auth Buttons -->
+            @auth
+                @if(auth()->user()->isSuperAdmin())
+                    <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Dashboard</a>
+                @elseif(auth()->user()->isProviderOwner())
+                    <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Dashboard</a>
+                @elseif(auth()->user()->isTraveler())
+                    <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Dashboard</a>
+                @else
+                    <a href="{{ route('home') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Home</a>
+                @endif
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="border border-red-500 text-red-500 hover:bg-red-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Login</a>
+                <a href="{{ route('register') }}" class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">Register</a>
+            @endauth
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main>
         @yield('content')
