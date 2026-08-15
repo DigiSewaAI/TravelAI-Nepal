@@ -9,14 +9,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background: #f3f4f6; }
-        .plan-card { transition: all 0.2s ease; }
-        .plan-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .plan-card.selected { border-color: #2563eb; background-color: #eff6ff; }
+        .account-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .account-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .account-card.selected {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px #2563eb, 0 10px 25px rgba(37, 99, 235, 0.15);
+        }
+        .account-card .checkmark {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .account-card.selected .checkmark {
+            display: flex;
+        }
+        .plan-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .plan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .plan-card.selected {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
     </style>
 </head>
 <body>
     <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
             <div class="text-center mb-6">
                 <i class="fas fa-mountain text-3xl text-blue-600"></i>
                 <h1 class="text-2xl font-bold text-gray-800 mt-2">TravelAI Nepal</h1>
@@ -33,82 +73,72 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" id="registerForm">
                 @csrf
-                <input type="hidden" name="billing_interval" value="{{ request('billing_interval', 'monthly') }}">
 
-                <!-- Basic Fields -->
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
-                    <input type="text" name="name" value="{{ old('name') }}" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
-                    <input type="text" name="phone" value="{{ old('phone') }}"
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
-                    <input type="password" name="password" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
+                {{-- ========== ACCOUNT TYPE SELECTION ========== --}}
                 <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Confirm Password *</label>
-                    <input type="password" name="password_confirmation" required
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-gray-700 text-sm font-bold mb-3">How are you joining TravelAI?</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Traveler Card --}}
+                        <div class="account-card border rounded-xl p-4 text-center {{ old('account_type', 'traveler') === 'traveler' ? 'selected' : '' }}" data-account="traveler">
+                            <div class="checkmark"><i class="fas fa-check"></i></div>
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-user text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">🧳 Traveler</h3>
+                            <p class="text-xs text-gray-500 mt-1">Plan trips, explore Nepal & book experiences.</p>
+                            <input type="radio" name="account_type" value="traveler" {{ old('account_type', 'traveler') === 'traveler' ? 'checked' : '' }} class="hidden account-radio">
+                        </div>
+
+                        {{-- Business/Provider Card --}}
+                        <div class="account-card border rounded-xl p-4 text-center {{ old('account_type') === 'provider' ? 'selected' : '' }}" data-account="provider">
+                            <div class="checkmark"><i class="fas fa-check"></i></div>
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-building text-green-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">🏢 Business / Provider</h3>
+                            <p class="text-xs text-gray-500 mt-1">List services, manage bookings & grow your business.</p>
+                            <input type="radio" name="account_type" value="provider" {{ old('account_type') === 'provider' ? 'checked' : '' }} class="hidden account-radio">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Plan Selection -->
-<div class="mb-6">
-    <label class="block text-gray-700 text-sm font-bold mb-2">Choose Your Plan</label>
-    <div class="grid grid-cols-2 gap-3">
-        @foreach($plans ?? [] as $plan)
-            <label class="plan-card border rounded-lg p-3 cursor-pointer transition {{ old('plan', 'free') == $plan->slug ? 'selected' : 'border-gray-200' }}">
-                <input type="radio" name="plan" value="{{ $plan->slug }}" 
-                       {{ old('plan', 'free') == $plan->slug ? 'checked' : '' }}
-                       class="hidden">
-                <div class="text-center">
-                    <span class="font-bold text-gray-800 block">{{ $plan->name }}</span>
-                    
-                    {{-- 🔥 Updated price display logic --}}
-                    @if($plan->slug == 'enterprise')
-                        <span class="text-sm text-blue-600 block">Contact for Pricing</span>
-                    @elseif($plan->price_monthly === 0 || $plan->price_yearly === 0)
-                        <span class="text-sm text-green-600 block">Free</span>
-                    @elseif($plan->price_monthly !== null)
-                        <span class="text-sm text-blue-600 block">${{ number_format($plan->price_monthly, 0) }}/mo</span>
-                    @else
-                        <span class="text-sm text-gray-500 block">Custom</span>
-                    @endif
-                </div>
-            </label>
-        @endforeach
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Don't worry, you can change your plan later.</p>
-</div>
+                {{-- ========== BASIC FIELDS (सबैको लागि) ========== --}}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+                        <input type="text" name="name" value="{{ old('name') }}" required
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
-                <!-- Checkbox: Register as Business/Provider -->
-                <div class="mb-4">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" id="is_provider" name="is_provider" value="1"
-                               {{ old('provider_type') ? 'checked' : '' }}
-                               class="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <span class="text-sm text-gray-700">Register as a business / provider</span>
-                    </label>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
+                        <input type="email" name="email" value="{{ old('email') }}" required
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+                        <input type="text" name="phone" value="{{ old('phone') }}"
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
+                        <input type="password" name="password" required
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirm Password *</label>
+                        <input type="password" name="password_confirmation" required
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
 
-                <!-- Provider Fields (hidden by default) -->
-                <div id="provider_fields" style="{{ old('provider_type') ? 'display: block;' : 'display: none;' }}">
+                {{-- ========== PROVIDER FIELDS (केवल Business को लागि) ========== --}}
+                <div id="providerFields" class="{{ old('account_type') === 'provider' ? 'block' : 'hidden' }} mt-6 pt-6 border-t">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Business Name *</label>
                         <input type="text" name="business_name" value="{{ old('business_name') }}"
@@ -128,8 +158,7 @@
                         </select>
                     </div>
 
-                    {{-- 🔥 Custom Type Input (hidden by default) --}}
-                    <div id="custom_type_section" style="{{ old('provider_type') == 'other' ? 'display: block;' : 'display: none;' }}" class="mb-4">
+                    <div id="customTypeSection" style="{{ old('provider_type') == 'other' ? 'display: block;' : 'display: none;' }}" class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Specify Business Type *</label>
                         <input type="text" name="custom_provider_type" value="{{ old('custom_provider_type') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -146,42 +175,83 @@
                         <input type="text" name="address" value="{{ old('address') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
+
+                    {{-- Plan Selection (केवल provider को लागि) --}}
+                    <div class="mt-6 pt-6 border-t">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Choose Your Plan</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            @foreach($plans ?? [] as $plan)
+                                <label class="plan-card border rounded-lg p-3 cursor-pointer transition {{ old('plan', 'free') == $plan->slug ? 'selected' : 'border-gray-200' }}">
+                                    <input type="radio" name="plan" value="{{ $plan->slug }}" 
+                                           {{ old('plan', 'free') == $plan->slug ? 'checked' : '' }}
+                                           class="hidden">
+                                    <div class="text-center">
+                                        <span class="font-bold text-gray-800 block">{{ $plan->name }}</span>
+                                        @if($plan->slug == 'enterprise')
+                                            <span class="text-sm text-blue-600 block">Contact for Pricing</span>
+                                        @elseif($plan->price_monthly === 0 || $plan->price_yearly === 0)
+                                            <span class="text-sm text-green-600 block">Free</span>
+                                        @else
+                                            <span class="text-sm text-blue-600 block">
+                                                {{ session('display_currency', 'USD') === 'USD' ? '$' : 'Rs. ' }}
+                                                {{ number_format($plan->price_monthly, 0) }}/mo
+                                            </span>
+                                        @endif
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">You can change your plan later from your dashboard.</p>
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Register
-                </button>
+                {{-- ========== SUBMIT BUTTON ========== --}}
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        <span id="submitBtnText">Create {{ old('account_type', 'traveler') === 'traveler' ? 'Traveler' : 'Business' }} Account</span>
+                    </button>
+                </div>
             </form>
 
             <p class="text-center text-gray-600 text-sm mt-6">
                 Already have an account?
                 <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Log in here</a>
             </p>
-
-            <div class="mt-4 text-center text-sm">
-                <span class="text-gray-400">or</span>
-                {{-- Legacy agency registration link removed --}}
-            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ========== Toggle Provider Fields ==========
-            const checkbox = document.getElementById('is_provider');
-            const fields = document.getElementById('provider_fields');
+            // ========== Account Type Selection ==========
+            const accountCards = document.querySelectorAll('.account-card');
+            const providerFields = document.getElementById('providerFields');
+            const submitBtnText = document.getElementById('submitBtnText');
 
-            if (checkbox && fields) {
-                fields.style.display = checkbox.checked ? 'block' : 'none';
+            accountCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    accountCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
 
-                checkbox.addEventListener('change', function() {
-                    fields.style.display = this.checked ? 'block' : 'none';
+                    // Check the radio
+                    const radio = this.querySelector('.account-radio');
+                    if (radio) radio.checked = true;
+
+                    // Show/hide provider fields
+                    const accountType = this.dataset.account;
+                    if (accountType === 'provider') {
+                        providerFields.classList.remove('hidden');
+                        submitBtnText.textContent = 'Create Business Account';
+                    } else {
+                        providerFields.classList.add('hidden');
+                        submitBtnText.textContent = 'Create Traveler Account';
+                    }
                 });
-            }
+            });
 
-            // ========== Toggle Custom Type Input ==========
+            // ========== Custom Type Input Toggle ==========
             const typeSelect = document.getElementById('provider_type');
-            const customSection = document.getElementById('custom_type_section');
+            const customSection = document.getElementById('customTypeSection');
 
             if (typeSelect && customSection) {
                 typeSelect.addEventListener('change', function() {
