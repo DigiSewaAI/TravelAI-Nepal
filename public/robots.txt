@@ -1,2 +1,16 @@
-User-agent: *
-Disallow:
+============================================
+robots.txt for TravelAI Nepal
+============================================
+User-agent: * Allow: /
+---- Disallow sensitive/private areas ----
+Disallow: /login Disallow: /register Disallow: /logout Disallow: /admin/ Disallow: /provider/ Disallow: /traveler/ Disallow: /currency/switch Disallow: /webhook/stripe
+---- Disallow old/redirected URLs ----
+Disallow: /agencies
+---- Disallow QR/check-in internal routes ----
+Disallow: /scan/ Disallow: /booking/qr/
+---- Sitemap location ----
+? Development (Local) ?? ????:
+Sitemap: http://localhost:8000/sitemap.xml
+? Production ?? ????? ?????? line comment ???? ???? uncomment ?????????:
+Sitemap: https://travelai.com.np/sitemap.xml
+

@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\ProviderController as AdminProviderController;
 // QR Code generation (requires SimpleSoftwareIO\QrCode)
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
+use App\Http\Controllers\SitemapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,8 @@ Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact'
 Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+
 
 // =============================================
 // 2. PUBLIC MARKETPLACE (Phase 7)

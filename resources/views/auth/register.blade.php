@@ -57,9 +57,12 @@
 <body>
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
+            <!-- ===== LOGO & HEADER (Updated) ===== -->
             <div class="text-center mb-6">
-                <i class="fas fa-mountain text-3xl text-blue-600"></i>
-                <h1 class="text-2xl font-bold text-gray-800 mt-2">TravelAI Nepal</h1>
+                <img src="{{ asset('images/logo.png') }}"
+                     alt="TravelAI Nepal"
+                     class="h-16 mx-auto mb-2">
+                <h1 class="text-2xl font-bold text-gray-800">TravelAI Nepal</h1>
                 <p class="text-gray-500">Create your account</p>
             </div>
 

@@ -13,10 +13,13 @@
 <body>
     <div class="min-h-screen flex items-center justify-center">
         <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+            <!-- ===== LOGO & HEADER (Updated) ===== -->
             <div class="text-center mb-6">
-                <i class="fas fa-mountain text-3xl text-blue-600"></i>
-                <h1 class="text-2xl font-bold text-gray-800 mt-2">TravelAI Nepal</h1>
-                <p class="text-gray-500">Log in to your account</p>
+                <img src="{{ asset('images/logo.png') }}"
+                     alt="TravelAI Nepal"
+                     class="h-16 mx-auto mb-2">
+                <h1 class="text-2xl font-bold text-gray-800">Welcome Back</h1>
+                <p class="text-gray-500">Log in to your TravelAI account</p>
             </div>
 
             @if($errors->any())
@@ -64,7 +67,7 @@
             {{-- Link to old agency login --}}
             <div class="mt-4 text-center text-sm">
                 <span class="text-gray-400">or</span>
-{{-- <a href="{{ route('agency.login') }}" class="text-blue-600 hover:underline ml-1">Agency Login (Legacy)</a> --}}
+                {{-- <a href="{{ route('agency.login') }}" class="text-blue-600 hover:underline ml-1">Agency Login (Legacy)</a> --}}
             </div>
         </div>
     </div>
