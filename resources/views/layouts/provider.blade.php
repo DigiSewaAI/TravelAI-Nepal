@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- ========== FAVICON ========== -->
+<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico?v=3') }}">
+<link rel="icon" type="image/png" sizes="128x128" href="{{ asset('favicon-128x128.png?v=3') }}">
+<link rel="icon" type="image/png" sizes="64x64" href="{{ asset('favicon-64x64.png?v=3') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png?v=3') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png?v=3') }}">
+<meta name="theme-color" content="#2563eb">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Provider Dashboard | TravelAI Nepal')</title>
@@ -20,10 +27,12 @@
     <div class="flex h-screen">
         <!-- Sidebar -->
         <div class="w-64 bg-white border-r shadow-sm p-4 flex flex-col">
-            <div class="flex items-center space-x-2 mb-6">
-                <i class="fas fa-mountain text-blue-600 text-xl"></i>
-                <span class="font-bold text-gray-800 text-lg">TravelAI Nepal</span>
-            </div>
+            <a href="{{ route('provider.dashboard') }}" class="flex items-center space-x-2 mb-6">
+    <img src="{{ asset('images/logo.png') }}" 
+         alt="TravelAI Nepal" 
+         class="h-10 w-auto">
+    <span class="font-bold text-gray-800 text-lg">TravelAI Nepal</span>
+</a>
 
             <!-- Provider Info with Logo -->
             @if(isset($provider) && $provider)

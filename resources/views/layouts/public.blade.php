@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <!-- ========== FAVICON (RealFaviconGenerator) ========== -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon-96x96.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
-    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
-    <meta name="msapplication-TileColor" content="#2563eb">
-    <meta name="theme-color" content="#2563eb">
+    <!-- ========== FAVICON (High Resolution PNG Priority) ========== -->
+<!-- 128x128 – सबैभन्दा ठूलो (Double Size) -->
+<link rel="icon" type="image/png" sizes="128x128" href="{{ asset('favicon-128x128.png?v=3') }}">
+<!-- 64x64 – मध्यम -->
+<link rel="icon" type="image/png" sizes="64x64" href="{{ asset('favicon-64x64.png?v=3') }}">
+<!-- 32x32 – Default -->
+<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png?v=3') }}">
+<!-- ICO – Fallback (अन्तिम) -->
+<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico?v=3') }}">
+<!-- Apple Touch Icon -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png?v=3') }}">
+<link rel="manifest" href="{{ asset('site.webmanifest?v=3') }}">
+<meta name="msapplication-TileColor" content="#2563eb">
+<meta name="theme-color" content="#2563eb">
 
     <!-- ========== PWA (Manifest + Service Worker) ========== -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">
