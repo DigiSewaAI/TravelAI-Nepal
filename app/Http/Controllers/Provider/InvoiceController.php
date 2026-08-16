@@ -4,21 +4,28 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
-use App\Services\InvoiceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
-    protected $invoiceService;
-
-    public function __construct(InvoiceService $invoiceService)
-    {
-        $this->invoiceService = $invoiceService;
-    }
-
     public function index(Request $request)
     {
-        $provider = auth()->user()->provider;
+        $user = Auth::user();
+
+        // ✅ hasOne relationship प्रयोग गर्नुहोस्
+        $provider = $user->provider;
+
+        // 🔥 Fallback – यदि relationship काम गरेन भने direct query
+        if (!$provider) {
+            $provider = \App\Models\Provider::where('user_id', $user->id)->first();
+        }
+
+        if (!$provider) {
+            return redirect()->route('provider.dashboard')
+                ->with('error', 'Provider profile not found. Please contact support.');
+        }
 
         $query = Invoice::where('provider_id', $provider->id);
 
@@ -32,6 +39,7 @@ class InvoiceController extends Controller
             'total' => Invoice::where('provider_id', $provider->id)->count(),
             'paid' => Invoice::where('provider_id', $provider->id)->where('status', 'paid')->count(),
             'pending' => Invoice::where('provider_id', $provider->id)->where('status', 'pending')->count(),
+            'overdue' => Invoice::where('provider_id', $provider->id)->where('status', 'overdue')->count(),
         ];
 
         return view('provider.invoices.index', compact('invoices', 'stats'));
@@ -39,15 +47,39 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $this->authorize('view', $invoice);
-        $invoice->load(['subscription', 'booking']);
+        $user = Auth::user();
+        $provider = $user->provider;
+
+        if (!$provider) {
+            $provider = \App\Models\Provider::where('user_id', $user->id)->first();
+        }
+
+        if (!$provider || $invoice->provider_id !== $provider->id) {
+            abort(403, 'Unauthorized access to this invoice.');
+        }
+
         return view('provider.invoices.show', compact('invoice'));
     }
 
     public function download(Invoice $invoice)
     {
-        $this->authorize('view', $invoice);
-        $pdf = $this->invoiceService->generatePdf($invoice);
-        return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+        $user = Auth::user();
+        $provider = $user->provider;
+
+        if (!$provider) {
+            $provider = \App\Models\Provider::where('user_id', $user->id)->first();
+        }
+
+        if (!$provider || $invoice->provider_id !== $provider->id) {
+            abort(403, 'Unauthorized access to this invoice.');
+        }
+
+        // ✅ PDF generation – DomPDF प्रयोग गर्नुहोस्
+        try {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.invoices.pdf', compact('invoice'));
+            return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'PDF generation failed: ' . $e->getMessage());
+        }
     }
 }

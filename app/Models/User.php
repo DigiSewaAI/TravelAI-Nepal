@@ -101,4 +101,8 @@ class User extends Authenticatable
     {
         return $this->providers()->first();
     }
+    public function provider()
+{
+    return $this->hasOne(\App\Models\Provider::class, 'user_id');
+}
 }

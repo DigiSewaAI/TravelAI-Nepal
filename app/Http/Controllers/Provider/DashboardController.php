@@ -19,10 +19,18 @@ class DashboardController extends Controller
         }
 
         $user = Auth::user();
-        $provider = $user->providers()->first();
+        
+        // ✅ hasOne relationship प्रयोग गर्नुहोस्
+        $provider = $user->provider;
+
+        // 🔥 Fallback – यदि relationship काम गरेन भने direct query
+        if (!$provider) {
+            $provider = \App\Models\Provider::where('user_id', $user->id)->first();
+        }
 
         if (!$provider) {
-            abort(403, 'You do not have a provider account.');
+            return redirect()->route('provider.dashboard')
+                ->with('error', 'Provider profile not found. Please contact support.');
         }
 
         // Get all services for this provider
@@ -57,7 +65,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 🔥 Recent Check-ins (QR Scans) for this provider's services
+        // Recent Check-ins (QR Scans) for this provider's services
         $checkinHistory = QrScan::whereIn('booking_id', function ($query) use ($serviceIds) {
             $query->select('id')
                   ->from('bookings')
