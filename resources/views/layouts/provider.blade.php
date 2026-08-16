@@ -105,6 +105,15 @@
                     <span>Payments</span>
                 </a>
 
+                                <!-- Invoices (Phase 13) -->
+                @if(Route::has('provider.invoices.index'))
+                <a href="{{ route('provider.invoices.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.invoices.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-invoice w-5"></i>
+                    <span>Invoices</span>
+                </a>
+                @endif
+
                 <!-- Profile -->
                 <a href="{{ route('provider.profile') }}" 
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">

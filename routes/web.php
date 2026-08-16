@@ -127,6 +127,11 @@ Route::prefix('provider')->name('provider.')->group(function () {
 
         Route::get('/checkins', [App\Http\Controllers\Provider\CheckinController::class, 'index'])->name('checkins.index');
     Route::get('/checkins/{scan}', [App\Http\Controllers\Provider\CheckinController::class, 'show'])->name('checkins.show');
+
+        // Provider Invoices
+    Route::get('/invoices', [App\Http\Controllers\Provider\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{invoice}', [App\Http\Controllers\Provider\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Provider\InvoiceController::class, 'download'])->name('invoices.download');
 });
 // Provider profile page (old, but keep for now)
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
@@ -191,6 +196,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Analytics (Phase 11)
     Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
+
+        // Admin Invoices
+    Route::get('/invoices', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{invoice}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
+    Route::post('/invoices/{invoice}/status', [App\Http\Controllers\Admin\InvoiceController::class, 'updateStatus'])->name('invoices.update-status');
 });
 
 // =======================================

@@ -6,16 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\PaymentService;
+use App\Services\InvoiceService;          // <-- Added for invoice generation
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
     protected $paymentService;
+    protected $invoiceService;             // <-- Added
 
-    public function __construct(PaymentService $paymentService)
+    public function __construct(PaymentService $paymentService, InvoiceService $invoiceService)
     {
         $this->paymentService = $paymentService;
+        $this->invoiceService = $invoiceService;   // <-- Injected
     }
 
     /**
@@ -102,6 +105,14 @@ class PaymentController extends Controller
         $result = $this->paymentService->confirmPayment($request->payment_id);
 
         if ($result) {
+            // 🔥 After successful payment, create and send invoice
+            $payment = Payment::where('payment_id', $request->payment_id)->first();
+
+            if ($payment && $payment->payable_type === 'App\Models\Subscription') {
+                $subscription = $payment->payable;
+                $this->invoiceService->createAndSend($payment, $subscription);
+            }
+
             return redirect()->route('provider.subscriptions.index')
                 ->with('success', 'Payment successful! Your subscription is now active.');
         }

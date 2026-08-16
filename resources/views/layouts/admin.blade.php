@@ -97,6 +97,15 @@
                 </a>
                 @endif
 
+    @if(Route::has('admin.invoices.index'))
+    <a href="{{ route('admin.invoices.index') }}"
+       class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}">
+        <i class="fas fa-file-invoice w-5"></i>
+        <span>Invoices</span>
+    </a>
+    @endif
+
+
                 @if(Route::has('admin.reports.index'))
                 <a href="{{ route('admin.reports.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">

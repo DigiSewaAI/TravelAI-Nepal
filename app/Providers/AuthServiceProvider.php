@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Gate;
 // Import Models
 use App\Models\Service;
 use App\Models\Booking;
+use App\Models\Invoice;          // <-- Added
 
 // Import Policies
 use App\Policies\ServicePolicy;
 use App\Policies\BookingPolicy;
+use App\Policies\InvoicePolicy;  // <-- Added
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Service::class => ServicePolicy::class,
         Booking::class => BookingPolicy::class,
+        Invoice::class => InvoicePolicy::class, // <-- Added
     ];
 
     /**
