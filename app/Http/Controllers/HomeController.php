@@ -36,21 +36,44 @@ class HomeController extends Controller
             ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
         ];
 
-        // Fetch latest 10 check-ins with related data
+        // 🔥 FIX: Recent Check‑ins with proper data, fallbacks, and privacy
         $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
-            ->latest()
+            ->latest('scanned_at')  // use scanned_at for ordering
             ->take(10)
             ->get()
             ->map(function ($scan) {
-                $service = $scan->booking->service;
-                $provider = $service->provider ?? null;
+                // Safely extract relations
+                $booking = $scan->booking;
+                $service = $booking?->service;
+                $provider = $service?->provider;
+
+                // Checkpoint: use scanned checkpoint_name, fallback to 'Checkpoint'
+                $checkpoint = $scan->checkpoint_name ?: 'Checkpoint';
+
+                // Trek/Route name: from service, fallback to 'Trek'
+                $trekName = $service?->name ?? 'Trek';
+
+                // Provider/Agency name: from provider, fallback to 'Local Trek Partner'
+                $agencyName = $provider?->name ?? 'Local Trek Partner';
+
+                // Traveler identity: always Anonymous (privacy)
+                $travelerName = 'Anonymous';
+
+                // Time: relative from scanned_at, fallback to 'Just now'
+                $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
+
+                // Cover image: if service has one, use it; otherwise null
+                $coverImage = $service?->cover_image
+                    ? asset('storage/' . $service->cover_image)
+                    : null;
+
                 return [
-                    'checkpoint'   => $scan->checkpoint_name,
-                    'service_name' => $service->name ?? 'Unknown Service',
-                    'provider_name' => $provider->name ?? 'Independent',
-                    'traveler_name' => $scan->booking->traveler->name ?? 'Guest',
-                    'time_ago'     => $scan->scanned_at->diffForHumans(),
-                    'cover_image'  => $service->cover_image ? asset('storage/' . $service->cover_image) : null,
+                    'checkpoint'    => $checkpoint,
+                    'trek_name'     => $trekName,
+                    'agency_name'   => $agencyName,
+                    'trekker_name'  => $travelerName,   // always Anonymous
+                    'time_ago'      => $timeAgo,
+                    'cover_image'   => $coverImage,
                 ];
             });
 
