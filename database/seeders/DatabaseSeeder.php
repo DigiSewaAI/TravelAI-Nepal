@@ -41,8 +41,11 @@ class DatabaseSeeder extends Seeder
             // ✅ Langtang, Helambu & Manaslu Region (7 destinations)
             LangtangHelambuManasluRegionSeeder::class,
             
-            // ✅ NEW: Mustang & Dolpo Region
+            // ✅ Mustang & Dolpo Region (8 destinations)
             MustangDolpoRegionSeeder::class,
+            
+            // ✅ NEW: Kanchenjunga & Makalu Region
+            KanchenjungaMakaluRegionSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
