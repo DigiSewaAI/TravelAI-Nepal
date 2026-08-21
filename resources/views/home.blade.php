@@ -56,11 +56,19 @@
                 <div class="grid md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Destination *</label>
-<select name="destination" id="destination" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
-    <option value="Annapurna Base Camp">Annapurna Base Camp (ABC)</option>
-    <option value="Everest Base Camp">Everest Base Camp (EBC)</option>
-    <option value="Langtang Valley">Langtang Valley</option>
-</select>
+<input type="text" 
+       name="destination" 
+       id="destination" 
+       list="routeList" 
+       required 
+       placeholder="e.g., Annapurna Base Camp, Pokhara, Paragliding..." 
+       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+<datalist id="routeList">
+    @foreach($routes as $route)
+        <option value="{{ $route->name }}"></option>
+    @endforeach
+</datalist>
+<p class="text-xs text-gray-400 mt-1">Type to search from {{ $routes->count() }}+ destinations</p>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Number of Days *</label>
@@ -484,56 +492,125 @@ document.addEventListener('DOMContentLoaded', function() {
     const costPreview = document.getElementById('costPreview');
 
     function estimateCost() {
-        const route = destinationSelect.value;
-        const days = parseInt(daysInput.value) || 0;
-        const style = styleSelect.value;
+    const destination = destinationSelect.value;
+    const days = parseInt(daysInput.value) || 0;
+    const style = styleSelect.value;
 
-        // Base costs per route (NPR)
-        const routeCosts = {
-            'Annapurna Base Camp': { permits: 5000, transport: 1000, foodPerDay: 2500 },
-            'Everest Base Camp': { permits: 5000, transport: 0, foodPerDay: 3000 },
-            'Langtang Valley': { permits: 5000, transport: 1500, foodPerDay: 2500 }
-        };
-
-        const cost = routeCosts[route];
-        if (!cost || days === 0) {
-            costPreview.innerHTML = '';
-            return;
-        }
-
-        let total = cost.permits + cost.transport + (cost.foodPerDay * days);
-
-        // Travel style multiplier
-        const styleMultiplier = { budget: 0.8, mid_range: 1.0, luxury: 1.5, backpacker: 0.9 };
-        total = total * (styleMultiplier[style] || 1.0);
-
-        // USD conversion (approx rate)
-        const usdRate = 0.0075; // 1 NPR ≈ 0.0075 USD
-        const usdTotal = Math.round(total * usdRate);
-
-        costPreview.innerHTML = `💰 Estimated Total: <span class="font-bold text-blue-600">NPR ${total.toLocaleString()}</span> (≈ USD ${usdTotal.toLocaleString()})`;
+    if (!destination || days === 0) {
+        costPreview.innerHTML = '';
+        return;
     }
+
+    // Compute rough estimate using route name matching
+    const estNpr = estimateBudgetFromName(destination, days);
+    if (estNpr === 0) {
+        costPreview.innerHTML = '';
+        return;
+    }
+
+    const styleMultiplier = { budget: 0.8, mid_range: 1.0, luxury: 1.5, backpacker: 0.9 };
+    const totalNpr = Math.round(estNpr * (styleMultiplier[style] || 1.0));
+    const usdTotal = Math.round(totalNpr * 0.0075);
+
+    costPreview.innerHTML = `💰 Estimated Total: <span class="font-bold text-blue-600">~$${usdTotal} USD</span>`;
+}
+
+function estimateBudgetFromName(name, days) {
+    // Map route names to estimates
+    const estimates = {
+        'Annapurna Base Camp': { permits: 5000, foodPerDay: 2500, transport: 1000 },
+        'Everest Base Camp': { permits: 5000, foodPerDay: 3000, transport: 0 },
+        'Langtang Valley': { permits: 5000, foodPerDay: 2500, transport: 1500 },
+        'Ghorepani Poon Hill': { permits: 3000, foodPerDay: 2000, transport: 1000 },
+        'Annapurna Circuit': { permits: 5000, foodPerDay: 2500, transport: 2000 },
+        'Mardi Himal': { permits: 3000, foodPerDay: 2200, transport: 500 },
+        'Manaslu Circuit': { permits: 8000, foodPerDay: 3000, transport: 1000 },
+        'Gokyo Lakes': { permits: 5000, foodPerDay: 3500, transport: 0 },
+        'Three Passes Trek': { permits: 5000, foodPerDay: 3500, transport: 0 },
+        'Upper Mustang': { permits: 8000, foodPerDay: 3000, transport: 1000 },
+        'Lower Mustang': { permits: 3000, foodPerDay: 2500, transport: 500 },
+        'Rara Lake': { permits: 3000, foodPerDay: 2200, transport: 500 },
+        'Dolpo Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
+        'Phoksundo Lake': { permits: 3000, foodPerDay: 2500, transport: 500 },
+        'Kanchenjunga Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
+        'Makalu Base Camp': { permits: 8000, foodPerDay: 3500, transport: 1000 },
+        'Dhaulagiri Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
+        'Kathmandu City Tour': { permits: 0, foodPerDay: 1500, transport: 50 },
+        'Kathmandu Valley Heritage Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
+        'Bhaktapur Durbar Square Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Patan Durbar Square Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Kirtipur Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Lumbini Buddhist Circuit': { permits: 0, foodPerDay: 1200, transport: 50 },
+        'Janakpur Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Muktinath Temple Tour': { permits: 0, foodPerDay: 2000, transport: 150 },
+        'Chitwan National Park Safari': { permits: 0, foodPerDay: 1500, transport: 50 },
+        'Trishuli River Rafting': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Paragliding in Pokhara': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Kusma Bungee': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Bandipur Village Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
+        'Tansen Hill Town Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
+        'Dhulikhel Scenic Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Panauti Heritage Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Namobuddha Monastery Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Kirtipur Ancient Town Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Sankhu Historical Town Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Khokana Traditional Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Bungamati Woodcarving Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Chobar Gorge & Temple Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Godavari Botanical Garden Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Pharping Monastery & Cave Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Kakani Hill Station Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Nuwakot Durbar Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
+        'Sindhuli Fort Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Bhedetar Hill Station Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
+        'Hile Tea Garden Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Dharan City Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
+        'Barun Valley Wilderness Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
+        'Simikot Remote Town Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
+        'Sinja Valley Historical Tour': { permits: 0, foodPerDay: 1200, transport: 50 },
+        'Shey Gompa Dolpa Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
+    };
+
+    // Try exact match first
+    if (estimates[name]) {
+        const est = estimates[name];
+        return est.permits + est.transport + (est.foodPerDay * days);
+    }
+
+    // Try partial match
+    const keys = Object.keys(estimates);
+    for (const key of keys) {
+        if (name.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(name.toLowerCase())) {
+            const est = estimates[key];
+            return est.permits + est.transport + (est.foodPerDay * days);
+        }
+    }
+
+    // Fallback: generic $50/day + $50
+    return (days * 50) + 50;
+}
 
     // Auto-fill days & budget on destination change
     function autoFill() {
-        const route = destinationSelect.value;
-        const daysMap = {
-            'Annapurna Base Camp': 9,
-            'Everest Base Camp': 12,
-            'Langtang Valley': 7
-        };
-        const budgetMap = {
-            'Annapurna Base Camp': 500,
-            'Everest Base Camp': 1200,
-            'Langtang Valley': 400
-        };
-        if (daysMap[route]) {
-            daysInput.value = daysMap[route];
-            budgetInput.value = budgetMap[route];
-            // After auto-fill, update cost preview
-            estimateCost();
-        }
+    const route = destinationSelect.value;
+    const routesData = @json($routes->map(function($r) {
+        return ['name' => $r->name, 'duration_days' => $r->duration_days];
+    }));
+
+    const matched = routesData.find(r => r.name === route || r.name.toLowerCase() === route.toLowerCase());
+    if (matched && matched.duration_days) {
+        daysInput.value = matched.duration_days;
+        // Budget estimate using estimateBudgetFromName
+        const estUsd = Math.round(estimateBudgetFromName(matched.name, matched.duration_days) * 0.0075);
+        budgetInput.value = estUsd;
+        estimateCost();
+    } else {
+        // Fallback: 3 days, $200
+        daysInput.value = 3;
+        budgetInput.value = 200;
+        estimateCost();
     }
+}
 
     // Event listeners
     destinationSelect.addEventListener('change', function() {

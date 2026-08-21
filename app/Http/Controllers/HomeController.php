@@ -6,6 +6,7 @@ use App\Models\Service;
 use App\Models\Booking;
 use App\Models\Provider;
 use App\Models\QrScan;
+use App\Models\Route;
 
 class HomeController extends Controller
 {
@@ -15,69 +16,60 @@ class HomeController extends Controller
      * @return \Illuminate\View\View
      */
     public function index()
-    {
-        // Fetch featured services (latest 6, with provider relationship)
-        $featuredServices = Service::with(['provider', 'category', 'trekDetail'])
-            ->where('status', 'active')
-            ->latest()
-            ->take(6)
-            ->get();
+{
+    // Fetch featured services (latest 6, with provider relationship)
+    $featuredServices = Service::with(['provider', 'category', 'trekDetail'])
+        ->where('status', 'active')
+        ->latest()
+        ->take(6)
+        ->get();
 
-        // Real-time stats from database
-        $totalServices = Service::count();
-        $totalProviders = Provider::count();
-        $totalBookings = Booking::count();
+    // Real-time stats from database
+    $totalServices = Service::count();
+    $totalProviders = Provider::count();
+    $totalBookings = Booking::count();
 
-        // Stats array for the banner
-        $stats = [
-            ['value' => $totalServices . '+', 'label' => 'Tourism Services'],
-            ['value' => $totalProviders, 'label' => 'Trusted Providers'],
-            ['value' => $totalBookings, 'label' => 'Happy Travelers'],
-            ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
-        ];
+    // Stats array for the banner
+    $stats = [
+        ['value' => $totalServices . '+', 'label' => 'Tourism Services'],
+        ['value' => $totalProviders, 'label' => 'Trusted Providers'],
+        ['value' => $totalBookings, 'label' => 'Happy Travelers'],
+        ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
+    ];
 
-        // 🔥 FIX: Recent Check‑ins with proper data, fallbacks, and privacy
-        $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
-            ->latest('scanned_at')  // use scanned_at for ordering
-            ->take(10)
-            ->get()
-            ->map(function ($scan) {
-                // Safely extract relations
-                $booking = $scan->booking;
-                $service = $booking?->service;
-                $provider = $service?->provider;
+    // Recent Check‑ins (existing)
+    $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
+        ->latest('scanned_at')
+        ->take(10)
+        ->get()
+        ->map(function ($scan) {
+            $booking = $scan->booking;
+            $service = $booking?->service;
+            $provider = $service?->provider;
 
-                // Checkpoint: use scanned checkpoint_name, fallback to 'Checkpoint'
-                $checkpoint = $scan->checkpoint_name ?: 'Checkpoint';
+            $checkpoint = $scan->checkpoint_name ?: 'Checkpoint';
+            $trekName = $service?->name ?? 'Trek';
+            $agencyName = $provider?->name ?? 'Local Trek Partner';
+            $travelerName = 'Anonymous';
+            $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
+            $coverImage = $service?->cover_image ? asset('storage/' . $service->cover_image) : null;
 
-                // Trek/Route name: from service, fallback to 'Trek'
-                $trekName = $service?->name ?? 'Trek';
+            return [
+                'checkpoint'    => $checkpoint,
+                'trek_name'     => $trekName,
+                'agency_name'   => $agencyName,
+                'trekker_name'  => $travelerName,
+                'time_ago'      => $timeAgo,
+                'cover_image'   => $coverImage,
+            ];
+        });
 
-                // Provider/Agency name: from provider, fallback to 'Local Trek Partner'
-                $agencyName = $provider?->name ?? 'Local Trek Partner';
+    // ✅ NEW: Fetch active routes for destination search
+    $routes = Route::where('is_active', true)
+        ->orderBy('name')
+        ->get(['id', 'name', 'slug', 'duration_days', 'max_altitude']);
 
-                // Traveler identity: always Anonymous (privacy)
-                $travelerName = 'Anonymous';
-
-                // Time: relative from scanned_at, fallback to 'Just now'
-                $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
-
-                // Cover image: if service has one, use it; otherwise null
-                $coverImage = $service?->cover_image
-                    ? asset('storage/' . $service->cover_image)
-                    : null;
-
-                return [
-                    'checkpoint'    => $checkpoint,
-                    'trek_name'     => $trekName,
-                    'agency_name'   => $agencyName,
-                    'trekker_name'  => $travelerName,   // always Anonymous
-                    'time_ago'      => $timeAgo,
-                    'cover_image'   => $coverImage,
-                ];
-            });
-
-        // Return view with all required variables
-        return view('home', compact('featuredServices', 'stats', 'recentCheckins'));
-    }
+    // Return view with all required variables
+    return view('home', compact('featuredServices', 'stats', 'recentCheckins', 'routes'));
+}
 }
