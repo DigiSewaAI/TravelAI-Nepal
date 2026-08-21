@@ -8,6 +8,7 @@ use App\Models\PlannerResult;
 use App\Models\ItineraryDay;
 use App\Models\ItineraryItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class PlannerService
@@ -29,27 +30,36 @@ class PlannerService
             throw ValidationException::withMessages(['destination' => 'Route not found.']);
         }
 
-        // 2. Load verified data
         $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
         if ($route->segments->isEmpty()) {
             throw new \Exception('Route has no segments defined.');
         }
 
-        // 3. Calculate base cost (Laravel engine)
+        // 2. Cost calculation
         $costBreakdown = $this->calculateCost($route, $input);
 
-        // 4. Build grounded context
+        // 3. Build context
         $context = $this->buildContext($route, $input, $costBreakdown);
 
-        // 5. Send to LLM
-        $prompt = $this->buildPrompt($context, $input);
-        $aiResponse = $this->llm->generateItinerary($prompt);
+        // 4. Try to get AI itinerary, fallback if fails
+        $aiResponse = null;
+        $usedFallback = false;
 
-        // 6. Validate AI output against database facts (pass context)
+        try {
+            $prompt = $this->buildPrompt($context, $input);
+            $aiResponse = $this->llm->generateItinerary($prompt);
+            Log::info('AI itinerary generated successfully.');
+        } catch (\Exception $e) {
+            Log::error('AI generation failed, using fallback.', ['error' => $e->getMessage()]);
+            $aiResponse = $this->buildFallbackResponse($route, $input);
+            $usedFallback = true;
+        }
+
+        // 5. Validate
         $validated = $this->validator->validate($aiResponse, $route, $input, $context);
 
-        // 7. Save everything
-        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse) {
+        // 6. Save
+        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
             $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
                 'session_id' => session()->getId(),
@@ -72,12 +82,11 @@ class PlannerService
                     'name' => $route->name,
                     'segments' => $route->segments->toArray(),
                 ],
-                'validation_status' => 'valid',
-                'fallback_used' => false,
+                'validation_status' => $usedFallback ? 'fallback' : 'valid',
+                'fallback_used' => $usedFallback,
                 'validation_errors' => null,
             ]);
 
-            // Save days and items
             foreach ($validated['days'] as $dayData) {
                 $day = ItineraryDay::create([
                     'result_id' => $plannerResult->id,
@@ -111,18 +120,19 @@ class PlannerService
                 'request' => $plannerRequest,
                 'result' => $plannerResult,
                 'days' => $plannerResult->days()->with('items')->get(),
+                'total_cost' => $costBreakdown['total'] ?? 0,
             ];
         });
-
-        // ✅ ADD total_cost from the already calculated breakdown
-        $result['total_cost'] = $costBreakdown['total'] ?? 0;
 
         return $result;
     }
 
     protected function resolveRoute(?string $destination): ?Route
     {
-        if (!$destination) return Route::where('is_active', true)->first();
+        if (!$destination) {
+            return Route::where('is_active', true)->first();
+        }
+
         return Route::where('name', 'LIKE', "%{$destination}%")
             ->orWhere('slug', 'LIKE', "%{$destination}%")
             ->where('is_active', true)
@@ -153,33 +163,6 @@ class PlannerService
         return ['total' => $total, 'breakdown' => $breakdown];
     }
 
-    /**
-     * Get verified partner services safe to use for ABC.
-     * Only hotel, transport, and guide categories – no activities/experiences.
-     */
-    protected function getSafeAbcServices(): array
-    {
-        $allowedCategories = ['hotel', 'transport', 'guide'];
-
-        return \App\Models\Service::whereHas('category', function ($q) use ($allowedCategories) {
-                $q->whereIn('slug', $allowedCategories);
-            })
-            ->where('status', 'active')
-            ->get()
-            ->map(function ($service) {
-                return [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'category' => $service->category->slug ?? 'unknown',
-                    'description' => $service->description,
-                    'price' => $service->price,
-                    'currency' => $service->currency ?? 'NPR',
-                    'provider' => $service->provider->name ?? null,
-                ];
-            })
-            ->toArray();
-    }
-
     protected function buildContext(Route $route, array $input, array $cost): array
     {
         $segments = [];
@@ -197,9 +180,6 @@ class PlannerService
             ];
         }
 
-        // ✅ Add safe partner services
-        $availableServices = $this->getSafeAbcServices();
-
         return [
             'route_name' => $route->name,
             'duration_days' => $route->duration_days,
@@ -213,47 +193,136 @@ class PlannerService
             'fitness_level' => $input['fitness_level'] ?? 'moderate',
             'cost_breakdown' => $cost,
             'segments' => $segments,
-            'available_services' => $availableServices,
         ];
     }
 
-    /**
-     * Build a prompt with reduced token size and include available services.
-     */
     protected function buildPrompt(array $context, array $input): string
-{
-    // Only 2+2 segments (first 2, last 2)
-    $segments = $context['segments'];
-    $total = count($segments);
-    if ($total > 4) {
-        $segments = array_merge(
-            array_slice($segments, 0, 2),
-            array_slice($segments, -2)
-        );
+    {
+        // Reduce segments to first 3 + last 3 to save tokens
+        $segments = $context['segments'];
+        $total = count($segments);
+        if ($total > 6) {
+            $segments = array_merge(
+                array_slice($segments, 0, 3),
+                array_slice($segments, -3)
+            );
+        }
+        $context['segments'] = $segments;
+
+        $payload = [
+            'instruction' => 'Generate a day-by-day itinerary for a Nepal trek. Use ONLY the provided verified data.',
+            'user_request' => [
+                'days' => $input['days'],
+                'budget' => $input['budget'],
+                'style' => $input['travel_style'] ?? 'mid_range',
+                'interests' => $input['interests'] ?? [],
+                'fitness' => $input['fitness_level'] ?? 'moderate',
+            ],
+            'route_data' => [
+                'name' => $context['route_name'],
+                'difficulty' => $context['difficulty'],
+                'max_altitude' => $context['max_altitude'],
+                'segments' => $segments,
+            ],
+            'cost_breakdown' => $context['cost_breakdown']['breakdown'] ?? [],
+            'rules' => [
+                'Use ONLY data from route_data for distances, waypoints, and altitudes.',
+                'Do NOT invent any waypoints, distances, or costs.',
+                'Do NOT calculate the total cost.',
+                'Return valid JSON with a "days" array.',
+            ],
+        ];
+
+        return json_encode($payload, JSON_PRETTY_PRINT);
     }
 
-    // Only 4 services (id, name, category)
-    $services = array_map(function($s) {
-        return ['id' => $s['id'], 'name' => $s['name'], 'category' => $s['category']];
-    }, array_slice($context['available_services'] ?? [], 0, 4));
+    protected function buildFallbackResponse(Route $route, array $input): array
+{
+    $segments = $route->segments()->orderBy('sequence')->get();
+    $days = [];
+    $dayNumber = 1;
 
-    $payload = [
-        'instruction' => 'Generate a 9-day ABC trek itinerary JSON. Use given segments and services. Return ONLY valid JSON.',
-        'segments' => $segments,
-        'services' => $services,
-        'cost_total' => $context['cost_breakdown']['total'] ?? 0,
-        'user' => [
-            'days' => $input['days'],
-            'style' => $input['travel_style'] ?? 'mid_range',
-        ],
-        'rules' => [
-            'Use services with service_id only.',
-            'Do NOT invent names.',
-            'Do NOT calculate total.',
-            'Return ONLY JSON. No explanation, no markdown.',
-        ],
-    ];
+    // Get route costs for calculation
+    $routeCosts = $route->costs;
+    $dailyFoodCost = 0;
+    $permitCost = 0;
+    $transportCost = 0;
 
-    return json_encode($payload, JSON_PRETTY_PRINT);
+    foreach ($routeCosts as $cost) {
+        if ($cost->unit === 'per_day') {
+            $dailyFoodCost = $cost->amount;
+        } elseif ($cost->type === 'permit' || $cost->type === 'conservation_fee') {
+            $permitCost += $cost->amount;
+        } elseif ($cost->type === 'local_transport') {
+            $transportCost = $cost->amount;
+        }
+    }
+
+    $totalPermitTransport = $permitCost + $transportCost;
+    $totalDays = $input['days'];
+
+    // Calculate per-day cost (spread permits/transport across days)
+    $perDayBaseCost = $totalPermitTransport / $totalDays;
+
+    foreach ($segments as $seg) {
+        $from = $seg->fromWaypoint;
+        $to = $seg->toWaypoint;
+
+        // Calculate day cost: base + food
+        $dayCost = $perDayBaseCost + $dailyFoodCost;
+
+        $days[] = [
+            'day_number' => $dayNumber++,
+            'title' => "Day " . ($dayNumber - 1) . ": {$from->name} → {$to->name}",
+            'description' => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
+            'overnight_waypoint_id' => $seg->to_waypoint_id,
+            'distance_km' => (float) $seg->distance_km,
+            'estimated_time_hours' => (float) $seg->estimated_time_hours,
+            'altitude_m' => $to->altitude,
+            'items' => [
+                [
+                    'title' => 'Trekking Day',
+                    'description' => "Hike from {$from->name} to {$to->name}",
+                    'time_of_day' => 'morning',
+                    'cost' => round($dayCost, 2), // ✅ Cost added
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
+                ]
+            ]
+        ];
+    }
+
+    // Add rest days if needed
+    $requestedDays = $input['days'];
+    while (count($days) < $requestedDays) {
+        $last = end($days);
+        $days[] = [
+            'day_number' => count($days) + 1,
+            'title' => "Day " . (count($days) + 1) . ": Rest & Acclimatization",
+            'description' => 'Rest day to acclimatize and enjoy the mountain views.',
+            'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
+            'distance_km' => 0,
+            'estimated_time_hours' => 0,
+            'altitude_m' => $last['altitude_m'] ?? null,
+            'items' => [
+                [
+                    'title' => 'Rest & Acclimatization',
+                    'description' => 'Take it easy, hydrate, and enjoy the scenery.',
+                    'time_of_day' => 'morning',
+                    'cost' => round($dailyFoodCost, 2), // ✅ Rest day cost (only food)
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
+                ]
+            ]
+        ];
+    }
+
+    return ['days' => $days];
 }
 }

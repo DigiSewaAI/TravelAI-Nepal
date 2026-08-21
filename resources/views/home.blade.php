@@ -43,6 +43,7 @@
   </section>
 
   <!-- AI Travel Planner सेक्सन -->
+   
 <div class="max-w-4xl mx-auto px-4 my-12">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
@@ -55,7 +56,11 @@
                 <div class="grid md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Destination *</label>
-                        <input type="text" name="destination" id="destination" required placeholder="e.g., Pokhara, Everest Base Camp" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+<select name="destination" id="destination" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+    <option value="Annapurna Base Camp">Annapurna Base Camp (ABC)</option>
+    <option value="Everest Base Camp">Everest Base Camp (EBC)</option>
+    <option value="Langtang Valley">Langtang Valley</option>
+</select>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Number of Days *</label>
@@ -90,6 +95,7 @@
                 <button type="submit" id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
                     <i class="fas fa-magic"></i> Generate Itinerary
                 </button>
+                <div id="costPreview" class="mt-4 text-center text-lg font-semibold text-gray-700"></div>
             </form>
             <div id="result" class="mt-8 hidden">
                 <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
@@ -468,4 +474,77 @@
     if (anonymizedCheckins.length > 0) { renderCheckin(0); startRotation(); }
     else { const slider = document.getElementById('checkin-slider'); slider.innerHTML = '<div class="text-center text-gray-500">No check‑ins yet</div>'; slider.style.backgroundImage = ''; }
   </script>
+    <!-- ✅ Auto-fill + Real-time Cost Preview -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const destinationSelect = document.getElementById('destination');
+    const daysInput = document.getElementById('days');
+    const budgetInput = document.getElementById('budget');
+    const styleSelect = document.getElementById('travel_style');
+    const costPreview = document.getElementById('costPreview');
+
+    function estimateCost() {
+        const route = destinationSelect.value;
+        const days = parseInt(daysInput.value) || 0;
+        const style = styleSelect.value;
+
+        // Base costs per route (NPR)
+        const routeCosts = {
+            'Annapurna Base Camp': { permits: 5000, transport: 1000, foodPerDay: 2500 },
+            'Everest Base Camp': { permits: 5000, transport: 0, foodPerDay: 3000 },
+            'Langtang Valley': { permits: 5000, transport: 1500, foodPerDay: 2500 }
+        };
+
+        const cost = routeCosts[route];
+        if (!cost || days === 0) {
+            costPreview.innerHTML = '';
+            return;
+        }
+
+        let total = cost.permits + cost.transport + (cost.foodPerDay * days);
+
+        // Travel style multiplier
+        const styleMultiplier = { budget: 0.8, mid_range: 1.0, luxury: 1.5, backpacker: 0.9 };
+        total = total * (styleMultiplier[style] || 1.0);
+
+        // USD conversion (approx rate)
+        const usdRate = 0.0075; // 1 NPR ≈ 0.0075 USD
+        const usdTotal = Math.round(total * usdRate);
+
+        costPreview.innerHTML = `💰 Estimated Total: <span class="font-bold text-blue-600">NPR ${total.toLocaleString()}</span> (≈ USD ${usdTotal.toLocaleString()})`;
+    }
+
+    // Auto-fill days & budget on destination change
+    function autoFill() {
+        const route = destinationSelect.value;
+        const daysMap = {
+            'Annapurna Base Camp': 9,
+            'Everest Base Camp': 12,
+            'Langtang Valley': 7
+        };
+        const budgetMap = {
+            'Annapurna Base Camp': 500,
+            'Everest Base Camp': 1200,
+            'Langtang Valley': 400
+        };
+        if (daysMap[route]) {
+            daysInput.value = daysMap[route];
+            budgetInput.value = budgetMap[route];
+            // After auto-fill, update cost preview
+            estimateCost();
+        }
+    }
+
+    // Event listeners
+    destinationSelect.addEventListener('change', function() {
+        autoFill();
+    });
+    daysInput.addEventListener('input', estimateCost);
+    budgetInput.addEventListener('input', estimateCost);
+    styleSelect.addEventListener('change', estimateCost);
+
+    // Trigger on load
+    autoFill();
+});
+</script>
 @endsection

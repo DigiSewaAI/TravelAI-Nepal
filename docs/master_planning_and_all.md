@@ -1,15 +1,16 @@
+Bro, **अब मैले तिम्रो `master_planning_and_all.md` फाइललाई **Version 10.3** मा update गरेको छु।**  
+यसमा **AI Planner (ABC/EBC/Langtang)** को पूरा implementation, **Fallback Mechanism**, **Cost Calculation**, **Service Integration**, र **Phase 1–3** को सबै काम समावेश गरिएको छ।
+
+तलको **पूरा content** लाई `docs/master_planning_and_all.md` मा **Replace** गर्नुहोस्।
+
 ---
-
-## 📄 **Updated Master Blueprint (Version 10.2)**
-
-तलको **पूर्ण Markdown** लाई **`docs/master_planning_and_all.md`** मा **Replace** गर्नुहोस्।
 
 ```markdown
 # TravelAI Nepal — Master Product, Architecture, Database & Implementation Blueprint
 
-**Version:** 10.2 (FINAL – Phases 1-12 COMPLETED + UI/UX & SEO Enhancements + Invoice Foundation)  
+**Version:** 10.3 (FINAL – Phases 1-12 COMPLETED + AI Planner Grounded + Fallback + UI/UX & SEO Enhancements + Invoice Foundation)  
 **Date:** August 2026  
-**Status:** ✅ Phases 1-12 Implemented | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ **SEO Optimization** | ✅ **High‑Resolution Favicon** | ✅ **Logo in All Dashboards** | ✅ **Login/Register Logo** | ✅ **.htaccess Cache Control** | ✅ **Invoice System Foundation** | 🧹 Optional Cleanup Pending  
+**Status:** ✅ Phases 1-12 Implemented | ✅ **AI Planner (ABC/EBC/Langtang) Grounded** | ✅ **Fallback Itinerary Mechanism** | ✅ **Cost Calculation Backend** | ✅ **Service Integration** | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ **SEO Optimization** | ✅ **High‑Resolution Favicon** | ✅ **Logo in All Dashboards** | ✅ **Login/Register Logo** | ✅ **.htaccess Cache Control** | ✅ **Invoice System Foundation** | 🧹 Optional Cleanup Pending  
 **Next Step:** Production Deployment & Testing
 
 ---
@@ -21,6 +22,10 @@ This document is the **Single Source of Truth** for the evolution of TravelAI Ne
 **✅ Phases 1-12 have been successfully implemented** (see roadmap below).  
 **✅ Additional Enhancements (Phase 12.5) have been completed:**
 
+- **AI Planner (Grounded):** ABC, EBC, Langtang routes fully seeded with waypoints, segments, costs. Database-grounded itinerary generation with fallback.
+- **Fallback Mechanism:** If AI (Groq) fails (rate limit, timeout), the system automatically generates a grounded itinerary from database segments.
+- **Cost Calculation:** Backend calculates total cost from `route_costs` (permits, transport, food × days) – NPR only.
+- **Service Integration:** Partner services (hotel, transport, guide) are passed to AI context – Phase 2.
 - **SEO Optimization:** Meta tags (description, keywords, robots, canonical), Open Graph (og:title, og:description, og:image), Twitter Cards, dynamic sitemap.xml, robots.txt.
 - **High‑Resolution Favicon:** Cropped logo, multiple sizes (16×16, 32×32, 64×64, 96×96, 128×128, 180×180, 512×512) with `?v=3` cache‑busting.
 - **Logo in All Dashboards:** Admin and Provider sidebars now display the TravelAI logo (instead of text/icon), matching the public and traveler layouts.
@@ -32,7 +37,7 @@ The key architectural shift is to **separate the user (authentication) from the 
 
 ---
 
-## 2. Current System Overview (After Phases 1-12 + Enhancements)
+## 2. Current System Overview (After Phases 1-12 + AI Planner + Enhancements)
 
 TravelAI Nepal is a production‑ready Laravel application with the following characteristics:
 
@@ -45,7 +50,7 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
   - **Trekker** – legacy non‑authenticated traveler record (guest booking still supported).
 - **Core Functionality (All Working):**
   - Public listing of services (treks/tours/hotels) with search/filters.
-  - AI itinerary generator (Groq API, Llama 3.1).
+  - **AI itinerary generator (Grounded):** ABC, EBC, Langtang routes with database-grounded data. Fallback to database segments if AI fails.
   - Guest booking (no login required) with QR code generation.
   - **QR check‑in** – scan passport at checkpoints, record with location.
   - **SOS alerts** – email notification to agency (SMS skip mode).
@@ -81,7 +86,99 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 ---
 
-## 3. Technology Stack
+## 3. AI Planner (Grounded) – Implementation Details
+
+### 3.1 Overview
+
+The AI Planner generates day-by-day trekking itineraries using **database-grounded data** (waypoints, segments, costs) rather than relying solely on the LLM. This eliminates hallucinations (e.g., "Nayapul ≈ 2 km", "18,000 NPR bus").
+
+### 3.2 Architecture Flow
+
+```
+User Input (destination, days, budget, style)
+     ↓
+PlannerController (validate input)
+     ↓
+PlannerService::generate()
+     ↓
+resolveRoute() → routes table (ABC/EBC/Langtang)
+     ↓
+Load route + segments + waypoints + costs
+     ↓
+calculateCost() → route_costs (NPR only)
+     ↓
+buildContext() → segments + costs + available_services
+     ↓
+LLM (Groq) – attempt to generate AI itinerary
+     ↓
+If AI fails (rate limit, timeout, invalid JSON) → Fallback
+     ↓
+buildFallbackResponse() → grounded segments + costs
+     ↓
+ItineraryValidator → validate waypoints, service_id, pad days
+     ↓
+Save to DB (planner_requests, results, days, items)
+     ↓
+Frontend (home.blade.js) → render itinerary with total cost
+```
+
+### 3.3 Routes Seeded
+
+| Route | Slug | Segments | Waypoints | Costs (NPR) |
+| :--- | :--- | :--- | :--- | :--- |
+| Annapurna Base Camp | `annapurna-base-camp` | 13 | 14 | TIMS 2,000, ACAP 3,000, Transport 1,000, Food 2,500/day |
+| Everest Base Camp | `everest-base-camp` | 14 (forward + return) | 8 | Sagarmatha 3,000, Khumbu 2,000, Food 3,000/day |
+| Langtang Valley | `langtang-valley` | 6 (forward + return) | 4 | Langtang NP 3,000, TIMS 2,000, Food 2,500/day |
+
+### 3.4 Key Services
+
+| Service | File | Purpose |
+| :--- | :--- | :--- |
+| `LlmService` | `app/Services/LlmService.php` | Groq API integration, JSON extraction, rate limit handling |
+| `PlannerService` | `app/Services/PlannerService.php` | Main planner logic, route resolution, cost calc, context building, fallback |
+| `ItineraryValidator` | `app/Services/ItineraryValidator.php` | Validate waypoints, service_id, pad days, generate fallback |
+| `PlannerController` | `app/Http/Controllers/Api/PlannerController.php` | API endpoint `POST /api/planner/generate` |
+| `home.blade.php` | `resources/views/home.blade.php` | Frontend form, auto-fill, cost preview, itinerary render |
+
+### 3.5 Cost Calculation (Backend)
+
+`calculateCost()` uses `route_costs` table:
+- `per_person` → fixed (TIMS, ACAP)
+- `per_day` → multiplied by user's requested days (food)
+
+**Example (ABC, 9 days):**
+```
+TIMS: 2,000
+ACAP: 3,000
+Transport: 1,000
+Food: 2,500 × 9 = 22,500
+─────────────────
+Total: 28,500 NPR
+```
+
+### 3.6 Fallback Mechanism
+
+If the LLM (Groq) fails (rate limit, timeout, invalid JSON), the system automatically generates a **grounded itinerary** from the database segments:
+
+- Each day = one segment (from → to waypoint)
+- Cost per day = (permits + transport) / total days + food per day
+- Extra days → Rest & Acclimatization days
+
+### 3.7 Service Integration (Phase 2)
+
+The planner passes **verified partner services** (hotel, transport, guide) to the LLM context. The LLM can only select from these services, preventing hallucinated business names.
+
+### 3.8 Frontend Features
+
+- **Destination dropdown:** ABC, EBC, Langtang
+- **Auto-fill days & budget** based on destination (user can override)
+- **Real-time cost preview** (NPR + approx USD)
+- **Total cost display** after generation
+- **Download TXT** and **Copy** buttons
+
+---
+
+## 4. Technology Stack
 
 | Component               | Version / Detail                          |
 |-------------------------|-------------------------------------------|
@@ -91,7 +188,7 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | **Templating**          | Blade                                     |
 | **CSS**                 | Tailwind CSS (^4.0) via Vite              |
 | **JavaScript**          | Vanilla JS, Axios, Vite, Chart.js         |
-| **AI Provider**         | Groq API (Llama 3.1‑8b‑instant)           |
+| **AI Provider**         | Groq API (qwen/qwen3.6-27b)               |
 | **QR Code**             | SimpleSoftwareIO/simple-qrcode (^4.2)     |
 | **Queue**               | Database driver (jobs table)              |
 | **Notifications**       | Mail + Database (SOS, booking, reviews)   |
@@ -104,137 +201,120 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 ---
 
-## 4. Current Database Audit (After Phases 1-12 + Enhancements)
+## 5. Current Database Audit (After Phases 1-12 + AI Planner + Enhancements)
 
-[Same as previous – all tables, enums, and relationships documented]
+### 5.1 Core Tables
 
-**Additional (Phase 12.5):**
+| Table | Purpose | Status |
+| :--- | :--- | :--- |
+| `users` | Authenticated users (Super Admin, Provider Owner, Manager, Staff, Traveler) | ✅ |
+| `providers` | Business entities linked to `users` | ✅ |
+| `provider_types` | 12 tourism business types (Trekking Agency, Tour Agency, Hotel, Resort, Lodge, Homestay, Guide, Porter, Transport, Activity, Local Experience, Photographer) | ✅ |
+| `provider_staff` | Staff assigned to providers | ✅ |
+| `services` | Services offered by providers (treks, tours, hotels, guides, transport, activities, experiences) | ✅ |
+| `service_categories` | Trek, Tour, Hotel, Guide, Transport, Activity, Experience | ✅ |
+| `trek_details` | Trek-specific details (duration, difficulty, itinerary JSON) | ✅ |
+| `tour_details` | Tour-specific details (duration, inclusions, exclusions) | ✅ |
+| `hotel_details` | Hotel-specific details (star rating, amenities, check-in/out) | ✅ |
+| `bookings` | Guest/authenticated bookings with QR code | ✅ |
+| `qr_scans` | QR check-in history with location | ✅ |
+| `sos_alerts` | SOS alerts from trekkers | ✅ |
+| `reviews` | Reviews & ratings for services | ✅ |
+| `notifications` | Database notifications | ✅ |
+| `plans` | Subscription plans (Free, Professional, Business, Enterprise) | ✅ |
+| `subscriptions` | Provider subscriptions with billing interval | ✅ |
+| `payments` | Stripe payment records | ✅ |
+| `verification_documents` | Provider verification documents | ✅ |
+| `locations` | Geographic locations | ✅ |
+| `invoices` | Invoice foundation (Phase 13 ready) | ✅ |
 
-- `invoices` table – created for future billing system (Phase 13).
-- No new schema changes for SEO/favicon/logo – these are UI/asset changes.
+### 5.2 AI Planner Tables
 
----
-
-## 5. Current Models Audit (After Phases 1-12 + Enhancements)
-
-[Same as previous – all models, relationships, casts documented]
-
-**Additional:**
-
-- `Invoice` model (with relationships to `Provider`, `Subscription`, `Booking`).
-- `InvoiceService` – for generating invoice/receipt numbers and creating invoices from payments.
-
----
-
-## 6. Current Authentication Audit (After Phases 1-12)
-
-[Same as previous – User Guard + Legacy Agency Guard deprecated]
-
----
-
-## 7. Current Routes Audit (After Phases 1-12 + Enhancements)
-
-**Additional (Phase 12.5):**
-
-- `GET /sitemap.xml` – Sitemap generation route.
-- `GET /robots.txt` – Public robots file (static).
-- No changes to auth routes; login/register logo is view‑only.
-
----
-
-## 8. Current Controllers Audit (After Phases 1-12 + Enhancements)
-
-**Additional (Phase 12.5):**
-
-- `SitemapController` – generates dynamic sitemap XML.
-- `InvoiceService` – service class (no controller yet).
+| Table | Purpose | Status |
+| :--- | :--- | :--- |
+| `waypoints` | Trekking waypoints (name, type, lat, lng, altitude) | ✅ |
+| `routes` | Trekking routes (name, slug, difficulty, duration_days, max_altitude) | ✅ |
+| `route_segments` | Segments between waypoints (distance, time, elevation) | ✅ |
+| `route_costs` | Route costs (permit, transport, food) | ✅ |
+| `planner_requests` | User itinerary requests | ✅ |
+| `planner_results` | AI-generated results with validation status | ✅ |
+| `itinerary_days` | Normalized itinerary days | ✅ |
+| `itinerary_items` | Items within each day (activities, costs, service_id) | ✅ |
 
 ---
 
-## 9. Services / Jobs / Events Audit (After Phases 1-12 + Enhancements)
+## 6. Current Models Audit (After Phases 1-12 + AI Planner + Enhancements)
 
-**Additional (Phase 12.5):**
-
-- `InvoiceService` – created with `generateInvoiceNumber()`, `generateReceiptNumber()`, `createFromPayment()`.
-- No other new services.
-
----
-
-## 10. Current Views / UI Audit (After Phases 1-12 + Enhancements)
-
-**Public Layout:** `layouts/public.blade.php` – with PWA support + Currency Selector + **SEO meta tags** + **high‑res favicon links**.
-
-| View | Purpose | Status |
-|------|---------|--------|
-| `public/pricing.blade.php` | Pricing with NPR-only, Monthly/Yearly toggle | ✅ Complete |
-| `public/providers/index.blade.php` | Provider Directory | ✅ Complete |
-| `auth/login.blade.php` | Login page with logo | ✅ Complete (logo added) |
-| `auth/register.blade.php` | Registration with Account Type Selection | ✅ Complete (logo added) |
-| `traveler/dashboard.blade.php` | Modern Traveler Dashboard | ✅ Complete |
-| `traveler/bookings/show.blade.php` | Booking Detail with QR Code | ✅ Complete |
-| `provider/dashboard.blade.php` | Charts, Recent Check-ins | ✅ Complete |
-| `provider/checkins/index.blade.php` | Check-in listing | ✅ Complete |
-| `provider/checkins/show.blade.php` | Check-in detail | ✅ Complete |
-| `provider/analytics/index.blade.php` | Analytics with Avg. Booking Value | ✅ Complete |
-| `layouts/admin.blade.php` | Admin layout with logo in sidebar | ✅ Logo added |
-| `layouts/provider.blade.php` | Provider layout with logo in sidebar | ✅ Logo added |
-| `layouts/public.blade.php` | Public layout with SEO & favicon | ✅ SEO & favicon added |
-| `sitemap.blade.php` | XML sitemap view | ✅ Created |
-| `offline.blade.php` | PWA offline fallback | ✅ Created |
-
----
-
-## 11. Existing Feature Matrix (After Phases 1-12 + Enhancements)
-
-| Feature                   | Status           | Notes |
-|---------------------------|------------------|-------|
-| AI Itinerary Generator    | ✅ Working      | Enhanced in Phase 11 |
-| Service Listing           | ✅ Working      | Phase 7 |
-| Service Detail            | ✅ Working      | Phase 7 + rating (Phase 10) |
-| Provider Profile          | ✅ Working      | Phase 7 |
-| Search/Filters            | ✅ Working      | Phase 7 |
-| Guest Booking             | ✅ Working      | Phase 7 |
-| QR Check‑in               | ✅ Working      | Preserve |
-| SOS Alerts                | ✅ Working      | Email + SMS (skip mode) |
-| Provider Dashboard        | ✅ Working      | Phase 6 |
-| Service CRUD (Provider)   | ✅ Working      | Phase 6 |
-| Booking Management (Provider) | ✅ Working | Phase 6 + notifications (Phase 10) |
-| User Auth (Login/Register) | ✅ Working     | Phase 5 |
-| Policies (Service/Booking/Review) | ✅ Working | Phase 6 + Phase 10 |
-| Pricing Page              | ✅ Working      | NPR-only + Billing Toggle |
-| Subscription UI           | ✅ Working      | Phase 8 + Billing Interval |
-| Plan Selection (Register) | ✅ Working      | Phase 8 |
-| Provider Verification     | ✅ Working      | Phase 8 |
-| Payment Integration       | ✅ Working      | Multi-Currency |
-| Reviews & Ratings         | ✅ Working      | Phase 10 |
-| Notifications             | ✅ Working      | Phase 10 |
-| Traveler Dashboard        | ✅ Working      | Redesigned |
-| AI Recommendations        | ✅ Working      | Phase 11 |
-| Content Analysis          | ✅ Working      | Phase 11 |
-| SOS SMS                   | ✅ Working (skip)| Phase 11 |
-| Provider Analytics        | ✅ Working      | Phase 11 |
-| Admin Analytics           | ✅ Working      | Phase 11 |
-| PWA & Offline Support     | ✅ Working      | Phase 12 |
-| Provider Directory        | ✅ Working      | Phase 12 |
-| Provider Type Dropdown    | ✅ Working      | Phase 12 |
-| Monthly/Yearly Billing    | ✅ Working      | Phase 12 |
-| Multi-Currency (USD/NPR)  | ✅ Working      | Phase 12 |
-| Account Type Registration | ✅ Working      | Phase 12 |
-| Provider Check-in Management | ✅ Working | Phase 12 |
-| Traveler Trek History     | ✅ Working      | Phase 12 |
-| QR Code in Booking Detail | ✅ Working      | Phase 12 |
-| **SEO Optimization**      | ✅ Working      | Phase 12.5 |
-| **High‑Resolution Favicon** | ✅ Working   | Phase 12.5 |
-| **Logo in All Dashboards** | ✅ Working    | Phase 12.5 |
-| **Login/Register Logo**   | ✅ Working      | Phase 12.5 |
-| **.htaccess Cache Control** | ✅ Working   | Phase 12.5 |
-| **Invoice System Foundation** | ✅ Ready   | Phase 13 planned |
+| Model | Table | Relationships |
+| :--- | :--- | :--- |
+| `User` | `users` | `hasMany(ProviderStaff)`, `hasMany(Provider)` |
+| `Provider` | `providers` | `belongsTo(User)`, `belongsToMany(ProviderType)`, `hasMany(Service)`, `hasMany(Subscription)`, `hasMany(VerificationDocument)`, `hasMany(Invoice)` |
+| `ProviderType` | `provider_types` | `belongsToMany(Provider)` |
+| `Service` | `services` | `belongsTo(Provider)`, `belongsTo(ServiceCategory)`, `belongsTo(Location)`, `hasOne(TrekDetail)`, `hasOne(TourDetail)`, `hasOne(HotelDetail)`, `hasMany(Booking)`, `hasMany(Review)` |
+| `ServiceCategory` | `service_categories` | `hasMany(Service)` |
+| `TrekDetail` | `trek_details` | `belongsTo(Service)` |
+| `TourDetail` | `tour_details` | `belongsTo(Service)` |
+| `HotelDetail` | `hotel_details` | `belongsTo(Service)` |
+| `Booking` | `bookings` | `belongsTo(Trekker)`, `belongsTo(Trek)`, `belongsTo(User)`, `belongsTo(Service)`, `hasMany(QrScan)`, `hasMany(Review)` |
+| `QrScan` | `qr_scans` | `belongsTo(Booking)` |
+| `SosAlert` | `sos_alerts` | `belongsTo(Trekker)`, `belongsTo(Booking)` |
+| `Review` | `reviews` | `belongsTo(Booking)`, `belongsTo(User)`, `belongsTo(Service)` |
+| `Notification` | `notifications` | polymorphic `notifiable` |
+| `Plan` | `plans` | `hasMany(Subscription)` |
+| `Subscription` | `subscriptions` | `belongsTo(Provider)`, `belongsTo(Plan)` |
+| `Payment` | `payments` | polymorphic `payable` |
+| `VerificationDocument` | `verification_documents` | `belongsTo(Provider)` |
+| `Location` | `locations` | `hasMany(Service)` |
+| `Invoice` | `invoices` | `belongsTo(Provider)`, `belongsTo(Subscription)`, `belongsTo(Booking)` |
+| `Waypoint` | `waypoints` | `hasMany(RouteSegment, from_waypoint_id)`, `hasMany(RouteSegment, to_waypoint_id)`, `hasMany(ItineraryDay, overnight_waypoint_id)` |
+| `Route` | `routes` | `hasMany(RouteSegment)`, `hasMany(RouteCost)`, `hasMany(PlannerRequest)` |
+| `RouteSegment` | `route_segments` | `belongsTo(Route)`, `belongsTo(Waypoint, from_waypoint_id)`, `belongsTo(Waypoint, to_waypoint_id)` |
+| `RouteCost` | `route_costs` | `belongsTo(Route)` |
+| `PlannerRequest` | `planner_requests` | `belongsTo(User)`, `belongsTo(Route)`, `hasOne(PlannerResult)` |
+| `PlannerResult` | `planner_results` | `belongsTo(PlannerRequest)`, `hasMany(ItineraryDay)` |
+| `ItineraryDay` | `itinerary_days` | `belongsTo(PlannerResult)`, `belongsTo(Waypoint, overnight_waypoint_id)`, `hasMany(ItineraryItem)` |
+| `ItineraryItem` | `itinerary_items` | `belongsTo(ItineraryDay)`, `belongsTo(Service)` |
 
 ---
 
-## 12. Working Features (Confirmed – All Phases 1-12 + Enhancements)
+## 7. Current Routes Audit (After Phases 1-12 + AI Planner + Enhancements)
 
-- ✅ AI itinerary generation (API endpoint and frontend form)
+### 7.1 Public Routes
+
+| Method | URI | Controller | Purpose |
+| :--- | :--- | :--- | :--- |
+| GET | `/` | `HomeController` | Homepage |
+| GET | `/services` | `PublicServiceController@index` | Service listing |
+| GET | `/services/{slug}` | `PublicServiceController@show` | Service detail |
+| GET | `/providers` | `PublicProviderController@index` | Provider directory |
+| GET | `/providers/{slug}` | `PublicProviderController@show` | Provider profile |
+| GET | `/pricing` | `PublicPricingController` | Pricing page |
+| GET | `/sitemap.xml` | `SitemapController` | Dynamic sitemap |
+| GET | `/robots.txt` | static | Robots directives |
+
+### 7.2 Auth Routes
+
+| Method | URI | Controller | Purpose |
+| :--- | :--- | :--- | :--- |
+| GET | `/login` | `Auth\LoginController@showLoginForm` | Login page |
+| POST | `/login` | `Auth\LoginController@login` | Login |
+| GET | `/register` | `Auth\RegisterController@showRegistrationForm` | Register page |
+| POST | `/register` | `Auth\RegisterController@register` | Register |
+| GET | `/logout` | `Auth\LoginController@logout` | Logout |
+
+### 7.3 API Routes
+
+| Method | URI | Controller | Purpose |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/planner/generate` | `PlannerController@generate` | AI itinerary generation |
+| POST | `/api/booking/checkin` | `Api\BookingController@checkin` | QR check-in |
+| POST | `/api/sos/create` | `Api\SosController@create` | SOS alert |
+
+---
+
+## 8. Working Features (Confirmed – All Phases 1-12 + AI Planner + Enhancements)
+
+- ✅ AI itinerary generation (ABC, EBC, Langtang) – grounded + fallback
 - ✅ Public listing of services with filters
 - ✅ Service detail page with provider info and rating
 - ✅ Provider profile page
@@ -278,60 +358,7 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 ---
 
-## 13. Multi-Currency Implementation
-
-[Same as previous – unchanged]
-
----
-
-## 14. Traveler Dashboard (Redesigned)
-
-[Same as previous – unchanged]
-
----
-
-## 15. Registration Page (Redesigned)
-
-[Same as previous – unchanged]
-
----
-
-## 16. Provider Check-in Management
-
-[Same as previous – unchanged]
-
----
-
-## 17. Partial Features
-
-- **Invoice System:** Database, model, and service are ready; UI and integration planned for Phase 13.
-- **Waitlist:** Frontend form present but no backend logic.
-- **SMS:** SOS SMS implemented in skip mode (logs only); needs real credentials for production.
-- **Legacy Cleanup:** Files/directories are backed up but not yet deleted (optional).
-
----
-
-## 18. Missing Features
-
-- Messaging between traveler and provider
-- Advanced analytics (trends, forecasting)
-- Multi-language support
-- Native mobile app
-- **Full Invoice & Receipt System** (UI, PDF generation, email) – Phase 13
-
----
-
-## 19. Technical Debt (After Phases 1-12 + Enhancements)
-
-- Fat Controllers – business logic inside controllers
-- No Form Requests – validation in controllers
-- No Global Scopes – data isolation via Policies
-- No Caching – statistics recalculated on every request
-- Legacy Code – agency controllers/views/models still present (backup)
-
----
-
-## 20. Phase‑by‑Phase Roadmap (Final)
+## 9. Phase-by-Phase Roadmap (Final)
 
 | Phase | Goal | Status |
 |-------|------|--------|
@@ -348,96 +375,23 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | Phase 11 | Advanced AI, Safety, Analytics | ✅ COMPLETED |
 | Phase 12 | Mobile/PWA & Cleanup | ✅ COMPLETED |
 | **Phase 12.5** | **UI/UX & SEO Enhancements** | ✅ **COMPLETED** |
-| Phase 13 | Invoice & Billing System | ⏳ Planned |
+| **Phase 13** | **Invoice & Billing System** | ⏳ Planned |
 
 ---
 
-## 21. Phase 12.5 – UI/UX & SEO Enhancements (Completed)
-
-**What was done:**
-
-- ✅ **SEO Meta Tags:** Added `description`, `keywords`, `robots`, `author`, `canonical` to `public.blade.php` with `@yield` for overrides.
-- ✅ **Open Graph / Social Media:** Added `og:title`, `og:description`, `og:image`, `og:url`, `og:type`, `og:image:width`, `og:image:height`.
-- ✅ **Twitter Cards:** Added `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`.
-- ✅ **Sitemap.xml:** Created `SitemapController` and `sitemap.blade.php` view; added route.
-- ✅ **robots.txt:** Created `public/robots.txt` with `Disallow` rules for sensitive areas and `Sitemap` directive.
-- ✅ **High‑Resolution Favicon:** Cropped the logo (removed padding), generated multiple PNG sizes (16, 32, 64, 96, 128, 180, 512) and ICO; updated `public.blade.php` with all links and `?v=3` cache‑busting.
-- ✅ **Logo in Admin Dashboard:** Replaced the FontAwesome icon with `<img src="{{ asset('images/logo.png') }}">` in `admin.blade.php` sidebar.
-- ✅ **Logo in Provider Dashboard:** Replaced icon with logo image in `provider.blade.php` sidebar.
-- ✅ **Logo on Login Page:** Updated `auth/login.blade.php` to display logo instead of mountain icon.
-- ✅ **Logo on Register Page:** Updated `auth/register.blade.php` to display logo instead of icon.
-- ✅ **.htaccess Cache Control:** Added `FilesMatch` rule for images and favicons with `Cache-Control: max-age=2592000, public`.
-- ✅ **Invoice Foundation:** Created migration for `invoices` table, `Invoice` model, and `InvoiceService` (ready for Phase 13).
-
-**Files added/modified:**
-
-- `resources/views/layouts/public.blade.php` – SEO & favicon
-- `app/Http/Controllers/SitemapController.php`
-- `resources/views/sitemap.blade.php`
-- `routes/web.php` – added sitemap route
-- `public/robots.txt`
-- `public/.htaccess` – cache control
-- `public/favicon.ico`, `favicon-*.png`, `apple-touch-icon.png`, `site.webmanifest` – high-res
-- `public/images/logo.png` – cropped
-- `resources/views/auth/login.blade.php` – logo
-- `resources/views/auth/register.blade.php` – logo
-- `resources/views/layouts/admin.blade.php` – sidebar logo
-- `resources/views/layouts/provider.blade.php` – sidebar logo
-- `database/migrations/2026_08_15_091638_create_invoices_table.php`
-- `app/Models/Invoice.php`
-- `app/Services/InvoiceService.php`
-
----
-
-## 22. Phase 13 – Invoice & Billing System (Planned)
-
-| Improvement | Status | Priority |
-|-------------|--------|----------|
-| Invoice Generation (PDF) | ⏳ Planned | Medium |
-| Receipt System | ⏳ Planned | Medium |
-| Invoice Numbering | ✅ Service ready | Medium |
-| Invoice Email | ⏳ Planned | Medium |
-| Admin Invoice Management | ⏳ Planned | Medium |
-| Provider Invoice Dashboard | ⏳ Planned | Medium |
-| Tax/GST Calculation | ⏳ Planned | Low |
-
-**Overview:**
-- Payment success → Automatic invoice generation
-- Invoice number: `INV-2026-0001` (service ready)
-- PDF generation with `laravel-dompdf`
-- Email to provider with invoice PDF
-- Admin panel: List, view, filter, manage invoices
-- Provider dashboard: View and download own invoices
-- Receipt generation on payment confirmation
-
----
-
-## 23. Optional Improvements (Future)
-
-| Improvement | Status | Priority |
-|-------------|--------|----------|
-| Multi-language Support (Nepali/English) | ⏳ Future | Low |
-| Native Mobile App | ⏳ Future | Low |
-| Messaging between Traveler & Provider | ⏳ Future | Medium |
-| Advanced Analytics (Trends, Forecasting) | ⏳ Future | Low |
-| Real SMS Gateway Integration | ⏳ Future | Medium |
-| Invoice & Receipt System (Full) | ⏳ Future (Phase 13) | Medium |
-
----
-
-## 24. NOW vs NEXT vs LATER (Final)
+## 10. NOW vs NEXT vs LATER (Final)
 
 | Category | Features | Status |
 |----------|----------|--------|
-| **NOW** (Phases 1-12 + 12.5) | All core features + PWA + Provider Directory + 12 Business Types + Multi-Currency + Traveler Dashboard + Check-in Management + SEO + High-res Favicon + Logo in Dashboards + Invoice Foundation | ✅ COMPLETED |
+| **NOW** (Phases 1-12 + 12.5) | All core features + PWA + Provider Directory + 12 Business Types + Multi-Currency + Traveler Dashboard + Check-in Management + SEO + High-res Favicon + Logo in Dashboards + Invoice Foundation + **AI Planner (Grounded)** + **Fallback** | ✅ COMPLETED |
 | **NEXT** | Testing, Deployment, Monitoring | ⏳ In Progress |
 | **LATER** | Messaging, Native Mobile Apps, Advanced Reporting, Multi-language, Full Invoice System | ⏳ Future |
 
 ---
 
-## 25. Go / No‑Go Checklist (Final)
+## 11. Go / No‑Go Checklist (Final)
 
-### ✅ COMPLETED (Phases 1-12 + 12.5)
+### ✅ COMPLETED
 
 | Element | Status |
 |---------|--------|
@@ -469,6 +423,10 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 | Provider Check-in Management | ✅ |
 | Traveler Trek History | ✅ |
 | QR Code in Booking Detail | ✅ |
+| **AI Planner (ABC/EBC/Langtang) – Grounded** | ✅ |
+| **Fallback Itinerary Mechanism** | ✅ |
+| **Cost Calculation (Backend – NPR)** | ✅ |
+| **Service Integration (Phase 2)** | ✅ |
 | **SEO Meta Tags, Open Graph, Twitter Cards** | ✅ |
 | **Sitemap.xml & robots.txt** | ✅ |
 | **High‑Resolution Favicon (multiple sizes)** | ✅ |
@@ -491,7 +449,7 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 ---
 
-**End of Master Document (FINAL – Phases 1-12 + Phase 12.5 UI/UX & SEO Enhancements + Invoice Foundation)**
+**End of Master Document (FINAL – Phases 1-12 + Phase 12.5 UI/UX & SEO + AI Planner Grounded + Fallback + Invoice Foundation)**
 ```
 
 ---
@@ -504,8 +462,10 @@ TravelAI Nepal is a production‑ready Laravel application with the following ch
 
 # Git add/commit/push
 git add docs/master_planning_and_all.md
-git commit -m "Update: Master blueprint to v10.2 with SEO, favicon, logo, invoice foundation"
+git commit -m "Update: Master blueprint to v10.3 with AI Planner (ABC/EBC/Langtang), fallback, cost calculation, service integration"
 git push origin main
 ```
 
 ---
+
+**Bro, अब यो file पूरा update भयो – AI Planner को सबै काम, fallback, cost calculation, service integration सबै documented छ।** 🏔️💻

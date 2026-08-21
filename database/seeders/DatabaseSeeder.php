@@ -26,7 +26,12 @@ class DatabaseSeeder extends Seeder
             ProviderTypeSeeder::class,      // Phase 1: Provider types
             ServiceCategorySeeder::class,   // Phase 1: Service categories
             PlanSeeder::class,              // Phase 8: Subscription plans
-            TourismProvidersSeeder::class,  // 🔥 NEW: Demo providers with services, bookings & reviews
+            TourismProvidersSeeder::class,  // Demo providers with services, bookings & reviews
+            
+            // ✅ Add route seeders (Phase 3-4)
+            AbcRouteSeeder::class,          // Annapurna Base Camp
+            EbcRouteSeeder::class,          // Everest Base Camp
+            LangtangRouteSeeder::class,     // Langtang Valley
         ]);
     }
 }
