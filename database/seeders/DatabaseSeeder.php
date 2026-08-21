@@ -47,6 +47,9 @@ class DatabaseSeeder extends Seeder
             // ✅ NEW: Kanchenjunga & Makalu Region
             KanchenjungaMakaluRegionSeeder::class,
             
+            // ✅ NEW: Remote Treks (e.g., Dhaulagiri, Kanchenjunga, etc.)
+            RemoteTreksSeeder::class,
+            
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
         ]);
