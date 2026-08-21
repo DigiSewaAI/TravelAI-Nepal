@@ -50,8 +50,11 @@ class DatabaseSeeder extends Seeder
             // ✅ Remote Treks (13 destinations)
             RemoteTreksSeeder::class,
             
-            // ✅ NEW: City & Cultural Tours
+            // ✅ City & Cultural Tours (23 destinations)
             CityCulturalToursSeeder::class,
+            
+            // ✅ NEW: National Parks
+            NationalParksSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,

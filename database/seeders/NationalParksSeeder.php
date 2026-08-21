@@ -47,7 +47,7 @@ class NationalParksSeeder extends Seeder
         $this->command->info('✅ Chitwan National Park seeded.');
 
         // ==========================================
-        // 2. KHAPTAD NATIONAL PARK
+        // 2. KHAPTAD NATIONAL PARK (lake → landmark)
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -60,7 +60,7 @@ class NationalParksSeeder extends Seeder
             ],
             'waypoints' => [
                 ['name' => 'Silgadhi', 'slug' => 'silgadhi', 'type' => 'village', 'lat' => 29.1234, 'lng' => 81.2345, 'alt' => 1500],
-                ['name' => 'Khaptad Lake', 'slug' => 'khaptad-lake', 'type' => 'lake', 'lat' => 29.1567, 'lng' => 81.2678, 'alt' => 3300],
+                ['name' => 'Khaptad Lake', 'slug' => 'khaptad-lake', 'type' => 'landmark', 'lat' => 29.1567, 'lng' => 81.2678, 'alt' => 3300],
                 ['name' => 'Khaptad National Park Entrance', 'slug' => 'khaptad-entrance', 'type' => 'landmark', 'lat' => 29.1789, 'lng' => 81.2891, 'alt' => 3200],
                 ['name' => 'Silgadhi', 'slug' => 'silgadhi-return', 'type' => 'village', 'lat' => 29.1234, 'lng' => 81.2345, 'alt' => 1500],
             ],
@@ -101,7 +101,7 @@ class NationalParksSeeder extends Seeder
         $this->command->info('✅ Koshi Tappu Wildlife Reserve seeded.');
 
         // ==========================================
-        // 4. SHUKLAPHANTA NATIONAL PARK
+        // 4. SHUKLAPHANTA NATIONAL PARK (lake → landmark)
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -115,7 +115,7 @@ class NationalParksSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Kanchanpur', 'slug' => 'kanchanpur', 'type' => 'village', 'lat' => 28.8234, 'lng' => 80.4567, 'alt' => 200],
                 ['name' => 'Shuklaphanta Entrance', 'slug' => 'shuklaphanta-entrance', 'type' => 'landmark', 'lat' => 28.8567, 'lng' => 80.4891, 'alt' => 200],
-                ['name' => 'Sikta Lake', 'slug' => 'sikta-lake', 'type' => 'lake', 'lat' => 28.8891, 'lng' => 80.5123, 'alt' => 200],
+                ['name' => 'Sikta Lake', 'slug' => 'sikta-lake', 'type' => 'landmark', 'lat' => 28.8891, 'lng' => 80.5123, 'alt' => 200],
                 ['name' => 'Kanchanpur', 'slug' => 'kanchanpur-return', 'type' => 'village', 'lat' => 28.8234, 'lng' => 80.4567, 'alt' => 200],
             ],
             'costs' => [
@@ -128,7 +128,7 @@ class NationalParksSeeder extends Seeder
         $this->command->info('✅ Shuklaphanta National Park seeded.');
 
         // ==========================================
-        // 5. DHORPATAN HUNTING RESERVE
+        // 5. DHORPATAN HUNTING RESERVE (lake → landmark)
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -142,7 +142,7 @@ class NationalParksSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Baglung', 'slug' => 'baglung', 'type' => 'village', 'lat' => 28.3123, 'lng' => 83.6123, 'alt' => 1000],
                 ['name' => 'Dhorpatan Entrance', 'slug' => 'dhorpatan-entrance', 'type' => 'landmark', 'lat' => 28.3456, 'lng' => 83.6456, 'alt' => 3000],
-                ['name' => 'Dhorpatan Lake', 'slug' => 'dhorpatan-lake', 'type' => 'lake', 'lat' => 28.3789, 'lng' => 83.6789, 'alt' => 3600],
+                ['name' => 'Dhorpatan Lake', 'slug' => 'dhorpatan-lake', 'type' => 'landmark', 'lat' => 28.3789, 'lng' => 83.6789, 'alt' => 3600],
                 ['name' => 'Baglung', 'slug' => 'baglung-return', 'type' => 'village', 'lat' => 28.3123, 'lng' => 83.6123, 'alt' => 1000],
             ],
             'costs' => [
@@ -155,7 +155,7 @@ class NationalParksSeeder extends Seeder
         $this->command->info('✅ Dhorpatan Hunting Reserve seeded.');
 
         // ==========================================
-        // 6. BANKE NATIONAL PARK
+        // 6. BANKE NATIONAL PARK (lake → landmark, city → village)
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -167,10 +167,10 @@ class NationalParksSeeder extends Seeder
                 'season' => 'October–June',
             ],
             'waypoints' => [
-                ['name' => 'Nepalgunj', 'slug' => 'nepalgunj', 'type' => 'city', 'lat' => 28.0456, 'lng' => 81.6123, 'alt' => 150],
+                ['name' => 'Nepalgunj', 'slug' => 'nepalgunj', 'type' => 'village', 'lat' => 28.0456, 'lng' => 81.6123, 'alt' => 150],
                 ['name' => 'Banke National Park Entrance', 'slug' => 'banke-entrance', 'type' => 'landmark', 'lat' => 28.0789, 'lng' => 81.6456, 'alt' => 300],
-                ['name' => 'Kataiya Lake', 'slug' => 'kataiya-lake', 'type' => 'lake', 'lat' => 28.1123, 'lng' => 81.6789, 'alt' => 300],
-                ['name' => 'Nepalgunj', 'slug' => 'nepalgunj-return', 'type' => 'city', 'lat' => 28.0456, 'lng' => 81.6123, 'alt' => 150],
+                ['name' => 'Kataiya Lake', 'slug' => 'kataiya-lake', 'type' => 'landmark', 'lat' => 28.1123, 'lng' => 81.6789, 'alt' => 300],
+                ['name' => 'Nepalgunj', 'slug' => 'nepalgunj-return', 'type' => 'village', 'lat' => 28.0456, 'lng' => 81.6123, 'alt' => 150],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Banke National Park Permit', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => true],
