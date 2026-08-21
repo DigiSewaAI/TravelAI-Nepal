@@ -348,8 +348,7 @@
         if (totalCost !== null && totalCost !== undefined && totalCost > 0) {
     const usdTotal = Math.round(totalCost * 0.0075);
     html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
-    html += `<p class="text-lg font-bold text-blue-800">💰 Base Route Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;
-    html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
+html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;    html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
     html += `</div>`;
 }
 

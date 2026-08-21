@@ -140,120 +140,115 @@ class ItineraryValidator
     }
 
     protected function normalize(array $aiOutput, Route $route, array $input): array
-    {
-        $normalized = ['days' => []];
-        $requestedDays = $input['days'];
-        $dayCounter = 1;
+{
+    $normalized = ['days' => []];
+    $requestedDays = $input['days'];
+    $dayCounter = 1;
 
-        // Filter out generic/empty days
-        $filteredDays = array_filter($aiOutput['days'] ?? [], function ($day) {
-            if (!empty($day['items'])) {
-                return true;
-            }
-            if (!empty($day['description']) && strlen($day['description']) > 10) {
-                return true;
-            }
-            $title = $day['title'] ?? '';
-            if (preg_match('/^Day\s*\d+$/i', trim($title))) {
-                return false;
-            }
-            if (strlen($title) > 10) {
-                return true;
-            }
-            return false;
-        });
-
-        // If no valid days, use fallback
-        if (empty($filteredDays)) {
-            $filteredDays = $this->generateFallbackItinerary($route, $input);
+    // ✅ Calculate daily food cost for rest days (consistency)
+    $dailyFoodCost = 0;
+    foreach ($route->costs as $cost) {
+        if ($cost->unit === 'per_day') {
+            $dailyFoodCost = $cost->amount;
+            break;
         }
+    }
 
-        foreach ($filteredDays as $day) {
-            $dayNumber = $dayCounter++;
+    // Filter out generic/empty days
+    $filteredDays = array_filter($aiOutput['days'] ?? [], function ($day) {
+        if (!empty($day['items'])) {
+            return true;
+        }
+        if (!empty($day['description']) && strlen($day['description']) > 10) {
+            return true;
+        }
+        $title = $day['title'] ?? '';
+        if (preg_match('/^Day\s*\d+$/i', trim($title))) {
+            return false;
+        }
+        if (strlen($title) > 10) {
+            return true;
+        }
+        return false;
+    });
+
+    // If no valid days, use fallback
+    if (empty($filteredDays)) {
+        $filteredDays = $this->generateFallbackItinerary($route, $input);
+    }
+
+    foreach ($filteredDays as $day) {
+        // ✅ Sequential day numbers – NO duplicates
+        $dayNumber = $dayCounter++;
+        $normalized['days'][] = [
+            'day_number' => $dayNumber,
+            'title' => $day['title'] ?? "Day {$dayNumber}",
+            'description' => $day['description'] ?? '',
+            'overnight_waypoint_id' => $day['overnight_waypoint_id'] ?? null,
+            'distance_km' => $day['distance_km'] ?? null,
+            'estimated_time_hours' => $day['estimated_time_hours'] ?? null,
+            'altitude_m' => $day['altitude_m'] ?? null,
+            'items' => array_map(function ($item) {
+                return [
+                    'title' => $item['title'] ?? '',
+                    'description' => $item['description'] ?? '',
+                    'time_of_day' => $item['time_of_day'] ?? null,
+                    'cost' => $item['cost'] ?? 0,
+                    'pricing_source' => $item['pricing_source'] ?? 'system_estimate',
+                    'pricing_snapshot' => $item['pricing_snapshot'] ?? null,
+                    'service_id' => $item['service_id'] ?? null,
+                    'is_optional' => $item['is_optional'] ?? false,
+                    'metadata' => $item['metadata'] ?? null,
+                ];
+            }, $day['items'] ?? []),
+        ];
+    }
+
+    $actualDays = count($normalized['days']);
+
+    // ✅ Pad with rest days if needed (max 3)
+    if ($actualDays < $requestedDays) {
+        $gap = $requestedDays - $actualDays;
+        $restDaysToAdd = min($gap, 3);
+
+        $lastDay = end($normalized['days']);
+        $lastWaypoint = $lastDay['overnight_waypoint_id'] ?? null;
+        $lastAltitude = $lastDay['altitude_m'] ?? null;
+
+        for ($i = 1; $i <= $restDaysToAdd; $i++) {
+            $dayNumber = $actualDays + $i;
             $normalized['days'][] = [
                 'day_number' => $dayNumber,
-                'title' => $day['title'] ?? "Day {$dayNumber}",
-                'description' => $day['description'] ?? '',
-                'overnight_waypoint_id' => $day['overnight_waypoint_id'] ?? null,
-                'distance_km' => $day['distance_km'] ?? null,
-                'estimated_time_hours' => $day['estimated_time_hours'] ?? null,
-                'altitude_m' => $day['altitude_m'] ?? null,
-                'items' => array_map(function ($item) {
-                    return [
-                        'title' => $item['title'] ?? '',
-                        'description' => $item['description'] ?? '',
-                        'time_of_day' => $item['time_of_day'] ?? null,
-                        'cost' => $item['cost'] ?? 0,
-                        'pricing_source' => $item['pricing_source'] ?? 'system_estimate',
-                        'pricing_snapshot' => $item['pricing_snapshot'] ?? null,
-                        'service_id' => $item['service_id'] ?? null,
-                        'is_optional' => $item['is_optional'] ?? false,
-                        'metadata' => $item['metadata'] ?? null,
-                    ];
-                }, $day['items'] ?? []),
+                'title' => "Day {$dayNumber}: Rest & Acclimatization",
+                'description' => "Rest day to acclimatize and enjoy the mountain views.",
+                'overnight_waypoint_id' => $lastWaypoint,
+                'distance_km' => 0,
+                'estimated_time_hours' => 0,
+                'altitude_m' => $lastAltitude,
+                'items' => [
+                    [
+                        'title' => 'Rest & Acclimatization',
+                        'description' => 'Take it easy, hydrate, and enjoy the scenery.',
+                        'time_of_day' => 'morning',
+                        'cost' => round($dailyFoodCost, 2), // ✅ Consistent with fallback
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
+                ]
             ];
         }
 
-        $actualDays = count($normalized['days']);
-
-        // Pad with rest days if needed (max 3)
-        if ($actualDays < $requestedDays) {
-            $gap = $requestedDays - $actualDays;
-            $restDaysToAdd = min($gap, 3);
-
-            $lastDay = end($normalized['days']);
-            $lastWaypoint = $lastDay['overnight_waypoint_id'] ?? null;
-            $lastAltitude = $lastDay['altitude_m'] ?? null;
-
-            for ($i = 1; $i <= $restDaysToAdd; $i++) {
-                $dayNumber = $actualDays + $i;
-                $normalized['days'][] = [
-                    'day_number' => $dayNumber,
-                    'title' => "Day {$dayNumber}: Rest & Acclimatization",
-                    'description' => "Rest day to acclimatize and enjoy the mountain views.",
-                    'overnight_waypoint_id' => $lastWaypoint,
-                    'distance_km' => 0,
-                    'estimated_time_hours' => 0,
-                    'altitude_m' => $lastAltitude,
-                    'items' => [
-                        [
-                            'title' => 'Rest & Acclimatization',
-                            'description' => 'Take it easy, hydrate, and enjoy the scenery.',
-                            'time_of_day' => 'morning',
-                            'cost' => 0,
-                            'pricing_source' => 'system_estimate',
-                            'pricing_snapshot' => null,
-                            'service_id' => null,
-                            'is_optional' => false,
-                            'metadata' => null,
-                        ]
-                    ]
-                ];
-            }
-
-            // Remaining days as "No Itinerary Data"
-            $remainingDays = $requestedDays - ($actualDays + $restDaysToAdd);
-            for ($i = 1; $i <= $remainingDays; $i++) {
-                $dayNumber = $actualDays + $restDaysToAdd + $i;
-                $normalized['days'][] = [
-                    'day_number' => $dayNumber,
-                    'title' => "Day {$dayNumber}: No Itinerary Data",
-                    'description' => "The AI did not generate data for this day. Please adjust your request or try again.",
-                    'overnight_waypoint_id' => null,
-                    'distance_km' => null,
-                    'estimated_time_hours' => null,
-                    'altitude_m' => null,
-                    'items' => [],
-                ];
-            }
-        }
-
-        // Ultimate fallback if no days at all
-        if (empty($normalized['days'])) {
+        // ✅ Remaining days as "No Itinerary Data"
+        $remainingDays = $requestedDays - ($actualDays + $restDaysToAdd);
+        for ($i = 1; $i <= $remainingDays; $i++) {
+            $dayNumber = $actualDays + $restDaysToAdd + $i;
             $normalized['days'][] = [
-                'day_number' => 1,
-                'title' => 'No Itinerary Generated',
-                'description' => 'Unable to generate an itinerary. Please try again with different parameters.',
+                'day_number' => $dayNumber,
+                'title' => "Day {$dayNumber}: No Itinerary Data",
+                'description' => "The AI did not generate data for this day. Please adjust your request or try again.",
                 'overnight_waypoint_id' => null,
                 'distance_km' => null,
                 'estimated_time_hours' => null,
@@ -261,7 +256,22 @@ class ItineraryValidator
                 'items' => [],
             ];
         }
-
-        return $normalized;
     }
+
+    // ✅ Ultimate fallback if no days at all
+    if (empty($normalized['days'])) {
+        $normalized['days'][] = [
+            'day_number' => 1,
+            'title' => 'No Itinerary Generated',
+            'description' => 'Unable to generate an itinerary. Please try again with different parameters.',
+            'overnight_waypoint_id' => null,
+            'distance_km' => null,
+            'estimated_time_hours' => null,
+            'altitude_m' => null,
+            'items' => [],
+        ];
+    }
+
+    return $normalized;
+}
 }

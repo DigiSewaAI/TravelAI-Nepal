@@ -214,13 +214,19 @@ class PlannerService
 
         foreach ($route->costs as $cost) {
             $amount = $cost->amount;
+            
+            // ✅ Convert USD to NPR (1 USD ≈ 133 NPR) for consistent backend calculation
+            if (strtoupper($cost->currency) === 'USD') {
+                $amount *= 133;
+            }
+            
             if ($cost->unit === 'per_day') {
                 $amount *= $days;
             }
             $breakdown[$cost->type] = [
                 'name' => $cost->name,
                 'amount' => $amount,
-                'currency' => $cost->currency,
+                'currency' => 'NPR', // Always store as NPR for internal calculation
                 'unit' => $cost->unit,
                 'is_mandatory' => (bool) $cost->is_mandatory,
             ];
@@ -306,41 +312,43 @@ class PlannerService
     protected function buildFallbackResponse(Route $route, array $input): array
     {
         $segments = $route->segments()->orderBy('sequence')->get();
+        $requestedDays = $input['days'];
         $days = [];
         $dayNumber = 1;
 
-        // Get route costs for calculation
         $routeCosts = $route->costs;
         $dailyFoodCost = 0;
-        $permitCost = 0;
-        $transportCost = 0;
+        $totalFixedCost = 0;
 
         foreach ($routeCosts as $cost) {
+            // ✅ Convert any USD amount to NPR (base currency for display)
+            $amount = $cost->amount;
+            if (strtoupper($cost->currency) === 'USD') {
+                $amount *= 133; // Approx exchange rate
+            }
+
             if ($cost->unit === 'per_day') {
-                $dailyFoodCost = $cost->amount;
-            } elseif ($cost->type === 'permit' || $cost->type === 'conservation_fee') {
-                $permitCost += $cost->amount;
-            } elseif ($cost->type === 'local_transport') {
-                $transportCost = $cost->amount;
+                $dailyFoodCost = $amount; // ✅ Assign, don't accumulate
+            } else {
+                // Permits, transport, conservation fees – all fixed per person
+                $totalFixedCost += $amount;
             }
         }
 
-        $totalPermitTransport = $permitCost + $transportCost;
-        $totalDays = $input['days'];
+        // Spread fixed costs across all requested days
+        $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
 
-        // Calculate per-day cost (spread permits/transport across days)
-        $perDayBaseCost = $totalDays > 0 ? $totalPermitTransport / $totalDays : 0;
+        // ✅ Only take the first `requestedDays` segments
+        $segmentsToUse = $segments->take($requestedDays);
 
-        foreach ($segments as $seg) {
+        foreach ($segmentsToUse as $seg) {
             $from = $seg->fromWaypoint;
             $to = $seg->toWaypoint;
-
-            // Calculate day cost: base + food
-            $dayCost = $perDayBaseCost + $dailyFoodCost;
+            $dayCost = $perDayFixedCost + $dailyFoodCost;
 
             $days[] = [
-                'day_number' => $dayNumber++,
-                'title' => "Day " . ($dayNumber - 1) . ": {$from->name} → {$to->name}",
+                'day_number' => $dayNumber,
+                'title' => "{$from->name} → {$to->name}",
                 'description' => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
                 'overnight_waypoint_id' => $seg->to_waypoint_id,
                 'distance_km' => (float) $seg->distance_km,
@@ -360,15 +368,15 @@ class PlannerService
                     ]
                 ]
             ];
+            $dayNumber++;
         }
 
-        // Add rest days if needed
-        $requestedDays = $input['days'];
+        // ✅ Add rest days if user requested more days than segments
         while (count($days) < $requestedDays) {
             $last = end($days);
             $days[] = [
                 'day_number' => count($days) + 1,
-                'title' => "Day " . (count($days) + 1) . ": Rest & Acclimatization",
+                'title' => "Rest & Acclimatization",
                 'description' => 'Rest day to acclimatize and enjoy the mountain views.',
                 'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
                 'distance_km' => 0,
@@ -379,7 +387,7 @@ class PlannerService
                         'title' => 'Rest & Acclimatization',
                         'description' => 'Take it easy, hydrate, and enjoy the scenery.',
                         'time_of_day' => 'morning',
-                        'cost' => round($dailyFoodCost, 2),
+                        'cost' => round($dailyFoodCost, 2), // ✅ Rest day only food cost
                         'pricing_source' => 'system_estimate',
                         'pricing_snapshot' => null,
                         'service_id' => null,
