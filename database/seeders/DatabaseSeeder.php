@@ -44,11 +44,14 @@ class DatabaseSeeder extends Seeder
             // ✅ Mustang & Dolpo Region (8 destinations)
             MustangDolpoRegionSeeder::class,
             
-            // ✅ NEW: Kanchenjunga & Makalu Region
+            // ✅ Kanchenjunga & Makalu Region
             KanchenjungaMakaluRegionSeeder::class,
             
-            // ✅ NEW: Remote Treks (e.g., Dhaulagiri, Kanchenjunga, etc.)
+            // ✅ Remote Treks (13 destinations)
             RemoteTreksSeeder::class,
+            
+            // ✅ NEW: City & Cultural Tours
+            CityCulturalToursSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,

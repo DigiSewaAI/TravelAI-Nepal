@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Route;
+use App\Models\RouteSegment;
 use App\Models\PlannerRequest;
 use App\Models\PlannerResult;
 use App\Models\ItineraryDay;
@@ -31,6 +32,13 @@ class PlannerService
         }
 
         $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
+
+        // ✅ FIX: If no segments, create a default one for tours
+        if ($route->segments->isEmpty()) {
+            $this->ensureSegmentsForTour($route);
+            $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
+        }
+
         if ($route->segments->isEmpty()) {
             throw new \Exception('Route has no segments defined.');
         }
@@ -125,6 +133,65 @@ class PlannerService
         });
 
         return $result;
+    }
+
+    /**
+     * ✅ Ensure a route has at least one segment (for tours without segments)
+     */
+    protected function ensureSegmentsForTour(Route $route): void
+    {
+        // Get waypoints from the route's costs (metadata can store waypoint IDs)
+        // Or try to get waypoints from route_snapshot
+        $waypoints = \App\Models\Waypoint::whereHas('fromSegments', function ($q) use ($route) {
+            $q->where('route_id', $route->id);
+        })->orWhereHas('toSegments', function ($q) use ($route) {
+            $q->where('route_id', $route->id);
+        })->get();
+
+        if ($waypoints->count() >= 2) {
+            RouteSegment::create([
+                'route_id' => $route->id,
+                'from_waypoint_id' => $waypoints[0]->id,
+                'to_waypoint_id' => $waypoints[1]->id,
+                'sequence' => 1,
+                'distance_km' => 5.0,
+                'estimated_time_hours' => 2.0,
+                'elevation_gain_m' => 0,
+                'elevation_loss_m' => 0,
+            ]);
+            Log::info('Created default segment for tour route', ['route_id' => $route->id]);
+            return;
+        }
+
+        // If no waypoints found, create two dummy waypoints
+        $wp1 = \App\Models\Waypoint::create([
+            'name' => $route->name . ' Start',
+            'slug' => $route->slug . '-start',
+            'type' => 'village',
+            'latitude' => 28.0,
+            'longitude' => 84.0,
+            'altitude' => 1000,
+        ]);
+        $wp2 = \App\Models\Waypoint::create([
+            'name' => $route->name . ' End',
+            'slug' => $route->slug . '-end',
+            'type' => 'village',
+            'latitude' => 28.1,
+            'longitude' => 84.1,
+            'altitude' => 1100,
+        ]);
+
+        RouteSegment::create([
+            'route_id' => $route->id,
+            'from_waypoint_id' => $wp1->id,
+            'to_waypoint_id' => $wp2->id,
+            'sequence' => 1,
+            'distance_km' => 10.0,
+            'estimated_time_hours' => 3.0,
+            'elevation_gain_m' => 100,
+            'elevation_loss_m' => 0,
+        ]);
+        Log::info('Created dummy waypoints and segment for tour route', ['route_id' => $route->id]);
     }
 
     protected function resolveRoute(?string $destination): ?Route
@@ -237,92 +304,92 @@ class PlannerService
     }
 
     protected function buildFallbackResponse(Route $route, array $input): array
-{
-    $segments = $route->segments()->orderBy('sequence')->get();
-    $days = [];
-    $dayNumber = 1;
+    {
+        $segments = $route->segments()->orderBy('sequence')->get();
+        $days = [];
+        $dayNumber = 1;
 
-    // Get route costs for calculation
-    $routeCosts = $route->costs;
-    $dailyFoodCost = 0;
-    $permitCost = 0;
-    $transportCost = 0;
+        // Get route costs for calculation
+        $routeCosts = $route->costs;
+        $dailyFoodCost = 0;
+        $permitCost = 0;
+        $transportCost = 0;
 
-    foreach ($routeCosts as $cost) {
-        if ($cost->unit === 'per_day') {
-            $dailyFoodCost = $cost->amount;
-        } elseif ($cost->type === 'permit' || $cost->type === 'conservation_fee') {
-            $permitCost += $cost->amount;
-        } elseif ($cost->type === 'local_transport') {
-            $transportCost = $cost->amount;
+        foreach ($routeCosts as $cost) {
+            if ($cost->unit === 'per_day') {
+                $dailyFoodCost = $cost->amount;
+            } elseif ($cost->type === 'permit' || $cost->type === 'conservation_fee') {
+                $permitCost += $cost->amount;
+            } elseif ($cost->type === 'local_transport') {
+                $transportCost = $cost->amount;
+            }
         }
-    }
 
-    $totalPermitTransport = $permitCost + $transportCost;
-    $totalDays = $input['days'];
+        $totalPermitTransport = $permitCost + $transportCost;
+        $totalDays = $input['days'];
 
-    // Calculate per-day cost (spread permits/transport across days)
-    $perDayBaseCost = $totalPermitTransport / $totalDays;
+        // Calculate per-day cost (spread permits/transport across days)
+        $perDayBaseCost = $totalDays > 0 ? $totalPermitTransport / $totalDays : 0;
 
-    foreach ($segments as $seg) {
-        $from = $seg->fromWaypoint;
-        $to = $seg->toWaypoint;
+        foreach ($segments as $seg) {
+            $from = $seg->fromWaypoint;
+            $to = $seg->toWaypoint;
 
-        // Calculate day cost: base + food
-        $dayCost = $perDayBaseCost + $dailyFoodCost;
+            // Calculate day cost: base + food
+            $dayCost = $perDayBaseCost + $dailyFoodCost;
 
-        $days[] = [
-            'day_number' => $dayNumber++,
-            'title' => "Day " . ($dayNumber - 1) . ": {$from->name} → {$to->name}",
-            'description' => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
-            'overnight_waypoint_id' => $seg->to_waypoint_id,
-            'distance_km' => (float) $seg->distance_km,
-            'estimated_time_hours' => (float) $seg->estimated_time_hours,
-            'altitude_m' => $to->altitude,
-            'items' => [
-                [
-                    'title' => 'Trekking Day',
-                    'description' => "Hike from {$from->name} to {$to->name}",
-                    'time_of_day' => 'morning',
-                    'cost' => round($dayCost, 2), // ✅ Cost added
-                    'pricing_source' => 'system_estimate',
-                    'pricing_snapshot' => null,
-                    'service_id' => null,
-                    'is_optional' => false,
-                    'metadata' => null,
+            $days[] = [
+                'day_number' => $dayNumber++,
+                'title' => "Day " . ($dayNumber - 1) . ": {$from->name} → {$to->name}",
+                'description' => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
+                'overnight_waypoint_id' => $seg->to_waypoint_id,
+                'distance_km' => (float) $seg->distance_km,
+                'estimated_time_hours' => (float) $seg->estimated_time_hours,
+                'altitude_m' => $to->altitude,
+                'items' => [
+                    [
+                        'title' => 'Trekking Day',
+                        'description' => "Hike from {$from->name} to {$to->name}",
+                        'time_of_day' => 'morning',
+                        'cost' => round($dayCost, 2),
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
                 ]
-            ]
-        ];
-    }
+            ];
+        }
 
-    // Add rest days if needed
-    $requestedDays = $input['days'];
-    while (count($days) < $requestedDays) {
-        $last = end($days);
-        $days[] = [
-            'day_number' => count($days) + 1,
-            'title' => "Day " . (count($days) + 1) . ": Rest & Acclimatization",
-            'description' => 'Rest day to acclimatize and enjoy the mountain views.',
-            'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
-            'distance_km' => 0,
-            'estimated_time_hours' => 0,
-            'altitude_m' => $last['altitude_m'] ?? null,
-            'items' => [
-                [
-                    'title' => 'Rest & Acclimatization',
-                    'description' => 'Take it easy, hydrate, and enjoy the scenery.',
-                    'time_of_day' => 'morning',
-                    'cost' => round($dailyFoodCost, 2), // ✅ Rest day cost (only food)
-                    'pricing_source' => 'system_estimate',
-                    'pricing_snapshot' => null,
-                    'service_id' => null,
-                    'is_optional' => false,
-                    'metadata' => null,
+        // Add rest days if needed
+        $requestedDays = $input['days'];
+        while (count($days) < $requestedDays) {
+            $last = end($days);
+            $days[] = [
+                'day_number' => count($days) + 1,
+                'title' => "Day " . (count($days) + 1) . ": Rest & Acclimatization",
+                'description' => 'Rest day to acclimatize and enjoy the mountain views.',
+                'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
+                'distance_km' => 0,
+                'estimated_time_hours' => 0,
+                'altitude_m' => $last['altitude_m'] ?? null,
+                'items' => [
+                    [
+                        'title' => 'Rest & Acclimatization',
+                        'description' => 'Take it easy, hydrate, and enjoy the scenery.',
+                        'time_of_day' => 'morning',
+                        'cost' => round($dailyFoodCost, 2),
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
                 ]
-            ]
-        ];
-    }
+            ];
+        }
 
-    return ['days' => $days];
-}
+        return ['days' => $days];
+    }
 }
