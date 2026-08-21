@@ -58,9 +58,15 @@ class DatabaseSeeder extends Seeder
             
             // ✅ NEW: Religious Sites
             ReligiousSitesSeeder::class,
+
+            AdventureActivitiesSeeder::class,
+            HiddenGemsSeeder::class,
+
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
+
+
         ]);
     }
 }
