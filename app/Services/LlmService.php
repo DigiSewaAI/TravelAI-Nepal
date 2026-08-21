@@ -13,6 +13,7 @@ class LlmService
     public function __construct()
     {
         $this->apiKey = config('services.groq.api_key');
+        // ✅ qwen मोडेल प्रयोग गर (किनभने त्यो काम गर्छ)
         $this->model = config('services.groq.model', 'qwen/qwen3.6-27b');
 
         Log::info('LlmService initialized', [
@@ -53,17 +54,17 @@ class LlmService
             ])
             ->withOptions([
                 'verify' => false,
-                'timeout' => 60,
+                'timeout' => 90, // ✅ बढाइयो timeout
             ])
             ->post('https://api.groq.com/openai/v1/chat/completions', [
                 'model' => $this->model,
                 'messages' => [
-                    ['role' => 'system', 'content' => 'You are a Nepal trek itinerary planner. You MUST respond with valid JSON only. No explanations, no markdown, no extra text. ONLY JSON.'],
+                    ['role' => 'system', 'content' => 'You are a JSON generator. Return ONLY valid JSON. No other text, no markdown, no explanations.'],
                     ['role' => 'user', 'content' => $prompt],
                 ],
-                'temperature' => 0.3, // ✅ घटाइयो (0.4 → 0.3) – अझ सटीक
-                'max_tokens' => 6000,
-                'response_format' => ['type' => 'json_object'],
+                'temperature' => 0.2,
+                'max_tokens' => 5000, // ✅ 5000 मा बढाइयो (पहिले 3000 थियो)
+                // ✅ `response_format` हटाइयो – qwen लाई यसले समस्या दिन्छ
             ]);
 
             Log::info('Groq API response received', [
@@ -91,9 +92,7 @@ class LlmService
                 'content_preview' => substr($content, 0, 500)
             ]);
 
-            // ✅ JSON Extract (markdown/plain text बाट)
             $parsed = $this->extractJson($content);
-
             return $parsed;
         } catch (\Exception $e) {
             Log::error('LlmService exception', [
@@ -105,40 +104,65 @@ class LlmService
     }
 
     /**
-     * Extract JSON from a string that may contain markdown or extra text.
+     * Extract JSON from a string that may contain markdown, <think> tags, or extra text.
+     * Improved: removes <think> tags, extracts the first complete JSON object,
+     * and attempts to fix incomplete JSON by adding missing braces.
      */
     protected function extractJson(string $content): array
     {
-        // Try direct JSON decode first
-        $decoded = json_decode($content, true);
+        Log::info('LLM Raw Response', ['content' => $content]);
+
+        // 1. Remove <think> ... </think> (including multiline)
+        $cleaned = preg_replace('/<think>.*?<\/think>/s', '', $content);
+
+        // 2. Remove any other HTML-like tags
+        $cleaned = preg_replace('/<[^>]+>/', '', $cleaned);
+
+        // 3. Find the first { and the last } – extract JSON candidate
+        if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
+            $jsonCandidate = $matches[0];
+        } else {
+            // If no braces found, treat the whole cleaned string as candidate
+            $jsonCandidate = $cleaned;
+        }
+
+        // 4. Fix incomplete JSON: add missing closing braces if needed
+        $open = substr_count($jsonCandidate, '{');
+        $close = substr_count($jsonCandidate, '}');
+        if ($open > $close) {
+            $jsonCandidate .= str_repeat('}', $open - $close);
+            Log::warning('Added missing braces to JSON: added ' . ($open - $close) . ' braces.');
+        }
+
+        // 5. Try to decode
+        $decoded = json_decode($jsonCandidate, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $decoded;
         }
 
-        // Try to extract JSON from markdown code blocks
-        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/', $content, $matches)) {
-            $jsonString = trim($matches[1]);
-            $decoded = json_decode($jsonString, true);
+        // 6. If still fails, try to remove markdown code blocks and re-extract
+        $cleaned = preg_replace('/```(?:json)?\s*([\s\S]*?)\s*```/', '$1', $content);
+        if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
+            $jsonCandidate = $matches[0];
+            $open = substr_count($jsonCandidate, '{');
+            $close = substr_count($jsonCandidate, '}');
+            if ($open > $close) {
+                $jsonCandidate .= str_repeat('}', $open - $close);
+            }
+            $decoded = json_decode($jsonCandidate, true);
             if (json_last_error() === JSON_ERROR_NONE) {
+                Log::warning('Fixed JSON after markdown removal and brace adjustment.');
                 return $decoded;
             }
         }
 
-        // Try to find anything that looks like a JSON object
-        if (preg_match('/\{[\s\S]*\}/', $content, $matches)) {
-            $jsonString = trim($matches[0]);
-            $decoded = json_decode($jsonString, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
-            }
-        }
-
-        // If everything fails, throw an exception with details
+        // 7. Log error and throw
         Log::error('Failed to extract JSON', [
-            'content' => $content,
+            'content_preview' => substr($content, 0, 500),
+            'cleaned_preview' => substr($cleaned, 0, 500),
             'json_error' => json_last_error_msg()
         ]);
 
-        throw new \Exception('Failed to validate JSON. Please adjust your prompt. See "failed_generation" for more details.');
+        throw new \Exception('Failed to validate JSON. Please adjust your prompt.');
     }
 }

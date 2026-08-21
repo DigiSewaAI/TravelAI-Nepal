@@ -45,8 +45,8 @@ class PlannerService
         $prompt = $this->buildPrompt($context, $input);
         $aiResponse = $this->llm->generateItinerary($prompt);
 
-        // 6. Validate AI output against database facts
-        $validated = $this->validator->validate($aiResponse, $route, $input);
+        // 6. Validate AI output against database facts (pass context)
+        $validated = $this->validator->validate($aiResponse, $route, $input, $context);
 
         // 7. Save everything
         $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse) {
@@ -153,6 +153,33 @@ class PlannerService
         return ['total' => $total, 'breakdown' => $breakdown];
     }
 
+    /**
+     * Get verified partner services safe to use for ABC.
+     * Only hotel, transport, and guide categories – no activities/experiences.
+     */
+    protected function getSafeAbcServices(): array
+    {
+        $allowedCategories = ['hotel', 'transport', 'guide'];
+
+        return \App\Models\Service::whereHas('category', function ($q) use ($allowedCategories) {
+                $q->whereIn('slug', $allowedCategories);
+            })
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($service) {
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'category' => $service->category->slug ?? 'unknown',
+                    'description' => $service->description,
+                    'price' => $service->price,
+                    'currency' => $service->currency ?? 'NPR',
+                    'provider' => $service->provider->name ?? null,
+                ];
+            })
+            ->toArray();
+    }
+
     protected function buildContext(Route $route, array $input, array $cost): array
     {
         $segments = [];
@@ -170,6 +197,9 @@ class PlannerService
             ];
         }
 
+        // ✅ Add safe partner services
+        $availableServices = $this->getSafeAbcServices();
+
         return [
             'route_name' => $route->name,
             'duration_days' => $route->duration_days,
@@ -183,37 +213,47 @@ class PlannerService
             'fitness_level' => $input['fitness_level'] ?? 'moderate',
             'cost_breakdown' => $cost,
             'segments' => $segments,
+            'available_services' => $availableServices,
         ];
     }
 
     /**
-     * Build a prompt with reduced token size to avoid TPM limits.
+     * Build a prompt with reduced token size and include available services.
      */
     protected function buildPrompt(array $context, array $input): string
-    {
-        // ✅ Limit segments to only 6 (3 first, 3 last)
-        $segments = $context['segments'];
-        $total = count($segments);
-        if ($total > 6) {
-            $segments = array_merge(
-                array_slice($segments, 0, 3),
-                array_slice($segments, -3)
-            );
-        }
-        $context['segments'] = $segments;
-
-        // ✅ Simpler payload
-        $payload = [
-            'instruction' => 'Generate day-by-day itinerary for Nepal trek.',
-            'user' => [
-                'days' => $input['days'],
-                'budget' => $input['budget'],
-                'style' => $input['travel_style'] ?? 'mid_range',
-            ],
-            'route' => $context,
-            'output' => 'Return JSON with "days" array. Each day: day_number, title, description, distance_km, altitude_m, items (title, description, cost).'
-        ];
-
-        return json_encode($payload, JSON_PRETTY_PRINT);
+{
+    // Only 2+2 segments (first 2, last 2)
+    $segments = $context['segments'];
+    $total = count($segments);
+    if ($total > 4) {
+        $segments = array_merge(
+            array_slice($segments, 0, 2),
+            array_slice($segments, -2)
+        );
     }
+
+    // Only 4 services (id, name, category)
+    $services = array_map(function($s) {
+        return ['id' => $s['id'], 'name' => $s['name'], 'category' => $s['category']];
+    }, array_slice($context['available_services'] ?? [], 0, 4));
+
+    $payload = [
+        'instruction' => 'Generate a 9-day ABC trek itinerary JSON. Use given segments and services. Return ONLY valid JSON.',
+        'segments' => $segments,
+        'services' => $services,
+        'cost_total' => $context['cost_breakdown']['total'] ?? 0,
+        'user' => [
+            'days' => $input['days'],
+            'style' => $input['travel_style'] ?? 'mid_range',
+        ],
+        'rules' => [
+            'Use services with service_id only.',
+            'Do NOT invent names.',
+            'Do NOT calculate total.',
+            'Return ONLY JSON. No explanation, no markdown.',
+        ],
+    ];
+
+    return json_encode($payload, JSON_PRETTY_PRINT);
+}
 }

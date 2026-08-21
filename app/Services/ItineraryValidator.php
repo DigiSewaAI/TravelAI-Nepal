@@ -8,36 +8,50 @@ use Illuminate\Support\Facades\Log;
 
 class ItineraryValidator
 {
-    public function validate(array $aiOutput, Route $route, array $input): array
+    /**
+     * Validate AI-generated itinerary against ground truth.
+     */
+    public function validate(array $aiOutput, Route $route, array $input, array $context): array
     {
         $errors = [];
+
+        // ✅ Normalize: if 'itinerary' exists, map to 'days'
+        if (isset($aiOutput['itinerary']) && !isset($aiOutput['days'])) {
+            $aiOutput['days'] = $aiOutput['itinerary'];
+        }
+
         $actualDays = count($aiOutput['days'] ?? []);
 
-        // ✅ Flexible: यदि AI ले कम दिन दियो भने error नफालौं, warning मात्र
+        // Flexible: यदि AI ले कम दिन दियो भने warning मात्र
         if ($actualDays < $input['days']) {
             Log::warning("AI generated only {$actualDays} days, but user requested {$input['days']}. Days will be padded.", [
                 'route' => $route->name,
                 'user_id' => auth()->id() ?? 'guest'
             ]);
-            // हामी पछि days padding गर्न सक्छौं, तर अहिले error नफालौं
         }
 
-        // Verify waypoints exist in route
+        // Get valid waypoint IDs from the route
         $validWaypointIds = $route->segments->pluck('from_waypoint_id')
             ->merge($route->segments->pluck('to_waypoint_id'))
             ->unique()->toArray();
 
+        // Get valid service IDs from context
+        $availableServiceIds = array_column($context['available_services'] ?? [], 'id');
+
         foreach ($aiOutput['days'] ?? [] as $day) {
+            // Validate overnight waypoint
             if (!empty($day['overnight_waypoint_id'])) {
                 if (!in_array($day['overnight_waypoint_id'], $validWaypointIds)) {
                     $errors[] = "Day {$day['day_number']}: unknown waypoint ID {$day['overnight_waypoint_id']}.";
                 }
             }
 
-            // Validate each item's cost (optional)
+            // Validate items
             foreach ($day['items'] ?? [] as $item) {
-                if (isset($item['cost']) && $item['cost'] > 0) {
-                    // Optional: check if cost is within reasonable range
+                if (!empty($item['service_id'])) {
+                    if (!in_array($item['service_id'], $availableServiceIds)) {
+                        $errors[] = "Invalid service_id: {$item['service_id']} – not in available services.";
+                    }
                 }
             }
         }
@@ -53,14 +67,19 @@ class ItineraryValidator
     protected function normalize(array $aiOutput, Route $route, array $input): array
     {
         $normalized = ['days' => []];
-        $actualDays = count($aiOutput['days'] ?? []);
         $requestedDays = $input['days'];
 
-        // Loop through AI-generated days
-        foreach ($aiOutput['days'] as $day) {
+        // ✅ Sequential day numbers – start from 1
+        $dayCounter = 1;
+
+        // Loop through AI-generated days (if any)
+        foreach ($aiOutput['days'] ?? [] as $day) {
+            // Force day_number to be sequential
+            $dayNumber = $dayCounter++;
+
             $normalized['days'][] = [
-                'day_number' => (int) $day['day_number'],
-                'title' => $day['title'] ?? "Day {$day['day_number']}",
+                'day_number' => $dayNumber,
+                'title' => $day['title'] ?? "Day {$dayNumber}",
                 'description' => $day['description'] ?? '',
                 'overnight_waypoint_id' => $day['overnight_waypoint_id'] ?? null,
                 'distance_km' => $day['distance_km'] ?? null,
@@ -82,20 +101,24 @@ class ItineraryValidator
             ];
         }
 
-        // ✅ यदि AI ले कम दिन दियो भने, बाँकी दिन "Rest/Acclimatization" day थप
+        $actualDays = count($normalized['days']);
+
+        // ✅ यदि AI ले कम दिन दियो भने, बाँकी दिन "Rest/Acclimatization" थप
         if ($actualDays < $requestedDays) {
+            // Use the last day's data (if any) for overnight waypoint and altitude
             $lastDay = end($normalized['days']);
-            $lastDayNumber = $lastDay['day_number'] ?? $actualDays;
+            $lastWaypoint = $lastDay['overnight_waypoint_id'] ?? null;
+            $lastAltitude = $lastDay['altitude_m'] ?? null;
 
             for ($i = $actualDays + 1; $i <= $requestedDays; $i++) {
                 $normalized['days'][] = [
                     'day_number' => $i,
                     'title' => "Day {$i}: Rest & Acclimatization",
                     'description' => "Rest day to acclimatize and enjoy the mountain views. Explore nearby trails or relax at the teahouse.",
-                    'overnight_waypoint_id' => $lastDay['overnight_waypoint_id'] ?? null,
+                    'overnight_waypoint_id' => $lastWaypoint,
                     'distance_km' => 0,
                     'estimated_time_hours' => 0,
-                    'altitude_m' => $lastDay['altitude_m'] ?? null,
+                    'altitude_m' => $lastAltitude,
                     'items' => [
                         [
                             'title' => 'Rest & Acclimatization',
