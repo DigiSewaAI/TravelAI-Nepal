@@ -38,8 +38,11 @@ class DatabaseSeeder extends Seeder
             // ✅ Everest Region (6 destinations)
             EverestRegionSeeder::class,
             
-            // ✅ NEW: Langtang, Helambu & Manaslu Region
+            // ✅ Langtang, Helambu & Manaslu Region (7 destinations)
             LangtangHelambuManasluRegionSeeder::class,
+            
+            // ✅ NEW: Mustang & Dolpo Region
+            MustangDolpoRegionSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
