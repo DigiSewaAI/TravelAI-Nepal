@@ -53,8 +53,11 @@ class DatabaseSeeder extends Seeder
             // ✅ City & Cultural Tours (23 destinations)
             CityCulturalToursSeeder::class,
             
-            // ✅ NEW: National Parks
+            // ✅ National Parks (6 destinations)
             NationalParksSeeder::class,
+            
+            // ✅ NEW: Religious Sites
+            ReligiousSitesSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
