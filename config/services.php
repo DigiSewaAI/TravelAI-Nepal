@@ -42,6 +42,17 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    // 🔥 Groq AI Configuration (for Itinerary Planner)
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'qwen/qwen3.6-27b'), // ✅ Changed to qwen model
+    ],
+
+    // 🔥 Google Places API (for geocoding & location search)
+    'google_places' => [
+        'api_key' => env('GOOGLE_PLACES_API_KEY'),
+    ],
+
     // ========== 🔥 PHASE 11: SMS Configuration ==========
     'sms' => [
         'gateway' => env('SMS_GATEWAY', 'twilio'),

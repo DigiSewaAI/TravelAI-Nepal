@@ -31,11 +31,43 @@ class ServiceController extends Controller
 {
     $provider = Auth::user()->ownProvider();
 
+    // --- Plan Limit Check ---
+    $activeServicesCount = Service::where('provider_id', $provider->id)
+                                  ->where('status', 'active')
+                                  ->count();
+
+    $subscription = $provider->subscriptions()
+                             ->where('status', 'active')
+                             ->latest()
+                             ->first();
+
+    $maxServices = 3; // Default Free plan
+
+    if ($subscription && $subscription->plan) {
+        $limits = $subscription->plan->limits ?? [];
+        $maxServices = $limits['services'] ?? 3;
+    }
+
+    if ($maxServices === -1 || $maxServices === null) {
+        $maxServices = PHP_INT_MAX;
+    }
+
+    // 🔥 Limit exceeded -> Return with BOTH Errors & Flash Session (सुरक्षाको लागि)
+    if ($activeServicesCount >= $maxServices) {
+    return back()
+        ->withErrors([
+            'limit' => "You have reached the maximum limit of {$maxServices} services for your current plan. Please <a href='".route('provider.subscriptions.index')."' class='text-blue-600 underline font-semibold hover:text-blue-800'>upgrade to the Professional or Business plan</a> to add more services."
+        ])
+        ->with('error', "Service limit reached! Max {$maxServices} services allowed.")
+        ->withInput();
+}
+
+    // --- Validate & Create (Purano code) ---
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'service_category_id' => 'required|exists:service_categories,id',
         'price' => 'nullable|numeric|min:0',
-        'currency' => 'required|in:USD,NPR',  // ✅ Added
+        'currency' => 'required|in:USD,NPR',
         'description' => 'nullable|string',
         'cover_image' => 'nullable|image|max:2048',
         'status' => 'nullable|in:active,inactive',

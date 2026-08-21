@@ -34,14 +34,15 @@ class SubscriptionController extends Controller
 
     /**
      * Store a new subscription (plan selection).
-     * For paid plans, redirects to payment page.
-     * For free plans, activates immediately.
+     * 
+     * 🧪 LOCAL: Activates immediately (payment bypassed)
+     * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
     public function store(Request $request)
     {
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
-            'billing_interval' => 'sometimes|in:monthly,yearly', // ✅ New
+            'billing_interval' => 'sometimes|in:monthly,yearly',
         ]);
 
         $user = Auth::user();
@@ -63,44 +64,63 @@ class SubscriptionController extends Controller
             return back()->with('error', 'You already have an active subscription. Please cancel it first.');
         }
 
-        // Create subscription with pending status
-        $subscription = Subscription::create([
-            'provider_id' => $provider->id,
-            'plan_id' => $plan->id,
-            'status' => 'pending',
-            'billing_interval' => $billingInterval, // ✅ Store interval
-            'start_date' => null,
-            'end_date' => null,
-        ]);
+        // 🌍 Environment check
+        $isLocal = app()->environment('local');
 
-        // If plan is free, activate immediately
-        $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
-
-        if ($isFree) {
-            $subscription->status = 'active';
-            $subscription->start_date = now();
-            $subscription->end_date = now()->addYear(); // Free plans usually yearly
-            $subscription->save();
+        if ($isLocal) {
+            // 🧪 LOCAL: Activate immediately without payment
+            $subscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'active',
+                'billing_interval' => $billingInterval,
+                'start_date' => now(),
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
+            ]);
 
             return redirect()->route('provider.subscriptions.index')
-                ->with('success', 'Free plan activated successfully!');
-        }
+                ->with('success', $plan->name . ' plan activated successfully!');
+        } else {
+            // 🔒 PRODUCTION: Create pending, redirect to payment
+            $subscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'pending',
+                'billing_interval' => $billingInterval,
+                'start_date' => null,
+                'end_date' => null,
+            ]);
 
-        // Redirect to payment page for paid plans
-        return redirect()->route('provider.payments.show', $subscription->id)
-            ->with('info', 'Please complete the payment to activate your subscription.');
+            // For free plans, activate immediately even in production
+            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+            
+            if ($isFree) {
+                $subscription->status = 'active';
+                $subscription->start_date = now();
+                $subscription->end_date = now()->addYear();
+                $subscription->save();
+
+                return redirect()->route('provider.subscriptions.index')
+                    ->with('success', $plan->name . ' plan activated successfully!');
+            }
+
+            return redirect()->route('provider.payments.show', $subscription->id)
+                ->with('info', 'Please complete the payment to activate your subscription.');
+        }
     }
 
     /**
      * Upgrade to a different plan.
      * Cancels current subscription and creates a new one.
-     * For paid plans, redirects to payment.
+     * 
+     * 🧪 LOCAL: Activates immediately (payment bypassed)
+     * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
     public function upgrade(Request $request)
     {
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
-            'billing_interval' => 'sometimes|in:monthly,yearly', // ✅ New
+            'billing_interval' => 'sometimes|in:monthly,yearly',
         ]);
 
         $user = Auth::user();
@@ -130,32 +150,49 @@ class SubscriptionController extends Controller
             $current->save();
         }
 
-        // Create new subscription with pending status
-        $subscription = Subscription::create([
-            'provider_id' => $provider->id,
-            'plan_id' => $plan->id,
-            'status' => 'pending',
-            'billing_interval' => $billingInterval, // ✅ Store interval
-            'start_date' => null,
-            'end_date' => null,
-        ]);
+        // 🌍 Environment check
+        $isLocal = app()->environment('local');
 
-        // If plan is free, activate immediately
-        $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
-
-        if ($isFree) {
-            $subscription->status = 'active';
-            $subscription->start_date = now();
-            $subscription->end_date = now()->addYear();
-            $subscription->save();
+        if ($isLocal) {
+            // 🧪 LOCAL: Activate immediately without payment
+            $subscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'active',
+                'billing_interval' => $billingInterval,
+                'start_date' => now(),
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
+            ]);
 
             return redirect()->route('provider.subscriptions.index')
-                ->with('success', 'Plan upgraded to ' . $plan->name . ' (Free) successfully!');
-        }
+                ->with('success', 'Plan upgraded to ' . $plan->name . ' successfully!');
+        } else {
+            // 🔒 PRODUCTION: Create pending, redirect to payment
+            $subscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'pending',
+                'billing_interval' => $billingInterval,
+                'start_date' => null,
+                'end_date' => null,
+            ]);
 
-        // Redirect to payment page for paid plans
-        return redirect()->route('provider.payments.show', $subscription->id)
-            ->with('info', 'Please complete the payment to activate your new plan.');
+            // For free plans, activate immediately even in production
+            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+            
+            if ($isFree) {
+                $subscription->status = 'active';
+                $subscription->start_date = now();
+                $subscription->end_date = now()->addYear();
+                $subscription->save();
+
+                return redirect()->route('provider.subscriptions.index')
+                    ->with('success', 'Plan upgraded to ' . $plan->name . ' (Free) successfully!');
+            }
+
+            return redirect()->route('provider.payments.show', $subscription->id)
+                ->with('info', 'Please complete the payment to activate your new plan.');
+        }
     }
 
     /**
@@ -187,6 +224,9 @@ class SubscriptionController extends Controller
 
     /**
      * Resume a cancelled subscription (reactivate).
+     * 
+     * 🧪 LOCAL: Activates immediately (payment bypassed)
+     * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
     public function resume(Request $request)
     {
@@ -206,31 +246,50 @@ class SubscriptionController extends Controller
             return back()->with('error', 'No cancelled subscription found.');
         }
 
-        // If the plan is free, reactivate immediately
         $plan = $subscription->plan;
-        $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+        $billingInterval = $subscription->billing_interval ?? 'monthly';
 
-        if ($isFree) {
-            $subscription->status = 'active';
-            $subscription->start_date = now();
-            $subscription->end_date = now()->addYear();
-            $subscription->save();
+        // 🌍 Environment check
+        $isLocal = app()->environment('local');
+
+        if ($isLocal) {
+            // 🧪 LOCAL: Activate immediately without payment
+            $newSubscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'active',
+                'billing_interval' => $billingInterval,
+                'start_date' => now(),
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
+            ]);
 
             return back()->with('success', 'Subscription resumed successfully!');
+        } else {
+            // 🔒 PRODUCTION: Check if free plan
+            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+
+            // If free, reactivate immediately
+            if ($isFree) {
+                $subscription->status = 'active';
+                $subscription->start_date = now();
+                $subscription->end_date = now()->addYear();
+                $subscription->save();
+
+                return back()->with('success', 'Subscription resumed successfully!');
+            }
+
+            // 🔒 Production: Create pending, redirect to payment
+            $newSubscription = Subscription::create([
+                'provider_id' => $provider->id,
+                'plan_id' => $plan->id,
+                'status' => 'pending',
+                'billing_interval' => $billingInterval,
+                'start_date' => null,
+                'end_date' => null,
+            ]);
+
+            return redirect()->route('provider.payments.show', $newSubscription->id)
+                ->with('info', 'Please complete the payment to resume your subscription.');
         }
-
-        // For paid plans, create a new subscription and redirect to payment
-        // Use existing billing_interval or default to monthly
-        $newSubscription = Subscription::create([
-            'provider_id' => $provider->id,
-            'plan_id' => $plan->id,
-            'status' => 'pending',
-            'billing_interval' => $subscription->billing_interval ?? 'monthly',
-            'start_date' => null,
-            'end_date' => null,
-        ]);
-
-        return redirect()->route('provider.payments.show', $newSubscription->id)
-            ->with('info', 'Please complete the payment to resume your subscription.');
     }
 }

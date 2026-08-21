@@ -43,34 +43,71 @@
   </section>
 
   <!-- AI Travel Planner सेक्सन -->
-  <div class="max-w-4xl mx-auto px-4 my-12">
+<div class="max-w-4xl mx-auto px-4 my-12">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-        <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-robot"></i> AI Travel Planner</h2>
-        <p class="text-blue-100 text-sm">Generate a personalized day-by-day itinerary powered by advanced AI</p>
-      </div>
-      <div class="p-6">
-        <form id="itineraryForm" class="space-y-5">
-          @csrf
-          <div class="grid md:grid-cols-2 gap-5">
-            <div><label class="block text-gray-700 font-semibold mb-1">Destination *</label><input type="text" name="destination" required placeholder="e.g., Pokhara, Everest Base Camp" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"></div>
-            <div><label class="block text-gray-700 font-semibold mb-1">Number of Days *</label><input type="number" name="days" min="1" max="30" required class="w-full border border-gray-300 rounded-lg px-4 py-2"></div>
-            <div><label class="block text-gray-700 font-semibold mb-1">Budget (USD) *</label><input type="number" name="budget" min="100" required placeholder="e.g., 1500" class="w-full border border-gray-300 rounded-lg px-4 py-2"></div>
-            <div><label class="block text-gray-700 font-semibold mb-1">Travel Style *</label><select name="travel_style" class="w-full border border-gray-300 rounded-lg px-4 py-2"><option value="budget">Budget Travel</option><option value="mid-range">Mid-Range</option><option value="luxury">Luxury</option><option value="backpacker">Backpacker</option></select></div>
-          </div>
-          <div><label class="block text-gray-700 font-semibold mb-1">Your Interests (optional)</label><textarea name="interests" rows="2" placeholder="e.g., adventure, culture, nature, food, photography" class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea></div>
-          <button type="submit" id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md"><i class="fas fa-magic"></i> Generate Itinerary</button>
-        </form>
-        <div id="result" class="mt-8 hidden">
-          <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
-            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-map-marked-alt text-blue-600"></i> Your Personalized Itinerary</h3>
-            <div class="flex gap-2"><button onclick="downloadItinerary()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fas fa-download"></i> Download TXT</button><button onclick="copyItinerary()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fas fa-copy"></i> Copy</button></div>
-          </div>
-          <div id="itineraryResult" class="bg-gray-50 p-5 rounded-xl border border-gray-200 text-gray-800 itinerary-content max-h-[600px] overflow-y-auto"></div>
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-robot"></i> AI Travel Planner</h2>
+            <p class="text-blue-100 text-sm">Generate a personalized day-by-day itinerary powered by advanced AI</p>
         </div>
-      </div>
+        <div class="p-6">
+            <form id="itineraryForm" class="space-y-5">
+                @csrf
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Destination *</label>
+                        <input type="text" name="destination" id="destination" required placeholder="e.g., Pokhara, Everest Base Camp" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Number of Days *</label>
+                        <input type="number" name="days" id="days" min="1" max="30" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Budget (USD) *</label>
+                        <input type="number" name="budget" id="budget" min="100" required placeholder="e.g., 1500" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Travel Style *</label>
+                        <select name="travel_style" id="travel_style" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="budget">Budget Travel</option>
+                            <option value="mid_range" selected>Mid-Range</option>
+                            <option value="luxury">Luxury</option>
+                            <option value="backpacker">Backpacker</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Your Interests (optional)</label>
+                    <textarea name="interests" id="interests" rows="2" placeholder="e.g., adventure, culture, nature, food, photography" class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Fitness Level (optional)</label>
+                    <select name="fitness_level" id="fitness_level" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                        <option value="easy">Easy</option>
+                        <option value="moderate" selected>Moderate</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <button type="submit" id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
+                    <i class="fas fa-magic"></i> Generate Itinerary
+                </button>
+            </form>
+            <div id="result" class="mt-8 hidden">
+                <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i class="fas fa-map-marked-alt text-blue-600"></i> Your Personalized Itinerary</h3>
+                    <div class="flex gap-2">
+                        <button onclick="downloadItinerary()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                            <i class="fas fa-download"></i> Download TXT
+                        </button>
+                        <button onclick="copyItinerary()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <div id="itineraryResult" class="bg-gray-50 p-5 rounded-xl border border-gray-200 text-gray-800 max-h-[600px] overflow-y-auto"></div>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
 
   <!-- Stats Banner -->
   <div class="bg-gray-50 border-y border-gray-100 py-6">
@@ -285,65 +322,102 @@
     initSmoothScroll();
   </script>
 
-  <!-- एआई इटिनररी जेएस -->
-  <script>
-    function formatMarkdown(text) {
-      if (!text) return '';
-      let html = text;
-      html = html.replace(/^# (.*?)$/gm, '<h3>$1</h3>');
-      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-      html = html.replace(/^[\*\-] (.*?)$/gm, '<li>$1</li>');
-      html = html.replace(/(<li>.*?<\/li>\n?)+/g, '<ul class="list-disc ml-5 my-2">$&</ul>');
-      html = html.replace(/\n/g, '<br>');
-      html = html.replace(/<\/ul><br>/g, '</ul>');
-      return html;
-    }
-
-    function downloadItinerary() {
-      const rawText = document.getElementById('itineraryResult').innerText;
-      const blob = new Blob([rawText], {type: 'text/plain'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'travel_itinerary.txt';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function copyItinerary() {
-      const rawText = document.getElementById('itineraryResult').innerText;
-      navigator.clipboard.writeText(rawText).then(() => alert('Itinerary copied to clipboard!')).catch(() => alert('Failed to copy.'));
+  <!-- AI Itinerary JavaScript (Updated) -->
+<script>
+    // Format JSON itinerary to readable HTML
+    function renderItinerary(days) {
+        if (!days || days.length === 0) return '<p class="text-gray-500">No itinerary generated.</p>';
+        let html = '';
+        days.forEach(day => {
+            html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
+            html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
+            html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
+            if (day.distance_km) html += `<p class="text-xs text-gray-400 mt-1">📏 ${day.distance_km} km  |  ⛰️ ${day.altitude_m || 'N/A'} m</p>`;
+            if (day.items && day.items.length > 0) {
+                html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
+                day.items.forEach(item => {
+                    html += `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
+                    if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">NPR ${item.cost}</span>`;
+                    html += `</li>`;
+                });
+                html += `</ul>`;
+            }
+            html += `</div>`;
+        });
+        return html;
     }
 
     document.getElementById('itineraryForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById('generateBtn');
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-      btn.disabled = true;
-      try {
-        const formData = new FormData(this);
-        const response = await fetch('/api/itinerary/generate', {
-          method: 'POST',
-          headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-          body: formData
-        });
-        const data = await response.json();
-        if (data.success) {
-          document.getElementById('itineraryResult').innerHTML = formatMarkdown(data.itinerary);
-          document.getElementById('result').classList.remove('hidden');
-        } else {
-          alert(data.message || 'Something went wrong. Please try again.');
+        e.preventDefault();
+        const btn = document.getElementById('generateBtn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+
+        try {
+            // Build payload
+            const interestsRaw = document.getElementById('interests').value;
+            const interests = interestsRaw ? interestsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+            const payload = {
+                destination: document.getElementById('destination').value,
+                days: parseInt(document.getElementById('days').value),
+                budget: parseFloat(document.getElementById('budget').value),
+                travel_style: document.getElementById('travel_style').value,
+                interests: interests,
+                fitness_level: document.getElementById('fitness_level').value,
+            };
+
+            const response = await fetch('/api/planner/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.days) {
+                document.getElementById('itineraryResult').innerHTML = renderItinerary(data.data.days);
+                document.getElementById('result').classList.remove('hidden');
+            } else {
+                alert(data.message || 'Something went wrong. Please try again.');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Server error. Please try again later.');
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         }
-      } catch (error) {
-        console.error(error);
-        alert('Server error. Please try again later.');
-      } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-      }
     });
-  </script>
+
+    // Download as TXT (plain text)
+    function downloadItinerary() {
+        const container = document.getElementById('itineraryResult');
+        const text = container.innerText || container.textContent;
+        const blob = new Blob([text], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'travel_itinerary.txt';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // Copy to clipboard
+    function copyItinerary() {
+        const container = document.getElementById('itineraryResult');
+        const text = container.innerText || container.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Itinerary copied to clipboard!');
+        }).catch(() => {
+            alert('Failed to copy. Please select and copy manually.');
+        });
+    }
+</script>
+
 
   <!-- रिसेन्ट चेक-इन जेएस (Anonymous सहित) -->
   <script>
