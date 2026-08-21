@@ -324,10 +324,21 @@
 
   <!-- AI Itinerary JavaScript (Updated) -->
 <script>
-    // Format JSON itinerary to readable HTML
-    function renderItinerary(days) {
+    // Format JSON itinerary to readable HTML with total cost
+    function renderItinerary(days, totalCost, currency) {
         if (!days || days.length === 0) return '<p class="text-gray-500">No itinerary generated.</p>';
+
         let html = '';
+
+        // Display total cost if available
+        if (totalCost !== null && totalCost !== undefined && totalCost > 0) {
+            html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
+            html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Total Cost: <span class="text-2xl">${currency || 'NPR'} ${totalCost.toLocaleString()}</span></p>`;
+            html += `<p class="text-xs text-gray-500 mt-1">* Based on current route cost estimates; optional services/activities are not included.</p>`;
+            html += `</div>`;
+        }
+
+        // ---- Existing days rendering ----
         days.forEach(day => {
             html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
             html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
@@ -337,13 +348,14 @@
                 html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
                 day.items.forEach(item => {
                     html += `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
-                    if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">NPR ${item.cost}</span>`;
+                    if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
                     html += `</li>`;
                 });
                 html += `</ul>`;
             }
             html += `</div>`;
         });
+
         return html;
     }
 
@@ -379,8 +391,13 @@
 
             const data = await response.json();
 
+            // ✅ Updated: Pass total_cost and currency
             if (data.success && data.data && data.data.days) {
-                document.getElementById('itineraryResult').innerHTML = renderItinerary(data.data.days);
+                document.getElementById('itineraryResult').innerHTML = renderItinerary(
+                    data.data.days,
+                    data.data.total_cost,
+                    data.data.currency || 'NPR'
+                );
                 document.getElementById('result').classList.remove('hidden');
             } else {
                 alert(data.message || 'Something went wrong. Please try again.');

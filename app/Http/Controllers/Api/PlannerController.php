@@ -32,7 +32,13 @@ class PlannerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $result,
+                'data' => [
+                    'request' => $result['request'],
+                    'result' => $result['result'],
+                    'days' => $result['days'],
+                    'total_cost' => $result['total_cost'] ?? null,
+                    'currency' => 'NPR', // ✅ Hardcoded as per current scope
+                ],
             ]);
         } catch (ValidationException $e) {
             return response()->json([

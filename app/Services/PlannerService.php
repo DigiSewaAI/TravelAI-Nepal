@@ -64,9 +64,9 @@ class PlannerService
             $plannerResult = PlannerResult::create([
                 'request_id' => $plannerRequest->id,
                 'raw_ai_response' => $aiResponse,
-                'model' => config('services.groq.model', 'qwen/qwen3.6-27b'), // ✅ dynamic model
+                'model' => config('services.groq.model', 'qwen/qwen3.6-27b'),
                 'model_version' => 'latest',
-                'prompt_version' => 'v2', // ✅ version bumped
+                'prompt_version' => 'v2',
                 'route_snapshot' => [
                     'route_id' => $route->id,
                     'name' => $route->name,
@@ -113,6 +113,9 @@ class PlannerService
                 'days' => $plannerResult->days()->with('items')->get(),
             ];
         });
+
+        // ✅ ADD total_cost from the already calculated breakdown
+        $result['total_cost'] = $costBreakdown['total'] ?? 0;
 
         return $result;
     }
@@ -187,30 +190,30 @@ class PlannerService
      * Build a prompt with reduced token size to avoid TPM limits.
      */
     protected function buildPrompt(array $context, array $input): string
-{
-    // ✅ Limit segments to only 6 (3 first, 3 last)
-    $segments = $context['segments'];
-    $total = count($segments);
-    if ($total > 6) {
-        $segments = array_merge(
-            array_slice($segments, 0, 3),
-            array_slice($segments, -3)
-        );
+    {
+        // ✅ Limit segments to only 6 (3 first, 3 last)
+        $segments = $context['segments'];
+        $total = count($segments);
+        if ($total > 6) {
+            $segments = array_merge(
+                array_slice($segments, 0, 3),
+                array_slice($segments, -3)
+            );
+        }
+        $context['segments'] = $segments;
+
+        // ✅ Simpler payload
+        $payload = [
+            'instruction' => 'Generate day-by-day itinerary for Nepal trek.',
+            'user' => [
+                'days' => $input['days'],
+                'budget' => $input['budget'],
+                'style' => $input['travel_style'] ?? 'mid_range',
+            ],
+            'route' => $context,
+            'output' => 'Return JSON with "days" array. Each day: day_number, title, description, distance_km, altitude_m, items (title, description, cost).'
+        ];
+
+        return json_encode($payload, JSON_PRETTY_PRINT);
     }
-    $context['segments'] = $segments;
-
-    // ✅ Simpler payload
-    $payload = [
-        'instruction' => 'Generate day-by-day itinerary for Nepal trek.',
-        'user' => [
-            'days' => $input['days'],
-            'budget' => $input['budget'],
-            'style' => $input['travel_style'] ?? 'mid_range',
-        ],
-        'route' => $context,
-        'output' => 'Return JSON with "days" array. Each day: day_number, title, description, distance_km, altitude_m, items (title, description, cost).'
-    ];
-
-    return json_encode($payload, JSON_PRETTY_PRINT);
-}
 }
