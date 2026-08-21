@@ -35,8 +35,11 @@ class DatabaseSeeder extends Seeder
             // ✅ Phase 4: Annapurna Region (12 destinations)
             AnnapurnaRegionSeeder::class,
             
-            // ✅ NEW: Everest Region (6 destinations - Gokyo, Three Passes, Everest View, Chola, Renjo La, Sherpa Cultural)
+            // ✅ Everest Region (6 destinations)
             EverestRegionSeeder::class,
+            
+            // ✅ NEW: Langtang, Helambu & Manaslu Region
+            LangtangHelambuManasluRegionSeeder::class,
             
             // ✅ Demo providers with services, bookings & reviews
             TourismProvidersSeeder::class,
