@@ -346,11 +346,12 @@
 
         // Display total cost if available
         if (totalCost !== null && totalCost !== undefined && totalCost > 0) {
-            html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
-            html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Total Cost: <span class="text-2xl">${currency || 'NPR'} ${totalCost.toLocaleString()}</span></p>`;
-            html += `<p class="text-xs text-gray-500 mt-1">* Based on current route cost estimates; optional services/activities are not included.</p>`;
-            html += `</div>`;
-        }
+    const usdTotal = Math.round(totalCost * 0.0075);
+    html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
+    html += `<p class="text-lg font-bold text-blue-800">💰 Base Route Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;
+    html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
+    html += `</div>`;
+}
 
         // ---- Existing days rendering ----
         days.forEach(day => {
@@ -495,100 +496,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const destination = destinationSelect.value;
     const days = parseInt(daysInput.value) || 0;
     const style = styleSelect.value;
+    const budget = parseFloat(budgetInput.value);
 
     if (!destination || days === 0) {
         costPreview.innerHTML = '';
         return;
     }
 
-    // Compute rough estimate using route name matching
-    const estNpr = estimateBudgetFromName(destination, days);
-    if (estNpr === 0) {
-        costPreview.innerHTML = '';
-        return;
+    if (budget && budget > 0) {
+        costPreview.innerHTML = `
+            💰 <span class="font-bold text-blue-600">Budget: $${budget} USD</span>
+            <p class="text-xs text-gray-400 mt-1">Base route costs will be calculated from verified data.</p>
+        `;
+    } else {
+        costPreview.innerHTML = `
+            <span class="text-gray-500">Enter your budget to see estimate</span>
+        `;
     }
-
-    const styleMultiplier = { budget: 0.8, mid_range: 1.0, luxury: 1.5, backpacker: 0.9 };
-    const totalNpr = Math.round(estNpr * (styleMultiplier[style] || 1.0));
-    const usdTotal = Math.round(totalNpr * 0.0075);
-
-    costPreview.innerHTML = `💰 Estimated Total: <span class="font-bold text-blue-600">~$${usdTotal} USD</span>`;
 }
 
-function estimateBudgetFromName(name, days) {
-    // Map route names to estimates
-    const estimates = {
-        'Annapurna Base Camp': { permits: 5000, foodPerDay: 2500, transport: 1000 },
-        'Everest Base Camp': { permits: 5000, foodPerDay: 3000, transport: 0 },
-        'Langtang Valley': { permits: 5000, foodPerDay: 2500, transport: 1500 },
-        'Ghorepani Poon Hill': { permits: 3000, foodPerDay: 2000, transport: 1000 },
-        'Annapurna Circuit': { permits: 5000, foodPerDay: 2500, transport: 2000 },
-        'Mardi Himal': { permits: 3000, foodPerDay: 2200, transport: 500 },
-        'Manaslu Circuit': { permits: 8000, foodPerDay: 3000, transport: 1000 },
-        'Gokyo Lakes': { permits: 5000, foodPerDay: 3500, transport: 0 },
-        'Three Passes Trek': { permits: 5000, foodPerDay: 3500, transport: 0 },
-        'Upper Mustang': { permits: 8000, foodPerDay: 3000, transport: 1000 },
-        'Lower Mustang': { permits: 3000, foodPerDay: 2500, transport: 500 },
-        'Rara Lake': { permits: 3000, foodPerDay: 2200, transport: 500 },
-        'Dolpo Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
-        'Phoksundo Lake': { permits: 3000, foodPerDay: 2500, transport: 500 },
-        'Kanchenjunga Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
-        'Makalu Base Camp': { permits: 8000, foodPerDay: 3500, transport: 1000 },
-        'Dhaulagiri Circuit': { permits: 8000, foodPerDay: 3500, transport: 1000 },
-        'Kathmandu City Tour': { permits: 0, foodPerDay: 1500, transport: 50 },
-        'Kathmandu Valley Heritage Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
-        'Bhaktapur Durbar Square Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Patan Durbar Square Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Kirtipur Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Lumbini Buddhist Circuit': { permits: 0, foodPerDay: 1200, transport: 50 },
-        'Janakpur Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Muktinath Temple Tour': { permits: 0, foodPerDay: 2000, transport: 150 },
-        'Chitwan National Park Safari': { permits: 0, foodPerDay: 1500, transport: 50 },
-        'Trishuli River Rafting': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Paragliding in Pokhara': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Kusma Bungee': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Bandipur Village Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
-        'Tansen Hill Town Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
-        'Dhulikhel Scenic Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Panauti Heritage Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Namobuddha Monastery Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Kirtipur Ancient Town Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Sankhu Historical Town Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Khokana Traditional Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Bungamati Woodcarving Village Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Chobar Gorge & Temple Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Godavari Botanical Garden Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Pharping Monastery & Cave Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Kakani Hill Station Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Nuwakot Durbar Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
-        'Sindhuli Fort Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Bhedetar Hill Station Tour': { permits: 0, foodPerDay: 1200, transport: 40 },
-        'Hile Tea Garden Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Dharan City Tour': { permits: 0, foodPerDay: 1000, transport: 30 },
-        'Barun Valley Wilderness Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
-        'Simikot Remote Town Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
-        'Sinja Valley Historical Tour': { permits: 0, foodPerDay: 1200, transport: 50 },
-        'Shey Gompa Dolpa Tour': { permits: 0, foodPerDay: 1500, transport: 100 },
-    };
-
-    // Try exact match first
-    if (estimates[name]) {
-        const est = estimates[name];
-        return est.permits + est.transport + (est.foodPerDay * days);
-    }
-
-    // Try partial match
-    const keys = Object.keys(estimates);
-    for (const key of keys) {
-        if (name.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(name.toLowerCase())) {
-            const est = estimates[key];
-            return est.permits + est.transport + (est.foodPerDay * days);
-        }
-    }
-
-    // Fallback: generic $50/day + $50
-    return (days * 50) + 50;
-}
 
     // Auto-fill days & budget on destination change
     function autoFill() {
@@ -600,14 +526,9 @@ function estimateBudgetFromName(name, days) {
     const matched = routesData.find(r => r.name === route || r.name.toLowerCase() === route.toLowerCase());
     if (matched && matched.duration_days) {
         daysInput.value = matched.duration_days;
-        // Budget estimate using estimateBudgetFromName
-        const estUsd = Math.round(estimateBudgetFromName(matched.name, matched.duration_days) * 0.0075);
-        budgetInput.value = estUsd;
         estimateCost();
     } else {
-        // Fallback: 3 days, $200
         daysInput.value = 3;
-        budgetInput.value = 200;
         estimateCost();
     }
 }
