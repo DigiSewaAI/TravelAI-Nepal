@@ -298,37 +298,46 @@ $services = $query->get();
 }
 
     protected function selectServicesForStyle(array $services, string $style, float $budget, int $days): array
-    {
-        // Group by category
-        $grouped = [];
-        foreach ($services as $svc) {
-            $cat = $svc['category'] ?? 'other';
-            $grouped[$cat][] = $svc;
-        }
-
-        $selected = [];
-        $remainingBudget = ($budget * 133) - $this->getMandatoryCost($services); // subtract route fixed costs
-
-        foreach ($grouped as $cat => $items) {
-            if (empty($items)) continue;
-
-            // Style priority: for budget/backpacker choose cheapest, for luxury choose most expensive
-            if ($style === 'budget' || $style === 'backpacker') {
-                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
-                $selected[] = $items[0];
-            } elseif ($style === 'luxury') {
-                usort($items, fn($a, $b) => $b['price'] <=> $a['price']);
-                $selected[] = $items[0];
-            } else { // mid_range
-                // Choose median price
-                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
-                $mid = floor(count($items) / 2);
-                $selected[] = $items[$mid];
-            }
-        }
-
-        return $selected;
+{
+    $grouped = [];
+    foreach ($services as $svc) {
+        $cat = $svc['category'] ?? 'other';
+        $grouped[$cat][] = $svc;
     }
+
+    $selected = [];
+
+    foreach ($grouped as $cat => $items) {
+        if (empty($items)) continue;
+
+        if ($style === 'budget' || $style === 'backpacker') {
+            usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+            $selected[] = $items[0];
+        } elseif ($style === 'luxury') {
+            usort($items, fn($a, $b) => $b['price'] <=> $a['price']);
+            $selected[] = $items[0];
+        } else { // mid_range
+            usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+            $mid = floor(count($items) / 2);
+            $selected[] = $items[$mid];
+        }
+    }
+
+    // ✅ Ensure provider name is preserved
+    $result = [];
+    foreach ($selected as $svc) {
+        $result[] = [
+            'id' => $svc['id'],
+            'name' => $svc['name'],
+            'category' => $svc['category'],
+            'price' => $svc['price'],
+            'currency' => $svc['currency'],
+            'provider' => $svc['provider'] ?? 'Local Partner', // ✅ यो लाइन महत्वपूर्ण छ
+        ];
+    }
+
+    return $result;
+}
 
     protected function getMandatoryCost(array $services): float
     {

@@ -343,7 +343,7 @@
 
     let html = '';
 
-    // ------ Cost Breakdown Section ------
+    // ------ Cost Breakdown Section (unchanged) ------
     if (breakdown && Object.keys(breakdown).length > 0) {
         html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
         html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Cost Breakdown (${currency || 'NPR'})</p>`;
@@ -379,7 +379,7 @@
         html += `</div>`;
     }
 
-    // ------ Days Rendering (Updated with service names) ------
+    // ------ Days Rendering (Updated: cost from breakdown) ------
     days.forEach(day => {
         html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
         html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
@@ -388,21 +388,40 @@
         if (day.items && day.items.length > 0) {
             html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
             day.items.forEach(item => {
-                let itemHtml = `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
+                let costDisplay = '';
                 
-                // ✅ Display service name with provider if available
+                // ✅ Try to get cost from breakdown if item has service_id
                 if (item.service_id && breakdown) {
                     const service = Object.values(breakdown).find(b => b.service_id === item.service_id);
                     if (service) {
                         const providerName = service.provider_name || 'Local Partner';
                         const serviceName = service.name || 'Service';
-                        itemHtml += ` <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">🏨 ${serviceName} (${providerName})</span>`;
+                        costDisplay = ` <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">🏨 ${serviceName} (${providerName})</span>`;
+                        // ✅ Also add the cost from breakdown
+                        if (service.amount) {
+                            costDisplay += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${Math.round(service.amount)}</span>`;
+                        }
                     }
                 }
                 
-                if (item.cost) {
-                    itemHtml += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
+                // ✅ If no service_id, check if item has its own cost (AI-generated)
+                if (!costDisplay && item.cost && item.cost > 0) {
+                    costDisplay = ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
                 }
+                
+                // ✅ If still no cost, try to match by title (fallback)
+                if (!costDisplay && breakdown) {
+                    const matchedService = Object.values(breakdown).find(b => 
+                        b.name && item.title && b.name.toLowerCase().includes(item.title.toLowerCase())
+                    );
+                    if (matchedService && matchedService.amount) {
+                        costDisplay = ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${Math.round(matchedService.amount)}</span>`;
+                    }
+                }
+
+                // Build item HTML
+                let itemHtml = `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
+                if (costDisplay) itemHtml += costDisplay;
                 itemHtml += `</li>`;
                 html += itemHtml;
             });
