@@ -31,15 +31,16 @@ class PlannerController extends Controller
             $result = $this->planner->generate($request->all());
 
             return response()->json([
-                'success' => true,
-                'data' => [
-                    'request' => $result['request'],
-                    'result' => $result['result'],
-                    'days' => $result['days'],
-                    'total_cost' => $result['total_cost'] ?? null,
-                    'currency' => 'NPR', // ✅ Hardcoded as per current scope
-                ],
-            ]);
+    'success' => true,
+    'data' => [
+        'request' => $result['request'],
+        'result' => $result['result'],
+        'days' => $result['days'],
+        'total_cost' => $result['total_cost'] ?? null,
+        'breakdown' => $result['breakdown'] ?? [], // ✅ यो लाइन थप
+        'currency' => 'NPR',
+    ],
+]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,

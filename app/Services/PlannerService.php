@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Route;
-use App\Models\RouteSegment;
+use App\Models\Service;
 use App\Models\PlannerRequest;
 use App\Models\PlannerResult;
 use App\Models\ItineraryDay;
@@ -33,26 +33,24 @@ class PlannerService
 
         $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
 
-        // ✅ FIX: If no segments, create a default one for tours
+        // 2. Ensure segments (for tours)
         if ($route->segments->isEmpty()) {
             $this->ensureSegmentsForTour($route);
             $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
         }
 
-        if ($route->segments->isEmpty()) {
-            throw new \Exception('Route has no segments defined.');
-        }
+        // 3. Get relevant services (filtered by location, category, style, budget)
+        $availableServices = $this->getServicesForRoute($route, $input);
 
-        // 2. Cost calculation
-        $costBreakdown = $this->calculateCost($route, $input);
+        // 4. Calculate cost with style + budget consideration
+        $costBreakdown = $this->calculateCost($route, $input, $availableServices);
 
-        // 3. Build context
-        $context = $this->buildContext($route, $input, $costBreakdown);
+        // 5. Build context for LLM (includes service pool)
+        $context = $this->buildContext($route, $input, $costBreakdown, $availableServices);
 
-        // 4. Try to get AI itinerary, fallback if fails
+        // 6. Try AI, fallback if needed
         $aiResponse = null;
         $usedFallback = false;
-
         try {
             $prompt = $this->buildPrompt($context, $input);
             $aiResponse = $this->llm->generateItinerary($prompt);
@@ -63,10 +61,10 @@ class PlannerService
             $usedFallback = true;
         }
 
-        // 5. Validate
+        // 7. Validate and normalize
         $validated = $this->validator->validate($aiResponse, $route, $input, $context);
 
-        // 6. Save
+        // 8. Save to DB
         $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
             $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
@@ -84,7 +82,7 @@ class PlannerService
                 'raw_ai_response' => $aiResponse,
                 'model' => config('services.groq.model', 'qwen/qwen3.6-27b'),
                 'model_version' => 'latest',
-                'prompt_version' => 'v2',
+                'prompt_version' => 'v3', // version bump
                 'route_snapshot' => [
                     'route_id' => $route->id,
                     'name' => $route->name,
@@ -129,114 +127,220 @@ class PlannerService
                 'result' => $plannerResult,
                 'days' => $plannerResult->days()->with('items')->get(),
                 'total_cost' => $costBreakdown['total'] ?? 0,
+                'breakdown' => $costBreakdown['breakdown'] ?? [],
             ];
         });
 
         return $result;
     }
 
-    /**
-     * ✅ Ensure a route has at least one segment (for tours without segments)
-     */
-    protected function ensureSegmentsForTour(Route $route): void
-    {
-        // Get waypoints from the route's costs (metadata can store waypoint IDs)
-        // Or try to get waypoints from route_snapshot
-        $waypoints = \App\Models\Waypoint::whereHas('fromSegments', function ($q) use ($route) {
-            $q->where('route_id', $route->id);
-        })->orWhereHas('toSegments', function ($q) use ($route) {
-            $q->where('route_id', $route->id);
-        })->get();
+    // ==========================================
+    //  SERVICE FILTERING (LOCATION + STYLE + BUDGET)
+    // ==========================================
 
-        if ($waypoints->count() >= 2) {
-            RouteSegment::create([
-                'route_id' => $route->id,
-                'from_waypoint_id' => $waypoints[0]->id,
-                'to_waypoint_id' => $waypoints[1]->id,
-                'sequence' => 1,
-                'distance_km' => 5.0,
-                'estimated_time_hours' => 2.0,
-                'elevation_gain_m' => 0,
-                'elevation_loss_m' => 0,
-            ]);
-            Log::info('Created default segment for tour route', ['route_id' => $route->id]);
-            return;
+    protected function getServicesForRoute(Route $route, array $input): array
+{
+    $style = $input['travel_style'] ?? 'mid_range';
+    $budget = $input['budget'] ?? 0;
+    $days = $input['days'] ?? $route->duration_days;
+
+    // Base query: active services from allowed categories
+    $query = Service::where('status', 'active')
+        ->whereHas('category', function ($q) {
+            $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
+        });
+
+    // 🔁 Try with location filter first (if route has location_id)
+    $services = collect();
+    // ✅ Location filter हटाइयो, सबै active services लिने
+$services = $query->get();
+
+    // Style-based price thresholds (USD)
+    $priceRanges = [
+        'budget'     => ['max' => 30,  'prefer' => 'lowest'],
+        'backpacker' => ['max' => 50,  'prefer' => 'low'],
+        'mid_range'  => ['max' => 120, 'prefer' => 'medium'],
+        'luxury'     => ['max' => 500, 'prefer' => 'high'],
+    ];
+
+    $range = $priceRanges[$style] ?? $priceRanges['mid_range'];
+
+    // Filter by budget (if budget is given) and style max
+    $filtered = [];
+    foreach ($services as $service) {
+        $price = (float) $service->price;
+        // Convert to NPR if needed (for comparison we keep in USD for budget check)
+        $priceUsd = $price;
+        if (strtoupper($service->currency) === 'NPR') {
+            $priceUsd = $price / 133; // convert to USD for budget cap
         }
-
-        // If no waypoints found, create two dummy waypoints
-        $wp1 = \App\Models\Waypoint::create([
-            'name' => $route->name . ' Start',
-            'slug' => $route->slug . '-start',
-            'type' => 'village',
-            'latitude' => 28.0,
-            'longitude' => 84.0,
-            'altitude' => 1000,
-        ]);
-        $wp2 = \App\Models\Waypoint::create([
-            'name' => $route->name . ' End',
-            'slug' => $route->slug . '-end',
-            'type' => 'village',
-            'latitude' => 28.1,
-            'longitude' => 84.1,
-            'altitude' => 1100,
-        ]);
-
-        RouteSegment::create([
-            'route_id' => $route->id,
-            'from_waypoint_id' => $wp1->id,
-            'to_waypoint_id' => $wp2->id,
-            'sequence' => 1,
-            'distance_km' => 10.0,
-            'estimated_time_hours' => 3.0,
-            'elevation_gain_m' => 100,
-            'elevation_loss_m' => 0,
-        ]);
-        Log::info('Created dummy waypoints and segment for tour route', ['route_id' => $route->id]);
+        // Check if service price fits within the style's max (in USD) and overall budget (daily cap)
+        if ($priceUsd <= $range['max'] && ($budget == 0 || $priceUsd <= $budget / $days)) {
+            $filtered[] = $service;
+        }
     }
 
-    protected function resolveRoute(?string $destination): ?Route
-    {
-        if (!$destination) {
-            return Route::where('is_active', true)->first();
+    // Sort by price according to style preference
+    usort($filtered, function ($a, $b) use ($range) {
+        $priceA = (float) $a->price;
+        $priceB = (float) $b->price;
+        if ($range['prefer'] === 'lowest' || $range['prefer'] === 'low') {
+            return $priceA <=> $priceB;
+        } elseif ($range['prefer'] === 'high') {
+            return $priceB <=> $priceA;
         }
+        // mid_range: prefer medium (closest to average)
+        $avg = ($priceA + $priceB) / 2;
+        return abs($priceA - $avg) <=> abs($priceB - $avg);
+    });
 
-        return Route::where('name', 'LIKE', "%{$destination}%")
-            ->orWhere('slug', 'LIKE', "%{$destination}%")
-            ->where('is_active', true)
-            ->first();
+    // Return top 3 per category
+    $grouped = [];
+    foreach ($filtered as $svc) {
+        $cat = $svc->category->slug ?? 'other';
+        if (!isset($grouped[$cat])) {
+            $grouped[$cat] = [];
+        }
+        if (count($grouped[$cat]) < 3) {
+            $grouped[$cat][] = $svc;
+        }
     }
 
-    protected function calculateCost(Route $route, array $input): array
+    // Flatten and return
+    $result = [];
+    foreach ($grouped as $cat => $items) {
+        foreach ($items as $item) {
+            $result[] = [
+                'id' => $item->id,
+                'name' => $item->name,
+                'category' => $cat,
+                'price' => (float) $item->price,
+                'currency' => $item->currency ?? 'NPR',
+                'provider' => $item->provider->name ?? null,
+                'description' => $item->description,
+                'rating' => $item->reviews->avg('rating') ?? null,
+            ];
+        }
+    }
+
+    return $result;
+}
+
+    // ==========================================
+    //  COST CALCULATION (WITH STYLE + BUDGET)
+    // ==========================================
+
+    protected function calculateCost(Route $route, array $input, array $services): array
     {
         $days = $input['days'] ?? $route->duration_days;
+        $style = $input['travel_style'] ?? 'mid_range';
+        $budget = $input['budget'] ?? 0;
+
+        // 1. Route fixed costs (permits, transport, food estimate)
         $total = 0;
         $breakdown = [];
 
         foreach ($route->costs as $cost) {
             $amount = $cost->amount;
-            
-            // ✅ Convert USD to NPR (1 USD ≈ 133 NPR) for consistent backend calculation
+            // Convert USD to NPR if needed
             if (strtoupper($cost->currency) === 'USD') {
                 $amount *= 133;
             }
-            
             if ($cost->unit === 'per_day') {
                 $amount *= $days;
             }
             $breakdown[$cost->type] = [
                 'name' => $cost->name,
                 'amount' => $amount,
-                'currency' => 'NPR', // Always store as NPR for internal calculation
+                'currency' => 'NPR',
                 'unit' => $cost->unit,
                 'is_mandatory' => (bool) $cost->is_mandatory,
             ];
             $total += $amount;
         }
 
+        // 2. Add selected partner services (best matching style & budget)
+        $selectedServices = $this->selectServicesForStyle($services, $style, $budget, $days);
+        foreach ($selectedServices as $svc) {
+            $price = $svc['price'];
+            if (strtoupper($svc['currency']) === 'USD') {
+                $price *= 133;
+            }
+            // Service cost per day (for accommodation, guide, transport)
+            if ($svc['category'] === 'hotel' || $svc['category'] === 'guide') {
+                $price *= $days;
+            }
+            $breakdown[$svc['category']] = [
+                'name' => $svc['name'],
+                'amount' => $price,
+                'currency' => 'NPR',
+                'unit' => 'per_day' . (in_array($svc['category'], ['transport']) ? '' : ' (per person)'),
+                'is_mandatory' => false,
+                'service_id' => $svc['id'],
+            ];
+            $total += $price;
+        }
+
+        // 3. Check budget sufficiency
+        $budgetNpr = $budget * 133; // convert user's USD budget to NPR for comparison
+        if ($budget > 0 && $total > $budgetNpr) {
+            // Notify via breakdown, but do not artificially alter
+            $breakdown['budget_insufficient'] = [
+                'name' => 'Budget Note',
+                'amount' => 0,
+                'currency' => 'NPR',
+                'unit' => 'Your budget of $' . $budget . ' USD may be insufficient. Consider adjusting style or days.',
+                'is_mandatory' => false,
+            ];
+        }
+
         return ['total' => $total, 'breakdown' => $breakdown];
     }
 
-    protected function buildContext(Route $route, array $input, array $cost): array
+    protected function selectServicesForStyle(array $services, string $style, float $budget, int $days): array
+    {
+        // Group by category
+        $grouped = [];
+        foreach ($services as $svc) {
+            $cat = $svc['category'] ?? 'other';
+            $grouped[$cat][] = $svc;
+        }
+
+        $selected = [];
+        $remainingBudget = ($budget * 133) - $this->getMandatoryCost($services); // subtract route fixed costs
+
+        foreach ($grouped as $cat => $items) {
+            if (empty($items)) continue;
+
+            // Style priority: for budget/backpacker choose cheapest, for luxury choose most expensive
+            if ($style === 'budget' || $style === 'backpacker') {
+                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+                $selected[] = $items[0];
+            } elseif ($style === 'luxury') {
+                usort($items, fn($a, $b) => $b['price'] <=> $a['price']);
+                $selected[] = $items[0];
+            } else { // mid_range
+                // Choose median price
+                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+                $mid = floor(count($items) / 2);
+                $selected[] = $items[$mid];
+            }
+        }
+
+        return $selected;
+    }
+
+    protected function getMandatoryCost(array $services): float
+    {
+        // Placeholder – in full implementation, calculate from route_costs
+        return 0;
+    }
+
+    // ==========================================
+    //  CONTEXT + PROMPT (with services)
+    // ==========================================
+
+    protected function buildContext(Route $route, array $input, array $cost, array $services): array
     {
         $segments = [];
         foreach ($route->segments as $seg) {
@@ -266,6 +370,7 @@ class PlannerService
             'fitness_level' => $input['fitness_level'] ?? 'moderate',
             'cost_breakdown' => $cost,
             'segments' => $segments,
+            'available_services' => $services, // Pass filtered services to LLM
         ];
     }
 
@@ -283,7 +388,7 @@ class PlannerService
         $context['segments'] = $segments;
 
         $payload = [
-            'instruction' => 'Generate a day-by-day itinerary for a Nepal trek. Use ONLY the provided verified data.',
+            'instruction' => 'Generate a personalized day-by-day itinerary for a Nepal trek. Use ONLY the provided data.',
             'user_request' => [
                 'days' => $input['days'],
                 'budget' => $input['budget'],
@@ -297,17 +402,31 @@ class PlannerService
                 'max_altitude' => $context['max_altitude'],
                 'segments' => $segments,
             ],
+            'available_services' => array_map(function ($svc) {
+                return [
+                    'id' => $svc['id'],
+                    'name' => $svc['name'],
+                    'category' => $svc['category'],
+                    'price' => $svc['price'],
+                    'currency' => $svc['currency'],
+                    'provider' => $svc['provider'],
+                ];
+            }, $context['available_services'] ?? []),
             'cost_breakdown' => $context['cost_breakdown']['breakdown'] ?? [],
             'rules' => [
-                'Use ONLY data from route_data for distances, waypoints, and altitudes.',
+                'Use ONLY services from available_services for accommodation, guides, transport.',
                 'Do NOT invent any waypoints, distances, or costs.',
-                'Do NOT calculate the total cost.',
                 'Return valid JSON with a "days" array.',
+                'If a service is used, include its id as service_id in the item.',
             ],
         ];
 
         return json_encode($payload, JSON_PRETTY_PRINT);
     }
+
+    // ==========================================
+    //  FALLBACK (requested days respected)
+    // ==========================================
 
     protected function buildFallbackResponse(Route $route, array $input): array
     {
@@ -321,24 +440,19 @@ class PlannerService
         $totalFixedCost = 0;
 
         foreach ($routeCosts as $cost) {
-            // ✅ Convert any USD amount to NPR (base currency for display)
             $amount = $cost->amount;
             if (strtoupper($cost->currency) === 'USD') {
-                $amount *= 133; // Approx exchange rate
+                $amount *= 133;
             }
-
             if ($cost->unit === 'per_day') {
-                $dailyFoodCost = $amount; // ✅ Assign, don't accumulate
+                $dailyFoodCost = $amount;
             } else {
-                // Permits, transport, conservation fees – all fixed per person
                 $totalFixedCost += $amount;
             }
         }
 
-        // Spread fixed costs across all requested days
         $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
 
-        // ✅ Only take the first `requestedDays` segments
         $segmentsToUse = $segments->take($requestedDays);
 
         foreach ($segmentsToUse as $seg) {
@@ -371,7 +485,6 @@ class PlannerService
             $dayNumber++;
         }
 
-        // ✅ Add rest days if user requested more days than segments
         while (count($days) < $requestedDays) {
             $last = end($days);
             $days[] = [
@@ -387,7 +500,7 @@ class PlannerService
                         'title' => 'Rest & Acclimatization',
                         'description' => 'Take it easy, hydrate, and enjoy the scenery.',
                         'time_of_day' => 'morning',
-                        'cost' => round($dailyFoodCost, 2), // ✅ Rest day only food cost
+                        'cost' => round($dailyFoodCost, 2),
                         'pricing_source' => 'system_estimate',
                         'pricing_snapshot' => null,
                         'service_id' => null,
@@ -399,5 +512,71 @@ class PlannerService
         }
 
         return ['days' => $days];
+    }
+
+    // ==========================================
+    //  HELPER: ensure tour segments
+    // ==========================================
+
+    protected function ensureSegmentsForTour(Route $route): void
+    {
+        $waypoints = \App\Models\Waypoint::whereHas('fromSegments', function ($q) use ($route) {
+            $q->where('route_id', $route->id);
+        })->orWhereHas('toSegments', function ($q) use ($route) {
+            $q->where('route_id', $route->id);
+        })->get();
+
+        if ($waypoints->count() >= 2) {
+            RouteSegment::create([
+                'route_id' => $route->id,
+                'from_waypoint_id' => $waypoints[0]->id,
+                'to_waypoint_id' => $waypoints[1]->id,
+                'sequence' => 1,
+                'distance_km' => 5.0,
+                'estimated_time_hours' => 2.0,
+                'elevation_gain_m' => 0,
+                'elevation_loss_m' => 0,
+            ]);
+            return;
+        }
+
+        $wp1 = \App\Models\Waypoint::create([
+            'name' => $route->name . ' Start',
+            'slug' => $route->slug . '-start',
+            'type' => 'village',
+            'latitude' => 28.0,
+            'longitude' => 84.0,
+            'altitude' => 1000,
+        ]);
+        $wp2 = \App\Models\Waypoint::create([
+            'name' => $route->name . ' End',
+            'slug' => $route->slug . '-end',
+            'type' => 'village',
+            'latitude' => 28.1,
+            'longitude' => 84.1,
+            'altitude' => 1100,
+        ]);
+
+        RouteSegment::create([
+            'route_id' => $route->id,
+            'from_waypoint_id' => $wp1->id,
+            'to_waypoint_id' => $wp2->id,
+            'sequence' => 1,
+            'distance_km' => 10.0,
+            'estimated_time_hours' => 3.0,
+            'elevation_gain_m' => 100,
+            'elevation_loss_m' => 0,
+        ]);
+    }
+
+    protected function resolveRoute(?string $destination): ?Route
+    {
+        if (!$destination) {
+            return Route::where('is_active', true)->first();
+        }
+        return Route::where('name', 'LIKE', "%{$destination}%")
+            ->orWhere('slug', 'LIKE', "%{$destination}%")
+            ->where('is_active', true)
+            ->first();
     }
 }

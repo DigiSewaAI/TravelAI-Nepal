@@ -76,7 +76,7 @@
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Budget (USD) *</label>
-                        <input type="number" name="budget" id="budget" min="100" required placeholder="e.g., 1500" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+<input type="number" name="budget" id="budget" min="100" required placeholder="Enter your budget (USD)" class="w-full border border-gray-300 rounded-lg px-4 py-2">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-1">Travel Style *</label>
@@ -103,7 +103,6 @@
                 <button type="submit" id="generateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
                     <i class="fas fa-magic"></i> Generate Itinerary
                 </button>
-                <div id="costPreview" class="mt-4 text-center text-lg font-semibold text-gray-700"></div>
             </form>
             <div id="result" class="mt-8 hidden">
                 <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
@@ -339,39 +338,68 @@
   <!-- AI Itinerary JavaScript (Updated) -->
 <script>
     // Format JSON itinerary to readable HTML with total cost
-    function renderItinerary(days, totalCost, currency) {
-        if (!days || days.length === 0) return '<p class="text-gray-500">No itinerary generated.</p>';
+    function renderItinerary(days, totalCost, breakdown, currency) {
+    if (!days || days.length === 0) return '<p class="text-gray-500">No itinerary generated.</p>';
 
-        let html = '';
+    let html = '';
 
-        // Display total cost if available
-        if (totalCost !== null && totalCost !== undefined && totalCost > 0) {
-    const usdTotal = Math.round(totalCost * 0.0075);
-    html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
-html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;    html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
-    html += `</div>`;
-}
-
-        // ---- Existing days rendering ----
-        days.forEach(day => {
-            html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
-            html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
-            html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
-            if (day.distance_km) html += `<p class="text-xs text-gray-400 mt-1">📏 ${day.distance_km} km  |  ⛰️ ${day.altitude_m || 'N/A'} m</p>`;
-            if (day.items && day.items.length > 0) {
-                html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
-                day.items.forEach(item => {
-                    html += `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
-                    if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
-                    html += `</li>`;
-                });
-                html += `</ul>`;
+    // ------ Cost Breakdown Section (new) ------
+    if (breakdown && Object.keys(breakdown).length > 0) {
+        html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
+        html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Cost Breakdown (${currency || 'NPR'})</p>`;
+        html += `<ul class="mt-2 space-y-1 text-sm">`;
+        let total = 0;
+        for (const [key, item] of Object.entries(breakdown)) {
+            if (key === 'budget_insufficient') {
+                html += `<li class="text-yellow-700"><span class="font-semibold">⚠️ Note:</span> ${item.unit}</li>`;
+                continue;
             }
-            html += `</div>`;
-        });
-
-        return html;
+            const amount = item.amount || 0;
+            total += amount;
+            html += `<li class="flex justify-between border-b border-gray-100 py-1">
+                        <span>${item.name || key}</span>
+                        <span class="font-medium">${item.currency || 'NPR'} ${Math.round(amount)}</span>
+                     </li>`;
+        }
+        if (totalCost && totalCost > 0) {
+            html += `<li class="flex justify-between font-bold text-blue-700 pt-2 border-t-2 border-blue-200">
+                        <span>Total</span>
+                        <span>${currency || 'NPR'} ${Math.round(totalCost)}</span>
+                     </li>`;
+        }
+        html += `</ul>`;
+        html += `<p class="text-xs text-gray-400 mt-2">* Includes mandatory costs (permits, transport, food) and selected services based on your travel style & budget.</p>`;
+        html += `</div>`;
+    } else if (totalCost && totalCost > 0) {
+        // Fallback: just show total if breakdown not available
+        const usdTotal = Math.round(totalCost * 0.0075);
+        html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
+        html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;
+        html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
+        html += `</div>`;
     }
+    // ------ End of Cost Breakdown ------
+
+    // Days rendering (unchanged from original)
+    days.forEach(day => {
+        html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
+        html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
+        html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
+        if (day.distance_km) html += `<p class="text-xs text-gray-400 mt-1">📏 ${day.distance_km} km  |  ⛰️ ${day.altitude_m || 'N/A'} m</p>`;
+        if (day.items && day.items.length > 0) {
+            html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
+            day.items.forEach(item => {
+                html += `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
+                if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
+                html += `</li>`;
+            });
+            html += `</ul>`;
+        }
+        html += `</div>`;
+    });
+
+    return html;
+}
 
     document.getElementById('itineraryForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -408,10 +436,11 @@ html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <s
             // ✅ Updated: Pass total_cost and currency
             if (data.success && data.data && data.data.days) {
                 document.getElementById('itineraryResult').innerHTML = renderItinerary(
-                    data.data.days,
-                    data.data.total_cost,
-                    data.data.currency || 'NPR'
-                );
+    data.data.days,
+    data.data.total_cost,
+    data.data.breakdown,          // <-- breakdown parameter added
+    data.data.currency || 'NPR'
+);
                 document.getElementById('result').classList.remove('hidden');
             } else {
                 alert(data.message || 'Something went wrong. Please try again.');
@@ -482,63 +511,29 @@ html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <s
     if (anonymizedCheckins.length > 0) { renderCheckin(0); startRotation(); }
     else { const slider = document.getElementById('checkin-slider'); slider.innerHTML = '<div class="text-center text-gray-500">No check‑ins yet</div>'; slider.style.backgroundImage = ''; }
   </script>
-    <!-- ✅ Auto-fill + Real-time Cost Preview -->
+    <!-- ✅ Auto-fill Days Only (No fake cost preview) -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const destinationSelect = document.getElementById('destination');
     const daysInput = document.getElementById('days');
-    const budgetInput = document.getElementById('budget');
-    const styleSelect = document.getElementById('travel_style');
-    const costPreview = document.getElementById('costPreview');
 
-    function estimateCost() {
-    const destination = destinationSelect.value;
-    const days = parseInt(daysInput.value) || 0;
-    const style = styleSelect.value;
-    const budget = parseFloat(budgetInput.value);
-
-    if (!destination || days === 0) {
-        costPreview.innerHTML = '';
-        return;
-    }
-
-    if (budget && budget > 0) {
-        costPreview.innerHTML = `
-            💰 <span class="font-bold text-blue-600">Budget: $${budget} USD</span>
-            <p class="text-xs text-gray-400 mt-1">Base route costs will be calculated from verified data.</p>
-        `;
-    } else {
-        costPreview.innerHTML = `
-            <span class="text-gray-500">Enter your budget to see estimate</span>
-        `;
-    }
-}
-
-
-    // Auto-fill days & budget on destination change
     function autoFill() {
-    const route = destinationSelect.value;
-    const routesData = @json($routes->map(function($r) {
-        return ['name' => $r->name, 'duration_days' => $r->duration_days];
-    }));
+        const route = destinationSelect.value;
+        const routesData = @json($routes->map(function($r) {
+            return ['name' => $r->name, 'duration_days' => $r->duration_days];
+        }));
 
-    const matched = routesData.find(r => r.name === route || r.name.toLowerCase() === route.toLowerCase());
-    if (matched && matched.duration_days) {
-        daysInput.value = matched.duration_days;
-        estimateCost();
-    } else {
-        daysInput.value = 3;
-        estimateCost();
+        const matched = routesData.find(r => r.name === route || r.name.toLowerCase() === route.toLowerCase());
+        if (matched && matched.duration_days) {
+            daysInput.value = matched.duration_days;
+        } else {
+            daysInput.value = 3;
+        }
     }
-}
 
-    // Event listeners
     destinationSelect.addEventListener('change', function() {
         autoFill();
     });
-    daysInput.addEventListener('input', estimateCost);
-    budgetInput.addEventListener('input', estimateCost);
-    styleSelect.addEventListener('change', estimateCost);
 
     // Trigger on load
     autoFill();
