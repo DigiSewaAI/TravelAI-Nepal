@@ -231,71 +231,71 @@ $services = $query->get();
     // ==========================================
 
     protected function calculateCost(Route $route, array $input, array $services): array
-    {
-        $days = $input['days'] ?? $route->duration_days;
-        $style = $input['travel_style'] ?? 'mid_range';
-        $budget = $input['budget'] ?? 0;
+{
+    $days = $input['days'] ?? $route->duration_days;
+    $style = $input['travel_style'] ?? 'mid_range';
+    $budget = $input['budget'] ?? 0;
 
-        // 1. Route fixed costs (permits, transport, food estimate)
-        $total = 0;
-        $breakdown = [];
+    $total = 0;
+    $breakdown = [];
 
-        foreach ($route->costs as $cost) {
-            $amount = $cost->amount;
-            // Convert USD to NPR if needed
-            if (strtoupper($cost->currency) === 'USD') {
-                $amount *= 133;
-            }
-            if ($cost->unit === 'per_day') {
-                $amount *= $days;
-            }
-            $breakdown[$cost->type] = [
-                'name' => $cost->name,
-                'amount' => $amount,
-                'currency' => 'NPR',
-                'unit' => $cost->unit,
-                'is_mandatory' => (bool) $cost->is_mandatory,
-            ];
-            $total += $amount;
+    // 1. Route fixed costs
+    foreach ($route->costs as $cost) {
+        $amount = $cost->amount;
+        if (strtoupper($cost->currency) === 'USD') {
+            $amount *= 133;
         }
-
-        // 2. Add selected partner services (best matching style & budget)
-        $selectedServices = $this->selectServicesForStyle($services, $style, $budget, $days);
-        foreach ($selectedServices as $svc) {
-            $price = $svc['price'];
-            if (strtoupper($svc['currency']) === 'USD') {
-                $price *= 133;
-            }
-            // Service cost per day (for accommodation, guide, transport)
-            if ($svc['category'] === 'hotel' || $svc['category'] === 'guide') {
-                $price *= $days;
-            }
-            $breakdown[$svc['category']] = [
-                'name' => $svc['name'],
-                'amount' => $price,
-                'currency' => 'NPR',
-                'unit' => 'per_day' . (in_array($svc['category'], ['transport']) ? '' : ' (per person)'),
-                'is_mandatory' => false,
-                'service_id' => $svc['id'],
-            ];
-            $total += $price;
+        if ($cost->unit === 'per_day') {
+            $amount *= $days;
         }
-
-        // 3. Check budget sufficiency
-        $budgetNpr = $budget * 133; // convert user's USD budget to NPR for comparison
-        if ($budget > 0 && $total > $budgetNpr) {
-            // Notify via breakdown, but do not artificially alter
-            $breakdown['budget_insufficient'] = [
-                'name' => 'Budget Note',
-                'amount' => 0,
-                'currency' => 'NPR',
-                'unit' => 'Your budget of $' . $budget . ' USD may be insufficient. Consider adjusting style or days.',
-                'is_mandatory' => false,
-            ];
-        }
-
-        return ['total' => $total, 'breakdown' => $breakdown];
+        $breakdown[$cost->type] = [
+            'name' => $cost->name,
+            'amount' => $amount,
+            'currency' => 'NPR',
+            'unit' => $cost->unit,
+            'is_mandatory' => (bool) $cost->is_mandatory,
+            'provider_name' => 'System',
+        ];
+        $total += $amount;
     }
+
+    // 2. Selected services (with provider name)
+    $selectedServices = $this->selectServicesForStyle($services, $style, $budget, $days);
+    foreach ($selectedServices as $svc) {
+        $price = $svc['price'];
+        if (strtoupper($svc['currency']) === 'USD') {
+            $price *= 133;
+        }
+        if ($svc['category'] === 'hotel' || $svc['category'] === 'guide') {
+            $price *= $days;
+        }
+        $breakdown[$svc['category']] = [
+            'name' => $svc['name'],
+            'provider_name' => $svc['provider'] ?? 'Local Partner',
+            'amount' => $price,
+            'currency' => 'NPR',
+            'unit' => 'per_day',
+            'is_mandatory' => false,
+            'service_id' => $svc['id'],
+        ];
+        $total += $price;
+    }
+
+    // 3. Budget sufficiency check
+    $budgetNpr = $budget * 133;
+    if ($budget > 0 && $total > $budgetNpr) {
+        $breakdown['budget_insufficient'] = [
+            'name' => 'Budget Note',
+            'amount' => 0,
+            'currency' => 'NPR',
+            'unit' => 'Your budget of $' . $budget . ' USD may be insufficient. Consider adjusting style or days.',
+            'is_mandatory' => false,
+            'provider_name' => 'System',
+        ];
+    }
+
+    return ['total' => $total, 'breakdown' => $breakdown];
+}
 
     protected function selectServicesForStyle(array $services, string $style, float $budget, int $days): array
     {

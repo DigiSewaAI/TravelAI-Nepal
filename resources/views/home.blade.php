@@ -343,7 +343,7 @@
 
     let html = '';
 
-    // ------ Cost Breakdown Section (new) ------
+    // ------ Cost Breakdown Section ------
     if (breakdown && Object.keys(breakdown).length > 0) {
         html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
         html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Cost Breakdown (${currency || 'NPR'})</p>`;
@@ -356,8 +356,9 @@
             }
             const amount = item.amount || 0;
             total += amount;
+            const providerDisplay = item.provider_name ? ` (${item.provider_name})` : '';
             html += `<li class="flex justify-between border-b border-gray-100 py-1">
-                        <span>${item.name || key}</span>
+                        <span>${item.name || key}${providerDisplay}</span>
                         <span class="font-medium">${item.currency || 'NPR'} ${Math.round(amount)}</span>
                      </li>`;
         }
@@ -368,19 +369,17 @@
                      </li>`;
         }
         html += `</ul>`;
-        html += `<p class="text-xs text-gray-400 mt-2">* Includes mandatory costs (permits, transport, food) and selected services based on your travel style & budget.</p>`;
+        html += `<p class="text-xs text-gray-400 mt-2">* Includes mandatory costs and selected services based on your travel style & budget.</p>`;
         html += `</div>`;
     } else if (totalCost && totalCost > 0) {
-        // Fallback: just show total if breakdown not available
         const usdTotal = Math.round(totalCost * 0.0075);
         html += `<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">`;
         html += `<p class="text-lg font-bold text-blue-800">💰 Estimated Base Cost: <span class="text-2xl">~$${usdTotal} USD</span></p>`;
-        html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates. Accommodation, guide, porter, insurance and other personal/optional expenses are not included.</p>`;
+        html += `<p class="text-xs text-gray-400 mt-1">Includes currently available permit, transport and food estimates.</p>`;
         html += `</div>`;
     }
-    // ------ End of Cost Breakdown ------
 
-    // Days rendering (unchanged from original)
+    // ------ Days Rendering (Updated with service names) ------
     days.forEach(day => {
         html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
         html += `<h3 class="text-lg font-bold text-blue-700">Day ${day.day_number}: ${day.title}</h3>`;
@@ -389,9 +388,23 @@
         if (day.items && day.items.length > 0) {
             html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
             day.items.forEach(item => {
-                html += `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
-                if (item.cost) html += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
-                html += `</li>`;
+                let itemHtml = `<li class="text-sm text-gray-700"><span class="font-medium">${item.title}</span> – ${item.description || ''}`;
+                
+                // ✅ Display service name with provider if available
+                if (item.service_id && breakdown) {
+                    const service = Object.values(breakdown).find(b => b.service_id === item.service_id);
+                    if (service) {
+                        const providerName = service.provider_name || 'Local Partner';
+                        const serviceName = service.name || 'Service';
+                        itemHtml += ` <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">🏨 ${serviceName} (${providerName})</span>`;
+                    }
+                }
+                
+                if (item.cost) {
+                    itemHtml += ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
+                }
+                itemHtml += `</li>`;
+                html += itemHtml;
             });
             html += `</ul>`;
         }
