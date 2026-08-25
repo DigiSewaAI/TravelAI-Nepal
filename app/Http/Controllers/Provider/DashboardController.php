@@ -29,9 +29,9 @@ class DashboardController extends Controller
         }
 
         if (!$provider) {
-            return redirect()->route('provider.dashboard')
-                ->with('error', 'Provider profile not found. Please contact support.');
-        }
+    return redirect()->route('home')
+        ->with('error', 'Provider profile not found. Please contact support.');
+}
 
         // Get all services for this provider
         $services = $provider->services()->get();

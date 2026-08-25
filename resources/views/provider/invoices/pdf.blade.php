@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice {{ $invoice->invoice_number }}</title>
+    <title>{{ __('messages.invoice_pdf_title', ['number' => $invoice->invoice_number]) }}</title>
     <style>
         body {
             font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif;
@@ -169,11 +169,11 @@
 
             <div>
                 <div class="provider-name">{{ $invoice->provider->name ?? 'Provider' }}</div>
-                <div class="travelai-brand">Powered by <strong>TravelAI Nepal</strong></div>
+                <div class="travelai-brand">{{ __('messages.powered_by') }} <strong>TravelAI Nepal</strong></div>
             </div>
         </div>
         <div>
-            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-title">{{ __('messages.invoice') }}</div>
             <div class="meta">#{{ $invoice->invoice_number }}</div>
         </div>
     </div>
@@ -181,33 +181,36 @@
     {{-- ====== Date & Status ====== --}}
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
         <div>
-            <strong style="color: #0f172a;">Date:</strong> {{ $invoice->created_at->format('M d, Y') }}<br>
-            <strong style="color: #0f172a;">Due Date:</strong> {{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : 'N/A' }}
+            <strong style="color: #0f172a;">{{ __('messages.date_label') }}:</strong> {{ $invoice->created_at->format('M d, Y') }}<br>
+            <strong style="color: #0f172a;">{{ __('messages.due_date_label') }}:</strong> {{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : __('messages.na') }}
         </div>
         <div>
             <span class="status-badge status-{{ $invoice->status }}">
-                {{ ucfirst($invoice->status) }}
+                @if($invoice->status === 'paid') {{ __('messages.paid') }}
+                @elseif($invoice->status === 'pending') {{ __('messages.pending') }}
+                @elseif($invoice->status === 'overdue') {{ __('messages.overdue') }}
+                @else {{ ucfirst($invoice->status) }} @endif
             </span>
         </div>
     </div>
 
     {{-- ====== BILL TO ====== --}}
     <div class="bill-to">
-        <strong style="color: #0f172a; display: block; margin-bottom: 5px;">Bill To:</strong>
+        <strong style="color: #0f172a; display: block; margin-bottom: 5px;">{{ __('messages.bill_to') }}:</strong>
 
         @if($invoice->booking)
             {{-- 🔥 Booking Invoice भए Traveler देखाउनुहोस् --}}
-            <div class="name">{{ $invoice->booking->traveler->name ?? 'Traveler' }}</div>
-            <div class="detail">{{ $invoice->booking->traveler->email ?? 'N/A' }}</div>
-            <div class="detail">{{ $invoice->booking->traveler->phone ?? 'N/A' }}</div>
+            <div class="name">{{ $invoice->booking->traveler->name ?? __('messages.traveler') }}</div>
+            <div class="detail">{{ $invoice->booking->traveler->email ?? __('messages.na') }}</div>
+            <div class="detail">{{ $invoice->booking->traveler->phone ?? __('messages.na') }}</div>
             <div class="meta-info">
-                Booking #{{ $invoice->booking->id }} • {{ $invoice->booking->service->name ?? 'Service' }}
+                {{ __('messages.booking_hash_short', ['id' => $invoice->booking->id]) }} • {{ $invoice->booking->service->name ?? __('messages.service') }}
             </div>
         @else
             {{-- 🔥 Provider Subscription Invoice भए Provider देखाउनुहोस् --}}
             <div class="name">{{ $invoice->provider->name }}</div>
-            <div class="detail">{{ $invoice->provider->address ?? 'N/A' }}</div>
-            <div class="detail">{{ $invoice->provider->contact_email ?? 'N/A' }}</div>
+            <div class="detail">{{ $invoice->provider->address ?? __('messages.na') }}</div>
+            <div class="detail">{{ $invoice->provider->contact_email ?? __('messages.na') }}</div>
         @endif
     </div>
 
@@ -215,39 +218,39 @@
     <table>
         <thead>
             <tr>
-                <th>Description</th>
-                <th style="text-align: right;">Amount</th>
+                <th>{{ __('messages.description') }}</th>
+                <th style="text-align: right;">{{ __('messages.amount') }}</th>
             </tr>
         </thead>
         <tbody>
             @if($invoice->booking)
                 <tr>
-                    <td>Booking: {{ $invoice->booking->service->name ?? 'Service' }}</td>
+                    <td>{{ __('messages.booking_service') }}: {{ $invoice->booking->service->name ?? __('messages.service') }}</td>
                     <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->amount, 2) }}</td>
                 </tr>
             @elseif($invoice->subscription)
                 <tr>
-                    <td>Subscription: {{ $invoice->subscription->plan->name ?? 'Plan' }}
-                        ({{ $invoice->subscription->billing_interval ?? 'Monthly' }})
+                    <td>{{ __('messages.subscription_plan') }}: {{ $invoice->subscription->plan->name ?? __('messages.plan') }}
+                        ({{ $invoice->subscription->billing_interval ?? __('messages.monthly') }})
                     </td>
                     <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->amount, 2) }}</td>
                 </tr>
             @else
                 <tr>
-                    <td>Payment</td>
+                    <td>{{ __('messages.payment') }}</td>
                     <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->amount, 2) }}</td>
                 </tr>
             @endif
 
             @if($invoice->tax > 0)
             <tr>
-                <td>Tax ({{ $invoice->tax_rate ?? 0 }}%)</td>
+                <td>{{ __('messages.tax') }} ({{ $invoice->tax_rate ?? 0 }}%)</td>
                 <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->tax, 2) }}</td>
             </tr>
             @endif
 
             <tr class="total-row">
-                <td>Total</td>
+                <td>{{ __('messages.total') }}</td>
                 <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</td>
             </tr>
         </tbody>
@@ -255,29 +258,29 @@
 
     {{-- ====== PAYMENT DETAILS ====== --}}
     <div class="payment-details">
-    <strong>Payment Method:</strong> {{ $invoice->payment_method ?? 'N/A' }}<br>
-    <strong>Paid At:</strong> {{ $invoice->paid_at ? $invoice->paid_at->format('M d, Y H:i') : 'N/A' }}
-    
-    @if($invoice->metadata)
-        <br><strong>Reference:</strong>
-        @php
-            $meta = is_string($invoice->metadata) ? json_decode($invoice->metadata, true) : $invoice->metadata;
-        @endphp
-        @if(is_array($meta))
-            @foreach($meta as $key => $value)
-                {{ ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}<br>
-            @endforeach
-        @else
-            {{ $invoice->metadata }}
+        <strong>{{ __('messages.payment_method_label') }}:</strong> {{ $invoice->payment_method ?? __('messages.na') }}<br>
+        <strong>{{ __('messages.paid_at_label') }}:</strong> {{ $invoice->paid_at ? $invoice->paid_at->format('M d, Y H:i') : __('messages.na') }}
+        
+        @if($invoice->metadata)
+            <br><strong>{{ __('messages.reference') }}:</strong>
+            @php
+                $meta = is_string($invoice->metadata) ? json_decode($invoice->metadata, true) : $invoice->metadata;
+            @endphp
+            @if(is_array($meta))
+                @foreach($meta as $key => $value)
+                    {{ ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}<br>
+                @endforeach
+            @else
+                {{ $invoice->metadata }}
+            @endif
         @endif
-    @endif
-</div>
+    </div>
 
     {{-- ====== FOOTER ====== --}}
     <div class="footer">
-        TravelAI Nepal — AI + data-driven trekking ecosystem. Built for Nepal, by passion.<br>
-        © {{ date('Y') }} TravelAI Nepal. All rights reserved.<br>
-        <span style="font-size: 10px; color: #94a3b8;">This is a system-generated invoice. No signature required.</span>
+        {{ __('messages.footer_text') }}<br>
+        © {{ date('Y') }} TravelAI Nepal. {{ __('messages.all_rights_reserved') }}<br>
+        <span style="font-size: 10px; color: #94a3b8;">{{ __('messages.system_generated_notice') }}</span>
     </div>
 
 </body>

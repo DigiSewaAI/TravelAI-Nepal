@@ -5,9 +5,9 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
     <nav class="text-sm text-gray-500 mb-4">
-        <a href="{{ route('home') }}" class="hover:text-blue-600">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-blue-600">{{ __('messages.home') }}</a>
         <span class="mx-2">/</span>
-        <a href="{{ route('public.providers.index') }}" class="hover:text-blue-600">Providers</a>
+        <a href="{{ route('public.providers.index') }}" class="hover:text-blue-600">{{ __('messages.providers') }}</a>
         <span class="mx-2">/</span>
         <span>{{ $provider->name }}</span>
     </nav>
@@ -32,7 +32,7 @@
                     @endforeach
                     @if($provider->verification_status === 'verified')
                         <span class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                            <i class="fas fa-check-circle"></i> Verified
+                            <i class="fas fa-check-circle"></i> {{ __('messages.verified') }}
                         </span>
                     @endif
                 </div>
@@ -47,19 +47,19 @@
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t pt-4 text-sm">
             <div>
-                <p class="text-gray-500">Contact Email</p>
-                <p class="font-medium">{{ $provider->contact_email ?? 'N/A' }}</p>
+                <p class="text-gray-500">{{ __('messages.contact_email') }}</p>
+                <p class="font-medium">{{ $provider->contact_email ?? __('messages.na') }}</p>
             </div>
             <div>
-                <p class="text-gray-500">Phone</p>
-                <p class="font-medium">{{ $provider->contact_phone ?? 'N/A' }}</p>
+                <p class="text-gray-500">{{ __('messages.phone') }}</p>
+                <p class="font-medium">{{ $provider->contact_phone ?? __('messages.na') }}</p>
             </div>
             <div>
-                <p class="text-gray-500">Address</p>
-                <p class="font-medium">{{ $provider->address ?? 'N/A' }}</p>
+                <p class="text-gray-500">{{ __('messages.address') }}</p>
+                <p class="font-medium">{{ $provider->address ?? __('messages.na') }}</p>
             </div>
             <div>
-                <p class="text-gray-500">Services</p>
+                <p class="text-gray-500">{{ __('messages.services') }}</p>
                 <p class="font-medium">{{ $provider->services()->where('status', 'active')->count() }}</p>
             </div>
         </div>
@@ -67,7 +67,7 @@
 
     <!-- Services -->
     @if($provider->services->count() > 0)
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Services by {{ $provider->name }}</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.services_by_provider', ['name' => $provider->name]) }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             @foreach($provider->services as $service)
                 <div class="bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden">
@@ -85,7 +85,7 @@
                         <div class="flex items-center justify-between mt-3">
                             <span class="text-blue-600 font-bold">Rs. {{ number_format($service->price, 0) }}</span>
                             <a href="{{ route('public.services.show', $service->slug) }}" 
-                               class="text-blue-600 hover:text-blue-800 text-sm">View →</a>
+                               class="text-blue-600 hover:text-blue-800 text-sm">{{ __('messages.view') }} →</a>
                         </div>
                     </div>
                 </div>

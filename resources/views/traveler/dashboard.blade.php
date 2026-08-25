@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'My Dashboard | TravelAI Nepal')
+@section('title', __('messages.traveler_dashboard_title'))
 
 @section('content')
 
@@ -10,16 +10,16 @@
         <div class="flex flex-wrap justify-between items-center">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold">
-                    Good {{ $greeting ?? 'Morning' }}, {{ Auth::user()->name ?? 'Traveler' }} 👋
+                    {{ __('messages.traveler_greeting', ['greeting' => $greeting ?? 'Morning', 'name' => Auth::user()->name ?? 'Traveler']) }}
                 </h1>
-                <p class="text-blue-100 text-lg mt-1">Ready for your next Nepal adventure?</p>
+                <p class="text-blue-100 text-lg mt-1">{{ __('messages.traveler_ready_for_adventure') }}</p>
             </div>
             <div class="flex flex-wrap gap-3 mt-4 md:mt-0">
                 <a href="{{ route('home') }}#ai-planner" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
-                    <i class="fas fa-robot"></i> Plan with AI
+                    <i class="fas fa-robot"></i> {{ __('messages.plan_with_ai') }}
                 </a>
                 <a href="{{ route('public.services.index') }}" class="bg-white text-blue-600 hover:bg-gray-100 px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
-                    <i class="fas fa-compass"></i> Explore Nepal
+                    <i class="fas fa-compass"></i> {{ __('messages.explore_nepal_btn') }}
                 </a>
             </div>
         </div>
@@ -32,19 +32,19 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
             <p class="text-2xl font-bold text-blue-600">{{ $bookingStats['upcoming'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">Upcoming</p>
+            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_upcoming') }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
             <p class="text-2xl font-bold text-green-600">{{ $bookingStats['active'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">Active</p>
+            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_active') }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
             <p class="text-2xl font-bold text-gray-800">{{ $bookingStats['completed'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">Completed</p>
+            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_completed') }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
             <p class="text-2xl font-bold text-purple-600">{{ $reviews->count() }}</p>
-            <p class="text-xs text-gray-500">Reviews</p>
+            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_reviews') }}</p>
         </div>
     </div>
 
@@ -57,23 +57,23 @@
             @if($activeTrip)
                 <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-hiking text-blue-600"></i> My Active Trip
+                        <i class="fas fa-hiking text-blue-600"></i> {{ __('messages.traveler_active_trip_title') }}
                     </h3>
                     <div class="mt-3">
-                        <h4 class="text-xl font-semibold text-gray-900">{{ $activeTrip->service->name ?? 'N/A' }}</h4>
+                        <h4 class="text-xl font-semibold text-gray-900">{{ $activeTrip->service->name ?? __('messages.na') }}</h4>
                         <p class="text-sm text-gray-500 mt-1">
                             <i class="far fa-calendar-alt mr-1"></i> 
-                            {{ $activeTrip->start_date ? $activeTrip->start_date->format('M d, Y') : 'TBD' }}
+                            {{ $activeTrip->start_date ? $activeTrip->start_date->format('M d, Y') : __('messages.tbd') }}
                         </p>
                         <div class="flex flex-wrap items-center gap-3 mt-3">
                             <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                                <i class="fas fa-circle text-[6px] mr-1 align-middle"></i> Active
+                                <i class="fas fa-circle text-[6px] mr-1 align-middle"></i> {{ __('messages.traveler_active') }}
                             </span>
                             <span class="text-sm text-gray-500">
-                                Status: <span class="font-medium text-gray-700">{{ ucfirst($activeTrip->status) }}</span>
+                                {{ __('messages.traveler_status_label') }}: <span class="font-medium text-gray-700">{{ ucfirst($activeTrip->status) }}</span>
                             </span>
                             <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-auto">
-                                View Trek Passport <i class="fas fa-arrow-right ml-1"></i>
+                                {{ __('messages.traveler_view_trek_passport') }} <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
                     </div>
@@ -81,9 +81,9 @@
             @else
                 <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
                     <i class="fas fa-hiking text-4xl text-gray-300 mb-3"></i>
-                    <h3 class="text-lg font-semibold text-gray-700">No Active Trip</h3>
-                    <p class="text-sm text-gray-400">Plan your next adventure with AI</p>
-                    <a href="{{ route('home') }}#ai-planner" class="inline-block mt-3 text-blue-600 hover:underline text-sm">Start Planning →</a>
+                    <h3 class="text-lg font-semibold text-gray-700">{{ __('messages.traveler_no_active_trip') }}</h3>
+                    <p class="text-sm text-gray-400">{{ __('messages.traveler_no_active_trip_sub') }}</p>
+                    <a href="{{ route('home') }}#ai-planner" class="inline-block mt-3 text-blue-600 hover:underline text-sm">{{ __('messages.traveler_start_planning') }} →</a>
                 </div>
             @endif
 
@@ -91,9 +91,9 @@
             <div class="bg-white rounded-xl shadow-sm border p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <i class="fas fa-calendar-check text-blue-600"></i> My Bookings
+                        <i class="fas fa-calendar-check text-blue-600"></i> {{ __('messages.traveler_my_bookings') }}
                     </h3>
-                    <span class="text-sm text-gray-400">{{ $bookings->count() }} total</span>
+                    <span class="text-sm text-gray-400">{{ $bookings->count() }} {{ __('messages.traveler_total') }}</span>
                 </div>
 
                 @if($bookings->count() > 0)
@@ -101,10 +101,10 @@
                         @foreach($bookings->take(5) as $booking)
                             <div class="py-3 flex flex-wrap justify-between items-center gap-2">
                                 <div>
-                                    <p class="font-medium text-gray-800">{{ $booking->service->name ?? 'N/A' }}</p>
+                                    <p class="font-medium text-gray-800">{{ $booking->service->name ?? __('messages.na') }}</p>
                                     <p class="text-xs text-gray-400">
                                         <i class="far fa-calendar-alt mr-1"></i> 
-                                        {{ $booking->start_date ? $booking->start_date->format('M d, Y') : 'TBD' }}
+                                        {{ $booking->start_date ? $booking->start_date->format('M d, Y') : __('messages.tbd') }}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-3">
@@ -113,18 +113,21 @@
                                         @elseif($booking->status === 'confirmed') bg-blue-100 text-blue-800
                                         @elseif($booking->status === 'completed') bg-green-100 text-green-800
                                         @else bg-red-100 text-red-800 @endif">
-                                        {{ ucfirst($booking->status) }}
+                                        @if($booking->status === 'pending') {{ __('messages.pending') }}
+                                        @elseif($booking->status === 'confirmed') {{ __('messages.confirmed') }}
+                                        @elseif($booking->status === 'completed') {{ __('messages.completed') }}
+                                        @else {{ __('messages.cancelled') }} @endif
                                     </span>
                                     @if($booking->status === 'completed' && !$booking->review)
                                         <a href="{{ route('traveler.reviews.create', $booking) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            <i class="fas fa-star"></i> Review
+                                            <i class="fas fa-star"></i> {{ __('messages.traveler_write_review') }}
                                         </a>
                                     @endif
                                     @if($booking->review)
-                                        <span class="text-sm text-green-600">✅ Reviewed</span>
+                                        <span class="text-sm text-green-600">✅ {{ __('messages.traveler_reviewed') }}</span>
                                     @endif
                                     <a href="{{ route('traveler.bookings.show', $booking->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        View <i class="fas fa-arrow-right ml-1"></i>
+                                        {{ __('messages.view') }} <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
                             </div>
@@ -132,13 +135,13 @@
                     </div>
                     @if($bookings->count() > 5)
                         <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">View All Bookings →</a>
+                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_bookings') }} →</a>
                         </div>
                     @endif
                 @else
-                    <p class="text-gray-500 text-center py-6">No bookings yet. Start exploring!</p>
+                    <p class="text-gray-500 text-center py-6">{{ __('messages.traveler_no_bookings_yet') }}</p>
                     <div class="text-center">
-                        <a href="{{ route('public.services.index') }}" class="text-blue-600 hover:underline text-sm">Explore Services →</a>
+                        <a href="{{ route('public.services.index') }}" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_explore_services') }} →</a>
                     </div>
                 @endif
             </div>
@@ -150,68 +153,68 @@
             {{-- My Reviews --}}
             <div class="bg-white rounded-xl shadow-sm border p-6">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-                    <i class="fas fa-star text-yellow-500"></i> My Reviews
+                    <i class="fas fa-star text-yellow-500"></i> {{ __('messages.traveler_my_reviews') }}
                 </h3>
                 @if($reviews->count() > 0)
                     <div class="space-y-3">
                         @foreach($reviews->take(3) as $review)
                             <div class="border-b pb-2 last:border-0">
                                 <div class="flex justify-between items-start">
-                                    <span class="font-medium text-sm text-gray-800">{{ $review->service->name ?? 'N/A' }}</span>
+                                    <span class="font-medium text-sm text-gray-800">{{ $review->service->name ?? __('messages.na') }}</span>
                                     <span class="text-yellow-500 text-sm">{{ str_repeat('⭐', $review->rating) }}</span>
                                 </div>
-                                <p class="text-xs text-gray-500 line-clamp-1">{{ $review->comment ?: 'No comment' }}</p>
+                                <p class="text-xs text-gray-500 line-clamp-1">{{ $review->comment ?: __('messages.traveler_no_comment') }}</p>
                             </div>
                         @endforeach
                     </div>
                     @if($reviews->count() > 3)
                         <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">View All Reviews →</a>
+                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_reviews') }} →</a>
                         </div>
                     @endif
                 @else
-                    <p class="text-gray-400 text-sm text-center py-4">No reviews yet.</p>
+                    <p class="text-gray-400 text-sm text-center py-4">{{ __('messages.traveler_no_reviews_yet') }}</p>
                 @endif
             </div>
 
             {{-- My Trek History (QR Check-ins) --}}
-<div class="bg-white rounded-xl shadow-sm border p-6">
-    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-        <i class="fas fa-route text-green-600"></i> My Trek History
-    </h3>
-    @if($qrScans->count() > 0)
-        <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
-            @foreach($qrScans as $scan)
-                <div class="flex justify-between items-center border-b border-gray-100 pb-2 last:border-0">
-                    <div>
-                        <p class="font-medium text-sm text-gray-800">{{ $scan->booking->service->name ?? 'N/A' }}</p>
-                        <p class="text-xs text-gray-400">
-                            <i class="fas fa-map-pin mr-1 text-blue-500"></i> 
-                            {{ $scan->checkpoint_name ?? 'Check-in' }}
-                        </p>
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
+                    <i class="fas fa-route text-green-600"></i> {{ __('messages.traveler_trek_history') }}
+                </h3>
+                @if($qrScans->count() > 0)
+                    <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                        @foreach($qrScans as $scan)
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-2 last:border-0">
+                                <div>
+                                    <p class="font-medium text-sm text-gray-800">{{ $scan->booking->service->name ?? __('messages.na') }}</p>
+                                    <p class="text-xs text-gray-400">
+                                        <i class="fas fa-map-pin mr-1 text-blue-500"></i> 
+                                        {{ $scan->checkpoint_name ?? __('messages.traveler_checkin_default') }}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-medium text-green-600">
+                                        <i class="fas fa-check-circle mr-1"></i> {{ __('messages.traveler_checked_in') }}
+                                    </span>
+                                    <p class="text-[10px] text-gray-400">{{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y H:i') : __('messages.na') }}</p>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs font-medium text-green-600">
-                            <i class="fas fa-check-circle mr-1"></i> Checked In
-                        </span>
-                        <p class="text-[10px] text-gray-400">{{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y H:i') : 'N/A' }}</p>
+                    @if($qrScans->count() > 10)
+                        <div class="mt-3 text-center">
+                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_history') }} →</a>
+                        </div>
+                    @endif
+                @else
+                    <div class="text-center py-4">
+                        <i class="fas fa-route text-3xl text-gray-300 mb-2"></i>
+                        <p class="text-gray-400 text-sm">{{ __('messages.traveler_no_trek_history') }}</p>
+                        <p class="text-xs text-gray-400">{{ __('messages.traveler_no_trek_history_sub') }}</p>
                     </div>
-                </div>
-            @endforeach
-        </div>
-        @if($qrScans->count() > 10)
-            <div class="mt-3 text-center">
-                <a href="#" class="text-blue-600 hover:underline text-sm">View All History →</a>
+                @endif
             </div>
-        @endif
-    @else
-        <div class="text-center py-4">
-            <i class="fas fa-route text-3xl text-gray-300 mb-2"></i>
-            <p class="text-gray-400 text-sm">No trek history yet.</p>
-            <p class="text-xs text-gray-400">Check-in at a trek checkpoint to start your journey.</p>
-        </div>
-    @endif
-</div>
 
             {{-- 🔥 AI Travel Planner (Prominent Card) --}}
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition">
@@ -220,12 +223,12 @@
                         <i class="fas fa-robot text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold">AI Travel Planner</h3>
+                        <h3 class="text-xl font-bold">{{ __('messages.traveler_ai_planner_card_title') }}</h3>
                         <p class="text-blue-100 text-sm mt-1 max-w-md">
-                            Tell us your budget, travel days, interests and travel style — we'll build a personalized itinerary for you.
+                            {{ __('messages.traveler_ai_planner_card_desc') }}
                         </p>
                         <a href="{{ route('home') }}#ai-planner" class="inline-block mt-4 bg-white text-blue-600 hover:bg-gray-100 px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-md hover:shadow-lg">
-                            Create AI Itinerary <i class="fas fa-arrow-right ml-2"></i>
+                            {{ __('messages.traveler_create_ai_itinerary') }} <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>
                 </div>
@@ -238,9 +241,9 @@
                         <i class="fas fa-passport text-blue-500 text-xl"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800">Digital Trek Passport</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Your digital record for future treks, check-ins and verified journey history.</p>
-                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">Coming 2026</span>
+                        <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_digital_passport_title') }}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_digital_passport_desc') }}</p>
+                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">{{ __('messages.traveler_coming_2026') }}</span>
                     </div>
                 </div>
             </div>
@@ -252,9 +255,9 @@
                         <i class="fas fa-shield-alt text-red-500 text-xl"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800">Safety Center</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">Safety tools and trek support designed for Nepal's mountain routes.</p>
-                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">Coming 2026</span>
+                        <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_safety_center_title') }}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_safety_center_desc') }}</p>
+                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">{{ __('messages.traveler_coming_2026') }}</span>
                     </div>
                 </div>
             </div>

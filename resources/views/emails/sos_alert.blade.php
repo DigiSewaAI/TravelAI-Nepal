@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>SOS Alert</title>
+    <title>{{ __('messages.sos_email_title') }}</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
@@ -13,25 +13,25 @@
 </head>
 <body>
 <div class="container">
-    <h2 style="color: #dc2626;">🚨 SOS ALERT</h2>
-    <p>Dear <strong>{{ $agency_name }}</strong>,</p>
-    <p>A trekker has triggered an emergency SOS.</p>
+    <h2 style="color: #dc2626;">🚨 {{ __('messages.sos_email_heading') }}</h2>
+    <p>{{ __('messages.sos_email_dear', ['name' => $agency_name]) }},</p>
+    <p>{{ __('messages.sos_email_intro') }}</p>
 
     <div class="alert-box">
-        <p><strong>🧑 Trekker:</strong> {{ $trekker_name }}</p>
-        <p><strong>🏔️ Trek:</strong> {{ $trek_name }}</p>
-        <p><strong>📝 Message:</strong> {{ $message }}</p>
-        <p><strong>📍 Location:</strong><br>
-            Latitude: {{ $latitude }}<br>
-            Longitude: {{ $longitude }}<br>
-            <a href="{{ $google_maps_link }}" target="_blank" class="button">View on Google Maps</a>
+        <p><strong>{{ __('messages.sos_email_trekker') }}:</strong> {{ $trekker_name }}</p>
+        <p><strong>{{ __('messages.sos_email_trek') }}:</strong> {{ $trek_name }}</p>
+        <p><strong>{{ __('messages.sos_email_message') }}:</strong> {{ $message }}</p>
+        <p><strong>{{ __('messages.sos_email_location') }}:</strong><br>
+            {{ __('messages.sos_email_latitude') }}: {{ $latitude }}<br>
+            {{ __('messages.sos_email_longitude') }}: {{ $longitude }}<br>
+            <a href="{{ $google_maps_link }}" target="_blank" class="button">{{ __('messages.sos_email_view_map') }}</a>
         </p>
-        <p><strong>⏰ Time:</strong> {{ $alert_time }}</p>
+        <p><strong>{{ __('messages.sos_email_time') }}:</strong> {{ $alert_time }}</p>
     </div>
 
-    <p><strong>Immediate action required.</strong> Please contact the trekker or coordinate with local rescue.</p>
+    <p><strong>{{ __('messages.sos_email_action_required') }}</strong></p>
     <hr>
-    <p style="font-size: 12px; color: #666;">This is an automated message from TravelAI Nepal.</p>
+    <p style="font-size: 12px; color: #666;">{{ __('messages.sos_email_auto_message') }}</p>
 </div>
 </body>
 </html>

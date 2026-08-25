@@ -45,7 +45,7 @@ class ServiceController extends Controller
 
     if ($subscription && $subscription->plan) {
         $limits = $subscription->plan->limits ?? [];
-        $maxServices = $limits['services'] ?? 3;
+        $maxServices = $limits['max_listings'] ?? 3;
     }
 
     if ($maxServices === -1 || $maxServices === null) {

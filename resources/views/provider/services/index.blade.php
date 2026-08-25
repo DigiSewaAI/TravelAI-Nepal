@@ -1,14 +1,14 @@
 @extends('layouts.provider')
 
-@section('title', 'Services | TravelAI Nepal')
-@section('header', 'Manage Services')
+@section('title', __('messages.services_page_title'))
+@section('header', __('messages.manage_services'))
 
 @section('content')
 <div class="bg-white rounded-xl shadow-sm border p-6">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-800">Your Services</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('messages.your_services') }}</h2>
         <a href="{{ route('provider.services.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
-            <i class="fas fa-plus mr-1"></i> Add New Service
+            <i class="fas fa-plus mr-1"></i> {{ __('messages.add_new_service') }}
         </a>
     </div>
 
@@ -17,11 +17,11 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b">
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Name</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Category</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Price</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Status</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Actions</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.name') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.category') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.price') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.status') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,7 +34,7 @@
                             <span class="px-2 py-1 rounded-full text-xs
                                 @if($service->status === 'active') bg-green-100 text-green-800
                                 @else bg-gray-100 text-gray-800 @endif">
-                                {{ ucfirst($service->status) }}
+                                @if($service->status === 'active') {{ __('messages.active') }} @else {{ __('messages.inactive') }} @endif
                             </span>
                         </td>
                         <td class="py-3 text-sm">
@@ -42,7 +42,7 @@
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form method="POST" action="{{ route('provider.services.destroy', $service) }}" class="inline"
-                                  onsubmit="return confirm('Delete this service?')">
+                                  onsubmit="return confirm('{{ __('messages.delete_confirm') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-800">
@@ -56,7 +56,7 @@
             </table>
         </div>
     @else
-        <p class="text-gray-500 text-center py-8">No services yet. Click "Add New Service" to create one.</p>
+        <p class="text-gray-500 text-center py-8">{!! __('messages.no_services_yet', ['link' => route('provider.services.create')]) !!}</p>
     @endif
 </div>
 @endsection

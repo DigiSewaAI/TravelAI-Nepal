@@ -1,7 +1,7 @@
 @extends('layouts.provider')
 
-@section('title', 'Edit Service | TravelAI Nepal')
-@section('header', 'Edit Service')
+@section('title', __('messages.edit_service_page_title'))
+@section('header', __('messages.edit_service_header'))
 
 @section('content')
 <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-6">
@@ -11,15 +11,15 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Service Name *</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.service_name') }} *</label>
                 <input type="text" name="name" value="{{ old('name', $service->name) }}" required
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Category *</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.category') }} *</label>
                 <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Select Category</option>
+                    <option value="">{{ __('messages.select_category') }}</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ old('service_category_id', $service->service_category_id) == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
@@ -30,7 +30,7 @@
 
             {{-- 🔥 यहाँ Price फिल्ड प्रतिस्थापन गरिएको छ --}}
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Price</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.price') }}</label>
                 <div class="flex gap-2">
                     <input type="number" name="price" value="{{ old('price', $service->price) }}" step="0.01"
                            class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -42,34 +42,34 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Description</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.description') }}</label>
                 <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description', $service->description) }}</textarea>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Cover Image</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.cover_image') }}</label>
                 <input type="file" name="cover_image" accept="image/*"
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @if($service->cover_image)
-                    <p class="text-xs text-gray-400 mt-1">Current: <a href="{{ asset('storage/' . $service->cover_image) }}" target="_blank">View</a></p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('messages.current') }}: <a href="{{ asset('storage/' . $service->cover_image) }}" target="_blank">{{ __('messages.view') }}</a></p>
                 @endif
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Status</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.status') }}</label>
                 <select name="status" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="active" {{ $service->status === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ $service->status === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="active" {{ $service->status === 'active' ? 'selected' : '' }}>{{ __('messages.active') }}</option>
+                    <option value="inactive" {{ $service->status === 'inactive' ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
                 </select>
             </div>
         </div>
 
         <div class="mt-6 flex gap-3">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition">
-                <i class="fas fa-save mr-1"></i> Update Service
+                <i class="fas fa-save mr-1"></i> {{ __('messages.update_service') }}
             </button>
             <a href="{{ route('provider.services.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">
-                Cancel
+                {{ __('messages.cancel') }}
             </a>
         </div>
     </form>

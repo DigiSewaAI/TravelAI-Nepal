@@ -1,7 +1,7 @@
 @extends('layouts.provider')
 
-@section('title', 'Create Service | TravelAI Nepal')
-@section('header', 'Create Service')
+@section('title', __('messages.create_service_page_title'))
+@section('header', __('messages.create_service_header'))
 
 @section('content')
 <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border p-6">
@@ -9,7 +9,7 @@
     {{-- ✅ Success Message (only when service created) --}}
     @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> {{ session('success') }}
+            <strong>{{ __('messages.success') }}</strong> {{ session('success') }}
             <button type="button" class="btn-close float-right" data-bs-dismiss="alert" aria-label="Close">&times;</button>
         </div>
     @endif
@@ -24,7 +24,7 @@
 
     @if (!empty($generalErrors))
         <div class="mb-4 p-4 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg alert-dismissible fade show" role="alert">
-            <strong>Validation Error!</strong>
+            <strong>{{ __('messages.validation_error') }}</strong>
             <ul class="mb-0 mt-1 list-disc list-inside">
                 @foreach ($generalErrors as $field => $messages)
                     @foreach ($messages as $message)
@@ -49,7 +49,7 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Service Name *</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.service_name') }} *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror">
                 @error('name')
@@ -58,9 +58,9 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Category *</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.category') }} *</label>
                 <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('service_category_id') border-red-500 @enderror">
-                    <option value="">Select Category</option>
+                    <option value="">{{ __('messages.select_category') }}</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
@@ -73,7 +73,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Price</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.price') }}</label>
                 <div class="flex gap-2">
                     <input type="number" name="price" value="{{ old('price') }}" step="0.01"
                            class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('price') border-red-500 @enderror">
@@ -91,7 +91,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Description</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.description') }}</label>
                 <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
                 @error('description')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -99,7 +99,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Cover Image</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.cover_image') }}</label>
                 <input type="file" name="cover_image" accept="image/*"
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('cover_image') border-red-500 @enderror">
                 @error('cover_image')
@@ -108,20 +108,20 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Status</label>
+                <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.status') }}</label>
                 <select name="status" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>{{ __('messages.active') }}</option>
+                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
                 </select>
             </div>
         </div>
 
         <div class="mt-6 flex gap-3">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition">
-                <i class="fas fa-save mr-1"></i> Create Service
+                <i class="fas fa-save mr-1"></i> {{ __('messages.create_service') }}
             </button>
             <a href="{{ route('provider.services.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">
-                Cancel
+                {{ __('messages.cancel') }}
             </a>
         </div>
     </form>

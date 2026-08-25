@@ -5,9 +5,9 @@
 <div class="max-w-6xl mx-auto px-4 py-8">
     <!-- Breadcrumb -->
     <nav class="text-sm text-gray-500 mb-4">
-        <a href="{{ route('home') }}" class="hover:text-blue-600">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-blue-600">{{ __('messages.home') }}</a>
         <span class="mx-2">/</span>
-        <a href="{{ route('public.services.index') }}" class="hover:text-blue-600">Explore</a>
+        <a href="{{ route('public.services.index') }}" class="hover:text-blue-600">{{ __('messages.explore') }}</a>
         <span class="mx-2">/</span>
         <span>{{ $service->name }}</span>
     </nav>
@@ -35,7 +35,7 @@
                 <div class="grid grid-cols-4 gap-2 mt-2">
                     @foreach(array_slice($gallery, 0, 4) as $image)
                         <img src="{{ asset('storage/' . $image) }}" 
-                             alt="Gallery image"
+                             alt="{{ __('messages.gallery_image') }}"
                              class="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75">
                     @endforeach
                 </div>
@@ -48,7 +48,7 @@
             
             <div class="flex items-center gap-2 mt-2 flex-wrap">
                 <span class="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
-                    {{ $service->category->name ?? 'N/A' }}
+                    {{ $service->category->name ?? __('messages.na') }}
                 </span>
 
                 @if($service->averageRating() > 0)
@@ -62,12 +62,11 @@
 
                 @if($service->provider->verification_status === 'verified')
                     <span class="px-2 py-1 text-sm rounded-full bg-green-100 text-green-700">
-                        <i class="fas fa-check-circle"></i> Verified Provider
+                        <i class="fas fa-check-circle"></i> {{ __('messages.verified_provider') }}
                     </span>
                 @endif
             </div>
 
-            {{-- 🔥 Main Price Display – प्रतिस्थापन गरियो --}}
             @php
                 $currencyService = app(\App\Services\CurrencyService::class);
                 $displayCurrency = $currencyService->getDisplayCurrency();
@@ -81,33 +80,33 @@
                 <p class="text-3xl font-bold text-blue-600">
                     {{ $formattedPrice }}
                     @if($service->trekDetail)
-                        <span class="text-sm font-normal text-gray-500">/ pax</span>
-                        <span class="text-sm font-normal text-gray-400 ml-2">({{ $service->trekDetail->duration_days ?? '1' }} days)</span>
+                        <span class="text-sm font-normal text-gray-500">/ {{ __('messages.pax') }}</span>
+                        <span class="text-sm font-normal text-gray-400 ml-2">({{ $service->trekDetail->duration_days ?? '1' }} {{ __('messages.days') }})</span>
                     @elseif($service->hotelDetail)
-                        <span class="text-sm font-normal text-gray-500">/ night</span>
+                        <span class="text-sm font-normal text-gray-500">/ {{ __('messages.night') }}</span>
                     @elseif($service->tourDetail)
-                        <span class="text-sm font-normal text-gray-500">/ person</span>
+                        <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
                     @else
-                        <span class="text-sm font-normal text-gray-500">/ person</span>
+                        <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
                     @endif
                 </p>
                 @if($showBaseNote)
-                    <p class="text-xs text-gray-400 mt-1">Base price: {{ $currencyService->format($service->price, $baseCurrency) }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('messages.base_price') }}: {{ $currencyService->format($service->price, $baseCurrency) }}</p>
                 @endif
             </div>
 
             <!-- Trek Details -->
             @if($service->trekDetail)
                 <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h3 class="font-semibold text-gray-700">Trek Details</h3>
+                    <h3 class="font-semibold text-gray-700">{{ __('messages.trek_details') }}</h3>
                     <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
-                        <div><span class="text-gray-500">Duration:</span> {{ $service->trekDetail->duration_days }} days</div>
-                        <div><span class="text-gray-500">Difficulty:</span> {{ ucfirst($service->trekDetail->difficulty) }}</div>
+                        <div><span class="text-gray-500">{{ __('messages.duration') }}:</span> {{ $service->trekDetail->duration_days }} {{ __('messages.days') }}</div>
+                        <div><span class="text-gray-500">{{ __('messages.difficulty') }}:</span> {{ ucfirst($service->trekDetail->difficulty) }}</div>
                         @if($service->trekDetail->max_altitude)
-                            <div><span class="text-gray-500">Max Altitude:</span> {{ $service->trekDetail->max_altitude }}m</div>
+                            <div><span class="text-gray-500">{{ __('messages.max_altitude') }}:</span> {{ $service->trekDetail->max_altitude }}m</div>
                         @endif
                         @if($service->trekDetail->season)
-                            <div><span class="text-gray-500">Season:</span> {{ $service->trekDetail->season }}</div>
+                            <div><span class="text-gray-500">{{ __('messages.season') }}:</span> {{ $service->trekDetail->season }}</div>
                         @endif
                     </div>
                 </div>
@@ -116,9 +115,9 @@
             <!-- Tour Details -->
             @if($service->tourDetail)
                 <div class="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h3 class="font-semibold text-gray-700">Tour Details</h3>
+                    <h3 class="font-semibold text-gray-700">{{ __('messages.tour_details') }}</h3>
                     <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
-                        <div><span class="text-gray-500">Duration:</span> {{ $service->tourDetail->duration_days }} days</div>
+                        <div><span class="text-gray-500">{{ __('messages.duration') }}:</span> {{ $service->tourDetail->duration_days }} {{ __('messages.days') }}</div>
                     </div>
                 </div>
             @endif
@@ -126,14 +125,14 @@
             <!-- Description -->
             @if($service->description)
                 <div class="mt-4">
-                    <h3 class="font-semibold text-gray-700">Description</h3>
+                    <h3 class="font-semibold text-gray-700">{{ __('messages.description') }}</h3>
                     <p class="text-gray-600 mt-2">{{ $service->description }}</p>
                 </div>
             @endif
 
             <!-- Provider Info -->
             <div class="mt-6 p-4 border rounded-lg">
-                <h3 class="font-semibold text-gray-700">Provider</h3>
+                <h3 class="font-semibold text-gray-700">{{ __('messages.provider') }}</h3>
                 <div class="flex items-center gap-3 mt-2">
                     @if($service->provider->logo_url)
                         <img src="{{ asset('storage/' . $service->provider->logo_url) }}" 
@@ -158,7 +157,7 @@
             <div class="mt-6">
                 <a href="{{ route('public.services.book', $service->slug) }}" 
                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg hover:shadow-xl text-center block">
-                    <i class="fas fa-calendar-check mr-2"></i> Book This Service
+                    <i class="fas fa-calendar-check mr-2"></i> {{ __('messages.book_this_service') }}
                 </a>
             </div>
         </div>
@@ -167,10 +166,9 @@
     <!-- Related Services -->
     @if($relatedServices && $relatedServices->count() > 0)
         <div class="mt-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Related Services</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.related_services') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 @foreach($relatedServices as $related)
-                    {{-- 🔥 Related Service Price – प्रतिस्थापन गरियो --}}
                     @php
                         $relBaseCurrency = $related->currency ?? 'USD';
                         $relDisplayPrice = $currencyService->convert($related->price, $relBaseCurrency, $displayCurrency);
@@ -193,7 +191,7 @@
                             <p class="text-blue-600 font-bold text-sm">{{ $relFormatted }}</p>
                             <a href="{{ route('public.services.show', $related->slug) }}" 
                                class="text-xs text-blue-600 hover:text-blue-800 font-medium group-hover:underline">
-                                View Details →
+                                {{ __('messages.view_details') }} →
                             </a>
                         </div>
                     </div>

@@ -34,13 +34,20 @@ class LoginController extends Controller
             // Redirect based on role
             $user = Auth::user();
             if ($user->isSuperAdmin()) {
-                return redirect()->intended(route('admin.dashboard'));
-            } elseif ($user->isProviderOwner() || $user->role === 'manager' || $user->role === 'staff') {
-                return redirect()->intended(route('provider.dashboard'));
-            } else {
-                // Traveler
-                return redirect()->intended(route('traveler.dashboard'));
-            }
+    return redirect()->intended(route('admin.dashboard'));
+} elseif ($user->isProviderOwner() || $user->role === 'manager' || $user->role === 'staff') {
+    // प्रोभाइडर प्रोफाइल छ कि जाँच गरौं
+    if (!$user->provider) {
+        // सत्र बन्द गरौं वा लगआउट नगरी फिर्ता पठाऔं
+        auth()->logout();
+        return redirect()->route('login')->withErrors([
+            'email' => 'Your account is not linked to a provider profile. Please contact support.'
+        ]);
+    }
+    return redirect()->intended(route('provider.dashboard'));
+} else {
+    return redirect()->intended(route('traveler.dashboard'));
+}
         }
 
         return back()->withErrors([

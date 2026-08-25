@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | TravelAI Nepal</title>
+    <title>{{ __('messages.register_page_title') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -57,13 +57,13 @@
 <body>
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
-            <!-- ===== LOGO & HEADER (Updated) ===== -->
+            <!-- ===== LOGO & HEADER ===== -->
             <div class="text-center mb-6">
                 <img src="{{ asset('images/logo.png') }}"
-                     alt="TravelAI Nepal"
+                     alt="{{ __('messages.app_name') }}"
                      class="h-16 mx-auto mb-2">
-                <h1 class="text-2xl font-bold text-gray-800">TravelAI Nepal</h1>
-                <p class="text-gray-500">Create your account</p>
+                <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.app_name') }}</h1>
+                <p class="text-gray-500">{{ __('messages.register_subtitle') }}</p>
             </div>
 
             @if($errors->any())
@@ -81,7 +81,7 @@
 
                 {{-- ========== ACCOUNT TYPE SELECTION ========== --}}
                 <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-3">How are you joining TravelAI?</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-3">{{ __('messages.register_account_type_question') }}</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Traveler Card --}}
                         <div class="account-card border rounded-xl p-4 text-center {{ old('account_type', 'traveler') === 'traveler' ? 'selected' : '' }}" data-account="traveler">
@@ -89,8 +89,8 @@
                             <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
                                 <i class="fas fa-user text-blue-600 text-xl"></i>
                             </div>
-                            <h3 class="font-bold text-gray-800">🧳 Traveler</h3>
-                            <p class="text-xs text-gray-500 mt-1">Plan trips, explore Nepal & book experiences.</p>
+                            <h3 class="font-bold text-gray-800">🧳 {{ __('messages.register_traveler') }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">{{ __('messages.register_traveler_desc') }}</p>
                             <input type="radio" name="account_type" value="traveler" {{ old('account_type', 'traveler') === 'traveler' ? 'checked' : '' }} class="hidden account-radio">
                         </div>
 
@@ -100,88 +100,88 @@
                             <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
                                 <i class="fas fa-building text-green-600 text-xl"></i>
                             </div>
-                            <h3 class="font-bold text-gray-800">🏢 Business / Provider</h3>
-                            <p class="text-xs text-gray-500 mt-1">List services, manage bookings & grow your business.</p>
+                            <h3 class="font-bold text-gray-800">🏢 {{ __('messages.register_business') }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">{{ __('messages.register_business_desc') }}</p>
                             <input type="radio" name="account_type" value="provider" {{ old('account_type') === 'provider' ? 'checked' : '' }} class="hidden account-radio">
                         </div>
                     </div>
                 </div>
 
-                {{-- ========== BASIC FIELDS (सबैको लागि) ========== --}}
+                {{-- ========== BASIC FIELDS ========== --}}
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.full_name') }} *</label>
                         <input type="text" name="name" value="{{ old('name') }}" required
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Email Address *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.email') }} *</label>
                         <input type="email" name="email" value="{{ old('email') }}" required
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.phone') }}</label>
                         <input type="text" name="phone" value="{{ old('phone') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.password') }} *</label>
                         <input type="password" name="password" required
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirm Password *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.password_confirmation') }} *</label>
                         <input type="password" name="password_confirmation" required
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
 
-                {{-- ========== PROVIDER FIELDS (केवल Business को लागि) ========== --}}
+                {{-- ========== PROVIDER FIELDS ========== --}}
                 <div id="providerFields" class="{{ old('account_type') === 'provider' ? 'block' : 'hidden' }} mt-6 pt-6 border-t">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Business Name *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_name') }} *</label>
                         <input type="text" name="business_name" value="{{ old('business_name') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Business Type *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_type') }} *</label>
                         <select name="provider_type" id="provider_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">Select your business type</option>
+                            <option value="">{{ __('messages.select_business_type') }}</option>
                             @foreach($providerTypes ?? [] as $type)
                                 <option value="{{ $type->id }}" {{ old('provider_type') == $type->id ? 'selected' : '' }}>
                                     {{ $type->name }}
                                 </option>
                             @endforeach
-                            <option value="other" {{ old('provider_type') == 'other' ? 'selected' : '' }}>Other (Specify below)</option>
+                            <option value="other" {{ old('provider_type') == 'other' ? 'selected' : '' }}>{{ __('messages.other_specify') }}</option>
                         </select>
                     </div>
 
                     <div id="customTypeSection" style="{{ old('provider_type') == 'other' ? 'display: block;' : 'display: none;' }}" class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Specify Business Type *</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.specify_business_type') }} *</label>
                         <input type="text" name="custom_provider_type" value="{{ old('custom_provider_type') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="e.g., Handicraft Shop, Restaurant, Art Gallery">
+                               placeholder="{{ __('messages.specify_business_type_placeholder') }}">
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Business Description (optional)</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_description') }}</label>
                         <textarea name="description" rows="2" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Business Address (optional)</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_address') }}</label>
                         <input type="text" name="address" value="{{ old('address') }}"
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    {{-- Plan Selection (केवल provider को लागि) --}}
+                    {{-- Plan Selection --}}
                     <div class="mt-6 pt-6 border-t">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Choose Your Plan</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.choose_plan') }}</label>
                         <div class="grid grid-cols-2 gap-3">
                             @foreach($plans ?? [] as $plan)
                                 <label class="plan-card border rounded-lg p-3 cursor-pointer transition {{ old('plan', 'free') == $plan->slug ? 'selected' : 'border-gray-200' }}">
@@ -191,9 +191,9 @@
                                     <div class="text-center">
                                         <span class="font-bold text-gray-800 block">{{ $plan->name }}</span>
                                         @if($plan->slug == 'enterprise')
-                                            <span class="text-sm text-blue-600 block">Contact for Pricing</span>
+                                            <span class="text-sm text-blue-600 block">{{ __('messages.contact_for_pricing') }}</span>
                                         @elseif($plan->price_monthly === 0 || $plan->price_yearly === 0)
-                                            <span class="text-sm text-green-600 block">Free</span>
+                                            <span class="text-sm text-green-600 block">{{ __('messages.free') }}</span>
                                         @else
                                             <span class="text-sm text-blue-600 block">
                                                 {{ session('display_currency', 'USD') === 'USD' ? '$' : 'Rs. ' }}
@@ -204,69 +204,62 @@
                                 </label>
                             @endforeach
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">You can change your plan later from your dashboard.</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ __('messages.change_plan_later') }}</p>
                     </div>
                 </div>
 
                 {{-- ========== SUBMIT BUTTON ========== --}}
                 <div class="mt-6">
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                        <span id="submitBtnText">Create {{ old('account_type', 'traveler') === 'traveler' ? 'Traveler' : 'Business' }} Account</span>
+                        <span id="submitBtnText">{{ old('account_type', 'traveler') === 'traveler' ? __('messages.create_traveler_account') : __('messages.create_business_account') }}</span>
                     </button>
                 </div>
             </form>
 
             <p class="text-center text-gray-600 text-sm mt-6">
-                Already have an account?
-                <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Log in here</a>
+                {{ __('messages.already_have_account') }}
+                <a href="{{ route('login') }}" class="text-blue-600 hover:underline">{{ __('messages.login_here') }}</a>
             </p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ========== Account Type Selection ==========
+            // Account Type Selection
             const accountCards = document.querySelectorAll('.account-card');
             const providerFields = document.getElementById('providerFields');
             const submitBtnText = document.getElementById('submitBtnText');
 
             accountCards.forEach(card => {
                 card.addEventListener('click', function() {
-                    // Remove selected class from all cards
                     accountCards.forEach(c => c.classList.remove('selected'));
                     this.classList.add('selected');
 
-                    // Check the radio
                     const radio = this.querySelector('.account-radio');
                     if (radio) radio.checked = true;
 
-                    // Show/hide provider fields
                     const accountType = this.dataset.account;
                     if (accountType === 'provider') {
                         providerFields.classList.remove('hidden');
-                        submitBtnText.textContent = 'Create Business Account';
+                        submitBtnText.textContent = '{{ __('messages.create_business_account') }}';
                     } else {
                         providerFields.classList.add('hidden');
-                        submitBtnText.textContent = 'Create Traveler Account';
+                        submitBtnText.textContent = '{{ __('messages.create_traveler_account') }}';
                     }
                 });
             });
 
-            // ========== Custom Type Input Toggle ==========
+            // Custom Type Input Toggle
             const typeSelect = document.getElementById('provider_type');
             const customSection = document.getElementById('customTypeSection');
 
             if (typeSelect && customSection) {
                 typeSelect.addEventListener('change', function() {
-                    if (this.value === 'other') {
-                        customSection.style.display = 'block';
-                    } else {
-                        customSection.style.display = 'none';
-                    }
+                    customSection.style.display = this.value === 'other' ? 'block' : 'none';
                 });
             }
 
-            // ========== Plan Card Selection ==========
+            // Plan Card Selection
             document.querySelectorAll('.plan-card').forEach(card => {
                 card.addEventListener('click', function() {
                     document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));

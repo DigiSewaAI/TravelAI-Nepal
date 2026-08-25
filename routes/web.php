@@ -252,3 +252,15 @@ Route::get('/currency/switch', function (Illuminate\Http\Request $request) {
     
     return redirect()->back();
 })->name('currency.switch');
+
+// =======================================
+// LANGUAGE SWITCH (Multi-Language Display)
+// =======================================
+Route::get('/lang/{locale}', function ($locale) {
+    // ✅ सबै ४ वटा Language Allow: English, Hindi, Chinese, Nepali
+    $allowed = ['en', 'hi', 'zh', 'np'];
+    if (in_array($locale, $allowed)) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');

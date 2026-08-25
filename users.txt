@@ -14,7 +14,7 @@ Nepal Heritage Tours	nepal.heritage.tours@travelai.com	provider owner	9830691407
 Mountain Magic Tours	mountain.magic.tours@travelai.com	provider owner	9898695519	  
 Himalayan Guides Nepal	himalayan.guides.nepal@travelai.com	provider owner	9869381075	  
 Himalayan Trekking Agency	himalayan@travelai.com	provider owner	9841234567	  
-Everest Trailblazers	regmiashish629@gmail.com	provider owner	9761762036	  
+	  
 Pokhara City Tours	info@pokharacitytours.com	provider owner	9812345678	  
 Hotel Welcome Pokhara	reservation@welcomehotel.com	provider owner	9851122334	  
 Parashar Regmi	parasharregmi@gmail.com	super admin	9761762036	  
@@ -23,5 +23,6 @@ Parashar Regmi	parasharregmi@gmail.com	super admin	9761762036
 1	James Anderson	test@example.com	Himalayan@1980
 2	Sophia Martinez	guest2_0MMnjT@temp.travelai.com	Himalayan@1980
 3	Oliver Smith	guest3_ZTASRd@temp.travelai.com	Himalayan@1980
+4	traveller	regmiashish629@gmail.com	
 
 

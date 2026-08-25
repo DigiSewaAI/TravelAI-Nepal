@@ -1,13 +1,13 @@
 @extends('layouts.public')
 
-@section('title', 'Explore Nepal | TravelAI')
+@section('title', __('messages.explore_services_title'))
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Category Tabs -->
     <div class="flex flex-wrap gap-2 mb-6 border-b pb-4">
         <a href="{{ route('public.services.index', ['category' => 'all']) }}" 
            class="px-4 py-2 rounded-lg {{ $categorySlug == 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
-            All
+            {{ __('messages.all') }}
         </a>
         @foreach($categories as $cat)
             <a href="{{ route('public.services.index', ['category' => $cat->slug]) }}" 
@@ -22,44 +22,43 @@
         <input type="hidden" name="category" value="{{ $categorySlug }}">
         <div class="flex-1 min-w-[200px]">
             <input type="text" name="search" value="{{ request('search') }}" 
-                   placeholder="Search services..." 
+                   placeholder="{{ __('messages.search_services_placeholder') }}" 
                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        {{-- 🔥 मुद्रा अनुसार Placeholder अपडेट गरियो --}}
         <div>
             <input type="number" name="min_price" value="{{ request('min_price') }}" 
-                   placeholder="Min Price ({{ session('display_currency', 'USD') }})" 
+                   placeholder="{{ __('messages.min_price_placeholder', ['currency' => session('display_currency', 'USD')]) }}" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
             <input type="number" name="max_price" value="{{ request('max_price') }}" 
-                   placeholder="Max Price ({{ session('display_currency', 'USD') }})" 
+                   placeholder="{{ __('messages.max_price_placeholder', ['currency' => session('display_currency', 'USD')]) }}" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
             <input type="number" name="min_days" value="{{ request('min_days') }}" 
-                   placeholder="Min Days" 
+                   placeholder="{{ __('messages.min_days_placeholder') }}" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
             <input type="number" name="max_days" value="{{ request('max_days') }}" 
-                   placeholder="Max Days" 
+                   placeholder="{{ __('messages.max_days_placeholder') }}" 
                    class="w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
             <select name="difficulty" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Difficulty</option>
-                <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>Easy</option>
-                <option value="moderate" {{ request('difficulty') == 'moderate' ? 'selected' : '' }}>Moderate</option>
-                <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>Hard</option>
+                <option value="">{{ __('messages.difficulty') }}</option>
+                <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>{{ __('messages.easy') }}</option>
+                <option value="moderate" {{ request('difficulty') == 'moderate' ? 'selected' : '' }}>{{ __('messages.moderate') }}</option>
+                <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>{{ __('messages.hard') }}</option>
             </select>
         </div>
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
-            <i class="fas fa-search"></i> Filter
+            <i class="fas fa-search"></i> {{ __('messages.filter_btn') }}
         </button>
         <a href="{{ route('public.services.index', ['category' => $categorySlug]) }}" 
            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">
-            Reset
+            {{ __('messages.reset') }}
         </a>
     </form>
 
@@ -81,7 +80,6 @@
             <div class="p-5">
                 <div class="flex justify-between items-start">
                     <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
-                    {{-- 🔥 Price Display को ठाउँमा CurrencyService प्रयोग गरियो --}}
                     <div class="text-right">
                         @php
                             $currencyService = app(\App\Services\CurrencyService::class);
@@ -96,23 +94,23 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2 mt-2 text-sm text-gray-500">
-                    <span><i class="far fa-calendar-alt"></i> {{ $service->trekDetail->duration_days ?? 'N/A' }} days</span>
+                    <span><i class="far fa-calendar-alt"></i> {{ $service->trekDetail->duration_days ?? __('messages.na') }} {{ __('messages.days') }}</span>
                     @if($service->trekDetail)
                         <span><i class="fas fa-chart-line"></i> {{ ucfirst($service->trekDetail->difficulty) }}</span>
                     @endif
-                    <span><i class="fas fa-tag"></i> {{ $service->category->name ?? 'N/A' }}</span>
+                    <span><i class="fas fa-tag"></i> {{ $service->category->name ?? __('messages.na') }}</span>
                 </div>
                 <p class="text-gray-600 text-sm mt-3">{{ $service->provider->name ?? 'TravelAI Partner' }}</p>
                 <a href="{{ route('public.services.show', $service->slug) }}" 
                    class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium text-sm">
-                    View Details →
+                    {{ __('messages.view_details') }} →
                 </a>
             </div>
         </div>
         @empty
         <div class="col-span-full text-center py-10 text-gray-500">
             <i class="fas fa-search text-4xl mb-4"></i>
-            <p class="text-lg">No services found matching your criteria.</p>
+            <p class="text-lg">{{ __('messages.no_services_found') }}</p>
         </div>
         @endforelse
     </div>
