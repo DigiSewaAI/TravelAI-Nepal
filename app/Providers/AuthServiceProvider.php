@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Gate;
 // Import Models
 use App\Models\Service;
 use App\Models\Booking;
-use App\Models\Invoice;          // <-- Added
+use App\Models\Invoice;
+use App\Models\User;          // <-- Added for Staff Policy
 
 // Import Policies
 use App\Policies\ServicePolicy;
 use App\Policies\BookingPolicy;
-use App\Policies\InvoicePolicy;  // <-- Added
+use App\Policies\InvoicePolicy;
+use App\Policies\ProviderPolicy;  // <-- Added for User/Staff
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,8 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Service::class => ServicePolicy::class,
         Booking::class => BookingPolicy::class,
-        Invoice::class => InvoicePolicy::class, // <-- Added
+        Invoice::class => InvoicePolicy::class,
+        User::class    => ProviderPolicy::class, // <-- Staff/Provider authorization
     ];
 
     /**
@@ -35,7 +38,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // (Optional) Custom gates
+        // (Optional) Custom gates – यहाँ आवश्यक भएमा थप्न सक्नुहुन्छ
         // Gate::define('manage-provider', function ($user) {
         //     return $user->isProviderOwner() || $user->isSuperAdmin();
         // });

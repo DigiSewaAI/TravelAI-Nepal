@@ -134,6 +134,7 @@ Route::prefix('provider')->name('provider.')->group(function () {
     Route::get('/invoices', [App\Http\Controllers\Provider\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Provider\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Provider\InvoiceController::class, 'download'])->name('invoices.download');
+    Route::resource('staff', \App\Http\Controllers\Provider\StaffController::class)->except(['show']);
 });
 // Provider profile page (old, but keep for now)
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');

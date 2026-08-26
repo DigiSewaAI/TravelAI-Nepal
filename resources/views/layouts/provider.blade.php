@@ -121,6 +121,12 @@
                     <span>{{ __('messages.profile') }}</span>
                 </a>
 
+                <a href="{{ route('provider.staff.index') }}" 
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
+    <i class="fas fa-users w-5"></i>
+    <span>Team</span>
+</a>
+
                 <!-- Analytics (Phase 11) -->
                 <a href="{{ route('provider.analytics.index') }}" 
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">

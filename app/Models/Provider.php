@@ -27,7 +27,10 @@ class Provider extends Model
         'is_active' => 'boolean',
     ];
 
-    // Relationships
+    // =====================================================
+    // RELATIONSHIPS
+    // =====================================================
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -38,9 +41,21 @@ class Provider extends Model
         return $this->belongsToMany(ProviderType::class, 'provider_provider_type');
     }
 
+    /**
+     * Get all staff members (users with provider_id = this provider)
+     * This replaces the old ProviderStaff relationship.
+     */
     public function staff()
     {
-        return $this->hasMany(ProviderStaff::class);
+        return $this->hasMany(User::class, 'provider_id');
+    }
+
+    /**
+     * Alias for staff() for clarity
+     */
+    public function staffUsers()
+    {
+        return $this->staff();
     }
 
     public function services()
@@ -58,6 +73,25 @@ class Provider extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    /**
+     * Get the latest active subscription for this provider.
+     */
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+                    ->where('status', 'active')
+                    ->latest('id');
+    }
+
+    /**
+     * Get the active subscription plan (convenience method)
+     */
+    public function getActivePlanAttribute()
+    {
+        $subscription = $this->activeSubscription()->first();
+        return $subscription ? $subscription->plan : null;
+    }
+
     public function documents()
     {
         return $this->hasMany(VerificationDocument::class);
@@ -68,7 +102,10 @@ class Provider extends Model
         return $this->hasMany(Payment::class);
     }
 
-    // Helper methods
+    // =====================================================
+    // HELPERS
+    // =====================================================
+
     public function isVerified(): bool
     {
         return $this->verification_status === 'verified';
@@ -77,5 +114,31 @@ class Provider extends Model
     public function isPending(): bool
     {
         return $this->verification_status === 'pending';
+    }
+
+    /**
+     * Get the maximum number of staff allowed based on the active plan.
+     * Returns -1 for unlimited.
+     */
+    public function getMaxStaffAttribute(): int
+    {
+        $plan = $this->getActivePlanAttribute();
+
+        if (!$plan) {
+            return 1; // Free plan default
+        }
+
+        if (isset($plan->limits['max_staff'])) {
+            return (int) $plan->limits['max_staff'];
+        }
+
+        // Fallback by plan slug
+        return match ($plan->slug) {
+            'free' => 1,
+            'professional' => 5,
+            'business' => 20,
+            'enterprise' => -1,
+            default => 1,
+        };
     }
 }
