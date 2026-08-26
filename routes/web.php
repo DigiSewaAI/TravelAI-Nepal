@@ -222,9 +222,11 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
     Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
     Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
-    
-    // Booking Detail
     Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
+    
+    // 🔥 Invoice Download Route (NEW)
+    Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])
+        ->name('bookings.invoice');
 });
 // =======================================
 // 7. WEBHOOK ROUTES

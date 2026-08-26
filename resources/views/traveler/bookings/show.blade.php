@@ -54,6 +54,14 @@
             </div>
         </div>
 
+        {{-- 🔥 DOWNLOAD INVOICE BUTTON --}}
+<div class="mt-6 border-t pt-4 flex justify-end">
+    <a href="{{ route('traveler.bookings.invoice', $booking) }}" 
+       class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2" target="_blank">
+        <i class="fas fa-file-pdf"></i> {{ __('Download Invoice') }}
+    </a>
+</div>
+
         {{-- Review Section --}}
         @if($booking->review)
             <div class="mt-6 border-t pt-4">

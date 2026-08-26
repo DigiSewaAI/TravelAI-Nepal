@@ -24,27 +24,30 @@
             align-items: center;
             gap: 15px;
         }
-        .provider-logo {
+        .brand-logo {
             max-height: 50px;
             max-width: 120px;
             object-fit: contain;
         }
-        .provider-name {
-            font-size: 18px;
+        .brand-name {
+            font-size: 20px;
             font-weight: 700;
-            color: #0f172a;
-        }
-        .travelai-brand {
-            font-size: 14px;
-            color: #64748b;
-        }
-        .travelai-brand strong {
             color: #2563eb;
+            line-height: 1.2;
+        }
+        .brand-sub {
+            font-size: 12px;
+            color: #64748b;
         }
         .invoice-title {
             font-size: 28px;
             font-weight: 700;
             color: #0f172a;
+            text-align: right;
+        }
+        .meta {
+            font-size: 14px;
+            color: #64748b;
             text-align: right;
         }
         .info-row {
@@ -127,11 +130,6 @@
         .footer strong {
             color: #2563eb;
         }
-        .meta {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 5px;
-        }
         .payment-details {
             background: #f8fafc;
             padding: 15px;
@@ -146,30 +144,26 @@
 </head>
 <body>
 
-    {{-- ====== HEADER: Provider Logo + TravelAI Brand ====== --}}
+    {{-- ====== HEADER: TravelAI Nepal Branding (Issuer) ====== --}}
     <div class="header">
         <div class="header-left">
-            {{-- Provider Logo (यदि छ भने) --}}
+            {{-- TravelAI Logo --}}
             @php
-                $logoPath = null;
-                if ($invoice->provider && $invoice->provider->logo_url) {
-                    $fullPath = public_path('storage/' . $invoice->provider->logo_url);
-                    if (file_exists($fullPath)) {
-                        $logoData = base64_encode(file_get_contents($fullPath));
-                        $logoPath = 'data:image/png;base64,' . $logoData;
-                    }
+                $logoData = null;
+                $logoPath = public_path('images/logo.png');
+                if (file_exists($logoPath)) {
+                    $logoData = base64_encode(file_get_contents($logoPath));
                 }
             @endphp
-
-            @if($logoPath)
-                <img src="{{ $logoPath }}" alt="{{ $invoice->provider->name }} logo" class="provider-logo">
+            @if($logoData)
+                <img src="data:image/png;base64,{{ $logoData }}" alt="TravelAI Nepal" class="brand-logo">
             @else
-                <div style="font-size: 20px; font-weight: 700; color: #2563eb;">🏔️ {{ $invoice->provider->name ?? 'Provider' }}</div>
+                <div style="font-size: 28px; font-weight: 700; color: #2563eb;">🏔️</div>
             @endif
 
             <div>
-                <div class="provider-name">{{ $invoice->provider->name ?? 'Provider' }}</div>
-                <div class="travelai-brand">{{ __('messages.powered_by') }} <strong>TravelAI Nepal</strong></div>
+                <div class="brand-name">TravelAI Nepal</div>
+                
             </div>
         </div>
         <div>
@@ -182,7 +176,7 @@
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
         <div>
             <strong style="color: #0f172a;">{{ __('messages.date_label') }}:</strong> {{ $invoice->created_at->format('M d, Y') }}<br>
-            <strong style="color: #0f172a;">{{ __('messages.due_date_label') }}:</strong> {{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : __('messages.na') }}
+            <strong style="color: #0f172a;">{{ __('messages.due_date_label') }}:</strong> {{ $invoice->due_date ? \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') : __('messages.na') }}
         </div>
         <div>
             <span class="status-badge status-{{ $invoice->status }}">
@@ -208,7 +202,7 @@
             </div>
         @else
             {{-- 🔥 Provider Subscription Invoice भए Provider देखाउनुहोस् --}}
-            <div class="name">{{ $invoice->provider->name }}</div>
+            <div class="name">{{ $invoice->provider->name ?? 'N/A' }}</div>
             <div class="detail">{{ $invoice->provider->address ?? __('messages.na') }}</div>
             <div class="detail">{{ $invoice->provider->contact_email ?? __('messages.na') }}</div>
         @endif
@@ -251,7 +245,7 @@
 
             <tr class="total-row">
                 <td>{{ __('messages.total') }}</td>
-                <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</td>
+                <td style="text-align: right;">{{ $invoice->currency }} {{ number_format($invoice->total ?? $invoice->amount, 2) }}</td>
             </tr>
         </tbody>
     </table>
@@ -259,7 +253,7 @@
     {{-- ====== PAYMENT DETAILS ====== --}}
     <div class="payment-details">
         <strong>{{ __('messages.payment_method_label') }}:</strong> {{ $invoice->payment_method ?? __('messages.na') }}<br>
-        <strong>{{ __('messages.paid_at_label') }}:</strong> {{ $invoice->paid_at ? $invoice->paid_at->format('M d, Y H:i') : __('messages.na') }}
+        <strong>{{ __('messages.paid_at_label') }}:</strong> {{ $invoice->paid_at ? \Carbon\Carbon::parse($invoice->paid_at)->format('M d, Y H:i') : __('messages.na') }}
         
         @if($invoice->metadata)
             <br><strong>{{ __('messages.reference') }}:</strong>
