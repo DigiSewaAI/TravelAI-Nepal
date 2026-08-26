@@ -40,8 +40,15 @@ class LlmService
         }, $data['data'] ?? []);
     }
 
-    public function generateItinerary(string $prompt): array
+    public function generateItinerary(string $prompt, string $locale = 'en'): array
     {
+        // ✅ LOG: locale र prompt को पहिलो 500 characters
+        Log::info('🔍 [LlmService] generateItinerary called', [
+            'locale' => $locale,
+            'prompt_preview' => substr($prompt, 0, 500),
+            'prompt_length' => strlen($prompt),
+        ]);
+
         $attempt = 0;
         $baseDelay = 2;
 
@@ -51,6 +58,14 @@ class LlmService
                     'model' => $this->model,
                     'attempt' => $attempt + 1,
                     'prompt_length' => strlen($prompt),
+                ]);
+
+                // ✅ LOG: API call भन्दा ठिक अघि system + user messages
+                Log::info('🔍 [LlmService] Sending to Groq', [
+                    'model' => $this->model,
+                    'system_prompt' => $this->getSystemPrompt($locale),
+                    'user_prompt_preview' => substr($prompt, 0, 300),
+                    'temperature' => 0.2,
                 ]);
 
                 $response = Http::withHeaders([
@@ -64,16 +79,23 @@ class LlmService
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => $this->model,
                     'messages' => [
-                        ['role' => 'system', 'content' => 'You are a JSON generator. Respond with a valid JSON object only. No other text.'],
+                        ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
                         ['role' => 'user', 'content' => $prompt],
                     ],
-                    'temperature' => 0.4,
+                    'temperature' => 0.2,
                     'max_tokens' => 3000,
                 ]);
 
                 if ($response->successful()) {
                     $data = $response->json();
                     $content = $data['choices'][0]['message']['content'] ?? '';
+
+                    // ✅ LOG: raw response (पूरै)
+                    Log::info('🔍 [LlmService] Raw Groq Response', [
+                        'raw_content' => $content, // ✅ पूरै content
+                        'content_length' => strlen($content),
+                    ]);
+
                     return $this->extractJson($content);
                 }
 
@@ -166,5 +188,18 @@ class LlmService
         ]);
 
         throw new \Exception('Failed to validate JSON. Please adjust your prompt.');
+    }
+
+    protected function getSystemPrompt(string $locale): string
+    {
+        $basePrompt = 'You are a JSON generator. Respond with a valid JSON object only. No other text.';
+        
+        $languageInstruction = match($locale) {
+            'hi' => ' Generate ALL day titles, descriptions, item names, and any text content EXCLUSIVELY in Hindi language (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. All other text MUST be in Hindi. Do NOT use English for descriptions or item names.',
+            'zh' => ' Generate ALL day titles, descriptions, item names, and any text content EXCLUSIVELY in Chinese language (Simplified Chinese characters). ONLY waypoint names like "Nayapul" can remain in English. All other text MUST be in Chinese. Do NOT use English for descriptions or item names.',
+            default => ' Generate all content in English.',
+        };
+        
+        return $basePrompt . $languageInstruction;
     }
 }

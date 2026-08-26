@@ -300,4 +300,12 @@ return [
     'save_profile' => 'प्रोफाइल सुरक्षित गर्नुहोस्',
     'issued_at' => 'जारी गरिएको',
     'download' => 'डाउनलोड गर्नुहोस्',
+    'cost.daily_food_budget' => 'दैनिक खाना बजेट',
+'cost.manang_special_permit' => 'मनाङ विशेष अनुमति',
+'service.homestay_experience' => 'होमस्टे अनुभव',
+'service.group_guide_service' => 'समूह गाइड सेवा',
+'service.standard_room' => 'स्ट्यान्डर्ड कोठा',
+'service.private_jeep' => 'प्राइभेट जिप',
+    'note' => 'तपाईंको :amount USD को बजट पर्याप्त नहुन सक्छ। कृपया शैली वा दिन समायोजन गर्नुहोस्।',
+
 ];

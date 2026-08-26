@@ -45,7 +45,7 @@ return [
     // 🔥 Groq AI Configuration (for Itinerary Planner)
     'groq' => [
         'api_key' => env('GROQ_API_KEY'),
-        'model' => env('GROQ_MODEL', 'qwen/qwen3.6-27b'), // ✅ Changed to qwen model
+        'model' => env('GROQ_MODEL', 'llama-3.1-70b-versatile'),
     ],
 
     // 🔥 Google Places API (for geocoding & location search)

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'test' => 'Test Translation',
     // ======================
     // SIDEBAR (Provider)
     // ======================
@@ -977,4 +978,12 @@ return [
 'offline_title' => 'आप ऑफलाइन हैं',
 'offline_message' => 'कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।',
 'offline_retry' => 'पुनः प्रयास करें',
+'cost.daily_food_budget' => 'दैनिक भोजन बजट',
+'cost.manang_special_permit' => 'मनांग विशेष अनुमति',
+'service.homestay_experience' => 'होमस्टे अनुभव',
+'service.group_guide_service' => 'समूह गाइड सेवा',
+'service.standard_room' => 'स्टैंडर्ड रूम',
+'service.private_jeep' => 'प्राइवेट जीप',
+'note' => 'आपका :amount USD का बजट पर्याप्त नहीं हो सकता। कृपया शैली या दिन समायोजित करें।',
+
 ];

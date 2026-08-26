@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register Route Observer
         Route::observe(RouteObserver::class);
+
+        // ✅ Force Translation Loader to use `lang/` folder with namespace
+        $this->loadTranslationsFrom(base_path('lang'), 'messages');
     }
 }

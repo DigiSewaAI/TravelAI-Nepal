@@ -409,9 +409,9 @@
         let total = 0;
         for (const [key, item] of Object.entries(breakdown)) {
           if (key === 'budget_insufficient') {
-            html += `<li class="text-yellow-700"><span class="font-semibold">⚠️ {{ __('messages.note') }}:</span> ${item.unit}</li>`;
-            continue;
-          }
+    html += `<li class="text-yellow-700">${item.unit}</li>`;
+    continue;
+}
           const amount = item.amount || 0;
           total += amount;
           const providerDisplay = item.provider_name ? ` (${item.provider_name})` : '';

@@ -951,4 +951,15 @@ return [
 'offline_title' => "You're Offline",
 'offline_message' => 'Please check your internet connection and try again.',
 'offline_retry' => 'Retry',
+// Cost names
+'cost.daily_food_budget' => 'Daily Food Budget',
+'cost.manang_special_permit' => 'Manang Special Permit',
+// Service names
+'service.homestay_experience' => 'Homestay Experience',
+'service.group_guide_service' => 'Group Guide Service',
+'service.standard_room' => 'Standard Room',
+'service.private_jeep' => 'Private Jeep',
+// Add any other cost/service names as needed
+'note' => 'Your budget of :amount USD may be insufficient. Consider adjusting style or days.',
+
 ];

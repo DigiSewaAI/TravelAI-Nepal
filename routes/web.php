@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\PageController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Admin\ProviderController as AdminProviderController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
 use App\Http\Controllers\SitemapController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -257,10 +259,18 @@ Route::get('/currency/switch', function (Illuminate\Http\Request $request) {
 // LANGUAGE SWITCH (Multi-Language Display)
 // =======================================
 Route::get('/lang/{locale}', function ($locale) {
-    // ✅ सबै ४ वटा Language Allow: English, Hindi, Chinese, Nepali
     $allowed = ['en', 'hi', 'zh', 'np'];
     if (in_array($locale, $allowed)) {
         session(['locale' => $locale]);
+        Log::info('🔍 [Language Switch] Set session locale', ['locale' => $locale]);
     }
     return redirect()->back();
 })->name('lang.switch');
+
+// ✅ Planner Route – web middleware को session पाउँछ
+Route::post('/api/planner/generate', [App\Http\Controllers\Api\PlannerController::class, 'generate']);
+
+Route::get('/test-lang', function () {
+    app()->setLocale('hi');
+    return __('cost.daily_food_budget');
+});

@@ -977,4 +977,12 @@ return [
 'offline_title' => '您已离线',
 'offline_message' => '请检查您的网络连接并重试。',
 'offline_retry' => '重试',
+'cost.daily_food_budget' => '每日食品预算',
+'cost.manang_special_permit' => '马南特别许可证',
+'service.homestay_experience' => '寄宿家庭体验',
+'service.group_guide_service' => '团体导游服务',
+'service.standard_room' => '标准间',
+'service.private_jeep' => '私人吉普车',
+'note' => '您的:amount USD预算可能不足。请调整风格或天数。',
+
 ];

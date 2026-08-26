@@ -8,6 +8,7 @@ use App\Models\PlannerRequest;
 use App\Models\PlannerResult;
 use App\Models\ItineraryDay;
 use App\Models\ItineraryItem;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -23,116 +24,138 @@ class PlannerService
         $this->validator = $validator;
     }
 
-    public function generate(array $input): array
-    {
-        // 1. Resolve route
-        $route = $this->resolveRoute($input['destination'] ?? null);
-        if (!$route) {
-            throw ValidationException::withMessages(['destination' => 'Route not found.']);
-        }
+    public function generate(array $input, string $locale = 'en'): array
+{
+    // ✅ LOG: locale र input
+    Log::info('🔍 [PlannerService] generate called', [
+        'locale' => $locale,
+        'input' => $input,
+    ]);
 
-        $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
-
-        // 2. Ensure segments (for tours)
-        if ($route->segments->isEmpty()) {
-            $this->ensureSegmentsForTour($route);
-            $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
-        }
-
-        // 3. Get relevant services (filtered by location, category, style, budget)
-        $availableServices = $this->getServicesForRoute($route, $input);
-
-        // 4. Calculate cost with style + budget consideration
-        $costBreakdown = $this->calculateCost($route, $input, $availableServices);
-
-        // 5. Build context for LLM (includes service pool)
-        $context = $this->buildContext($route, $input, $costBreakdown, $availableServices);
-
-        // 6. Try AI, fallback if needed
-        $aiResponse = null;
-        $usedFallback = false;
-        try {
-            $prompt = $this->buildPrompt($context, $input);
-            $aiResponse = $this->llm->generateItinerary($prompt);
-            Log::info('AI itinerary generated successfully.');
-        } catch (\Exception $e) {
-            Log::error('AI generation failed, using fallback.', ['error' => $e->getMessage()]);
-            $aiResponse = $this->buildFallbackResponse($route, $input);
-            $usedFallback = true;
-        }
-
-        // 7. Validate and normalize
-        $validated = $this->validator->validate($aiResponse, $route, $input, $context);
-
-        // 8. Save to DB
-        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
-            $plannerRequest = PlannerRequest::create([
-                'user_id' => auth()->id() ?? null,
-                'session_id' => session()->getId(),
-                'route_id' => $route->id,
-                'destination' => $route->name,
-                'days' => $input['days'],
-                'budget' => $input['budget'],
-                'travel_style' => $input['travel_style'] ?? 'mid_range',
-                'interests' => $input['interests'] ?? [],
-            ]);
-
-            $plannerResult = PlannerResult::create([
-                'request_id' => $plannerRequest->id,
-                'raw_ai_response' => $aiResponse,
-                'model' => config('services.groq.model', 'qwen/qwen3.6-27b'),
-                'model_version' => 'latest',
-                'prompt_version' => 'v3', // version bump
-                'route_snapshot' => [
-                    'route_id' => $route->id,
-                    'name' => $route->name,
-                    'segments' => $route->segments->toArray(),
-                ],
-                'validation_status' => $usedFallback ? 'fallback' : 'valid',
-                'fallback_used' => $usedFallback,
-                'validation_errors' => null,
-            ]);
-
-            foreach ($validated['days'] as $dayData) {
-                $day = ItineraryDay::create([
-                    'result_id' => $plannerResult->id,
-                    'day_number' => $dayData['day_number'],
-                    'title' => $dayData['title'],
-                    'description' => $dayData['description'] ?? null,
-                    'overnight_waypoint_id' => $dayData['overnight_waypoint_id'] ?? null,
-                    'distance_km' => $dayData['distance_km'] ?? null,
-                    'estimated_time_hours' => $dayData['estimated_time_hours'] ?? null,
-                    'altitude_m' => $dayData['altitude_m'] ?? null,
-                ]);
-
-                foreach ($dayData['items'] as $itemData) {
-                    ItineraryItem::create([
-                        'day_id' => $day->id,
-                        'title' => $itemData['title'],
-                        'description' => $itemData['description'] ?? null,
-                        'time_of_day' => $itemData['time_of_day'] ?? null,
-                        'cost' => $itemData['cost'] ?? null,
-                        'currency' => 'NPR',
-                        'pricing_source' => $itemData['pricing_source'] ?? 'system_estimate',
-                        'pricing_snapshot' => $itemData['pricing_snapshot'] ?? null,
-                        'service_id' => $itemData['service_id'] ?? null,
-                        'is_optional' => $itemData['is_optional'] ?? false,
-                        'metadata' => $itemData['metadata'] ?? null,
-                    ]);
-                }
-            }
-
-            return [
-                'request' => $plannerRequest,
-                'result' => $plannerResult,
-                'days' => $plannerResult->days()->with('items')->get(),
-                'total_cost' => $costBreakdown['total'] ?? 0,
-                'breakdown' => $costBreakdown['breakdown'] ?? [],
-            ];
-        });
-
-        return $result;
+    // 1. Resolve route
+    $route = $this->resolveRoute($input['destination'] ?? null);
+    if (!$route) {
+        throw ValidationException::withMessages(['destination' => 'Route not found.']);
     }
+
+    $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
+
+    // 2. Ensure segments (for tours)
+    if ($route->segments->isEmpty()) {
+        $this->ensureSegmentsForTour($route);
+        $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
+    }
+
+    // 3. Get relevant services (filtered by location, category, style, budget)
+    $availableServices = $this->getServicesForRoute($route, $input);
+
+    // 4. Calculate cost with style + budget consideration
+    $costBreakdown = $this->calculateCost($route, $input, $availableServices, $locale);
+
+    // 5. Build context for LLM (includes service pool)
+    $context = $this->buildContext($route, $input, $costBreakdown, $availableServices);
+
+    // 6. Try AI, fallback if needed
+    $aiResponse = null;
+    $usedFallback = false;
+    try {
+        $prompt = $this->buildPrompt($context, $input, $locale);
+        
+        // ✅ LOG: exact prompt going to LLM
+        Log::info('🔍 [PlannerService] Prompt to LLM', [
+            'prompt' => $prompt, // पूरै JSON payload
+            'locale' => $locale,
+        ]);
+        
+        $aiResponse = $this->llm->generateItinerary($prompt, $locale);
+        Log::info('AI itinerary generated successfully.');
+    } catch (\Exception $e) {
+        Log::error('AI generation failed, using fallback.', ['error' => $e->getMessage()]);
+        $aiResponse = $this->buildFallbackResponse($route, $input, $locale);
+        $usedFallback = true;
+    }
+
+    // After the try-catch block
+if ($aiResponse && !$usedFallback) {
+    if (!$this->isLanguageCorrect($aiResponse, $locale)) {
+        Log::warning('AI response language mismatch, using fallback.', ['locale' => $locale]);
+        $aiResponse = $this->buildFallbackResponse($route, $input, $locale);
+        $usedFallback = true;
+    }
+}
+
+    // 7. Validate and normalize
+    $validated = $this->validator->validate($aiResponse, $route, $input, $context, $locale);
+
+    // 8. Save to DB
+    $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
+        $plannerRequest = PlannerRequest::create([
+            'user_id' => auth()->id() ?? null,
+            'session_id' => session()->getId(),
+            'route_id' => $route->id,
+            'destination' => $route->name,
+            'days' => $input['days'],
+            'budget' => $input['budget'],
+            'travel_style' => $input['travel_style'] ?? 'mid_range',
+            'interests' => $input['interests'] ?? [],
+        ]);
+
+        $plannerResult = PlannerResult::create([
+            'request_id' => $plannerRequest->id,
+            'raw_ai_response' => $aiResponse,
+            'model' => config('services.groq.model', 'qwen/qwen3.6-27b'),
+            'model_version' => 'latest',
+            'prompt_version' => 'v3', // version bump
+            'route_snapshot' => [
+                'route_id' => $route->id,
+                'name' => $route->name,
+                'segments' => $route->segments->toArray(),
+            ],
+            'validation_status' => $usedFallback ? 'fallback' : 'valid',
+            'fallback_used' => $usedFallback,
+            'validation_errors' => null,
+        ]);
+
+        foreach ($validated['days'] as $dayData) {
+            $day = ItineraryDay::create([
+                'result_id' => $plannerResult->id,
+                'day_number' => $dayData['day_number'],
+                'title' => $dayData['title'],
+                'description' => $dayData['description'] ?? null,
+                'overnight_waypoint_id' => $dayData['overnight_waypoint_id'] ?? null,
+                'distance_km' => $dayData['distance_km'] ?? null,
+                'estimated_time_hours' => $dayData['estimated_time_hours'] ?? null,
+                'altitude_m' => $dayData['altitude_m'] ?? null,
+            ]);
+
+            foreach ($dayData['items'] as $itemData) {
+                ItineraryItem::create([
+                    'day_id' => $day->id,
+                    'title' => $itemData['title'],
+                    'description' => $itemData['description'] ?? null,
+                    'time_of_day' => $itemData['time_of_day'] ?? null,
+                    'cost' => $itemData['cost'] ?? null,
+                    'currency' => 'NPR',
+                    'pricing_source' => $itemData['pricing_source'] ?? 'system_estimate',
+                    'pricing_snapshot' => $itemData['pricing_snapshot'] ?? null,
+                    'service_id' => $itemData['service_id'] ?? null,
+                    'is_optional' => $itemData['is_optional'] ?? false,
+                    'metadata' => $itemData['metadata'] ?? null,
+                ]);
+            }
+        }
+
+        return [
+            'request' => $plannerRequest,
+            'result' => $plannerResult,
+            'days' => $plannerResult->days()->with('items')->get(),
+            'total_cost' => $costBreakdown['total'] ?? 0,
+            'breakdown' => $costBreakdown['breakdown'] ?? [],
+        ];
+    });
+
+    return $result;
+}
 
     // ==========================================
     //  SERVICE FILTERING (LOCATION + STYLE + BUDGET)
@@ -230,7 +253,7 @@ $services = $query->get();
     //  COST CALCULATION (WITH STYLE + BUDGET)
     // ==========================================
 
-    protected function calculateCost(Route $route, array $input, array $services): array
+    protected function calculateCost(Route $route, array $input, array $services, string $locale = 'en'): array
 {
     $days = $input['days'] ?? $route->duration_days;
     $style = $input['travel_style'] ?? 'mid_range';
@@ -249,8 +272,8 @@ $services = $query->get();
             $amount *= $days;
         }
         $breakdown[$cost->type] = [
-            'name' => $cost->name,
-            'amount' => $amount,
+    'name' => $this->translateName($cost->name, 'cost', $locale),
+    'amount' => $amount,
             'currency' => 'NPR',
             'unit' => $cost->unit,
             'is_mandatory' => (bool) $cost->is_mandatory,
@@ -270,8 +293,8 @@ $services = $query->get();
             $price *= $days;
         }
         $breakdown[$svc['category']] = [
-            'name' => $svc['name'],
-            'provider_name' => $svc['provider'] ?? 'Local Partner',
+    'name' => $this->translateName($svc['name'], 'service', $locale),
+    'provider_name' => $svc['provider'] ?? 'Local Partner',
             'amount' => $price,
             'currency' => 'NPR',
             'unit' => 'per_day',
@@ -288,7 +311,7 @@ $services = $query->get();
             'name' => 'Budget Note',
             'amount' => 0,
             'currency' => 'NPR',
-            'unit' => 'Your budget of $' . $budget . ' USD may be insufficient. Consider adjusting style or days.',
+                'unit' => __('messages.note', ['amount' => $input['budget']]),
             'is_mandatory' => false,
             'provider_name' => 'System',
         ];
@@ -383,145 +406,203 @@ $services = $query->get();
         ];
     }
 
-    protected function buildPrompt(array $context, array $input): string
-    {
-        // Reduce segments to first 3 + last 3 to save tokens
-        $segments = $context['segments'];
-        $total = count($segments);
-        if ($total > 6) {
-            $segments = array_merge(
-                array_slice($segments, 0, 3),
-                array_slice($segments, -3)
-            );
-        }
-        $context['segments'] = $segments;
-
-        $payload = [
-            'instruction' => 'Generate a personalized day-by-day itinerary for a Nepal trek. Use ONLY the provided data.',
-            'user_request' => [
-                'days' => $input['days'],
-                'budget' => $input['budget'],
-                'style' => $input['travel_style'] ?? 'mid_range',
-                'interests' => $input['interests'] ?? [],
-                'fitness' => $input['fitness_level'] ?? 'moderate',
-            ],
-            'route_data' => [
-                'name' => $context['route_name'],
-                'difficulty' => $context['difficulty'],
-                'max_altitude' => $context['max_altitude'],
-                'segments' => $segments,
-            ],
-            'available_services' => array_map(function ($svc) {
-                return [
-                    'id' => $svc['id'],
-                    'name' => $svc['name'],
-                    'category' => $svc['category'],
-                    'price' => $svc['price'],
-                    'currency' => $svc['currency'],
-                    'provider' => $svc['provider'],
-                ];
-            }, $context['available_services'] ?? []),
-            'cost_breakdown' => $context['cost_breakdown']['breakdown'] ?? [],
-            'rules' => [
-                'Use ONLY services from available_services for accommodation, guides, transport.',
-                'Do NOT invent any waypoints, distances, or costs.',
-                'Return valid JSON with a "days" array.',
-                'If a service is used, include its id as service_id in the item.',
-            ],
-        ];
-
-        return json_encode($payload, JSON_PRETTY_PRINT);
+    protected function buildPrompt(array $context, array $input, string $locale = 'en'): string
+{
+    // Reduce segments to first 3 + last 3 to save tokens
+    $segments = $context['segments'];
+    $total = count($segments);
+    if ($total > 6) {
+        $segments = array_merge(
+            array_slice($segments, 0, 3),
+            array_slice($segments, -3)
+        );
     }
+    $context['segments'] = $segments;
+
+    $payload = [
+        'instruction' => 'Generate a personalized day-by-day itinerary for a Nepal trek. Use ONLY the provided data.',
+        'user_request' => [
+            'days' => $input['days'],
+            'budget' => $input['budget'],
+            'style' => $input['travel_style'] ?? 'mid_range',
+            'interests' => $input['interests'] ?? [],
+            'fitness' => $input['fitness_level'] ?? 'moderate',
+        ],
+        'route_data' => [
+            'name' => $context['route_name'],
+            'difficulty' => $context['difficulty'],
+            'max_altitude' => $context['max_altitude'],
+            'segments' => $segments,
+        ],
+        'available_services' => array_map(function ($svc) {
+            return [
+                'id' => $svc['id'],
+                'name' => $svc['name'],
+                'category' => $svc['category'],
+                'price' => $svc['price'],
+                'currency' => $svc['currency'],
+                'provider' => $svc['provider'],
+            ];
+        }, $context['available_services'] ?? []),
+        'cost_breakdown' => $context['cost_breakdown']['breakdown'] ?? [],
+        'locale' => $locale,   // ✅ opening quote थपियो
+        'rules' => [           // ✅ space हटाइयो
+            'Use ONLY services from available_services for accommodation, guides, transport.',
+            'Do NOT invent any waypoints, distances, or costs.',
+            'Return valid JSON with a "days" array.',
+            'If a service is used, include its id as service_id in the item.',
+            "IMPORTANT: ALL text content (day titles, descriptions, item names, cost labels) MUST be in the language: " . match($locale) {
+    'hi' => 'Hindi (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. Everything else must be in Hindi.',
+    'zh' => 'Chinese (Simplified Chinese characters). ONLY waypoint names like "Nayapul" can remain in English. Everything else must be in Chinese.',
+    default => 'English.',
+},
+        ],
+    ];
+
+    return json_encode($payload, JSON_PRETTY_PRINT);
+}
 
     // ==========================================
     //  FALLBACK (requested days respected)
     // ==========================================
 
-    protected function buildFallbackResponse(Route $route, array $input): array
-    {
-        $segments = $route->segments()->orderBy('sequence')->get();
-        $requestedDays = $input['days'];
-        $days = [];
-        $dayNumber = 1;
+    protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en'): array
+{
+    $segments = $route->segments()->orderBy('sequence')->get();
+    $requestedDays = $input['days'];
+    $days = [];
+    $dayNumber = 1;
 
-        $routeCosts = $route->costs;
-        $dailyFoodCost = 0;
-        $totalFixedCost = 0;
+    $routeCosts = $route->costs;
+    $dailyFoodCost = 0;
+    $totalFixedCost = 0;
 
-        foreach ($routeCosts as $cost) {
-            $amount = $cost->amount;
-            if (strtoupper($cost->currency) === 'USD') {
-                $amount *= 133;
-            }
-            if ($cost->unit === 'per_day') {
-                $dailyFoodCost = $amount;
-            } else {
-                $totalFixedCost += $amount;
-            }
+    foreach ($routeCosts as $cost) {
+        $amount = $cost->amount;
+        if (strtoupper($cost->currency) === 'USD') {
+            $amount *= 133;
         }
-
-        $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
-
-        $segmentsToUse = $segments->take($requestedDays);
-
-        foreach ($segmentsToUse as $seg) {
-            $from = $seg->fromWaypoint;
-            $to = $seg->toWaypoint;
-            $dayCost = $perDayFixedCost + $dailyFoodCost;
-
-            $days[] = [
-                'day_number' => $dayNumber,
-                'title' => "{$from->name} → {$to->name}",
-                'description' => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
-                'overnight_waypoint_id' => $seg->to_waypoint_id,
-                'distance_km' => (float) $seg->distance_km,
-                'estimated_time_hours' => (float) $seg->estimated_time_hours,
-                'altitude_m' => $to->altitude,
-                'items' => [
-                    [
-                        'title' => 'Trekking Day',
-                        'description' => "Hike from {$from->name} to {$to->name}",
-                        'time_of_day' => 'morning',
-                        'cost' => round($dayCost, 2),
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
-                ]
-            ];
-            $dayNumber++;
+        if ($cost->unit === 'per_day') {
+            $dailyFoodCost = $amount;
+        } else {
+            $totalFixedCost += $amount;
         }
-
-        while (count($days) < $requestedDays) {
-            $last = end($days);
-            $days[] = [
-                'day_number' => count($days) + 1,
-                'title' => "Rest & Acclimatization",
-                'description' => 'Rest day to acclimatize and enjoy the mountain views.',
-                'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
-                'distance_km' => 0,
-                'estimated_time_hours' => 0,
-                'altitude_m' => $last['altitude_m'] ?? null,
-                'items' => [
-                    [
-                        'title' => 'Rest & Acclimatization',
-                        'description' => 'Take it easy, hydrate, and enjoy the scenery.',
-                        'time_of_day' => 'morning',
-                        'cost' => round($dailyFoodCost, 2),
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
-                ]
-            ];
-        }
-
-        return ['days' => $days];
     }
+
+    $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
+
+    $segmentsToUse = $segments->take($requestedDays);
+
+    foreach ($segmentsToUse as $seg) {
+        $from = $seg->fromWaypoint;
+        $to = $seg->toWaypoint;
+        $dayCost = $perDayFixedCost + $dailyFoodCost;
+
+        // Translated title & description
+        $title = match($locale) {
+            'hi' => "{$from->name} → {$to->name}",
+            'zh' => "{$from->name} → {$to->name}",
+            default => "{$from->name} → {$to->name}",
+        };
+        // Waypoint names are kept same, but we can keep them as is.
+
+        $desc = match($locale) {
+    'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।",
+    'zh' => "从 {$from->name}（{$from->altitude}米）徒步到 {$to->name}（{$to->altitude}米）。距离：{$seg->distance_km}公里，预计时间：{$seg->estimated_time_hours}小时。",
+    'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。",
+    default => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
+};
+
+        $itemTitle = match($locale) {
+            'hi' => "ट्रेकिंग दिन",
+            'zh' => "徒步日",
+            default => "Trekking Day",
+        };
+
+        $itemDesc = match($locale) {
+            'hi' => "{$from->name} से {$to->name} तक ट्रेक करें",
+            'zh' => "从 {$from->name} 徒步到 {$to->name}",
+            default => "Hike from {$from->name} to {$to->name}",
+        };
+
+        $days[] = [
+            'day_number' => $dayNumber,
+            'title' => $title,
+            'description' => $desc,
+            'overnight_waypoint_id' => $seg->to_waypoint_id,
+            'distance_km' => (float) $seg->distance_km,
+            'estimated_time_hours' => (float) $seg->estimated_time_hours,
+            'altitude_m' => $to->altitude,
+            'items' => [
+                [
+                    'title' => $itemTitle,
+                    'description' => $itemDesc,
+                    'time_of_day' => 'morning',
+                    'cost' => round($dayCost, 2),
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
+                ]
+            ]
+        ];
+        $dayNumber++;
+    }
+
+    while (count($days) < $requestedDays) {
+    $last = end($days);
+
+    $restTitle = match($locale) {
+        'hi' => "आराम और अनुकूलन",
+        'zh' => "休息和适应",
+        'np' => "आराम र अनुकूलन",
+        default => "Rest & Acclimatization",
+    };
+
+    $restDesc = match($locale) {
+        'hi' => "आराम और अनुकूलन का दिन।",
+        'zh' => "休息和适应的一天。",
+        'np' => "आराम र अनुकूलनको दिन।",
+        default => "Rest day to acclimatize and enjoy the mountain views.",
+    };
+
+    // ✅ Define $restItemTitle
+    $restItemTitle = $restTitle;
+
+    $restItemDesc = match($locale) {
+        'hi' => "आराम करें, हाइड्रेट करें, और दृश्य का आनंद लें।",
+        'zh' => "放松，补充水分，享受风景。",
+        'np' => "आराम गर्नुहोस्, हाइड्रेट गर्नुहोस्, र दृश्यको आनन्द लिनुहोस्。",
+        default => "Take it easy, hydrate, and enjoy the scenery.",
+    };
+
+    $days[] = [
+        'day_number' => count($days) + 1,
+        'title' => $restItemTitle,
+        'description' => $restDesc,
+        'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
+        'distance_km' => 0,
+        'estimated_time_hours' => 0,
+        'altitude_m' => $last['altitude_m'] ?? null,
+        'items' => [
+            [
+                'title' => $restItemTitle,
+                'description' => $restItemDesc,
+                'time_of_day' => 'morning',
+                'cost' => round($dailyFoodCost, 2),
+                'pricing_source' => 'system_estimate',
+                'pricing_snapshot' => null,
+                'service_id' => null,
+                'is_optional' => false,
+                'metadata' => null,
+            ]
+        ]
+    ];
+}
+
+    return ['days' => $days];
+}
 
     // ==========================================
     //  HELPER: ensure tour segments
@@ -588,4 +669,63 @@ $services = $query->get();
             ->where('is_active', true)
             ->first();
     }
+    /**
+ * Translate a dynamic name using the current locale.
+ * Falls back to original if translation not found.
+ */
+private function translateName(string $name, string $prefix, string $locale): string
+{
+    // Direct translation map for Hindi
+    if ($locale === 'hi') {
+        $map = [
+            'cost.daily_food_budget' => 'दैनिक भोजन बजट',
+            'cost.manang_special_permit' => 'मनांग विशेष अनुमति',
+            'service.homestay_experience' => 'होमस्टे अनुभव',
+            'service.group_guide_service' => 'समूह गाइड सेवा',
+            'service.standard_room' => 'स्टैंडर्ड रूम',
+            'service.private_jeep' => 'प्राइवेट जीप',
+        ];
+        $key = $prefix . '.' . Str::slug($name, '_');
+        return $map[$key] ?? $name;
+    }
+
+    // ✅ Direct translation map for Chinese
+    if ($locale === 'zh') {
+        $map = [
+            'cost.daily_food_budget' => '每日食品预算',
+            'cost.manang_special_permit' => '马南特别许可证',
+            'service.homestay_experience' => '寄宿家庭体验',
+            'service.group_guide_service' => '团体导游服务',
+            'service.standard_room' => '标准间',
+            'service.private_jeep' => '私人吉普车',
+        ];
+        $key = $prefix . '.' . Str::slug($name, '_');
+        return $map[$key] ?? $name;
+    }
+
+    // For other locales (en, np) – use translation system
+    $key = $prefix . '.' . Str::slug($name, '_');
+    $translated = __($key, [], $locale);
+    return ($translated !== $key) ? $translated : $name;
+}
+/**
+ * Recursively extract all string values and check for Devanagari.
+ * For hi/np, require at least one Devanagari character.
+ */
+private function isLanguageCorrect(array $data, string $locale): bool
+{
+    if (!in_array($locale, ['hi', 'np'])) {
+        return true; // Skip validation for English/Chinese
+    }
+
+    $strings = [];
+    array_walk_recursive($data, function ($value) use (&$strings) {
+        if (is_string($value) && !is_numeric($value)) {
+            $strings[] = $value;
+        }
+    });
+
+    $text = implode(' ', $strings);
+    return preg_match('/[\x{0900}-\x{097F}]/u', $text) === 1;
+}
 }

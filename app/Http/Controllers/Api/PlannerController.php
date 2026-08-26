@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\PlannerService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class PlannerController extends Controller
 {
@@ -18,6 +19,16 @@ class PlannerController extends Controller
 
     public function generate(Request $request)
     {
+        // ✅ Session बाट सिधै locale लिने (middleware ले सही नगरे पनि काम गर्छ)
+        $locale = session('locale', 'en');
+        
+        Log::info('🔍 [PlannerController] Locale from session', [
+            'locale' => $locale,
+            'session_locale' => session('locale'),
+            'app_locale' => app()->getLocale(), // तुलनाको लागि मात्र
+            'request_locale' => $request->input('locale'),
+        ]);
+
         try {
             $request->validate([
                 'destination' => 'nullable|string|max:255',
@@ -28,7 +39,8 @@ class PlannerController extends Controller
                 'fitness_level' => 'nullable|in:easy,moderate,hard',
             ]);
 
-            $result = $this->planner->generate($request->all());
+            // ✅ session बाट लिइएको locale पास गर्ने
+            $result = $this->planner->generate($request->all(), $locale);
 
             return response()->json([
                 'success' => true,
