@@ -121,11 +121,12 @@
                     <span>{{ __('messages.profile') }}</span>
                 </a>
 
+                <!-- Team (Staff Management) -->
                 <a href="{{ route('provider.staff.index') }}" 
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
-    <i class="fas fa-users w-5"></i>
-    <span>Team</span>
-</a>
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
+                    <i class="fas fa-users w-5"></i>
+                    <span>Team</span>
+                </a>
 
                 <!-- Analytics (Phase 11) -->
                 <a href="{{ route('provider.analytics.index') }}" 
@@ -201,23 +202,8 @@
                 </div>
             </header>
 
-            <!-- Main Content -->
+            <!-- 🔥 Main Content – Flash Messages REMOVED from Layout -->
             <main class="flex-1 overflow-y-auto p-6">
-                @if(session('success'))
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4 rounded">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                @if(session('info'))
-                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 mb-4 rounded">
-                        {{ session('info') }}
-                    </div>
-                @endif
                 @yield('content')
             </main>
         </div>

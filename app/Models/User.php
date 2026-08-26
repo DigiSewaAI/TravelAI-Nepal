@@ -214,4 +214,12 @@ class User extends Authenticatable
             default => 'User',
         };
     }
+    /**
+ * Get the provider owned by this user (for provider_owner role).
+ * This is an alias for the provider() relationship.
+ */
+public function ownProvider()
+{
+    return $this->provider;
+}
 }

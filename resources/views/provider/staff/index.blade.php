@@ -20,6 +20,12 @@
 @if(session('error'))
     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
         {{ session('error') }}
+        @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
+            <br>
+            <a href="{{ route('provider.subscriptions.index') }}" class="text-blue-600 hover:text-blue-800 font-medium underline inline-block mt-1">
+                <i class="fas fa-arrow-up"></i> Upgrade Your Plan
+            </a>
+        @endif
     </div>
 @endif
 
@@ -27,18 +33,10 @@
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -66,23 +64,16 @@
                     </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a href="{{ route('provider.staff.edit', $member) }}" class="text-blue-600 hover:text-blue-900 mr-3">
-                        Edit
-                    </a>
+                    <a href="{{ route('provider.staff.edit', $member) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                     <form action="{{ route('provider.staff.destroy', $member) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to remove this staff member?')">
-                            Remove
-                        </button>
+                        @csrf @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Remove this staff member?')">Remove</button>
                     </form>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                    No staff members yet.
-                </td>
+                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No staff members yet.</td>
             </tr>
             @endforelse
         </tbody>
@@ -96,6 +87,11 @@
     <span>
         Max staff allowed: 
         <strong>{{ $maxStaff == -1 ? 'Unlimited' : $maxStaff }}</strong>
+        @if($staff->count() >= $maxStaff && $maxStaff != -1)
+            <a href="{{ route('provider.subscriptions.index') }}" class="text-blue-600 hover:text-blue-800 ml-2 text-xs underline">
+                <i class="fas fa-arrow-up"></i> Upgrade Plan
+            </a>
+        @endif
     </span>
 </div>
 @endsection

@@ -6,6 +6,25 @@
 @section('content')
 <div class="max-w-2xl mx-auto">
     <h2 class="text-2xl font-bold mb-4">Edit Staff Member</h2>
+
+    @if(session('error'))
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+            {{ session('error') }}
+            @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
+                <br>
+                <a href="{{ route('provider.subscriptions.index') }}" class="text-blue-600 hover:text-blue-800 font-medium underline inline-block mt-1">
+                    <i class="fas fa-arrow-up"></i> Upgrade Your Plan
+                </a>
+            @endif
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('provider.staff.update', $staff) }}" class="bg-white p-6 rounded-lg shadow">
         @csrf
         @method('PUT')

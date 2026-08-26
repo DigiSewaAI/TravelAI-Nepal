@@ -19,7 +19,6 @@ class StaffController extends Controller
     {
         $provider = Auth::user()->provider;
 
-        // ✅ Staff = ProviderStaff मोडेलबाट, User सहित Load गर्ने
         $staff = ProviderStaff::where('provider_id', $provider->id)
                     ->with('user')
                     ->get();
@@ -39,8 +38,9 @@ class StaffController extends Controller
         $currentStaffCount = ProviderStaff::where('provider_id', $provider->id)->count();
 
         if ($currentStaffCount >= $maxStaff && $maxStaff != -1) {
+            // ✅ No HTML in error message – plain text only
             return redirect()->route('provider.staff.index')
-                ->with('error', 'You have reached your staff limit. Upgrade your plan to add more staff.');
+                ->with('error', 'You have reached your staff limit. Please upgrade your plan to add more staff.');
         }
 
         return view('provider.staff.create');
@@ -57,7 +57,7 @@ class StaffController extends Controller
 
         if ($currentStaffCount >= $maxStaff && $maxStaff != -1) {
             return redirect()->route('provider.staff.index')
-                ->with('error', 'Staff limit reached.');
+                ->with('error', 'Staff limit reached. Please upgrade your plan.');
         }
 
         $validated = $request->validate([
@@ -67,7 +67,7 @@ class StaffController extends Controller
             'role' => 'nullable|string|max:255',
         ]);
 
-        // 1. नयाँ User सिर्जना गर्ने
+        // 1. Create the user
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -75,7 +75,7 @@ class StaffController extends Controller
             'role' => 'staff',
         ]);
 
-        // 2. ProviderStaff मा Entry बनाउने
+        // 2. Create ProviderStaff entry
         ProviderStaff::create([
             'user_id' => $user->id,
             'provider_id' => $provider->id,
@@ -92,7 +92,6 @@ class StaffController extends Controller
      */
     public function edit(ProviderStaff $staff)
     {
-        // Ensure this staff belongs to the current provider
         if ($staff->provider_id !== Auth::user()->provider->id) {
             abort(403, 'Unauthorized.');
         }
@@ -113,9 +112,7 @@ class StaffController extends Controller
             'role' => 'nullable|string|max:255',
         ]);
 
-        // Update the user's name
         $staff->user->update(['name' => $validated['name']]);
-        // Update the staff role (on ProviderStaff)
         $staff->update(['role' => $validated['role'] ?? $staff->role]);
 
         return redirect()->route('provider.staff.index')
@@ -131,8 +128,6 @@ class StaffController extends Controller
             abort(403, 'Unauthorized.');
         }
 
-        // Optionally delete the user too? Usually you might just delete the staff link.
-        // We'll delete the ProviderStaff record, but keep the user.
         $staff->delete();
 
         return redirect()->route('provider.staff.index')
@@ -148,14 +143,13 @@ class StaffController extends Controller
         $plan = $subscription ? $subscription->plan : null;
 
         if (!$plan) {
-            return 1; // Free plan default
+            return 1;
         }
 
         if (isset($plan->limits['max_staff'])) {
             return (int) $plan->limits['max_staff'];
         }
 
-        // Fallback by plan slug
         return match ($plan->slug) {
             'free' => 1,
             'professional' => 5,
