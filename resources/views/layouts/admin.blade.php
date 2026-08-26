@@ -105,6 +105,24 @@
     </a>
     @endif
 
+    <!-- Route Management Section -->
+<a href="{{ route('admin.routes.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.routes.*') ? 'active' : '' }}">
+    <i class="fas fa-route w-5"></i>
+    <span>Routes</span>
+</a>
+<a href="{{ route('admin.waypoints.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.waypoints.*') ? 'active' : '' }}">
+    <i class="fas fa-map-pin w-5"></i>
+    <span>Waypoints</span>
+</a>
+<a href="{{ route('admin.segments.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.segments.*') ? 'active' : '' }}">
+    <i class="fas fa-link w-5"></i>
+    <span>Segments</span>
+</a>
+<a href="{{ route('admin.route-costs.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.route-costs.*') ? 'active' : '' }}">
+    <i class="fas fa-dollar-sign w-5"></i>
+    <span>Route Costs</span>
+</a>
+
 
                 @if(Route::has('admin.reports.index'))
                 <a href="{{ route('admin.reports.index') }}"

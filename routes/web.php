@@ -204,6 +204,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
     Route::post('/invoices/{invoice}/status', [App\Http\Controllers\Admin\InvoiceController::class, 'updateStatus'])->name('invoices.update-status');
+    
+    // =======================================
+// ADMIN – Route Management (Phase 5)
+// =======================================
+Route::resource('routes', \App\Http\Controllers\Admin\RouteController::class);
+Route::resource('waypoints', \App\Http\Controllers\Admin\WaypointController::class);
+Route::resource('segments', \App\Http\Controllers\Admin\SegmentController::class);
+Route::resource('route-costs', \App\Http\Controllers\Admin\RouteCostController::class);
+
 });
 
 // =======================================
