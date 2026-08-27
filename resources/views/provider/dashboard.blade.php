@@ -30,6 +30,28 @@
         </div>
     </div>
 
+{{-- AI Usage Widget --}}
+<div class="bg-white rounded-xl shadow-sm border p-4 hover:shadow-md transition">
+    <div class="flex justify-between items-center">
+        <div>
+            <p class="text-sm text-gray-500">🤖 AI Requests</p>
+            @if($aiUsage['is_unlimited'])
+                <p class="text-2xl font-bold text-green-600">♾️ Unlimited</p>
+            @else
+                <p class="text-2xl font-bold {{ $aiUsage['remaining'] > 0 ? 'text-blue-600' : 'text-red-600' }}">
+                    {{ $aiUsage['remaining'] }}
+                </p>
+                <p class="text-xs text-gray-400">of {{ $aiUsage['limit'] }} remaining this month</p>
+            @endif
+        </div>
+        @if(!$aiUsage['is_unlimited'] && $aiUsage['remaining'] == 0)
+            <a href="{{ route('provider.subscriptions.index') }}" class="text-sm text-blue-600 hover:underline">
+                Upgrade Plan →
+            </a>
+        @endif
+    </div>
+</div>
+
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="bg-white p-4 rounded-xl shadow-sm border">

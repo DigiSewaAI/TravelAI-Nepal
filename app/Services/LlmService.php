@@ -40,7 +40,7 @@ class LlmService
         }, $data['data'] ?? []);
     }
 
-    public function generateItinerary(string $prompt, string $locale = 'en'): array
+    public function generateItinerary(string $prompt, string $locale = 'en', ?string $model = null): array
     {
         // ✅ LOG: locale र prompt को पहिलो 500 characters
         Log::info('🔍 [LlmService] generateItinerary called', [
@@ -54,15 +54,17 @@ class LlmService
 
         while ($attempt < $this->maxRetries) {
             try {
-                Log::info('Groq API call initiated', [
-                    'model' => $this->model,
+                $modelToUse = $model ?? $this->model;
+
+Log::info('Groq API call initiated', [
+    'model' => $modelToUse,
                     'attempt' => $attempt + 1,
                     'prompt_length' => strlen($prompt),
                 ]);
 
                 // ✅ LOG: API call भन्दा ठिक अघि system + user messages
                 Log::info('🔍 [LlmService] Sending to Groq', [
-                    'model' => $this->model,
+                    'model' => $modelToUse,
                     'system_prompt' => $this->getSystemPrompt($locale),
                     'user_prompt_preview' => substr($prompt, 0, 300),
                     'temperature' => 0.2,
@@ -77,7 +79,7 @@ class LlmService
                     'timeout' => 120,
                 ])
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => $this->model,
+                    'model' => $modelToUse,
                     'messages' => [
                         ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
                         ['role' => 'user', 'content' => $prompt],

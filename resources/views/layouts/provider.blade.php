@@ -77,6 +77,12 @@
                     <span>{{ __('messages.services') }}</span>
                 </a>
 
+                <a href="{{ route('provider.quotation.create') }}" 
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
+    <i class="fas fa-file-invoice-dollar w-5"></i>
+    <span>AI Quotation</span>
+</a>
+
                 <!-- Bookings -->
                 <a href="{{ route('provider.bookings.index') }}" 
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">

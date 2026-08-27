@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
-use App\Models\Service;
 use App\Models\QrScan;
+use App\Models\Service;
+use App\Services\AiLimitService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(AiLimitService $aiLimit)
     {
         // Auth check
         if (!auth()->check()) {
@@ -29,9 +31,9 @@ class DashboardController extends Controller
         }
 
         if (!$provider) {
-    return redirect()->route('home')
-        ->with('error', 'Provider profile not found. Please contact support.');
-}
+            return redirect()->route('home')
+                ->with('error', 'Provider profile not found. Please contact support.');
+        }
 
         // Get all services for this provider
         $services = $provider->services()->get();
@@ -75,6 +77,9 @@ class DashboardController extends Controller
           ->take(20)
           ->get();
 
+        // ✅ AI Usage Data (for Dashboard Widget)
+        $aiUsage = $aiLimit->getUsage($provider);
+
         return view('provider.dashboard', compact(
             'provider',
             'totalServices',
@@ -83,7 +88,8 @@ class DashboardController extends Controller
             'recentBookings',
             'bookingsTrend',
             'topServices',
-            'checkinHistory'
+            'checkinHistory',
+            'aiUsage'  // ✅ Pass to view
         ));
     }
 }
