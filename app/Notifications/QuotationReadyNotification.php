@@ -24,15 +24,20 @@ class QuotationReadyNotification extends Notification
     }
 
     public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject('📄 Your Quotation is Ready!')
-            ->greeting('Hello ' . ($this->quotationRequest->traveler->name ?? 'Traveler') . '!')
-            ->line("Your quotation from **{$this->quotationRequest->provider->name}** is ready.")
-            ->line("Please check your TravelAI Nepal dashboard to view the quotation.")
-            ->action('View Quotation', route('traveler.dashboard'))
-            ->line('Thank you for using TravelAI Nepal!');
-    }
+{
+    $quotationRequest = $this->quotationRequest;
+    $quotationText = $quotationRequest->quotation_text;
+
+    return (new MailMessage)
+        ->subject('📄 Your Quotation is Ready!')
+        ->greeting('Hello ' . ($quotationRequest->traveler_name ?? $quotationRequest->traveler->name ?? 'Traveler') . '!')
+        ->line("Your quotation from **{$quotationRequest->provider->name}** is ready.")
+        ->line("Please find the quotation details below:")
+        ->line('')
+        ->line($quotationText)
+        ->action('View Quotation', route('traveler.dashboard'))
+        ->line('Thank you for using TravelAI Nepal!');
+}
 
     public function toArray($notifiable)
     {

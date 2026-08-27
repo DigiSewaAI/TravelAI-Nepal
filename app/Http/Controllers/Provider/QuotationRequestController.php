@@ -9,6 +9,8 @@ use App\Services\AiLimitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail; // ✅ Mail Facade
+use App\Mail\QuotationMail; // ✅ Mailable Class
 
 class QuotationRequestController extends Controller
 {
@@ -21,6 +23,9 @@ class QuotationRequestController extends Controller
         $this->aiLimit = $aiLimit;
     }
 
+    /**
+     * List all quotation requests for the provider.
+     */
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -38,6 +43,9 @@ class QuotationRequestController extends Controller
         return view('provider.quotation-requests.index', compact('requests', 'pendingCount'));
     }
 
+    /**
+     * Show a single quotation request with full itinerary.
+     */
     public function show(QuotationRequest $quotationRequest)
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -53,6 +61,9 @@ class QuotationRequestController extends Controller
         return view('provider.quotation-requests.show', compact('quotationRequest'));
     }
 
+    /**
+     * Generate AI quotation from the itinerary data.
+     */
     public function generateQuotation(Request $request, QuotationRequest $quotationRequest)
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -65,7 +76,7 @@ class QuotationRequestController extends Controller
 
             $prompt = $this->buildQuotationPrompt($quotationRequest, $provider);
 
-            // ✅ Generate with extraction disabled, higher max_tokens (6000)
+            // Generate with extraction disabled, higher max_tokens (6000)
             $response = $this->llm->generateItinerary($prompt, 'en', 'qwen/qwen3.6-27b', false, 6000);
 
             $rawContent = is_array($response) && isset($response['content']) ? $response['content'] : (string) $response;
@@ -109,20 +120,22 @@ class QuotationRequestController extends Controller
         }
     }
 
+    /**
+     * Build the AI prompt using itinerary data.
+     */
     private function buildQuotationPrompt(QuotationRequest $request, $provider): string
     {
         $itinerary = $request->itinerary_data;
         $input = $request->traveler_input;
 
-        // 🔥 Extract group size from message or traveler input
-        $groupSize = 1; // Default
+        // Extract group size from message
+        $groupSize = 1;
         if ($request->message) {
             preg_match('/(\d+)\s*pax/i', $request->message, $matches);
             if (!empty($matches[1])) {
                 $groupSize = (int) $matches[1];
             }
         }
-        // Alternative: if message has "pax" in different format
         if ($groupSize === 1 && $request->message) {
             preg_match('/(\d+)\s*people/i', $request->message, $matches);
             if (!empty($matches[1])) {
@@ -199,6 +212,9 @@ The JSON structure should be:
 Ensure the grand_total is the sum of all item totals.**";
     }
 
+    /**
+     * Format AI response into readable quotation text.
+     */
     private function formatQuotationText(array $quotationData, $provider, $quotationRequest): string
     {
         $travelerName = $quotationRequest->traveler_name ?? $quotationRequest->traveler->name ?? 'Traveler';
@@ -242,7 +258,6 @@ Ensure the grand_total is the sum of all item totals.**";
             $items = $p['items'] ?? [];
             
             foreach ($items as $item) {
-                // ✅ Support both 'total' and 'per_person' formats
                 $amount = $item['total'] ?? 0;
                 if ($amount == 0 && isset($item['per_person'])) {
                     $amount = $item['per_person'];
@@ -264,7 +279,6 @@ Ensure the grand_total is the sum of all item totals.**";
                 );
             }
             
-            // ✅ If grand_total is missing or 0, calculate from items
             $grandTotal = $p['grand_total'] ?? $p['total'] ?? 0;
             if ($grandTotal == 0 && $total > 0) {
                 $grandTotal = $total;
@@ -293,6 +307,9 @@ Ensure the grand_total is the sum of all item totals.**";
         return $content;
     }
 
+    /**
+     * Extract JSON from LLM response (handles markdown, extra text, etc.)
+     */
     private function extractQuotationJson($content): array
     {
         if (is_array($content)) {
@@ -306,11 +323,11 @@ Ensure the grand_total is the sum of all item totals.**";
             throw new \Exception('Invalid content type for JSON extraction.');
         }
 
-        // 1. Remove <think> tags and any other unwanted text
+        // Remove <think> tags and any other unwanted text
         $cleaned = preg_replace('/<think>.*?<\/think>/s', '', $content);
         $cleaned = preg_replace('/<[^>]+>/', '', $cleaned);
 
-        // 2. Find JSON from the first { to the last }
+        // Find JSON from the first { to the last }
         if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
             $json = $matches[0];
             // Fix potential unclosed braces
@@ -325,7 +342,7 @@ Ensure the grand_total is the sum of all item totals.**";
             }
         }
 
-        // 3. Try to decode the whole cleaned content
+        // Try to decode the whole cleaned content
         $decoded = json_decode($cleaned, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $decoded;
@@ -333,5 +350,36 @@ Ensure the grand_total is the sum of all item totals.**";
 
         Log::error('Failed to extract JSON from quotation response', ['content' => $content]);
         throw new \Exception('Failed to extract JSON from AI response. Please adjust your prompt.');
+    }
+
+    /**
+     * Send the quotation email to the traveler.
+     */
+    public function sendQuotationEmail(QuotationRequest $quotationRequest)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        if (!$provider || $quotationRequest->provider_id !== $provider->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if ($quotationRequest->status !== 'completed' || empty($quotationRequest->quotation_text)) {
+            return back()->with('error', 'Quotation not generated yet. Please generate quotation first.');
+        }
+
+        // Determine email address
+        $email = $quotationRequest->traveler_email ?? $quotationRequest->traveler->email ?? null;
+
+        if (!$email) {
+            return back()->with('error', 'No traveler email address found.');
+        }
+
+        try {
+            // Send email using Mailable
+            Mail::to($email)->send(new QuotationMail($quotationRequest));
+            return back()->with('success', 'Quotation email sent successfully to traveler.');
+        } catch (\Exception $e) {
+            Log::error('Failed to send quotation email: ' . $e->getMessage());
+            return back()->with('error', 'Failed to send email. Please try again.');
+        }
     }
 }

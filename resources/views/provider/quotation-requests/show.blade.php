@@ -1,3 +1,15 @@
+@if(session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+        {{ session('error') }}
+    </div>
+@endif
+
 @extends('layouts.provider')
 
 @section('title', 'Quotation Request #' . $quotationRequest->id)
@@ -36,7 +48,7 @@
         @endif
     </div>
 
-    {{-- Traveler Contact Information (NEW) --}}
+    {{-- Traveler Contact Information --}}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <h3 class="text-lg font-bold mb-4">📞 Traveler Contact Information</h3>
         <div class="grid grid-cols-3 gap-4">
@@ -104,8 +116,26 @@
         @endif
     </div>
 
-    {{-- Generate Quotation --}}
-    @if($quotationRequest->status !== 'completed')
+    {{-- Quotation Section: Generate OR Show + Send Email --}}
+    @if($quotationRequest->status === 'completed')
+        {{-- Quotation Already Generated --}}
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-bold mb-4 text-green-600">✅ Quotation Generated</h3>
+            <div class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono">
+                {{ $quotationRequest->quotation_text ?? 'Quotation not available.' }}
+            </div>
+            {{-- Send Email Button --}}
+            <div class="mt-4">
+                <form action="{{ route('provider.quotation-requests.send-email', $quotationRequest) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <i class="fas fa-envelope"></i> Send Email to Traveler
+                    </button>
+                </form>
+            </div>
+        </div>
+    @else
+        {{-- Generate Quotation Form --}}
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-bold mb-4">Generate Quotation</h3>
             <p class="text-sm text-gray-500 mb-4">AI will use the itinerary above to generate a professional quotation.</p>
@@ -128,15 +158,9 @@
                 <p class="mt-2 text-gray-500">Generating quotation... Please wait.</p>
             </div>
         </div>
-    @else
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-bold mb-4 text-green-600">✅ Quotation Generated</h3>
-            <div class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono">
-                {{ $quotationRequest->quotation_text ?? 'Quotation not available.' }}
-            </div>
-        </div>
     @endif
 
+    {{-- Back Button --}}
     <div class="mt-4">
         <a href="{{ route('provider.quotation-requests.index') }}" class="text-blue-600 hover:underline">← Back to Requests</a>
     </div>

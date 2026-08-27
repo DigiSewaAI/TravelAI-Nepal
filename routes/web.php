@@ -145,6 +145,8 @@ Route::prefix('quotation-requests')->name('quotation-requests.')->group(function
     Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
     Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
     Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
+    // Quotation Requests - Send Email
+Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
 });
 });
 // Provider profile page (old, but keep for now)
