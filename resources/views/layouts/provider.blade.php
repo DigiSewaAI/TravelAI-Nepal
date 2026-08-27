@@ -83,7 +83,22 @@
     <span>AI Quotation</span>
 </a>
 
-                <!-- Bookings -->
+<!-- Quotation Requests -->
+<a href="{{ route('provider.quotation-requests.index') }}" 
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation-requests.*') ? 'active' : '' }}">
+    <i class="fas fa-inbox w-5"></i>
+    <span>Quotation Requests</span>
+    @php
+        $pendingCount = 0;
+        if (Auth::check() && Auth::user()->getCurrentProvider()) {
+            $pendingCount = \App\Models\QuotationRequest::where('provider_id', Auth::user()->getCurrentProvider()->id)
+                            ->where('status', 'pending')->count();
+        }
+    @endphp
+    @if($pendingCount > 0)
+        <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
+    @endif
+</a>                <!-- Bookings -->
                 <a href="{{ route('provider.bookings.index') }}" 
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check w-5"></i>

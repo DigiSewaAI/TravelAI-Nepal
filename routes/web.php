@@ -139,6 +139,13 @@ Route::prefix('provider')->name('provider.')->group(function () {
     // AI Quotation
 Route::get('/quotation/create', [App\Http\Controllers\Provider\QuotationController::class, 'create'])->name('quotation.create');
 Route::post('/quotation/generate', [App\Http\Controllers\Provider\QuotationController::class, 'generate'])->name('quotation.generate');
+
+// Quotation Requests (New)
+Route::prefix('quotation-requests')->name('quotation-requests.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
+    Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
+    Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
+});
 });
 // Provider profile page (old, but keep for now)
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');

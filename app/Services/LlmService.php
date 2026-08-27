@@ -40,9 +40,18 @@ class LlmService
         }, $data['data'] ?? []);
     }
 
-    public function generateItinerary(string $prompt, string $locale = 'en', ?string $model = null): array
+    /**
+     * Generate itinerary or any AI response.
+     *
+     * @param string $prompt
+     * @param string $locale
+     * @param string|null $model
+     * @param bool $extract  If true, extract JSON automatically; if false, return raw content array.
+     * @param int $maxTokens Max tokens for the response.
+     * @return array
+     */
+    public function generateItinerary(string $prompt, string $locale = 'en', ?string $model = null, bool $extract = true, int $maxTokens = 3000): array
     {
-        // ✅ LOG: locale र prompt को पहिलो 500 characters
         Log::info('🔍 [LlmService] generateItinerary called', [
             'locale' => $locale,
             'prompt_preview' => substr($prompt, 0, 500),
@@ -56,13 +65,12 @@ class LlmService
             try {
                 $modelToUse = $model ?? $this->model;
 
-Log::info('Groq API call initiated', [
-    'model' => $modelToUse,
+                Log::info('Groq API call initiated', [
+                    'model' => $modelToUse,
                     'attempt' => $attempt + 1,
                     'prompt_length' => strlen($prompt),
                 ]);
 
-                // ✅ LOG: API call भन्दा ठिक अघि system + user messages
                 Log::info('🔍 [LlmService] Sending to Groq', [
                     'model' => $modelToUse,
                     'system_prompt' => $this->getSystemPrompt($locale),
@@ -85,19 +93,24 @@ Log::info('Groq API call initiated', [
                         ['role' => 'user', 'content' => $prompt],
                     ],
                     'temperature' => 0.2,
-                    'max_tokens' => 3000,
+                    'max_tokens' => $maxTokens,
                 ]);
 
                 if ($response->successful()) {
                     $data = $response->json();
                     $content = $data['choices'][0]['message']['content'] ?? '';
 
-                    // ✅ LOG: raw response (पूरै)
                     Log::info('🔍 [LlmService] Raw Groq Response', [
-                        'raw_content' => $content, // ✅ पूरै content
+                        'raw_content' => $content,
                         'content_length' => strlen($content),
                     ]);
 
+                    // ✅ If extraction is disabled, return raw content as array
+                    if (!$extract) {
+                        return ['content' => $content, 'raw' => true];
+                    }
+
+                    // ✅ Default: extract JSON
                     return $this->extractJson($content);
                 }
 
@@ -194,7 +207,7 @@ Log::info('Groq API call initiated', [
 
     protected function getSystemPrompt(string $locale): string
     {
-        $basePrompt = 'You are a JSON generator. Respond with a valid JSON object only. No other text.';
+        $basePrompt = 'You are a JSON generator. Respond with a valid JSON object only. No other text. Do NOT include any thinking process, explanations, or markdown. Your entire response must be a single valid JSON object.';
         
         $languageInstruction = match($locale) {
             'hi' => ' Generate ALL day titles, descriptions, item names, and any text content EXCLUSIVELY in Hindi language (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. All other text MUST be in Hindi. Do NOT use English for descriptions or item names.',

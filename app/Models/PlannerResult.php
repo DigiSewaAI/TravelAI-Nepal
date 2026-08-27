@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PlannerResult extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'request_id', 'raw_ai_response', 'model', 'model_version',
-        'prompt_version', 'route_snapshot', 'validation_status',
-        'fallback_used', 'validation_errors'
+        'request_id',
+        'raw_ai_response',
+        'model',
+        'model_version',
+        'prompt_version',
+        'route_snapshot',
+        'validation_status',
+        'fallback_used',
+        'validation_errors',
     ];
 
     protected $casts = [
@@ -19,12 +28,21 @@ class PlannerResult extends Model
         'fallback_used' => 'boolean',
     ];
 
-    public function request()
+    // =====================================================
+    // RELATIONSHIPS
+    // =====================================================
+
+    /**
+     * Get the planner request that owns this result.
+     */
+    public function plannerRequest()
     {
-        return $this->belongsTo(PlannerRequest::class);
+        return $this->belongsTo(PlannerRequest::class, 'request_id');
     }
 
-    // ✅ यहाँ result_id स्पष्ट रूपमा दिइयो
+    /**
+     * Get the itinerary days for this result.
+     */
     public function days()
     {
         return $this->hasMany(ItineraryDay::class, 'result_id');

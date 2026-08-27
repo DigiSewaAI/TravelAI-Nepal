@@ -25,7 +25,7 @@ class PlannerController extends Controller
         Log::info('🔍 [PlannerController] Locale from session', [
             'locale' => $locale,
             'session_locale' => session('locale'),
-            'app_locale' => app()->getLocale(), // तुलनाको लागि मात्र
+            'app_locale' => app()->getLocale(),
             'request_locale' => $request->input('locale'),
         ]);
 
@@ -49,6 +49,7 @@ class PlannerController extends Controller
                     'total_cost' => $result['total_cost'],
                     'breakdown' => $result['breakdown'] ?? [],
                     'currency' => 'NPR',
+                    'planner_result_id' => $result['result']->id ?? null, // ✅ NEW – Itinerary ID for quotation requests
                 ],
             ]);
         } catch (ValidationException $e) {

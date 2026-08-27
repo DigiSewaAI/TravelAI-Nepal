@@ -121,6 +121,54 @@
     </div>
   </div>
 
+    <!-- Quotation Request Modal -->
+  <div id="quotationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+      <h3 class="text-xl font-bold mb-4">Request Quotation</h3>
+      <p class="text-sm text-gray-600 mb-4">Select a provider to send your itinerary for a quotation.</p>
+      <form id="quotationRequestForm">
+        <input type="hidden" name="planner_result_id" id="plannerResultId">
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Select Provider</label>
+          <select name="provider_id" id="providerSelect" class="w-full border rounded-lg px-4 py-2" required>
+            <option value="">Loading providers...</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+    <label class="block font-medium mb-1">Your Full Name *</label>
+    <input type="text" name="traveler_name" id="travelerName" 
+           class="w-full border rounded-lg px-4 py-2" required 
+           placeholder="Enter your full name">
+</div>
+
+<div class="mb-4">
+    <label class="block font-medium mb-1">Your Email *</label>
+    <input type="email" name="traveler_email" id="travelerEmail" 
+           class="w-full border rounded-lg px-4 py-2" required 
+           placeholder="your@email.com">
+</div>
+
+<div class="mb-4">
+    <label class="block font-medium mb-1">Your Phone (optional)</label>
+    <input type="text" name="traveler_phone" id="travelerPhone" 
+           class="w-full border rounded-lg px-4 py-2" 
+           placeholder="+977 98XXXXXXXX">
+</div>
+
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Message (optional)</label>
+          <textarea name="message" id="quotationMessage" rows="3" class="w-full border rounded-lg px-4 py-2" placeholder="Any special requests..."></textarea>
+        </div>
+        <div class="flex gap-3">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex-1">Send Request</button>
+          <button type="button" onclick="closeQuotationModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">Cancel</button>
+        </div>
+      </form>
+      <div id="quotationRequestStatus" class="mt-3 hidden text-center"></div>
+    </div>
+  </div>
+
   <!-- Stats Banner -->
 <div class="bg-gray-50 border-y border-gray-100 py-6">
     <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-around gap-6 text-center">
@@ -479,6 +527,14 @@
         html += `</div>`;
       });
 
+            // ➕ Add "Request Quotation" button after itinerary
+      html += `<div class="mt-6 border-t pt-4 text-center">
+                <button onclick="openQuotationModal()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto">
+                    <i class="fas fa-paper-plane"></i> Request Quotation from Providers
+                </button>
+              </div>`;
+
       return html;
     }
 
@@ -521,6 +577,8 @@
             data.data.currency || 'NPR'
           );
           document.getElementById('result').classList.remove('hidden');
+                    // Store planner_result_id for quotation
+          currentPlannerResultId = data.data.planner_result_id || null;
         } else {
           alert(data.message || '{{ __('messages.something_wrong') }}');
         }
@@ -553,6 +611,96 @@
         alert('{{ __('messages.copy_failed') }}');
       });
     }
+        // ---------- Quotation Request Functions ----------
+    let currentPlannerResultId = null;
+
+    function openQuotationModal() {
+        if (!currentPlannerResultId) {
+            alert('Please generate an itinerary first.');
+            return;
+        }
+        document.getElementById('plannerResultId').value = currentPlannerResultId;
+        // Auto-fill user data if logged in
+const userName = "{{ Auth::check() ? Auth::user()->name : '' }}";
+const userEmail = "{{ Auth::check() ? Auth::user()->email : '' }}";
+
+if (userName) document.getElementById('travelerName').value = userName;
+if (userEmail) document.getElementById('travelerEmail').value = userEmail;
+        loadProviders();
+        document.getElementById('quotationModal').classList.remove('hidden');
+    }
+
+    function closeQuotationModal() {
+        document.getElementById('quotationModal').classList.add('hidden');
+        // Reset status message
+        document.getElementById('quotationRequestStatus').classList.add('hidden');
+        document.getElementById('quotationRequestStatus').innerHTML = '';
+        document.getElementById('quotationRequestForm').reset();
+    }
+
+    function loadProviders() {
+        const select = document.getElementById('providerSelect');
+        select.innerHTML = '<option value="">Loading...</option>';
+        fetch('/api/providers/list')
+            .then(res => res.json())
+            .then(data => {
+                select.innerHTML = '';
+                if (data.providers && data.providers.length) {
+                    data.providers.forEach(p => {
+                        select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="">No providers available</option>';
+                }
+            })
+            .catch(() => {
+                select.innerHTML = '<option value="">Error loading providers</option>';
+            });
+    }
+
+    document.getElementById('quotationRequestForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = this.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Sending...';
+        btn.disabled = true;
+
+        try {
+            const payload = {
+    planner_result_id: document.getElementById('plannerResultId').value,
+    provider_id: document.getElementById('providerSelect').value,
+    traveler_name: document.getElementById('travelerName').value,
+    traveler_email: document.getElementById('travelerEmail').value,
+    traveler_phone: document.getElementById('travelerPhone').value,
+    message: document.getElementById('quotationMessage').value,
+};
+
+            const response = await fetch('/api/quotation-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            const statusDiv = document.getElementById('quotationRequestStatus');
+            if (data.success) {
+                statusDiv.innerHTML = '<p class="text-green-600">✅ Request sent successfully! The provider will get back to you.</p>';
+                statusDiv.classList.remove('hidden');
+                setTimeout(() => { closeQuotationModal(); }, 3000);
+            } else {
+                alert(data.message || 'Failed to send request.');
+            }
+        } catch (error) {
+            alert('Server error. Please try again.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+
   </script>
 
   <!-- रिसेन्ट चेक-इन जेएस (Anonymous सहित) -->
