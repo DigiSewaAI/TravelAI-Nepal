@@ -331,6 +331,7 @@
       <h2 class="text-3xl md:text-5xl font-extrabold">{{ __('messages.ready_to_transform') }}</h2>
       <p class="text-gray-300 text-lg mt-4 max-w-2xl mx-auto">{{ __('messages.waitlist_text') }}</p>
       <form class="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" action="#">
+        @csrf
         <input type="email" required placeholder="{{ __('messages.email_placeholder') }}" class="flex-1 px-5 py-3 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 border-0">
         <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"><i class="fas fa-rocket"></i> {{ __('messages.reserve_early_spot') }}</button>
       </form>
@@ -423,11 +424,42 @@
       `).join('');
     }
     function initForm() {
-      document.querySelector('#early-access form')?.addEventListener('submit', (e) => {
+    document.querySelector('#early-access form')?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        alert('{{ __('messages.waitlist_success_alert') }}');
-      });
-    }
+        const form = this;
+        const email = form.querySelector('input[type="email"]').value;
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = 'Submitting...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/waitlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify({ email: email })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                form.reset();
+            } else {
+                alert(data.message || 'Something went wrong. Please try again.');
+            }
+        } catch (error) {
+            alert('Server error. Please try again.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+}
     function initSmoothScroll() {
       document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) {
         const target = document.querySelector(this.getAttribute('href'));

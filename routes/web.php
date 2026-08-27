@@ -299,3 +299,5 @@ Route::get('/test-lang', function () {
     app()->setLocale('hi');
     return __('cost.daily_food_budget');
 });
+
+Route::post('/waitlist', [App\Http\Controllers\WaitlistController::class, 'store'])->name('waitlist.store');
