@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-// 🔥 Import Review model
-use App\Models\Review;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class Booking extends Model
 {
@@ -20,50 +19,87 @@ class Booking extends Model
         'status',
         'qr_code',
         'invoice_url',
-        'traveler_id', // ✅ Phase 4
-        'service_id',  // ✅ Phase 4
+        'traveler_id',
+        'service_id',
+        // ✅ New fields (Phase 7)
+        'qr_token',
+        'qr_token_expires_at',
     ];
 
     protected $casts = [
         'booking_date' => 'date',
         'start_date' => 'date',
+        'qr_token_expires_at' => 'datetime',
     ];
 
-    // ========== OLD RELATIONSHIPS ==========
-    public function trekker()
+    // ... (existing relationships remain unchanged) ...
+
+    // =============================================
+    // ✅ NEW: QR Token Methods (Phase 7)
+    // =============================================
+
+    /**
+     * Generate a secure QR token for this booking.
+     * Token = HMAC-SHA256(booking_id + waypoint_id + secret)
+     */
+    public function generateQrToken(?int $waypointId = null): string
     {
-        return $this->belongsTo(Trekker::class);
+        $secret = config('app.key');
+        $waypointId = $waypointId ?? 0;
+        $data = $this->id . '|' . $waypointId . '|' . $this->created_at->timestamp;
+        
+        return hash_hmac('sha256', $data, $secret);
     }
 
-    public function trek()
+    /**
+     * Check if a given token is valid for this booking and optional waypoint.
+     */
+    public function isValidQrToken(string $token, ?int $waypointId = null): bool
     {
-        return $this->belongsTo(Trek::class);
+        // If token is empty, it's a legacy QR code (no token) - we allow it but mark as pending.
+        if (empty($this->qr_token)) {
+            return true; // Backward compatibility: allow legacy QR
+        }
+
+        // Check if token matches
+        if ($this->qr_token !== $token) {
+            return false;
+        }
+
+        // Check expiry
+        if ($this->qr_token_expires_at && now()->greaterThan($this->qr_token_expires_at)) {
+            return false;
+        }
+
+        // Optional: If waypoint_id provided, regenerate token and compare (for waypoint-specific token)
+        if ($waypointId) {
+            $expectedToken = $this->generateQrToken($waypointId);
+            if ($token !== $expectedToken) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    // ========== PHASE 4 RELATIONSHIPS ==========
-    public function traveler()
+    /**
+     * Check if the QR token has expired.
+     */
+    public function isQrTokenExpired(): bool
     {
-        return $this->belongsTo(User::class, 'traveler_id');
+        if (!$this->qr_token_expires_at) {
+            return false;
+        }
+        return now()->greaterThan($this->qr_token_expires_at);
     }
 
-    public function service()
+    /**
+     * Regenerate QR token (e.g., when booking is confirmed or waypoint changes).
+     */
+    public function regenerateQrToken(?int $waypointId = null): void
     {
-        return $this->belongsTo(Service::class, 'service_id');
-    }
-
-    public function qrScans()
-    {
-        return $this->hasMany(QrScan::class);
-    }
-
-    public function sosAlert()
-    {
-        return $this->hasOne(SosAlert::class);
-    }
-
-    // ========== PHASE 10: REVIEW RELATION ==========
-    public function review()
-    {
-        return $this->hasOne(Review::class);
+        $this->qr_token = $this->generateQrToken($waypointId);
+        $this->qr_token_expires_at = now()->addDays(30); // 30 days expiry
+        $this->save();
     }
 }

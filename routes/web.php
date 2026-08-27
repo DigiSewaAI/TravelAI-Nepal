@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Services\Passport\QrSecurityService;
 
 // ✅ Phase 7 – New Public Controllers
 use App\Http\Controllers\Public\ServiceController;
@@ -34,12 +35,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
 use App\Http\Controllers\SitemapController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
 // ========================
 // 1. PUBLIC PAGES
 // ========================
@@ -55,8 +56,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact'
 Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
-
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 // =============================================
 // 2. PUBLIC MARKETPLACE (Phase 7)
@@ -69,16 +69,18 @@ Route::prefix('explore')->name('public.')->group(function () {
     Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
 });
 
-// =============================================
-// 2.5. PROVIDER DIRECTORY (Phase 12) – बाहिर
-// =============================================
-Route::get('/providers', [App\Http\Controllers\Public\ProviderController::class, 'index'])->name('public.providers.index');
-Route::get('/providers/{provider:slug}', [App\Http\Controllers\Public\ProviderController::class, 'show'])->name('public.providers.show');
-
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');
 
+// =============================================
+// 2.5. PROVIDER DIRECTORY (Phase 12) – बाहिर
+// =============================================
+Route::get('/providers', [ProviderController::class, 'index'])->name('public.providers.index');
+Route::get('/providers/{provider:slug}', [ProviderController::class, 'show'])->name('public.providers.show');
+
+// Provider profile page (old, but keep for now)
+Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
 
 // =======================================
 // 3. AUTH ROUTES (User Guard)
@@ -91,7 +93,34 @@ Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 's
 Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
 
 // =======================================
-// 4. PROVIDER DASHBOARD ROUTES
+// 4. TRAVELER ROUTES (Phase 10 + Passport)
+// =======================================
+Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
+
+    // 🔥 Digital Trek Passport (Phase 4)
+    Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
+    // 🔥 Toggle Privacy (Phase 4)
+    Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
+
+    // Reviews
+    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+
+    // Bookings
+    Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+});
+
+// =======================================
+// 5. PUBLIC PASSPORT (Phase 6) – No auth required
+// =======================================
+Route::get('/passport/{publicId}', [App\Http\Controllers\Public\PassportController::class, 'show'])
+    ->name('public.passport.show');
+
+// =======================================
+// 6. PROVIDER DASHBOARD ROUTES
 // =======================================
 Route::prefix('provider')->name('provider.')->group(function () {
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
@@ -127,33 +156,33 @@ Route::prefix('provider')->name('provider.')->group(function () {
     Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/export', [App\Http\Controllers\Provider\AnalyticsController::class, 'export'])->name('analytics.export');
 
-        Route::get('/checkins', [App\Http\Controllers\Provider\CheckinController::class, 'index'])->name('checkins.index');
+    // Checkins
+    Route::get('/checkins', [App\Http\Controllers\Provider\CheckinController::class, 'index'])->name('checkins.index');
     Route::get('/checkins/{scan}', [App\Http\Controllers\Provider\CheckinController::class, 'show'])->name('checkins.show');
 
-        // Provider Invoices
+    // Invoices
     Route::get('/invoices', [App\Http\Controllers\Provider\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Provider\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Provider\InvoiceController::class, 'download'])->name('invoices.download');
+
+    // Staff
     Route::resource('staff', \App\Http\Controllers\Provider\StaffController::class)->except(['show']);
 
     // AI Quotation
-Route::get('/quotation/create', [App\Http\Controllers\Provider\QuotationController::class, 'create'])->name('quotation.create');
-Route::post('/quotation/generate', [App\Http\Controllers\Provider\QuotationController::class, 'generate'])->name('quotation.generate');
+    Route::get('/quotation/create', [App\Http\Controllers\Provider\QuotationController::class, 'create'])->name('quotation.create');
+    Route::post('/quotation/generate', [App\Http\Controllers\Provider\QuotationController::class, 'generate'])->name('quotation.generate');
 
-// Quotation Requests (New)
-Route::prefix('quotation-requests')->name('quotation-requests.')->group(function () {
-    Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
-    Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
-    Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
-    // Quotation Requests - Send Email
-Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
+    // Quotation Requests
+    Route::prefix('quotation-requests')->name('quotation-requests.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
+        Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
+        Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
+        Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
+    });
 });
-});
-// Provider profile page (old, but keep for now)
-Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
 
 // =======================================
-// 5. ADMIN ROUTES (Super Admin)
+// 7. ADMIN ROUTES (Super Admin)
 // =======================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -213,37 +242,23 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Analytics (Phase 11)
     Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
 
-        // Admin Invoices
+    // Admin Invoices
     Route::get('/invoices', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
     Route::post('/invoices/{invoice}/status', [App\Http\Controllers\Admin\InvoiceController::class, 'updateStatus'])->name('invoices.update-status');
-    
+
     // =======================================
-// ADMIN – Route Management (Phase 5)
-// =======================================
-Route::resource('routes', \App\Http\Controllers\Admin\RouteController::class);
-Route::resource('waypoints', \App\Http\Controllers\Admin\WaypointController::class);
-Route::resource('segments', \App\Http\Controllers\Admin\SegmentController::class);
-Route::resource('route-costs', \App\Http\Controllers\Admin\RouteCostController::class);
-
+    // ADMIN – Route Management (Phase 5)
+    // =======================================
+    Route::resource('routes', \App\Http\Controllers\Admin\RouteController::class);
+    Route::resource('waypoints', \App\Http\Controllers\Admin\WaypointController::class);
+    Route::resource('segments', \App\Http\Controllers\Admin\SegmentController::class);
+    Route::resource('route-costs', \App\Http\Controllers\Admin\RouteCostController::class);
 });
 
 // =======================================
-// 6. TRAVELER ROUTES (Phase 10)
-// =======================================
-Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
-    Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
-    
-    // 🔥 Invoice Download Route (NEW)
-    Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])
-        ->name('bookings.invoice');
-});
-// =======================================
-// 7. WEBHOOK ROUTES
+// 8. WEBHOOK ROUTES
 // =======================================
 Route::post('/webhook/stripe', [WebhookController::class, 'stripe'])->name('webhook.stripe');
 
@@ -253,14 +268,17 @@ Route::get('/agencies', function () {
 });
 
 // =======================================
-// 8. QR CODE & CHECK-IN ROUTES (still needed for both legacy and new bookings)
+// 9. QR CODE & CHECK-IN ROUTES
 // =======================================
 // QR Code image generation
 Route::get('/booking/qr/{booking}', function ($id) {
     $booking = Booking::findOrFail($id);
-    return response(QrCode::size(300)->generate(route('scan.checkin', $booking->id)))
+    $qrSecurityService = app(QrSecurityService::class);
+    $secureUrl = $qrSecurityService->generateSecureQrUrl($booking);
+    return response(QrCode::size(300)->generate($secureUrl))
            ->header('Content-Type', 'image/svg+xml');
 })->name('booking.qr');
+
 
 // QR Check-in Routes
 Route::get('/scan/{booking}', [CheckinController::class, 'show'])->name('scan.checkin');

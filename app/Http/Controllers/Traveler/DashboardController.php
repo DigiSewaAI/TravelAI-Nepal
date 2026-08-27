@@ -45,6 +45,11 @@ class DashboardController extends Controller
         ];
         
         $hasBookings = $totalBookings > 0;
+
+        // ✅ NEW: Check if user has any passport data (scan history)
+        $hasPassport = QrScan::whereHas('booking', function ($q) use ($user) {
+            $q->where('traveler_id', $user->id);
+        })->exists();
         
         $hour = Carbon::now()->hour;
         if ($hour < 12) {
@@ -63,7 +68,8 @@ class DashboardController extends Controller
             'bookingStats',
             'activeTrip',
             'hasBookings',
-            'greeting'
+            'greeting',
+            'hasPassport' // ✅ Add this
         ));
     }
 }

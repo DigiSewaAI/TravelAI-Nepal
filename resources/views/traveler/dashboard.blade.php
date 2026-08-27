@@ -48,6 +48,48 @@
         </div>
     </div>
 
+    {{-- ✅ PASSPORT QUICK ACCESS CARD WITH SHARE TOGGLE --}}
+    <div class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-2xl p-6 mb-6 text-white shadow-xl relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div class="flex items-center gap-4">
+                <div class="text-4xl">🎒</div>
+                <div>
+                    <h3 class="text-xl font-bold">My Digital Trek Passport</h3>
+                    <p class="text-blue-100 text-sm">
+                        {{ Auth::user()->passport_privacy === 'public' ? '🌍 Publicly shared' : '🔒 Private' }}
+                    </p>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 flex-wrap">
+                {{-- Share Toggle --}}
+                <form action="{{ route('traveler.passport.toggle') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 rounded-xl text-sm font-semibold transition-all
+                                {{ Auth::user()->passport_privacy === 'public'
+                                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                    : 'bg-white/20 hover:bg-white/30 text-white' }}">
+                        {{ Auth::user()->passport_privacy === 'public' ? '🔒 Make Private' : '🌍 Share Publicly' }}
+                    </button>
+                </form>
+                <a href="{{ route('traveler.passport') }}"
+                   class="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 group-hover:scale-105 transform duration-200">
+                    View Full Passport →
+                </a>
+            </div>
+        </div>
+        @if(Auth::user()->passport_privacy === 'public')
+            <div class="relative z-10 mt-3 text-sm text-blue-100">
+                🔗 Share: <span class="font-mono text-xs bg-black/20 px-2 py-1 rounded">{{ url('/passport/' . Auth::user()->passport_public_id) }}</span>
+                <button onclick="navigator.clipboard?.writeText('{{ url('/passport/' . Auth::user()->passport_public_id) }}')"
+                        class="ml-2 text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition">
+                    📋 Copy
+                </button>
+            </div>
+        @endif
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- ========== LEFT COLUMN: Active Trip + Bookings ========== --}}
@@ -230,20 +272,6 @@
                         <a href="{{ route('home') }}#ai-planner" class="inline-block mt-4 bg-white text-blue-600 hover:bg-gray-100 px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-md hover:shadow-lg">
                             {{ __('messages.traveler_create_ai_itinerary') }} <i class="fas fa-arrow-right ml-2"></i>
                         </a>
-                    </div>
-                </div>
-            </div>
-
-            {{-- 🔥 Digital Trek Passport (Premium Coming Soon) --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
-                <div class="flex items-start gap-3">
-                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-passport text-blue-500 text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_digital_passport_title') }}</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_digital_passport_desc') }}</p>
-                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">{{ __('messages.traveler_coming_2026') }}</span>
                     </div>
                 </div>
             </div>

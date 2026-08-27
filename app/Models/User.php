@@ -23,6 +23,9 @@ class User extends Authenticatable
         'phone',
         'avatar',
         'provider_id', // 👈 Staff/Provider Owner को लागि
+        // ✅ New Fields (Phase 1)
+        'passport_public_id',
+        'passport_privacy',
     ];
 
     protected $hidden = [
@@ -94,6 +97,20 @@ class User extends Authenticatable
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    // =====================================================
+    // ✅ NEW RELATIONSHIPS (Phase 1)
+    // =====================================================
+
+    /**
+     * Get the achievements earned by this user.
+     */
+    public function achievements()
+    {
+        return $this->belongsToMany(Achievement::class, 'user_achievements')
+                    ->withPivot('earned_at', 'metadata')
+                    ->withTimestamps();
     }
 
     // =====================================================
@@ -214,12 +231,13 @@ class User extends Authenticatable
             default => 'User',
         };
     }
+
     /**
- * Get the provider owned by this user (for provider_owner role).
- * This is an alias for the provider() relationship.
- */
-public function ownProvider()
-{
-    return $this->provider;
-}
+     * Get the provider owned by this user (for provider_owner role).
+     * This is an alias for the provider() relationship.
+     */
+    public function ownProvider()
+    {
+        return $this->provider;
+    }
 }
