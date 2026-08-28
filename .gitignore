@@ -24,3 +24,4 @@ Homestead.yaml
 Thumbs.db
 "storage/framework/views/*.php" 
 ".~lock.*.txt#" 
+"storage/framework/views/" 
