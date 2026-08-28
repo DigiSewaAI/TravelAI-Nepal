@@ -45,6 +45,7 @@ class DashboardController extends Controller
         ];
         
         $hasBookings = $totalBookings > 0;
+        $hasReplay = Booking::where('traveler_id', $user->id)->exists();
 
         // ✅ NEW: Check if user has any passport data (scan history)
         $hasPassport = QrScan::whereHas('booking', function ($q) use ($user) {
@@ -69,7 +70,8 @@ class DashboardController extends Controller
             'activeTrip',
             'hasBookings',
             'greeting',
-            'hasPassport' // ✅ Add this
+            'hasPassport',
+            'hasReplay'
         ));
     }
 }

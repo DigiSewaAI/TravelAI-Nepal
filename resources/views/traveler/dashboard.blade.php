@@ -277,6 +277,23 @@
                 </div>
             </div>
 
+            {{-- 🎬 My Journey Replay (Always Visible) --}}
+<div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition group">
+    <div class="flex items-start gap-3">
+        <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-film text-2xl"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-lg">🎬 My Journey Replay</h4>
+            <p class="text-sm text-purple-100 mt-0.5">Turn your TravelAI Nepal experiences into a beautiful travel memory.</p>
+            <a href="{{ route('traveler.journey-replay') }}" 
+               class="inline-block mt-2 bg-white text-purple-600 hover:bg-gray-100 px-4 py-1.5 rounded-lg text-sm font-semibold transition shadow group-hover:scale-105 transform duration-200">
+                Relive Your Journey →
+            </a>
+        </div>
+    </div>
+</div>
+
             {{-- 🔥 Safety Center (Premium Coming Soon) --}}
             <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
                 <div class="flex items-start gap-3">

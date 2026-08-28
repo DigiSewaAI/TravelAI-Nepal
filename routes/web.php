@@ -111,6 +111,9 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
     // Bookings
     Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+
+    Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])
+    ->name('journey-replay');  // ✅ यो line थप्नुहोस्
 });
 
 // =======================================
