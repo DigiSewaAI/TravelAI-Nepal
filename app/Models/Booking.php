@@ -21,7 +21,6 @@ class Booking extends Model
         'invoice_url',
         'traveler_id',
         'service_id',
-        // ✅ New fields (Phase 7)
         'qr_token',
         'qr_token_expires_at',
     ];
@@ -32,16 +31,34 @@ class Booking extends Model
         'qr_token_expires_at' => 'datetime',
     ];
 
-    // ... (existing relationships remain unchanged) ...
-
     // =============================================
-    // ✅ NEW: QR Token Methods (Phase 7)
+    // RELATIONSHIPS
     // =============================================
 
-    /**
-     * Generate a secure QR token for this booking.
-     * Token = HMAC-SHA256(booking_id + waypoint_id + secret)
-     */
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id');
+    }
+
+    public function traveler()
+    {
+        return $this->belongsTo(User::class, 'traveler_id');
+    }
+
+    public function qrScans()
+    {
+        return $this->hasMany(QrScan::class);
+    }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    // =============================================
+    // QR TOKEN METHODS (Phase 7)
+    // =============================================
+
     public function generateQrToken(?int $waypointId = null): string
     {
         $secret = config('app.key');
@@ -51,27 +68,20 @@ class Booking extends Model
         return hash_hmac('sha256', $data, $secret);
     }
 
-    /**
-     * Check if a given token is valid for this booking and optional waypoint.
-     */
     public function isValidQrToken(string $token, ?int $waypointId = null): bool
     {
-        // If token is empty, it's a legacy QR code (no token) - we allow it but mark as pending.
         if (empty($this->qr_token)) {
-            return true; // Backward compatibility: allow legacy QR
+            return true;
         }
 
-        // Check if token matches
         if ($this->qr_token !== $token) {
             return false;
         }
 
-        // Check expiry
         if ($this->qr_token_expires_at && now()->greaterThan($this->qr_token_expires_at)) {
             return false;
         }
 
-        // Optional: If waypoint_id provided, regenerate token and compare (for waypoint-specific token)
         if ($waypointId) {
             $expectedToken = $this->generateQrToken($waypointId);
             if ($token !== $expectedToken) {
@@ -82,9 +92,6 @@ class Booking extends Model
         return true;
     }
 
-    /**
-     * Check if the QR token has expired.
-     */
     public function isQrTokenExpired(): bool
     {
         if (!$this->qr_token_expires_at) {
@@ -93,13 +100,10 @@ class Booking extends Model
         return now()->greaterThan($this->qr_token_expires_at);
     }
 
-    /**
-     * Regenerate QR token (e.g., when booking is confirmed or waypoint changes).
-     */
     public function regenerateQrToken(?int $waypointId = null): void
     {
         $this->qr_token = $this->generateQrToken($waypointId);
-        $this->qr_token_expires_at = now()->addDays(30); // 30 days expiry
+        $this->qr_token_expires_at = now()->addDays(30);
         $this->save();
     }
 }

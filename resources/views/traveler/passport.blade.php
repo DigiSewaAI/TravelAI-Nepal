@@ -1,49 +1,47 @@
 @extends('layouts.public')
 
-@section('title', 'My Digital Trek Passport - TravelAI Nepal')
+@section('title', __('messages.passport_title') . ' - TravelAI Nepal')
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl">
 
     {{-- ==========================================
-        SECTION 1: PASSPORT HEADER (Glassmorphism)
+        SECTION 1: PASSPORT HEADER
         ========================================== --}}
     <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-8 mb-8 text-white shadow-2xl relative overflow-hidden">
-        {{-- Background Blob Decorations --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-400 opacity-10 rounded-full blur-3xl -ml-10 -mb-10"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
             <div class="flex items-center space-x-4">
-                {{-- Avatar --}}
                 <div class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/50 flex items-center justify-center text-3xl font-bold shadow-lg">
                     {{ substr($user->name, 0, 1) }}
                 </div>
                 <div>
-                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">🎒 Digital Trek Passport</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ __('messages.passport_header_title') }}</h1>
                     <p class="text-blue-100 text-lg">{{ $user->name }}</p>
                     <div class="flex items-center gap-3 mt-2 flex-wrap">
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                            🏅 Level {{ $level }}
+                            🏅 Level {{ $level ?? 0 }}
                         </span>
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                            ⭐ {{ $xp }} XP
+                            ⭐ {{ $xp ?? 0 }} XP
                         </span>
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                            📅 Member since {{ $user->created_at->format('M Y') }}
+                            📅 {{ __('messages.passport_member_since') }} {{ $user->created_at->format('M Y') }}
                         </span>
                     </div>
                 </div>
             </div>
             <div class="mt-4 md:mt-0 text-right">
-                <span class="text-sm text-blue-200 block">Passport ID</span>
+                <span class="text-sm text-blue-200 block">{{ __('messages.passport_public_id_label') }}</span>
                 <span class="font-mono text-xs bg-black/20 px-3 py-1 rounded-lg backdrop-blur-sm">
                     {{ $user->passport_public_id ? substr($user->passport_public_id, 0, 8) . '...' : 'Not Set' }}
                 </span>
                 @if($user->passport_privacy === 'public')
-                    <span class="ml-2 text-xs bg-green-500/30 px-2 py-0.5 rounded-full border border-green-400">🌍 Public</span>
+                    <span class="ml-2 text-xs bg-green-500/30 px-2 py-0.5 rounded-full border border-green-400">{{ __('messages.passport_privacy_public') }}</span>
                 @else
-                    <span class="ml-2 text-xs bg-gray-500/30 px-2 py-0.5 rounded-full border border-gray-400">🔒 Private</span>
+                    <span class="ml-2 text-xs bg-gray-500/30 px-2 py-0.5 rounded-full border border-gray-400">{{ __('messages.passport_privacy_private') }}</span>
                 @endif
             </div>
         </div>
@@ -55,19 +53,19 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div class="text-3xl font-extrabold text-blue-600">{{ $passportData['statistics']['total_treks'] ?? 0 }}</div>
-            <div class="text-sm text-gray-500 mt-1">Total Treks</div>
+            <div class="text-sm text-gray-500 mt-1">{{ __('messages.passport_stats_total_treks') }}</div>
         </div>
         <div class="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div class="text-3xl font-extrabold text-green-600">{{ $passportData['statistics']['total_checkins'] ?? 0 }}</div>
-            <div class="text-sm text-gray-500 mt-1">Check-ins</div>
+            <div class="text-sm text-gray-500 mt-1">{{ __('messages.passport_stats_checkins') }}</div>
         </div>
         <div class="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div class="text-3xl font-extrabold text-purple-600">{{ $passportData['statistics']['unique_waypoints'] ?? 0 }}</div>
-            <div class="text-sm text-gray-500 mt-1">Unique Places</div>
+            <div class="text-sm text-gray-500 mt-1">{{ __('messages.passport_stats_unique_places') }}</div>
         </div>
         <div class="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div class="text-3xl font-extrabold text-orange-600">{{ $passportData['statistics']['highest_altitude'] ?? 0 }}m</div>
-            <div class="text-sm text-gray-500 mt-1">Highest Altitude</div>
+            <div class="text-sm text-gray-500 mt-1">{{ __('messages.passport_stats_highest_altitude') }}</div>
         </div>
     </div>
 
@@ -79,18 +77,18 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <span class="animate-pulse text-green-500">●</span> Active Trek
+                        <span class="animate-pulse text-green-500">●</span> {{ __('messages.passport_active_trek') }}
                     </h2>
                     <h3 class="text-2xl font-bold text-gray-900">{{ $passportData['active_journey']['name'] }}</h3>
                     <p class="text-gray-600 text-sm">
-                        Started: {{ $passportData['active_journey']['start_date']?->format('M d, Y') ?? 'N/A' }}
-                        • {{ $passportData['active_journey']['checkins'] }} check-ins
-                        • {{ $passportData['active_journey']['unique_waypoints'] }} unique locations
+                        {{ __('messages.passport_member_since') }}: {{ $passportData['active_journey']['start_date']?->format('M d, Y') ?? 'N/A' }}
+                        • {{ $passportData['active_journey']['checkins'] }} {{ __('messages.passport_stats_checkins') }}
+                        • {{ $passportData['active_journey']['unique_waypoints'] }} {{ __('messages.passport_stats_unique_places') }}
                     </p>
                 </div>
                 <div class="mt-4 md:mt-0 w-full md:w-64">
                     <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Progress</span>
+                        <span>{{ __('messages.passport_active_progress') }}</span>
                         <span>{{ round($passportData['active_journey']['progress'] ?? 0) }}%</span>
                     </div>
                     <div class="w-full h-3 bg-white rounded-full overflow-hidden shadow-inner">
@@ -100,7 +98,7 @@
                     </div>
                     @if($passportData['active_journey']['last_checkin'])
                         <p class="text-xs text-gray-500 mt-2">
-                            📍 Last Check-in: {{ $passportData['active_journey']['last_checkin']->checkpoint_name }}
+                            📍 {{ __('messages.passport_active_last_checkin') }}: {{ $passportData['active_journey']['last_checkin']->checkpoint_name }}
                             ({{ $passportData['active_journey']['last_checkin']->scanned_at->diffForHumans() }})
                         </p>
                     @endif
@@ -109,9 +107,9 @@
         </div>
     @else
         <div class="bg-gray-50 rounded-2xl p-8 mb-8 text-center border-2 border-dashed border-gray-300">
-            <p class="text-gray-500 text-lg">🚀 No active trek right now.</p>
+            <p class="text-gray-500 text-lg">{{ __('messages.passport_no_active_trek') }}</p>
             <a href="{{ route('public.services.index') }}" class="inline-block mt-3 text-blue-600 font-semibold hover:underline">
-                Explore new treks →
+                {{ __('messages.passport_no_active_trek_action') }}
             </a>
         </div>
     @endif
@@ -121,8 +119,8 @@
         ========================================== --}}
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
         <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            📮 Passport Stamps
-            <span class="text-sm font-normal text-gray-400">({{ $passportData['stamps']->count() }} collected)</span>
+            {{ __('messages.passport_stamps_title') }}
+            <span class="text-sm font-normal text-gray-400">({{ $passportData['stamps']->count() }} {{ __('messages.passport_stamps_collected') }})</span>
         </h2>
         @if($passportData['stamps']->count() > 0)
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -137,13 +135,13 @@
                             <div class="text-xs text-blue-600 font-medium">{{ number_format($stamp['altitude']) }}m</div>
                         @endif
                         <div class="mt-1 flex justify-center">
-                            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Verified</span>
+                            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{{ __('messages.passport_verified') }}</span>
                         </div>
                     </div>
                 @endforeach
             </div>
         @else
-            <p class="text-gray-500 text-center py-6">No stamps yet. Start your trekking journey to collect your first stamp! 🎒</p>
+            <p class="text-gray-500 text-center py-6">{{ __('messages.passport_stamps_empty') }}</p>
         @endif
     </div>
 
@@ -152,8 +150,8 @@
         ========================================== --}}
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
         <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            🏆 Achievements
-            <span class="text-sm font-normal text-gray-400">({{ $achievements->count() }} unlocked)</span>
+            {{ __('messages.passport_achievements_title') }}
+            <span class="text-sm font-normal text-gray-400">({{ $achievements->count() }} {{ __('messages.passport_achievements_unlocked') }})</span>
         </h2>
         @if($achievements->count() > 0)
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -178,16 +176,16 @@
                 @endforeach
             </div>
         @else
-            <p class="text-gray-500 text-center py-6">Complete treks and check-ins to unlock achievements! 🌟</p>
+            <p class="text-gray-500 text-center py-6">{{ __('messages.passport_achievements_empty') }}</p>
         @endif
     </div>
 
     {{-- ==========================================
-        SECTION 6: TREK HISTORY (Timeline)
+        SECTION 6: TREK HISTORY
         ========================================== --}}
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
         <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            📜 Trek History
+            {{ __('messages.passport_trek_history_title') }}
             <span class="text-sm font-normal text-gray-400">({{ $passportData['journeys']->count() }} treks)</span>
         </h2>
         @if($passportData['journeys']->count() > 0)
@@ -213,7 +211,7 @@
                 @endforeach
             </div>
         @else
-            <p class="text-gray-500 text-center py-6">No trek history found. Start your first adventure! 🌄</p>
+            <p class="text-gray-500 text-center py-6">{{ __('messages.passport_trek_history_empty') }}</p>
         @endif
     </div>
 
@@ -222,15 +220,14 @@
         ========================================== --}}
     <div class="flex justify-between items-center flex-wrap gap-4">
         <a href="{{ route('traveler.dashboard') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
-            ← Back to Dashboard
+            {{ __('messages.passport_back_to_dashboard') }}
         </a>
         <div class="text-xs text-gray-400">
-            Passport v2.1 • Last updated {{ now()->format('M d, Y H:i') }}
+            {{ __('messages.passport_last_updated') }} {{ now()->format('M d, Y H:i') }}
         </div>
     </div>
 </div>
 
-{{-- Optional: Add a little style for animations (if not using Tailwind animations) --}}
 <style>
     .animate-pulse {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;

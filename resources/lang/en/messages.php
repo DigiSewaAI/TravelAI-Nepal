@@ -961,5 +961,51 @@ return [
 'service.private_jeep' => 'Private Jeep',
 // Add any other cost/service names as needed
 'note' => 'Your budget of :amount USD may be insufficient. Consider adjusting style or days.',
+// =============================================
+// PASSPORT KEYS (Phase 8)
+// =============================================
+
+// Passport Page
+'passport_title' => 'My Digital Trek Passport',
+'passport_header_title' => '🎒 Digital Trek Passport',
+'passport_member_since' => 'Member since',
+'passport_public_id_label' => 'Passport ID',
+'passport_privacy_public' => '🌍 Public',
+'passport_privacy_private' => '🔒 Private',
+'passport_stats_total_treks' => 'Total Treks',
+'passport_stats_checkins' => 'Check-ins',
+'passport_stats_unique_places' => 'Unique Places',
+'passport_stats_highest_altitude' => 'Highest Altitude',
+'passport_active_trek' => 'Active Trek',
+'passport_active_progress' => 'Progress',
+'passport_active_last_checkin' => 'Last Check-in',
+'passport_no_active_trek' => '🚀 No active trek right now.',
+'passport_no_active_trek_action' => 'Explore new treks →',
+'passport_stamps_title' => '📮 Passport Stamps',
+'passport_stamps_collected' => 'collected',
+'passport_stamps_empty' => 'No stamps yet. Start your trekking journey to collect your first stamp! 🎒',
+'passport_achievements_title' => '🏆 Achievements',
+'passport_achievements_unlocked' => 'unlocked',
+'passport_achievements_empty' => 'Complete treks and check-ins to unlock achievements! 🌟',
+'passport_trek_history_title' => '📜 Trek History',
+'passport_trek_history_empty' => 'No trek history found. Start your first adventure! 🌄',
+'passport_back_to_dashboard' => '← Back to Dashboard',
+'passport_last_updated' => 'Last updated',
+'passport_verified' => 'Verified',
+
+// Passport Dashboard Card
+'passport_card_title' => 'My Digital Trek Passport',
+'passport_card_public' => '🌍 Publicly shared',
+'passport_card_private' => '🔒 Private',
+'passport_card_share_public' => '🌍 Share Publicly',
+'passport_card_make_private' => '🔒 Make Private',
+'passport_card_view_full' => 'View Full Passport →',
+'passport_card_share_label' => '🔗 Share:',
+'passport_card_copy' => '📋 Copy',
+'passport_card_coming_2026' => 'Coming 2026',
+'passport_card_coming_title' => 'Digital Trek Passport',
+'passport_card_coming_desc' => 'Your digital record for future treks, check-ins and verified journey history.',
+'passport_safety_center_title' => 'Safety Center',
+'passport_safety_center_desc' => 'Safety tools and trek support designed for Nepal\'s mountain routes.',
 
 ];
