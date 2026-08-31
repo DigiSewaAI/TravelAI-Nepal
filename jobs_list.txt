@@ -1,2 +1,0 @@
-C:\laragon\www\TravelAI-Nepal\app\Jobs\ProcessMediaUpload.php
-C:\laragon\www\TravelAI-Nepal\app\Jobs\SendSosNotification.php

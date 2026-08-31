@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasSafetyStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Waypoint extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSafetyStatus;
 
     protected $fillable = [
         'name', 'slug', 'type', 'latitude', 'longitude',
@@ -31,8 +32,9 @@ class Waypoint extends Model
     {
         return $this->hasMany(RouteSegment::class, 'to_waypoint_id');
     }
+
     public function qrScans()
-{
-    return $this->hasMany(QrScan::class);
-}
+    {
+        return $this->hasMany(QrScan::class);
+    }
 }

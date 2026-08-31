@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasSafetyStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Route extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSafetyStatus;
 
     protected $fillable = [
         'name', 'slug', 'description', 'difficulty',

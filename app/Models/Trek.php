@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasSafetyStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Trek extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSafetyStatus;
 
     protected $fillable = [
         'agency_id',

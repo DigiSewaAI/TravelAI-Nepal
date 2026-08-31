@@ -13,7 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // ✅ Register Safety Services as singletons
+        $this->app->singleton(\App\Services\Safety\RiskScoringService::class);
+        $this->app->singleton(\App\Services\Safety\SafetyStatusService::class);
     }
 
     /**

@@ -1,5 +1,0 @@
-C:\laragon\www\TravelAI-Nepal\app\Notifications\BookingStatusUpdated.php
-C:\laragon\www\TravelAI-Nepal\app\Notifications\NewReviewReceived.php
-C:\laragon\www\TravelAI-Nepal\app\Notifications\QuotationReadyNotification.php
-C:\laragon\www\TravelAI-Nepal\app\Notifications\QuotationRequestedNotification.php
-C:\laragon\www\TravelAI-Nepal\app\Notifications\SosSmsNotification.php
