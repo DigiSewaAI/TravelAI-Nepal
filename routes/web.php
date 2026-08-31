@@ -92,6 +92,7 @@ Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logou
 Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
 
+
 // =======================================
 // 4. TRAVELER ROUTES (Phase 10 + Passport)
 // =======================================
@@ -99,9 +100,8 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
 
-    // 🔥 Digital Trek Passport (Phase 4)
+    // Digital Trek Passport
     Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
-    // 🔥 Toggle Privacy (Phase 4)
     Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
 
     // Reviews
@@ -112,8 +112,20 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
     Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
 
-    Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])
-    ->name('journey-replay');  // ✅ यो line थप्नुहोस्
+    // Cinematic Replay
+    Route::get('/cinematic-replay', [App\Http\Controllers\Traveler\CinematicReplayController::class, 'index'])->name('cinematic-replay');
+
+    // Media Upload (✅ यो सही छ)
+Route::post('/checkpoint/upload', [App\Http\Controllers\Traveler\MediaUploadController::class, 'upload'])
+    ->name('checkpoint.upload');
+    // Delete Memory (✅ यो सही छ)
+    Route::delete('/memory/delete', [App\Http\Controllers\Traveler\MediaUploadController::class, 'delete'])->name('memory.delete');
+
+    // Journey Replay
+    Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])->name('journey-replay');
+
+    // ❌ यो अनावश्यक route हटाउनुहोस् (जसले closure मा undefined variables को error दिन्छ)
+    // Route::get('/upload-via-controller', ...)  <-- यो पूरै हटाउनुहोस्
 });
 
 // =======================================

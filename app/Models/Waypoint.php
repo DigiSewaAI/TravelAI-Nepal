@@ -31,4 +31,8 @@ class Waypoint extends Model
     {
         return $this->hasMany(RouteSegment::class, 'to_waypoint_id');
     }
+    public function qrScans()
+{
+    return $this->hasMany(QrScan::class);
+}
 }

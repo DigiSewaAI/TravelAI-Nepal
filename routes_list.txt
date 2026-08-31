@@ -1,0 +1,3 @@
+C:\laragon\www\TravelAI-Nepal\routes\api.php
+C:\laragon\www\TravelAI-Nepal\routes\console.php
+C:\laragon\www\TravelAI-Nepal\routes\web.php

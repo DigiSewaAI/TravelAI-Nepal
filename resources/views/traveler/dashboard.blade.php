@@ -277,6 +277,69 @@
                 </div>
             </div>
 
+            {{-- 📸 My Travel Memories --}}
+<div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+    <div class="flex items-start gap-3">
+        <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-images text-green-500 text-xl"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-semibold text-gray-800">📸 My Travel Memories</h4>
+            <p class="text-xs text-gray-500 mt-0.5">Upload photos & videos from your journey checkpoints.</p>
+            
+            {{-- ✅ Upload Form --}}
+            <form id="uploadForm" class="mt-3" enctype="multipart/form-data">
+                @csrf
+                <div class="flex flex-wrap gap-2">
+                    <select name="checkpoint" id="checkpointSelect" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2" required>
+                        <option value="">Select a checkpoint...</option>
+                        @foreach($userWaypoints as $wp)
+                            <option value="{{ $wp->name }}">{{ $wp->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700" required>
+                    <button type="submit" id="uploadBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">
+                        <i class="fas fa-upload"></i> Upload
+                    </button>
+                </div>
+                <div id="uploadMessage" class="mt-2 text-sm hidden"></div>
+            </form>
+
+            {{-- Session messages --}}
+            @if(session('upload_success'))
+                <div class="mt-2 text-sm text-green-600">{{ session('upload_success') }}</div>
+            @endif
+            @if(session('upload_error'))
+                <div class="mt-2 text-sm text-red-600">{{ session('upload_error') }}</div>
+            @endif
+
+            {{-- Existing Memories --}}
+            @if($userMedia->count() > 0)
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                    @foreach($userMedia->take(6) as $media)
+                        <div class="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square bg-gray-100">
+                            @if($media->media_type === 'image')
+                                <img src="{{ asset('storage/' . $media->optimized_path) }}" alt="{{ $media->file_name }}" class="w-full h-full object-cover">
+                            @endif
+                            <form action="{{ route('traveler.memory.delete') }}" method="POST" class="absolute top-1 right-1">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="id" value="{{ $media->id }}">
+                                <button type="submit" onclick="return confirm('Delete this memory?')" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">×</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+                @if($userMedia->count() > 6)
+                    <p class="text-xs text-gray-400 mt-2">+{{ $userMedia->count() - 6 }} more</p>
+                @endif
+            @else
+                <p class="text-xs text-gray-400 mt-3">No memories uploaded yet.</p>
+            @endif
+        </div>
+    </div>
+</div>
+
             {{-- 🎬 My Journey Replay (Always Visible) --}}
 <div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition group">
     <div class="flex items-start gap-3">
@@ -311,5 +374,50 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadForm');
+    const btn = document.getElementById('uploadBtn');
+    const msg = document.getElementById('uploadMessage');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        msg.classList.add('hidden');
+
+        fetch('{{ route("traveler.checkpoint.upload") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('✅ ' + data.message, 'green');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage('❌ ' + data.message, 'red');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
+            }
+        })
+        .catch(error => {
+            showMessage('❌ Network error', 'red');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
+        });
+    });
+
+    function showMessage(text, color) {
+        msg.textContent = text;
+        msg.className = 'mt-2 text-sm ' + (color === 'red' ? 'text-red-600' : 'text-green-600');
+        msg.classList.remove('hidden');
+    }
+});
+</script>
 
 @endsection
