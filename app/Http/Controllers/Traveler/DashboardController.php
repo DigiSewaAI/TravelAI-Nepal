@@ -7,11 +7,23 @@ use App\Models\Booking;
 use App\Models\QrScan;
 use App\Models\UserMedia;
 use App\Models\Waypoint;
+use App\Services\Safety\AlertService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    protected $alertService;
+
+    /**
+     * Constructor with AlertService injection
+     */
+    public function __construct(AlertService $alertService)
+    {
+        $this->alertService = $alertService;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -54,7 +66,7 @@ class DashboardController extends Controller
             $q->where('traveler_id', $user->id);
         })->exists();
 
-        // ✅ NEW: User Media for Memories section
+        // User Media for Memories section
         $userMedia = UserMedia::where('user_id', $user->id)
             ->with(['waypoint'])
             ->orderBy('created_at', 'desc')
@@ -62,12 +74,15 @@ class DashboardController extends Controller
 
         $mediaByCheckpoint = $userMedia->groupBy('waypoint_id');
 
-        // ✅ NEW: All waypoints the user has checked into (for dropdown)
+        // All waypoints the user has checked into (for dropdown)
         $waypointIds = QrScan::whereHas('booking', function ($q) use ($user) {
-    $q->where('traveler_id', $user->id);
-})->whereNotNull('waypoint_id')->pluck('waypoint_id')->unique()->values();
+            $q->where('traveler_id', $user->id);
+        })->whereNotNull('waypoint_id')->pluck('waypoint_id')->unique()->values();
 
-$userWaypoints = Waypoint::whereIn('id', $waypointIds)->get();
+        $userWaypoints = Waypoint::whereIn('id', $waypointIds)->get();
+
+        // ✅ NEW: Get unread safety alerts for this user
+        $unreadAlerts = $this->alertService->getUnreadAlerts($user->id);
 
         $hour = Carbon::now()->hour;
         if ($hour < 12) {
@@ -89,9 +104,25 @@ $userWaypoints = Waypoint::whereIn('id', $waypointIds)->get();
             'greeting',
             'hasPassport',
             'hasReplay',
-            'userMedia',          // ✅ NEW
-            'mediaByCheckpoint',  // ✅ NEW
-            'userWaypoints'       // ✅ NEW
+            'userMedia',
+            'mediaByCheckpoint',
+            'userWaypoints',
+            'unreadAlerts'   // ✅ NEW: Pass to view
         ));
+    }
+
+    /**
+     * Mark a safety alert as read
+     */
+    public function markAlertRead(Request $request, int $alertId)
+    {
+        $user = auth()->user();
+        $success = $this->alertService->markAsRead($alertId, $user->id);
+
+        if ($success) {
+            return response()->json(['success' => true, 'message' => 'Alert marked as read']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Alert not found'], 404);
     }
 }

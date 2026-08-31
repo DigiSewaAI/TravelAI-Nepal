@@ -6,11 +6,22 @@ use App\Models\User;
 use App\Models\Booking;
 use App\Models\QrScan;
 use App\Models\Waypoint;
+use App\Services\Safety\SafetyStatusService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DigitalTrekPassportService
 {
+    protected $safetyStatusService;
+
+    /**
+     * Constructor with SafetyStatusService injection
+     */
+    public function __construct(SafetyStatusService $safetyStatusService)
+    {
+        $this->safetyStatusService = $safetyStatusService;
+    }
+
     /**
      * Get full passport data for a user
      */
@@ -56,11 +67,11 @@ class DigitalTrekPassportService
                                  ->whereIn('status', ['confirmed', 'active'])
                                  ->count();
 
-        // ✅ Phase 5.5: Check-in stats with duplicate filter
+        // Check-in stats with duplicate filter
         $stats = QrScan::whereHas('booking', function ($q) use ($user) {
             $q->where('traveler_id', $user->id);
         })
-        ->whereNull('duplicate_of') // ✅ Only original scans (ignore duplicates)
+        ->whereNull('duplicate_of')
         ->join('waypoints', 'qr_scans.waypoint_id', '=', 'waypoints.id')
         ->selectRaw('
             COUNT(*) as total_scans,
@@ -145,7 +156,7 @@ class DigitalTrekPassportService
         })
         ->with(['waypoint', 'booking.service'])
         ->whereNotNull('waypoint_id')
-        ->whereNull('duplicate_of') // ✅ Phase 5.5: Only original scans (ignore duplicates)
+        ->whereNull('duplicate_of')
         ->latest('scanned_at')
         ->get()
         ->map(function ($scan) {
@@ -170,7 +181,7 @@ class DigitalTrekPassportService
             $q->where('traveler_id', $user->id);
         })
         ->with(['waypoint', 'booking.service'])
-        ->whereNull('duplicate_of') // ✅ Phase 5.5: Only original scans
+        ->whereNull('duplicate_of')
         ->orderBy('scanned_at', 'desc')
         ->get();
     }
@@ -185,7 +196,7 @@ class DigitalTrekPassportService
         })
         ->with('waypoint')
         ->whereNotNull('waypoint_id')
-        ->whereNull('duplicate_of') // ✅ Phase 5.5: Only original scans
+        ->whereNull('duplicate_of')
         ->get()
         ->map(function ($scan) {
             return [
@@ -211,7 +222,7 @@ class DigitalTrekPassportService
             $q->where('traveler_id', $user->id);
         })->count() * 10;
 
-        $achievementXP = app(AchievementService::class)->getTotalXP($user);
+        $achievementXP = app(\App\Services\AchievementService::class)->getTotalXP($user);
 
         return $checkinXP + $achievementXP;
     }
@@ -236,5 +247,46 @@ class DigitalTrekPassportService
             $unique >= 1  => 1,
             default => 0,
         };
+    }
+
+    // ============================================================
+    // ✅ NEW: Safety Status Methods (Phase 5)
+    // ============================================================
+
+    /**
+     * Get safety status for a checkpoint (waypoint)
+     */
+    public function getCheckpointSafetyStatus(Waypoint $waypoint): array
+    {
+        return $this->safetyStatusService->getStatusForEntity($waypoint);
+    }
+
+    /**
+     * Get safety status for all checkpoints in a booking
+     */
+    public function getBookingCheckpointsSafety(Booking $booking): Collection
+    {
+        $waypoints = $booking->service?->route?->segments()
+            ->with('fromWaypoint', 'toWaypoint')
+            ->get()
+            ->flatMap(function ($segment) {
+                return [$segment->fromWaypoint, $segment->toWaypoint];
+            })
+            ->unique('id')
+            ->filter();
+
+        return $waypoints->map(function ($waypoint) {
+            $status = $this->getCheckpointSafetyStatus($waypoint);
+            return [
+                'waypoint' => $waypoint,
+                'status' => $status['status'],
+                'status_color' => $status['status_color'] ?? '⚪',
+                'incident' => $status['incident'] ? [
+                    'id' => $status['incident']->id,
+                    'title' => $status['incident']->title,
+                    'severity' => $status['incident']->severity,
+                ] : null,
+            ];
+        });
     }
 }
