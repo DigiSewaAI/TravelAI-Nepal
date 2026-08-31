@@ -200,6 +200,7 @@
                     <li><a href="{{ route('pages.features') }}" class="hover:text-blue-600">{{ __('messages.features') }}</a></li>
                     <li><a href="{{ route('pages.pricing') }}" class="hover:text-blue-600">{{ __('messages.pricing') }}</a></li>
                     <li><a href="{{ route('public.providers.index') }}" class="hover:text-blue-600">{{ __('messages.providers') }}</a></li>
+                        <li><a href="{{ route('safety.index') }}" class="hover:text-blue-600">🛡️ Travel Safety</a></li>
                     <li><a href="{{ route('register') }}" class="hover:text-blue-600">{{ __('messages.become_partner') }}</a></li>
                 </ul>
             </div>

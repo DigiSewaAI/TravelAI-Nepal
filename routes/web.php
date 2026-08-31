@@ -334,3 +334,24 @@ Route::get('/test-lang', function () {
 });
 
 Route::post('/waitlist', [App\Http\Controllers\WaitlistController::class, 'store'])->name('waitlist.store');
+
+// Public safety
+Route::get('/travel-safety', [App\Http\Controllers\SafetyController::class, 'index'])->name('safety.index');
+Route::get('/travel-safety/destination/{slug}', [App\Http\Controllers\SafetyController::class, 'destination'])->name('safety.destination');
+Route::get('/travel-safety/incident/{id}', [App\Http\Controllers\SafetyController::class, 'incident'])->name('safety.incident');
+
+// API
+Route::get('/api/safety/markers', [App\Http\Controllers\SafetyController::class, 'markers'])->name('api.safety.markers');
+
+// Admin safety (add to admin group)
+Route::prefix('admin/safety')->name('admin.safety.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\SafetyController::class, 'dashboard'])->name('dashboard');
+    Route::get('/incidents', [App\Http\Controllers\Admin\SafetyController::class, 'incidents'])->name('incidents');
+    Route::post('/incident/{id}/verify', [App\Http\Controllers\Admin\SafetyController::class, 'verify'])->name('verify');
+    Route::post('/incident/{id}/override', [App\Http\Controllers\Admin\SafetyController::class, 'override'])->name('override');
+    Route::post('/incident/{primary}/merge', [App\Http\Controllers\Admin\SafetyController::class, 'merge'])->name('merge');
+    Route::get('/sources', [App\Http\Controllers\Admin\SafetyController::class, 'sources'])->name('sources');
+    Route::post('/sources', [App\Http\Controllers\Admin\SafetyController::class, 'storeSource'])->name('sources.store');
+    Route::post('/sources/{id}/toggle', [App\Http\Controllers\Admin\SafetyController::class, 'toggleSource'])->name('sources.toggle');
+    Route::get('/audit', [App\Http\Controllers\Admin\SafetyController::class, 'audit'])->name('audit');
+});

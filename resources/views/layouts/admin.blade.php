@@ -65,6 +65,37 @@
                 </a>
                 @endif
 
+                <!-- ===== SAFETY SECTION (Phase 6) ===== -->
+@if(Route::has('admin.safety.dashboard'))
+<div class="border-t border-gray-200 my-2 pt-2">
+    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Safety</p>
+    
+    <a href="{{ route('admin.safety.dashboard') }}"
+       class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.*') ? 'active' : '' }}">
+        <i class="fas fa-shield-alt w-5"></i>
+        <span>Safety Dashboard</span>
+    </a>
+    
+    <a href="{{ route('admin.safety.incidents') }}"
+       class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.incidents') ? 'active' : '' }}">
+        <i class="fas fa-exclamation-triangle w-5"></i>
+        <span>Incidents</span>
+    </a>
+    
+    <a href="{{ route('admin.safety.sources') }}"
+       class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.sources') ? 'active' : '' }}">
+        <i class="fas fa-rss w-5"></i>
+        <span>Sources</span>
+    </a>
+    
+    <a href="{{ route('admin.safety.audit') }}"
+       class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.audit') ? 'active' : '' }}">
+        <i class="fas fa-history w-5"></i>
+        <span>Audit Log</span>
+    </a>
+</div>
+@endif
+
                 @if(Route::has('admin.services.index'))
                 <a href="{{ route('admin.services.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
