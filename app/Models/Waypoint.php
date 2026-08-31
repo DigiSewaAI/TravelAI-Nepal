@@ -5,14 +5,23 @@ namespace App\Models;
 use App\Models\Traits\HasSafetyStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Waypoint extends Model
 {
     use SoftDeletes, HasSafetyStatus;
 
     protected $fillable = [
-        'name', 'slug', 'type', 'latitude', 'longitude',
-        'altitude', 'description', 'metadata'
+        'name',
+        'slug',
+        'type',
+        'latitude',
+        'longitude',
+        'altitude',
+        'description',
+        'metadata',
+        'safety_status',      // ✅ Added
+        'safety_updated_at',  // ✅ Added
     ];
 
     protected $casts = [
@@ -20,7 +29,21 @@ class Waypoint extends Model
         'longitude' => 'decimal:8',
         'altitude' => 'integer',
         'metadata' => 'array',
+        'safety_updated_at' => 'datetime',   // ✅ Ensures Carbon instance
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->slug)) {
+                $model->slug = Str::slug($model->name . '-' . uniqid());
+            }
+        });
+    }
 
     // Relationships
     public function fromSegments()

@@ -44,9 +44,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'stale' => [
-        'verification_hours' => 24,
-        'expiry_days' => 7,
-        'confidence_decay_per_day' => 0.1,
+        'verification_hours' => 24,          // Hours after which confidence decays
+        'expiry_days' => 7,                  // Days after which incident expires
+        'confidence_decay_per_day' => 0.1,   // Confidence lost per day
     ],
 
     /*
@@ -55,18 +55,34 @@ return [
     |--------------------------------------------------------------------------
     */
     'alert' => [
-        'dedup_window_minutes' => 60,
+        'dedup_window_minutes' => 60,        // Don't send same alert within X minutes
         'resend_on_severity_change' => true,
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Cache
+    | Cache TTL Settings
     |--------------------------------------------------------------------------
     */
     'cache' => [
-        'geocode_ttl' => 604800, // 7 days
-        'status_ttl' => 900,    // 15 minutes
+        'geocode_ttl' => 604800,  // 7 days (seconds)
+        'status_ttl' => 900,      // 15 minutes (seconds)
+        'risk_cache_ttl' => 3600, // 1 hour (seconds)
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Incident Status Workflow (valid transitions)
+    |--------------------------------------------------------------------------
+    */
+    'status_workflow' => [
+        'detected' => ['under_review', 'false_positive'],
+        'under_review' => ['verified', 'false_positive'],
+        'verified' => ['active', 'false_positive'],
+        'active' => ['resolved', 'expired', 'false_positive'],
+        'resolved' => ['expired'],
+        'expired' => [],
+        'false_positive' => [],
     ],
 
     /*

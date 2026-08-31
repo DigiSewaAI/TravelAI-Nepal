@@ -3,36 +3,36 @@
 namespace App\Models\Traits;
 
 use App\Models\TravelSafetyIncident;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 trait HasSafetyStatus
 {
     /**
      * Get all safety incidents affecting this entity.
-     * ✅ Fixed: specify pivot table and foreign keys.
      */
     public function safetyIncidents()
-    {
-        return $this->morphToMany(
-            TravelSafetyIncident::class,
-            'affectable',
-            'incident_affectables',
-            'affectable_id',   // foreign key for this model (the affectable entity)
-            'incident_id'      // related key for the incident
-        )->withPivot('distance', 'match_type', 'confidence', 'metadata')
-         ->withTimestamps()
-         ->where('status', 'active'); // only active incidents
-    }
+{
+    return $this->morphToMany(
+        TravelSafetyIncident::class,
+        'affectable',
+        'incident_affectables',
+        'affectable_id',
+        'incident_id'
+    )->withPivot('distance', 'match_type', 'confidence', 'metadata')
+     ->withTimestamps()
+     ->whereIn('status', ['active', 'verified', 'under_review']); // ✅ Include these
+}
 
     /**
      * Get the computed safety status (cached).
      */
     public function getSafetyStatusAttribute()
     {
-        // Return cached column if available and not stale
-        if ($this->safety_updated_at && $this->safety_updated_at->gt(now()->subMinutes(15))) {
-            return $this->safety_status;
+        // ✅ Check if safety_updated_at is a Carbon instance and within cache TTL
+        if ($this->safety_updated_at instanceof \Carbon\Carbon) {
+            if ($this->safety_updated_at->gt(now()->subMinutes(15))) {
+                return $this->safety_status ?? 'unknown';
+            }
         }
 
         // Compute fresh
@@ -47,27 +47,27 @@ trait HasSafetyStatus
         $statuses = $this->safetyIncidents->pluck('severity')->unique();
 
         if ($statuses->isEmpty()) {
-            return 'unknown';
+            $status = 'unknown';
+        } else {
+            // Highest severity wins (critical > high > moderate > low)
+            $priority = ['critical' => 4, 'high' => 3, 'moderate' => 2, 'low' => 1];
+            $max = $statuses->map(function ($s) use ($priority) {
+                return $priority[$s] ?? 0;
+            })->max();
+
+            $mapping = [
+                4 => 'avoid',
+                3 => 'high_risk',
+                2 => 'caution',
+                1 => 'normal',
+                0 => 'unknown',
+            ];
+
+            $status = $mapping[$max] ?? 'unknown';
         }
 
-        // Highest severity wins (critical > high > moderate > low)
-        $priority = ['critical' => 4, 'high' => 3, 'moderate' => 2, 'low' => 1];
-        $max = $statuses->map(function ($s) use ($priority) {
-            return $priority[$s] ?? 0;
-        })->max();
-
-        $mapping = [
-            4 => 'avoid',
-            3 => 'high_risk',
-            2 => 'caution',
-            1 => 'normal',
-            0 => 'unknown',
-        ];
-
-        $status = $mapping[$max] ?? 'unknown';
-
-        // Cache the computed status in the database columns
-        $this->update([
+        // ✅ Use updateQuietly to avoid event loops and set both fields
+        $this->updateQuietly([
             'safety_status' => $status,
             'safety_updated_at' => now(),
         ]);

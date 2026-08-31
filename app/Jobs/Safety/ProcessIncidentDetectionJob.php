@@ -5,6 +5,7 @@ namespace App\Jobs\Safety;
 use App\Models\TravelSafetyIncident;
 use App\Services\Safety\LocationMatchingService;
 use App\Services\Safety\RiskScoringService;
+use App\Jobs\Safety\UpdateSafetyStatusesJob;  // ✅ IMPORTANT: Add this
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -47,7 +48,7 @@ class ProcessIncidentDetectionJob implements ShouldQueue
                     'match_count' => count($matches)
                 ]);
 
-                // 3. Dispatch safety status update job (if table exists)
+                // 3. Dispatch safety status update job
                 try {
                     UpdateSafetyStatusesJob::dispatch();
                 } catch (\Exception $e) {

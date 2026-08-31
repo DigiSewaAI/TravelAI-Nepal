@@ -4,73 +4,92 @@ namespace App\Jobs\Safety;
 
 use App\Models\Waypoint;
 use App\Models\Route;
+use App\Models\Trek;
 use App\Models\Location;
+use App\Services\Safety\SafetyStatusService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
 class UpdateSafetyStatusesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle(): void
+    protected $entityType;
+    protected $entityId;
+
+    public function __construct(?string $entityType = null, ?int $entityId = null)
     {
-        // Update all Waypoints
-        Waypoint::chunk(100, function ($waypoints) {
-            foreach ($waypoints as $waypoint) {
-                try {
-                    $waypoint->refreshSafetyStatus();
-                } catch (\Exception $e) {
-                    Log::error('Failed to update waypoint safety status', [
-                        'waypoint_id' => $waypoint->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        });
+        $this->entityType = $entityType;
+        $this->entityId = $entityId;
+    }
 
-        // Update all Routes
-        Route::chunk(100, function ($routes) {
-            foreach ($routes as $route) {
-                try {
-                    $route->refreshSafetyStatus();
-                } catch (\Exception $e) {
-                    Log::error('Failed to update route safety status', [
-                        'route_id' => $route->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        });
-
-        // Update all Locations (if table exists)
-        try {
-            Location::chunk(100, function ($locations) {
-                foreach ($locations as $location) {
-                    try {
-                        if (method_exists($location, 'refreshSafetyStatus')) {
-                            $location->refreshSafetyStatus();
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('Failed to update location safety status', [
-                            'location_id' => $location->id,
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                }
-            });
-        } catch (QueryException $e) {
-            // Location table might not have safety_status columns yet
-            Log::warning('Location safety status update skipped', [
-                'error' => $e->getMessage()
-            ]);
+    public function handle(SafetyStatusService $statusService): void
+    {
+        // If specific entity provided, update only that
+        if ($this->entityType && $this->entityId) {
+            $this->updateSpecificEntity($statusService);
+            return;
         }
 
-        // Note: Trek updates are skipped because 'treks' table doesn't exist yet
-        // Will be added when Trek module is ready
+        // Otherwise update all
+        $this->updateAllEntities($statusService);
+    }
+
+    protected function updateSpecificEntity(SafetyStatusService $statusService): void
+    {
+        $entity = $this->findEntity($this->entityType, $this->entityId);
+        if ($entity) {
+            $statusService->refreshEntityStatus($entity);
+        }
+    }
+
+    protected function updateAllEntities(SafetyStatusService $statusService): void
+    {
+        Log::info('Starting safety status update for all entities');
+
+        // Update Waypoints
+        Waypoint::chunk(100, function ($waypoints) use ($statusService) {
+            foreach ($waypoints as $waypoint) {
+                $statusService->refreshEntityStatus($waypoint);
+            }
+        });
+
+        // Update Routes
+        Route::chunk(100, function ($routes) use ($statusService) {
+            foreach ($routes as $route) {
+                $statusService->refreshEntityStatus($route);
+            }
+        });
+
+        // Update Treks
+        Trek::chunk(100, function ($treks) use ($statusService) {
+            foreach ($treks as $trek) {
+                $statusService->refreshEntityStatus($trek);
+            }
+        });
+
+        // Update Locations
+        Location::chunk(100, function ($locations) use ($statusService) {
+            foreach ($locations as $location) {
+                $statusService->refreshEntityStatus($location);
+            }
+        });
+
+        Log::info('Safety status update completed for all entities');
+    }
+
+    protected function findEntity(string $type, int $id)
+    {
+        return match ($type) {
+            'waypoint' => Waypoint::find($id),
+            'route' => Route::find($id),
+            'trek' => Trek::find($id),
+            'location' => Location::find($id),
+            default => null,
+        };
     }
 }
