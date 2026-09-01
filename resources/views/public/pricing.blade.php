@@ -40,7 +40,8 @@
 
             <div class="mt-2">
                 <h3 class="text-2xl font-bold text-gray-900">{{ $plan->name }}</h3>
-                <p class="text-gray-500 text-sm mt-1">{{ $plan->description }}</p>
+                {{-- ✅ Description now uses translation key --}}
+                <p class="text-gray-500 text-sm mt-1">{{ __('messages.plans.' . $plan->slug . '.description') }}</p>
             </div>
 
             {{-- Price display with toggle support --}}
@@ -78,9 +79,13 @@
             <ul class="mt-6 space-y-2 text-sm">
                 @php $features = $plan->features ?? []; @endphp
                 @foreach($features as $feature)
+                    @php
+                        // Generate translation key from feature string
+                        $featureKey = 'plans.features.' . \Illuminate\Support\Str::slug($feature, '_');
+                    @endphp
                     <li class="flex items-start gap-2">
                         <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                        <span>{{ $feature }}</span>
+                        <span>{{ __('messages.' . $featureKey) }}</span>
                     </li>
                 @endforeach
             </ul>
@@ -90,13 +95,13 @@
                 <div class="mt-4 pt-4 border-t text-xs text-gray-500">
                     @php $limits = $plan->limits; @endphp
                     @if(isset($limits['max_listings']))
-                        <div>📦 {{ $limits['max_listings'] == -1 ? '∞' : $limits['max_listings'] }} {{ __('messages.services') }}</div>
+                        <div>📦 {{ $limits['max_listings'] == -1 ? __('messages.unlimited') : $limits['max_listings'] }} {{ __('messages.services') }}</div>
                     @endif
                     @if(isset($limits['max_staff']))
-                        <div>👥 {{ $limits['max_staff'] == -1 ? '∞' : $limits['max_staff'] }} {{ __('messages.staff') }}</div>
+                        <div>👥 {{ $limits['max_staff'] == -1 ? __('messages.unlimited') : $limits['max_staff'] }} {{ __('messages.staff') }}</div>
                     @endif
                     @if(isset($limits['max_ai_requests']))
-                        <div>🤖 {{ $limits['max_ai_requests'] == -1 ? '∞' : $limits['max_ai_requests'] }} {{ __('messages.ai_requests_mo') }}</div>
+                        <div>🤖 {{ $limits['max_ai_requests'] == -1 ? __('messages.unlimited') : $limits['max_ai_requests'] }} {{ __('messages.ai_requests_mo') }}</div>
                     @endif
                 </div>
             @endif
@@ -133,42 +138,59 @@
                 </thead>
                 <tbody>
                     <tr class="border-b">
-    <td class="py-3 text-gray-600">{{ __('messages.price') }}</td>
-    @foreach($plans as $plan)
-        <td class="text-center py-3 font-medium">
-            <span class="price-amount" data-interval="monthly">
-                @if($plan->price_monthly === null) {{ __('messages.custom') }}
-                @elseif($plan->price_monthly == 0) {{ __('messages.free') }}
-                @else Rs. {{ number_format($plan->price_monthly, 0) }}/mo
-                @endif
-            </span>
-            <span class="price-amount hidden" data-interval="yearly">
-                @if($plan->price_yearly === null) {{ __('messages.custom') }}
-                @elseif($plan->price_yearly == 0) {{ __('messages.free') }}
-                @else Rs. {{ number_format($plan->price_yearly, 0) }}/yr
-                @endif
-            </span>
-        </td>
-    @endforeach
-</tr>
+                        <td class="py-3 text-gray-600">{{ __('messages.price') }}</td>
+                        @foreach($plans as $plan)
+                            <td class="text-center py-3 font-medium">
+                                <span class="price-amount" data-interval="monthly">
+                                    @if($plan->price_monthly === null) {{ __('messages.custom') }}
+                                    @elseif($plan->price_monthly == 0) {{ __('messages.free') }}
+                                    @else Rs. {{ number_format($plan->price_monthly, 0) }}/mo
+                                    @endif
+                                </span>
+                                <span class="price-amount hidden" data-interval="yearly">
+                                    @if($plan->price_yearly === null) {{ __('messages.custom') }}
+                                    @elseif($plan->price_yearly == 0) {{ __('messages.free') }}
+                                    @else Rs. {{ number_format($plan->price_yearly, 0) }}/yr
+                                    @endif
+                                </span>
+                            </td>
+                        @endforeach
+                    </tr>
+
+                    {{-- SERVICES row --}}
                     <tr class="border-b">
                         <td class="py-3 text-gray-600">{{ __('messages.services') }}</td>
                         @foreach($plans as $plan)
-                            <td class="text-center py-3">{{ $plan->limits['max_listings'] ?? '∞' }}</td>
+                            @php $value = $plan->limits['max_listings'] ?? null; @endphp
+                            <td class="text-center py-3">
+                                {{ $value == -1 ? __('messages.unlimited') : ($value ?? '∞') }}
+                            </td>
                         @endforeach
                     </tr>
+
+                    {{-- STAFF USERS row --}}
                     <tr class="border-b">
                         <td class="py-3 text-gray-600">{{ __('messages.staff_users') }}</td>
                         @foreach($plans as $plan)
-                            <td class="text-center py-3">{{ $plan->limits['max_staff'] ?? '∞' }}</td>
+                            @php $value = $plan->limits['max_staff'] ?? null; @endphp
+                            <td class="text-center py-3">
+                                {{ $value == -1 ? __('messages.unlimited') : ($value ?? '∞') }}
+                            </td>
                         @endforeach
                     </tr>
+
+                    {{-- AI REQUESTS row --}}
                     <tr class="border-b">
                         <td class="py-3 text-gray-600">{{ __('messages.ai_requests') }}</td>
                         @foreach($plans as $plan)
-                            <td class="text-center py-3">{{ $plan->limits['max_ai_requests'] ?? '∞' }}</td>
+                            @php $value = $plan->limits['max_ai_requests'] ?? null; @endphp
+                            <td class="text-center py-3">
+                                {{ $value == -1 ? __('messages.unlimited') : ($value ?? '∞') }}
+                            </td>
                         @endforeach
                     </tr>
+
+                    {{-- CUSTOM LOGO row --}}
                     <tr>
                         <td class="py-3 text-gray-600">{{ __('messages.custom_logo') }}</td>
                         @foreach($plans as $plan)

@@ -1126,4 +1126,50 @@ return [
 'live_interactive_map' => 'लाइव इंटरैक्टिव मानचित्र',
 'loading_map_data' => 'मानचित्र डेटा लोड हो रहा है...',
 'no_areas_under_alert' => 'वर्तमान में कोई क्षेत्र सुरक्षा अलर्ट में नहीं है।',
+'unlimited' => 'असीमित',
+'pricing_hero_title' => 'AI के साथ अपने पर्यटन व्यवसाय को सशक्त बनाएं',
+'pricing_hero_subtitle' => 'अपने व्यवसाय के लिए सही TravelAI नेपाल योजना चुनें — मुफ्त शुरू करने से लेकर उन्नत AI-संचालित उपकरण, विश्लेषण, बुकिंग और अधिक के साथ विस्तार करने तक।',
+'plans' => [
+    'free' => [
+        'description' => 'छोटे स्टार्टअप और व्यवसायों के लिए आदर्श',
+    ],
+    'professional' => [
+        'description' => 'बढ़ती ट्रैवल एजेंसियों और होटलों के लिए',
+    ],
+    'business' => [
+        'description' => 'बड़े पर्यटन व्यवसायों और चेन के लिए',
+    ],
+    'enterprise' => [
+        'description' => 'बड़े उद्यमों के लिए अनुकूलित समाधान',
+    ],
+    'features' => [
+        'basic_dashboard' => 'बेसिक डैशबोर्ड',
+        '3_listings' => '3 लिस्टिंग',
+        '5_ai_requests_mo' => '5 AI अनुरोध/महीना',
+        '10_bookings_mo' => '10 बुकिंग/महीना',
+        'advanced_dashboard' => 'उन्नत डैशबोर्ड',
+        '20_listings' => '20 लिस्टिंग',
+        '50_ai_requests_mo' => '50 AI अनुरोध/महीना',
+        '100_bookings_mo' => '100 बुकिंग/महीना',
+        'custom_logo' => 'कस्टम लोगो',
+        'full_analytics' => 'पूर्ण विश्लेषण',
+        '100_listings' => '100 लिस्टिंग',
+        '500_ai_requests_mo' => '500 AI अनुरोध/महीना',
+        '1000_bookings_mo' => '1000 बुकिंग/महीना',
+        'white_label' => 'व्हाइट-लेबल',
+        'unlimited_listings' => 'असीमित लिस्टिंग',
+        'unlimited_staff' => 'असीमित कर्मचारी',
+        'unlimited_ai' => 'असीमित AI',
+        'unlimited_bookings' => 'असीमित बुकिंग',
+        'priority_support' => 'प्राथमिकता सहायता',
+            // 🔽 यी keys थप्नुहोस् (underscore बिना)
+    '5_ai_requestsmo' => '5 AI अनुरोध/महीना',
+    '10_bookingsmo'   => '10 बुकिंग/महीना',
+    '50_ai_requestsmo' => '50 AI अनुरोध/महीना',
+    '100_bookingsmo'  => '100 बुकिंग/महीना',
+    '500_ai_requestsmo' => '500 AI अनुरोध/महीना',
+    '1000_bookingsmo' => '1000 बुकिंग/महीना',
+
+    ],
+],
 ];

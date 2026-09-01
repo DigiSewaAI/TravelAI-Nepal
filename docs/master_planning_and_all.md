@@ -1,9 +1,9 @@
 # TravelAI Nepal — Master Product, Architecture, Database & Implementation Blueprint
 
-**Version:** 13.1 (FINAL – ALL PHASES COMPLETED + Multi-Language Support (EN/NP/HI/ZH) COMPLETED + AI Planner Grounded + Fallback + UI/UX & SEO + ALL Nepal Routes Data Entry COMPLETED + Invoice Auto-Generation COMPLETED + AI Travel Planner Language COMPLETED + Admin Panel (Route/CRUD) COMPLETED + Provider Staff Management (Team CRUD) COMPLETED + Waitlist Feature COMPLETED + Digital Trek Passport COMPLETED + My Journey Replay (Cinematic Timeline + Map + Stats) COMPLETED + Cinematic Journey Replay (Media Upload, Slideshow, Optimization, Fallback) COMPLETED + **Phase 6 Safety Module (Multi-Language Support + End-to-End Testing) COMPLETED**)
+**Version:** 13.2 (FINAL – ALL PHASES COMPLETED + Journey Replay Social Sharing ADDED)
 
 **Date:** September 2026
-**Status:** ✅ **ALL PHASES COMPLETED** | ✅ Multi-Language Support (EN/NP/HI/ZH) COMPLETED | ✅ AI Planner (ABC/EBC/Langtang) Grounded | ✅ Fallback Itinerary Mechanism | ✅ Cost Calculation Backend | ✅ Service Integration | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ SEO Optimization | ✅ High‑Resolution Favicon | ✅ Logo in All Dashboards | ✅ Login/Register Logo | ✅ .htaccess Cache Control | ✅ Invoice System (Complete) | ✅ Legacy Cleanup | ✅ ALL Nepal Routes Data Entry (138+ Destinations) | ✅ AI Travel Planner Language | ✅ Admin Panel (Route/CRUD) | ✅ Provider Staff Management | ✅ Waitlist (with confirmation email) | ✅ Digital Trek Passport (Full Implementation) | ✅ My Journey Replay (Cinematic Timeline + Map + Stats) | ✅ Cinematic Journey Replay (Slideshow, Media Upload, Optimization, Fallback) | ✅ **Phase 6 Safety Module – Multi-Language Support (EN/NP/HI/ZH) COMPLETED & END-TO-END TESTED**
+**Status:** ✅ **ALL PHASES COMPLETED** | ✅ Multi-Language Support (EN/NP/HI/ZH) COMPLETED | ✅ AI Planner (ABC/EBC/Langtang) Grounded | ✅ Fallback Itinerary Mechanism | ✅ Cost Calculation Backend | ✅ Service Integration | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ SEO Optimization | ✅ High‑Resolution Favicon | ✅ Logo in All Dashboards | ✅ Login/Register Logo | ✅ .htaccess Cache Control | ✅ Invoice System (Complete) | ✅ Legacy Cleanup | ✅ ALL Nepal Routes Data Entry (138+ Destinations) | ✅ AI Travel Planner Language | ✅ Admin Panel (Route/CRUD) | ✅ Provider Staff Management | ✅ Waitlist (with confirmation email) | ✅ Digital Trek Passport (Full Implementation) | ✅ My Journey Replay (Cinematic Timeline + Map + Stats) | ✅ Cinematic Journey Replay (Slideshow, Media Upload, Optimization, Fallback) | ✅ Phase 6 Safety Module – Multi-Language Support (EN/NP/HI/ZH) COMPLETED & END-TO-END TESTED | ✅ **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility control, social share buttons, OG meta) COMPLETED**
 
 **Next Step:** 🚀 **Deployment & Monitoring → Launch**
 
@@ -11,10 +11,10 @@
 
 ## 1. Executive Summary
 
-This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, PWA capabilities, **Multi-Currency (USD/NPR)**, **Multi-Language (English, Nepali, Hindi, Chinese)**, **Traveler Dashboard**, **Account Type Registration**, **Provider Check-in Management**, **Monthly/Yearly billing toggle**, **Provider Staff Management**, **Digital Trek Passport**, **My Journey Replay**, **Cinematic Journey Replay**, and **Phase 6 Safety Module with Multi-Language Support**.
+This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, PWA capabilities, **Multi-Currency (USD/NPR)**, **Multi-Language (English, Nepali, Hindi, Chinese)**, **Traveler Dashboard**, **Account Type Registration**, **Provider Check-in Management**, **Monthly/Yearly billing toggle**, **Provider Staff Management**, **Digital Trek Passport**, **My Journey Replay**, **Cinematic Journey Replay**, **Phase 6 Safety Module with Multi-Language Support**, and **Phase 16: Public Journey Replay Social Sharing**.
 
-**✅ ALL PHASES (1-15) HAVE BEEN SUCCESSFULLY IMPLEMENTED** (see roadmap below).
-**✅ All additional Enhancements (Phase 12.5 – 12.9, Phase 5, Staff Management, Digital Trek Passport, My Journey Replay, Cinematic Journey Replay, and Phase 6 Safety Module) have been completed:**
+**✅ ALL PHASES (1-16) HAVE BEEN SUCCESSFULLY IMPLEMENTED** (see roadmap below).
+**✅ All additional Enhancements (Phase 12.5 – 12.9, Phase 5, Staff Management, Digital Trek Passport, My Journey Replay, Cinematic Journey Replay, Phase 6 Safety Module, and Phase 16 Social Sharing) have been completed:**
 
 - **AI Planner (Grounded):** ABC, EBC, Langtang routes fully seeded with waypoints, segments, costs. Database-grounded itinerary generation with fallback.
 - **Fallback Mechanism:** If AI (Groq) fails (rate limit, timeout), the system automatically generates a grounded itinerary from database segments.
@@ -112,21 +112,22 @@ This document is the **Single Source of Truth** for the evolution of TravelAI Ne
   - **Result:** Travelers can now watch a cinematic replay of their journey with their own media or beautiful fallback images. ✅ **COMPLETED**
 - **Phase 6 Safety Module – End-to-End Testing & Multi-Language Support:**
   - **All Safety Views** (`destination.blade.php`, `incident.blade.php`, `index.blade.php`, `admin/safety/dashboard.blade.php`) now fully translated.
-  - **Added 70+ translation keys** for safety-related UI elements: `safety_status`, `travel_safety`, `risk_score`, `status_normal`, `status_caution`, `status_high_risk`, `status_avoid`, `safety_map`, `active_incidents`, `related_incidents`, `safety_recommendations`, and many more.
+  - **Added 70+ translation keys** for safety-related UI elements.
   - **Language Switcher** works seamlessly on public and admin safety pages.
   - **Admin Safety Dashboard** translated for EN/NP/HI/ZH.
-  - **Incident Detail & Destination Safety pages** fully localized.
-  - **End-to-End Testing Completed:**
-    - ✅ Incident creation with waypoint matching
-    - ✅ Risk scoring (severity → safety_status mapping)
-    - ✅ Traveler alert creation and dashboard display
-    - ✅ Public safety page with map markers and affected areas
-    - ✅ Admin safety dashboard with incident management
-    - ✅ Multi-language support for all safety pages
-    - ✅ Safety status permanently fixed – no more `unknown` status
-    - ✅ Memory error resolved – infinite recursion fixed
-    - ✅ RSS source fetching and incident detection jobs working
+  - **End-to-End Testing Completed** – all safety flows working.
   - **Result:** The entire Phase 6 Safety Module is now fully multi‑lingual, production‑ready, and end-to-end tested. ✅ **COMPLETED**
+- **Phase 16: Public Journey Replay Social Sharing:**
+  - **Share Token System:** Generated unique 64-character tokens per booking with `share_enabled_at` and `share_revoked_at` timestamps.
+  - **Visibility Control:** Three levels – `private` (no access), `link` (token required), `public` (token required but accessible).
+  - **Public Journey Replay Pages:** Dedicated public-facing journey replay with OG meta tags for social sharing.
+  - **Social Share Buttons:** Facebook, WhatsApp, Copy Link, and Native Share (mobile).
+  - **Share Management UI:** Traveler can toggle visibility, copy share link, revoke access, and regenerate tokens.
+  - **Media Privacy:** All media served through a secure route that validates the share token and booking visibility.
+  - **Cinematic Replay Support:** Public cinematic replay also accessible with the same share token.
+  - **Privacy-Compliant:** No email, phone, or sensitive data exposed on public pages.
+  - **OG Meta Integration:** Dynamic Open Graph tags for rich social media previews.
+  - **Result:** Travelers can now share their journey experiences publicly via social media, with full control over visibility. ✅ **COMPLETED**
 
 The key architectural shift is to **separate the user (authentication) from the provider (business entity)** and to **decouple provider types from system roles**. This document provides a detailed audit, target architecture, database mapping, phased migration strategy, and implementation roadmap—all designed to **preserve existing functionality** while enabling future extensibility.
 
@@ -152,6 +153,7 @@ The system is now a comprehensive trekking ecosystem with:
 - **My Journey Replay** – Cinematic timeline, map, and stats for each traveler.
 - **Cinematic Journey Replay** – Full‑screen slideshow with user media, optimization, and fallback.
 - **Safety Module** – Incident tracking, location resolution, risk scoring, safety status, traveler alerts, admin safety dashboard, and **real-time safety map** – **fully multi‑lingual**.
+- **Public Journey Replay Social Sharing** – Shareable links with visibility control (private/link/public), social share buttons (Facebook, WhatsApp, Copy Link), dynamic OG meta tags for social previews, and secure media serving via share tokens.
 
 ---
 
@@ -193,7 +195,7 @@ The system is now a comprehensive trekking ecosystem with:
 | `trek_details` | Trek-specific data | `service_id, duration_days, difficulty, max_altitude, season, itinerary` |
 | `tour_details` | Tour-specific data | `service_id, duration_days, inclusions, exclusions` |
 | `hotel_details` | Hotel-specific data | `service_id, star_rating, amenities, check_in_time, check_out_time` |
-| `bookings` | Traveler bookings | `id, traveler_id, service_id, status, start_date, booking_date, qr_code` |
+| `bookings` | Traveler bookings | `id, traveler_id, service_id, status, start_date, booking_date, qr_code, visibility, share_token, share_enabled_at, share_revoked_at` |
 | `qr_scans` | Check-in records | `id, booking_id, waypoint_id, scanned_at, latitude, longitude, duplicate_of` |
 | `reviews` | Service reviews | `id, booking_id, user_id, service_id, rating, comment, status` |
 | `notifications` | System notifications | `id, user_id, type, data, read_at` |
@@ -270,16 +272,17 @@ The system is now a comprehensive trekking ecosystem with:
 | Phase 13 | Invoice System (Complete) | ✅ COMPLETED |
 | Phase 14 | **My Journey Replay** (Cinematic Timeline, Map, Stats, Dashboard Integration) | ✅ COMPLETED |
 | Phase 15 | **Cinematic Journey Replay** (Media Upload, Slideshow, Optimization, Fallback) | ✅ COMPLETED |
+| Phase 16 | **Public Journey Replay Social Sharing** (shareable links, visibility control, social share buttons, OG meta) | ✅ **COMPLETED** |
 | Staff Management | Provider Staff/Team CRUD with plan limits | ✅ COMPLETED |
 | Waitlist | Waitlist signup with confirmation email | ✅ COMPLETED |
 
 ---
 
-## 7. NOW vs NEXT vs LATER (Final – v13.1)
+## 7. NOW vs NEXT vs LATER (Final – v13.2)
 
 | Category | Features | Status |
 |----------|----------|--------|
-| **NOW** (All completed) | All core features + PWA + Provider Directory + 12 Business Types + Multi‑Currency + Traveler Dashboard + QR Check‑in + SEO + High‑res Favicon + Logo in Dashboards + Invoice System (Complete) + AI Planner (ABC/EBC/Langtang) + Fallback + Multi‑Language (EN/NP/HI/ZH) + AI Travel Planner Language + Admin Panel (Route/CRUD) + Provider Staff Management + Legacy Cleanup + ALL Nepal Routes Data Entry (138+) + Waitlist + Digital Trek Passport + My Journey Replay + Cinematic Journey Replay + **Phase 6 Safety Module (Multi‑Language + End-to-End Tested)** | ✅ **COMPLETED** |
+| **NOW** (All completed) | All core features + PWA + Provider Directory + 12 Business Types + Multi‑Currency + Traveler Dashboard + QR Check‑in + SEO + High‑res Favicon + Logo in Dashboards + Invoice System (Complete) + AI Planner (ABC/EBC/Langtang) + Fallback + Multi‑Language (EN/NP/HI/ZH) + AI Travel Planner Language + Admin Panel (Route/CRUD) + Provider Staff Management + Legacy Cleanup + ALL Nepal Routes Data Entry (138+) + Waitlist + Digital Trek Passport + My Journey Replay + Cinematic Journey Replay + Phase 6 Safety Module (Multi‑Language + End-to-End Tested) + **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility toggle, social share buttons, OG meta for public pages)** | ✅ **COMPLETED** |
 | **NEXT** | Deployment & Monitoring (Production server, performance tuning, error tracking) | ⏳ In Progress |
 | **NEXT** | Final QA and User Acceptance Testing | ⏳ In Progress |
 | **LATER** | **Traveler Dashboard – View Received Quotations** | ⏳ Planned |
@@ -292,13 +295,13 @@ The system is now a comprehensive trekking ecosystem with:
 
 ---
 
-## 8. Go / No‑Go Checklist (v13.1 – ALL COMPLETED)
+## 8. Go / No‑Go Checklist (v13.2 – ALL COMPLETED)
 
 ### ✅ COMPLETED (All items)
 
 | Element | Status |
 |---------|--------|
-| **Phase 1-15 Core Features** | ✅ |
+| **Phase 1-16 Core Features** | ✅ |
 | **Multi-Language Support (EN/NP/HI/ZH)** | ✅ |
 | **AI Planner Grounded + Fallback** | ✅ |
 | **Invoice System Complete** | ✅ |
@@ -312,6 +315,7 @@ The system is now a comprehensive trekking ecosystem with:
 | **My Journey Replay** | ✅ |
 | **Cinematic Journey Replay** | ✅ |
 | **Phase 6 Safety Module – Multi‑Language + End-to-End Tested** | ✅ |
+| **Phase 16: Public Journey Replay Social Sharing** | ✅ |
 | Memory error resolved | ✅ |
 | Safety status `unknown` issue resolved | ✅ |
 | Multi‑language support – ALL views | ✅ |
@@ -344,6 +348,7 @@ The system is now a comprehensive trekking ecosystem with:
 | `2026_08_31_030730_add_safety_status_to_existing_tables` | `waypoints`, `routes`, `treks`, `locations` | Add safety_status columns |
 | `2026_08_31_030731_add_safety_fields_to_waypoints_table` | `waypoints` | Additional safety fields |
 | `2026_08_31_030732_create_safety_alerts_table` | `traveler_safety_alerts` | Alert storage |
+| `2026_09_01_073207_add_share_fields_to_bookings_table` | `bookings` | Add visibility, share_token, share_enabled_at, share_revoked_at |
 
 ---
 

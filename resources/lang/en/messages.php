@@ -1092,4 +1092,51 @@ return [
 'live_interactive_map' => 'Live Interactive Map',
 'loading_map_data' => 'Loading map data...',
 'no_areas_under_alert' => 'No areas currently under safety alerts.',
+'unlimited' => 'Unlimited',
+'pricing_hero_title' => 'Power Your Tourism Business with AI',
+'pricing_hero_subtitle' => 'Choose the right TravelAI Nepal plan for your business — from getting started for free to scaling with advanced AI-powered tools, analytics, bookings, and more.',
+// ======================
+// PLANS (for cards)
+// ======================
+'plans' => [
+    'free' => [
+        'description' => 'Ideal for startups and small businesses',
+    ],
+    'professional' => [
+        'description' => 'For growing agencies and hotels',
+    ],
+    'business' => [
+        'description' => 'For large operators and chains',
+    ],
+    'enterprise' => [
+        'description' => 'Custom solutions for large enterprises',
+    ],
+    'features' => [
+        'basic_dashboard' => 'Basic Dashboard',
+        '3_listings' => '3 Listings',
+        '5_ai_requests_mo' => '5 AI Requests/mo',
+        '10_bookings_mo' => '10 Bookings/mo',
+        'advanced_dashboard' => 'Advanced Dashboard',
+        '20_listings' => '20 Listings',
+        '50_ai_requests_mo' => '50 AI Requests/mo',
+        '100_bookings_mo' => '100 Bookings/mo',
+        'custom_logo' => 'Custom Logo',
+        'full_analytics' => 'Full Analytics',
+        '100_listings' => '100 Listings',
+        '500_ai_requests_mo' => '500 AI Requests/mo',
+        '1000_bookings_mo' => '1000 Bookings/mo',
+        'white_label' => 'White-label',
+        'unlimited_listings' => 'Unlimited Listings',
+        'unlimited_staff' => 'Unlimited Staff',
+        'unlimited_ai' => 'Unlimited AI',
+        'unlimited_bookings' => 'Unlimited Bookings',
+        'priority_support' => 'Priority Support',
+        '5_ai_requestsmo' => '5 AI Requests/mo',
+'10_bookingsmo'   => '10 Bookings/mo',
+'50_ai_requestsmo' => '50 AI Requests/mo',
+'100_bookingsmo'  => '100 Bookings/mo',
+'500_ai_requestsmo' => '500 AI Requests/mo',
+'1000_bookingsmo' => '1000 Bookings/mo',
+    ],
+],
 ];
