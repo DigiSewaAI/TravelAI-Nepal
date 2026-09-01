@@ -3,92 +3,110 @@
 namespace App\Models\Traits;
 
 use App\Models\TravelSafetyIncident;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 trait HasSafetyStatus
 {
-    /**
-     * Get all safety incidents affecting this entity.
-     */
-    public function safetyIncidents()
-{
-    return $this->morphToMany(
-        TravelSafetyIncident::class,
-        'affectable',
-        'incident_affectables',
-        'affectable_id',
-        'incident_id'
-    )->withPivot('distance', 'match_type', 'confidence', 'metadata')
-     ->withTimestamps()
-     ->whereIn('status', ['active', 'verified', 'under_review']); // ✅ Include these
-}
+    public function safetyIncidents(): MorphToMany
+    {
+        return $this->morphToMany(
+            TravelSafetyIncident::class,
+            'affectable',
+            'incident_affectables',
+            'affectable_id',
+            'incident_id',
+            'id',
+            'id'
+        )->withPivot('distance', 'match_type', 'confidence', 'metadata')
+         ->withTimestamps()
+         ->whereIn('status', ['active', 'verified', 'under_review']);
+    }
 
     /**
-     * Get the computed safety status (cached).
+     * Accessor for safety_status – uses raw attributes to avoid recursion.
      */
-    public function getSafetyStatusAttribute()
+    public function getSafetyStatusAttribute(): string
     {
-        // ✅ Check if safety_updated_at is a Carbon instance and within cache TTL
-        if ($this->safety_updated_at instanceof \Carbon\Carbon) {
-            if ($this->safety_updated_at->gt(now()->subMinutes(15))) {
-                return $this->safety_status ?? 'unknown';
-            }
+        // ✅ Use raw attributes – no recursion
+        $status = $this->attributes['safety_status'] ?? null;
+        $updated = $this->attributes['safety_updated_at'] ?? null;
+
+        // If manually set (non-unknown), return it without any DB operation
+        if ($status && $status !== 'unknown') {
+            return $status;
+        }
+
+        // If status is null or unknown, compute fresh (but only if not cached)
+        if ($updated && \Carbon\Carbon::parse($updated)->gt(now()->subMinutes(15))) {
+            return $status ?? 'unknown';
         }
 
         // Compute fresh
         return $this->computeSafetyStatus();
     }
 
-    /**
-     * Compute safety status from linked incidents.
-     */
     public function computeSafetyStatus(): string
     {
-        $statuses = $this->safetyIncidents->pluck('severity')->unique();
+        // ✅ Use raw attributes to avoid recursion
+        $currentStatus = $this->attributes['safety_status'] ?? null;
 
-        if ($statuses->isEmpty()) {
-            $status = 'unknown';
-        } else {
-            // Highest severity wins (critical > high > moderate > low)
-            $priority = ['critical' => 4, 'high' => 3, 'moderate' => 2, 'low' => 1];
-            $max = $statuses->map(function ($s) use ($priority) {
-                return $priority[$s] ?? 0;
-            })->max();
-
-            $mapping = [
-                4 => 'avoid',
-                3 => 'high_risk',
-                2 => 'caution',
-                1 => 'normal',
-                0 => 'unknown',
-            ];
-
-            $status = $mapping[$max] ?? 'unknown';
+        // If already manually set (non-unknown), skip computation
+        if ($currentStatus && $currentStatus !== 'unknown') {
+            return $currentStatus;
         }
 
-        // ✅ Use updateQuietly to avoid event loops and set both fields
-        $this->updateQuietly([
-            'safety_status' => $status,
-            'safety_updated_at' => now(),
-        ]);
+        // Direct DB query for incident severities
+        $severities = DB::table('incident_affectables')
+            ->join('travel_safety_incidents', 'incident_affectables.incident_id', '=', 'travel_safety_incidents.id')
+            ->where('incident_affectables.affectable_id', $this->id)
+            ->where('incident_affectables.affectable_type', 'App\\Models\\Waypoint') // ✅ exact DB format
+            ->whereIn('travel_safety_incidents.status', ['active', 'verified', 'under_review'])
+            ->whereNull('travel_safety_incidents.deleted_at')
+            ->pluck('travel_safety_incidents.severity')
+            ->unique()
+            ->values()
+            ->toArray();
 
-        return $status;
+        if (empty($severities)) {
+            // No incidents – keep current status or set unknown
+            return $currentStatus ?? 'unknown';
+        }
+
+        $priority = ['critical' => 4, 'high' => 3, 'moderate' => 2, 'low' => 1];
+        $max = 0;
+        foreach ($severities as $sev) {
+            $max = max($max, $priority[$sev] ?? 0);
+        }
+
+        $mapping = [
+            4 => 'avoid',
+            3 => 'high_risk',
+            2 => 'caution',
+            1 => 'normal',
+            0 => 'unknown',
+        ];
+        $computedStatus = $mapping[$max] ?? 'unknown';
+
+        // Only update if computed is different and not 'unknown'
+        if ($currentStatus !== $computedStatus && $computedStatus !== 'unknown') {
+            $this->updateQuietly([
+                'safety_status' => $computedStatus,
+                'safety_updated_at' => now(),
+            ]);
+        }
+
+        return $computedStatus;
     }
 
-    /**
-     * Update safety status for this entity.
-     * Called after incident changes.
-     */
-    public function refreshSafetyStatus()
+    public function refreshSafetyStatus(): void
     {
         $this->computeSafetyStatus();
     }
 
-    /**
-     * Check if entity is safe (normal/unknown).
-     */
     public function isSafe(): bool
     {
-        return in_array($this->safety_status, ['normal', 'unknown']);
+        $status = $this->attributes['safety_status'] ?? 'unknown';
+        return in_array($status, ['normal', 'unknown']);
     }
 }

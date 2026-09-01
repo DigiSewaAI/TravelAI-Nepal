@@ -1,8 +1,8 @@
-@extends('layouts.public')
 
-@section('title', __('messages.travel_safety_nepal'))
 
-@section('content')
+<?php $__env->startSection('title', __('messages.travel_safety_nepal')); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
     
     <!-- Page Header with Last Updated -->
@@ -10,53 +10,56 @@
         <div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3">
                 <span class="text-4xl">🇳🇵</span>
-                {{ __('messages.travel_safety_nepal') }}
+                <?php echo e(__('messages.travel_safety_nepal')); ?>
+
             </h1>
             <p class="text-gray-600 mt-2 max-w-2xl">
-                {{ __('messages.safety_subtitle') ?? 'Real-time safety updates, AI-driven risk assessments, and live incident tracking for travelers across Nepal.' }}
+                <?php echo e(__('messages.safety_subtitle') ?? 'Real-time safety updates, AI-driven risk assessments, and live incident tracking for travelers across Nepal.'); ?>
+
             </p>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
             <i class="fas fa-sync-alt text-blue-500 animate-spin-slow"></i>
-            <span>Last updated: {{ now()->format('M d, Y h:i A') }}</span>
+            <span>Last updated: <?php echo e(now()->format('M d, Y h:i A')); ?></span>
         </div>
     </div>
     
     <!-- Advanced Summary Cards -->
-@php
+<?php
     $computedStats = [
         'normal'    => $incidents->where('severity', 'normal')->count(),
         'caution'   => $incidents->where('severity', 'moderate')->count(),
         'high_risk' => $incidents->whereIn('severity', ['high', 'high_risk'])->count(),
         'avoid'     => $incidents->whereIn('severity', ['critical', 'avoid'])->count(),
     ];
-@endphp
+?>
 
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-    @php
+    <?php
         $statsConfig = [
             ['key' => 'normal', 'label' => __('messages.status_normal'), 'color' => 'emerald', 'icon' => 'fa-check-circle'],
             ['key' => 'caution', 'label' => __('messages.status_caution'), 'color' => 'amber', 'icon' => 'fa-exclamation-circle'],
             ['key' => 'high_risk', 'label' => __('messages.status_high_risk'), 'color' => 'orange', 'icon' => 'fa-radiation'],
             ['key' => 'avoid', 'label' => __('messages.status_avoid'), 'color' => 'red', 'icon' => 'fa-ban'],
         ];
-    @endphp
+    ?>
 
-    @foreach($statsConfig as $stat)
-        <div class="glass-card rounded-2xl p-5 border-l-4 border-{{ $stat['color'] }}-500 bg-{{ $stat['color'] }}-50/40 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <?php $__currentLoopData = $statsConfig; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $stat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="glass-card rounded-2xl p-5 border-l-4 border-<?php echo e($stat['color']); ?>-500 bg-<?php echo e($stat['color']); ?>-50/40 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-{{ $stat['color'] }}-700 uppercase tracking-wider">{{ $stat['label'] }}</p>
-                    <h2 class="text-3xl font-extrabold text-{{ $stat['color'] }}-900 mt-1">
-                        {{ $computedStats[$stat['key']] ?? 0 }}
+                    <p class="text-xs font-bold text-<?php echo e($stat['color']); ?>-700 uppercase tracking-wider"><?php echo e($stat['label']); ?></p>
+                    <h2 class="text-3xl font-extrabold text-<?php echo e($stat['color']); ?>-900 mt-1">
+                        <?php echo e($computedStats[$stat['key']] ?? 0); ?>
+
                     </h2>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-{{ $stat['color'] }}-100 flex items-center justify-center text-{{ $stat['color'] }}-600 shadow-sm">
-                    <i class="fas {{ $stat['icon'] }} text-xl"></i>
+                <div class="w-12 h-12 rounded-xl bg-<?php echo e($stat['color']); ?>-100 flex items-center justify-center text-<?php echo e($stat['color']); ?>-600 shadow-sm">
+                    <i class="fas <?php echo e($stat['icon']); ?> text-xl"></i>
                 </div>
             </div>
         </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -67,7 +70,8 @@
                 <div class="bg-white rounded-xl p-4 md:p-6 relative">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-map-marked-alt text-blue-600"></i> {{ __('messages.safety_map') }}
+                            <i class="fas fa-map-marked-alt text-blue-600"></i> <?php echo e(__('messages.safety_map')); ?>
+
                         </h2>
                         <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Live Interactive Map</span>
                     </div>
@@ -101,15 +105,16 @@
         <div class="lg:col-span-1">
             <div class="glass-card rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
                 <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-layer-group text-red-500"></i> {{ __('messages.affected_areas') }}
+                    <i class="fas fa-layer-group text-red-500"></i> <?php echo e(__('messages.affected_areas')); ?>
+
                 </h3>
 
                 <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                    @php $hasAreas = false; @endphp
+                    <?php $hasAreas = false; ?>
                     
-                    @foreach(($affectedWaypoints ?? []) as $wp)
-                        @php $hasAreas = true; @endphp
-                        @php 
+                    <?php $__currentLoopData = ($affectedWaypoints ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $wp): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $hasAreas = true; ?>
+                        <?php 
                             $status = strtolower($wp->safety_status ?? 'normal');
                             $badgeColor = match($status) {
                                 'caution' => 'bg-amber-100 text-amber-800 border-amber-200',
@@ -117,21 +122,22 @@
                                 'avoid', 'critical' => 'bg-red-100 text-red-800 border-red-200',
                                 default => 'bg-emerald-100 text-emerald-800 border-emerald-200'
                             };
-                        @endphp
+                        ?>
                         <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-map-pin text-gray-400"></i>
-                                <span class="font-medium text-gray-800 text-sm">{{ $wp->name ?? 'Unknown Location' }}</span>
+                                <span class="font-medium text-gray-800 text-sm"><?php echo e($wp->name ?? 'Unknown Location'); ?></span>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border {{ $badgeColor }}">
-                                {{ str_replace('_', ' ', $status) }}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border <?php echo e($badgeColor); ?>">
+                                <?php echo e(str_replace('_', ' ', $status)); ?>
+
                             </span>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                    @foreach(($affectedTreks ?? []) as $trek)
-                        @php $hasAreas = true; @endphp
-                        @php 
+                    <?php $__currentLoopData = ($affectedTreks ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $trek): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $hasAreas = true; ?>
+                        <?php 
                             $status = strtolower($trek->safety_status ?? 'normal');
                             $badgeColor = match($status) {
                                 'caution' => 'bg-amber-100 text-amber-800 border-amber-200',
@@ -139,24 +145,25 @@
                                 'avoid', 'critical' => 'bg-red-100 text-red-800 border-red-200',
                                 default => 'bg-emerald-100 text-emerald-800 border-emerald-200'
                             };
-                        @endphp
+                        ?>
                         <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-mountain text-gray-400"></i>
-                                <span class="font-medium text-gray-800 text-sm">{{ $trek->name ?? 'Unknown Trek' }}</span>
+                                <span class="font-medium text-gray-800 text-sm"><?php echo e($trek->name ?? 'Unknown Trek'); ?></span>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border {{ $badgeColor }}">
-                                {{ str_replace('_', ' ', $status) }}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border <?php echo e($badgeColor); ?>">
+                                <?php echo e(str_replace('_', ' ', $status)); ?>
+
                             </span>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                    @if(!$hasAreas)
+                    <?php if(!$hasAreas): ?>
                         <div class="text-center py-8 text-gray-500">
                             <i class="fas fa-shield-alt text-3xl text-emerald-400 mb-2"></i>
                             <p class="text-sm">No areas currently under safety alerts.</p>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -166,12 +173,12 @@
     <div class="mt-10">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-2 h-8 bg-red-500 rounded-full animate-pulse"></div>
-            <h2 class="text-2xl font-bold text-gray-900">{{ __('messages.active_incidents') }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900"><?php echo e(__('messages.active_incidents')); ?></h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($incidents as $incident)
-                @php
+            <?php $__empty_1 = true; $__currentLoopData = $incidents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $incident): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php
                     $severityColor = match($incident->severity) {
                         'critical' => 'border-red-500 bg-red-50/50',
                         'high' => 'border-orange-500 bg-orange-50/50',
@@ -184,54 +191,57 @@
                         'moderate' => '🟡',
                         default => '🟢'
                     };
-                @endphp
-                <div class="glass-card rounded-2xl p-5 border-l-4 {{ $severityColor }} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+                ?>
+                <div class="glass-card rounded-2xl p-5 border-l-4 <?php echo e($severityColor); ?> hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
                     <div class="flex items-start justify-between mb-3">
-                        <span class="text-2xl" title="{{ $incident->severity }}">{{ $icon }}</span>
+                        <span class="text-2xl" title="<?php echo e($incident->severity); ?>"><?php echo e($icon); ?></span>
                         <span class="text-xs font-semibold text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200">
-                            {{ $incident->reported_at?->diffForHumans() ?? 'Recently' }}
+                            <?php echo e($incident->reported_at?->diffForHumans() ?? 'Recently'); ?>
+
                         </span>
                     </div>
                     
                     <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
-                        <a href="{{ route('safety.incident', $incident->id) }}" class="hover:text-blue-600 transition-colors">
-                            {{ $incident->title }}
+                        <a href="<?php echo e(route('safety.incident', $incident->id)); ?>" class="hover:text-blue-600 transition-colors">
+                            <?php echo e($incident->title); ?>
+
                         </a>
                     </h3>
                     
                     <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
                         <i class="fas fa-map-marker-alt text-gray-400"></i>
-                        <span class="truncate">{{ $incident->location_name ?? 'Unknown Location' }}</span>
+                        <span class="truncate"><?php echo e($incident->location_name ?? 'Unknown Location'); ?></span>
                     </div>
 
-                    @if($incident->description)
+                    <?php if($incident->description): ?>
                         <p class="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">
-                            {{ Str::limit($incident->description, 120) }}
-                        </p>
-                    @endif
+                            <?php echo e(Str::limit($incident->description, 120)); ?>
 
-                    <a href="{{ route('safety.incident', $incident->id) }}" class="mt-auto inline-flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
-                        {{ __('messages.view_details') }} <i class="fas fa-arrow-right text-xs"></i>
+                        </p>
+                    <?php endif; ?>
+
+                    <a href="<?php echo e(route('safety.incident', $incident->id)); ?>" class="mt-auto inline-flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+                        <?php echo e(__('messages.view_details')); ?> <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="col-span-full glass-card rounded-2xl p-12 text-center border border-dashed border-gray-300">
                     <i class="fas fa-check-circle text-5xl text-emerald-400 mb-4"></i>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">All Clear!</h3>
-                    <p class="text-gray-500">{{ __('messages.no_active_incidents_reported') ?? 'No active safety incidents reported at this time.' }}</p>
+                    <p class="text-gray-500"><?php echo e(__('messages.no_active_incidents_reported') ?? 'No active safety incidents reported at this time.'); ?></p>
                 </div>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('{{ route("api.safety.markers") }}')
+        fetch('<?php echo e(route("api.safety.markers")); ?>')
             .then(response => response.json())
             .then(data => {
                 // Hide loader
@@ -289,5 +299,6 @@
             });
     });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.public', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\TravelAI-Nepal\resources\views/safety/index.blade.php ENDPATH**/ ?>

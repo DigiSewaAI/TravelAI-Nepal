@@ -308,4 +308,22 @@ class SafetyController extends Controller
 
         return view('admin.safety.audit', compact('logs'));
     }
+    public function index()
+{
+    $incidents = TravelSafetyIncident::whereIn('status', ['active', 'verified'])->get();
+    
+    $summary = [
+        'normal'    => $incidents->where('severity', 'normal')->count(),
+        'caution'   => $incidents->where('severity', 'moderate')->count(),
+        'high_risk' => $incidents->where('severity', 'high')->count(),
+        'avoid'     => $incidents->where('severity', 'critical')->count(),
+    ];
+
+    $affectedWaypoints = Waypoint::whereNotNull('safety_status')
+        ->whereNotIn('safety_status', ['normal', 'unknown'])
+        ->limit(10)
+        ->get();
+
+    return view('safety.index', compact('incidents', 'summary', 'affectedWaypoints'));
+}
 }

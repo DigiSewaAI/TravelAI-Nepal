@@ -20,8 +20,8 @@ class Waypoint extends Model
         'altitude',
         'description',
         'metadata',
-        'safety_status',      // ✅ Added
-        'safety_updated_at',  // ✅ Added
+        'safety_status',
+        'safety_updated_at',
     ];
 
     protected $casts = [
@@ -29,7 +29,7 @@ class Waypoint extends Model
         'longitude' => 'decimal:8',
         'altitude' => 'integer',
         'metadata' => 'array',
-        'safety_updated_at' => 'datetime',   // ✅ Ensures Carbon instance
+        'safety_updated_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
