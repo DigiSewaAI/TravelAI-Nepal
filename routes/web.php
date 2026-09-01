@@ -79,8 +79,7 @@ Route::get('/service/confirmation/{booking}', [PublicBookingController::class, '
 Route::get('/providers', [ProviderController::class, 'index'])->name('public.providers.index');
 Route::get('/providers/{provider:slug}', [ProviderController::class, 'show'])->name('public.providers.show');
 
-// Provider profile page (old, but keep for now)
-Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
+
 
 // =======================================
 // 3. AUTH ROUTES (User Guard)
@@ -91,48 +90,6 @@ Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logou
 
 Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
-
-
-// =======================================
-// 4. TRAVELER ROUTES (Phase 10 + Passport)
-// =======================================
-Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
-
-    // Digital Trek Passport
-    Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
-    Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
-
-    // Reviews
-    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
-
-    // Bookings
-    Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
-    Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
-
-    // Cinematic Replay
-    Route::get('/cinematic-replay', [App\Http\Controllers\Traveler\CinematicReplayController::class, 'index'])->name('cinematic-replay');
-
-    // Media Upload (✅ यो सही छ)
-Route::post('/checkpoint/upload', [App\Http\Controllers\Traveler\MediaUploadController::class, 'upload'])
-    ->name('checkpoint.upload');
-    // Delete Memory (✅ यो सही छ)
-    Route::delete('/memory/delete', [App\Http\Controllers\Traveler\MediaUploadController::class, 'delete'])->name('memory.delete');
-
-    // Journey Replay
-    Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])->name('journey-replay');
-
-    // ❌ यो अनावश्यक route हटाउनुहोस् (जसले closure मा undefined variables को error दिन्छ)
-    // Route::get('/upload-via-controller', ...)  <-- यो पूरै हटाउनुहोस्
-});
-
-// =======================================
-// 5. PUBLIC PASSPORT (Phase 6) – No auth required
-// =======================================
-Route::get('/passport/{publicId}', [App\Http\Controllers\Public\PassportController::class, 'show'])
-    ->name('public.passport.show');
 
 // =======================================
 // 6. PROVIDER DASHBOARD ROUTES
@@ -195,6 +152,47 @@ Route::prefix('provider')->name('provider.')->group(function () {
         Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
     });
 });
+// Provider profile page (old, but keep for now)
+Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');
+// =======================================
+// 4. TRAVELER ROUTES (Phase 10 + Passport)
+// =======================================
+Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
+
+    // Digital Trek Passport
+    Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
+    Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
+
+    // Reviews
+    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+
+    // Bookings
+    Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+
+    // Cinematic Replay
+    Route::get('/cinematic-replay', [App\Http\Controllers\Traveler\CinematicReplayController::class, 'index'])->name('cinematic-replay');
+
+    // Media Upload (✅ यो सही छ)
+Route::post('/checkpoint/upload', [App\Http\Controllers\Traveler\MediaUploadController::class, 'upload'])
+    ->name('checkpoint.upload');
+    // Delete Memory (✅ यो सही छ)
+    Route::delete('/memory/delete', [App\Http\Controllers\Traveler\MediaUploadController::class, 'delete'])->name('memory.delete');
+
+    // Journey Replay
+    Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])->name('journey-replay');
+
+Route::post('/alert/{alert}/read', [App\Http\Controllers\Traveler\AlertController::class, 'markAsRead'])->name('alert.read');
+});
+
+// =======================================
+// 5. PUBLIC PASSPORT (Phase 6) – No auth required
+// =======================================
+Route::get('/passport/{publicId}', [App\Http\Controllers\Public\PassportController::class, 'show'])
+    ->name('public.passport.show');
 
 // =======================================
 // 7. ADMIN ROUTES (Super Admin)

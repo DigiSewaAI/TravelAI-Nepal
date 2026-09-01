@@ -357,22 +357,69 @@
     </div>
 </div>
 
-            {{-- 🔥 Safety Center (Premium Coming Soon) --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
-                <div class="flex items-start gap-3">
-                    <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-shield-alt text-red-500 text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_safety_center_title') }}</h4>
-                        <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_safety_center_desc') }}</p>
-                        <span class="inline-block mt-2 text-[10px] bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full font-medium">{{ __('messages.traveler_coming_2026') }}</span>
-                    </div>
+            {{-- 🔥 Safety Center --}}
+<div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+    <div class="flex items-start gap-3">
+        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-shield-alt text-red-500 text-xl"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_safety_center_title') }}</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_safety_center_desc') }}</p>
                 </div>
+                @if(isset($unreadAlerts) && count($unreadAlerts) > 0)
+                    <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ count($unreadAlerts) }}</span>
+                @endif
             </div>
 
+            {{-- Alerts List --}}
+            @if(isset($unreadAlerts) && count($unreadAlerts) > 0)
+                <div class="mt-3 space-y-2 max-h-60 overflow-y-auto">
+                    @foreach($unreadAlerts as $alert)
+                        <div class="border-l-4 
+                            @if($alert['severity'] === 'critical') border-red-600
+                            @elseif($alert['severity'] === 'high') border-orange-500
+                            @elseif($alert['severity'] === 'moderate') border-yellow-500
+                            @else border-green-500 @endif
+                            bg-gray-50 p-3 rounded-r-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-medium text-sm">
+                                        @if($alert['severity'] === 'critical') 🔴
+                                        @elseif($alert['severity'] === 'high') 🟠
+                                        @elseif($alert['severity'] === 'moderate') 🟡
+                                        @else 🟢 @endif
+                                        {{ $alert['incident']['title'] ?? $alert['message'] ?? 'Safety Alert' }}
+                                    </p>
+                                    <p class="text-xs text-gray-600">{{ $alert['message'] }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">
+    {{ isset($alert['sent_at']) ? \Carbon\Carbon::parse($alert['sent_at'])->diffForHumans() : 'Just now' }}
+</p>
+                                </div>
+                                <form method="POST" action="{{ route('traveler.alert.read', $alert['id']) }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800">Mark as Read</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-3">
+                    <p class="text-gray-500 text-sm">✅ No safety alerts at this time.</p>
+                </div>
+            @endif
+
+            <div class="mt-3">
+                <a href="{{ route('safety.index') }}" class="text-sm text-blue-600 hover:underline">
+                    View Safety Map →
+                </a>
+            </div>
         </div>
     </div>
+</div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

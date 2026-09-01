@@ -15,6 +15,7 @@ class DashboardController extends Controller
 {
     public function index(AiLimitService $aiLimit)
     {
+
         // Auth check
         if (!auth()->check()) {
             return redirect()->route('login');

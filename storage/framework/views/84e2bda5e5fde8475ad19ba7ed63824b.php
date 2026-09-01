@@ -200,6 +200,7 @@
                     <li><a href="<?php echo e(route('pages.features')); ?>" class="hover:text-blue-600"><?php echo e(__('messages.features')); ?></a></li>
                     <li><a href="<?php echo e(route('pages.pricing')); ?>" class="hover:text-blue-600"><?php echo e(__('messages.pricing')); ?></a></li>
                     <li><a href="<?php echo e(route('public.providers.index')); ?>" class="hover:text-blue-600"><?php echo e(__('messages.providers')); ?></a></li>
+                        <li><a href="<?php echo e(route('safety.index')); ?>" class="hover:text-blue-600">🛡️ Travel Safety</a></li>
                     <li><a href="<?php echo e(route('register')); ?>" class="hover:text-blue-600"><?php echo e(__('messages.become_partner')); ?></a></li>
                 </ul>
             </div>
