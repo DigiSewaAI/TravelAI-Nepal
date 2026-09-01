@@ -15,14 +15,29 @@ class MediaUploadController extends Controller
     public function upload(Request $request)
     {
         try {
+            // ✅ Debug: Log incoming request
+            Log::info('Upload request received', $request->all());
+
             $request->validate([
                 'checkpoint' => 'required|string',
-                'media' => 'required|file|max:51200', // 50MB
+                'media' => 'required|file|max:51200',
             ]);
 
             $user = Auth::user();
+            $file = $request->file('media');
 
-            // Find waypoint by name
+            // ✅ Debug: Check if file is present
+            if (!$file) {
+                throw new \Exception('No file received');
+            }
+
+            Log::info('File received', [
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+            ]);
+
+            // Find waypoint
             $waypoint = Waypoint::where('name', $request->checkpoint)
                                 ->orWhere('slug', $request->checkpoint)
                                 ->first();
@@ -34,26 +49,31 @@ class MediaUploadController extends Controller
                 ], 404);
             }
 
-            // ✅ Store file directly (no processing)
-            $path = $request->file('media')->store('media', 'public');
+            // ✅ Store file
+            $path = $file->store('media/' . $user->id, 'public');
 
             if (!$path) {
                 throw new \Exception('Failed to store file.');
             }
 
+            Log::info('File stored at: ' . $path);
+
             // ✅ Create DB record
             $media = UserMedia::create([
                 'user_id'        => $user->id,
                 'waypoint_id'    => $waypoint->id,
-                'media_type'     => 'image',
-                'file_name'      => $request->file('media')->getClientOriginalName(),
+                'booking_id'     => null,
+                'media_type'     => str_starts_with($file->getMimeType(), 'image/') ? 'image' : 'video',
+                'file_name'      => $file->getClientOriginalName(),
                 'optimized_path' => $path,
                 'thumbnail_path' => null,
-                'source'         => 'user',
+                'metadata'       => json_encode(['checkpoint' => $request->checkpoint]),
+                'captured_at'    => now(),
                 'is_primary'     => false,
+                'source'         => 'user',
             ]);
 
-            Log::info('✅ Upload success', ['media_id' => $media->id, 'path' => $path]);
+            Log::info('Media record created', ['media_id' => $media->id]);
 
             return response()->json([
                 'success' => true,
@@ -62,7 +82,7 @@ class MediaUploadController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('❌ Upload error: ' . $e->getMessage());
+            Log::error('Upload error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => '❌ ' . $e->getMessage(),
@@ -79,7 +99,6 @@ class MediaUploadController extends Controller
                               ->where('user_id', Auth::id())
                               ->firstOrFail();
 
-            // Delete file from storage
             if (Storage::disk('public')->exists($media->optimized_path)) {
                 Storage::disk('public')->delete($media->optimized_path);
             }
@@ -93,7 +112,7 @@ class MediaUploadController extends Controller
                              ->with('upload_success', '✅ Memory deleted successfully!');
 
         } catch (\Exception $e) {
-            Log::error('❌ Delete error: ' . $e->getMessage());
+            Log::error('Delete error: ' . $e->getMessage());
             return redirect()->route('traveler.dashboard')
                              ->with('upload_error', '❌ ' . $e->getMessage());
         }

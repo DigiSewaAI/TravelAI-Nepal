@@ -1,13 +1,9 @@
-@extends('layouts.public')
+<?php $__env->startSection('title', 'My Journey Replay - TravelAI Nepal'); ?>
 
-@section('title', 'My Journey Replay - TravelAI Nepal')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8 max-w-7xl">
 
-    {{-- ===============================================
-        CINEMATIC HERO
-    =============================================== --}}
+    
     <div class="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-br from-indigo-900 via-purple-800 to-gray-900 text-white shadow-2xl hero-section">
         <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 70%);"></div>
         <div class="absolute inset-0 bg-black/10"></div>
@@ -16,38 +12,40 @@
             <p class="text-sm uppercase tracking-[0.3em] text-purple-300 mb-3 font-light">✨ My Journey Replay</p>
 
             <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-[1.1] tracking-tight">
-                @if($replayData['has_data'])
-                    {{ $replayData['story'] ? '"A Journey to Remember"' : 'Your Journey. Your Story.' }}
-                @else
+                <?php if($replayData['has_data']): ?>
+                    <?php echo e($replayData['story'] ? '"A Journey to Remember"' : 'Your Journey. Your Story.'); ?>
+
+                <?php else: ?>
                     Your journey is waiting to be written.
-                @endif
+                <?php endif; ?>
             </h1>
 
-            @if($replayData['has_data'])
+            <?php if($replayData['has_data']): ?>
                 <p class="text-lg md:text-xl lg:text-2xl text-blue-100/80 max-w-2xl mx-auto font-light leading-relaxed">
                     A collection of places, moments and experiences from your journey.
                 </p>
 
                 <div class="mt-6 flex flex-wrap justify-center gap-3 md:gap-4 text-sm">
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['total_bookings'] }} <span class="text-blue-200/70">Experiences</span>
+                        <?php echo e($replayData['stats']['total_bookings']); ?> <span class="text-blue-200/70">Experiences</span>
                     </span>
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['total_checkins'] }} <span class="text-blue-200/70">Moments</span>
+                        <?php echo e($replayData['stats']['total_checkins']); ?> <span class="text-blue-200/70">Moments</span>
                     </span>
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['unique_places'] }} <span class="text-blue-200/70">Places</span>
+                        <?php echo e($replayData['stats']['unique_places']); ?> <span class="text-blue-200/70">Places</span>
                     </span>
-                    @if($replayData['stats']['highest_altitude'] > 0)
+                    <?php if($replayData['stats']['highest_altitude'] > 0): ?>
                         <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-blue-200/70">Highest</span>
+                            <?php echo e(number_format($replayData['stats']['highest_altitude'])); ?>m <span class="text-blue-200/70">Highest</span>
                         </span>
-                    @endif
-                    @if($replayData['stats']['journey_start'] && $replayData['stats']['journey_end'])
+                    <?php endif; ?>
+                    <?php if($replayData['stats']['journey_start'] && $replayData['stats']['journey_end']): ?>
                         <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                            {{ $replayData['stats']['journey_start']->format('M d') }} – {{ $replayData['stats']['journey_end']->format('M d, Y') }}
+                            <?php echo e($replayData['stats']['journey_start']->format('M d')); ?> – <?php echo e($replayData['stats']['journey_end']->format('M d, Y')); ?>
+
                         </span>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="mt-8">
@@ -58,62 +56,54 @@
                 </div>
 
                 <div class="mt-6 text-blue-200/30 text-xs tracking-[0.2em] animate-pulse">S C R O L L</div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
-    {{-- ===============================================
-        EMPTY STATE
-    =============================================== --}}
-    @if(!$replayData['has_data'])
+    
+    <?php if(!$replayData['has_data']): ?>
         <div class="text-center py-20">
             <div class="text-7xl mb-6">🗺️</div>
             <h2 class="text-3xl font-bold text-gray-700">No journey yet</h2>
             <p class="text-gray-400 mt-3 max-w-md mx-auto">Book your first TravelAI Nepal experience and your memories will appear here.</p>
-            <a href="{{ route('public.services.index') }}" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg">
+            <a href="<?php echo e(route('public.services.index')); ?>" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg">
                 Explore Experiences →
             </a>
         </div>
-    @else
+    <?php else: ?>
 
-        {{-- ===============================================
-            JOURNEY HIGHLIGHTS
-        =============================================== --}}
+        
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10" id="stats-container">
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-3xl md:text-4xl font-bold text-blue-600 stat-number" data-target="{{ $replayData['stats']['total_bookings'] }}">0</div>
+                <div class="text-3xl md:text-4xl font-bold text-blue-600 stat-number" data-target="<?php echo e($replayData['stats']['total_bookings']); ?>">0</div>
                 <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Experiences</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-3xl md:text-4xl font-bold text-green-600 stat-number" data-target="{{ $replayData['stats']['total_checkins'] }}">0</div>
+                <div class="text-3xl md:text-4xl font-bold text-green-600 stat-number" data-target="<?php echo e($replayData['stats']['total_checkins']); ?>">0</div>
                 <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Moments</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-3xl md:text-4xl font-bold text-purple-600 stat-number" data-target="{{ $replayData['stats']['unique_places'] }}">0</div>
+                <div class="text-3xl md:text-4xl font-bold text-purple-600 stat-number" data-target="<?php echo e($replayData['stats']['unique_places']); ?>">0</div>
                 <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Places</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
-                <div class="text-3xl md:text-4xl font-bold text-orange-600 stat-number" data-target="{{ $replayData['stats']['highest_altitude'] }}">0</div>
+                <div class="text-3xl md:text-4xl font-bold text-orange-600 stat-number" data-target="<?php echo e($replayData['stats']['highest_altitude']); ?>">0</div>
                 <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Highest Altitude</div>
             </div>
         </div>
 
-        {{-- ===============================================
-            SHARE MANAGEMENT (NEW)
-        =============================================== --}}
-        @if(isset($booking))
-            @include('traveler.share-management', ['booking' => $booking])
-        @else
-            {{-- If $booking is not passed, show a warning (optional) --}}
+        
+        <?php if(isset($booking)): ?>
+            <?php echo $__env->make('traveler.share-management', ['booking' => $booking], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php else: ?>
+            
             <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 text-sm">
                 ⚠️ Share management is not available because booking data is missing. Please ensure your controller passes <code>$booking</code>.
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- ===============================================
-            YOUR JOURNEY STORY — FINAL POLISH
-        =============================================== --}}
-        @if($replayData['story'])
+        
+        <?php if($replayData['story']): ?>
             <div class="relative rounded-3xl p-7 md:p-10 mb-10 overflow-hidden story-section">
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-50/70 via-indigo-50/50 to-purple-50/70"></div>
                 <div class="absolute top-0 right-0 w-48 h-48 bg-purple-200/15 rounded-full blur-3xl -mr-16 -mt-16"></div>
@@ -125,21 +115,20 @@
                         <span class="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium">Your Journey Story</span>
                     </div>
                     <div class="text-lg md:text-xl lg:text-2xl text-gray-800 leading-relaxed font-light italic max-w-2xl mx-auto">
-                        {{ $replayData['story'] }}
+                        <?php echo e($replayData['story']); ?>
+
                     </div>
                     <div class="mt-6 text-xs text-gray-400 tracking-wide">— TravelAI Nepal</div>
                 </div>
             </div>
-        @else
+        <?php else: ?>
             <div class="bg-gray-50/80 rounded-3xl p-8 mb-10 border border-gray-100 text-center">
                 <p class="text-gray-400">✨ A story from your journey will appear here.</p>
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- ===============================================
-            MAP — INTEGRATED
-        =============================================== --}}
-        @if(count($replayData['map_points']) > 0)
+        
+        <?php if(count($replayData['map_points']) > 0): ?>
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100/80 p-4 md:p-6 mb-10">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="text-2xl">🗺️</span>
@@ -156,18 +145,16 @@
                     </span>
                 </div>
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- ===============================================
-            JOURNEY CHAPTERS
-        =============================================== --}}
+        
         <div id="journey-timeline" class="mt-12">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center tracking-tight">
                 📖 Your Journey Chapters
             </h2>
 
             <div class="relative space-y-10">
-                @php
+                <?php
                     $chapterLabels = [
                         'tour' => 'Exploring Nepal',
                         'trek' => 'Into the Mountains',
@@ -177,10 +164,10 @@
                     ];
                     $chapterCounter = 1;
                     $totalChapters = count($replayData['timeline']);
-                @endphp
+                ?>
 
-                @foreach($replayData['timeline'] as $index => $event)
-                    @php
+                <?php $__currentLoopData = $replayData['timeline']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $type = $event['type'];
                         $label = $chapterLabels[$type] ?? 'The Journey Continues';
                         if ($chapterCounter === 1) $label = 'The Journey Begins';
@@ -202,95 +189,95 @@
                         $uniqueCheckpoints = $event['checkins']->pluck('checkpoint')->unique()->values();
                         $visibleCheckpoints = $uniqueCheckpoints->take(3);
                         $extraCheckpoints = max(0, $uniqueCheckpoints->count() - 3);
-                    @endphp
+                    ?>
 
                     <div class="flex flex-col md:flex-row gap-4 items-start animate-fade-up chapter-card">
                         <div class="md:w-24 flex-shrink-0 text-right">
-                            <span class="text-xs font-bold text-blue-600/60 uppercase tracking-[0.15em]">Chapter {{ str_pad($chapterCounter, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="text-xs font-bold text-blue-600/60 uppercase tracking-[0.15em]">Chapter <?php echo e(str_pad($chapterCounter, 2, '0', STR_PAD_LEFT)); ?></span>
                         </div>
 
                         <div class="flex-1 bg-white rounded-3xl shadow-sm border border-gray-100/80 overflow-hidden hover:shadow-lg transition-all duration-300 group">
                             <div class="flex flex-col md:flex-row">
-                                {{-- ✅ FIXED IMAGE CONTAINER with consistent aspect ratio --}}
+                                
                                 <div class="md:w-44 h-44 flex-shrink-0 bg-gray-100 relative overflow-hidden">
-                                    @if($event['cover_image'])
-                                        <img src="{{ asset('storage/' . $event['cover_image']) }}"
-                                             alt="{{ $event['service_name'] }}"
+                                    <?php if($event['cover_image']): ?>
+                                        <img src="<?php echo e(asset('storage/' . $event['cover_image'])); ?>"
+                                             alt="<?php echo e($event['service_name']); ?>"
                                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                              style="aspect-ratio: 1/1; object-fit: cover;"
                                              loading="lazy">
-                                    @else
+                                    <?php else: ?>
                                         <div class="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-gray-50 to-gray-100 text-gray-300">
-                                            {{ $icon }}
+                                            <?php echo e($icon); ?>
+
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="flex-1 p-5 md:p-6">
                                     <div class="flex flex-wrap items-start justify-between gap-2">
                                         <div>
                                             <div class="flex flex-wrap items-center gap-2 mb-1">
-                                                <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">{{ $displayType }}</span>
-                                                @if($event['status'] === 'completed')
+                                                <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full"><?php echo e($displayType); ?></span>
+                                                <?php if($event['status'] === 'completed'): ?>
                                                     <span class="text-xs text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">Completed</span>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
                                             <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                                                {{ $event['service_name'] }}
+                                                <?php echo e($event['service_name']); ?>
+
                                             </h3>
-                                            @if($event['provider'])
-                                                <p class="text-sm text-gray-500">{{ $event['provider'] }}</p>
-                                            @endif
+                                            <?php if($event['provider']): ?>
+                                                <p class="text-sm text-gray-500"><?php echo e($event['provider']); ?></p>
+                                            <?php endif; ?>
                                         </div>
 
                                         <div class="text-right text-sm text-gray-500 flex-shrink-0">
-                                            <div>{{ $event['start_date'] ? $event['start_date']->format('M d, Y') : 'N/A' }}</div>
-                                            @if($event['duration'])
-                                                <div class="text-xs text-gray-400">{{ $event['duration'] }} days</div>
-                                            @endif
+                                            <div><?php echo e($event['start_date'] ? $event['start_date']->format('M d, Y') : 'N/A'); ?></div>
+                                            <?php if($event['duration']): ?>
+                                                <div class="text-xs text-gray-400"><?php echo e($event['duration']); ?> days</div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
                                     <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                                        @if($event['location'])
-                                            <span class="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">📍 {{ $event['location'] }}</span>
-                                        @endif
-                                        @if($event['type'] === 'trek' && isset($event['difficulty']))
-                                            <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">⛰️ {{ ucfirst($event['difficulty']) }}</span>
-                                        @endif
-                                        @if($event['type'] === 'hotel' && isset($event['star_rating']))
-                                            <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">⭐ {{ $event['star_rating'] }}</span>
-                                        @endif
-                                        <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">📸 {{ $event['checkins']->count() }} check-ins</span>
-                                        @if($event['rating'])
-                                            <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">★ {{ number_format($event['rating'], 1) }}</span>
-                                        @endif
+                                        <?php if($event['location']): ?>
+                                            <span class="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">📍 <?php echo e($event['location']); ?></span>
+                                        <?php endif; ?>
+                                        <?php if($event['type'] === 'trek' && isset($event['difficulty'])): ?>
+                                            <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">⛰️ <?php echo e(ucfirst($event['difficulty'])); ?></span>
+                                        <?php endif; ?>
+                                        <?php if($event['type'] === 'hotel' && isset($event['star_rating'])): ?>
+                                            <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">⭐ <?php echo e($event['star_rating']); ?></span>
+                                        <?php endif; ?>
+                                        <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">📸 <?php echo e($event['checkins']->count()); ?> check-ins</span>
+                                        <?php if($event['rating']): ?>
+                                            <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">★ <?php echo e(number_format($event['rating'], 1)); ?></span>
+                                        <?php endif; ?>
                                     </div>
 
-                                    @if($uniqueCheckpoints->isNotEmpty())
+                                    <?php if($uniqueCheckpoints->isNotEmpty()): ?>
                                         <div class="mt-2 text-xs text-gray-400">
                                             <span class="font-medium text-gray-500">Checkpoints:</span>
-                                            @foreach($visibleCheckpoints as $name)
-                                                <span class="inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full mr-1">{{ $name }}</span>
-                                            @endforeach
-                                            @if($extraCheckpoints > 0)
-                                                <span class="text-gray-400">+{{ $extraCheckpoints }} more</span>
-                                            @endif
+                                            <?php $__currentLoopData = $visibleCheckpoints; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <span class="inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full mr-1"><?php echo e($name); ?></span>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($extraCheckpoints > 0): ?>
+                                                <span class="text-gray-400">+<?php echo e($extraCheckpoints); ?> more</span>
+                                            <?php endif; ?>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    @php $chapterCounter++; @endphp
-                @endforeach
+                    <?php $chapterCounter++; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
 
-        {{-- ===============================================
-            CINEMATIC ENDING
-        =============================================== --}}
+        
         <div class="mt-16 text-center border-t border-gray-200/60 pt-12 ending-section">
             <div class="max-w-2xl mx-auto">
                 <p class="text-base text-gray-400/80 italic font-light">And just like that...</p>
@@ -300,45 +287,43 @@
 
                 <div class="flex flex-wrap justify-center gap-4 mt-6">
                     <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                        {{ $replayData['stats']['total_bookings'] }} <span class="text-gray-400">experiences</span>
+                        <?php echo e($replayData['stats']['total_bookings']); ?> <span class="text-gray-400">experiences</span>
                     </span>
                     <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                        {{ $replayData['stats']['total_checkins'] }} <span class="text-gray-400">moments</span>
+                        <?php echo e($replayData['stats']['total_checkins']); ?> <span class="text-gray-400">moments</span>
                     </span>
-                    @if($replayData['stats']['highest_altitude'] > 0)
+                    <?php if($replayData['stats']['highest_altitude'] > 0): ?>
                         <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-gray-400">reached</span>
+                            <?php echo e(number_format($replayData['stats']['highest_altitude'])); ?>m <span class="text-gray-400">reached</span>
                         </span>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <p class="text-gray-400 mt-6 text-base font-light tracking-wide">Until the next adventure. ❤️</p>
             </div>
         </div>
 <div class="text-center mt-8">
-    <a href="{{ route('traveler.cinematic-replay') }}"
+    <a href="<?php echo e(route('traveler.cinematic-replay')); ?>"
        class="inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition hover:scale-105">
         🎬 Watch Cinematic Replay
     </a>
 </div>
-        {{-- Back to Dashboard --}}
+        
         <div class="mt-10 text-center">
-            <a href="{{ route('traveler.dashboard') }}"
+            <a href="<?php echo e(route('traveler.dashboard')); ?>"
                class="inline-block text-sm text-gray-400 hover:text-gray-600 transition-colors duration-300">
                 ← Back to Dashboard
             </a>
         </div>
 
-    @endif
+    <?php endif; ?>
 </div>
 
-{{-- ===============================================
-    LEAFTLET (Map)
-=============================================== --}}
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-@if($replayData['has_data'] && count($replayData['map_points']) > 0)
+<?php if($replayData['has_data'] && count($replayData['map_points']) > 0): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const map = L.map('journey-map').setView([28.3949, 84.1240], 7);
@@ -346,7 +331,7 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        const points = @json($replayData['map_points']);
+        const points = <?php echo json_encode($replayData['map_points'], 15, 512) ?>;
         const latlngs = points.map(p => [p.lat, p.lng]);
 
         if (latlngs.length > 1) {
@@ -382,7 +367,7 @@
         });
     });
 </script>
-@endif
+<?php endif; ?>
 
 <style>
     .hero-section .animate-pulse {
@@ -424,4 +409,5 @@
     }
 </style>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.public', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\TravelAI-Nepal\resources\views/traveler/journey-replay.blade.php ENDPATH**/ ?>

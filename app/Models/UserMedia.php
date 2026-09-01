@@ -21,6 +21,10 @@ class UserMedia extends Model
         'is_primary' => 'boolean',
     ];
 
+    // =============================================
+    // RELATIONSHIPS (existing)
+    // =============================================
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -39,5 +43,31 @@ class UserMedia extends Model
     public function qrScan()
     {
         return $this->belongsTo(QrScan::class);
+    }
+
+    // =============================================
+    // HELPER METHOD (NEW - optional, but per plan)
+    // =============================================
+
+    /**
+     * Check if this media belongs to a booking that is shareable via the given token.
+     * Note: Actual privacy enforcement is done at the controller/middleware level,
+     * but this helper can be used for convenience.
+     */
+    public function belongsToShareableBooking(?string $token = null): bool
+    {
+        if (!$this->booking) {
+            return false;
+        }
+
+        $booking = $this->booking;
+
+        // If token is provided, check if it matches the booking's share token
+        if ($token !== null && $booking->share_token !== $token) {
+            return false;
+        }
+
+        // Check if the booking is shareable (enabled, not revoked)
+        return $booking->isShareable();
     }
 }

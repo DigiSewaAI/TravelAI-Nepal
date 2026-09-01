@@ -2,6 +2,7 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- ========== FAVICON ========== -->
@@ -29,20 +30,8 @@
     <meta name="author" content="{{ __('messages.app_name') }}">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="@yield('og_title', config('app.name') . ' | ' . __('messages.og_title_default'))">
-    <meta property="og:description" content="@yield('og_description', __('messages.og_description_default'))">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('twitter_title', config('app.name'))">
-    <meta name="twitter:description" content="@yield('twitter_description', __('messages.twitter_description_default'))">
-    <meta name="twitter:image" content="{{ asset('images/og-image.jpg') }}">
+    <!-- ========== OPEN GRAPH & TWITTER CARDS (DYNAMIC) ========== -->
+@yield('og_meta')
 
     <!-- ========== Tailwind, Font Awesome, Fonts ========== -->
     <script src="https://cdn.tailwindcss.com"></script>

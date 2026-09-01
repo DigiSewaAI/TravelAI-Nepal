@@ -222,7 +222,7 @@ class DigitalTrekPassportService
             $q->where('traveler_id', $user->id);
         })->count() * 10;
 
-        $achievementXP = app(\App\Services\AchievementService::class)->getTotalXP($user);
+        $achievementXP = app(\App\Services\Passport\AchievementService::class)->getTotalXP($user);
 
         return $checkinXP + $achievementXP;
     }

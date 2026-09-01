@@ -35,6 +35,9 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Booking;
 use App\Http\Controllers\SitemapController;
 
+use App\Http\Controllers\Public\JourneyReplayController as PublicJourneyReplayController;
+use App\Http\Controllers\Traveler\ShareController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -186,6 +189,15 @@ Route::post('/checkpoint/upload', [App\Http\Controllers\Traveler\MediaUploadCont
     Route::get('/journey-replay', [App\Http\Controllers\Traveler\JourneyReplayController::class, 'index'])->name('journey-replay');
 
 Route::post('/alert/{alert}/read', [App\Http\Controllers\Traveler\AlertController::class, 'markAsRead'])->name('alert.read');
+    // =============================================
+    // SHARE MANAGEMENT (Phase 13)
+    // =============================================
+    Route::post('/share/toggle/{booking}', [ShareController::class, 'toggleVisibility'])
+        ->name('share.toggle');
+    Route::post('/share/revoke/{booking}', [ShareController::class, 'revoke'])
+        ->name('share.revoke');
+    Route::post('/share/regenerate/{booking}', [ShareController::class, 'regenerateToken'])
+        ->name('share.regenerate');
 });
 
 // =======================================
@@ -193,6 +205,18 @@ Route::post('/alert/{alert}/read', [App\Http\Controllers\Traveler\AlertControlle
 // =======================================
 Route::get('/passport/{publicId}', [App\Http\Controllers\Public\PassportController::class, 'show'])
     ->name('public.passport.show');
+
+    // =============================================
+// 10. PUBLIC JOURNEY REPLAY (Phase 13)
+// =============================================
+Route::get('/journey/replay/{token}', [PublicJourneyReplayController::class, 'show'])
+    ->name('public.journey.replay');
+
+Route::get('/journey/media/{token}/{filename}', [PublicJourneyReplayController::class, 'serveMedia'])
+    ->name('public.journey.media');
+
+Route::get('/journey/cinematic/{token}', [PublicJourneyReplayController::class, 'cinematic'])
+    ->name('public.journey.cinematic');
 
 // =======================================
 // 7. ADMIN ROUTES (Super Admin)
