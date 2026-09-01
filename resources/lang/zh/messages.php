@@ -398,6 +398,7 @@ return [
     'copy_failed' => '复制失败。请选择并手动复制。',
     'anonymous' => '匿名',
     'smart_contracts_ready' => '智能合约就绪',
+    'time_ago' => ':time前',
 
     // ======================
     // FEATURES DATA (JavaScript)
@@ -412,7 +413,7 @@ return [
     'immutable_instant' => '不可变且即时',
     'pwa_offline' => 'PWA + 离线优先',
     'realtime_safety_score' => '实时安全评分',
-    'multilingual' => '多语言（尼泊尔语/英语）',
+    'multilingual' => '多语言 (尼泊尔语/英语/印地语/中文)',
     'ai_generates_trek' => 'AI生成您的徒步行程',
     'digital_qr_passport' => '数字QR护照',
     'safe_trek_memories' => '安全徒步 + 回忆',

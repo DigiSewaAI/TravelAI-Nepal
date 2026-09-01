@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Provider;
 use App\Models\QrScan;
 use App\Models\Route;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -17,6 +18,13 @@ class HomeController extends Controller
      */
     public function index()
 {
+    // ✅ Get current app locale
+    $locale = app()->getLocale();
+    // ✅ Map 'np' to 'ne' for Carbon
+    $carbonLocale = $locale === 'np' ? 'ne' : $locale;
+    Carbon::setLocale($carbonLocale);
+
+
     // Fetch featured services (latest 6, with provider relationship)
     $featuredServices = Service::with(['provider', 'category', 'trekDetail'])
         ->where('status', 'active')
@@ -39,30 +47,31 @@ class HomeController extends Controller
 
     // Recent Check‑ins (existing)
     $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
-        ->latest('scanned_at')
-        ->take(10)
-        ->get()
-        ->map(function ($scan) {
-            $booking = $scan->booking;
-            $service = $booking?->service;
-            $provider = $service?->provider;
+    ->latest('scanned_at')
+    ->take(10)
+    ->get()
+    ->map(function ($scan) {
+        $booking = $scan->booking;
+        $service = $booking?->service;
+        $provider = $service?->provider;
 
-            $checkpoint = $scan->checkpoint_name ?: 'Checkpoint';
-            $trekName = $service?->name ?? 'Trek';
-            $agencyName = $provider?->name ?? 'Local Trek Partner';
-            $travelerName = 'Anonymous';
-            $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
-            $coverImage = $service?->cover_image ? asset('storage/' . $service->cover_image) : null;
+        $checkpoint = $scan->checkpoint_name ?: 'Checkpoint';
+        $trekName = $service?->name ?? 'Trek';
+        $agencyName = $provider?->name ?? 'Local Trek Partner';
+        $travelerName = 'Anonymous';
+        $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
+        
+        $coverImage = $service?->cover_image ? asset('storage/' . $service->cover_image) : null;
 
-            return [
-                'checkpoint'    => $checkpoint,
-                'trek_name'     => $trekName,
-                'agency_name'   => $agencyName,
-                'trekker_name'  => $travelerName,
-                'time_ago'      => $timeAgo,
-                'cover_image'   => $coverImage,
-            ];
-        });
+        return [
+            'checkpoint'    => $checkpoint,
+            'trek_name'     => $trekName,
+            'agency_name'   => $agencyName,
+            'trekker_name'  => $travelerName,
+            'time_ago'      => $timeAgo,
+            'cover_image'   => $coverImage,
+        ];
+    });
 
     // ✅ NEW: Fetch active routes for destination search
     $routes = Route::where('is_active', true)

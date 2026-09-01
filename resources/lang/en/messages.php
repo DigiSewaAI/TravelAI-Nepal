@@ -411,7 +411,7 @@ return [
     'immutable_instant' => 'Immutable & instant',
     'pwa_offline' => 'PWA + Offline first',
     'realtime_safety_score' => 'Real-time safety score',
-    'multilingual' => 'Multi-lingual (Nepali/English)',
+    'multilingual' => 'Multi-lingual (Nepali/English/Hindi/Chinese)',
     'ai_generates_trek' => 'AI generates your trek',
     'digital_qr_passport' => 'Digital QR Passport',
     'safe_trek_memories' => 'Safe trek + memories',
@@ -431,6 +431,7 @@ return [
 // STATS BANNER
 // ======================
 'smart_contracts_ready' => 'Smart Contracts Ready',
+'time_ago' => ':time ago',
 // ======================
 // ABOUT PAGE
 // ======================

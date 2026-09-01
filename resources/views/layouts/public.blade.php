@@ -92,29 +92,32 @@
 
                 <!-- ✅ Language Switcher (Get Early Access को ठाउँमा) -->
                 <div class="relative">
-                    <button type="button" class="flex items-center text-gray-700 hover:text-gray-900 text-sm font-medium" id="languageDropdown" aria-haspopup="true">
-                        <span class="mr-1">
-                            @if(session('locale') == 'hi') 🇮🇳
-                            @elseif(session('locale') == 'zh') 🇨🇳
-                            @else 🇬🇧
-                            @endif
-                        </span>
-                        <span class="text-sm font-medium">
-                            @if(session('locale') == 'hi') हिन्दी
-                            @elseif(session('locale') == 'zh') 中文
-                            @else English
-                            @endif
-                        </span>
-                        <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
-                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
-                        <a href="{{ route('lang.switch', 'hi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇮🇳 हिन्दी</a>
-                        <a href="{{ route('lang.switch', 'zh') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇨🇳 中文</a>
-                    </div>
-                </div>
+    <button type="button" class="flex items-center text-gray-700 hover:text-gray-900 text-sm font-medium" id="languageDropdown">
+        <span class="mr-1">
+            @if(session('locale') == 'hi') 🇮🇳
+            @elseif(session('locale') == 'zh') 🇨🇳
+            @elseif(session('locale') == 'np') 🇳🇵
+            @else 🇬🇧
+            @endif
+        </span>
+        <span class="text-sm font-medium">
+            @if(session('locale') == 'hi') हिन्दी
+            @elseif(session('locale') == 'zh') 中文
+            @elseif(session('locale') == 'np') नेपाली
+            @else English
+            @endif
+        </span>
+        <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
+    <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
+        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
+        <a href="{{ route('lang.switch', 'hi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇮🇳 हिन्दी</a>
+        <a href="{{ route('lang.switch', 'zh') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇨🇳 中文</a>
+        <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇳🇵 नेपाली</a>
+    </div>
+</div>
 
                 <!-- Currency Selector -->
                 <div class="flex items-center">

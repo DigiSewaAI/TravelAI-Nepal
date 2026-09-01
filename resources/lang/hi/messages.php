@@ -399,7 +399,7 @@ return [
     'copy_failed' => 'कॉपी करने में विफल। कृपया चुनें और मैन्युअल रूप से कॉपी करें।',
     'anonymous' => 'अनाम',
     'smart_contracts_ready' => 'स्मार्ट अनुबंध तैयार',
-
+'time_ago' => ':time पहिले',
     // ======================
     // FEATURES DATA (JavaScript)
     // ======================
@@ -413,7 +413,7 @@ return [
     'immutable_instant' => 'अपरिवर्तनीय और तुरंत',
     'pwa_offline' => 'PWA + ऑफलाइन पहले',
     'realtime_safety_score' => 'वास्तविक-समय सुरक्षा स्कोर',
-    'multilingual' => 'बहुभाषी (नेपाली/अंग्रेजी)',
+    'multilingual' => 'बहुभाषी (नेपाली/अंग्रेजी/हिन्दी/中文)',
     'ai_generates_trek' => 'AI आपका ट्रेक उत्पन्न करता है',
     'digital_qr_passport' => 'डिजिटल QR पासपोर्ट',
     'safe_trek_memories' => 'सुरक्षित ट्रेक + यादें',
