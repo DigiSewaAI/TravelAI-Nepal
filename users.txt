@@ -1,28 +1,14 @@
-
-Name	Email	Role	Phone	Actions
-Nepal Photography Studio	nepal.photography.studio@travelai.com	provider owner	9841284797	  
-Professional Guides Nepal	professional.guides.nepal@travelai.com	provider owner	9852832165	  
-Himalayan Transport Service	himalayan.transport.service@travelai.com	provider owner	9884887776	  
-Adventure Nepal Activities	adventure.nepal.activities@travelai.com	provider owner	9878256876	  
-Nepal Homestay Experience	nepal.homestay.experience@travelai.com	provider owner	9885027508	  
-Hotel Himalayan View	hotel.himalayan.view@travelai.com	provider owner	9868680091	  
-Kathmandu Grand Hotel	kathmandu.grand.hotel@travelai.com	provider owner	9842451398	  
-Pokhara Lakeside Resort	pokhara.lakeside.resort@travelai.com	provider owner	9852158660	  
-Everest Trailblazers	everest.trailblazers@travelai.com	provider owner	9893206921	  
-Annapurna Eco Treks	annapurna.eco.treks@travelai.com	provider owner	9887659900	  
-Nepal Heritage Tours	nepal.heritage.tours@travelai.com	provider owner	9830691407	  
-Mountain Magic Tours	mountain.magic.tours@travelai.com	provider owner	9898695519	  
-Himalayan Guides Nepal	himalayan.guides.nepal@travelai.com	provider owner	9869381075	  
-Himalayan Trekking Agency	himalayan@travelai.com	provider owner	9841234567	  
-	  
-Pokhara City Tours	info@pokharacitytours.com	provider owner	9812345678	  
-Hotel Welcome Pokhara	reservation@welcomehotel.com	provider owner	9851122334	  
-Parashar Regmi	parasharregmi@gmail.com	super admin	9761762036	  
-✅ Traveler Accounts (Login Credentials)
-#	Name	Email	Password
-1	James Anderson	test@example.com	Himalayan@1980
-2	Sophia Martinez	guest2_0MMnjT@temp.travelai.com	Himalayan@1980
-3	Oliver Smith	guest3_ZTASRd@temp.travelai.com	Himalayan@1980
-4	traveller	regmiashish629@gmail.com	
-
-
+parasharregmi@gmail.com → super_admin
+anjuregmimesh@gmail.com → provider_owner-------------Business Plan
+shresthaxok@gmail.com → traveler
+info@everestbasecamptrek.com → provider_owner
+info@nepalheritagetours.com → provider_owner
+info@himalayanhotel.com → provider_owner
+info@adventurenepal.com → provider_owner
+info@professionalguides.com → provider_owner
+info@himalayantransport.com → provider_owner
+maria.smith@gmail.com → traveler
+david.chen@gmail.com → traveler
+free@travelai.com → provider_owner------------------Free Plan
+professional@travelai.com → provider_owner----------Professional Plan
+enterprise@travelai.com → provider_owner------------Enterprise Plan

@@ -78,18 +78,22 @@
         </div>
 
         <!-- Weather Snapshot Strip (compact) -->
-        @if(isset($weatherData) && count(array_filter($weatherData)) > 0)
+        @if(isset($weatherStrip) && count(array_filter($weatherStrip)) > 0)
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between text-sm">
                 <div class="flex items-center gap-2 text-gray-700 font-medium">
                     <i class="fas fa-cloud-sun text-yellow-500"></i>
                     <span>{{ __('messages.weather_across_nepal') }}</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-4 text-gray-700">
-                    @foreach($weatherData as $city => $data)
+                    @foreach($weatherStrip as $city => $data)
                         @if($data)
                             <span class="inline-flex items-center gap-1.5">
                                 <span class="font-medium">{{ $city }}</span>
-                                <span class="text-blue-600 font-bold">{{ $data['temp'] }}°C</span>
+                                @if($data && isset($data['temp']) && $data['temp'] > 0)
+    <span class="text-blue-600 font-bold">{{ $data['temp'] }}°C</span>
+@else
+    <span class="text-gray-400 text-xs">—</span>
+@endif
                                 @if($data['icon'])
                                     <img src="https://openweathermap.org/img/wn/{{ $data['icon'] }}.png" class="w-5 h-5" alt="weather icon">
                                 @endif
@@ -344,42 +348,59 @@
 
         function performSearch(query) {
             fetch(`/safety/search?q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     if (!data.found) {
                         resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">No destinations found</div>`;
                         resultsContainer.classList.remove('hidden');
                         return;
                     }
-                    const statusBadge = data.safety_status === 'avoid' ? 'bg-red-100 text-red-700' : 
-                                        (data.safety_status === 'high_risk' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700');
-                    const statusLabel = data.safety_status ? data.safety_status.toUpperCase() : 'NORMAL';
-                    const incidentInfo = data.incident ? `<div class="text-xs text-red-600 mt-1">⚠️ ${data.incident.title}</div>` : '';
 
-                    resultsContainer.innerHTML = `
-                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition" onclick="window.location.href='/travel-safety/destination/${data.slug}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-bold text-gray-800">${data.name}</h4>
-                                    ${data.weather ? `
-                                        <div class="flex items-center gap-3 text-sm mt-1">
-                                            <span class="text-gray-600"><i class="fas fa-thermometer-half"></i> ${data.weather.temp}°C</span>
-                                            <span class="text-gray-600 capitalize"><i class="fas fa-cloud"></i> ${data.weather.condition}</span>
-                                            <span class="text-gray-600"><i class="fas fa-tint"></i> ${data.weather.humidity}%</span>
+                    // Data structure: data.results is an array of results
+                    if (data.results && data.results.length > 0) {
+                        let html = '';
+                        data.results.forEach(item => {
+                            const statusBadge = item.safety_status === 'avoid' ? 'bg-red-100 text-red-700' : 
+                                                (item.safety_status === 'high_risk' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700');
+                            const statusLabel = item.safety_status ? item.safety_status.toUpperCase() : 'NORMAL';
+                            const incidentInfo = item.incident ? `<div class="text-xs text-red-600 mt-1">⚠️ ${item.incident.title}</div>` : '';
+
+                            html += `
+                                <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition" onclick="window.location.href='/travel-safety/destination/${item.slug}'">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                            ${item.weather ? `
+                                                <div class="flex items-center gap-3 text-sm mt-1">
+                                                    <span class="text-gray-600"><i class="fas fa-thermometer-half"></i> ${item.weather.temp}°C</span>
+                                                    <span class="text-gray-600 capitalize"><i class="fas fa-cloud"></i> ${item.weather.condition}</span>
+                                                    <span class="text-gray-600"><i class="fas fa-tint"></i> ${item.weather.humidity}%</span>
+                                                </div>
+                                            ` : `<div class="text-xs text-gray-400 mt-1">Weather data unavailable</div>`}
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${statusBadge}">${statusLabel}</span>
+                                                ${incidentInfo}
+                                            </div>
                                         </div>
-                                    ` : `<div class="text-xs text-gray-400 mt-1">Weather data unavailable</div>`}
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${statusBadge}">${statusLabel}</span>
-                                        ${incidentInfo}
+                                        <span class="text-blue-600 text-sm font-medium">View →</span>
                                     </div>
                                 </div>
-                                <span class="text-blue-600 text-sm font-medium">View →</span>
-                            </div>
-                        </div>
-                    `;
-                    resultsContainer.classList.remove('hidden');
+                            `;
+                        });
+                        resultsContainer.innerHTML = html;
+                        resultsContainer.classList.remove('hidden');
+                    } else {
+                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">No results found</div>`;
+                        resultsContainer.classList.remove('hidden');
+                    }
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.error('Search error:', error);
                     resultsContainer.innerHTML = `<div class="p-4 text-red-500 text-sm">Error searching. Please try again.</div>`;
                     resultsContainer.classList.remove('hidden');
                 });

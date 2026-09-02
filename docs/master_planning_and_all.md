@@ -1,9 +1,9 @@
 # TravelAI Nepal — Master Product, Architecture, Database & Implementation Blueprint
 
-**Version:** 13.2 (FINAL – ALL PHASES COMPLETED + Journey Replay Social Sharing ADDED)
+**Version:** 13.3 (FINAL – ALL PHASES COMPLETED + Weather Intelligence ADDED)
 
 **Date:** September 2026
-**Status:** ✅ **ALL PHASES COMPLETED** | ✅ Multi-Language Support (EN/NP/HI/ZH) COMPLETED | ✅ AI Planner (ABC/EBC/Langtang) Grounded | ✅ Fallback Itinerary Mechanism | ✅ Cost Calculation Backend | ✅ Service Integration | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ SEO Optimization | ✅ High‑Resolution Favicon | ✅ Logo in All Dashboards | ✅ Login/Register Logo | ✅ .htaccess Cache Control | ✅ Invoice System (Complete) | ✅ Legacy Cleanup | ✅ ALL Nepal Routes Data Entry (138+ Destinations) | ✅ AI Travel Planner Language | ✅ Admin Panel (Route/CRUD) | ✅ Provider Staff Management | ✅ Waitlist (with confirmation email) | ✅ Digital Trek Passport (Full Implementation) | ✅ My Journey Replay (Cinematic Timeline + Map + Stats) | ✅ Cinematic Journey Replay (Slideshow, Media Upload, Optimization, Fallback) | ✅ Phase 6 Safety Module – Multi-Language Support (EN/NP/HI/ZH) COMPLETED & END-TO-END TESTED | ✅ **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility control, social share buttons, OG meta) COMPLETED**
+**Status:** ✅ **ALL PHASES COMPLETED** | ✅ Multi-Language Support (EN/NP/HI/ZH) COMPLETED | ✅ AI Planner (ABC/EBC/Langtang) Grounded | ✅ Fallback Itinerary Mechanism | ✅ Cost Calculation Backend | ✅ Service Integration | ✅ Multi-Currency (USD/NPR) | ✅ Traveler Dashboard | ✅ Registration Redesign | ✅ Provider Check-in Management | ✅ QR Code in Traveler Booking | ✅ SEO Optimization | ✅ High‑Resolution Favicon | ✅ Logo in All Dashboards | ✅ Login/Register Logo | ✅ .htaccess Cache Control | ✅ Invoice System (Complete) | ✅ Legacy Cleanup | ✅ ALL Nepal Routes Data Entry (138+ Destinations) | ✅ AI Travel Planner Language | ✅ Admin Panel (Route/CRUD) | ✅ Provider Staff Management | ✅ Waitlist (with confirmation email) | ✅ Digital Trek Passport (Full Implementation) | ✅ My Journey Replay (Cinematic Timeline + Map + Stats) | ✅ Cinematic Journey Replay (Slideshow, Media Upload, Optimization, Fallback) | ✅ Phase 6 Safety Module – Multi-Language Support (EN/NP/HI/ZH) COMPLETED & END-TO-END TESTED | ✅ **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility control, social share buttons, OG meta) COMPLETED** | ✅ **Weather Intelligence (OpenWeatherMap Integration + Search + Safety Context) ADDED & TESTED**
 
 **Next Step:** 🚀 **Deployment & Monitoring → Launch**
 
@@ -11,10 +11,10 @@
 
 ## 1. Executive Summary
 
-This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, PWA capabilities, **Multi-Currency (USD/NPR)**, **Multi-Language (English, Nepali, Hindi, Chinese)**, **Traveler Dashboard**, **Account Type Registration**, **Provider Check-in Management**, **Monthly/Yearly billing toggle**, **Provider Staff Management**, **Digital Trek Passport**, **My Journey Replay**, **Cinematic Journey Replay**, **Phase 6 Safety Module with Multi-Language Support**, and **Phase 16: Public Journey Replay Social Sharing**.
+This document is the **Single Source of Truth** for the evolution of TravelAI Nepal. It is based on a thorough audit of the **actual Laravel 13 codebase, database schema, routes, models, controllers, and views**. The current system is a fully functional platform that supports **all 12 tourism business types**, authenticated travelers, AI-powered itineraries, booking, QR check‑in, SOS, reviews, notifications, advanced analytics, Stripe payments, PWA capabilities, **Multi-Currency (USD/NPR)**, **Multi-Language (English, Nepali, Hindi, Chinese)**, **Traveler Dashboard**, **Account Type Registration**, **Provider Check-in Management**, **Monthly/Yearly billing toggle**, **Provider Staff Management**, **Digital Trek Passport**, **My Journey Replay**, **Cinematic Journey Replay**, **Phase 6 Safety Module with Multi-Language Support**, **Phase 16: Public Journey Replay Social Sharing**, and **Weather Intelligence (real-time weather conditions, weather snapshots, search-based weather + safety context)**.
 
 **✅ ALL PHASES (1-16) HAVE BEEN SUCCESSFULLY IMPLEMENTED** (see roadmap below).
-**✅ All additional Enhancements (Phase 12.5 – 12.9, Phase 5, Staff Management, Digital Trek Passport, My Journey Replay, Cinematic Journey Replay, Phase 6 Safety Module, and Phase 16 Social Sharing) have been completed:**
+**✅ All additional Enhancements (Phase 12.5 – 12.9, Phase 5, Staff Management, Digital Trek Passport, My Journey Replay, Cinematic Journey Replay, Phase 6 Safety Module, Phase 16 Social Sharing, and Weather Intelligence) have been completed:**
 
 - **AI Planner (Grounded):** ABC, EBC, Langtang routes fully seeded with waypoints, segments, costs. Database-grounded itinerary generation with fallback.
 - **Fallback Mechanism:** If AI (Groq) fails (rate limit, timeout), the system automatically generates a grounded itinerary from database segments.
@@ -128,6 +128,13 @@ This document is the **Single Source of Truth** for the evolution of TravelAI Ne
   - **Privacy-Compliant:** No email, phone, or sensitive data exposed on public pages.
   - **OG Meta Integration:** Dynamic Open Graph tags for rich social media previews.
   - **Result:** Travelers can now share their journey experiences publicly via social media, with full control over visibility. ✅ **COMPLETED**
+- **Weather Intelligence (NEW – September 2026):**
+  - **OpenWeatherMap Integration:** Free tier (1,000 calls/day) with 15-minute caching.
+  - **Weather Snapshot:** Compact weather strip for major trekking nodes (Kathmandu, Pokhara, Lukla, Namche Bazaar, Manang) on Safety Page.
+  - **Search + Weather + Safety:** AJAX-powered search box on Safety Page that returns destination weather + safety status in one result.
+  - **Contextual Weather:** Incident-specific weather context (e.g., "18°C · Heavy rain risk") displayed on Incident detail pages.
+  - **Multi-Language Ready:** All weather UI elements translated in EN/NP/HI/ZH.
+  - **Result:** Travelers can now check real-time weather and safety status for any destination in Nepal, making the Safety Page a complete "Travel Safety Intelligence Center." ✅ **COMPLETED**
 
 The key architectural shift is to **separate the user (authentication) from the provider (business entity)** and to **decouple provider types from system roles**. This document provides a detailed audit, target architecture, database mapping, phased migration strategy, and implementation roadmap—all designed to **preserve existing functionality** while enabling future extensibility.
 
@@ -152,7 +159,7 @@ The system is now a comprehensive trekking ecosystem with:
 - **Digital Trek Passport** – Complete traveler identity, stamps, achievements, and sharing.
 - **My Journey Replay** – Cinematic timeline, map, and stats for each traveler.
 - **Cinematic Journey Replay** – Full‑screen slideshow with user media, optimization, and fallback.
-- **Safety Module** – Incident tracking, location resolution, risk scoring, safety status, traveler alerts, admin safety dashboard, and **real-time safety map** – **fully multi‑lingual**.
+- **Safety Module** – Incident tracking, location resolution, risk scoring, safety status, traveler alerts, admin safety dashboard, **real-time safety map**, and **weather intelligence** (OpenWeatherMap integration, weather snapshot, search + weather + safety, contextual weather) – **fully multi‑lingual**.
 - **Public Journey Replay Social Sharing** – Shareable links with visibility control (private/link/public), social share buttons (Facebook, WhatsApp, Copy Link), dynamic OG meta tags for social previews, and secure media serving via share tokens.
 
 ---
@@ -176,6 +183,7 @@ The system is now a comprehensive trekking ecosystem with:
 | Image Optimization | Intervention Image |
 | Video Optimization | FFmpeg (via laravel-ffmpeg) |
 | Fallback Media | Pexels API, Pixabay API |
+| **Weather API** | **OpenWeatherMap API (Free Tier, 1,000 calls/day)** |
 
 ---
 
@@ -235,6 +243,7 @@ The system is now a comprehensive trekking ecosystem with:
 | 5 | Dashboard Display | Alert visible on Traveler Dashboard | ✅ Success |
 | 6 | Public Safety Page | Incident + map marker + affected areas | ✅ Success |
 | 7 | Multi-Language | All safety pages translated in EN/NP/HI/ZH | ✅ Success |
+| 8 | **Weather Intelligence** (NEW) | **Weather Snapshot + Search + Weather + Safety** | ✅ **Success** |
 
 ### 5.2 Key Fixes Applied
 
@@ -256,7 +265,7 @@ The system is now a comprehensive trekking ecosystem with:
 | Phase 3 | Location Resolution & Matching (Waypoint/Route/Trek matching, geocoding) | ✅ COMPLETED |
 | Phase 4 | Risk Scoring & Status Updates (RiskScoringService, SafetyStatusService, Job) | ✅ COMPLETED |
 | Phase 5 | Admin Panel (Route/CRUD for waypoints/routes/segments/costs) | ✅ COMPLETED |
-| Phase 6 | **Safety Module – Public & Admin UI (Multi‑Language Support + End-to-End Testing)** | ✅ **COMPLETED** |
+| Phase 6 | **Safety Module – Public & Admin UI (Multi‑Language Support + End-to-End Testing + Weather Intelligence)** | ✅ **COMPLETED** |
 | Phase 7 | Public Marketplace (Service listings, filtering, booking) | ✅ COMPLETED |
 | Phase 8 | Pricing & Subscriptions | ✅ COMPLETED |
 | Phase 9 | Payments (Stripe Integration) | ✅ COMPLETED |
@@ -273,16 +282,17 @@ The system is now a comprehensive trekking ecosystem with:
 | Phase 14 | **My Journey Replay** (Cinematic Timeline, Map, Stats, Dashboard Integration) | ✅ COMPLETED |
 | Phase 15 | **Cinematic Journey Replay** (Media Upload, Slideshow, Optimization, Fallback) | ✅ COMPLETED |
 | Phase 16 | **Public Journey Replay Social Sharing** (shareable links, visibility control, social share buttons, OG meta) | ✅ **COMPLETED** |
+| **Weather Intelligence (NEW)** | **OpenWeatherMap Integration + Weather Snapshot + Search + Weather + Safety** | ✅ **COMPLETED** |
 | Staff Management | Provider Staff/Team CRUD with plan limits | ✅ COMPLETED |
 | Waitlist | Waitlist signup with confirmation email | ✅ COMPLETED |
 
 ---
 
-## 7. NOW vs NEXT vs LATER (Final – v13.2)
+## 7. NOW vs NEXT vs LATER (Final – v13.3)
 
 | Category | Features | Status |
 |----------|----------|--------|
-| **NOW** (All completed) | All core features + PWA + Provider Directory + 12 Business Types + Multi‑Currency + Traveler Dashboard + QR Check‑in + SEO + High‑res Favicon + Logo in Dashboards + Invoice System (Complete) + AI Planner (ABC/EBC/Langtang) + Fallback + Multi‑Language (EN/NP/HI/ZH) + AI Travel Planner Language + Admin Panel (Route/CRUD) + Provider Staff Management + Legacy Cleanup + ALL Nepal Routes Data Entry (138+) + Waitlist + Digital Trek Passport + My Journey Replay + Cinematic Journey Replay + Phase 6 Safety Module (Multi‑Language + End-to-End Tested) + **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility toggle, social share buttons, OG meta for public pages)** | ✅ **COMPLETED** |
+| **NOW** (All completed) | All core features + PWA + Provider Directory + 12 Business Types + Multi‑Currency + Traveler Dashboard + QR Check‑in + SEO + High‑res Favicon + Logo in Dashboards + Invoice System (Complete) + AI Planner (ABC/EBC/Langtang) + Fallback + Multi‑Language (EN/NP/HI/ZH) + AI Travel Planner Language + Admin Panel (Route/CRUD) + Provider Staff Management + Legacy Cleanup + ALL Nepal Routes Data Entry (138+) + Waitlist + Digital Trek Passport + My Journey Replay + Cinematic Journey Replay + Phase 6 Safety Module (Multi‑Language + End-to-End Tested) + **Phase 16: Public Journey Replay Social Sharing (shareable links, visibility toggle, social share buttons, OG meta for public pages)** + **Weather Intelligence (OpenWeatherMap Integration + Weather Snapshot + Search + Weather + Safety)** | ✅ **COMPLETED** |
 | **NEXT** | Deployment & Monitoring (Production server, performance tuning, error tracking) | ⏳ In Progress |
 | **NEXT** | Final QA and User Acceptance Testing | ⏳ In Progress |
 | **LATER** | **Traveler Dashboard – View Received Quotations** | ⏳ Planned |
@@ -295,7 +305,7 @@ The system is now a comprehensive trekking ecosystem with:
 
 ---
 
-## 8. Go / No‑Go Checklist (v13.2 – ALL COMPLETED)
+## 8. Go / No‑Go Checklist (v13.3 – ALL COMPLETED)
 
 ### ✅ COMPLETED (All items)
 
@@ -316,6 +326,7 @@ The system is now a comprehensive trekking ecosystem with:
 | **Cinematic Journey Replay** | ✅ |
 | **Phase 6 Safety Module – Multi‑Language + End-to-End Tested** | ✅ |
 | **Phase 16: Public Journey Replay Social Sharing** | ✅ |
+| **Weather Intelligence (OpenWeatherMap + Search + Weather + Safety)** | ✅ |
 | Memory error resolved | ✅ |
 | Safety status `unknown` issue resolved | ✅ |
 | Multi‑language support – ALL views | ✅ |
@@ -372,3 +383,6 @@ php artisan tinker
 >>> $waypoint = App\Models\Waypoint::first();
 >>> $waypoint->refreshSafetyStatus();
 >>> $waypoint->safety_status;
+
+# Weather cache clear (if needed)
+php artisan cache:clear

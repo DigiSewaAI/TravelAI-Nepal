@@ -73,36 +73,49 @@ class SafetyController extends Controller
     }
 
     /**
-     * Destination safety detail page
-     */
-    public function destination(Request $request, string $slug)
-    {
-        // Try to find as Trek, Waypoint, or Route
-        $entity = Trek::where('slug', $slug)->first();
-        if (!$entity) {
-            $entity = Waypoint::where('slug', $slug)->first();
-        }
-        if (!$entity) {
-            $entity = Route::where('slug', $slug)->first();
-        }
-        if (!$entity) {
-            abort(404, 'Destination not found');
-        }
-
-        $status = $this->statusService->getStatusForEntity($entity);
-        $incidents = $entity->safetyIncidents()
-            ->whereIn('status', ['active', 'verified'])
-            ->with('sources')
-            ->get();
-
-        // ✅ Weather for this specific destination (if it's a Waypoint or has lat/lng)
-        $weather = null;
-        if ($entity instanceof Waypoint && $entity->latitude && $entity->longitude) {
-            $weather = $this->getWeatherForDestination($entity);
-        }
-
-        return view('safety.destination', compact('entity', 'status', 'incidents', 'weather'));
+ * Destination safety detail page
+ */
+public function destination(Request $request, string $slug)
+{
+    // Try to find as Trek, Waypoint, or Route
+    $entity = Trek::where('slug', $slug)->first();
+    if (!$entity) {
+        $entity = Waypoint::where('slug', $slug)->first();
     }
+    if (!$entity) {
+        $entity = Route::where('slug', $slug)->first();
+    }
+    if (!$entity) {
+        abort(404, 'Destination not found');
+    }
+
+    // ✅ Get safety status from service
+    $status = $this->statusService->getStatusForEntity($entity);
+    
+    // ✅ SOLUTION 2: यदि Status 'unknown' छ भने 'normal' मा Set गर्नुहोस्
+    // किनभने कुनै Incident नभएको अवस्थामा Normal नै देखिनु पर्छ
+    if (isset($status['status']) && $status['status'] === 'unknown') {
+        $status['status'] = 'normal';
+        $status['score'] = 10;
+        $status['status_color'] = '🟢';
+        // ✅ Human-readable label पनि थप्नुहोस् (Blade मा प्रयोगको लागि)
+        $status['label'] = 'Normal';
+    }
+
+    // Get related incidents (only active/verified)
+    $incidents = $entity->safetyIncidents()
+        ->whereIn('status', ['active', 'verified'])
+        ->with('sources')
+        ->get();
+
+    // ✅ Weather for this specific destination (if it's a Waypoint or has lat/lng)
+    $weather = null;
+    if ($entity instanceof Waypoint && $entity->latitude && $entity->longitude) {
+        $weather = $this->getWeatherForDestination($entity);
+    }
+
+    return view('safety.destination', compact('entity', 'status', 'incidents', 'weather'));
+}
 
     /**
      * Incident detail page
@@ -285,43 +298,44 @@ class SafetyController extends Controller
      * ✅ NEW: Get weather for a specific destination (cached)
      */
     protected function getWeatherForDestination($entity): ?array
-    {
-        if (!$entity || !($entity instanceof Waypoint)) {
-            return null;
-        }
+{
+    if (!$entity || !($entity instanceof Waypoint)) {
+        return null;
+    }
 
-        if (!$entity->latitude || !$entity->longitude) {
-            return null;
-        }
+    if (!$entity->latitude || !$entity->longitude) {
+        return null;
+    }
 
-        $cacheKey = "weather_wp_{$entity->id}";
-        
-        return Cache::remember($cacheKey, 900, function () use ($entity) {
-            try {
-                $data = $this->weatherService->getWeatherByCoords(
-                    $entity->latitude,
-                    $entity->longitude
-                );
+    $cacheKey = "weather_wp_{$entity->id}";
+    
+    return Cache::remember($cacheKey, 900, function () use ($entity) {
+        try {
+            $data = $this->weatherService->getWeatherByCoords(
+                $entity->latitude,
+                $entity->longitude
+            );
 
-                if (!$data || isset($data['cod']) && $data['cod'] != 200) {
-                    return null;
-                }
-
-                return [
-                    'temp' => round($data['main']['temp'] ?? 0),
-                    'feels_like' => round($data['main']['feels_like'] ?? 0),
-                    'humidity' => $data['main']['humidity'] ?? 0,
-                    'condition' => $data['weather'][0]['description'] ?? 'Unknown',
-                    'icon' => $data['weather'][0]['icon'] ?? '01d',
-                    'wind_speed' => $data['wind']['speed'] ?? 0,
-                    'precipitation' => $data['rain']['1h'] ?? $data['snow']['1h'] ?? 0,
-                ];
-            } catch (\Exception $e) {
-                \Log::error('Weather fetch failed: ' . $e->getMessage());
+            // ✅ If data is null or missing temp, return null
+            if (!$data || !isset($data['temp'])) {
                 return null;
             }
-        });
-    }
+
+            return [
+                'temp' => round($data['temp'] ?? 0),
+                'feels_like' => round($data['feels_like'] ?? 0),
+                'humidity' => $data['humidity'] ?? 0,
+                'condition' => $data['condition'] ?? 'Unknown',
+                'icon' => $data['icon'] ?? '01d',
+                'wind_speed' => $data['wind_speed'] ?? 0,
+                'precipitation' => $data['precipitation'] ?? 0,
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Weather fetch failed: ' . $e->getMessage());
+            return null;
+        }
+    });
+}
 
     /**
      * Helper: Get color for severity

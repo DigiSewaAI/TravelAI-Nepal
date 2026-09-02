@@ -363,9 +363,9 @@ Route::get('/travel-safety/destination/{slug}', [App\Http\Controllers\SafetyCont
 Route::get('/travel-safety/incident/{id}', [App\Http\Controllers\SafetyController::class, 'incident'])->name('safety.incident');
 
 // Safety Search API (AJAX)
-Route::get('/safety/search', [App\Http\Controllers\SafetyController::class, 'search'])
+Route::get('/safety/search', [App\Http\Controllers\SafetyController::class, 'searchDestination'])
     ->name('safety.search');
-    
+
 // API
 Route::get('/api/safety/markers', [App\Http\Controllers\SafetyController::class, 'markers'])->name('api.safety.markers');
 
