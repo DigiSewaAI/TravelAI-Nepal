@@ -803,6 +803,22 @@ return [
 'search_trek_placeholder' => 'Trek name...',
 'clear_filters' => 'Clear filters',
 'no_items_found' => 'No :type found matching your criteria.',
+'realtime_safety' => 'Real-time safety',
+'view_status' => 'View status →',
+// Safety Page - Search & Weather
+'safety_subtitle' => 'Real-time safety updates, AI-driven risk assessments, and live incident tracking for travelers across Nepal.',
+'check_destination_weather_safety' => 'Check a destination\'s weather & safety',
+'search_placeholder' => 'e.g. Rasuwa Gadhi, Pokhara, Namche...',
+'weather_across_nepal' => 'Weather conditions across Nepal',
+'weather_unavailable' => 'Weather data unavailable',
+'search_results' => 'Search Results',
+'no_results' => 'No destinations found',
+'view_details' => 'View Details',
+'safety_status' => 'Safety Status',
+'weather' => 'Weather',
+'temperature' => 'Temperature',
+'humidity' => 'Humidity',
+'wind' => 'Wind',
 // ======================
 // TRAVELER DASHBOARD
 // ======================

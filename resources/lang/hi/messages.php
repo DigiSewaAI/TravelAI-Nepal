@@ -801,6 +801,21 @@ return [
 'search_trek_placeholder' => 'ट्रेक का नाम...',
 'clear_filters' => 'फ़िल्टर साफ़ करें',
 'no_items_found' => 'आपके मानदंडों से मेल खाने वाला कोई :type नहीं मिला।',
+'view_status' => 'स्थिति देखें →',
+// Safety Page - Search & Weather
+'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, और नेपाल भर यात्रियों के लिए लाइव घटना ट्रैकिंग।',
+'check_destination_weather_safety' => 'किसी गंतव्य का मौसम और सुरक्षा जांचें',
+'search_placeholder' => 'जैसे, रसुवागढी, पोखरा, नाम्चे...',
+'weather_across_nepal' => 'नेपाल भर मौसम की स्थिति',
+'weather_unavailable' => 'मौसम डेटा उपलब्ध नहीं',
+'search_results' => 'खोज परिणाम',
+'no_results' => 'कोई गंतव्य नहीं मिला',
+'view_details' => 'विवरण देखें',
+'safety_status' => 'सुरक्षा स्थिति',
+'weather' => 'मौसम',
+'temperature' => 'तापमान',
+'humidity' => 'आर्द्रता',
+'wind' => 'हवा',
 // ======================
 // PRICING PAGE - Hindi (Missing Keys)
 // ======================

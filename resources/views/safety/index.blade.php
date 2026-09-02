@@ -23,45 +23,89 @@
     </div>
     
     <!-- Advanced Summary Cards -->
-@php
-    $computedStats = [
-        'normal'    => $incidents->where('severity', 'normal')->count(),
-        'caution'   => $incidents->where('severity', 'moderate')->count(),
-        'high_risk' => $incidents->whereIn('severity', ['high', 'high_risk'])->count(),
-        'avoid'     => $incidents->whereIn('severity', ['critical', 'avoid'])->count(),
-    ];
-@endphp
-
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
     @php
-        $statsConfig = [
-            ['key' => 'normal', 'label' => __('messages.status_normal'), 'color' => 'emerald', 'icon' => 'fa-check-circle'],
-            ['key' => 'caution', 'label' => __('messages.status_caution'), 'color' => 'amber', 'icon' => 'fa-exclamation-circle'],
-            ['key' => 'high_risk', 'label' => __('messages.status_high_risk'), 'color' => 'orange', 'icon' => 'fa-radiation'],
-            ['key' => 'avoid', 'label' => __('messages.status_avoid'), 'color' => 'red', 'icon' => 'fa-ban'],
+        $computedStats = [
+            'normal'    => $incidents->where('severity', 'normal')->count(),
+            'caution'   => $incidents->where('severity', 'moderate')->count(),
+            'high_risk' => $incidents->whereIn('severity', ['high', 'high_risk'])->count(),
+            'avoid'     => $incidents->whereIn('severity', ['critical', 'avoid'])->count(),
         ];
     @endphp
 
-    @foreach($statsConfig as $stat)
-        <div class="glass-card rounded-2xl p-5 border-l-4 border-{{ $stat['color'] }}-500 bg-{{ $stat['color'] }}-50/40 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold text-{{ $stat['color'] }}-700 uppercase tracking-wider">{{ $stat['label'] }}</p>
-                    <h2 class="text-3xl font-extrabold text-{{ $stat['color'] }}-900 mt-1">
-                        {{ $computedStats[$stat['key']] ?? 0 }}
-                    </h2>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-{{ $stat['color'] }}-100 flex items-center justify-center text-{{ $stat['color'] }}-600 shadow-sm">
-                    <i class="fas {{ $stat['icon'] }} text-xl"></i>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        @php
+            $statsConfig = [
+                ['key' => 'normal', 'label' => __('messages.status_normal'), 'color' => 'emerald', 'icon' => 'fa-check-circle'],
+                ['key' => 'caution', 'label' => __('messages.status_caution'), 'color' => 'amber', 'icon' => 'fa-exclamation-circle'],
+                ['key' => 'high_risk', 'label' => __('messages.status_high_risk'), 'color' => 'orange', 'icon' => 'fa-radiation'],
+                ['key' => 'avoid', 'label' => __('messages.status_avoid'), 'color' => 'red', 'icon' => 'fa-ban'],
+            ];
+        @endphp
+
+        @foreach($statsConfig as $stat)
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-{{ $stat['color'] }}-500 bg-{{ $stat['color'] }}-50/40 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-{{ $stat['color'] }}-700 uppercase tracking-wider">{{ $stat['label'] }}</p>
+                        <h2 class="text-3xl font-extrabold text-{{ $stat['color'] }}-900 mt-1">
+                            {{ $computedStats[$stat['key']] ?? 0 }}
+                        </h2>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-{{ $stat['color'] }}-100 flex items-center justify-center text-{{ $stat['color'] }}-600 shadow-sm">
+                        <i class="fas {{ $stat['icon'] }} text-xl"></i>
+                    </div>
                 </div>
             </div>
+        @endforeach
+    </div>
+
+    <!-- ========== NEW: Search & Weather Section ========== -->
+    <div class="mb-8 space-y-4">
+        <!-- Search Box -->
+        <div class="relative max-w-2xl">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                <i class="fas fa-search text-blue-500 mr-1"></i>
+                {{ __('messages.check_destination_weather_safety') }}
+            </label>
+            <div class="relative">
+                <input type="text" id="safetySearch"
+                       placeholder="{{ __('messages.search_placeholder') }}"
+                       class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-blue-500 shadow-sm transition">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <div id="searchResults" class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 hidden z-50 max-h-96 overflow-y-auto"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-1.5">Search from 138+ destinations across Nepal</p>
         </div>
-    @endforeach
-</div>
+
+        <!-- Weather Snapshot Strip (compact) -->
+        @if(isset($weatherData) && count(array_filter($weatherData)) > 0)
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between text-sm">
+                <div class="flex items-center gap-2 text-gray-700 font-medium">
+                    <i class="fas fa-cloud-sun text-yellow-500"></i>
+                    <span>{{ __('messages.weather_across_nepal') }}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-gray-700">
+                    @foreach($weatherData as $city => $data)
+                        @if($data)
+                            <span class="inline-flex items-center gap-1.5">
+                                <span class="font-medium">{{ $city }}</span>
+                                <span class="text-blue-600 font-bold">{{ $data['temp'] }}°C</span>
+                                @if($data['icon'])
+                                    <img src="https://openweathermap.org/img/wn/{{ $data['icon'] }}.png" class="w-5 h-5" alt="weather icon">
+                                @endif
+                            </span>
+                        @endif
+                    @endforeach
+                    <span class="text-xs text-gray-400">· {{ now()->diffForHumans() }}</span>
+                </div>
+            </div>
+        @endif
+    </div>
+    <!-- ========== END NEW SECTION ========== -->
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- Map Section (Takes 2/3 width on large screens) -->
+        <!-- Map Section (Takes 2/3 width) -->
         <div class="lg:col-span-2">
             <div class="glass-card rounded-2xl p-1 shadow-lg border border-gray-200 overflow-hidden relative">
                 <div class="bg-white rounded-xl p-4 md:p-6 relative">
@@ -231,22 +275,16 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ---------- Map ----------
         fetch('{{ route("api.safety.markers") }}')
             .then(response => response.json())
             .then(data => {
-                // Hide loader
                 document.getElementById('mapLoader').style.display = 'none';
-
                 const map = L.map('safetyMap').setView([28.3949, 84.1240], 7);
-                
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; OpenStreetMap contributors',
                     className: 'rounded-xl'
                 }).addTo(map);
-
-                if (data.length === 0) {
-                    // Optional: Add a "No incidents" marker or message on map
-                }
 
                 data.forEach(incident => {
                     const marker = L.circleMarker([incident.latitude, incident.longitude], {
@@ -287,6 +325,72 @@
                 console.error('Error loading safety markers:', error);
                 document.getElementById('mapLoader').innerHTML = '<span class="text-red-500 text-sm">Failed to load map data</span>';
             });
+
+        // ---------- Search: Weather & Safety ----------
+        const searchInput = document.getElementById('safetySearch');
+        const resultsContainer = document.getElementById('searchResults');
+
+        // Delay search for better UX
+        let debounceTimer;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim();
+            if (query.length < 2) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            debounceTimer = setTimeout(() => performSearch(query), 300);
+        });
+
+        function performSearch(query) {
+            fetch(`/safety/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.found) {
+                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">No destinations found</div>`;
+                        resultsContainer.classList.remove('hidden');
+                        return;
+                    }
+                    const statusBadge = data.safety_status === 'avoid' ? 'bg-red-100 text-red-700' : 
+                                        (data.safety_status === 'high_risk' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700');
+                    const statusLabel = data.safety_status ? data.safety_status.toUpperCase() : 'NORMAL';
+                    const incidentInfo = data.incident ? `<div class="text-xs text-red-600 mt-1">⚠️ ${data.incident.title}</div>` : '';
+
+                    resultsContainer.innerHTML = `
+                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition" onclick="window.location.href='/travel-safety/destination/${data.slug}'">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${data.name}</h4>
+                                    ${data.weather ? `
+                                        <div class="flex items-center gap-3 text-sm mt-1">
+                                            <span class="text-gray-600"><i class="fas fa-thermometer-half"></i> ${data.weather.temp}°C</span>
+                                            <span class="text-gray-600 capitalize"><i class="fas fa-cloud"></i> ${data.weather.condition}</span>
+                                            <span class="text-gray-600"><i class="fas fa-tint"></i> ${data.weather.humidity}%</span>
+                                        </div>
+                                    ` : `<div class="text-xs text-gray-400 mt-1">Weather data unavailable</div>`}
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${statusBadge}">${statusLabel}</span>
+                                        ${incidentInfo}
+                                    </div>
+                                </div>
+                                <span class="text-blue-600 text-sm font-medium">View →</span>
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.classList.remove('hidden');
+                })
+                .catch(() => {
+                    resultsContainer.innerHTML = `<div class="p-4 text-red-500 text-sm">Error searching. Please try again.</div>`;
+                    resultsContainer.classList.remove('hidden');
+                });
+        }
+
+        // Close search results on click outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#safetySearch') && !e.target.closest('#searchResults')) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
     });
 </script>
 @endpush

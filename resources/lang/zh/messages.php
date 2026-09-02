@@ -801,6 +801,21 @@ return [
 'search_trek_placeholder' => '徒步名称...',
 'clear_filters' => '清除筛选条件',
 'no_items_found' => '未找到符合您条件的 :type。',
+'view_status' => '查看状态 →',
+// Safety Page - Search & Weather
+'safety_subtitle' => '实时安全更新，AI驱动的风险评估，以及尼泊尔旅行者的实时事件跟踪。',
+'check_destination_weather_safety' => '查看目的地的天气和安全状况',
+'search_placeholder' => '例如，Rasuwa Gadhi，博卡拉，Namche...',
+'weather_across_nepal' => '尼泊尔各地天气状况',
+'weather_unavailable' => '天气数据不可用',
+'search_results' => '搜索结果',
+'no_results' => '未找到目的地',
+'view_details' => '查看详情',
+'safety_status' => '安全状态',
+'weather' => '天气',
+'temperature' => '温度',
+'humidity' => '湿度',
+'wind' => '风',
 // ======================
 // PRICING PAGE - Chinese (Missing Keys)
 // ======================

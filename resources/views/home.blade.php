@@ -20,7 +20,15 @@
           </div>
           <div class="flex flex-wrap gap-6 mt-10 text-sm text-gray-500">
             <div class="flex items-center gap-1"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.no_hidden_fees') }}</div>
-            <div class="flex items-center gap-1"><i class="fas fa-shield-alt text-blue-500"></i> {{ __('messages.realtime_safety') }}</div>
+            <a href="{{ route('safety.index') }}" 
+   class="flex items-center gap-1 hover:underline hover:opacity-80 transition-all duration-200">
+    <i class="fas fa-shield-alt text-blue-500"></i>
+    {{ __('messages.realtime_safety') }}
+    <span class="text-xs text-gray-400 mx-1">·</span>
+    <span class="text-xs text-blue-600 font-medium hover:underline">
+        {{ __('messages.view_status') }}
+    </span>
+</a>
             <div class="flex items-center gap-1"><i class="fas fa-headset text-purple-500"></i> {{ __('messages.local_support_24_7') }}</div>
           </div>
         </div>
