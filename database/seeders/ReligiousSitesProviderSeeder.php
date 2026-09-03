@@ -21,6 +21,9 @@ class ReligiousSitesProviderSeeder extends Seeder
         'Patan' => 25,
         'Bhaktapur' => 25,
         'Kathmandu' => 35,
+        'Pathibhara' => 25,
+        'Suketar' => 20,
+        'Taplejung' => 20,
     ];
 
     public function run(): void
@@ -53,6 +56,9 @@ class ReligiousSitesProviderSeeder extends Seeder
             'Patan' => ['lat' => 27.6736, 'lng' => 85.3251, 'alt' => 1400],
             'Bhaktapur' => ['lat' => 27.6722, 'lng' => 85.4295, 'alt' => 1401],
             'Kathmandu' => ['lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+            'Pathibhara' => ['lat' => 27.4123, 'lng' => 87.7567, 'alt' => 3794],
+            'Suketar' => ['lat' => 27.3456, 'lng' => 87.7123, 'alt' => 2420],
+            'Taplejung' => ['lat' => 27.3456, 'lng' => 87.7123, 'alt' => 2420],
         ];
 
         $totalProviders = 0;

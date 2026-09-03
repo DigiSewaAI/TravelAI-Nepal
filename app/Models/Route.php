@@ -35,4 +35,8 @@ class Route extends Model
     {
         return $this->hasMany(PlannerRequest::class);
     }
+    public function serviceCategory()
+{
+    return $this->belongsTo(ServiceCategory::class);
+}
 }

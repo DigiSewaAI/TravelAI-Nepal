@@ -131,7 +131,12 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Kapilavastu', 'city' => 'Kapilavastu', 'latitude' => 27.5345, 'longitude' => 83.0234],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Gorkha', 'latitude' => 28.0123, 'longitude' => 84.6123],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Manakamana', 'latitude' => 27.8234, 'longitude' => 84.5678],
-
+// ============================================================
+// RELIGIOUS SITES - Pathibhara Temple
+// ============================================================
+['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Pathibhara', 'latitude' => 27.3456, 'longitude' => 87.7123],
+['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Taplejung', 'latitude' => 27.3456, 'longitude' => 87.7123],
+['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Suketar', 'latitude' => 27.3456, 'longitude' => 87.7123],
             // ============================================================
             // VALLEY SURROUNDINGS (Kathmandu Valley)
             // ============================================================

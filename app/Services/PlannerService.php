@@ -558,6 +558,17 @@ class PlannerService
     $days = [];
     $dayNumber = 1;
 
+    // ✅ Get route category (trek, tour, activity, etc.)
+    $categorySlug = $route->serviceCategory->slug ?? 'trek';
+    $activityLabel = match($categorySlug) {
+        'trek' => 'Trekking',
+        'tour' => 'Tour',
+        'activity' => 'Activity',
+        'experience' => 'Experience',
+        'hotel' => 'Hotel',
+        default => 'Day',
+    };
+
     $routeCosts = $route->costs;
     $dailyFoodCost = 0;
     $totalFixedCost = 0;
@@ -583,63 +594,52 @@ class PlannerService
         $to = $seg->toWaypoint;
         $dayCost = $perDayFixedCost + $dailyFoodCost;
 
-        // ✅ Detect rest/acclimatization day
         $isRestDay = ($from->id === $to->id || (float)$seg->distance_km == 0);
 
-        // Day title & description
         if ($isRestDay) {
             $title = match($locale) {
-                'hi' => "{$to->name} में अनुकूलन दिवस",
-                'zh' => "{$to->name} 适应日",
-                'np' => "{$to->name} मा अनुकूलन दिन",
-                default => "Acclimatization Day at {$to->name}",
+                'hi' => "आराम दिन",
+                'zh' => "休息日",
+                'np' => "आराम दिन",
+                default => "Rest Day",
             };
             $desc = match($locale) {
-                'hi' => "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।",
-                'zh' => "今天不徒步。在 {$to->name} 休息和适应。",
-                'np' => "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।",
-                default => "No trekking today. Rest and acclimatize at {$to->name}.",
+                'hi' => "आजको दिन आराम गर्नुहोस्।",
+                'zh' => "今天休息。",
+                'np' => "आजको दिन आराम गर्नुहोस्।",
+                default => "Rest today.",
             };
         } else {
             $title = match($locale) {
-                'hi' => "{$from->name} → {$to->name}",
-                'zh' => "{$from->name} → {$to->name}",
-                default => "{$from->name} → {$to->name}",
+                'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
+                default => "Day {$dayNumber}: {$from->name} → {$to->name}",
             };
             $desc = match($locale) {
-                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।",
-                'zh' => "从 {$from->name}（{$from->altitude}米）徒步到 {$to->name}（{$to->altitude}米）。距离：{$seg->distance_km}公里，预计时间：{$seg->estimated_time_hours}小时。",
-                'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा।",
-                default => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
+                'hi' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।",
+                'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$seg->distance_km}公里，预计时间：{$seg->estimated_time_hours}小时。",
+                default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
             };
         }
 
-        // ✅ Item title & description
-        if ($isRestDay) {
-            $itemTitle = match($locale) {
-                'hi' => "आराम / अनुकूलन",
-                'zh' => "休息 / 适应",
-                'np' => "आराम / अनुकूलन",
-                default => "Rest / Acclimatization",
-            };
-            $itemDesc = match($locale) {
-                'hi' => "{$to->name} में आराम और अनुकूलन।",
-                'zh' => "在 {$to->name} 休息和适应。",
-                'np' => "{$to->name} मा आराम र अनुकूलन।",
-                default => "Rest and acclimatization at {$to->name}.",
-            };
-        } else {
-            $itemTitle = match($locale) {
-                'hi' => "ट्रेकिंग दिन",
-                'zh' => "徒步日",
-                default => "Trekking Day",
-            };
-            $itemDesc = match($locale) {
-                'hi' => "{$from->name} से {$to->name} तक ट्रेक करें",
-                'zh' => "从 {$from->name} 徒步到 {$to->name}",
-                default => "Hike from {$from->name} to {$to->name}",
-            };
-        }
+        // ✅ Dynamic item title
+        $itemTitle = match($locale) {
+            'hi' => $isRestDay ? "आराम दिन" : "{$activityLabel} दिन",
+            'zh' => $isRestDay ? "休息日" : "{$activityLabel}日",
+            default => $isRestDay ? "Rest Day" : "{$activityLabel} Day",
+        };
+
+        $itemDesc = match($locale) {
+            'hi' => $isRestDay 
+                ? "आराम गर्नुहोस्" 
+                : "{$from->name} देखि {$to->name} सम्म {$activityLabel}",
+            'zh' => $isRestDay 
+                ? "休息" 
+                : "从 {$from->name} 到 {$to->name} {$activityLabel}",
+            default => $isRestDay 
+                ? "Rest" 
+                : "{$activityLabel} from {$from->name} to {$to->name}",
+        };
 
         $days[] = [
             'day_number' => $dayNumber,
@@ -666,28 +666,27 @@ class PlannerService
         $dayNumber++;
     }
 
-    // Rest day limit for extra days beyond segments (unchanged)
+    // Rest days limit (max 3) – same as before
     $maxRestDays = min(3, $requestedDays - count($segments));
     $restDaysAdded = 0;
 
     while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
         $last = end($days);
-
         $waypointId = $last['overnight_waypoint_id'] ?? null;
         $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
         $waypointName = $waypoint ? $waypoint->name : 'Unknown';
 
         $restTitle = match($locale) {
-            'hi' => "{$waypointName} में अनुकूलन दिवस",
-            'zh' => "{$waypointName} 适应日",
-            'np' => "{$waypointName} मा अनुकूलन दिन",
-            default => "Acclimatization Day at {$waypointName}",
+            'hi' => "{$waypointName} में आराम दिन",
+            'zh' => "{$waypointName} 休息日",
+            'np' => "{$waypointName} मा आराम दिन",
+            default => "Rest Day at {$waypointName}",
         };
         $restDesc = match($locale) {
-            'hi' => "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-            'zh' => "今天不徒步。在 {$waypointName} 休息和适应。",
-            'np' => "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-            default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+            'hi' => "{$waypointName} में आराम गर्नुहोस्।",
+            'zh' => "在 {$waypointName} 休息。",
+            'np' => "{$waypointName} मा आराम गर्नुहोस्।",
+            default => "Rest at {$waypointName}.",
         };
 
         $days[] = [
@@ -700,8 +699,8 @@ class PlannerService
             'altitude_m' => $last['altitude_m'] ?? null,
             'items' => [
                 [
-                    'title' => 'Rest / Acclimatization',
-                    'description' => 'Rest and acclimatization.',
+                    'title' => 'Rest Day',
+                    'description' => 'Rest and relax.',
                     'time_of_day' => 'morning',
                     'cost' => round($dailyFoodCost, 2),
                     'pricing_source' => 'system_estimate',
@@ -715,17 +714,19 @@ class PlannerService
         $restDaysAdded++;
     }
 
-    // Remaining days as "No Itinerary Data" (unchanged)
+    // Remaining days as "No Itinerary Data"
     while (count($days) < $requestedDays) {
         $dayNumber = count($days) + 1;
         $titleNoData = match($locale) {
             'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
             'zh' => "第 {$dayNumber} 天: 无行程数据",
+            'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
             default => "Day {$dayNumber}: No Itinerary Data",
         };
         $descNoData = match($locale) {
             'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
             'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
+            'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
             default => "The AI did not generate data for this day. Please adjust your request or try again.",
         };
         $days[] = [

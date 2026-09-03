@@ -222,7 +222,7 @@ class ReligiousSitesSeeder extends Seeder
         $this->command->info('✅ Gorkha Durbar seeded.');
 
         // ==========================================
-        // 9. PALPA (TANSEN, RANI MAHAL) - viewpoint → landmark
+        // 9. PALPA (TANSEN, RANI MAHAL)
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -290,7 +290,7 @@ class ReligiousSitesSeeder extends Seeder
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour' , 'name' => 'Guide Service', 'amount' => 10, 'unit' => 'per_group', 'mandatory' => false],
+                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 10, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
 
@@ -348,7 +348,7 @@ class ReligiousSitesSeeder extends Seeder
         $this->command->info('✅ Gupteshwor Mahadev Cave seeded.');
 
         // ==========================================
-        // 14. BARAHI TEMPLE - lake → landmark
+        // 14. BARAHI TEMPLE
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -473,6 +473,103 @@ class ReligiousSitesSeeder extends Seeder
 
         $this->command->info('✅ Baglung Kalika Temple seeded.');
 
-        $this->command->info('🎉 Religious & Pilgrimage Sites Complete! 18 destinations seeded.');
+        // ==========================================
+// 🆕 PATHIBHARA TEMPLE (Direct creation - no helper)
+// ==========================================
+$this->command->info('🛕 Seeding Pathibhara Temple with proper waypoints...');
+
+// Route
+$route = \App\Models\Route::firstOrCreate(
+    ['slug' => 'pathibhara-temple-pilgrimage'],
+    [
+        'name' => 'Pathibhara Temple Pilgrimage',
+        'description' => 'Pilgrimage trek to Pathibhara Devi Temple, a sacred Shakti Peetha at 3,794m in Taplejung, eastern Nepal.',
+        'difficulty' => 'moderate',
+        'duration_days' => 3,
+        'max_altitude' => 3794,
+        'season' => 'Spring/Autumn',
+        'is_active' => true,
+    ]
+);
+
+// Waypoints
+$suketar = \App\Models\Waypoint::firstOrCreate(
+    ['slug' => 'suketar-pathibhara'],
+    ['name' => 'Suketar', 'type' => 'village', 'latitude' => 27.3456, 'longitude' => 87.7123, 'altitude' => 2420]
+);
+$kaflePati = \App\Models\Waypoint::firstOrCreate(
+    ['slug' => 'kafle-pati-pathibhara'],
+    ['name' => 'Kafle Pati', 'type' => 'village', 'latitude' => 27.4123, 'longitude' => 87.7567, 'altitude' => 2800]
+);
+$pathibhara = \App\Models\Waypoint::firstOrCreate(
+    ['slug' => 'pathibhara-devi-temple'],
+    ['name' => 'Pathibhara Devi Temple', 'type' => 'landmark', 'latitude' => 27.4789, 'longitude' => 87.8012, 'altitude' => 3794]
+);
+
+// Segments (Suketar → Kafle Pati → Temple → Kafle Pati → Suketar)
+\App\Models\RouteSegment::updateOrCreate(
+    ['route_id' => $route->id, 'sequence' => 1],
+    ['from_waypoint_id' => $suketar->id, 'to_waypoint_id' => $kaflePati->id, 'distance_km' => 8.00, 'estimated_time_hours' => 4.0, 'elevation_gain_m' => 380, 'elevation_loss_m' => 0]
+);
+\App\Models\RouteSegment::updateOrCreate(
+    ['route_id' => $route->id, 'sequence' => 2],
+    ['from_waypoint_id' => $kaflePati->id, 'to_waypoint_id' => $pathibhara->id, 'distance_km' => 6.00, 'estimated_time_hours' => 3.0, 'elevation_gain_m' => 994, 'elevation_loss_m' => 0]
+);
+\App\Models\RouteSegment::updateOrCreate(
+    ['route_id' => $route->id, 'sequence' => 3],
+    ['from_waypoint_id' => $pathibhara->id, 'to_waypoint_id' => $kaflePati->id, 'distance_km' => 6.00, 'estimated_time_hours' => 2.5, 'elevation_gain_m' => 0, 'elevation_loss_m' => 994]
+);
+\App\Models\RouteSegment::updateOrCreate(
+    ['route_id' => $route->id, 'sequence' => 4],
+    ['from_waypoint_id' => $kaflePati->id, 'to_waypoint_id' => $suketar->id, 'distance_km' => 8.00, 'estimated_time_hours' => 3.5, 'elevation_gain_m' => 0, 'elevation_loss_m' => 380]
+);
+
+// ✅ Costs with unique effective_from per cost
+$costs = [
+    [
+        'type' => 'tour',
+        'name' => 'Temple Entrance Fee',
+        'amount' => 5,
+        'unit' => 'per_person',
+        'is_mandatory' => true,
+        'effective_from' => now()->toDateString(), // day 1
+    ],
+    [
+        'type' => 'tour',
+        'name' => 'Private Vehicle (Suketar–Kafle Pati)',
+        'amount' => 50,
+        'unit' => 'per_group',
+        'is_mandatory' => false,
+        'effective_from' => now()->addDay()->toDateString(), // day 2
+    ],
+    [
+        'type' => 'tour',
+        'name' => 'Guide Service',
+        'amount' => 20,
+        'unit' => 'per_group',
+        'is_mandatory' => false,
+        'effective_from' => now()->addDays(2)->toDateString(), // day 3
+    ],
+];
+
+foreach ($costs as $costData) {
+    \App\Models\RouteCost::updateOrCreate(
+        [
+            'route_id' => $route->id,
+            'type' => $costData['type'],
+            'name' => $costData['name'],
+            'effective_from' => $costData['effective_from'],
+        ],
+        [
+            'amount' => $costData['amount'],
+            'currency' => 'USD',
+            'unit' => $costData['unit'],
+            'is_mandatory' => $costData['is_mandatory'],
+            'effective_until' => '2099-12-31',
+        ]
+    );
+}
+
+$this->command->info('✅ Pathibhara Temple Pilgrimage seeded with proper waypoints.');
     }
 }

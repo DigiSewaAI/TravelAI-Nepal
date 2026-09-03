@@ -186,6 +186,15 @@ class WaypointLocationSeeder extends Seeder
             'Kusma Bridge' => 'Kusma Bridge',
 
             // ============================================================
+// RELIGIOUS SITES - Pathibhara
+// ============================================================
+'Pathibhara Temple' => 'Pathibhara',
+'Pathibhara Devi Temple' => 'Pathibhara',
+'Pathibhara' => 'Pathibhara',
+'Suketar' => 'Suketar',
+'Taplejung' => 'Taplejung',
+
+            // ============================================================
             // OTHER
             // ============================================================
             'Sindhuli' => 'Sindhuli',
