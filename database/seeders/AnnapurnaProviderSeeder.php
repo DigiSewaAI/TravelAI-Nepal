@@ -12,9 +12,26 @@ use Illuminate\Database\Seeder;
 
 class AnnapurnaProviderSeeder extends Seeder
 {
+    protected array $priceMap = [
+        'Besisahar' => 25,
+        'Bahundanda' => 22,
+        'Chamche' => 22,
+        'Dharapani' => 28,
+        'Chame' => 30,
+        'Pisang' => 35,
+        'Manang' => 40,
+        'Yak Kharka' => 30,
+        'Thorong Phedi' => 25,
+        'Thorong La' => 50,
+        'Muktinath' => 30,
+        'Jomsom' => 28,
+        'Tatopani' => 25,
+        'Ghorepani' => 30,
+        'Nayapul' => 20,
+    ];
+
     public function run(): void
     {
-        // 1. Get or create a provider owner user
         $user = User::firstOrCreate(
             ['email' => 'annapurna-providers@travelai.com'],
             [
@@ -25,7 +42,6 @@ class AnnapurnaProviderSeeder extends Seeder
         );
         $this->command->info("✅ User ready: {$user->name} (ID: {$user->id})");
 
-        // 2. Get service categories
         $hotelCat = ServiceCategory::where('slug', 'hotel')->first();
         $guideCat = ServiceCategory::where('slug', 'guide')->first();
         $transportCat = ServiceCategory::where('slug', 'transport')->first();
@@ -35,7 +51,6 @@ class AnnapurnaProviderSeeder extends Seeder
             return;
         }
 
-        // 3. Define locations with coordinates (ALL overnight stops including Thorong La)
         $locationData = [
             'Besisahar' => ['lat' => 28.2398, 'lng' => 84.3824, 'alt' => 760],
             'Bahundanda' => ['lat' => 28.3312, 'lng' => 84.3601, 'alt' => 1310],
@@ -46,7 +61,7 @@ class AnnapurnaProviderSeeder extends Seeder
             'Manang' => ['lat' => 28.6664, 'lng' => 84.1248, 'alt' => 3540],
             'Yak Kharka' => ['lat' => 28.7123, 'lng' => 84.0877, 'alt' => 4010],
             'Thorong Phedi' => ['lat' => 28.7525, 'lng' => 84.0649, 'alt' => 4420],
-            'Thorong La' => ['lat' => 28.7992, 'lng' => 84.0081, 'alt' => 5416], // ✅ NEW: Added Thorong La
+            'Thorong La' => ['lat' => 28.7992, 'lng' => 84.0081, 'alt' => 5416],
             'Muktinath' => ['lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
             'Jomsom' => ['lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
             'Tatopani' => ['lat' => 28.6533, 'lng' => 83.6365, 'alt' => 1190],
@@ -58,19 +73,22 @@ class AnnapurnaProviderSeeder extends Seeder
         $totalServices = 0;
 
         foreach ($locationData as $city => $coords) {
-            // Get location model
             $location = Location::where('city', $city)->first();
             if (!$location) {
                 $this->command->warn("⚠️ Location not found: {$city}, skipping.");
                 continue;
             }
 
-            $this->command->info("📍 Seeding providers for {$city}...");
+            $midPrice = $this->priceMap[$city] ?? 40;
+            $budgetPrice = round($midPrice * 0.55, 0);
+            $luxuryPrice = round($midPrice * 2.5, 0);
+
+            $this->command->info("📍 Updating providers for {$city} (mid-price: \${$midPrice})...");
 
             // ============================================================
-            // 1. BUDGET + BACKPACKER PROVIDER (combined)
+            // 1. BUDGET + BACKPACKER PROVIDER
             // ============================================================
-            $provider = Provider::firstOrCreate(
+            $provider = Provider::updateOrCreate(
                 ['slug' => "{$city}-budget-lodge"],
                 [
                     'user_id' => $user->id,
@@ -80,7 +98,6 @@ class AnnapurnaProviderSeeder extends Seeder
                     'is_active' => true,
                 ]
             );
-            // Assign styles
             ProviderStyle::firstOrCreate(
                 ['provider_id' => $provider->id, 'style_slug' => 'budget']
             );
@@ -88,29 +105,27 @@ class AnnapurnaProviderSeeder extends Seeder
                 ['provider_id' => $provider->id, 'style_slug' => 'backpacker']
             );
 
-            // Hotel service
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-budget-lodge"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $hotelCat->id,
                     'name' => "{$city} Budget Lodge",
                     'description' => "Basic lodge at {$city}",
-                    'price' => 15,
+                    'price' => $budgetPrice,
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
                 ]
             );
-            // Guide service (budget)
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-local-guide"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $guideCat->id,
                     'name' => "{$city} Local Guide",
                     'description' => "Local guide at {$city}",
-                    'price' => 20,
+                    'price' => round($budgetPrice * 0.8, 0),
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
@@ -122,7 +137,7 @@ class AnnapurnaProviderSeeder extends Seeder
             // ============================================================
             // 2. MID-RANGE PROVIDER
             // ============================================================
-            $provider = Provider::firstOrCreate(
+            $provider = Provider::updateOrCreate(
                 ['slug' => "{$city}-mid-lodge"],
                 [
                     'user_id' => $user->id,
@@ -136,27 +151,27 @@ class AnnapurnaProviderSeeder extends Seeder
                 ['provider_id' => $provider->id, 'style_slug' => 'mid_range']
             );
 
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-mid-lodge"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $hotelCat->id,
                     'name' => "{$city} Mid-Range Lodge",
                     'description' => "Comfortable lodge at {$city}",
-                    'price' => 40,
+                    'price' => $midPrice,
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
                 ]
             );
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-certified-guide"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $guideCat->id,
                     'name' => "{$city} Certified Guide",
                     'description' => "Certified guide at {$city}",
-                    'price' => 35,
+                    'price' => round($midPrice * 0.9, 0),
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
@@ -168,7 +183,7 @@ class AnnapurnaProviderSeeder extends Seeder
             // ============================================================
             // 3. LUXURY PROVIDER
             // ============================================================
-            $provider = Provider::firstOrCreate(
+            $provider = Provider::updateOrCreate(
                 ['slug' => "{$city}-luxury-resort"],
                 [
                     'user_id' => $user->id,
@@ -182,27 +197,27 @@ class AnnapurnaProviderSeeder extends Seeder
                 ['provider_id' => $provider->id, 'style_slug' => 'luxury']
             );
 
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-luxury-resort"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $hotelCat->id,
                     'name' => "{$city} Luxury Resort",
                     'description' => "Premium resort at {$city}",
-                    'price' => 100,
+                    'price' => $luxuryPrice,
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
                 ]
             );
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-expert-guide"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $guideCat->id,
                     'name' => "{$city} Expert Guide",
                     'description' => "Expert guide at {$city}",
-                    'price' => 60,
+                    'price' => round($luxuryPrice * 0.6, 0),
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
@@ -214,7 +229,7 @@ class AnnapurnaProviderSeeder extends Seeder
             // ============================================================
             // 4. TRANSPORT PROVIDER
             // ============================================================
-            $provider = Provider::firstOrCreate(
+            $provider = Provider::updateOrCreate(
                 ['slug' => "{$city}-transport"],
                 [
                     'user_id' => $user->id,
@@ -231,14 +246,14 @@ class AnnapurnaProviderSeeder extends Seeder
                 ['provider_id' => $provider->id, 'style_slug' => 'budget']
             );
 
-            Service::firstOrCreate(
+            Service::updateOrCreate(
                 ['slug' => "{$city}-jeep"],
                 [
                     'provider_id' => $provider->id,
                     'service_category_id' => $transportCat->id,
                     'name' => "{$city} Jeep Rental",
                     'description' => "Jeep rental at {$city}",
-                    'price' => 50,
+                    'price' => round($midPrice * 1.2, 0),
                     'currency' => 'USD',
                     'status' => 'active',
                     'location_id' => $location->id,
@@ -247,14 +262,13 @@ class AnnapurnaProviderSeeder extends Seeder
             $totalProviders++;
             $totalServices++;
 
-            $this->command->info("   ✅ {$city}: 4 providers, " . ($totalServices - ($totalProviders * 3)) . " services created.");
+            $this->command->info("   ✅ {$city}: mid-lodge \${$midPrice}, budget \${$budgetPrice}, luxury \${$luxuryPrice}");
         }
 
         $this->command->newLine();
         $this->command->info("✅ AnnapurnaProviderSeeder completed!");
         $this->command->info("   📌 Total Providers: {$totalProviders}");
         $this->command->info("   📌 Total Services: {$totalServices}");
-        $this->command->info("   📌 Locations seeded: " . count($locationData));
-        $this->command->info("   ✅ Thorong La is now included with its own providers.");
+        $this->command->info("   ✅ Location-based pricing updated!");
     }
 }

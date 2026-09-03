@@ -552,171 +552,196 @@ class PlannerService
     // ==========================================
 
     protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en'): array
-    {
-        $segments = $route->segments()->orderBy('sequence')->get();
-        $requestedDays = $input['days'];
-        $days = [];
-        $dayNumber = 1;
+{
+    $segments = $route->segments()->orderBy('sequence')->get();
+    $requestedDays = $input['days'];
+    $days = [];
+    $dayNumber = 1;
 
-        $routeCosts = $route->costs;
-        $dailyFoodCost = 0;
-        $totalFixedCost = 0;
+    $routeCosts = $route->costs;
+    $dailyFoodCost = 0;
+    $totalFixedCost = 0;
 
-        foreach ($routeCosts as $cost) {
-            $amount = $cost->amount;
-            if (strtoupper($cost->currency) === 'USD') {
-                $amount *= 133;
-            }
-            if ($cost->unit === 'per_day') {
-                $dailyFoodCost = $amount;
-            } else {
-                $totalFixedCost += $amount;
-            }
+    foreach ($routeCosts as $cost) {
+        $amount = $cost->amount;
+        if (strtoupper($cost->currency) === 'USD') {
+            $amount *= 133;
         }
+        if ($cost->unit === 'per_day') {
+            $dailyFoodCost = $amount;
+        } else {
+            $totalFixedCost += $amount;
+        }
+    }
 
-        $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
+    $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
 
-        $segmentsToUse = $segments->take($requestedDays);
+    $segmentsToUse = $segments->take($requestedDays);
 
-        foreach ($segmentsToUse as $seg) {
-            $from = $seg->fromWaypoint;
-            $to = $seg->toWaypoint;
-            $dayCost = $perDayFixedCost + $dailyFoodCost;
+    foreach ($segmentsToUse as $seg) {
+        $from = $seg->fromWaypoint;
+        $to = $seg->toWaypoint;
+        $dayCost = $perDayFixedCost + $dailyFoodCost;
 
+        // ✅ Detect rest/acclimatization day
+        $isRestDay = ($from->id === $to->id || (float)$seg->distance_km == 0);
+
+        // Day title & description
+        if ($isRestDay) {
+            $title = match($locale) {
+                'hi' => "{$to->name} में अनुकूलन दिवस",
+                'zh' => "{$to->name} 适应日",
+                'np' => "{$to->name} मा अनुकूलन दिन",
+                default => "Acclimatization Day at {$to->name}",
+            };
+            $desc = match($locale) {
+                'hi' => "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।",
+                'zh' => "今天不徒步。在 {$to->name} 休息和适应。",
+                'np' => "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।",
+                default => "No trekking today. Rest and acclimatize at {$to->name}.",
+            };
+        } else {
             $title = match($locale) {
                 'hi' => "{$from->name} → {$to->name}",
                 'zh' => "{$from->name} → {$to->name}",
                 default => "{$from->name} → {$to->name}",
             };
-
             $desc = match($locale) {
                 'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।",
                 'zh' => "从 {$from->name}（{$from->altitude}米）徒步到 {$to->name}（{$to->altitude}米）。距离：{$seg->distance_km}公里，预计时间：{$seg->estimated_time_hours}小时。",
                 'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म ट्रेक। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा।",
                 default => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
             };
+        }
 
+        // ✅ Item title & description
+        if ($isRestDay) {
+            $itemTitle = match($locale) {
+                'hi' => "आराम / अनुकूलन",
+                'zh' => "休息 / 适应",
+                'np' => "आराम / अनुकूलन",
+                default => "Rest / Acclimatization",
+            };
+            $itemDesc = match($locale) {
+                'hi' => "{$to->name} में आराम और अनुकूलन।",
+                'zh' => "在 {$to->name} 休息和适应。",
+                'np' => "{$to->name} मा आराम र अनुकूलन।",
+                default => "Rest and acclimatization at {$to->name}.",
+            };
+        } else {
             $itemTitle = match($locale) {
                 'hi' => "ट्रेकिंग दिन",
                 'zh' => "徒步日",
                 default => "Trekking Day",
             };
-
             $itemDesc = match($locale) {
                 'hi' => "{$from->name} से {$to->name} तक ट्रेक करें",
                 'zh' => "从 {$from->name} 徒步到 {$to->name}",
                 default => "Hike from {$from->name} to {$to->name}",
             };
+        }
 
-            $days[] = [
-                'day_number' => $dayNumber,
-                'title' => $title,
-                'description' => $desc,
-                'overnight_waypoint_id' => $seg->to_waypoint_id,
-                'distance_km' => (float) $seg->distance_km,
-                'estimated_time_hours' => (float) $seg->estimated_time_hours,
-                'altitude_m' => $to->altitude,
-                'items' => [
-                    [
-                        'title' => $itemTitle,
-                        'description' => $itemDesc,
-                        'time_of_day' => 'morning',
-                        'cost' => round($dayCost, 2),
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
+        $days[] = [
+            'day_number' => $dayNumber,
+            'title' => $title,
+            'description' => $desc,
+            'overnight_waypoint_id' => $seg->to_waypoint_id,
+            'distance_km' => (float) $seg->distance_km,
+            'estimated_time_hours' => (float) $seg->estimated_time_hours,
+            'altitude_m' => $to->altitude,
+            'items' => [
+                [
+                    'title' => $itemTitle,
+                    'description' => $itemDesc,
+                    'time_of_day' => 'morning',
+                    'cost' => round($dayCost, 2),
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
                 ]
-            ];
-            $dayNumber++;
-        }
-
-        // ✅ Rest Day Limit: अधिकतम 3 rest days
-        $maxRestDays = min(3, $requestedDays - count($segments));
-        $restDaysAdded = 0;
-
-        while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
-            $last = end($days);
-
-            $restTitle = match($locale) {
-                'hi' => "आराम और अनुकूलन",
-                'zh' => "休息和适应",
-                'np' => "आराम र अनुकूलन",
-                default => "Rest & Acclimatization",
-            };
-
-            $restDesc = match($locale) {
-                'hi' => "आराम और अनुकूलन का दिन।",
-                'zh' => "休息和适应的一天。",
-                'np' => "आराम र अनुकूलनको दिन।",
-                default => "Rest day to acclimatize and enjoy the mountain views.",
-            };
-
-            $restItemTitle = $restTitle;
-            $restItemDesc = match($locale) {
-                'hi' => "आराम करें, हाइड्रेट करें, और दृश्य का आनंद लें।",
-                'zh' => "放松，补充水分，享受风景。",
-                'np' => "आराम गर्नुहोस्, हाइड्रेट गर्नुहोस्, र दृश्यको आनन्द लिनुहोस्।",
-                default => "Take it easy, hydrate, and enjoy the scenery.",
-            };
-
-            $days[] = [
-                'day_number' => count($days) + 1,
-                'title' => $restItemTitle,
-                'description' => $restDesc,
-                'overnight_waypoint_id' => $last['overnight_waypoint_id'] ?? null,
-                'distance_km' => 0,
-                'estimated_time_hours' => 0,
-                'altitude_m' => $last['altitude_m'] ?? null,
-                'items' => [
-                    [
-                        'title' => $restItemTitle,
-                        'description' => $restItemDesc,
-                        'time_of_day' => 'morning',
-                        'cost' => round($dailyFoodCost, 2),
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
-                ]
-            ];
-            $restDaysAdded++;
-        }
-
-        // ✅ बाँकी days "No Itinerary Data"
-        while (count($days) < $requestedDays) {
-            $dayNumber = count($days) + 1;
-
-            $titleNoData = match($locale) {
-                'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-                'zh' => "第 {$dayNumber} 天: 无行程数据",
-                default => "Day {$dayNumber}: No Itinerary Data",
-            };
-
-            $descNoData = match($locale) {
-                'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-                'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-                default => "The AI did not generate data for this day. Please adjust your request or try again.",
-            };
-
-            $days[] = [
-                'day_number' => $dayNumber,
-                'title' => $titleNoData,
-                'description' => $descNoData,
-                'overnight_waypoint_id' => null,
-                'distance_km' => null,
-                'estimated_time_hours' => null,
-                'altitude_m' => null,
-                'items' => [],
-            ];
-        }
-
-        return ['days' => $days];
+            ]
+        ];
+        $dayNumber++;
     }
+
+    // Rest day limit for extra days beyond segments (unchanged)
+    $maxRestDays = min(3, $requestedDays - count($segments));
+    $restDaysAdded = 0;
+
+    while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
+        $last = end($days);
+
+        $waypointId = $last['overnight_waypoint_id'] ?? null;
+        $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
+        $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+
+        $restTitle = match($locale) {
+            'hi' => "{$waypointName} में अनुकूलन दिवस",
+            'zh' => "{$waypointName} 适应日",
+            'np' => "{$waypointName} मा अनुकूलन दिन",
+            default => "Acclimatization Day at {$waypointName}",
+        };
+        $restDesc = match($locale) {
+            'hi' => "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
+            'zh' => "今天不徒步。在 {$waypointName} 休息和适应。",
+            'np' => "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
+            default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+        };
+
+        $days[] = [
+            'day_number' => count($days) + 1,
+            'title' => $restTitle,
+            'description' => $restDesc,
+            'overnight_waypoint_id' => $waypointId,
+            'distance_km' => 0,
+            'estimated_time_hours' => 0,
+            'altitude_m' => $last['altitude_m'] ?? null,
+            'items' => [
+                [
+                    'title' => 'Rest / Acclimatization',
+                    'description' => 'Rest and acclimatization.',
+                    'time_of_day' => 'morning',
+                    'cost' => round($dailyFoodCost, 2),
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
+                ]
+            ]
+        ];
+        $restDaysAdded++;
+    }
+
+    // Remaining days as "No Itinerary Data" (unchanged)
+    while (count($days) < $requestedDays) {
+        $dayNumber = count($days) + 1;
+        $titleNoData = match($locale) {
+            'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+            'zh' => "第 {$dayNumber} 天: 无行程数据",
+            default => "Day {$dayNumber}: No Itinerary Data",
+        };
+        $descNoData = match($locale) {
+            'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
+            'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
+            default => "The AI did not generate data for this day. Please adjust your request or try again.",
+        };
+        $days[] = [
+            'day_number' => $dayNumber,
+            'title' => $titleNoData,
+            'description' => $descNoData,
+            'overnight_waypoint_id' => null,
+            'distance_km' => null,
+            'estimated_time_hours' => null,
+            'altitude_m' => null,
+            'items' => [],
+        ];
+    }
+
+    return ['days' => $days];
+}
 
     // ==========================================
     //  HELPER: ensure tour segments
