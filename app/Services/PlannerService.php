@@ -47,50 +47,50 @@ class PlannerService
         }
 
         // ============================================================
-        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER (FIXED)
-        // ============================================================
-        $overnightSegments = [];
-        $dayNumber = 1;
-        $mergedSegment = null;
+// BUILD SEGMENTS WITH OVERNIGHT STOP FILTER (FINAL FIX)
+// ============================================================
+$overnightSegments = [];
+$dayNumber = 1;
+$mergedSegment = null;
 
-        foreach ($route->segments as $segment) {
-            $toWaypoint = $segment->toWaypoint;
-            $isOvernight = $toWaypoint->is_overnight_stop ?? true; // default true
+// ✅ Sort segments by sequence to ensure correct order
+$segments = $route->segments->sortBy('sequence');
 
-            if ($isOvernight) {
-                // If we have a pending merged segment, attach it now
-                if ($mergedSegment) {
-                    // Merge the pending segment with the current segment
-                    $merged = $this->mergeSegments($mergedSegment, $segment);
-                    $overnightSegments[] = [
-                        'sequence' => $dayNumber++,
-                        'segment' => $merged,
-                    ];
-                    $mergedSegment = null;
-                } else {
-                    // Just add this segment as a normal day
-                    $overnightSegments[] = [
-                        'sequence' => $dayNumber++,
-                        'segment' => $segment,
-                    ];
-                }
-            } else {
-                // Non-overnight stop: accumulate into mergedSegment
-                if ($mergedSegment) {
-                    $mergedSegment = $this->mergeSegments($mergedSegment, $segment);
-                } else {
-                    $mergedSegment = clone $segment;
-                }
-            }
-        }
+foreach ($segments as $segment) {
+    $toWaypoint = $segment->toWaypoint;
+    $toWaypoint->refresh(); // ✅ Force fresh data from DB
+    $isOvernight = $toWaypoint->is_overnight_stop ?? true;
 
-        // If there is still a mergedSegment left (should not happen if last is overnight, but just in case)
+    if ($isOvernight) {
         if ($mergedSegment) {
+            $merged = $this->mergeSegments($mergedSegment, $segment);
             $overnightSegments[] = [
                 'sequence' => $dayNumber++,
-                'segment' => $mergedSegment,
+                'segment' => $merged,
+            ];
+            $mergedSegment = null;
+        } else {
+            $overnightSegments[] = [
+                'sequence' => $dayNumber++,
+                'segment' => $segment,
             ];
         }
+    } else {
+        // Non-overnight: accumulate
+        if ($mergedSegment) {
+            $mergedSegment = $this->mergeSegments($mergedSegment, $segment);
+        } else {
+            $mergedSegment = clone $segment;
+        }
+    }
+}
+
+if ($mergedSegment) {
+    $overnightSegments[] = [
+        'sequence' => $dayNumber++,
+        'segment' => $mergedSegment,
+    ];
+}
 
         // ============================================================
         // BUILD DAY SERVICES MAP

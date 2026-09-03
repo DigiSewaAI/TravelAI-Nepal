@@ -97,7 +97,7 @@ class ItineraryValidator
                     default => ($altitude >= 3000 && !$isTour) ? "Acclimatization Day at {$to->name}" : "Rest Day",
                 };
                 $desc = match($locale) {
-                    'hi' => ($altitude >= 3000 && !$isTour) ? "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन。" : "आजको दिन आराम गर्नुहोस्।",
+                    'hi' => ($altitude >= 3000 && !$isTour) ? "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।" : "आजको दिन आराम गर्नुहोस्।",
                     'zh' => ($altitude >= 3000 && !$isTour) ? "今天不徒步。在 {$to->name} 休息和适应。" : "今天休息。",
                     'np' => ($altitude >= 3000 && !$isTour) ? "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन。" : "आजको दिन आराम गर्नुहोस्।",
                     default => ($altitude >= 3000 && !$isTour) ? "No trekking today. Rest and acclimatize at {$to->name}." : "Rest today.",
@@ -214,15 +214,6 @@ class ItineraryValidator
         return $days;
     }
 
-    /**
-     * Normalize and validate the AI output.
-     * 
-     * 🔥 KEY FIX: 
-     * - Detects "No Itinerary Data" using case-insensitive stripos()
-     * - Keeps ONLY the FIRST "No Itinerary Data" day
-     * - Converts ALL subsequent "No Itinerary Data" days to "Buffer Day"
-     * - Also skips low-altitude rest days (Jomsom 2700m)
-     */
     protected function normalize(array $aiOutput, Route $route, array $input, string $locale = 'en'): array
     {
         $normalized = ['days' => []];
@@ -238,9 +229,19 @@ class ItineraryValidator
         }
 
         $filteredDays = array_filter($aiOutput['days'] ?? [], function ($day) {
+            $title = $day['title'] ?? '';
+            
+            if (stripos($title, 'no itinerary') !== false ||
+                stripos($title, 'no data') !== false ||
+                stripos($title, 'कोई यात्रा') !== false ||
+                stripos($title, '无行程') !== false ||
+                preg_match('/no\s*data/i', $title) ||
+                preg_match('/no\s*itinerary/i', $title)) {
+                return true;
+            }
+            
             if (!empty($day['items'])) return true;
             if (!empty($day['description']) && strlen($day['description']) > 10) return true;
-            $title = $day['title'] ?? '';
             if (preg_match('/^Day\s*\d+$/i', trim($title))) return false;
             return strlen($title) > 10;
         });
@@ -250,11 +251,10 @@ class ItineraryValidator
         }
 
         // ============================================================
-        //  Process days: skip low-altitude rest days,
-        //  keep only FIRST "No Itinerary Data", convert rest to "Buffer Day"
+        // ✅ Process days: track if we already have a "No Itinerary Data" day
         // ============================================================
         $noDataCount = 0;
-        $firstNoDataSkipped = false;
+        $hasNoDataDay = false;
 
         foreach ($filteredDays as $day) {
             $isRestDay = isset($day['distance_km']) && (float) $day['distance_km'] == 0;
@@ -273,20 +273,22 @@ class ItineraryValidator
 
             $originalTitle = $day['title'] ?? '';
             
-            // 🔥 CASE-INSENSITIVE detection of "No Itinerary Data" and translations
-            $isNoData = (stripos($originalTitle, 'No Itinerary Data') !== false ||
-                         stripos($originalTitle, 'कोई यात्रा डेटा') !== false ||
-                         stripos($originalTitle, '无行程数据') !== false ||
+            $isNoData = (stripos($originalTitle, 'no itinerary') !== false ||
+                         stripos($originalTitle, 'no data') !== false ||
                          stripos($originalTitle, 'कोई यात्रा') !== false ||
-                         stripos($originalTitle, '无行程') !== false);
+                         stripos($originalTitle, '无行程') !== false ||
+                         stripos($originalTitle, 'buffer') !== false ||
+                         preg_match('/no\s*data/i', $originalTitle) ||
+                         preg_match('/no\s*itinerary/i', $originalTitle) ||
+                         (trim($originalTitle) === '') ||
+                         (preg_match('/^Day\s*\d+\s*[:：]?\s*$/i', trim($originalTitle))));
 
-            // For "No Itinerary Data" days
             if ($isNoData) {
                 $noDataCount++;
                 $dayNumber = $dayCounter++;
 
                 if ($noDataCount > 1) {
-                    // ✅ Convert to Buffer Day
+                    // ✅ SECOND "No Itinerary Data" → Buffer Day
                     $newTitle = match($locale) {
                         'hi' => "दिन {$dayNumber}: बफर दिन",
                         'zh' => "第 {$dayNumber} 天: 缓冲日",
@@ -300,7 +302,7 @@ class ItineraryValidator
                         default => "This day is kept as an extra buffer for the journey.",
                     };
                 } else {
-                    // ✅ First "No Itinerary Data" — keep as is
+                    // ✅ FIRST "No Itinerary Data" — keep as is
                     $newTitle = match($locale) {
                         'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
                         'zh' => "第 {$dayNumber} 天: 无行程数据",
@@ -308,11 +310,12 @@ class ItineraryValidator
                         default => "Day {$dayNumber}: No Itinerary Data",
                     };
                     $newDescription = match($locale) {
-                        'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-                        'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-                        'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
-                        default => "The AI did not generate data for this day. Please adjust your request or try again.",
+                        'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें।",
+                        'zh' => "AI 没有为此天生成数据。请调整您的请求。",
+                        'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस्।",
+                        default => "The AI did not generate data for this day. Please adjust your request.",
                     };
+                    $hasNoDataDay = true;
                 }
 
                 $normalized['days'][] = [
@@ -401,19 +404,20 @@ class ItineraryValidator
         $actualDays = count($normalized['days']);
 
         // ============================================================
-        //  Padding: if still less than requested
+        //  ✅ FINAL PADDING: Only add "No Itinerary Data" if not already present
         // ============================================================
         if ($actualDays < $requestedDays) {
             $gap = $requestedDays - $actualDays;
-            $restDaysToAdd = min($gap, 3);
-
+            
             $lastDay = end($normalized['days']);
             $lastWaypointId = $lastDay['overnight_waypoint_id'] ?? null;
             $lastDistance = $lastDay['distance_km'] ?? null;
             $waypoint = $lastWaypointId ? Waypoint::find($lastWaypointId) : null;
             $lastAltitude = $waypoint ? $waypoint->altitude : 0;
 
+            // First try to add rest days (if altitude >= 3000)
             if ($lastDistance !== null && $lastAltitude >= 3000) {
+                $restDaysToAdd = min(3, $gap);
                 for ($i = 1; $i <= $restDaysToAdd; $i++) {
                     $dayNumber = $actualDays + $i;
                     $waypointName = $waypoint ? $waypoint->name : 'Unknown';
@@ -446,36 +450,40 @@ class ItineraryValidator
                         ]
                     ];
                 }
+                $gap = $requestedDays - count($normalized['days']);
             }
 
-            $remainingDays = $requestedDays - count($normalized['days']);
-            if ($remainingDays > 0) {
-                // First remaining → "No Itinerary Data"
-                $dayNumber = count($normalized['days']) + 1;
-                $normalized['days'][] = [
-                    'day_number' => $dayNumber,
-                    'title' => match($locale) {
-                        'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-                        'zh' => "第 {$dayNumber} 天: 无行程数据",
-                        'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
-                        default => "Day {$dayNumber}: No Itinerary Data",
-                    },
-                    'description' => match($locale) {
-                        'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-                        'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-                        'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
-                        default => "The AI did not generate data for this day. Please adjust your request or try again.",
-                    },
-                    'overnight_waypoint_id' => null,
-                    'distance_km' => null,
-                    'estimated_time_hours' => null,
-                    'altitude_m' => null,
-                    'items' => [],
-                ];
+            // ✅ Remaining days: if we already have a "No Itinerary Data" day, only add "Buffer Day"
+            if ($gap > 0) {
+                if (!$hasNoDataDay) {
+                    // First remaining → "No Itinerary Data"
+                    $dayNumber = count($normalized['days']) + 1;
+                    $normalized['days'][] = [
+                        'day_number' => $dayNumber,
+                        'title' => match($locale) {
+                            'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+                            'zh' => "第 {$dayNumber} 天: 无行程数据",
+                            'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+                            default => "Day {$dayNumber}: No Itinerary Data",
+                        },
+                        'description' => match($locale) {
+                            'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें।",
+                            'zh' => "AI 没有为此天生成数据。请调整您的请求。",
+                            'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस्।",
+                            default => "The AI did not generate data for this day. Please adjust your request.",
+                        },
+                        'overnight_waypoint_id' => null,
+                        'distance_km' => null,
+                        'estimated_time_hours' => null,
+                        'altitude_m' => null,
+                        'items' => [],
+                    ];
+                    $gap--;
+                    $hasNoDataDay = true;
+                }
 
-                // Extra remaining → "Buffer Day"
-                $extra = $remainingDays - 1;
-                for ($i = 1; $i <= $extra; $i++) {
+                // ✅ All remaining → "Buffer Day"
+                for ($i = 1; $i <= $gap; $i++) {
                     $dayNumber = count($normalized['days']) + 1;
                     $normalized['days'][] = [
                         'day_number' => $dayNumber,
