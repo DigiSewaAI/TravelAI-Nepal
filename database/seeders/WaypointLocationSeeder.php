@@ -11,32 +11,26 @@ class WaypointLocationSeeder extends Seeder
 {
     public function run(): void
     {
-        // ✅ Updated MAPPING: Annapurna Circuit waypoints → actual locations.city
-        // Note: Yak Kharka, Thorong Phedi, Thorong La now have their own locations
-        // (Make sure LocationSeeder has these cities before running this seeder)
         $map = [
             // ============================================================
-            // ANNAPURNA CIRCUIT TREK (with correct location mapping)
+            // ANNAPURNA CIRCUIT TREK
             // ============================================================
             'Besisahar' => 'Besisahar',
-            'Bahundanda' => 'Besisahar',      // Bahundanda → Besisahar area
+            'Bahundanda' => 'Besisahar',
             'Chamche' => 'Chamche',
             'Dharapani' => 'Dharapani',
             'Chame' => 'Chame',
             'Pisang' => 'Pisang',
             'Manang' => 'Manang',
-
-            // ✅ NEW: Separate locations (not Manang)
-            'Yak Kharka' => 'Yak Kharka',           // New location
-            'Thorong Phedi' => 'Thorong Phedi',     // New location
-            'Thorong La' => 'Thorong La',           // New location
-
+            'Yak Kharka' => 'Yak Kharka',
+            'Thorong Phedi' => 'Thorong Phedi',
+            'Thorong La' => 'Thorong La',
             'Muktinath' => 'Muktinath',
             'Jomsom' => 'Jomsom',
             'Tatopani' => 'Tatopani',
             'Ghorepani' => 'Ghorepani',
             'Nayapul' => 'Nayapul',
-            'Birethanti' => 'Nayapul',              // Birethanti → Nayapul area
+            'Birethanti' => 'Nayapul',
 
             // Annapurna Base Camp route
             'Tikhedhunga' => 'Tikhedhunga',
@@ -82,40 +76,56 @@ class WaypointLocationSeeder extends Seeder
             'Shey Gompa' => 'Shey Gompa',
 
             // ============================================================
-// KANCHENJUNGA REGION
-// ============================================================
-'Suketar' => 'Suketar',
-'Kabeli' => 'Suketar',
-'Chirwa' => 'Suketar',
-'Sakathum' => 'Suketar',
-'Amjilosa' => 'Suketar',
-'Gyabla' => 'Suketar',
-'Ghunsa' => 'Ghunsa',
-'Kambachen' => 'Kanchenjunga Base Camp',
-'Lhonak' => 'Kanchenjunga Base Camp',
-'Kanchenjunga North Base Camp' => 'Kanchenjunga Base Camp',
-'Mamanke' => 'Suketar',
-'Yamphudin' => 'Suketar',
-'Torotong' => 'Suketar',
-'Lamite' => 'Suketar',
-'Cheram' => 'Suketar',
-'Ramche' => 'Suketar',
-'Kanchenjunga South Base Camp' => 'Kanchenjunga Base Camp',
+            // KANCHENJUNGA REGION
+            // ============================================================
+            'Suketar' => 'Suketar',
+            'Kabeli' => 'Suketar',
+            'Chirwa' => 'Suketar',
+            'Sakathum' => 'Suketar',
+            'Amjilosa' => 'Suketar',
+            'Gyabla' => 'Suketar',
+            'Ghunsa' => 'Ghunsa',
+            'Kambachen' => 'Kanchenjunga Base Camp',
+            'Lhonak' => 'Kanchenjunga Base Camp',
+            'Kanchenjunga North Base Camp' => 'Kanchenjunga Base Camp',
+            'Mamanke' => 'Suketar',
+            'Yamphudin' => 'Suketar',
+            'Torotong' => 'Suketar',
+            'Lamite' => 'Suketar',
+            'Cheram' => 'Suketar',
+            'Ramche' => 'Suketar',
+            'Kanchenjunga South Base Camp' => 'Kanchenjunga Base Camp',
 
-// ============================================================
-// MAKALU REGION
-// ============================================================
-'Tumlingtar' => 'Tumlingtar',
-'Chichila' => 'Tumlingtar',
-'Num' => 'Tumlingtar',
-'Sedua' => 'Tumlingtar',
-'Tashigaon' => 'Tumlingtar',
-'Kharkadanda' => 'Tumlingtar',
-'Mumbuk' => 'Tumlingtar',
-'Yangri Kharka' => 'Tumlingtar',
-'Makalu Base Camp' => 'Makalu Base Camp',
-'Barun Valley' => 'Barun Valley',
+            // ============================================================
+            // MAKALU REGION
+            // ============================================================
+            'Tumlingtar' => 'Tumlingtar',
+            'Chichila' => 'Tumlingtar',
+            'Num' => 'Tumlingtar',
+            'Sedua' => 'Tumlingtar',
+            'Tashigaon' => 'Tumlingtar',
+            'Kharkadanda' => 'Tumlingtar',
+            'Mumbuk' => 'Tumlingtar',
+            'Yangri Kharka' => 'Tumlingtar',
+            'Makalu Base Camp' => 'Makalu Base Camp',
+            'Barun Valley' => 'Barun Valley',
 
+            // ============================================================
+            // MANASLU REGION (ADDED)
+            // ============================================================
+            'Arughat' => 'Arughat',
+            'Soti Khola' => 'Soti Khola',
+            'Machha Khola' => 'Machha Khola',
+            'Jagat' => 'Jagat',
+            'Deng' => 'Deng',
+            'Namrung' => 'Namrung',
+            'Lho' => 'Lho',
+            'Samagaon' => 'Samagaon',
+            'Samdo' => 'Samdo',
+            'Dharamsala' => 'Dharamsala',
+            'Bimthang' => 'Bimthang',
+            'Tilije' => 'Tilije',
+            'Tal' => 'Tal',
 
             // ============================================================
             // CITIES / TOURS
@@ -139,14 +149,27 @@ class WaypointLocationSeeder extends Seeder
             'Patan' => 'Patan',
 
             // ============================================================
-            // ADVENTURE ACTIVITIES (Kathmandu / Pokhara based)
-            // ============================================================
-            'Trishuli River' => 'Kathmandu',
-            'Bhote Koshi River' => 'Kathmandu',
-            'Kali Gandaki River' => 'Pokhara',
-            'Seti River' => 'Pokhara',
-            'Sarangkot' => 'Pokhara',
-            'Kusma Bridge' => 'Pokhara',
+// ADVENTURE ACTIVITIES - Waypoint to Location Mapping (Exact)
+// ============================================================
+'Trishuli River Rafting Start' => 'Trishuli River',
+'Trishuli River Rafting End' => 'Trishuli River',
+'Bhote Koshi River Rafting Start' => 'Bhote Koshi River',
+'Bhote Koshi River Rafting End' => 'Bhote Koshi River',
+'Kali Gandaki River Rafting Start' => 'Kali Gandaki River',
+'Kali Gandaki River Rafting End' => 'Kali Gandaki River',
+'Seti River Rafting Start' => 'Seti River',
+'Seti River Rafting End' => 'Seti River',
+'Sarangkot Paragliding Start' => 'Sarangkot',
+'Sarangkot Paragliding End' => 'Sarangkot',
+'Kusma Bridge Bungee Start' => 'Kusma Bridge',
+'Kusma Bridge Bungee End' => 'Kusma Bridge',
+// Also map the generic location names (if any waypoint is just "Trishuli River")
+'Trishuli River' => 'Trishuli River',
+'Bhote Koshi River' => 'Bhote Koshi River',
+'Kali Gandaki River' => 'Kali Gandaki River',
+'Seti River' => 'Seti River',
+'Sarangkot' => 'Sarangkot',
+'Kusma Bridge' => 'Kusma Bridge',
         ];
 
         $totalUpdated = 0;
@@ -159,7 +182,7 @@ class WaypointLocationSeeder extends Seeder
             $waypointName = trim($waypoint->name);
             $locationName = null;
 
-            // 1. Exact match (case-insensitive)
+            // Exact match
             foreach ($map as $key => $value) {
                 if (strtolower($waypointName) === strtolower($key)) {
                     $locationName = $value;
@@ -167,7 +190,7 @@ class WaypointLocationSeeder extends Seeder
                 }
             }
 
-            // 2. Partial match (if exact match not found)
+            // Partial match
             if (!$locationName) {
                 foreach ($map as $key => $value) {
                     if (stripos($waypointName, $key) !== false) {
@@ -186,10 +209,8 @@ class WaypointLocationSeeder extends Seeder
                     $totalUpdated++;
                     $this->command->info("✅ {$waypoint->name} → {$location->city}");
                 } else {
-                    // Fallback: try to find any location with similar name (for new locations)
                     $fallbackLocation = Location::where('city', 'LIKE', "%Manang%")->first();
                     if ($fallbackLocation && in_array($waypointName, ['Yak Kharka', 'Thorong Phedi', 'Thorong La'])) {
-                        // Temporary fallback – but ideally LocationSeeder should have these cities
                         $waypoint->location_id = $fallbackLocation->id;
                         $waypoint->save();
                         $totalFallback++;
@@ -211,10 +232,5 @@ class WaypointLocationSeeder extends Seeder
         $this->command->info("   📌 Updated: {$totalUpdated}");
         $this->command->info("   ⚠️  Fallback (Manang): {$totalFallback}");
         $this->command->info("   ❌ Not Found / Skipped: {$totalNotFound}");
-
-        if ($totalFallback > 0) {
-            $this->command->warn("🔴 Please run LocationSeeder first to create: Yak Kharka, Thorong Phedi, Thorong La");
-            $this->command->warn("   Then re-run this seeder for exact mapping.");
-        }
     }
 }
