@@ -40,24 +40,35 @@ class ItineraryValidator
             ->merge($route->segments->pluck('to_waypoint_id'))
             ->unique()->toArray();
 
-        // Get valid service IDs from context
-        $availableServiceIds = array_column($context['available_services'] ?? [], 'id');
+        // ============================================================
+        //  STEP 2: Day-Level Service Validation
+        // ============================================================
+        $dayServicesMap = $context['day_services'] ?? [];
 
         $hasValidDays = false;
 
         foreach ($aiOutput['days'] ?? [] as $day) {
+            $dayNumber = $day['day_number'] ?? null;
+
             // Validate overnight waypoint
             if (!empty($day['overnight_waypoint_id'])) {
                 if (!in_array($day['overnight_waypoint_id'], $validWaypointIds)) {
-                    $errors[] = "Day {$day['day_number']}: unknown waypoint ID {$day['overnight_waypoint_id']}.";
+                    $errors[] = "Day {$dayNumber}: unknown waypoint ID {$day['overnight_waypoint_id']}.";
                 }
+            }
+
+            // Get valid service IDs for this day
+            $validServiceIds = [];
+            if ($dayNumber !== null && isset($dayServicesMap[$dayNumber])) {
+                // $dayServicesMap[$dayNumber] is a Collection of services
+                $validServiceIds = $dayServicesMap[$dayNumber]->pluck('id')->toArray();
             }
 
             // Validate service IDs
             foreach ($day['items'] ?? [] as $item) {
                 if (!empty($item['service_id'])) {
-                    if (!in_array($item['service_id'], $availableServiceIds)) {
-                        $errors[] = "Invalid service_id: {$item['service_id']} – not in available services.";
+                    if (!in_array($item['service_id'], $validServiceIds)) {
+                        $errors[] = "Day {$dayNumber}: Invalid service_id: {$item['service_id']} – not available for this day.";
                     }
                 }
             }

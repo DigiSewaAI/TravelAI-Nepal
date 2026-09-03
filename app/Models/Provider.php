@@ -141,4 +141,12 @@ class Provider extends Model
             default => 1,
         };
     }
+    public function styles()
+{
+    return $this->hasMany(ProviderStyle::class, 'provider_id');
+}
+public function supportsStyle(string $styleSlug): bool
+{
+    return $this->styles()->where('style_slug', $styleSlug)->exists();
+}
 }
