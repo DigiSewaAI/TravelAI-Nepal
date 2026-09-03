@@ -13,12 +13,10 @@ class ItineraryValidator
     {
         $errors = [];
 
-        // Normalize: if 'itinerary' exists, map to 'days'
         if (isset($aiOutput['itinerary']) && !isset($aiOutput['days'])) {
             $aiOutput['days'] = $aiOutput['itinerary'];
         }
 
-        // If empty days, generate fallback
         if (empty($aiOutput['days']) || !is_array($aiOutput['days']) || count($aiOutput['days']) === 0) {
             Log::warning('AI returned empty days, generating fallback itinerary.', [
                 'route' => $route->name,
@@ -28,7 +26,6 @@ class ItineraryValidator
         }
 
         $actualDays = count($aiOutput['days'] ?? []);
-
         if ($actualDays < $input['days']) {
             Log::warning("AI generated only {$actualDays} days, but user requested {$input['days']}. Days will be padded.", [
                 'route' => $route->name,
@@ -36,35 +33,27 @@ class ItineraryValidator
             ]);
         }
 
-        // Get valid waypoint IDs
         $validWaypointIds = $route->segments->pluck('from_waypoint_id')
             ->merge($route->segments->pluck('to_waypoint_id'))
             ->unique()->toArray();
 
-        // ============================================================
-        //  Day-Level Service Validation
-        // ============================================================
         $dayServicesMap = $context['day_services'] ?? [];
-
         $hasValidDays = false;
 
         foreach ($aiOutput['days'] ?? [] as $day) {
             $dayNumber = $day['day_number'] ?? null;
 
-            // Validate overnight waypoint
             if (!empty($day['overnight_waypoint_id'])) {
                 if (!in_array($day['overnight_waypoint_id'], $validWaypointIds)) {
                     $errors[] = "Day {$dayNumber}: unknown waypoint ID {$day['overnight_waypoint_id']}.";
                 }
             }
 
-            // Get valid service IDs for this day
             $validServiceIds = [];
             if ($dayNumber !== null && isset($dayServicesMap[$dayNumber])) {
                 $validServiceIds = $dayServicesMap[$dayNumber]->pluck('id')->toArray();
             }
 
-            // Validate service IDs
             foreach ($day['items'] ?? [] as $item) {
                 if (!empty($item['service_id'])) {
                     if (!in_array($item['service_id'], $validServiceIds)) {
@@ -73,7 +62,6 @@ class ItineraryValidator
                 }
             }
 
-            // Check if this day has meaningful content
             if (!empty($day['items']) || (!empty($day['description']) && strlen($day['description']) > 10)) {
                 $hasValidDays = true;
             }
@@ -86,39 +74,33 @@ class ItineraryValidator
         return $this->normalize($aiOutput, $route, $input, $locale);
     }
 
-    /**
-     * Generate a fallback itinerary when AI fails.
-     * Now with Rest Day Limit (max 3 rest days).
-     */
     protected function generateFallbackItinerary(Route $route, array $input, string $locale = 'en'): array
     {
         $segments = $route->segments()->orderBy('sequence')->get();
         $requestedDays = $input['days'];
         $days = [];
+        $isTour = $this->isTourRoute($route);
 
-        // First, add all trekking days (segments)
         for ($i = 0; $i < count($segments) && $i < $requestedDays; $i++) {
             $segment = $segments[$i];
             $from = $segment->fromWaypoint;
             $to = $segment->toWaypoint;
 
-            // Check if this is a rest day (from == to or distance = 0)
             $isRestDay = ($from->id === $to->id || (float) $segment->distance_km == 0);
 
             if ($isRestDay) {
-                // Check if this is a tour (city tour, safari, etc.)
-                $isTour = $this->isTourRoute($route);
+                $altitude = $to->altitude ?? 0;
                 $title = match($locale) {
-                    'hi' => $isTour ? "आराम दिन" : "{$to->name} में अनुकूलन दिवस",
-                    'zh' => $isTour ? "休息日" : "{$to->name} 适应日",
-                    'np' => $isTour ? "आराम दिन" : "{$to->name} मा अनुकूलन दिन",
-                    default => $isTour ? "Rest Day" : "Acclimatization Day at {$to->name}",
+                    'hi' => ($altitude >= 3000 && !$isTour) ? "{$to->name} में अनुकूलन दिवस" : "आराम दिन",
+                    'zh' => ($altitude >= 3000 && !$isTour) ? "{$to->name} 适应日" : "休息日",
+                    'np' => ($altitude >= 3000 && !$isTour) ? "{$to->name} मा अनुकूलन दिन" : "आराम दिन",
+                    default => ($altitude >= 3000 && !$isTour) ? "Acclimatization Day at {$to->name}" : "Rest Day",
                 };
                 $desc = match($locale) {
-                    'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।",
-                    'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$to->name} 休息和适应。",
-                    'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।",
-                    default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$to->name}.",
+                    'hi' => ($altitude >= 3000 && !$isTour) ? "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन。" : "आजको दिन आराम गर्नुहोस्।",
+                    'zh' => ($altitude >= 3000 && !$isTour) ? "今天不徒步。在 {$to->name} 休息和适应。" : "今天休息。",
+                    'np' => ($altitude >= 3000 && !$isTour) ? "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन。" : "आजको दिन आराम गर्नुहोस्।",
+                    default => ($altitude >= 3000 && !$isTour) ? "No trekking today. Rest and acclimatize at {$to->name}." : "Rest today.",
                 };
             } else {
                 $title = match($locale) {
@@ -133,18 +115,6 @@ class ItineraryValidator
                 };
             }
 
-            $itemTitle = match($locale) {
-                'hi' => $isRestDay ? "आराम दिन" : "ट्रेकिंग दिन",
-                'zh' => $isRestDay ? "休息日" : "徒步日",
-                default => $isRestDay ? "Rest Day" : "Trekking Day",
-            };
-
-            $itemDesc = match($locale) {
-                'hi' => $isRestDay ? "आराम गर्नुहोस्" : "{$from->name} से {$to->name} तक ट्रेक करें",
-                'zh' => $isRestDay ? "休息" : "从 {$from->name} 徒步到 {$to->name}",
-                default => $isRestDay ? "Rest" : "Hike from {$from->name} to {$to->name}",
-            };
-
             $days[] = [
                 'day_number' => $i + 1,
                 'title' => $title,
@@ -155,8 +125,8 @@ class ItineraryValidator
                 'altitude_m' => $to->altitude,
                 'items' => [
                     [
-                        'title' => $itemTitle,
-                        'description' => $itemDesc,
+                        'title' => $isRestDay ? 'Rest Day' : 'Trekking Day',
+                        'description' => $isRestDay ? 'Rest and relax.' : "Hike from {$from->name} to {$to->name}",
                         'time_of_day' => 'morning',
                         'cost' => 0,
                         'pricing_source' => 'system_estimate',
@@ -169,7 +139,6 @@ class ItineraryValidator
             ];
         }
 
-        // ✅ Rest Day Limit: अधिकतम 3 rest days मात्र
         $currentDays = count($days);
         $maxRestDays = min(3, $requestedDays - $currentDays);
         $restDaysAdded = 0;
@@ -179,9 +148,13 @@ class ItineraryValidator
             $dayNumber = $currentDays + $restDaysAdded + 1;
             $waypointId = $prevDay ? $prevDay['overnight_waypoint_id'] : null;
             $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
-            $waypointName = $waypoint ? $waypoint->name : 'Unknown';
-            $isTour = $this->isTourRoute($route);
+            $altitude = $waypoint ? $waypoint->altitude : 0;
 
+            if ($altitude < 3000) {
+                break;
+            }
+
+            $waypointName = $waypoint ? $waypoint->name : 'Unknown';
             $titleRest = match($locale) {
                 'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
                 'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
@@ -189,21 +162,14 @@ class ItineraryValidator
                 default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
             };
 
-            $descRest = match($locale) {
-                'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-                'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypointName} 休息和适应。",
-                'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-                default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypointName}.",
-            };
-
             $days[] = [
                 'day_number' => $dayNumber,
                 'title' => $titleRest,
-                'description' => $descRest,
+                'description' => "No trekking today. Rest and acclimatize at {$waypointName}.",
                 'overnight_waypoint_id' => $waypointId,
                 'distance_km' => 0,
                 'estimated_time_hours' => 0,
-                'altitude_m' => $prevDay ? $prevDay['altitude_m'] : null,
+                'altitude_m' => $altitude,
                 'items' => [
                     [
                         'title' => 'Rest Day',
@@ -221,28 +187,22 @@ class ItineraryValidator
             $restDaysAdded++;
         }
 
-        // ✅ बाँकी days को लागि "No Itinerary Data" (translated)
         while (count($days) < $requestedDays) {
             $dayNumber = count($days) + 1;
-
-            $titleNoData = match($locale) {
-                'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-                'zh' => "第 {$dayNumber} 天: 无行程数据",
-                'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
-                default => "Day {$dayNumber}: No Itinerary Data",
-            };
-
-            $descNoData = match($locale) {
-                'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-                'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-                'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
-                default => "The AI did not generate data for this day. Please adjust your request or try again.",
-            };
-
             $days[] = [
                 'day_number' => $dayNumber,
-                'title' => $titleNoData,
-                'description' => $descNoData,
+                'title' => match($locale) {
+                    'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+                    'zh' => "第 {$dayNumber} 天: 无行程数据",
+                    'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+                    default => "Day {$dayNumber}: No Itinerary Data",
+                },
+                'description' => match($locale) {
+                    'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया।",
+                    'zh' => "AI 没有为此天生成数据。",
+                    'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन।",
+                    default => "The AI did not generate data for this day.",
+                },
                 'overnight_waypoint_id' => null,
                 'distance_km' => null,
                 'estimated_time_hours' => null,
@@ -256,9 +216,12 @@ class ItineraryValidator
 
     /**
      * Normalize and validate the AI output.
-     * - Filters out generic/empty days.
-     * - Ensures requested days count with rest days (max 3) and "No Itinerary Data".
-     * - ✅ Overrides rest day titles: "Rest Day" for tours, "Acclimatization Day" for treks.
+     * 
+     * 🔥 KEY FIX: 
+     * - Detects "No Itinerary Data" using case-insensitive stripos()
+     * - Keeps ONLY the FIRST "No Itinerary Data" day
+     * - Converts ALL subsequent "No Itinerary Data" days to "Buffer Day"
+     * - Also skips low-altitude rest days (Jomsom 2700m)
      */
     protected function normalize(array $aiOutput, Route $route, array $input, string $locale = 'en'): array
     {
@@ -266,7 +229,6 @@ class ItineraryValidator
         $requestedDays = $input['days'];
         $dayCounter = 1;
 
-        // Calculate daily food cost for rest days (consistency)
         $dailyFoodCost = 0;
         foreach ($route->costs as $cost) {
             if ($cost->unit === 'per_day') {
@@ -275,39 +237,113 @@ class ItineraryValidator
             }
         }
 
-        // Filter out generic/empty days
         $filteredDays = array_filter($aiOutput['days'] ?? [], function ($day) {
-            if (!empty($day['items'])) {
-                return true;
-            }
-            if (!empty($day['description']) && strlen($day['description']) > 10) {
-                return true;
-            }
+            if (!empty($day['items'])) return true;
+            if (!empty($day['description']) && strlen($day['description']) > 10) return true;
             $title = $day['title'] ?? '';
-            if (preg_match('/^Day\s*\d+$/i', trim($title))) {
-                return false;
-            }
-            if (strlen($title) > 10) {
-                return true;
-            }
-            return false;
+            if (preg_match('/^Day\s*\d+$/i', trim($title))) return false;
+            return strlen($title) > 10;
         });
 
-        // If no valid days, use fallback with locale
         if (empty($filteredDays)) {
             $filteredDays = $this->generateFallbackItinerary($route, $input, $locale);
         }
 
+        // ============================================================
+        //  Process days: skip low-altitude rest days,
+        //  keep only FIRST "No Itinerary Data", convert rest to "Buffer Day"
+        // ============================================================
+        $noDataCount = 0;
+        $firstNoDataSkipped = false;
+
         foreach ($filteredDays as $day) {
+            $isRestDay = isset($day['distance_km']) && (float) $day['distance_km'] == 0;
+            $altitude = null;
+
+            if ($isRestDay && !empty($day['overnight_waypoint_id'])) {
+                $waypoint = Waypoint::find($day['overnight_waypoint_id']);
+                $altitude = $waypoint ? $waypoint->altitude : null;
+            }
+
+            // Skip low-altitude rest days (Jomsom 2700m)
+            if ($isRestDay && ($altitude === null || $altitude < 3000)) {
+                Log::info("⏭️ Skipping low-altitude rest day at waypoint ID: " . ($day['overnight_waypoint_id'] ?? 'null'));
+                continue;
+            }
+
+            $originalTitle = $day['title'] ?? '';
+            
+            // 🔥 CASE-INSENSITIVE detection of "No Itinerary Data" and translations
+            $isNoData = (stripos($originalTitle, 'No Itinerary Data') !== false ||
+                         stripos($originalTitle, 'कोई यात्रा डेटा') !== false ||
+                         stripos($originalTitle, '无行程数据') !== false ||
+                         stripos($originalTitle, 'कोई यात्रा') !== false ||
+                         stripos($originalTitle, '无行程') !== false);
+
+            // For "No Itinerary Data" days
+            if ($isNoData) {
+                $noDataCount++;
+                $dayNumber = $dayCounter++;
+
+                if ($noDataCount > 1) {
+                    // ✅ Convert to Buffer Day
+                    $newTitle = match($locale) {
+                        'hi' => "दिन {$dayNumber}: बफर दिन",
+                        'zh' => "第 {$dayNumber} 天: 缓冲日",
+                        'np' => "दिन {$dayNumber}: बफर दिन",
+                        default => "Day {$dayNumber}: Buffer Day",
+                    };
+                    $newDescription = match($locale) {
+                        'hi' => "यो दिन यात्राको लागि अतिरिक्त बफरको रूपमा राखिएको छ।",
+                        'zh' => "此日为行程预留的额外缓冲日。",
+                        'np' => "यो दिन यात्राको लागि अतिरिक्त बफरको रूपमा राखिएको छ।",
+                        default => "This day is kept as an extra buffer for the journey.",
+                    };
+                } else {
+                    // ✅ First "No Itinerary Data" — keep as is
+                    $newTitle = match($locale) {
+                        'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+                        'zh' => "第 {$dayNumber} 天: 无行程数据",
+                        'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+                        default => "Day {$dayNumber}: No Itinerary Data",
+                    };
+                    $newDescription = match($locale) {
+                        'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
+                        'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
+                        'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
+                        default => "The AI did not generate data for this day. Please adjust your request or try again.",
+                    };
+                }
+
+                $normalized['days'][] = [
+                    'day_number' => $dayNumber,
+                    'title' => $newTitle,
+                    'description' => $newDescription,
+                    'overnight_waypoint_id' => null,
+                    'distance_km' => null,
+                    'estimated_time_hours' => null,
+                    'altitude_m' => null,
+                    'items' => [],
+                ];
+                continue;
+            }
+
+            // Normal day with trekking data
             $dayNumber = $dayCounter++;
+            $patterns = ['/^Day\s*\d+\s*[:：]/i', '/^दिन\s*\d+\s*[:：]/', '/^第\s*\d+\s*天\s*[:：]/'];
+            $newTitle = preg_replace($patterns, "Day {$dayNumber}: ", $originalTitle);
+            if ($newTitle === $originalTitle) {
+                $newTitle = "Day {$dayNumber}: " . $originalTitle;
+            }
+
             $normalized['days'][] = [
                 'day_number' => $dayNumber,
-                'title' => $day['title'] ?? "Day {$dayNumber}",
+                'title' => $newTitle,
                 'description' => $day['description'] ?? '',
                 'overnight_waypoint_id' => $day['overnight_waypoint_id'] ?? null,
                 'distance_km' => $day['distance_km'] ?? null,
                 'estimated_time_hours' => $day['estimated_time_hours'] ?? null,
-                'altitude_m' => $day['altitude_m'] ?? null,
+                'altitude_m' => $day['altitude_m'] ?? $altitude ?? null,
                 'items' => array_map(function ($item) {
                     return [
                         'title' => $item['title'] ?? '',
@@ -325,30 +361,37 @@ class ItineraryValidator
         }
 
         // ============================================================
-        //  ✅ Rest Day Title Override (for days with distance = 0)
-        //  "Acclimatization Day" for treks, "Rest Day" for tours
+        //  Rest Day Title Override (for distance=0, altitude>=3000m)
         // ============================================================
         $isTour = $this->isTourRoute($route);
-
         foreach ($normalized['days'] as &$normalizedDay) {
-            if (
-                isset($normalizedDay['distance_km']) &&
-                (float) $normalizedDay['distance_km'] == 0 &&
-                !empty($normalizedDay['overnight_waypoint_id'])
-            ) {
+            if (isset($normalizedDay['distance_km']) && (float) $normalizedDay['distance_km'] == 0 && !empty($normalizedDay['overnight_waypoint_id'])) {
                 $waypoint = Waypoint::find($normalizedDay['overnight_waypoint_id']);
-                if ($waypoint) {
+                if ($waypoint && ($waypoint->altitude ?? 0) >= 3000 && !$isTour) {
                     $normalizedDay['title'] = match($locale) {
-                        'hi' => $isTour ? "आराम दिन" : "{$waypoint->name} में अनुकूलन दिवस",
-                        'zh' => $isTour ? "休息日" : "{$waypoint->name} 适应日",
-                        'np' => $isTour ? "आराम दिन" : "{$waypoint->name} मा अनुकूलन दिन",
-                        default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypoint->name}",
+                        'hi' => "{$waypoint->name} में अनुकूलन दिवस",
+                        'zh' => "{$waypoint->name} 适应日",
+                        'np' => "{$waypoint->name} मा अनुकूलन दिन",
+                        default => "Acclimatization Day at {$waypoint->name}",
                     };
                     $normalizedDay['description'] = match($locale) {
-                        'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypoint->name} में आराम और अनुकूलन।",
-                        'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypoint->name} 休息和适应。",
-                        'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
-                        default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypoint->name}.",
+                        'hi' => "आज कोई ट्रेकिंग नहीं। {$waypoint->name} में आराम और अनुकूलन।",
+                        'zh' => "今天不徒步。在 {$waypoint->name} 休息和适应。",
+                        'np' => "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
+                        default => "No trekking today. Rest and acclimatize at {$waypoint->name}.",
+                    };
+                } else {
+                    $normalizedDay['title'] = match($locale) {
+                        'hi' => "आराम दिन",
+                        'zh' => "休息日",
+                        'np' => "आराम दिन",
+                        default => "Rest Day",
+                    };
+                    $normalizedDay['description'] = match($locale) {
+                        'hi' => "आजको दिन आराम गर्नुहोस्।",
+                        'zh' => "今天休息。",
+                        'np' => "आजको दिन आराम गर्नुहोस्।",
+                        default => "Rest today.",
                     };
                 }
             }
@@ -357,110 +400,122 @@ class ItineraryValidator
 
         $actualDays = count($normalized['days']);
 
-        // Pad with rest days if needed (max 3)
+        // ============================================================
+        //  Padding: if still less than requested
+        // ============================================================
         if ($actualDays < $requestedDays) {
             $gap = $requestedDays - $actualDays;
             $restDaysToAdd = min($gap, 3);
 
             $lastDay = end($normalized['days']);
-            $lastWaypoint = $lastDay['overnight_waypoint_id'] ?? null;
-            $lastAltitude = $lastDay['altitude_m'] ?? null;
+            $lastWaypointId = $lastDay['overnight_waypoint_id'] ?? null;
+            $lastDistance = $lastDay['distance_km'] ?? null;
+            $waypoint = $lastWaypointId ? Waypoint::find($lastWaypointId) : null;
+            $lastAltitude = $waypoint ? $waypoint->altitude : 0;
 
-            for ($i = 1; $i <= $restDaysToAdd; $i++) {
-                $dayNumber = $actualDays + $i;
-                $waypoint = $lastWaypoint ? Waypoint::find($lastWaypoint) : null;
-                $waypointName = $waypoint ? $waypoint->name : 'Unknown';
-
-                $titleRest = match($locale) {
-                    'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
-                    'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
-                    'np' => $isTour ? "आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
-                    default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
-                };
-
-                $descRest = match($locale) {
-                    'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-                    'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypointName} 休息和适应。",
-                    'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-                    default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypointName}.",
-                };
-
-                $normalized['days'][] = [
-                    'day_number' => $dayNumber,
-                    'title' => $titleRest,
-                    'description' => $descRest,
-                    'overnight_waypoint_id' => $lastWaypoint,
-                    'distance_km' => 0,
-                    'estimated_time_hours' => 0,
-                    'altitude_m' => $lastAltitude,
-                    'items' => [
-                        [
-                            'title' => 'Rest Day',
-                            'description' => 'Rest and relax.',
-                            'time_of_day' => 'morning',
-                            'cost' => round($dailyFoodCost, 2),
-                            'pricing_source' => 'system_estimate',
-                            'pricing_snapshot' => null,
-                            'service_id' => null,
-                            'is_optional' => false,
-                            'metadata' => null,
+            if ($lastDistance !== null && $lastAltitude >= 3000) {
+                for ($i = 1; $i <= $restDaysToAdd; $i++) {
+                    $dayNumber = $actualDays + $i;
+                    $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+                    $titleRest = match($locale) {
+                        'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
+                        'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
+                        'np' => $isTour ? "आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
+                        default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
+                    };
+                    $normalized['days'][] = [
+                        'day_number' => $dayNumber,
+                        'title' => $titleRest,
+                        'description' => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypointName}.",
+                        'overnight_waypoint_id' => $lastWaypointId,
+                        'distance_km' => 0,
+                        'estimated_time_hours' => 0,
+                        'altitude_m' => $lastAltitude,
+                        'items' => [
+                            [
+                                'title' => 'Rest Day',
+                                'description' => 'Rest and relax.',
+                                'time_of_day' => 'morning',
+                                'cost' => round($dailyFoodCost, 2),
+                                'pricing_source' => 'system_estimate',
+                                'pricing_snapshot' => null,
+                                'service_id' => null,
+                                'is_optional' => false,
+                                'metadata' => null,
+                            ]
                         ]
-                    ]
-                ];
+                    ];
+                }
             }
 
-            // Remaining days as "No Itinerary Data" with translation
-            $remainingDays = $requestedDays - ($actualDays + $restDaysToAdd);
-            for ($i = 1; $i <= $remainingDays; $i++) {
-                $dayNumber = $actualDays + $restDaysToAdd + $i;
-
-                $titleNoData = match($locale) {
-                    'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-                    'zh' => "第 {$dayNumber} 天: 无行程数据",
-                    'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
-                    default => "Day {$dayNumber}: No Itinerary Data",
-                };
-
-                $descNoData = match($locale) {
-                    'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-                    'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-                    'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
-                    default => "The AI did not generate data for this day. Please adjust your request or try again.",
-                };
-
+            $remainingDays = $requestedDays - count($normalized['days']);
+            if ($remainingDays > 0) {
+                // First remaining → "No Itinerary Data"
+                $dayNumber = count($normalized['days']) + 1;
                 $normalized['days'][] = [
                     'day_number' => $dayNumber,
-                    'title' => $titleNoData,
-                    'description' => $descNoData,
+                    'title' => match($locale) {
+                        'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+                        'zh' => "第 {$dayNumber} 天: 无行程数据",
+                        'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+                        default => "Day {$dayNumber}: No Itinerary Data",
+                    },
+                    'description' => match($locale) {
+                        'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
+                        'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
+                        'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
+                        default => "The AI did not generate data for this day. Please adjust your request or try again.",
+                    },
                     'overnight_waypoint_id' => null,
                     'distance_km' => null,
                     'estimated_time_hours' => null,
                     'altitude_m' => null,
                     'items' => [],
                 ];
+
+                // Extra remaining → "Buffer Day"
+                $extra = $remainingDays - 1;
+                for ($i = 1; $i <= $extra; $i++) {
+                    $dayNumber = count($normalized['days']) + 1;
+                    $normalized['days'][] = [
+                        'day_number' => $dayNumber,
+                        'title' => match($locale) {
+                            'hi' => "दिन {$dayNumber}: बफर दिन",
+                            'zh' => "第 {$dayNumber} 天: 缓冲日",
+                            'np' => "दिन {$dayNumber}: बफर दिन",
+                            default => "Day {$dayNumber}: Buffer Day",
+                        },
+                        'description' => match($locale) {
+                            'hi' => "यो दिन यात्राको लागि अतिरिक्त बफरको रूपमा राखिएको छ।",
+                            'zh' => "此日为行程预留的额外缓冲日。",
+                            'np' => "यो दिन यात्राको लागि अतिरिक्त बफरको रूपमा राखिएको छ।",
+                            default => "This day is kept as an extra buffer for the journey.",
+                        },
+                        'overnight_waypoint_id' => null,
+                        'distance_km' => null,
+                        'estimated_time_hours' => null,
+                        'altitude_m' => null,
+                        'items' => [],
+                    ];
+                }
             }
         }
 
-        // Ultimate fallback if no days at all
         if (empty($normalized['days'])) {
-            $titleFallback = match($locale) {
-                'hi' => "कोई यात्रा उत्पन्न नहीं हुई",
-                'zh' => "未生成行程",
-                'np' => "कुनै यात्रा उत्पन्न भएन",
-                default => "No Itinerary Generated",
-            };
-
-            $descFallback = match($locale) {
-                'hi' => "यात्रा उत्पन्न करने में असमर्थ। कृपया भिन्न पैरामीटर के साथ पुनः प्रयास करें।",
-                'zh' => "无法生成行程。请尝试使用不同的参数。",
-                'np' => "यात्रा उत्पन्न गर्न असमर्थ। कृपया फरक प्यारामिटरको साथ पुनः प्रयास गर्नुहोस्।",
-                default => "Unable to generate an itinerary. Please try again with different parameters.",
-            };
-
             $normalized['days'][] = [
                 'day_number' => 1,
-                'title' => $titleFallback,
-                'description' => $descFallback,
+                'title' => match($locale) {
+                    'hi' => "कोई यात्रा उत्पन्न नहीं हुई",
+                    'zh' => "未生成行程",
+                    'np' => "कुनै यात्रा उत्पन्न भएन",
+                    default => "No Itinerary Generated",
+                },
+                'description' => match($locale) {
+                    'hi' => "यात्रा उत्पन्न करने में असमर्थ। कृपया भिन्न पैरामीटर के साथ पुनः प्रयास करें।",
+                    'zh' => "无法生成行程。请尝试使用不同的参数。",
+                    'np' => "यात्रा उत्पन्न गर्न असमर्थ। कृपया फरक प्यारामिटरको साथ पुनः प्रयास गर्नुहोस्।",
+                    default => "Unable to generate an itinerary. Please try again with different parameters.",
+                },
                 'overnight_waypoint_id' => null,
                 'distance_km' => null,
                 'estimated_time_hours' => null,
@@ -472,9 +527,6 @@ class ItineraryValidator
         return $normalized;
     }
 
-    /**
-     * Helper: Check if the route is a tour (city tour, safari, etc.)
-     */
     private function isTourRoute(Route $route): bool
     {
         $tourKeywords = ['Tour', 'Safari', 'Heritage', 'Pilgrimage', 'Circuit', 'Sightseeing'];

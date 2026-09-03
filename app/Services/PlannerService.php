@@ -37,6 +37,8 @@ class PlannerService
             throw ValidationException::withMessages(['destination' => 'Route not found.']);
         }
 
+        // ✅ REFRESH to get latest waypoint data (including is_overnight_stop)
+        $route->refresh();
         $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
 
         if ($route->segments->isEmpty()) {
@@ -44,32 +46,88 @@ class PlannerService
             $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
         }
 
-        // Build day-level service map
+        // ============================================================
+        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER (FIXED)
+        // ============================================================
+        $overnightSegments = [];
+        $dayNumber = 1;
+        $mergedSegment = null;
+
+        foreach ($route->segments as $segment) {
+            $toWaypoint = $segment->toWaypoint;
+            $isOvernight = $toWaypoint->is_overnight_stop ?? true; // default true
+
+            if ($isOvernight) {
+                // If we have a pending merged segment, attach it now
+                if ($mergedSegment) {
+                    // Merge the pending segment with the current segment
+                    $merged = $this->mergeSegments($mergedSegment, $segment);
+                    $overnightSegments[] = [
+                        'sequence' => $dayNumber++,
+                        'segment' => $merged,
+                    ];
+                    $mergedSegment = null;
+                } else {
+                    // Just add this segment as a normal day
+                    $overnightSegments[] = [
+                        'sequence' => $dayNumber++,
+                        'segment' => $segment,
+                    ];
+                }
+            } else {
+                // Non-overnight stop: accumulate into mergedSegment
+                if ($mergedSegment) {
+                    $mergedSegment = $this->mergeSegments($mergedSegment, $segment);
+                } else {
+                    $mergedSegment = clone $segment;
+                }
+            }
+        }
+
+        // If there is still a mergedSegment left (should not happen if last is overnight, but just in case)
+        if ($mergedSegment) {
+            $overnightSegments[] = [
+                'sequence' => $dayNumber++,
+                'segment' => $mergedSegment,
+            ];
+        }
+
+        // ============================================================
+        // BUILD DAY SERVICES MAP
+        // ============================================================
         $dayServicesMap = [];
         $dayDiagnostics = [];
 
-        foreach ($route->segments as $segment) {
-            $dayNumber = $segment->sequence;
-            $waypoint = $segment->toWaypoint;
+        foreach ($overnightSegments as $item) {
+            $dayNum = $item['sequence'];
+            $seg = $item['segment'];
+            $waypoint = $seg->toWaypoint;
+
             $result = $this->getServicesForDay($waypoint, $input);
-            $dayServicesMap[$dayNumber] = $result['services'] ?? collect();
+            $dayServicesMap[$dayNum] = $result['services'] ?? collect();
             if ($result['diagnostic']) {
-                $dayDiagnostics[$dayNumber] = $result['diagnostic'];
+                $dayDiagnostics[$dayNum] = $result['diagnostic'];
             }
         }
 
         $totalDays = $input['days'];
-        for ($i = count($route->segments) + 1; $i <= $totalDays; $i++) {
+        for ($i = count($overnightSegments) + 1; $i <= $totalDays; $i++) {
             $dayServicesMap[$i] = collect();
         }
 
-        // Calculate cost (only system costs)
+        // ============================================================
+        // COST CALCULATION
+        // ============================================================
         $costBreakdown = $this->calculateCost($route, $input, [], $locale);
 
-        // Build context
-        $context = $this->buildContext($route, $input, $costBreakdown, $dayServicesMap, $dayDiagnostics);
+        // ============================================================
+        // BUILD CONTEXT
+        // ============================================================
+        $context = $this->buildContext($route, $input, $costBreakdown, $dayServicesMap, $dayDiagnostics, $overnightSegments);
 
-        // Try AI, fallback if needed
+        // ============================================================
+        // AI / FALLBACK
+        // ============================================================
         $aiResponse = null;
         $usedFallback = false;
         try {
@@ -82,65 +140,120 @@ class PlannerService
             Log::info('✅ AI itinerary generated successfully.');
         } catch (\Exception $e) {
             Log::error('❌ AI generation failed, using fallback.', ['error' => $e->getMessage()]);
-            $aiResponse = $this->buildFallbackResponse($route, $input, $locale);
+            $aiResponse = $this->buildFallbackResponse($route, $input, $locale, $overnightSegments);
             $usedFallback = true;
         }
 
         if ($aiResponse && !$usedFallback) {
             if (!$this->isLanguageCorrect($aiResponse, $locale)) {
                 Log::warning('⚠️ AI response language mismatch, using fallback.', ['locale' => $locale]);
-                $aiResponse = $this->buildFallbackResponse($route, $input, $locale);
+                $aiResponse = $this->buildFallbackResponse($route, $input, $locale, $overnightSegments);
                 $usedFallback = true;
             }
         }
 
-        // Validate and normalize
+        // ============================================================
+        // VALIDATE & NORMALIZE
+        // ============================================================
         $validated = $this->validator->validate($aiResponse, $route, $input, $context, $locale);
 
         // ============================================================
-        // PROGRAMMATICALLY ATTACH SERVICES (AI बिना पनि)
-        // ============================================================
-        foreach ($validated['days'] as &$dayData) {
-            $dayNumber = $dayData['day_number'];
-            $services = $dayServicesMap[$dayNumber] ?? collect();
+// ATTACH SERVICES TO DAYS (WITH FALLBACK)
+// ============================================================
+foreach ($validated['days'] as &$dayData) {
+    $dayNumber = $dayData['day_number'];
+    $services = $dayServicesMap[$dayNumber] ?? collect();
 
-            if ($services->isNotEmpty()) {
-                $bestService = $services->first();
+    // Skip "No Itinerary Data" days
+    if ($dayData['distance_km'] === null) {
+        continue;
+    }
 
-                $priceNpr = $bestService['price'];
-                if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
-                    $priceNpr *= 133;
-                }
+    $waypointId = $dayData['overnight_waypoint_id'] ?? null;
+    if (!$waypointId) {
+        continue;
+    }
 
-                $hasService = false;
-                foreach ($dayData['items'] as $item) {
-                    if (!empty($item['service_id'])) {
-                        $hasService = true;
-                        break;
-                    }
-                }
+    $waypoint = Waypoint::find($waypointId);
+    if (!$waypoint) {
+        continue;
+    }
 
-                if (!$hasService) {
-                    $dayData['items'][] = [
-                        'title' => $bestService['name'],
-                        'description' => 'Service Included',
-                        'time_of_day' => 'afternoon',
-                        'cost' => $priceNpr,
-                        'currency' => 'NPR',
-                        'pricing_source' => 'provider_service',
-                        'pricing_snapshot' => null,
-                        'service_id' => $bestService['id'],
-                        'is_optional' => false,
-                        'metadata' => null,
-                        'provider' => $bestService['provider'] ?? 'TravelAI Partner', // ✅ added for breakdown
-                    ];
-                }
-            }
+    $locationId = $waypoint->location_id;
+    $bestService = null;
+
+    // ✅ First: Try exact location_id match
+    foreach ($services as $svc) {
+        if (($svc['location_id'] ?? null) == $locationId) {
+            $bestService = $svc;
+            break;
         }
-        unset($dayData);
+    }
 
-        // Save to DB
-        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown, $dayServicesMap) {
+    // ✅ Second: Fallback — search by waypoint name
+    if (!$bestService) {
+        $waypointName = $waypoint->name;
+        $fallbackService = Service::where('status', 'active')
+            ->where('name', 'LIKE', "%{$waypointName}%")
+            ->whereHas('category', function ($q) {
+                $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
+            })
+            ->first();
+
+        if ($fallbackService) {
+            $bestService = [
+                'id' => $fallbackService->id,
+                'name' => $fallbackService->name,
+                'price' => (float) $fallbackService->price,
+                'currency' => $fallbackService->currency ?? 'NPR',
+                'provider' => $fallbackService->provider->name ?? 'TravelAI Partner',
+                'location_id' => $fallbackService->location_id,
+            ];
+            Log::info("✅ Fallback: Day {$dayNumber} using service {$fallbackService->name} for {$waypointName}");
+        }
+    }
+
+    if (!$bestService) {
+        Log::info("ℹ️ No service found for Day {$dayNumber} ({$waypoint->name})");
+        continue;
+    }
+
+    // Attach the service
+    $priceNpr = $bestService['price'];
+    if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
+        $priceNpr *= 133;
+    }
+
+    $hasService = false;
+    foreach ($dayData['items'] as $item) {
+        if (!empty($item['service_id'])) {
+            $hasService = true;
+            break;
+        }
+    }
+
+    if (!$hasService) {
+        $dayData['items'][] = [
+            'title' => $bestService['name'],
+            'description' => 'Service Included',
+            'time_of_day' => 'afternoon',
+            'cost' => $priceNpr,
+            'currency' => 'NPR',
+            'pricing_source' => 'provider_service',
+            'pricing_snapshot' => null,
+            'service_id' => $bestService['id'],
+            'is_optional' => false,
+            'metadata' => null,
+            'provider' => $bestService['provider'] ?? 'TravelAI Partner',
+        ];
+    }
+}
+unset($dayData);
+
+        // ============================================================
+        // SAVE TO DB
+        // ============================================================
+        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
             $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
                 'session_id' => session()->getId(),
@@ -197,20 +310,15 @@ class PlannerService
                 }
             }
 
-            // ============================================================
-            // STEP 4: Per-Day Cost Breakdown (instead of lump sum)
-            // ============================================================
             $breakdown = $costBreakdown['breakdown'] ?? [];
             $totalCost = 0;
 
-            // Add system costs
             foreach ($breakdown as $key => $item) {
-                if ($key !== 'services') { // remove any existing lump sum
+                if ($key !== 'services') {
                     $totalCost += $item['amount'] ?? 0;
                 }
             }
 
-            // Build per-day service costs
             $perDayServiceCosts = [];
             foreach ($validated['days'] as $dayData) {
                 foreach ($dayData['items'] as $item) {
@@ -230,7 +338,6 @@ class PlannerService
                 }
             }
 
-            // Merge system costs + per-day service costs
             $finalBreakdown = array_merge($breakdown, $perDayServiceCosts);
 
             return [
@@ -246,98 +353,23 @@ class PlannerService
     }
 
     // ==========================================
-    //  SERVICE FILTERING (LOCATION + STYLE + BUDGET)
+    // HELPER: MERGE TWO SEGMENTS
     // ==========================================
-
-    protected function getServicesForRoute(Route $route, array $input): array
+    protected function mergeSegments($seg1, $seg2)
     {
-        $style = $input['travel_style'] ?? 'mid_range';
-        $budget = $input['budget'] ?? 0;
-        $days = $input['days'] ?? $route->duration_days;
-
-        $query = Service::where('status', 'active')
-            ->whereHas('category', function ($q) {
-                $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
-            });
-
-        $services = collect();
-        $locationId = $route->segments->first()->fromWaypoint->location_id ?? null;
-        if ($locationId) {
-            $services = $query->where('location_id', $locationId)->get();
-            if ($services->isEmpty()) {
-                $services = $query->whereNull('location_id')->get();
-            }
-        } else {
-            $services = $query->get();
-        }
-
-        $priceRanges = [
-            'budget'     => ['max' => 30,  'prefer' => 'lowest'],
-            'backpacker' => ['max' => 50,  'prefer' => 'low'],
-            'mid_range'  => ['max' => 120, 'prefer' => 'medium'],
-            'luxury'     => ['max' => 500, 'prefer' => 'high'],
-        ];
-
-        $range = $priceRanges[$style] ?? $priceRanges['mid_range'];
-
-        $filtered = [];
-        foreach ($services as $service) {
-            $price = (float) $service->price;
-            $priceUsd = $price;
-            if (strtoupper($service->currency) === 'NPR') {
-                $priceUsd = $price / 133;
-            }
-            if ($priceUsd <= $range['max'] && ($budget == 0 || $priceUsd <= $budget / $days)) {
-                $filtered[] = $service;
-            }
-        }
-
-        usort($filtered, function ($a, $b) use ($range) {
-            $priceA = (float) $a->price;
-            $priceB = (float) $b->price;
-            if ($range['prefer'] === 'lowest' || $range['prefer'] === 'low') {
-                return $priceA <=> $priceB;
-            } elseif ($range['prefer'] === 'high') {
-                return $priceB <=> $priceA;
-            }
-            $avg = ($priceA + $priceB) / 2;
-            return abs($priceA - $avg) <=> abs($priceB - $avg);
-        });
-
-        $grouped = [];
-        foreach ($filtered as $svc) {
-            $cat = $svc->category->slug ?? 'other';
-            if (!isset($grouped[$cat])) {
-                $grouped[$cat] = [];
-            }
-            if (count($grouped[$cat]) < 3) {
-                $grouped[$cat][] = $svc;
-            }
-        }
-
-        $result = [];
-        foreach ($grouped as $cat => $items) {
-            foreach ($items as $item) {
-                $result[] = [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'category' => $cat,
-                    'price' => (float) $item->price,
-                    'currency' => $item->currency ?? 'NPR',
-                    'provider' => $item->provider->name ?? null,
-                    'description' => $item->description,
-                    'rating' => $item->reviews->avg('rating') ?? null,
-                ];
-            }
-        }
-
-        return $result;
+        $merged = clone $seg1;
+        $merged->distance_km = (float)$seg1->distance_km + (float)$seg2->distance_km;
+        $merged->estimated_time_hours = (float)$seg1->estimated_time_hours + (float)$seg2->estimated_time_hours;
+        $merged->elevation_gain_m = (float)$seg1->elevation_gain_m + (float)$seg2->elevation_gain_m;
+        $merged->elevation_loss_m = (float)$seg1->elevation_loss_m + (float)$seg2->elevation_loss_m;
+        $merged->to_waypoint_id = $seg2->to_waypoint_id;
+        $merged->toWaypoint = $seg2->toWaypoint;
+        return $merged;
     }
 
     // ==========================================
-    //  COST CALCULATION
+    // COST CALCULATION
     // ==========================================
-
     protected function calculateCost(Route $route, array $input, array $services, string $locale = 'en'): array
     {
         $days = $input['days'] ?? $route->duration_days;
@@ -388,15 +420,19 @@ class PlannerService
         }
 
         $budgetNpr = $budget * 133;
-        if ($budget > 0 && $total > $budgetNpr) {
-            $breakdown['budget_insufficient'] = [
-                'name' => 'Budget Note',
-                'amount' => 0,
-                'currency' => 'NPR',
-                'unit' => __('messages.note', ['amount' => $input['budget']]),
-                'is_mandatory' => false,
-                'provider_name' => 'System',
-            ];
+        if ($budget > 0) {
+            $overPercent = (($total - $budgetNpr) / $budgetNpr) * 100;
+            if ($overPercent > 10) {
+                $breakdown['budget_insufficient'] = [
+                    'name' => '⚠️ Budget Warning',
+                    'amount' => 0,
+                    'currency' => 'NPR',
+                    'unit' => 'note',
+                    'is_mandatory' => false,
+                    'provider_name' => 'System',
+                    'message' => "Your budget of {$budget} USD is " . round($overPercent, 0) . "% over the estimated cost.",
+                ];
+            }
         }
 
         return ['total' => $total, 'breakdown' => $breakdown];
@@ -449,15 +485,16 @@ class PlannerService
     }
 
     // ==========================================
-    //  CONTEXT + PROMPT
+    // CONTEXT + PROMPT
     // ==========================================
 
-    protected function buildContext(Route $route, array $input, array $cost, array $dayServicesMap, array $dayDiagnostics = []): array
+    protected function buildContext(Route $route, array $input, array $cost, array $dayServicesMap, array $dayDiagnostics = [], array $overnightSegments = []): array
     {
         $segments = [];
-        foreach ($route->segments as $seg) {
+        foreach ($overnightSegments as $item) {
+            $seg = $item['segment'];
             $segments[] = [
-                'sequence' => $seg->sequence,
+                'sequence' => $item['sequence'],
                 'from' => $seg->fromWaypoint->name,
                 'to' => $seg->toWaypoint->name,
                 'distance_km' => $seg->distance_km,
@@ -499,7 +536,6 @@ class PlannerService
         }
         $context['segments'] = $segments;
 
-        // छोटो day_services (id, name, category, price)
         $dayServicesForPrompt = [];
         foreach ($context['day_services'] as $dayNumber => $services) {
             $dayServicesForPrompt[$dayNumber] = $services->map(function ($svc) {
@@ -548,204 +584,135 @@ class PlannerService
     }
 
     // ==========================================
-    //  FALLBACK (with Rest Day Limit)
+    // FALLBACK (with maxDailyDistance)
     // ==========================================
+    protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en', array $overnightSegments = []): array
+    {
+        $days = [];
+        $dayNumber = 1;
+        $maxDailyDistance = 15;
 
-    protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en'): array
-{
-    $segments = $route->segments()->orderBy('sequence')->get();
-    $requestedDays = $input['days'];
-    $days = [];
-    $dayNumber = 1;
+        foreach ($overnightSegments as $item) {
+            $seg = $item['segment'];
+            $from = $seg->fromWaypoint;
+            $to = $seg->toWaypoint;
 
-    // ✅ Get route category (trek, tour, activity, etc.)
-    $categorySlug = $route->serviceCategory->slug ?? 'trek';
-    $activityLabel = match($categorySlug) {
-        'trek' => 'Trekking',
-        'tour' => 'Tour',
-        'activity' => 'Activity',
-        'experience' => 'Experience',
-        'hotel' => 'Hotel',
-        default => 'Day',
-    };
+            $distance = (float) $seg->distance_km;
+            $isLongDay = $distance > $maxDailyDistance;
 
-    $routeCosts = $route->costs;
-    $dailyFoodCost = 0;
-    $totalFixedCost = 0;
-
-    foreach ($routeCosts as $cost) {
-        $amount = $cost->amount;
-        if (strtoupper($cost->currency) === 'USD') {
-            $amount *= 133;
-        }
-        if ($cost->unit === 'per_day') {
-            $dailyFoodCost = $amount;
-        } else {
-            $totalFixedCost += $amount;
-        }
-    }
-
-    $perDayFixedCost = $requestedDays > 0 ? $totalFixedCost / $requestedDays : 0;
-
-    $segmentsToUse = $segments->take($requestedDays);
-
-    foreach ($segmentsToUse as $seg) {
-        $from = $seg->fromWaypoint;
-        $to = $seg->toWaypoint;
-        $dayCost = $perDayFixedCost + $dailyFoodCost;
-
-        $isRestDay = ($from->id === $to->id || (float)$seg->distance_km == 0);
-
-        if ($isRestDay) {
-            $title = match($locale) {
-                'hi' => "आराम दिन",
-                'zh' => "休息日",
-                'np' => "आराम दिन",
-                default => "Rest Day",
-            };
-            $desc = match($locale) {
-                'hi' => "आजको दिन आराम गर्नुहोस्।",
-                'zh' => "今天休息。",
-                'np' => "आजको दिन आराम गर्नुहोस्।",
-                default => "Rest today.",
-            };
-        } else {
             $title = match($locale) {
                 'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
                 'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
                 default => "Day {$dayNumber}: {$from->name} → {$to->name}",
             };
+
             $desc = match($locale) {
-                'hi' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$seg->distance_km} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।",
-                'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$seg->distance_km}公里，预计时间：{$seg->estimated_time_hours}小时。",
-                default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$seg->distance_km} km, estimated time: {$seg->estimated_time_hours} hrs.",
+                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+                'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
             };
+
+            $days[] = [
+                'day_number' => $dayNumber,
+                'title' => $title,
+                'description' => $desc,
+                'overnight_waypoint_id' => $to->id,
+                'distance_km' => $distance,
+                'estimated_time_hours' => (float) $seg->estimated_time_hours,
+                'altitude_m' => $to->altitude,
+                'items' => [
+                    [
+                        'title' => 'Trekking Day',
+                        'description' => "Trek from {$from->name} to {$to->name}",
+                        'time_of_day' => 'morning',
+                        'cost' => 0,
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
+                ]
+            ];
+            $dayNumber++;
         }
 
-        // ✅ Dynamic item title
-        $itemTitle = match($locale) {
-            'hi' => $isRestDay ? "आराम दिन" : "{$activityLabel} दिन",
-            'zh' => $isRestDay ? "休息日" : "{$activityLabel}日",
-            default => $isRestDay ? "Rest Day" : "{$activityLabel} Day",
-        };
+        $requestedDays = $input['days'];
+        $maxRestDays = min(3, $requestedDays - count($days));
+        $restDaysAdded = 0;
 
-        $itemDesc = match($locale) {
-            'hi' => $isRestDay 
-                ? "आराम गर्नुहोस्" 
-                : "{$from->name} देखि {$to->name} सम्म {$activityLabel}",
-            'zh' => $isRestDay 
-                ? "休息" 
-                : "从 {$from->name} 到 {$to->name} {$activityLabel}",
-            default => $isRestDay 
-                ? "Rest" 
-                : "{$activityLabel} from {$from->name} to {$to->name}",
-        };
+        while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
+            $last = end($days);
+            $waypointId = $last['overnight_waypoint_id'] ?? null;
+            $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
+            $waypointName = $waypoint ? $waypoint->name : 'Unknown';
 
-        $days[] = [
-            'day_number' => $dayNumber,
-            'title' => $title,
-            'description' => $desc,
-            'overnight_waypoint_id' => $seg->to_waypoint_id,
-            'distance_km' => (float) $seg->distance_km,
-            'estimated_time_hours' => (float) $seg->estimated_time_hours,
-            'altitude_m' => $to->altitude,
-            'items' => [
-                [
-                    'title' => $itemTitle,
-                    'description' => $itemDesc,
-                    'time_of_day' => 'morning',
-                    'cost' => round($dayCost, 2),
-                    'pricing_source' => 'system_estimate',
-                    'pricing_snapshot' => null,
-                    'service_id' => null,
-                    'is_optional' => false,
-                    'metadata' => null,
+            $altitude = $last['altitude_m'] ?? 0;
+            if ($altitude < 3000) {
+                break;
+            }
+
+            $restTitle = match($locale) {
+                'hi' => "{$waypointName} में अनुकूलन दिवस",
+                'zh' => "{$waypointName} 适应日",
+                'np' => "{$waypointName} मा अनुकूलन दिन",
+                default => "Acclimatization Day at {$waypointName}",
+            };
+
+            $days[] = [
+                'day_number' => count($days) + 1,
+                'title' => $restTitle,
+                'description' => "No trekking today. Rest and acclimatize at {$waypointName}.",
+                'overnight_waypoint_id' => $waypointId,
+                'distance_km' => 0,
+                'estimated_time_hours' => 0,
+                'altitude_m' => $altitude,
+                'items' => [
+                    [
+                        'title' => 'Rest Day',
+                        'description' => 'Rest and relax.',
+                        'time_of_day' => 'morning',
+                        'cost' => 0,
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
                 ]
-            ]
-        ];
-        $dayNumber++;
+            ];
+            $restDaysAdded++;
+        }
+
+        while (count($days) < $requestedDays) {
+            $dayNumber = count($days) + 1;
+            $days[] = [
+                'day_number' => $dayNumber,
+                'title' => match($locale) {
+                    'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+                    'zh' => "第 {$dayNumber} 天: 无行程数据",
+                    'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+                    default => "Day {$dayNumber}: No Itinerary Data",
+                },
+                'description' => match($locale) {
+                    'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया।",
+                    'zh' => "AI 没有为此天生成数据。",
+                    'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन।",
+                    default => "The AI did not generate data for this day.",
+                },
+                'overnight_waypoint_id' => null,
+                'distance_km' => null,
+                'estimated_time_hours' => null,
+                'altitude_m' => null,
+                'items' => [],
+            ];
+        }
+
+        return ['days' => $days];
     }
-
-    // Rest days limit (max 3) – same as before
-    $maxRestDays = min(3, $requestedDays - count($segments));
-    $restDaysAdded = 0;
-
-    while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
-        $last = end($days);
-        $waypointId = $last['overnight_waypoint_id'] ?? null;
-        $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
-        $waypointName = $waypoint ? $waypoint->name : 'Unknown';
-
-        $restTitle = match($locale) {
-            'hi' => "{$waypointName} में आराम दिन",
-            'zh' => "{$waypointName} 休息日",
-            'np' => "{$waypointName} मा आराम दिन",
-            default => "Rest Day at {$waypointName}",
-        };
-        $restDesc = match($locale) {
-            'hi' => "{$waypointName} में आराम गर्नुहोस्।",
-            'zh' => "在 {$waypointName} 休息。",
-            'np' => "{$waypointName} मा आराम गर्नुहोस्।",
-            default => "Rest at {$waypointName}.",
-        };
-
-        $days[] = [
-            'day_number' => count($days) + 1,
-            'title' => $restTitle,
-            'description' => $restDesc,
-            'overnight_waypoint_id' => $waypointId,
-            'distance_km' => 0,
-            'estimated_time_hours' => 0,
-            'altitude_m' => $last['altitude_m'] ?? null,
-            'items' => [
-                [
-                    'title' => 'Rest Day',
-                    'description' => 'Rest and relax.',
-                    'time_of_day' => 'morning',
-                    'cost' => round($dailyFoodCost, 2),
-                    'pricing_source' => 'system_estimate',
-                    'pricing_snapshot' => null,
-                    'service_id' => null,
-                    'is_optional' => false,
-                    'metadata' => null,
-                ]
-            ]
-        ];
-        $restDaysAdded++;
-    }
-
-    // Remaining days as "No Itinerary Data"
-    while (count($days) < $requestedDays) {
-        $dayNumber = count($days) + 1;
-        $titleNoData = match($locale) {
-            'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-            'zh' => "第 {$dayNumber} 天: 无行程数据",
-            'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
-            default => "Day {$dayNumber}: No Itinerary Data",
-        };
-        $descNoData = match($locale) {
-            'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया। कृपया अपना अनुरोध समायोजित करें या पुनः प्रयास करें।",
-            'zh' => "AI 没有为此天生成数据。请调整您的请求或重试。",
-            'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन। कृपया आफ्नो अनुरोध समायोजन गर्नुहोस् वा पुनः प्रयास गर्नुहोस्।",
-            default => "The AI did not generate data for this day. Please adjust your request or try again.",
-        };
-        $days[] = [
-            'day_number' => $dayNumber,
-            'title' => $titleNoData,
-            'description' => $descNoData,
-            'overnight_waypoint_id' => null,
-            'distance_km' => null,
-            'estimated_time_hours' => null,
-            'altitude_m' => null,
-            'items' => [],
-        ];
-    }
-
-    return ['days' => $days];
-}
 
     // ==========================================
-    //  HELPER: ensure tour segments
+    // HELPER: ensure tour segments
     // ==========================================
 
     protected function ensureSegmentsForTour(Route $route): void
@@ -810,10 +777,6 @@ class PlannerService
             ->first();
     }
 
-    /**
-     * Translate a dynamic name using the current locale.
-     * Falls back to original if translation not found.
-     */
     private function translateName(string $name, string $prefix, string $locale): string
     {
         if ($locale === 'hi') {
@@ -847,10 +810,6 @@ class PlannerService
         return ($translated !== $key) ? $translated : $name;
     }
 
-    /**
-     * Recursively extract all string values and check for Devanagari.
-     * For hi/np, require at least one Devanagari character.
-     */
     private function isLanguageCorrect(array $data, string $locale): bool
     {
         if (!in_array($locale, ['hi', 'np'])) {
@@ -869,7 +828,7 @@ class PlannerService
     }
 
     // ==========================================
-    //  DAY-LEVEL SERVICE FETCHER
+    // DAY-LEVEL SERVICE FETCHER
     // ==========================================
 
     protected function getServicesForDay(Waypoint $waypoint, array $input): array
@@ -925,6 +884,7 @@ class PlannerService
                     'provider_id' => $item->provider_id,
                     'description' => $item->description,
                     'rating' => $item->reviews->avg('rating') ?? null,
+                    'location_id' => $item->location_id,
                 ];
             }
         }

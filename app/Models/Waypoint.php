@@ -18,6 +18,7 @@ class Waypoint extends Model
         'latitude',
         'longitude',
         'altitude',
+        'is_overnight_stop', // added
         'description',
         'metadata',
         'safety_status',
@@ -28,6 +29,7 @@ class Waypoint extends Model
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'altitude' => 'integer',
+        'is_overnight_stop' => 'boolean',
         'metadata' => 'array',
         'safety_updated_at' => 'datetime',
         'created_at' => 'datetime',

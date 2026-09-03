@@ -149,7 +149,7 @@ class WaypointLocationSeeder extends Seeder
             'Patan' => 'Patan',
 
             // ============================================================
-            // CITY TOURS - Start/End waypoints (NEW)
+            // CITY TOURS - Start/End waypoints
             // ============================================================
             'Tansen Hill Town Tour Start' => 'Tansen',
             'Tansen Hill Town Tour End' => 'Tansen',
@@ -163,7 +163,7 @@ class WaypointLocationSeeder extends Seeder
             'Chitwan National Park Safari End' => 'Chitwan',
 
             // ============================================================
-            // ADVENTURE ACTIVITIES - Waypoint to Location Mapping (Exact)
+            // ADVENTURE ACTIVITIES
             // ============================================================
             'Trishuli River Rafting Start' => 'Trishuli River',
             'Trishuli River Rafting End' => 'Trishuli River',
@@ -177,7 +177,6 @@ class WaypointLocationSeeder extends Seeder
             'Sarangkot Paragliding End' => 'Sarangkot',
             'Kusma Bridge Bungee Start' => 'Kusma Bridge',
             'Kusma Bridge Bungee End' => 'Kusma Bridge',
-            // Also map the generic location names (if any waypoint is just "Trishuli River")
             'Trishuli River' => 'Trishuli River',
             'Bhote Koshi River' => 'Bhote Koshi River',
             'Kali Gandaki River' => 'Kali Gandaki River',
@@ -186,13 +185,13 @@ class WaypointLocationSeeder extends Seeder
             'Kusma Bridge' => 'Kusma Bridge',
 
             // ============================================================
-// RELIGIOUS SITES - Pathibhara
-// ============================================================
-'Pathibhara Temple' => 'Pathibhara',
-'Pathibhara Devi Temple' => 'Pathibhara',
-'Pathibhara' => 'Pathibhara',
-'Suketar' => 'Suketar',
-'Taplejung' => 'Taplejung',
+            // RELIGIOUS SITES - Pathibhara
+            // ============================================================
+            'Pathibhara Temple' => 'Pathibhara',
+            'Pathibhara Devi Temple' => 'Pathibhara',
+            'Pathibhara' => 'Pathibhara',
+            'Suketar' => 'Suketar',
+            'Taplejung' => 'Taplejung',
 
             // ============================================================
             // OTHER
@@ -206,6 +205,9 @@ class WaypointLocationSeeder extends Seeder
 
         $this->command->info('📍 Populating waypoint location_id...');
 
+        // ============================================================
+        // STEP 1: Map all waypoints to locations using $map
+        // ============================================================
         foreach (Waypoint::all() as $waypoint) {
             $waypointName = trim($waypoint->name);
             $locationName = null;
@@ -237,6 +239,7 @@ class WaypointLocationSeeder extends Seeder
                     $totalUpdated++;
                     $this->command->info("✅ {$waypoint->name} → {$location->city}");
                 } else {
+                    // Fallback for some Annapurna waypoints if location not found
                     $fallbackLocation = Location::where('city', 'LIKE', "%Manang%")->first();
                     if ($fallbackLocation && in_array($waypointName, ['Yak Kharka', 'Thorong Phedi', 'Thorong La'])) {
                         $waypoint->location_id = $fallbackLocation->id;
@@ -255,10 +258,76 @@ class WaypointLocationSeeder extends Seeder
             }
         }
 
+        // ============================================================
+        // STEP 2: Set is_overnight_stop for ALL waypoints
+        // (Thorong La and EBC are explicitly false)
+        // ============================================================
+        $nonOvernightNames = ['Thorong La', 'Everest Base Camp'];
+
+        foreach (Waypoint::all() as $waypoint) {
+            $isOvernight = !in_array($waypoint->name, $nonOvernightNames);
+            $waypoint->is_overnight_stop = $isOvernight;
+            $waypoint->save();
+
+            if (!$isOvernight) {
+                $this->command->info("🚫 Set is_overnight_stop=false for: {$waypoint->name}");
+            }
+        }
+
+        // ============================================================
+        // 🔥 STEP 3: EXPLICIT FORCE SET for Annapurna Circuit waypoints
+        // (Override both location_id and is_overnight_stop)
+        // ============================================================
+        $annapurnaWaypoints = [
+            'Besisahar'    => ['location' => 'Besisahar',    'overnight' => true],
+            'Bahundanda'   => ['location' => 'Besisahar',    'overnight' => true],
+            'Chamche'      => ['location' => 'Chamche',      'overnight' => true],
+            'Dharapani'    => ['location' => 'Dharapani',    'overnight' => true],
+            'Chame'        => ['location' => 'Chame',        'overnight' => true],
+            'Pisang'       => ['location' => 'Pisang',       'overnight' => true],
+            'Manang'       => ['location' => 'Manang',       'overnight' => true],
+            'Yak Kharka'   => ['location' => 'Yak Kharka',   'overnight' => true],
+            'Thorong Phedi'=> ['location' => 'Thorong Phedi','overnight' => true],
+            'Thorong La'   => ['location' => 'Thorong La',   'overnight' => false],
+            'Muktinath'    => ['location' => 'Muktinath',    'overnight' => true],
+            'Jomsom'       => ['location' => 'Jomsom',       'overnight' => true],
+            'Tatopani'     => ['location' => 'Tatopani',     'overnight' => true],
+            'Ghorepani'    => ['location' => 'Ghorepani',    'overnight' => true],
+            'Nayapul'      => ['location' => 'Nayapul',      'overnight' => true],
+        ];
+
+        foreach ($annapurnaWaypoints as $name => $data) {
+            $waypoint = Waypoint::where('name', $name)->first();
+            if ($waypoint) {
+                $location = Location::where('city', $data['location'])->first();
+                if ($location) {
+                    $waypoint->location_id = $location->id;
+                    $waypoint->is_overnight_stop = $data['overnight'];
+                    $waypoint->save();
+                    $this->command->info("🔒 FORCE SET: {$name} → location_id={$location->id}, overnight=" . ($data['overnight'] ? 'true' : 'false'));
+                } else {
+                    Log::warning("⚠️ Explicit set skipped: Location '{$data['location']}' not found for waypoint '{$name}'");
+                    $this->command->warn("⚠️ Explicit set skipped: Location '{$data['location']}' not found for waypoint '{$name}'");
+                }
+            } else {
+                Log::warning("⚠️ Explicit set skipped: Waypoint '{$name}' not found");
+                $this->command->warn("⚠️ Explicit set skipped: Waypoint '{$name}' not found");
+            }
+        }
+
+        // ============================================================
+        // STEP 4: Verify counts
+        // ============================================================
+        $totalOvernight = Waypoint::where('is_overnight_stop', true)->count();
+        $totalNonOvernight = Waypoint::where('is_overnight_stop', false)->count();
+
         $this->command->newLine();
-        $this->command->info("✅ Waypoint Location Seeder Completed:");
-        $this->command->info("   📌 Updated: {$totalUpdated}");
+        $this->command->info("✅ Waypoint Location Seeder Completed!");
+        $this->command->info("   📌 Location mappings updated: {$totalUpdated}");
         $this->command->info("   ⚠️  Fallback (Manang): {$totalFallback}");
         $this->command->info("   ❌ Not Found / Skipped: {$totalNotFound}");
+        $this->command->info("   🏨 Overnight stops: {$totalOvernight}");
+        $this->command->info("   🚫 Non-overnight stops: {$totalNonOvernight}");
+        $this->command->info("   📌 Non-overnight waypoints: " . implode(', ', $nonOvernightNames));
     }
 }
