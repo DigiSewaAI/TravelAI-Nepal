@@ -151,8 +151,7 @@ class LocationSeeder extends Seeder
             // ============================================================
             // REMOTE AREAS
             // ============================================================
-            ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Dhorpatan', 'latitude' => 28.4500, 'longitude' => 83.0500],
-            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Dolakha', 'latitude' => 27.6123, 'longitude' => 86.2234],
+            ['country' => 'Nepal', 'state' => 'Lumbini', 'city' => 'Dhorpatan', 'latitude' => 28.4500, 'longitude' => 83.0500],            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Dolakha', 'latitude' => 27.6123, 'longitude' => 86.2234],
             ['country' => 'Nepal', 'state' => 'Rolwaling', 'city' => 'Rolwaling', 'latitude' => 27.6456, 'longitude' => 86.2456],
             ['country' => 'Nepal', 'state' => 'Mugu', 'city' => 'Rara Lake', 'latitude' => 29.3789, 'longitude' => 82.3891],
             ['country' => 'Nepal', 'state' => 'Bardiya', 'city' => 'Bardiya', 'latitude' => 28.3123, 'longitude' => 81.4234],
@@ -168,6 +167,11 @@ class LocationSeeder extends Seeder
 ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Seti River', 'latitude' => 28.2096, 'longitude' => 83.9857],
 ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Sarangkot', 'latitude' => 28.2456, 'longitude' => 83.9456],
 ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Kusma Bridge', 'latitude' => 28.2096, 'longitude' => 83.9857],
+
+// ============================================================
+// HIDDEN GEMS
+// ============================================================
+['country' => 'Nepal', 'state' => 'Sindhuli', 'city' => 'Sindhuli', 'latitude' => 27.2789, 'longitude' => 85.9567],
         ];
 
         foreach ($locations as $loc) {

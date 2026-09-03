@@ -149,27 +149,46 @@ class WaypointLocationSeeder extends Seeder
             'Patan' => 'Patan',
 
             // ============================================================
-// ADVENTURE ACTIVITIES - Waypoint to Location Mapping (Exact)
-// ============================================================
-'Trishuli River Rafting Start' => 'Trishuli River',
-'Trishuli River Rafting End' => 'Trishuli River',
-'Bhote Koshi River Rafting Start' => 'Bhote Koshi River',
-'Bhote Koshi River Rafting End' => 'Bhote Koshi River',
-'Kali Gandaki River Rafting Start' => 'Kali Gandaki River',
-'Kali Gandaki River Rafting End' => 'Kali Gandaki River',
-'Seti River Rafting Start' => 'Seti River',
-'Seti River Rafting End' => 'Seti River',
-'Sarangkot Paragliding Start' => 'Sarangkot',
-'Sarangkot Paragliding End' => 'Sarangkot',
-'Kusma Bridge Bungee Start' => 'Kusma Bridge',
-'Kusma Bridge Bungee End' => 'Kusma Bridge',
-// Also map the generic location names (if any waypoint is just "Trishuli River")
-'Trishuli River' => 'Trishuli River',
-'Bhote Koshi River' => 'Bhote Koshi River',
-'Kali Gandaki River' => 'Kali Gandaki River',
-'Seti River' => 'Seti River',
-'Sarangkot' => 'Sarangkot',
-'Kusma Bridge' => 'Kusma Bridge',
+            // CITY TOURS - Start/End waypoints (NEW)
+            // ============================================================
+            'Tansen Hill Town Tour Start' => 'Tansen',
+            'Tansen Hill Town Tour End' => 'Tansen',
+            'Palpa (Tansen, Rani Mahal) Tour Start' => 'Tansen',
+            'Palpa (Tansen, Rani Mahal) Tour End' => 'Tansen',
+            'Lumbini Buddhist Circuit Start' => 'Lumbini',
+            'Lumbini Buddhist Circuit End' => 'Lumbini',
+            'Lumbini Mayadevi Temple Pilgrimage Start' => 'Lumbini',
+            'Lumbini Mayadevi Temple Pilgrimage End' => 'Lumbini',
+            'Chitwan National Park Safari Start' => 'Chitwan',
+            'Chitwan National Park Safari End' => 'Chitwan',
+
+            // ============================================================
+            // ADVENTURE ACTIVITIES - Waypoint to Location Mapping (Exact)
+            // ============================================================
+            'Trishuli River Rafting Start' => 'Trishuli River',
+            'Trishuli River Rafting End' => 'Trishuli River',
+            'Bhote Koshi River Rafting Start' => 'Bhote Koshi River',
+            'Bhote Koshi River Rafting End' => 'Bhote Koshi River',
+            'Kali Gandaki River Rafting Start' => 'Kali Gandaki River',
+            'Kali Gandaki River Rafting End' => 'Kali Gandaki River',
+            'Seti River Rafting Start' => 'Seti River',
+            'Seti River Rafting End' => 'Seti River',
+            'Sarangkot Paragliding Start' => 'Sarangkot',
+            'Sarangkot Paragliding End' => 'Sarangkot',
+            'Kusma Bridge Bungee Start' => 'Kusma Bridge',
+            'Kusma Bridge Bungee End' => 'Kusma Bridge',
+            // Also map the generic location names (if any waypoint is just "Trishuli River")
+            'Trishuli River' => 'Trishuli River',
+            'Bhote Koshi River' => 'Bhote Koshi River',
+            'Kali Gandaki River' => 'Kali Gandaki River',
+            'Seti River' => 'Seti River',
+            'Sarangkot' => 'Sarangkot',
+            'Kusma Bridge' => 'Kusma Bridge',
+
+            // ============================================================
+            // OTHER
+            // ============================================================
+            'Sindhuli' => 'Sindhuli',
         ];
 
         $totalUpdated = 0;
