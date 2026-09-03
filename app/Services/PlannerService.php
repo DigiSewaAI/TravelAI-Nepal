@@ -116,9 +116,16 @@ if ($mergedSegment) {
         }
 
         // ============================================================
-        // COST CALCULATION
-        // ============================================================
-        $costBreakdown = $this->calculateCost($route, $input, [], $locale);
+// COST CALCULATION (with services included for budget warning)
+// ============================================================
+// Collect all services across all days for accurate cost calculation
+$allServices = [];
+foreach ($dayServicesMap as $services) {
+    foreach ($services as $svc) {
+        $allServices[] = $svc;
+    }
+}
+$costBreakdown = $this->calculateCost($route, $input, $allServices, $locale);
 
         // ============================================================
         // BUILD CONTEXT
@@ -340,13 +347,30 @@ unset($dayData);
 
             $finalBreakdown = array_merge($breakdown, $perDayServiceCosts);
 
-            return [
-                'request' => $plannerRequest,
-                'result' => $plannerResult,
-                'days' => $plannerResult->days()->with('items')->get(),
-                'total_cost' => $totalCost,
-                'breakdown' => $finalBreakdown,
-            ];
+// ✅ Budget Warning based on total cost (system + services)
+$budgetNpr = $input['budget'] * 133;
+if ($input['budget'] > 0 && $totalCost > $budgetNpr) {
+    $overPercent = (($totalCost - $budgetNpr) / $budgetNpr) * 100;
+    if ($overPercent > 10) {
+        $finalBreakdown['budget_insufficient'] = [
+            'name' => '⚠️ Budget Warning',
+            'amount' => 0,
+            'currency' => 'NPR',
+            'unit' => 'note',
+            'is_mandatory' => false,
+            'provider_name' => 'System',
+            'message' => "Your budget of {$input['budget']} USD is " . round($overPercent, 0) . "% over the estimated cost. Consider increasing your budget or choosing a more affordable style.",
+        ];
+    }
+}
+
+return [
+    'request' => $plannerRequest,
+    'result' => $plannerResult,
+    'days' => $plannerResult->days()->with('items')->get(),
+    'total_cost' => $totalCost,
+    'breakdown' => $finalBreakdown,
+];
         });
 
         return $result;
@@ -371,113 +395,78 @@ unset($dayData);
     // COST CALCULATION
     // ==========================================
     protected function calculateCost(Route $route, array $input, array $services, string $locale = 'en'): array
-    {
-        $days = $input['days'] ?? $route->duration_days;
-        $style = $input['travel_style'] ?? 'mid_range';
-        $budget = $input['budget'] ?? 0;
+{
+    $days = $input['days'] ?? $route->duration_days;
+    $budget = $input['budget'] ?? 0;
 
-        $total = 0;
-        $breakdown = [];
+    $total = 0;
+    $breakdown = [];
 
-        foreach ($route->costs as $cost) {
-            $amount = $cost->amount;
-            if (strtoupper($cost->currency) === 'USD') {
-                $amount *= 133;
-            }
-            if ($cost->unit === 'per_day') {
-                $amount *= $days;
-            }
-            $breakdown[$cost->type] = [
-                'name' => $this->translateName($cost->name, 'cost', $locale),
-                'amount' => $amount,
-                'currency' => 'NPR',
-                'unit' => $cost->unit,
-                'is_mandatory' => (bool) $cost->is_mandatory,
-                'provider_name' => 'System',
-            ];
-            $total += $amount;
+    // ✅ ONLY system costs (food, permit, etc.)
+    foreach ($route->costs as $cost) {
+        $amount = $cost->amount;
+        if (strtoupper($cost->currency) === 'USD') {
+            $amount *= 133;
         }
-
-        $selectedServices = $this->selectServicesForStyle($services, $style, $budget, $days);
-        foreach ($selectedServices as $svc) {
-            $price = $svc['price'];
-            if (strtoupper($svc['currency']) === 'USD') {
-                $price *= 133;
-            }
-            if ($svc['category'] === 'hotel' || $svc['category'] === 'guide') {
-                $price *= $days;
-            }
-            $breakdown[$svc['category']] = [
-                'name' => $this->translateName($svc['name'], 'service', $locale),
-                'provider_name' => $svc['provider'] ?? 'Local Partner',
-                'amount' => $price,
-                'currency' => 'NPR',
-                'unit' => 'per_day',
-                'is_mandatory' => false,
-                'service_id' => $svc['id'],
-            ];
-            $total += $price;
+        if ($cost->unit === 'per_day') {
+            $amount *= $days;
         }
-
-        $budgetNpr = $budget * 133;
-        if ($budget > 0) {
-            $overPercent = (($total - $budgetNpr) / $budgetNpr) * 100;
-            if ($overPercent > 10) {
-                $breakdown['budget_insufficient'] = [
-                    'name' => '⚠️ Budget Warning',
-                    'amount' => 0,
-                    'currency' => 'NPR',
-                    'unit' => 'note',
-                    'is_mandatory' => false,
-                    'provider_name' => 'System',
-                    'message' => "Your budget of {$budget} USD is " . round($overPercent, 0) . "% over the estimated cost.",
-                ];
-            }
-        }
-
-        return ['total' => $total, 'breakdown' => $breakdown];
+        $breakdown[$cost->type] = [
+            'name' => $this->translateName($cost->name, 'cost', $locale),
+            'amount' => $amount,
+            'currency' => 'NPR',
+            'unit' => $cost->unit,
+            'is_mandatory' => (bool) $cost->is_mandatory,
+            'provider_name' => 'System',
+        ];
+        $total += $amount;
     }
+
+    // ❌ NO BUDGET WARNING HERE — will be added in DB transaction
+
+    return ['total' => $total, 'breakdown' => $breakdown];
+}
 
     protected function selectServicesForStyle(array $services, string $style, float $budget, int $days): array
-    {
-        $grouped = [];
-        foreach ($services as $svc) {
-            $cat = $svc['category'] ?? 'other';
-            $grouped[$cat][] = $svc;
-        }
-
-        $selected = [];
-
-        foreach ($grouped as $cat => $items) {
-            if (empty($items)) continue;
-
-            if ($style === 'budget' || $style === 'backpacker') {
-                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
-                $selected[] = $items[0];
-            } elseif ($style === 'luxury') {
-                usort($items, fn($a, $b) => $b['price'] <=> $a['price']);
-                $selected[] = $items[0];
-            } else {
-                usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
-                $mid = floor(count($items) / 2);
-                $selected[] = $items[$mid];
-            }
-        }
-
-        $result = [];
-        foreach ($selected as $svc) {
-            $result[] = [
-                'id' => $svc['id'],
-                'name' => $svc['name'],
-                'category' => $svc['category'],
-                'price' => $svc['price'],
-                'currency' => $svc['currency'],
-                'provider' => $svc['provider'] ?? 'Local Partner',
-            ];
-        }
-
-        return $result;
+{
+    $grouped = [];
+    foreach ($services as $svc) {
+        $cat = $svc['category'] ?? 'other';
+        $grouped[$cat][] = $svc;
     }
+
+    $selected = [];
+
+    foreach ($grouped as $cat => $items) {
+        if (empty($items)) continue;
+
+        if ($style === 'budget' || $style === 'backpacker') {
+            usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+            $selected[] = $items[0];
+        } elseif ($style === 'luxury') {
+            usort($items, fn($a, $b) => $b['price'] <=> $a['price']);
+            $selected[] = $items[0];
+        } else {
+            usort($items, fn($a, $b) => $a['price'] <=> $b['price']);
+            $mid = floor(count($items) / 2);
+            $selected[] = $items[$mid];
+        }
+    }
+
+    $result = [];
+    foreach ($selected as $svc) {
+        $result[] = [
+            'id' => $svc['id'],
+            'name' => $svc['name'],
+            'category' => $svc['category'],
+            'price' => $svc['price'],
+            'currency' => $svc['currency'],
+            'provider' => $svc['provider'] ?? 'Local Partner',
+        ];
+    }
+
+    return $result;
+}
 
     protected function getMandatoryCost(array $services): float
     {
