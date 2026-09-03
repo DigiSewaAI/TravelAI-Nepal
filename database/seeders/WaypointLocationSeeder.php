@@ -82,6 +82,42 @@ class WaypointLocationSeeder extends Seeder
             'Shey Gompa' => 'Shey Gompa',
 
             // ============================================================
+// KANCHENJUNGA REGION
+// ============================================================
+'Suketar' => 'Suketar',
+'Kabeli' => 'Suketar',
+'Chirwa' => 'Suketar',
+'Sakathum' => 'Suketar',
+'Amjilosa' => 'Suketar',
+'Gyabla' => 'Suketar',
+'Ghunsa' => 'Ghunsa',
+'Kambachen' => 'Kanchenjunga Base Camp',
+'Lhonak' => 'Kanchenjunga Base Camp',
+'Kanchenjunga North Base Camp' => 'Kanchenjunga Base Camp',
+'Mamanke' => 'Suketar',
+'Yamphudin' => 'Suketar',
+'Torotong' => 'Suketar',
+'Lamite' => 'Suketar',
+'Cheram' => 'Suketar',
+'Ramche' => 'Suketar',
+'Kanchenjunga South Base Camp' => 'Kanchenjunga Base Camp',
+
+// ============================================================
+// MAKALU REGION
+// ============================================================
+'Tumlingtar' => 'Tumlingtar',
+'Chichila' => 'Tumlingtar',
+'Num' => 'Tumlingtar',
+'Sedua' => 'Tumlingtar',
+'Tashigaon' => 'Tumlingtar',
+'Kharkadanda' => 'Tumlingtar',
+'Mumbuk' => 'Tumlingtar',
+'Yangri Kharka' => 'Tumlingtar',
+'Makalu Base Camp' => 'Makalu Base Camp',
+'Barun Valley' => 'Barun Valley',
+
+
+            // ============================================================
             // CITIES / TOURS
             // ============================================================
             'Kathmandu' => 'Kathmandu',

@@ -66,6 +66,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Rasuwa', 'city' => 'Gosaikunda', 'latitude' => 28.1784, 'longitude' => 85.3931],
             ['country' => 'Nepal', 'state' => 'Rasuwa', 'city' => 'Dhunche', 'latitude' => 28.0937, 'longitude' => 85.3068],
             ['country' => 'Nepal', 'state' => 'Rasuwa', 'city' => 'Kyangjin Gompa', 'latitude' => 28.2567, 'longitude' => 85.5234],
+            ['country' => 'Nepal', 'state' => 'Rasuwa', 'city' => 'Lama Hotel', 'latitude' => 28.1678, 'longitude' => 85.3782],
 
             // ============================================================
             // MUSTANG / DOLPO
@@ -87,6 +88,7 @@ class LocationSeeder extends Seeder
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Tumlingtar', 'latitude' => 27.3123, 'longitude' => 87.2234],
             ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Makalu Base Camp', 'latitude' => 27.5789, 'longitude' => 87.4012],
+            ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Barun Valley', 'latitude' => 27.5789, 'longitude' => 87.4012],
 
             // ============================================================
             // OTHER REMOTE REGIONS
@@ -127,6 +129,13 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Bhaktapur', 'city' => 'Bhaktapur', 'latitude' => 27.6722, 'longitude' => 85.4295],
             ['country' => 'Nepal', 'state' => 'Lalitpur', 'city' => 'Patan', 'latitude' => 27.6736, 'longitude' => 85.3251],
             ['country' => 'Nepal', 'state' => 'Bhaktapur', 'city' => 'Changunarayan', 'latitude' => 27.7123, 'longitude' => 85.4234],
+            // ✅ ADDED: Nagarkot
+            ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Nagarkot', 'latitude' => 27.7145, 'longitude' => 85.5234],
+
+            // ============================================================
+            // REMOTE AREAS - add Dhorpatan
+            // ============================================================
+            ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Dhorpatan', 'latitude' => 28.4500, 'longitude' => 83.0500],
 
             // ============================================================
             // OTHER REMOTE AREAS
@@ -149,5 +158,6 @@ class LocationSeeder extends Seeder
 
         $this->command->info('✅ LocationSeeder completed: ' . count($locations) . ' locations.');
         $this->command->info('   📌 Yak Kharka, Thorong Phedi, Thorong La are now separate locations.');
+        $this->command->info('   📌 Added Nagarkot and Dhorpatan.');
     }
 }

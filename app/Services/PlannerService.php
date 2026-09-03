@@ -123,7 +123,7 @@ class PlannerService
                 if (!$hasService) {
                     $dayData['items'][] = [
                         'title' => $bestService['name'],
-                        'description' => 'Recommended by TravelAI',
+                        'description' => 'Service Included',
                         'time_of_day' => 'afternoon',
                         'cost' => $priceNpr,
                         'currency' => 'NPR',
