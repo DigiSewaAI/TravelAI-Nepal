@@ -11,26 +11,34 @@ class WaypointLocationSeeder extends Seeder
 {
     public function run(): void
     {
-        // ✅ VERIFIED MAPPING: Annapurna Circuit waypoints → actual locations.city
-        // पहिले locations table मा यी cities छन् भनेर verify गरिएको छ
+        // ✅ Updated MAPPING: Annapurna Circuit waypoints → actual locations.city
+        // Note: Yak Kharka, Thorong Phedi, Thorong La now have their own locations
+        // (Make sure LocationSeeder has these cities before running this seeder)
         $map = [
-            // Annapurna Circuit (सबै waypoints को सही mapping)
+            // ============================================================
+            // ANNAPURNA CIRCUIT TREK (with correct location mapping)
+            // ============================================================
             'Besisahar' => 'Besisahar',
-            'Bahundanda' => 'Besisahar',      // Bahundanda को location Besisahar नै हो
+            'Bahundanda' => 'Besisahar',      // Bahundanda → Besisahar area
             'Chamche' => 'Chamche',
             'Dharapani' => 'Dharapani',
             'Chame' => 'Chame',
             'Pisang' => 'Pisang',
             'Manang' => 'Manang',
-            'Yak Kharka' => 'Manang',          // Yak Kharka Manang मा पर्छ
-            'Thorong Phedi' => 'Manang',       // Thorong Phedi Manang मा
-            'Thorong La' => 'Manang',          // Thorong La Manang मा
+
+            // ✅ NEW: Separate locations (not Manang)
+            'Yak Kharka' => 'Yak Kharka',           // New location
+            'Thorong Phedi' => 'Thorong Phedi',     // New location
+            'Thorong La' => 'Thorong La',           // New location
+
             'Muktinath' => 'Muktinath',
             'Jomsom' => 'Jomsom',
             'Tatopani' => 'Tatopani',
             'Ghorepani' => 'Ghorepani',
             'Nayapul' => 'Nayapul',
-            'Birethanti' => 'Nayapul',         // Birethanti Nayapul नजिक
+            'Birethanti' => 'Nayapul',              // Birethanti → Nayapul area
+
+            // Annapurna Base Camp route
             'Tikhedhunga' => 'Tikhedhunga',
             'Ulleri' => 'Ulleri',
             'Ghandruk' => 'Ghandruk',
@@ -43,7 +51,10 @@ class WaypointLocationSeeder extends Seeder
             'Deurali' => 'Deurali',
             'Machhapuchhre Base Camp' => 'Machhapuchhre Base Camp',
             'Annapurna Base Camp' => 'Annapurna Base Camp',
-            // Everest Region
+
+            // ============================================================
+            // EVEREST REGION
+            // ============================================================
             'Lukla' => 'Lukla',
             'Phakding' => 'Phakding',
             'Namche Bazaar' => 'Namche',
@@ -52,18 +63,27 @@ class WaypointLocationSeeder extends Seeder
             'Lobuche' => 'Lobuche',
             'Gorak Shep' => 'Gorak Shep',
             'Everest Base Camp' => 'Everest Base Camp',
-            // Langtang
+
+            // ============================================================
+            // LANGTANG REGION
+            // ============================================================
             'Syabrubesi' => 'Syabrubesi',
             'Lama Hotel' => 'Lama Hotel',
             'Langtang Village' => 'Langtang',
             'Kyangjin Gompa' => 'Kyangjin Gompa',
-            // Mustang/Dolpo
+
+            // ============================================================
+            // MUSTANG / DOLPO
+            // ============================================================
             'Kagbeni' => 'Kagbeni',
             'Marpha' => 'Marpha',
             'Lo Manthang' => 'Lo Manthang',
             'Phoksundo Lake' => 'Phoksundo Lake',
             'Shey Gompa' => 'Shey Gompa',
-            // Cities/Tours
+
+            // ============================================================
+            // CITIES / TOURS
+            // ============================================================
             'Kathmandu' => 'Kathmandu',
             'Pokhara' => 'Pokhara',
             'Lumbini' => 'Lumbini',
@@ -81,7 +101,10 @@ class WaypointLocationSeeder extends Seeder
             'Nagarkot' => 'Nagarkot',
             'Bhaktapur' => 'Bhaktapur',
             'Patan' => 'Patan',
-            // Adventure Activities (काठमाडौं/पोखरा based)
+
+            // ============================================================
+            // ADVENTURE ACTIVITIES (Kathmandu / Pokhara based)
+            // ============================================================
             'Trishuli River' => 'Kathmandu',
             'Bhote Koshi River' => 'Kathmandu',
             'Kali Gandaki River' => 'Pokhara',
@@ -92,14 +115,15 @@ class WaypointLocationSeeder extends Seeder
 
         $totalUpdated = 0;
         $totalNotFound = 0;
+        $totalFallback = 0;
 
         $this->command->info('📍 Populating waypoint location_id...');
 
         foreach (Waypoint::all() as $waypoint) {
+            $waypointName = trim($waypoint->name);
             $locationName = null;
 
-            // 1. Exact match (case-insensitive, trimmed)
-            $waypointName = trim($waypoint->name);
+            // 1. Exact match (case-insensitive)
             foreach ($map as $key => $value) {
                 if (strtolower($waypointName) === strtolower($key)) {
                     $locationName = $value;
@@ -107,7 +131,7 @@ class WaypointLocationSeeder extends Seeder
                 }
             }
 
-            // 2. Partial match (यदि exact match नभए)
+            // 2. Partial match (if exact match not found)
             if (!$locationName) {
                 foreach ($map as $key => $value) {
                     if (stripos($waypointName, $key) !== false) {
@@ -119,24 +143,42 @@ class WaypointLocationSeeder extends Seeder
 
             if ($locationName) {
                 $location = Location::where('city', 'LIKE', "%{$locationName}%")->first();
+
                 if ($location) {
                     $waypoint->location_id = $location->id;
                     $waypoint->save();
                     $totalUpdated++;
-                    // $this->command->info("✅ Updated: {$waypoint->name} → {$location->city}");
+                    $this->command->info("✅ {$waypoint->name} → {$location->city}");
                 } else {
-                    Log::warning("Location not found for city: {$locationName} (Waypoint: {$waypoint->name})");
-                    $totalNotFound++;
+                    // Fallback: try to find any location with similar name (for new locations)
+                    $fallbackLocation = Location::where('city', 'LIKE', "%Manang%")->first();
+                    if ($fallbackLocation && in_array($waypointName, ['Yak Kharka', 'Thorong Phedi', 'Thorong La'])) {
+                        // Temporary fallback – but ideally LocationSeeder should have these cities
+                        $waypoint->location_id = $fallbackLocation->id;
+                        $waypoint->save();
+                        $totalFallback++;
+                        Log::warning("⚠️ Fallback: {$waypoint->name} → Manang (location '{$locationName}' not found)");
+                        $this->command->warn("⚠️ Fallback: {$waypoint->name} → Manang (please run LocationSeeder first)");
+                    } else {
+                        Log::warning("❌ Location not found for: {$locationName} (Waypoint: {$waypoint->name})");
+                        $totalNotFound++;
+                    }
                 }
             } else {
-                // No mapping found – log but don't set location_id
-                Log::info("No mapping for waypoint: {$waypoint->name}");
+                Log::info("ℹ️ No mapping for waypoint: {$waypoint->name}");
                 $totalNotFound++;
             }
         }
 
+        $this->command->newLine();
         $this->command->info("✅ Waypoint Location Seeder Completed:");
-        $this->command->info("   - Updated: {$totalUpdated}");
-        $this->command->info("   - Not Found / Skipped: {$totalNotFound}");
+        $this->command->info("   📌 Updated: {$totalUpdated}");
+        $this->command->info("   ⚠️  Fallback (Manang): {$totalFallback}");
+        $this->command->info("   ❌ Not Found / Skipped: {$totalNotFound}");
+
+        if ($totalFallback > 0) {
+            $this->command->warn("🔴 Please run LocationSeeder first to create: Yak Kharka, Thorong Phedi, Thorong La");
+            $this->command->warn("   Then re-run this seeder for exact mapping.");
+        }
     }
 }

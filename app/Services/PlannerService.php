@@ -27,13 +27,11 @@ class PlannerService
 
     public function generate(array $input, string $locale = 'en'): array
     {
-        // ✅ LOG: locale र input
         Log::info('🔍 [PlannerService] generate called', [
             'locale' => $locale,
             'input' => $input,
         ]);
 
-        // 1. Resolve route
         $route = $this->resolveRoute($input['destination'] ?? null);
         if (!$route) {
             throw ValidationException::withMessages(['destination' => 'Route not found.']);
@@ -41,15 +39,12 @@ class PlannerService
 
         $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
 
-        // 2. Ensure segments (for tours)
         if ($route->segments->isEmpty()) {
             $this->ensureSegmentsForTour($route);
             $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
         }
 
-        // ============================================================
-        //  Day-Level Provider Matching
-        // ============================================================
+        // Build day-level service map
         $dayServicesMap = [];
         $dayDiagnostics = [];
 
@@ -68,23 +63,21 @@ class PlannerService
             $dayServicesMap[$i] = collect();
         }
 
-        // 4. Calculate cost (only system costs, services added later)
+        // Calculate cost (only system costs)
         $costBreakdown = $this->calculateCost($route, $input, [], $locale);
 
-        // 5. Build context for LLM
+        // Build context
         $context = $this->buildContext($route, $input, $costBreakdown, $dayServicesMap, $dayDiagnostics);
 
-        // 6. Try AI, fallback if needed
+        // Try AI, fallback if needed
         $aiResponse = null;
         $usedFallback = false;
         try {
             $prompt = $this->buildPrompt($context, $input, $locale);
-            
             Log::info('🔍 [PlannerService] Prompt to LLM', [
                 'prompt_length' => strlen($prompt),
                 'locale' => $locale,
             ]);
-            
             $aiResponse = $this->llm->generateItinerary($prompt, $locale);
             Log::info('✅ AI itinerary generated successfully.');
         } catch (\Exception $e) {
@@ -93,7 +86,6 @@ class PlannerService
             $usedFallback = true;
         }
 
-        // Language validation
         if ($aiResponse && !$usedFallback) {
             if (!$this->isLanguageCorrect($aiResponse, $locale)) {
                 Log::warning('⚠️ AI response language mismatch, using fallback.', ['locale' => $locale]);
@@ -102,28 +94,24 @@ class PlannerService
             }
         }
 
-        // 7. Validate and normalize
+        // Validate and normalize
         $validated = $this->validator->validate($aiResponse, $route, $input, $context, $locale);
 
         // ============================================================
-        //  🆕 PROGRAMMATICALLY ATTACH SERVICES (AI बिना पनि)
-        //  यदि AI ले service_id नपठाए पनि, हामी आफैं attach गर्छौं
+        // PROGRAMMATICALLY ATTACH SERVICES (AI बिना पनि)
         // ============================================================
         foreach ($validated['days'] as &$dayData) {
             $dayNumber = $dayData['day_number'];
             $services = $dayServicesMap[$dayNumber] ?? collect();
 
             if ($services->isNotEmpty()) {
-                // पहिलो service लिने (या rating अनुसार sort गर्न सकिन्छ)
                 $bestService = $services->first();
 
-                // Price NPR मा convert
                 $priceNpr = $bestService['price'];
                 if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
                     $priceNpr *= 133;
                 }
 
-                // यदि यो day मा पहिले नै service छैन भने मात्र थप्ने (duplicate avoid)
                 $hasService = false;
                 foreach ($dayData['items'] as $item) {
                     if (!empty($item['service_id'])) {
@@ -144,14 +132,15 @@ class PlannerService
                         'service_id' => $bestService['id'],
                         'is_optional' => false,
                         'metadata' => null,
+                        'provider' => $bestService['provider'] ?? 'TravelAI Partner', // ✅ added for breakdown
                     ];
                 }
             }
         }
-        unset($dayData); // break reference
+        unset($dayData);
 
-        // 8. Save to DB
-        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
+        // Save to DB
+        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown, $dayServicesMap) {
             $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
                 'session_id' => session()->getId(),
@@ -168,7 +157,7 @@ class PlannerService
                 'raw_ai_response' => $aiResponse,
                 'model' => config('services.groq.model', 'openai/gpt-oss-20b'),
                 'model_version' => 'latest',
-                'prompt_version' => 'v4', // ✅ v4 with programmatic service attachment
+                'prompt_version' => 'v4',
                 'route_snapshot' => [
                     'route_id' => $route->id,
                     'name' => $route->name,
@@ -208,45 +197,48 @@ class PlannerService
                 }
             }
 
-            // Recalculate total cost with services
-            $totalCost = 0;
+            // ============================================================
+            // STEP 4: Per-Day Cost Breakdown (instead of lump sum)
+            // ============================================================
             $breakdown = $costBreakdown['breakdown'] ?? [];
+            $totalCost = 0;
 
-            // System costs already in breakdown
+            // Add system costs
             foreach ($breakdown as $key => $item) {
-                if ($key !== 'service_attached') {
+                if ($key !== 'services') { // remove any existing lump sum
                     $totalCost += $item['amount'] ?? 0;
                 }
             }
 
-            // Add service costs from validated days
-            $serviceCostTotal = 0;
+            // Build per-day service costs
+            $perDayServiceCosts = [];
             foreach ($validated['days'] as $dayData) {
                 foreach ($dayData['items'] as $item) {
                     if (($item['pricing_source'] ?? '') === 'provider_service' && !empty($item['service_id'])) {
-                        $serviceCostTotal += $item['cost'] ?? 0;
+                        $dayNumber = $dayData['day_number'];
+                        $key = "day_{$dayNumber}_service";
+                        $perDayServiceCosts[$key] = [
+                            'name' => "Day {$dayNumber}: {$item['title']}",
+                            'amount' => $item['cost'] ?? 0,
+                            'currency' => 'NPR',
+                            'unit' => 'total',
+                            'is_mandatory' => false,
+                            'provider_name' => $item['provider'] ?? 'TravelAI Partner',
+                        ];
+                        $totalCost += $item['cost'] ?? 0;
                     }
                 }
             }
 
-            if ($serviceCostTotal > 0) {
-                $breakdown['services'] = [
-                    'name' => 'Provider Services (Programmatic)',
-                    'amount' => $serviceCostTotal,
-                    'currency' => 'NPR',
-                    'unit' => 'total',
-                    'is_mandatory' => false,
-                    'provider_name' => 'Various Providers',
-                ];
-                $totalCost += $serviceCostTotal;
-            }
+            // Merge system costs + per-day service costs
+            $finalBreakdown = array_merge($breakdown, $perDayServiceCosts);
 
             return [
                 'request' => $plannerRequest,
                 'result' => $plannerResult,
                 'days' => $plannerResult->days()->with('items')->get(),
                 'total_cost' => $totalCost,
-                'breakdown' => $breakdown,
+                'breakdown' => $finalBreakdown,
             ];
         });
 
@@ -507,7 +499,7 @@ class PlannerService
         }
         $context['segments'] = $segments;
 
-        // ✅ day_services लाई सानो (id, name, category, price) मात्र
+        // छोटो day_services (id, name, category, price)
         $dayServicesForPrompt = [];
         foreach ($context['day_services'] as $dayNumber => $services) {
             $dayServicesForPrompt[$dayNumber] = $services->map(function ($svc) {
@@ -641,7 +633,7 @@ class PlannerService
             $dayNumber++;
         }
 
-        // ✅ Rest Day Limit: अधिकतम 3 rest days मात्र
+        // ✅ Rest Day Limit: अधिकतम 3 rest days
         $maxRestDays = min(3, $requestedDays - count($segments));
         $restDaysAdded = 0;
 
@@ -695,7 +687,7 @@ class PlannerService
             $restDaysAdded++;
         }
 
-        // ✅ बाँकी days को लागि "No Itinerary Data"
+        // ✅ बाँकी days "No Itinerary Data"
         while (count($days) < $requestedDays) {
             $dayNumber = count($days) + 1;
 
