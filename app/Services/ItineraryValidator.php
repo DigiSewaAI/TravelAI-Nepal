@@ -106,17 +106,19 @@ class ItineraryValidator
             $isRestDay = ($from->id === $to->id || (float) $segment->distance_km == 0);
 
             if ($isRestDay) {
+                // Check if this is a tour (city tour, safari, etc.)
+                $isTour = $this->isTourRoute($route);
                 $title = match($locale) {
-                    'hi' => "{$to->name} में अनुकूलन दिवस",
-                    'zh' => "{$to->name} 适应日",
-                    'np' => "{$to->name} मा अनुकूलन दिन",
-                    default => "Acclimatization Day at {$to->name}",
+                    'hi' => $isTour ? "आराम दिन" : "{$to->name} में अनुकूलन दिवस",
+                    'zh' => $isTour ? "休息日" : "{$to->name} 适应日",
+                    'np' => $isTour ? "आराम दिन" : "{$to->name} मा अनुकूलन दिन",
+                    default => $isTour ? "Rest Day" : "Acclimatization Day at {$to->name}",
                 };
                 $desc = match($locale) {
-                    'hi' => "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।",
-                    'zh' => "今天不徒步。在 {$to->name} 休息和适应。",
-                    'np' => "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।",
-                    default => "No trekking today. Rest and acclimatize at {$to->name}.",
+                    'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।",
+                    'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$to->name} 休息和适应。",
+                    'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।",
+                    default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$to->name}.",
                 };
             } else {
                 $title = match($locale) {
@@ -138,9 +140,9 @@ class ItineraryValidator
             };
 
             $itemDesc = match($locale) {
-                'hi' => $isRestDay ? "{$to->name} में आराम करें" : "{$from->name} से {$to->name} तक ट्रेक करें",
-                'zh' => $isRestDay ? "在 {$to->name} 休息" : "从 {$from->name} 徒步到 {$to->name}",
-                default => $isRestDay ? "Rest at {$to->name}" : "Hike from {$from->name} to {$to->name}",
+                'hi' => $isRestDay ? "आराम गर्नुहोस्" : "{$from->name} से {$to->name} तक ट्रेक करें",
+                'zh' => $isRestDay ? "休息" : "从 {$from->name} 徒步到 {$to->name}",
+                default => $isRestDay ? "Rest" : "Hike from {$from->name} to {$to->name}",
             };
 
             $days[] = [
@@ -178,19 +180,20 @@ class ItineraryValidator
             $waypointId = $prevDay ? $prevDay['overnight_waypoint_id'] : null;
             $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
             $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+            $isTour = $this->isTourRoute($route);
 
             $titleRest = match($locale) {
-                'hi' => "{$waypointName} में अनुकूलन दिवस",
-                'zh' => "{$waypointName} 适应日",
-                'np' => "{$waypointName} मा अनुकूलन दिन",
-                default => "Acclimatization Day at {$waypointName}",
+                'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
+                'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
+                'np' => $isTour ? "आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
+                default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
             };
 
             $descRest = match($locale) {
-                'hi' => "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-                'zh' => "今天不徒步。在 {$waypointName} 休息和适应。",
-                'np' => "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-                default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+                'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
+                'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypointName} 休息和适应。",
+                'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
+                default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypointName}.",
             };
 
             $days[] = [
@@ -203,8 +206,8 @@ class ItineraryValidator
                 'altitude_m' => $prevDay ? $prevDay['altitude_m'] : null,
                 'items' => [
                     [
-                        'title' => 'Rest & Acclimatization',
-                        'description' => 'Take it easy, hydrate, and enjoy the scenery.',
+                        'title' => 'Rest Day',
+                        'description' => 'Rest and relax.',
                         'time_of_day' => 'morning',
                         'cost' => 0,
                         'pricing_source' => 'system_estimate',
@@ -255,7 +258,7 @@ class ItineraryValidator
      * Normalize and validate the AI output.
      * - Filters out generic/empty days.
      * - Ensures requested days count with rest days (max 3) and "No Itinerary Data".
-     * - ✅ Overrides rest day titles (distance = 0) to "Acclimatization Day at [Waypoint]".
+     * - ✅ Overrides rest day titles: "Rest Day" for tours, "Acclimatization Day" for treks.
      */
     protected function normalize(array $aiOutput, Route $route, array $input, string $locale = 'en'): array
     {
@@ -323,9 +326,10 @@ class ItineraryValidator
 
         // ============================================================
         //  ✅ Rest Day Title Override (for days with distance = 0)
-        //  यदि distance_km 0 छ र waypoint ID छ भने, title लाई
-        //  "Acclimatization Day at [Waypoint]" मा बदल्ने
+        //  "Acclimatization Day" for treks, "Rest Day" for tours
         // ============================================================
+        $isTour = $this->isTourRoute($route);
+
         foreach ($normalized['days'] as &$normalizedDay) {
             if (
                 isset($normalizedDay['distance_km']) &&
@@ -335,16 +339,16 @@ class ItineraryValidator
                 $waypoint = Waypoint::find($normalizedDay['overnight_waypoint_id']);
                 if ($waypoint) {
                     $normalizedDay['title'] = match($locale) {
-                        'hi' => "{$waypoint->name} में अनुकूलन दिवस",
-                        'zh' => "{$waypoint->name} 适应日",
-                        'np' => "{$waypoint->name} मा अनुकूलन दिन",
-                        default => "Acclimatization Day at {$waypoint->name}",
+                        'hi' => $isTour ? "आराम दिन" : "{$waypoint->name} में अनुकूलन दिवस",
+                        'zh' => $isTour ? "休息日" : "{$waypoint->name} 适应日",
+                        'np' => $isTour ? "आराम दिन" : "{$waypoint->name} मा अनुकूलन दिन",
+                        default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypoint->name}",
                     };
                     $normalizedDay['description'] = match($locale) {
-                        'hi' => "आज कोई ट्रेकिंग नहीं। {$waypoint->name} में आराम और अनुकूलन।",
-                        'zh' => "今天不徒步。在 {$waypoint->name} 休息和适应。",
-                        'np' => "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
-                        default => "No trekking today. Rest and acclimatize at {$waypoint->name}.",
+                        'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypoint->name} में आराम और अनुकूलन।",
+                        'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypoint->name} 休息和适应。",
+                        'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
+                        default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypoint->name}.",
                     };
                 }
             }
@@ -368,17 +372,17 @@ class ItineraryValidator
                 $waypointName = $waypoint ? $waypoint->name : 'Unknown';
 
                 $titleRest = match($locale) {
-                    'hi' => "{$waypointName} में अनुकूलन दिवस",
-                    'zh' => "{$waypointName} 适应日",
-                    'np' => "{$waypointName} मा अनुकूलन दिन",
-                    default => "Acclimatization Day at {$waypointName}",
+                    'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
+                    'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
+                    'np' => $isTour ? "आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
+                    default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
                 };
 
                 $descRest = match($locale) {
-                    'hi' => "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-                    'zh' => "今天不徒步。在 {$waypointName} 休息和适应。",
-                    'np' => "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-                    default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+                    'hi' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कोई ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
+                    'zh' => $isTour ? "今天休息。" : "今天不徒步。在 {$waypointName} 休息和适应。",
+                    'np' => $isTour ? "आजको दिन आराम गर्नुहोस्।" : "आज कुनै ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
+                    default => $isTour ? "Rest today." : "No trekking today. Rest and acclimatize at {$waypointName}.",
                 };
 
                 $normalized['days'][] = [
@@ -391,8 +395,8 @@ class ItineraryValidator
                     'altitude_m' => $lastAltitude,
                     'items' => [
                         [
-                            'title' => 'Rest & Acclimatization',
-                            'description' => 'Take it easy, hydrate, and enjoy the scenery.',
+                            'title' => 'Rest Day',
+                            'description' => 'Rest and relax.',
                             'time_of_day' => 'morning',
                             'cost' => round($dailyFoodCost, 2),
                             'pricing_source' => 'system_estimate',
@@ -466,5 +470,19 @@ class ItineraryValidator
         }
 
         return $normalized;
+    }
+
+    /**
+     * Helper: Check if the route is a tour (city tour, safari, etc.)
+     */
+    private function isTourRoute(Route $route): bool
+    {
+        $tourKeywords = ['Tour', 'Safari', 'Heritage', 'Pilgrimage', 'Circuit', 'Sightseeing'];
+        foreach ($tourKeywords as $keyword) {
+            if (stripos($route->name, $keyword) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 }
