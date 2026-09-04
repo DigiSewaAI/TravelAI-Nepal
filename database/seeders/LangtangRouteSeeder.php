@@ -54,19 +54,26 @@ class LangtangRouteSeeder extends Seeder
         );
 
         // ==========================================
-        // STEP 3: SEGMENTS (Forward + Return)
+        // STEP 3: SEGMENTS (Forward + Rest + Return)
         // ==========================================
+        // ✅ Rest day segment added: Kyangjin Gompa → Kyangjin Gompa (distance 0)
         $segments = [
             // Forward (1-3)
             ['from' => 'syabrubesi', 'to' => 'lama-hotel', 'dist' => 12.0, 'time' => 6.0, 'gain' => 967, 'loss' => 0],
             ['from' => 'lama-hotel', 'to' => 'langtang-village', 'dist' => 10.0, 'time' => 5.0, 'gain' => 960, 'loss' => 0],
             ['from' => 'langtang-village', 'to' => 'kyangjin-gompa', 'dist' => 7.5, 'time' => 4.0, 'gain' => 440, 'loss' => 0],
-            // Return (4-6)
+            // Rest Day at Kyangjin Gompa (sequence 4)
+            ['from' => 'kyangjin-gompa', 'to' => 'kyangjin-gompa', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+            // Return (5-7)
             ['from' => 'kyangjin-gompa', 'to' => 'langtang-village', 'dist' => 7.5, 'time' => 4.0, 'gain' => 0, 'loss' => 440],
             ['from' => 'langtang-village', 'to' => 'lama-hotel', 'dist' => 10.0, 'time' => 5.0, 'gain' => 0, 'loss' => 960],
             ['from' => 'lama-hotel', 'to' => 'syabrubesi', 'dist' => 12.0, 'time' => 6.0, 'gain' => 0, 'loss' => 967],
         ];
 
+        // Delete existing segments for this route to avoid sequence conflicts
+        RouteSegment::where('route_id', $route->id)->delete();
+
+        // Insert new segments with correct sequence
         foreach ($segments as $i => $seg) {
             RouteSegment::updateOrCreate(
                 [
@@ -87,8 +94,6 @@ class LangtangRouteSeeder extends Seeder
         // ==========================================
         // STEP 4: COSTS
         // ==========================================
-        // Verified: Langtang National Park (source: NTB)
-        // Approximate: TIMS, food
         $costs = [
             [
                 'type' => 'permit',
@@ -141,6 +146,6 @@ class LangtangRouteSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ Langtang Route seeded successfully (6 segments, forward + return).');
+        $this->command->info('✅ Langtang Route seeded successfully (7 segments: forward, rest day, return).');
     }
 }

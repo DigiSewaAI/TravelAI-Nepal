@@ -19,60 +19,84 @@ class CityCulturalToursSeeder extends Seeder
         $this->command->info('🏛️ Seeding City & Cultural Tours...');
 
         // ==========================================
-        // 1. KATHMANDU VALLEY HERITAGE TOUR
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Kathmandu Valley Heritage Tour',
-                'slug' => 'kathmandu-heritage',
-                'description' => 'UNESCO World Heritage tour of Kathmandu Valley covering Patan, Bhaktapur, and Kathmandu Durbar Squares.',
-                'duration_days' => 4,
-                'max_altitude' => 1400,
-                'season' => 'All Year',
-            ],
-            'waypoints' => [
-                ['name' => 'Kathmandu', 'slug' => 'kathmandu-ht', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Patan Durbar Square', 'slug' => 'patan-ds', 'type' => 'landmark', 'lat' => 27.6736, 'lng' => 85.3251, 'alt' => 1350],
-                ['name' => 'Bhaktapur Durbar Square', 'slug' => 'bhaktapur-ds', 'type' => 'landmark', 'lat' => 27.6722, 'lng' => 85.4295, 'alt' => 1400],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Heritage Site Entrance Fees', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Private Vehicle (3 days)', 'amount' => 120, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Guide Service (3 days)', 'amount' => 60, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
-
-        $this->command->info('✅ Kathmandu Valley Heritage Tour seeded.');
-
-        // ==========================================
-        // 2. KATHMANDU CITY TOUR
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Kathmandu City Tour',
-                'slug' => 'kathmandu-city-tour',
-                'description' => 'Tour of Kathmandu\'s top attractions: Swayambhunath, Pashupatinath, and Boudhanath.',
-                'duration_days' => 2,
-                'max_altitude' => 1400,
-                'season' => 'All Year',
-            ],
-            'waypoints' => [
-                ['name' => 'Kathmandu', 'slug' => 'kathmandu-ct', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Swayambhunath Stupa', 'slug' => 'swayambhunath', 'type' => 'landmark', 'lat' => 27.7148, 'lng' => 85.2901, 'alt' => 1450],
-                ['name' => 'Boudhanath Stupa', 'slug' => 'boudhanath', 'type' => 'landmark', 'lat' => 27.7215, 'lng' => 85.3629, 'alt' => 1350],
-                ['name' => 'Pashupatinath Temple', 'slug' => 'pashupatinath', 'type' => 'landmark', 'lat' => 27.7108, 'lng' => 85.3482, 'alt' => 1350],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Temple Entrance Fees', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
-
-        $this->command->info('✅ Kathmandu City Tour seeded.');
+// 1. KATHMANDU HERITAGE TOUR (1 DAY, 4 UNESCO SITES)
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Kathmandu Heritage Tour',
+        'slug' => 'kathmandu-heritage',
+        'description' => 'UNESCO World Heritage tour covering Pashupatinath Temple, Boudhanath Stupa, Swayambhunath Stupa, and Kathmandu Durbar Square.',
+        'duration_days' => 1,
+        'max_altitude' => 1450,
+        'season' => 'All Year',
+    ],
+    'waypoints' => [
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-heritage-start', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+        ['name' => 'Pashupatinath Temple', 'slug' => 'pashupatinath-heritage', 'type' => 'landmark', 'lat' => 27.7108, 'lng' => 85.3482, 'alt' => 1350],
+        ['name' => 'Boudhanath Stupa', 'slug' => 'boudhanath-heritage', 'type' => 'landmark', 'lat' => 27.7215, 'lng' => 85.3629, 'alt' => 1350],
+        ['name' => 'Swayambhunath Stupa', 'slug' => 'swayambhunath-heritage', 'type' => 'landmark', 'lat' => 27.7148, 'lng' => 85.2901, 'alt' => 1450],
+        ['name' => 'Kathmandu Durbar Square', 'slug' => 'kathmandu-durbar', 'type' => 'landmark', 'lat' => 27.7044, 'lng' => 85.3078, 'alt' => 1400],
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-heritage-end', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+    ],
+    'segments' => [
+        ['from' => 'kathmandu-heritage-start', 'to' => 'pashupatinath-heritage', 'dist' => 2.0, 'time' => 1.0],
+        ['from' => 'pashupatinath-heritage', 'to' => 'boudhanath-heritage', 'dist' => 1.5, 'time' => 0.5],
+        ['from' => 'boudhanath-heritage', 'to' => 'swayambhunath-heritage', 'dist' => 5.0, 'time' => 2.0],
+        ['from' => 'swayambhunath-heritage', 'to' => 'kathmandu-durbar', 'dist' => 3.0, 'time' => 1.0],
+        ['from' => 'kathmandu-durbar', 'to' => 'kathmandu-heritage-end', 'dist' => 1.0, 'time' => 0.5],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'UNESCO Entrance Fees (4 sites)', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Private Vehicle (Full Day)', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Guide Service (Full Day)', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
+$this->command->info('✅ Kathmandu Heritage Tour seeded.');
 
         // ==========================================
-        // 3. BHAKTAPUR DURBAR SQUARE TOUR
+// 2. KATHMANDU CITY TOUR (2 DAYS, 7 ATTRACTIONS)
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Kathmandu City Tour',
+        'slug' => 'kathmandu-city-tour',
+        'description' => 'Comprehensive Kathmandu city experience covering UNESCO sites, local markets, Thamel, Asan Bazaar, and Garden of Dreams.',
+        'duration_days' => 2,
+        'max_altitude' => 1450,
+        'season' => 'All Year',
+    ],
+    'waypoints' => [
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-city-start', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+        ['name' => 'Swayambhunath Stupa', 'slug' => 'swayambhunath-city', 'type' => 'landmark', 'lat' => 27.7148, 'lng' => 85.2901, 'alt' => 1450],
+        ['name' => 'Boudhanath Stupa', 'slug' => 'boudhanath-city', 'type' => 'landmark', 'lat' => 27.7215, 'lng' => 85.3629, 'alt' => 1350],
+        ['name' => 'Pashupatinath Temple', 'slug' => 'pashupatinath-city', 'type' => 'landmark', 'lat' => 27.7108, 'lng' => 85.3482, 'alt' => 1350],
+        ['name' => 'Kathmandu Durbar Square', 'slug' => 'kathmandu-durbar-city', 'type' => 'landmark', 'lat' => 27.7044, 'lng' => 85.3078, 'alt' => 1400],
+        ['name' => 'Thamel', 'slug' => 'thamel-city', 'type' => 'neighborhood', 'lat' => 27.7141, 'lng' => 85.3124, 'alt' => 1400],
+        ['name' => 'Asan Bazaar', 'slug' => 'asan-city', 'type' => 'neighborhood', 'lat' => 27.7072, 'lng' => 85.3082, 'alt' => 1400],
+        ['name' => 'Garden of Dreams', 'slug' => 'garden-city', 'type' => 'park', 'lat' => 27.7168, 'lng' => 85.3182, 'alt' => 1400],
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-city-end', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+    ],
+    'segments' => [
+        ['from' => 'kathmandu-city-start', 'to' => 'swayambhunath-city', 'dist' => 3.0, 'time' => 1.0],
+        ['from' => 'swayambhunath-city', 'to' => 'boudhanath-city', 'dist' => 6.0, 'time' => 2.0],
+        ['from' => 'boudhanath-city', 'to' => 'pashupatinath-city', 'dist' => 2.0, 'time' => 0.5],
+        ['from' => 'pashupatinath-city', 'to' => 'kathmandu-durbar-city', 'dist' => 4.0, 'time' => 1.5],
+        ['from' => 'kathmandu-durbar-city', 'to' => 'thamel-city', 'dist' => 0.5, 'time' => 0.2],
+        ['from' => 'thamel-city', 'to' => 'asan-city', 'dist' => 0.5, 'time' => 0.2],
+        ['from' => 'asan-city', 'to' => 'garden-city', 'dist' => 1.0, 'time' => 0.3],
+        ['from' => 'garden-city', 'to' => 'kathmandu-city-end', 'dist' => 0.5, 'time' => 0.2],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'UNESCO Entrance Fees (4 sites)', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Private Vehicle (2 days)', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Guide Service (2 days)', 'amount' => 40, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
+$this->command->info('✅ Kathmandu City Tour seeded.');
+
+
+        // ==========================================
+        // 4. BHAKTAPUR DURBAR SQUARE TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -94,11 +118,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Bhaktapur Durbar Square Tour seeded.');
 
         // ==========================================
-        // 4. PATAN DURBAR SQUARE TOUR
+        // 5. PATAN DURBAR SQUARE TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -119,11 +142,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Patan Durbar Square Tour seeded.');
 
         // ==========================================
-        // 5. KIRTIPUR VILLAGE TOUR
+        // 6. KIRTIPUR VILLAGE TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -144,11 +166,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Kirtipur Village Tour seeded.');
 
         // ==========================================
-        // 6. SANKHU–BAJRAYOGINI TOUR
+        // 7. SANKHU–BAJRAYOGINI TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -169,11 +190,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Sankhu–Bajrayogini Tour seeded.');
 
         // ==========================================
-        // 7. NAGARKOT SUNRISE TOUR
+        // 8. NAGARKOT SUNRISE TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -187,17 +207,49 @@ class CityCulturalToursSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-nagarkot', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Nagarkot Viewpoint', 'slug' => 'nagarkot-view', 'type' => 'landmark', 'lat' => 27.7123, 'lng' => 85.5345, 'alt' => 2195],
+                ['name' => 'Kathmandu', 'slug' => 'kathmandu-nagarkot-return', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-nagarkot', 'to' => 'nagarkot-view', 'dist' => 25.0, 'time' => 6.0],
+                ['from' => 'nagarkot-view', 'to' => 'kathmandu-nagarkot-return', 'dist' => 25.0, 'time' => 6.0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle (Round Trip)', 'amount' => 40, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Breakfast at Nagarkot', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Nagarkot Sunrise Tour seeded.');
 
         // ==========================================
-        // 8. DHULIKHEL–NAMOBUDDHA TOUR
+        // 9. SARANGKOT SUNRISE TOUR
+        // ==========================================
+        $this->helper->seedTour([
+            'route' => [
+                'name' => 'Sarangkot Sunrise Tour',
+                'slug' => 'sarangkot-sunrise',
+                'description' => 'Early morning drive to Sarangkot for breathtaking sunrise views over Annapurna and Dhaulagiri.',
+                'duration_days' => 1,
+                'max_altitude' => 1600,
+                'season' => 'All Year',
+            ],
+            'waypoints' => [
+                ['name' => 'Pokhara', 'slug' => 'pokhara-sarangkot', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+                ['name' => 'Sarangkot', 'slug' => 'sarangkot-tour', 'type' => 'landmark', 'lat' => 28.2446, 'lng' => 83.9453, 'alt' => 1600],
+                ['name' => 'Pokhara', 'slug' => 'pokhara-sarangkot-return', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-sarangkot', 'to' => 'sarangkot-tour', 'dist' => 8.0, 'time' => 2.0],
+                ['from' => 'sarangkot-tour', 'to' => 'pokhara-sarangkot-return', 'dist' => 8.0, 'time' => 2.0],
+            ],
+            'costs' => [
+                ['type' => 'tour', 'name' => 'Private Vehicle (Round Trip)', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
+                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
+            ],
+        ]);
+        $this->command->info('✅ Sarangkot Sunrise Tour seeded.');
+
+        // ==========================================
+        // 10. DHULIKHEL–NAMOBUDDHA TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -218,11 +270,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Dhulikhel–Namobuddha Tour seeded.');
 
         // ==========================================
-        // 9. PANUTI–KHOKANA–BUNGAMATI TOUR
+        // 11. PANUTI–KHOKANA–BUNGAMATI TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -244,11 +295,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Panauti–Khokana–Bungamati Tour seeded.');
 
         // ==========================================
-        // 10. LUMBINI BUDDHIST CIRCUIT
+        // 12. LUMBINI BUDDHIST CIRCUIT
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -270,11 +320,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Lumbini Buddhist Circuit seeded.');
 
         // ==========================================
-        // 11. KAPILAVASTU TOUR
+        // 13. KAPILAVASTU TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -295,11 +344,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Kapilavastu Tour seeded.');
 
         // ==========================================
-        // 12. JANAKPUR (JANAKI TEMPLE)
+        // 14. JANAKPUR (JANAKI TEMPLE) TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -321,11 +369,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Janakpur Tour seeded.');
 
         // ==========================================
-        // 13. MUKTINATH TEMPLE TOUR
+        // 15. MUKTINATH TEMPLE TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -347,11 +394,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Muktinath Temple Tour seeded.');
 
         // ==========================================
-        // 14. JOMSOM–KAGBENI–MUKTINATH TOUR
+        // 16. JOMSOM–KAGBENI–MUKTINATH TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -374,11 +420,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Jomsom–Kagbeni–Muktinath Tour seeded.');
 
         // ==========================================
-        // 15. MARPHA–TUKUCHE–KOBANG TOUR
+        // 17. MARPHA–TUKUCHE–KOBANG TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -400,11 +445,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Marpha–Tukuche–Kobang Tour seeded.');
 
         // ==========================================
-        // 16. DHARAN–DHANKUTA–BHEDETAR TOUR
+        // 18. DHARAN–DHANKUTA–BHEDETAR TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -426,11 +470,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Dharan–Dhankuta–Bhedetar Tour seeded.');
 
         // ==========================================
-        // 17. BIRATNAGAR–KOSHI RIVER TOUR
+        // 19. BIRATNAGAR–KOSHI RIVER TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -451,11 +494,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Biratnagar–Koshi River Tour seeded.');
 
         // ==========================================
-        // 18. BUTWAL–SIDDHARTHANAGAR TOUR
+        // 20. BUTWAL–SIDDHARTHANAGAR TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -476,11 +518,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Butwal–Siddharthanagar Tour seeded.');
 
         // ==========================================
-        // 19. SURKHET–BIRENDRANAGAR TOUR
+        // 21. SURKHET–BIRENDRANAGAR TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -501,11 +542,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Surkhet–Birendranagar Tour seeded.');
 
         // ==========================================
-        // 20. KALIKOT–SINJA VALLEY TOUR
+        // 22. KALIKOT–SINJA VALLEY TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -526,11 +566,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Kalikot–Sinja Valley Tour seeded.');
 
         // ==========================================
-        // 21. JUMLA–SINJA VALLEY TOUR
+        // 23. JUMLA–SINJA VALLEY TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -551,11 +590,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Jumla–Sinja Valley Tour seeded.');
 
         // ==========================================
-        // 22. SIMIKOT–HUMLA TOUR
+        // 24. SIMIKOT–HUMLA TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -577,11 +615,10 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Simikot–Humla Tour seeded.');
 
         // ==========================================
-        // 23. BAJHANG–BAJURA TOUR
+        // 25. BAJHANG–BAJURA TOUR
         // ==========================================
         $this->helper->seedTour([
             'route' => [
@@ -602,9 +639,8 @@ class CityCulturalToursSeeder extends Seeder
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
             ],
         ]);
-
         $this->command->info('✅ Bajhang–Bajura Tour seeded.');
 
-        $this->command->info('🎉 City & Cultural Tours Complete! 23 destinations seeded.');
+        $this->command->info('🎉 City & Cultural Tours Complete! 25 destinations seeded.');
     }
 }

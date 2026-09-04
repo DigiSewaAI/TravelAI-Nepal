@@ -24,6 +24,12 @@ class CityCulturalProviderSeeder extends Seeder
         'Bandipur' => 20,
         'Dhulikhel' => 20,
         'Nagarkot' => 25,
+        // ✅ थपिएका missing locations (Kathmandu Valley / City Cultural)
+        'Kirtipur' => 20,
+        'Sankhu' => 18,
+        'Panauti' => 18,
+        'Khokana' => 18,
+        'Bungamati' => 18,
     ];
 
     public function run(): void
@@ -59,6 +65,12 @@ class CityCulturalProviderSeeder extends Seeder
             'Bandipur' => ['lat' => 27.9123, 'lng' => 84.4123, 'alt' => 1030],
             'Dhulikhel' => ['lat' => 27.6223, 'lng' => 85.5456, 'alt' => 1550],
             'Nagarkot' => ['lat' => 27.7145, 'lng' => 85.5234, 'alt' => 2175],
+            // ✅ थपिएका missing locations को coordinates (Kathmandu Valley)
+            'Kirtipur'   => ['lat' => 27.6756, 'lng' => 85.2789, 'alt' => 1400],
+            'Sankhu'     => ['lat' => 27.7345, 'lng' => 85.4567, 'alt' => 1350],
+            'Panauti'    => ['lat' => 27.6123, 'lng' => 85.5345, 'alt' => 1350],
+            'Khokana'    => ['lat' => 27.6456, 'lng' => 85.2989, 'alt' => 1300],
+            'Bungamati'  => ['lat' => 27.6345, 'lng' => 85.3123, 'alt' => 1300],
         ];
 
         $totalProviders = 0;

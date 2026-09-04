@@ -47,6 +47,26 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Myagdi', 'city' => 'Ghasa', 'latitude' => 28.6123, 'longitude' => 83.6456, 'is_habitable' => true],
 
             // ============================================================
+            // ✅ थपिएका 15 LOCATIONS (ABC, Mardi Himal को लागि)
+            // ============================================================
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Tadapani', 'latitude' => 28.5107, 'longitude' => 83.7435, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Chhomrong', 'latitude' => 28.5332, 'longitude' => 83.7589, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Sinuwa', 'latitude' => 28.5436, 'longitude' => 83.7651, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Bamboo', 'latitude' => 28.5549, 'longitude' => 83.7722, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Dovan', 'latitude' => 28.5658, 'longitude' => 83.7786, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Himalaya', 'latitude' => 28.5753, 'longitude' => 83.7834, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Deurali', 'latitude' => 28.5844, 'longitude' => 83.7893, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Machhapuchhre Base Camp', 'latitude' => 28.5923, 'longitude' => 83.7956, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Annapurna Base Camp', 'latitude' => 28.6005, 'longitude' => 83.8001, 'is_habitable' => true],
+
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Pothana', 'latitude' => 28.3714, 'longitude' => 83.8309, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Forest Camp', 'latitude' => 28.3915, 'longitude' => 83.7912, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Low Camp', 'latitude' => 28.3997, 'longitude' => 83.7745, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'High Camp', 'latitude' => 28.4089, 'longitude' => 83.7593, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Mardi Himal Base Camp', 'latitude' => 28.4201, 'longitude' => 83.7482, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Siding Village', 'latitude' => 28.3442, 'longitude' => 83.7109, 'is_habitable' => true],
+
+            // ============================================================
             // EVEREST REGION
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Lukla', 'latitude' => 27.6869, 'longitude' => 86.7314, 'is_habitable' => true],
@@ -93,7 +113,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Barun Valley', 'latitude' => 27.5789, 'longitude' => 87.4012, 'is_habitable' => true],
 
             // ============================================================
-            // MANASLU REGION (ADDED)
+            // MANASLU REGION (already present)
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Arughat', 'latitude' => 28.0456, 'longitude' => 84.8123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Soti Khola', 'latitude' => 28.0789, 'longitude' => 84.8345, 'is_habitable' => true],
@@ -133,12 +153,9 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Kapilavastu', 'city' => 'Kapilavastu', 'latitude' => 27.5345, 'longitude' => 83.0234, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Gorkha', 'latitude' => 28.0123, 'longitude' => 84.6123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Manakamana', 'latitude' => 27.8234, 'longitude' => 84.5678, 'is_habitable' => true],
-            // ============================================================
-            // RELIGIOUS SITES - Pathibhara Temple
-            // ============================================================
             ['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Pathibhara', 'latitude' => 27.3456, 'longitude' => 87.7123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Taplejung', 'latitude' => 27.3456, 'longitude' => 87.7123, 'is_habitable' => true],
-            ['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Suketar', 'latitude' => 27.3456, 'longitude' => 87.7123, 'is_habitable' => true],
+
             // ============================================================
             // VALLEY SURROUNDINGS (Kathmandu Valley)
             // ============================================================
@@ -168,7 +185,8 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Phu', 'latitude' => 28.6512, 'longitude' => 84.1589, 'is_habitable' => true],
 
             // ============================================================
-            // ✅ यी locations हुन् (यी राख्नुहोस्, यदि छैनन् भने)
+            // ADDITIONAL RIVERS & VIEWPOINTS (already present)
+            // ============================================================
             ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Trishuli River', 'latitude' => 27.9123, 'longitude' => 84.8123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Sindhupalchok', 'city' => 'Bhote Koshi River', 'latitude' => 27.8456, 'longitude' => 85.9234, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Kali Gandaki River', 'latitude' => 28.7345, 'longitude' => 83.7123, 'is_habitable' => true],
@@ -191,6 +209,6 @@ class LocationSeeder extends Seeder
 
         $this->command->info('✅ LocationSeeder completed: ' . count($locations) . ' locations.');
         $this->command->info('   📌 Non‑habitable: Thorong La, Everest Base Camp (is_habitable=false).');
-        $this->command->info('   📌 Manaslu & all other locations are habitable (is_habitable=true).');
+        $this->command->info('   📌 All ABC & Mardi Himal locations now habitable.');
     }
 }

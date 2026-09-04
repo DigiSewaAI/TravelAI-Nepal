@@ -111,7 +111,7 @@ class WaypointLocationSeeder extends Seeder
             'Barun Valley' => 'Barun Valley',
 
             // ============================================================
-            // MANASLU REGION (ADDED)
+            // MANASLU REGION
             // ============================================================
             'Arughat' => 'Arughat',
             'Soti Khola' => 'Soti Khola',
@@ -128,7 +128,7 @@ class WaypointLocationSeeder extends Seeder
             'Tal' => 'Tal',
 
             // ============================================================
-            // CITIES / TOURS
+            // CITIES / TOURS (Existing)
             // ============================================================
             'Kathmandu' => 'Kathmandu',
             'Pokhara' => 'Pokhara',
@@ -149,7 +149,7 @@ class WaypointLocationSeeder extends Seeder
             'Patan' => 'Patan',
 
             // ============================================================
-            // CITY TOURS - Start/End waypoints
+            // CITY TOURS - Start/End waypoints (Existing)
             // ============================================================
             'Tansen Hill Town Tour Start' => 'Tansen',
             'Tansen Hill Town Tour End' => 'Tansen',
@@ -192,6 +192,36 @@ class WaypointLocationSeeder extends Seeder
             'Pathibhara' => 'Pathibhara',
             'Suketar' => 'Suketar',
             'Taplejung' => 'Taplejung',
+
+            // ============================================================
+            // ✅ NEW: Kathmandu Heritage / City Tours waypoints
+            // ============================================================
+            // ============================================================
+// ✅ FIX: Start/End slugs for Heritage & City Tours
+// ============================================================
+'kathmandu-heritage-start' => 'Kathmandu',
+'kathmandu-heritage-end'   => 'Kathmandu',
+'kathmandu-city-tour-start'=> 'Kathmandu',
+'kathmandu-city-tour-end'  => 'Kathmandu',
+
+// ✅ Durbar Square slugs (Heritage & City)
+'kathmandu-durbar'        => 'Kathmandu',
+'kathmandu-durbar-city'   => 'Kathmandu',
+            'Swayambhunath Stupa' => 'Kathmandu',
+            'Boudhanath Stupa' => 'Kathmandu',
+            'Pashupatinath Temple' => 'Kathmandu',
+            'Kathmandu Durbar Square' => 'Kathmandu',
+            'Thamel' => 'Kathmandu',
+            'Asan Bazaar' => 'Kathmandu',
+            'Garden of Dreams' => 'Kathmandu',
+            'Patan Durbar Square' => 'Patan',
+            'Bhaktapur Durbar Square' => 'Bhaktapur',
+
+            // ============================================================
+// ✅ FIX: City Tour start/end slugs
+// ============================================================
+'kathmandu-city-start' => 'Kathmandu',
+'kathmandu-city-end'   => 'Kathmandu',
 
             // ============================================================
             // OTHER

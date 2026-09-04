@@ -249,7 +249,10 @@ class ItineraryValidator
         if (empty($filteredDays)) {
             $filteredDays = $this->generateFallbackItinerary($route, $input, $locale);
         }
-
+// ✅ Trim days if more than requested (applies to ALL routes)
+if (count($filteredDays) > $requestedDays) {
+    $filteredDays = array_slice($filteredDays, 0, $requestedDays);
+}
         // ============================================================
         // ✅ Track "No Itinerary Data" count for proper conversion
         // ============================================================

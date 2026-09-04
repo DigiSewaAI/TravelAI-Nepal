@@ -46,11 +46,12 @@ class PlannerService
         }
 
         // ============================================================
-        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER
+        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER (UPDATED: track merged waypoints)
         // ============================================================
         $overnightSegments = [];
         $dayNumber = 1;
         $mergedSegment = null;
+        $mergedWaypoints = []; // Track non-overnight waypoints for round-trip detection
         $segments = $route->segments()->orderBy('sequence')->get();
 
         foreach ($segments as $segment) {
@@ -60,12 +61,23 @@ class PlannerService
             if ($isOvernight) {
                 if ($mergedSegment) {
                     $merged = $this->mergeSegments($mergedSegment, $segment);
-                    $overnightSegments[] = ['sequence' => $dayNumber++, 'segment' => $merged];
+                    $overnightSegments[] = [
+                        'sequence' => $dayNumber++,
+                        'segment' => $merged,
+                        'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
+                    ];
                     $mergedSegment = null;
+                    $mergedWaypoints = [];
                 } else {
-                    $overnightSegments[] = ['sequence' => $dayNumber++, 'segment' => $segment];
+                    $overnightSegments[] = [
+                        'sequence' => $dayNumber++,
+                        'segment' => $segment,
+                        'merged_waypoints' => [],
+                    ];
                 }
             } else {
+                // Non-overnight waypoint: add to merged list
+                $mergedWaypoints[] = $toWaypoint->name;
                 if ($mergedSegment) {
                     $mergedSegment = $this->mergeSegments($mergedSegment, $segment);
                 } else {
@@ -75,7 +87,11 @@ class PlannerService
         }
 
         if ($mergedSegment) {
-            $overnightSegments[] = ['sequence' => $dayNumber++, 'segment' => $mergedSegment];
+            $overnightSegments[] = [
+                'sequence' => $dayNumber++,
+                'segment' => $mergedSegment,
+                'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
+            ];
         }
 
         Log::info("📊 Total overnight segments: " . count($overnightSegments));
@@ -180,6 +196,24 @@ class PlannerService
             $services = $dayServicesMap[$dayNumber] ?? collect();
 
             if ($dayData['distance_km'] === null) {
+                continue;
+            }
+
+            // ✅ REST DAY FIX (STRONGER): Override items and skip service attachment
+            if ((float) $dayData['distance_km'] == 0) {
+                $dayData['items'] = [
+                    [
+                        'title' => 'Rest Day',
+                        'description' => 'Rest and relax at the lodge.',
+                        'time_of_day' => 'morning',
+                        'cost' => 0,
+                        'pricing_source' => 'system_estimate',
+                        'pricing_snapshot' => null,
+                        'service_id' => null,
+                        'is_optional' => false,
+                        'metadata' => null,
+                    ]
+                ];
                 continue;
             }
 
@@ -530,7 +564,7 @@ class PlannerService
     }
 
     // ==========================================
-    // FALLBACK (with proper service attachment)
+    // FALLBACK (with round-trip detection)
     // ==========================================
     protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en', array $overnightSegments = []): array
     {
@@ -542,23 +576,41 @@ class PlannerService
             $seg = $item['segment'];
             $from = $seg->fromWaypoint;
             $to = $seg->toWaypoint;
+            $mergedWaypoints = $item['merged_waypoints'] ?? [];
 
             $distance = (float) $seg->distance_km;
             $isLongDay = $distance > $maxDailyDistance;
 
-            $title = match($locale) {
-                'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
-                'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                default => "Day {$dayNumber}: {$from->name} → {$to->name}",
-            };
-
-            $desc = match($locale) {
-                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
-                'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-            };
+            // 🆕 Round-trip detection: same start/end, distance > 0, and merged waypoints exist
+            if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
+                $landmarkName = implode(' → ', $mergedWaypoints);
+                $title = match($locale) {
+                    'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                    'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
+                    'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                    default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                };
+                $desc = match($locale) {
+                    'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
+                    'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                    'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                    default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+                };
+            } else {
+                // Normal title/description
+                $title = match($locale) {
+                    'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                    'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
+                    'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                    default => "Day {$dayNumber}: {$from->name} → {$to->name}",
+                };
+                $desc = match($locale) {
+                    'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+                    'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                    'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                    default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+                };
+            }
 
             // ✅ Get service for this waypoint
             $service = $this->getServiceForWaypoint($to, $input);
