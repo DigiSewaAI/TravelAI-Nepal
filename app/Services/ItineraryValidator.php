@@ -99,7 +99,7 @@ class ItineraryValidator
                 $desc = match($locale) {
                     'hi' => ($altitude >= 3000 && !$isTour) ? "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।" : "आजको दिन आराम गर्नुहोस्।",
                     'zh' => ($altitude >= 3000 && !$isTour) ? "今天不徒步。在 {$to->name} 休息和适应。" : "今天休息。",
-                    'np' => ($altitude >= 3000 && !$isTour) ? "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन。" : "आजको दिन आराम गर्नुहोस्।",
+                    'np' => ($altitude >= 3000 && !$isTour) ? "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।" : "आजको दिन आराम गर्नुहोस्।",
                     default => ($altitude >= 3000 && !$isTour) ? "No trekking today. Rest and acclimatize at {$to->name}." : "Rest today.",
                 };
             } else {
@@ -251,7 +251,7 @@ class ItineraryValidator
         }
 
         // ============================================================
-        // ✅ Process days: track if we already have a "No Itinerary Data" day
+        // ✅ Track "No Itinerary Data" count for proper conversion
         // ============================================================
         $noDataCount = 0;
         $hasNoDataDay = false;
@@ -404,7 +404,8 @@ class ItineraryValidator
         $actualDays = count($normalized['days']);
 
         // ============================================================
-        //  ✅ FINAL PADDING: Only add "No Itinerary Data" if not already present
+        //  ✅ FINAL PADDING: First missing → "No Itinerary Data",
+        //     subsequent → "Buffer Day"
         // ============================================================
         if ($actualDays < $requestedDays) {
             $gap = $requestedDays - $actualDays;
@@ -453,10 +454,10 @@ class ItineraryValidator
                 $gap = $requestedDays - count($normalized['days']);
             }
 
-            // ✅ Remaining days: if we already have a "No Itinerary Data" day, only add "Buffer Day"
+            // ✅ Remaining days: first → "No Itinerary Data", rest → "Buffer Day"
             if ($gap > 0) {
                 if (!$hasNoDataDay) {
-                    // First remaining → "No Itinerary Data"
+                    // First missing day → "No Itinerary Data"
                     $dayNumber = count($normalized['days']) + 1;
                     $normalized['days'][] = [
                         'day_number' => $dayNumber,

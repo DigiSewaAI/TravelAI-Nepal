@@ -496,8 +496,15 @@
         html += `<ul class="mt-2 space-y-1 text-sm">`;
         let total = 0;
         for (const [key, item] of Object.entries(breakdown)) {
-          if (key === 'budget_insufficient') {
-    html += `<li class="text-yellow-700">${item.unit}</li>`;
+          if (item.unit === 'note') {
+    // Render as warning box with message
+    html += `<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-2 rounded shadow-sm">`;
+    html += `<div class="flex items-start">`;
+    html += `<div class="flex-shrink-0"><i class="fas fa-exclamation-triangle text-yellow-500 text-lg"></i></div>`;
+    html += `<div class="ml-3">`;
+    html += `<p class="text-sm font-semibold text-yellow-800">${item.name || '⚠️ Budget Warning'}</p>`;
+    html += `<p class="text-sm text-yellow-700">${item.message || ''}</p>`;
+    html += `</div></div></div>`;
     continue;
 }
           const amount = item.amount || 0;
