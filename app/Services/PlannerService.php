@@ -597,20 +597,30 @@ class PlannerService
                     default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
                 };
             } else {
-                // Normal title/description
-                $title = match($locale) {
-                    'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                    'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
-                    'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                    default => "Day {$dayNumber}: {$from->name} → {$to->name}",
-                };
-                $desc = match($locale) {
-                    'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
-                    'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                    'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                    default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-                };
-            }
+    // Normal title/description (show merged waypoints if any)
+    if (!empty($mergedWaypoints)) {
+        $landmarkName = implode(' → ', $mergedWaypoints);
+        $title = match($locale) {
+            'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+            'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
+            'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+            default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+        };
+    } else {
+        $title = match($locale) {
+            'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+            'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
+            'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+            default => "Day {$dayNumber}: {$from->name} → {$to->name}",
+        };
+    }
+    $desc = match($locale) {
+        'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+        'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+        'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+        default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+    };
+}
 
             // ✅ Get service for this waypoint
             $service = $this->getServiceForWaypoint($to, $input);
