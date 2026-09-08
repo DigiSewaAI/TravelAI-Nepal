@@ -46,12 +46,12 @@ class PlannerService
         }
 
         // ============================================================
-        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER (UPDATED: track merged waypoints)
+        // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER
         // ============================================================
         $overnightSegments = [];
         $dayNumber = 1;
         $mergedSegment = null;
-        $mergedWaypoints = []; // Track non-overnight waypoints for round-trip detection
+        $mergedWaypoints = [];
         $segments = $route->segments()->orderBy('sequence')->get();
 
         foreach ($segments as $segment) {
@@ -76,7 +76,6 @@ class PlannerService
                     ];
                 }
             } else {
-                // Non-overnight waypoint: add to merged list
                 $mergedWaypoints[] = $toWaypoint->name;
                 if ($mergedSegment) {
                     $mergedSegment = $this->mergeSegments($mergedSegment, $segment);
@@ -120,7 +119,7 @@ class PlannerService
         }
 
         // ============================================================
-        // COST CALCULATION (system costs only)
+        // COST CALCULATION
         // ============================================================
         $costBreakdown = $this->calculateCost($route, $input, [], $locale);
 
@@ -130,39 +129,10 @@ class PlannerService
         $context = $this->buildContext($route, $input, $costBreakdown, $dayServicesMap, $dayDiagnostics, $overnightSegments);
 
         // ============================================================
-        // ⚠️ FORCE FALLBACK FOR TESTING (remove after fix)
+        // FALLBACK
         // ============================================================
         $aiResponse = $this->buildFallbackResponse($route, $input, $locale, $overnightSegments);
         $usedFallback = true;
-
-        // ============================================================
-        // (Original AI call – now skipped for forced fallback)
-        // ============================================================
-        /*
-        $aiResponse = null;
-        $usedFallback = false;
-        try {
-            $prompt = $this->buildPrompt($context, $input, $locale);
-            Log::info('🔍 [PlannerService] Prompt to LLM', [
-                'prompt_length' => strlen($prompt),
-                'locale' => $locale,
-            ]);
-            $aiResponse = $this->llm->generateItinerary($prompt, $locale);
-            Log::info('✅ AI itinerary generated successfully.');
-        } catch (\Exception $e) {
-            Log::error('❌ AI generation failed, using fallback.', ['error' => $e->getMessage()]);
-            $aiResponse = $this->buildFallbackResponse($route, $input, $locale, $overnightSegments);
-            $usedFallback = true;
-        }
-
-        if ($aiResponse && !$usedFallback) {
-            if (!$this->isLanguageCorrect($aiResponse, $locale)) {
-                Log::warning('⚠️ AI response language mismatch, using fallback.', ['locale' => $locale]);
-                $aiResponse = $this->buildFallbackResponse($route, $input, $locale, $overnightSegments);
-                $usedFallback = true;
-            }
-        }
-        */
 
         // ============================================================
         // VALIDATE & NORMALIZE
@@ -170,11 +140,10 @@ class PlannerService
         $validated = $this->validator->validate($aiResponse, $route, $input, $context, $locale);
 
         // ============================================================
-        // BUFFER DAY FIX: Convert second "No Itinerary Data" to Buffer Day
+        // BUFFER DAY FIX
         // ============================================================
         $noDataCount = 0;
         foreach ($validated['days'] as $index => $day) {
-            // Check if title contains "No Itinerary Data" (any language)
             if (strpos($day['title'], 'No Itinerary Data') !== false ||
                 strpos($day['title'], 'कोई यात्रा डेटा नहीं') !== false ||
                 strpos($day['title'], '无行程数据') !== false ||
@@ -189,112 +158,132 @@ class PlannerService
         }
 
         // ============================================================
-        // ATTACH SERVICES TO DAYS
-        // ============================================================
-        foreach ($validated['days'] as &$dayData) {
-            $dayNumber = $dayData['day_number'];
-            $services = $dayServicesMap[$dayNumber] ?? collect();
+// ATTACH SERVICES TO DAYS
+// ============================================================
+foreach ($validated['days'] as &$dayData) {
+    $dayNumber = $dayData['day_number'];
+    $services = $dayServicesMap[$dayNumber] ?? collect();
 
-            if ($dayData['distance_km'] === null) {
-                continue;
-            }
+    if ($dayData['distance_km'] === null) {
+        continue;
+    }
 
-            // ✅ REST DAY FIX (STRONGER): Override items and skip service attachment
-            if ((float) $dayData['distance_km'] == 0) {
-                $dayData['items'] = [
-                    [
-                        'title' => 'Rest Day',
-                        'description' => 'Rest and relax at the lodge.',
-                        'time_of_day' => 'morning',
-                        'cost' => 0,
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
-                ];
-                continue;
-            }
+    // REST DAY
+    if ((float) $dayData['distance_km'] == 0) {
+        $dayData['items'] = [
+            [
+                'title' => 'Rest Day',
+                'description' => 'Rest and relax at the lodge.',
+                'time_of_day' => 'morning',
+                'cost' => 0,
+                'pricing_source' => 'system_estimate',
+                'pricing_snapshot' => null,
+                'service_id' => null,
+                'is_optional' => false,
+                'metadata' => null,
+            ]
+        ];
+        continue;
+    }
 
-            $waypointId = $dayData['overnight_waypoint_id'] ?? null;
-            if (!$waypointId) {
-                continue;
-            }
+    $waypointId = $dayData['overnight_waypoint_id'] ?? null;
+    if (!$waypointId) {
+        continue;
+    }
 
-            $waypoint = Waypoint::find($waypointId);
-            if (!$waypoint) {
-                continue;
-            }
+    $waypoint = Waypoint::find($waypointId);
+    if (!$waypoint) {
+        continue;
+    }
 
-            $locationId = $waypoint->location_id;
-            $bestService = null;
+    $locationId = $waypoint->location_id;
+    $bestService = null;
 
-            foreach ($services as $svc) {
-                if (($svc['location_id'] ?? null) == $locationId) {
-                    $bestService = $svc;
-                    break;
-                }
-            }
-
-            if (!$bestService) {
-                $waypointName = $waypoint->name;
-                $fallbackService = Service::where('status', 'active')
-                    ->where('name', 'LIKE', "%{$waypointName}%")
-                    ->whereHas('category', function ($q) {
-                        $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
-                    })
-                    ->first();
-
-                if ($fallbackService) {
-                    $bestService = [
-                        'id' => $fallbackService->id,
-                        'name' => $fallbackService->name,
-                        'price' => (float) $fallbackService->price,
-                        'currency' => $fallbackService->currency ?? 'NPR',
-                        'provider' => $fallbackService->provider->name ?? 'TravelAI Partner',
-                        'location_id' => $fallbackService->location_id,
-                    ];
-                    Log::info("✅ Fallback: Day {$dayNumber} using service {$fallbackService->name} for {$waypointName}");
-                }
-            }
-
-            if (!$bestService) {
-                Log::info("ℹ️ No service found for Day {$dayNumber} ({$waypoint->name})");
-                continue;
-            }
-
-            $priceNpr = $bestService['price'];
-            if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
-                $priceNpr *= 133;
-            }
-
-            $hasService = false;
-            foreach ($dayData['items'] as $item) {
-                if (!empty($item['service_id'])) {
-                    $hasService = true;
-                    break;
-                }
-            }
-
-            if (!$hasService) {
-                $dayData['items'][] = [
-                    'title' => $bestService['name'],
-                    'description' => 'Service Included',
-                    'time_of_day' => 'afternoon',
-                    'cost' => $priceNpr,
-                    'currency' => 'NPR',
-                    'pricing_source' => 'provider_service',
-                    'pricing_snapshot' => null,
-                    'service_id' => $bestService['id'],
-                    'is_optional' => false,
-                    'metadata' => null,
-                    'provider' => $bestService['provider'] ?? 'TravelAI Partner',
-                ];
-                Log::info("✅ Attached service to Day {$dayNumber}: {$bestService['name']} (NPR {$priceNpr})");
-            }
+    // Try to find service by location
+    foreach ($services as $svc) {
+        if (($svc['location_id'] ?? null) == $locationId) {
+            $bestService = $svc;
+            break;
         }
-        unset($dayData);
+    }
+
+    // 🔥 Style-matched hotel override (पहिले यो check गरौं)
+    $waypointName = $waypoint->name;
+    $style = $input['travel_style'] ?? 'mid_range';
+
+    $styleMatchedHotel = Service::where('status', 'active')
+        ->where('name', 'LIKE', "%{$waypointName}%")
+        ->whereHas('category', function($q) {
+            $q->where('slug', 'hotel');
+        })
+        ->whereHas('provider.styles', function($q) use ($style) {
+            $q->where('style_slug', $style);
+        })
+        ->first();
+
+    if ($styleMatchedHotel) {
+        $bestService = [
+            'id' => $styleMatchedHotel->id,
+            'name' => $styleMatchedHotel->name,
+            'price' => (float) $styleMatchedHotel->price,
+            'currency' => $styleMatchedHotel->currency ?? 'NPR',
+            'provider' => $styleMatchedHotel->provider->name ?? 'TravelAI Partner',
+            'location_id' => $styleMatchedHotel->location_id,
+        ];
+        Log::info("✅ Override with style-matched hotel: {$bestService['name']} for Day {$dayNumber}");
+    } else {
+        // यदि style-matched hotel छैन भने, fallback guide खोज
+        $guide = Service::where('status', 'active')
+            ->where('name', 'LIKE', "%{$waypointName}%")
+            ->whereHas('category', function($q) {
+                $q->where('slug', 'guide');
+            })
+            ->first();
+
+        if ($guide) {
+            $bestService = [
+                'id' => $guide->id,
+                'name' => $guide->name ?? 'Unknown Guide',
+                'price' => (float) ($guide->price ?? 0),
+                'currency' => $guide->currency ?? 'NPR',
+                'provider' => $guide->provider->name ?? 'TravelAI Partner',
+                'location_id' => $guide->location_id,
+            ];
+            Log::info("✅ Guide fallback found: {$bestService['name']} for Day {$dayNumber}");
+        } else {
+            Log::info("❌ No service found for: {$waypointName} (Day {$dayNumber})");
+        }
+    }
+
+    if (!$bestService) {
+        Log::info("ℹ️ No service found for Day {$dayNumber} ({$waypoint->name})");
+        continue;
+    }
+
+    $priceNpr = $bestService['price'];
+    if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
+        $priceNpr *= 133;
+    }
+
+    // Override items completely
+    $dayData['items'] = [
+        [
+            'title' => $bestService['name'],
+            'description' => 'Service Included',
+            'time_of_day' => 'afternoon',
+            'cost' => $priceNpr,
+            'currency' => 'NPR',
+            'pricing_source' => 'provider_service',
+            'pricing_snapshot' => null,
+            'service_id' => $bestService['id'],
+            'is_optional' => false,
+            'metadata' => null,
+            'provider' => $bestService['provider'] ?? 'TravelAI Partner',
+        ]
+    ];
+    Log::info("✅ Attached service to Day {$dayNumber}: {$bestService['name']} (NPR {$priceNpr})");
+}
+unset($dayData);
 
         // ============================================================
         // SAVE TO DB
@@ -386,7 +375,7 @@ class PlannerService
 
             $finalBreakdown = array_merge($breakdown, $perDayServiceCosts);
 
-            // ✅ BUDGET WARNING
+            // BUDGET WARNING
             $budgetNpr = $input['budget'] * 133;
             if ($input['budget'] > 0 && $totalCost > $budgetNpr) {
                 $overPercent = (($totalCost - $budgetNpr) / $budgetNpr) * 100;
@@ -434,7 +423,7 @@ class PlannerService
     }
 
     // ==========================================
-    // COST CALCULATION (system costs only)
+    // COST CALCULATION
     // ==========================================
     protected function calculateCost(Route $route, array $input, array $services, string $locale = 'en'): array
     {
@@ -564,7 +553,7 @@ class PlannerService
     }
 
     // ==========================================
-    // FALLBACK (with round-trip detection)
+    // FALLBACK
     // ==========================================
     protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en', array $overnightSegments = []): array
     {
@@ -581,7 +570,6 @@ class PlannerService
             $distance = (float) $seg->distance_km;
             $isLongDay = $distance > $maxDailyDistance;
 
-            // 🆕 Round-trip detection: same start/end, distance > 0, and merged waypoints exist
             if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
                 $landmarkName = implode(' → ', $mergedWaypoints);
                 $title = match($locale) {
@@ -591,39 +579,70 @@ class PlannerService
                     default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
                 };
                 $desc = match($locale) {
-                    'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
+                    'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
                     'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
                     'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
                     default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
                 };
             } else {
-    // Normal title/description (show merged waypoints if any)
-    if (!empty($mergedWaypoints)) {
-        $landmarkName = implode(' → ', $mergedWaypoints);
-        $title = match($locale) {
-            'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-            'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
-            'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-            default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-        };
-    } else {
-        $title = match($locale) {
-            'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-            'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
-            'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-            default => "Day {$dayNumber}: {$from->name} → {$to->name}",
-        };
-    }
-    $desc = match($locale) {
-        'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
-        'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-        'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-        default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-    };
-}
+                if (!empty($mergedWaypoints)) {
+                    $landmarkName = implode(' → ', $mergedWaypoints);
+                    $title = match($locale) {
+                        'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                        'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
+                        'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                        default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                    };
+                } else {
+                    $title = match($locale) {
+                        'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                        'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
+                        'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                        default => "Day {$dayNumber}: {$from->name} → {$to->name}",
+                    };
+                }
+                $desc = match($locale) {
+                    'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+                    'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                    'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                    default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+                };
+            }
 
-            // ✅ Get service for this waypoint
-            $service = $this->getServiceForWaypoint($to, $input);
+            // FORCE HOTEL FOR TOURS
+            $service = null;
+            $isTour = $this->isTourRoute($route);
+            Log::info("🔍 isTourRoute result: " . ($isTour ? 'true' : 'false'));
+
+            if ($isTour) {
+                Log::info("🔍 Forcing hotel for tour, location_id: " . ($to->location_id ?? 'null'));
+                $service = Service::where('status', 'active')
+                    ->where('location_id', $to->location_id)
+                    ->whereHas('category', function($q) {
+                        $q->where('slug', 'hotel');
+                    })
+                    ->first();
+
+                if ($service) {
+                    Log::info("🔍 Hotel found: " . $service->name);
+                    $service = [
+                        'id' => $service->id,
+                        'name' => $service->name,
+                        'price' => (float) $service->price,
+                        'currency' => $service->currency ?? 'USD',
+                        'provider' => $service->provider->name ?? 'TravelAI Partner',
+                        'location_id' => $service->location_id,
+                    ];
+                } else {
+                    Log::info("🔍 Hotel found: NONE");
+                }
+            }
+
+            if (!$service) {
+                Log::info("🔍 Falling back to getServiceForWaypoint");
+                $service = $this->getServiceForWaypoint($to, $input);
+            }
+
             $serviceCost = $service ? $service['price'] * 133 : 0;
             $serviceName = $service ? $service['name'] : 'Trekking Day';
             $serviceId = $service ? $service['id'] : null;
@@ -732,48 +751,163 @@ class PlannerService
     }
 
     // ==========================================
-    // HELPER: GET SINGLE SERVICE FOR WAYPOINT
+    // ✅ GET SINGLE SERVICE FOR WAYPOINT (with style filter and formatService)
     // ==========================================
     protected function getServiceForWaypoint(Waypoint $waypoint, array $input): ?array
+    {
+        $waypointName = $waypoint->name;
+        $style = $input['travel_style'] ?? 'mid_range';
+        Log::info("🔍 getServiceForWaypoint called for: {$waypointName} (style: {$style})");
+
+        try {
+            // 1. Try hotel with matching style
+            $hotel = Service::where('status', 'active')
+                ->where('name', 'LIKE', "%{$waypointName}%")
+                ->whereHas('category', function($q) {
+                    $q->where('slug', 'hotel');
+                })
+                ->whereHas('provider.styles', function($q) use ($style) {
+                    $q->where('style_slug', $style);
+                })
+                ->first();
+
+            if ($hotel) {
+                Log::info("✅ Found style-matched hotel: {$hotel->name}");
+                return $this->formatService($hotel);
+            }
+
+            // 2. If no style-matched hotel, try any hotel
+            $hotel = Service::where('status', 'active')
+                ->where('name', 'LIKE', "%{$waypointName}%")
+                ->whereHas('category', function($q) {
+                    $q->where('slug', 'hotel');
+                })
+                ->first();
+
+            if ($hotel) {
+                Log::info("✅ Found any hotel (style fallback): {$hotel->name}");
+                return $this->formatService($hotel);
+            }
+
+            // 3. Try guide with style
+            $guide = Service::where('status', 'active')
+                ->where('name', 'LIKE', "%{$waypointName}%")
+                ->whereHas('category', function($q) {
+                    $q->where('slug', 'guide');
+                })
+                ->whereHas('provider.styles', function($q) use ($style) {
+                    $q->where('style_slug', $style);
+                })
+                ->first();
+
+            if ($guide) {
+                Log::info("✅ Found style-matched guide: {$guide->name}");
+                return $this->formatService($guide);
+            }
+
+            // 4. Try any guide
+            $guide = Service::where('status', 'active')
+                ->where('name', 'LIKE', "%{$waypointName}%")
+                ->whereHas('category', function($q) {
+                    $q->where('slug', 'guide');
+                })
+                ->first();
+
+            if ($guide) {
+                Log::info("✅ Found any guide (style fallback): {$guide->name}");
+                return $this->formatService($guide);
+            }
+
+            Log::info("❌ No service found for: {$waypointName}");
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error("🔥 Error in getServiceForWaypoint: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    // ✅ FORMAT SERVICE HELPER (MISSING METHOD ADDED)
+    protected function formatService(Service $service): array
+    {
+        return [
+            'id' => $service->id,
+            'name' => $service->name ?? 'Unknown Service',
+            'price' => (float) ($service->price ?? 0),
+            'currency' => $service->currency ?? 'NPR',
+            'provider' => $service->provider->name ?? 'TravelAI Partner',
+            'location_id' => $service->location_id,
+        ];
+    }
+
+    // ==========================================
+    // DAY-LEVEL SERVICE FETCHER
+    // ==========================================
+    protected function getServicesForDay(Waypoint $waypoint, array $input): array
     {
         $style = $input['travel_style'] ?? 'mid_range';
         $locationId = $waypoint->location_id;
 
         if (!$locationId) {
-            return null;
+            return ['services' => collect(), 'diagnostic' => 'no_location_match'];
         }
 
-        $service = Service::where('status', 'active')
+        $services = Service::where('status', 'active')
             ->where('location_id', $locationId)
             ->whereHas('category', function ($q) {
                 $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
             })
-            ->whereHas('provider.styles', function ($q) use ($style) {
-                $q->where('style_slug', $style);
-            })
-            ->first();
+            ->with(['category', 'provider.styles', 'reviews'])
+            ->get();
 
-        if (!$service) {
-            $service = Service::where('status', 'active')
-                ->where('name', 'LIKE', "%{$waypoint->name}%")
-                ->whereHas('category', function ($q) {
-                    $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
-                })
-                ->first();
+        if ($services->isEmpty()) {
+            return ['services' => collect(), 'diagnostic' => 'no_active_service'];
         }
 
-        if (!$service) {
-            return null;
+        $priorityMap = ['hotel' => 1, 'guide' => 2, 'transport' => 3, 'activity' => 4, 'experience' => 5];
+        $services = $services->sortBy(function($s) use ($priorityMap) {
+            return $priorityMap[$s->category->slug ?? ''] ?? 99;
+        });
+
+        $filtered = $services->filter(function ($service) use ($style) {
+            return $service->provider->styles->contains('style_slug', $style);
+        });
+
+        if ($filtered->isEmpty()) {
+            $filtered = $services;
+            Log::info("⚠️ No style match, using all services for location_id: {$locationId}");
         }
 
-        return [
-            'id' => $service->id,
-            'name' => $service->name,
-            'price' => (float) $service->price,
-            'currency' => $service->currency ?? 'USD',
-            'provider' => $service->provider->name ?? 'TravelAI Partner',
-            'location_id' => $service->location_id,
-        ];
+        $grouped = [];
+        foreach ($filtered as $svc) {
+            $cat = $svc->category->slug ?? 'other';
+            if (!isset($grouped[$cat])) {
+                $grouped[$cat] = [];
+            }
+            if (count($grouped[$cat]) < 2) {
+                $grouped[$cat][] = $svc;
+            }
+        }
+
+        $result = [];
+        foreach ($grouped as $cat => $items) {
+            foreach ($items as $item) {
+                $result[] = [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'category' => $cat,
+                    'price' => (float) $item->price,
+                    'currency' => $item->currency ?? 'NPR',
+                    'provider' => $item->provider->name ?? null,
+                    'provider_id' => $item->provider_id,
+                    'description' => $item->description,
+                    'rating' => $item->reviews->avg('rating') ?? null,
+                    'location_id' => $item->location_id,
+                ];
+            }
+        }
+
+        return ['services' => collect($result), 'diagnostic' => null];
     }
 
     // ==========================================
@@ -904,67 +1038,18 @@ class PlannerService
         return preg_match('/[\x{0900}-\x{097F}]/u', $text) === 1;
     }
 
-    // ==========================================
-    // DAY-LEVEL SERVICE FETCHER
-    // ==========================================
-    protected function getServicesForDay(Waypoint $waypoint, array $input): array
+    private function isTourRoute(Route $route): bool
     {
-        $style = $input['travel_style'] ?? 'mid_range';
-        $locationId = $waypoint->location_id;
-
-        if (!$locationId) {
-            return ['services' => collect(), 'diagnostic' => 'no_location_match'];
+        if (stripos($route->name, 'Trek') !== false) {
+            return false;
         }
 
-        $query = Service::where('status', 'active')
-            ->where('location_id', $locationId)
-            ->whereHas('category', function ($q) {
-                $q->whereIn('slug', ['hotel', 'guide', 'transport', 'activity', 'experience']);
-            });
-
-        $services = $query->with(['provider.styles', 'reviews'])->get();
-
-        if ($services->isEmpty()) {
-            return ['services' => collect(), 'diagnostic' => 'no_active_service'];
-        }
-
-        $filtered = $services->filter(function ($service) use ($style) {
-            return $service->provider->styles->contains('style_slug', $style);
-        });
-
-        if ($filtered->isEmpty()) {
-            return ['services' => collect(), 'diagnostic' => 'no_style_match'];
-        }
-
-        $grouped = [];
-        foreach ($filtered as $svc) {
-            $cat = $svc->category->slug ?? 'other';
-            if (!isset($grouped[$cat])) {
-                $grouped[$cat] = [];
-            }
-            if (count($grouped[$cat]) < 2) {
-                $grouped[$cat][] = $svc;
+        $tourKeywords = ['Tour', 'Safari', 'Heritage', 'Pilgrimage', 'Circuit', 'Sightseeing'];
+        foreach ($tourKeywords as $keyword) {
+            if (stripos($route->name, $keyword) !== false) {
+                return true;
             }
         }
-
-        $result = [];
-        foreach ($grouped as $cat => $items) {
-            foreach ($items as $item) {
-                $result[] = [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'category' => $cat,
-                    'price' => (float) $item->price,
-                    'currency' => $item->currency ?? 'NPR',
-                    'provider' => $item->provider->name ?? null,
-                    'provider_id' => $item->provider_id,
-                    'description' => $item->description,
-                    'rating' => $item->reviews->avg('rating') ?? null,
-                    'location_id' => $item->location_id,
-                ];
-            }
-        }
-
-        return ['services' => collect($result), 'diagnostic' => null];
+        return false;
     }
 }

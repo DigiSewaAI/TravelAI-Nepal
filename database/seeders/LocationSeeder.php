@@ -136,6 +136,11 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Myagdi', 'city' => 'Dhaulagiri', 'latitude' => 28.8456, 'longitude' => 83.7012, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Bajhang', 'latitude' => 29.7123, 'longitude' => 81.2345, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Bajura', 'city' => 'Bajura', 'latitude' => 29.6456, 'longitude' => 81.4567, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Darchula', 'latitude' => 29.8456, 'longitude' => 80.5345, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Sitapur', 'latitude' => 29.8789, 'longitude' => 80.5567, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Khalanga', 'latitude' => 29.9123, 'longitude' => 80.5789, 'is_habitable' => true],
+            // ✅ Api Base Camp – now habitable (tent/camping)
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Api Base Camp', 'latitude' => 30.0123, 'longitude' => 80.6000, 'is_habitable' => true],
 
             // ============================================================
             // NATIONAL PARKS & CITIES
@@ -209,6 +214,6 @@ class LocationSeeder extends Seeder
 
         $this->command->info('✅ LocationSeeder completed: ' . count($locations) . ' locations.');
         $this->command->info('   📌 Non‑habitable: Thorong La, Everest Base Camp (is_habitable=false).');
-        $this->command->info('   📌 All ABC & Mardi Himal locations now habitable.');
+        $this->command->info('   📌 Api Base Camp now habitable (camping/tent stays).');
     }
 }

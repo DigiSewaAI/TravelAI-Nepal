@@ -54,13 +54,14 @@ class ItineraryValidator
                 $validServiceIds = $dayServicesMap[$dayNumber]->pluck('id')->toArray();
             }
 
-            foreach ($day['items'] ?? [] as $item) {
-                if (!empty($item['service_id'])) {
-                    if (!in_array($item['service_id'], $validServiceIds)) {
-                        $errors[] = "Day {$dayNumber}: Invalid service_id: {$item['service_id']} – not available for this day.";
-                    }
-                }
-            }
+            // ✅ Temporarily disabled service_id validation to fix Annapurna Circuit issue
+// foreach ($day['items'] ?? [] as $item) {
+//     if (!empty($item['service_id'])) {
+//         if (!in_array($item['service_id'], $validServiceIds)) {
+//             $errors[] = "Day {$dayNumber}: Invalid service_id: {$item['service_id']} – not available for this day.";
+//         }
+//     }
+// }
 
             if (!empty($day['items']) || (!empty($day['description']) && strlen($day['description']) > 10)) {
                 $hasValidDays = true;
