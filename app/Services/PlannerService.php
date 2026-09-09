@@ -37,20 +37,27 @@ class PlannerService
             throw ValidationException::withMessages(['destination' => 'Route not found.']);
         }
 
-        // ✅ Load segments with relations
-$route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
+        $route->refresh();
+$route->load(['costs']);
 
-// ✅ Use the loaded relation (not the JSON attribute)
-$loadedSegments = $route->getRelation('segments');
+// ✅ DIRECTLY QUERY SEGMENTS FROM DATABASE – no ambiguity
+$segments = $route->segments()
+    ->with(['fromWaypoint', 'toWaypoint'])
+    ->orderBy('sequence')
+    ->get();
 
-if ($loadedSegments->isEmpty()) {
-    $this->ensureSegmentsForTour($route);
-    $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
-    $loadedSegments = $route->getRelation('segments');
-}
+// if ($segments->isEmpty()) {
+//     $this->ensureSegmentsForTour($route);
+//     $segments = $route->segments()
+//         ->with(['fromWaypoint', 'toWaypoint'])
+//         ->orderBy('sequence')
+//         ->get();
+// }
 
-// ✅ Use eager-loaded segments for building overnight segments
-$segments = $loadedSegments->sortBy('sequence');
+Log::info("🔍 Loaded " . $segments->count() . " segments from DB for " . $route->slug);
+
+// ✅ Important: Sort by sequence
+$segments = $segments->sortBy('sequence');
 
         // ============================================================
         // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER
@@ -315,7 +322,7 @@ unset($dayData);
                 'route_snapshot' => [
     'route_id' => $route->id,
     'name' => $route->name,
-    'segments' => $route->segments ? $route->segments->toArray() : $route->segments()->get()->toArray(),
+    'segments' => $route->segments()->with(['fromWaypoint', 'toWaypoint'])->get()->toArray(),
 ],
                 'validation_status' => $usedFallback ? 'fallback' : 'valid',
                 'fallback_used' => $usedFallback,
@@ -562,199 +569,221 @@ unset($dayData);
     // FALLBACK
     // ==========================================
     protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en', array $overnightSegments = []): array
-    {
-        $days = [];
-        $dayNumber = 1;
-        $maxDailyDistance = 15;
+{
+    // ✅ Always fetch fresh segments from DB with relations loaded
+    $freshSegments = $route->segments()
+        ->with(['fromWaypoint', 'toWaypoint'])
+        ->orderBy('sequence')
+        ->get();
 
-        foreach ($overnightSegments as $item) {
-            $seg = $item['segment'];
-            $from = $seg->fromWaypoint;
-            $to = $seg->toWaypoint;
-            $mergedWaypoints = $item['merged_waypoints'] ?? [];
-
-            $distance = (float) $seg->distance_km;
-            $isLongDay = $distance > $maxDailyDistance;
-
-            if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
-                $landmarkName = implode(' → ', $mergedWaypoints);
-                $title = match($locale) {
-                    'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                    'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
-                    'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                    default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                };
-                $desc = match($locale) {
-                    'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
-                    'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                    'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                    default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-                };
-            } else {
-                if (!empty($mergedWaypoints)) {
-                    $landmarkName = implode(' → ', $mergedWaypoints);
-                    $title = match($locale) {
-                        'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                        'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
-                        'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                        default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                    };
-                } else {
-                    $title = match($locale) {
-                        'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                        'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
-                        'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                        default => "Day {$dayNumber}: {$from->name} → {$to->name}",
-                    };
-                }
-                $desc = match($locale) {
-                    'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
-                    'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                    'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                    default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-                };
-            }
-
-            // FORCE HOTEL FOR TOURS
-            $service = null;
-            $isTour = $this->isTourRoute($route);
-            Log::info("🔍 isTourRoute result: " . ($isTour ? 'true' : 'false'));
-
-            if ($isTour) {
-                Log::info("🔍 Forcing hotel for tour, location_id: " . ($to->location_id ?? 'null'));
-                $service = Service::where('status', 'active')
-                    ->where('location_id', $to->location_id)
-                    ->whereHas('category', function($q) {
-                        $q->where('slug', 'hotel');
-                    })
-                    ->first();
-
-                if ($service) {
-                    Log::info("🔍 Hotel found: " . $service->name);
-                    $service = [
-                        'id' => $service->id,
-                        'name' => $service->name,
-                        'price' => (float) $service->price,
-                        'currency' => $service->currency ?? 'USD',
-                        'provider' => $service->provider->name ?? 'TravelAI Partner',
-                        'location_id' => $service->location_id,
-                    ];
-                } else {
-                    Log::info("🔍 Hotel found: NONE");
-                }
-            }
-
-            if (!$service) {
-                Log::info("🔍 Falling back to getServiceForWaypoint");
-                $service = $this->getServiceForWaypoint($to, $input);
-            }
-
-            $serviceCost = $service ? $service['price'] * 133 : 0;
-            $serviceName = $service ? $service['name'] : 'Trekking Day';
-            $serviceId = $service ? $service['id'] : null;
-            $pricingSource = $service ? 'provider_service' : 'system_estimate';
-
-            $days[] = [
-                'day_number' => $dayNumber,
-                'title' => $title,
-                'description' => $desc,
-                'overnight_waypoint_id' => $to->id,
-                'distance_km' => $distance,
-                'estimated_time_hours' => (float) $seg->estimated_time_hours,
-                'altitude_m' => $to->altitude,
-                'items' => [
-                    [
-                        'title' => $serviceName,
-                        'description' => "Trek from {$from->name} to {$to->name}",
-                        'time_of_day' => 'morning',
-                        'cost' => $serviceCost,
-                        'pricing_source' => $pricingSource,
-                        'pricing_snapshot' => null,
-                        'service_id' => $serviceId,
-                        'is_optional' => false,
-                        'metadata' => null,
-                        'provider' => $service ? $service['provider'] : null,
-                    ]
-                ]
-            ];
-            $dayNumber++;
-        }
-
-        $requestedDays = $input['days'];
-        $maxRestDays = min(3, $requestedDays - count($days));
-        $restDaysAdded = 0;
-
-        while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
-            $last = end($days);
-            $waypointId = $last['overnight_waypoint_id'] ?? null;
-            $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
-            $waypointName = $waypoint ? $waypoint->name : 'Unknown';
-
-            $altitude = $last['altitude_m'] ?? 0;
-            if ($altitude < 3000) {
-                break;
-            }
-
-            $restTitle = match($locale) {
-                'hi' => "{$waypointName} में अनुकूलन दिवस",
-                'zh' => "{$waypointName} 适应日",
-                'np' => "{$waypointName} मा अनुकूलन दिन",
-                default => "Acclimatization Day at {$waypointName}",
-            };
-
-            $days[] = [
-                'day_number' => count($days) + 1,
-                'title' => $restTitle,
-                'description' => "No trekking today. Rest and acclimatize at {$waypointName}.",
-                'overnight_waypoint_id' => $waypointId,
-                'distance_km' => 0,
-                'estimated_time_hours' => 0,
-                'altitude_m' => $altitude,
-                'items' => [
-                    [
-                        'title' => 'Rest Day',
-                        'description' => 'Rest and relax.',
-                        'time_of_day' => 'morning',
-                        'cost' => 0,
-                        'pricing_source' => 'system_estimate',
-                        'pricing_snapshot' => null,
-                        'service_id' => null,
-                        'is_optional' => false,
-                        'metadata' => null,
-                    ]
-                ]
-            ];
-            $restDaysAdded++;
-        }
-
-        while (count($days) < $requestedDays) {
-            $dayNumber = count($days) + 1;
-            $titleNoData = match($locale) {
-                'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
-                'zh' => "第 {$dayNumber} 天: 无行程数据",
-                'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
-                default => "Day {$dayNumber}: No Itinerary Data",
-            };
-            $descNoData = match($locale) {
-                'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया।",
-                'zh' => "AI 没有为此天生成数据。",
-                'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन।",
-                default => "The AI did not generate data for this day.",
-            };
-            $days[] = [
-                'day_number' => $dayNumber,
-                'title' => $titleNoData,
-                'description' => $descNoData,
-                'overnight_waypoint_id' => null,
-                'distance_km' => null,
-                'estimated_time_hours' => null,
-                'altitude_m' => null,
-                'items' => [],
-            ];
-        }
-
-        return ['days' => $days];
+    if ($freshSegments->isEmpty()) {
+        // If no segments, create a dummy one
+        $this->ensureSegmentsForTour($route);
+        $freshSegments = $route->segments()
+            ->with(['fromWaypoint', 'toWaypoint'])
+            ->orderBy('sequence')
+            ->get();
     }
+
+    $days = [];
+    $dayNumber = 1;
+    $maxDailyDistance = 15;
+
+    foreach ($freshSegments as $seg) {
+        $from = $seg->fromWaypoint;
+        $to = $seg->toWaypoint;
+
+        if (!$from || !$to) {
+            Log::warning("⚠️ Segment missing waypoint relations: route_id={$route->id}, seg_id={$seg->id}");
+            continue;
+        }
+
+        $distance = (float) $seg->distance_km;
+        $isLongDay = $distance > $maxDailyDistance;
+        $mergedWaypoints = [];
+
+        // Title & description based on locale
+        if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
+            $landmarkName = implode(' → ', $mergedWaypoints);
+            $title = match($locale) {
+                'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
+                'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+            };
+            $desc = match($locale) {
+                'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
+                'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+            };
+        } else {
+            $title = match($locale) {
+                'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
+                'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
+                default => "Day {$dayNumber}: {$from->name} → {$to->name}",
+            };
+            $desc = match($locale) {
+                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+                'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+            };
+        }
+
+        // FORCE HOTEL FOR TOURS
+$service = null;
+
+// ✅ Special case for Paragliding (high priority)
+if ($route->slug === 'pokhara-paragliding') {
+    $paraglidingService = Service::where('slug', 'paragliding-pokhara')->first();
+    if ($paraglidingService) {
+        $service = [
+            'id' => $paraglidingService->id,
+            'name' => $paraglidingService->name,
+            'price' => (float) $paraglidingService->price,
+            'currency' => $paraglidingService->currency ?? 'USD',
+            'provider' => $paraglidingService->provider->name ?? 'TravelAI Partner',
+            'location_id' => $paraglidingService->location_id,
+        ];
+        Log::info("✅ Paragliding service manually attached");
+    }
+}
+
+// ✅ For tours, try to get hotel by location
+$isTour = $this->isTourRoute($route);
+if (!$service && $isTour) {
+    $service = Service::where('status', 'active')
+        ->where('location_id', $to->location_id)
+        ->whereHas('category', function($q) {
+            $q->where('slug', 'hotel');
+        })
+        ->first();
+
+    if ($service) {
+        $service = [
+            'id' => $service->id,
+            'name' => $service->name,
+            'price' => (float) $service->price,
+            'currency' => $service->currency ?? 'USD',
+            'provider' => $service->provider->name ?? 'TravelAI Partner',
+            'location_id' => $service->location_id,
+        ];
+    }
+}
+
+// ✅ Only call getServiceForWaypoint if no service found yet AND we have a waypoint
+if (!$service && $to) {
+    $service = $this->getServiceForWaypoint($to, $input);
+}
+
+        $serviceCost = $service ? $service['price'] * 133 : 0;
+        $serviceName = $service ? $service['name'] : 'Trekking Day';
+        $serviceId = $service ? $service['id'] : null;
+        $pricingSource = $service ? 'provider_service' : 'system_estimate';
+
+        $days[] = [
+            'day_number' => $dayNumber,
+            'title' => $title,
+            'description' => $desc,
+            'overnight_waypoint_id' => $to->id,
+            'distance_km' => $distance,
+            'estimated_time_hours' => (float) $seg->estimated_time_hours,
+            'altitude_m' => $to->altitude,
+            'items' => [
+                [
+                    'title' => $serviceName,
+                    'description' => "Trek from {$from->name} to {$to->name}",
+                    'time_of_day' => 'morning',
+                    'cost' => $serviceCost,
+                    'pricing_source' => $pricingSource,
+                    'pricing_snapshot' => null,
+                    'service_id' => $serviceId,
+                    'is_optional' => false,
+                    'metadata' => null,
+                    'provider' => $service ? $service['provider'] : null,
+                ]
+            ]
+        ];
+        $dayNumber++;
+    }
+
+    $requestedDays = $input['days'];
+    $maxRestDays = min(3, $requestedDays - count($days));
+    $restDaysAdded = 0;
+
+    while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
+        $last = end($days);
+        $waypointId = $last['overnight_waypoint_id'] ?? null;
+        $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
+        $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+
+        $altitude = $last['altitude_m'] ?? 0;
+        if ($altitude < 3000) {
+            break;
+        }
+
+        $restTitle = match($locale) {
+            'hi' => "{$waypointName} में अनुकूलन दिवस",
+            'zh' => "{$waypointName} 适应日",
+            'np' => "{$waypointName} मा अनुकूलन दिन",
+            default => "Acclimatization Day at {$waypointName}",
+        };
+
+        $days[] = [
+            'day_number' => count($days) + 1,
+            'title' => $restTitle,
+            'description' => "No trekking today. Rest and acclimatize at {$waypointName}.",
+            'overnight_waypoint_id' => $waypointId,
+            'distance_km' => 0,
+            'estimated_time_hours' => 0,
+            'altitude_m' => $altitude,
+            'items' => [
+                [
+                    'title' => 'Rest Day',
+                    'description' => 'Rest and relax.',
+                    'time_of_day' => 'morning',
+                    'cost' => 0,
+                    'pricing_source' => 'system_estimate',
+                    'pricing_snapshot' => null,
+                    'service_id' => null,
+                    'is_optional' => false,
+                    'metadata' => null,
+                ]
+            ]
+        ];
+        $restDaysAdded++;
+    }
+
+    while (count($days) < $requestedDays) {
+        $dayNumber = count($days) + 1;
+        $titleNoData = match($locale) {
+            'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
+            'zh' => "第 {$dayNumber} 天: 无行程数据",
+            'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
+            default => "Day {$dayNumber}: No Itinerary Data",
+        };
+        $descNoData = match($locale) {
+            'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया।",
+            'zh' => "AI 没有为此天生成数据。",
+            'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन।",
+            default => "The AI did not generate data for this day.",
+        };
+        $days[] = [
+            'day_number' => $dayNumber,
+            'title' => $titleNoData,
+            'description' => $descNoData,
+            'overnight_waypoint_id' => null,
+            'distance_km' => null,
+            'estimated_time_hours' => null,
+            'altitude_m' => null,
+            'items' => [],
+        ];
+    }
+
+    return ['days' => $days];
+}
 
     // ==========================================
     // ✅ GET SINGLE SERVICE FOR WAYPOINT (with style filter and formatService)
@@ -920,55 +949,9 @@ unset($dayData);
     // HELPER: ensure tour segments
     // ==========================================
     protected function ensureSegmentsForTour(Route $route): void
-    {
-        $waypoints = \App\Models\Waypoint::whereHas('fromSegments', function ($q) use ($route) {
-            $q->where('route_id', $route->id);
-        })->orWhereHas('toSegments', function ($q) use ($route) {
-            $q->where('route_id', $route->id);
-        })->get();
-
-        if ($waypoints->count() >= 2) {
-            \App\Models\RouteSegment::create([
-                'route_id' => $route->id,
-                'from_waypoint_id' => $waypoints[0]->id,
-                'to_waypoint_id' => $waypoints[1]->id,
-                'sequence' => 1,
-                'distance_km' => 5.0,
-                'estimated_time_hours' => 2.0,
-                'elevation_gain_m' => 0,
-                'elevation_loss_m' => 0,
-            ]);
-            return;
-        }
-
-        $wp1 = \App\Models\Waypoint::create([
-            'name' => $route->name . ' Start',
-            'slug' => $route->slug . '-start',
-            'type' => 'village',
-            'latitude' => 28.0,
-            'longitude' => 84.0,
-            'altitude' => 1000,
-        ]);
-        $wp2 = \App\Models\Waypoint::create([
-            'name' => $route->name . ' End',
-            'slug' => $route->slug . '-end',
-            'type' => 'village',
-            'latitude' => 28.1,
-            'longitude' => 84.1,
-            'altitude' => 1100,
-        ]);
-
-        \App\Models\RouteSegment::create([
-            'route_id' => $route->id,
-            'from_waypoint_id' => $wp1->id,
-            'to_waypoint_id' => $wp2->id,
-            'sequence' => 1,
-            'distance_km' => 10.0,
-            'estimated_time_hours' => 3.0,
-            'elevation_gain_m' => 100,
-            'elevation_loss_m' => 0,
-        ]);
-    }
+{
+    // ✅ Do nothing – segments already exist from seeder/Tinker
+}
 
     protected function resolveRoute(?string $destination): ?Route
     {
