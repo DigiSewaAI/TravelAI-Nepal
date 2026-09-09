@@ -618,29 +618,59 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
         $this->command->info('✅ Simikot–Humla Tour seeded.');
 
         // ==========================================
-        // 25. BAJHANG–BAJURA TOUR
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Bajhang–Bajura Tour',
-                'slug' => 'bajhang-bajura',
-                'description' => 'Tour of Bajhang and Bajura districts in the far west of Nepal.',
-                'duration_days' => 3,
-                'max_altitude' => 1500,
-                'season' => 'Spring/Autumn',
-            ],
-            'waypoints' => [
-                ['name' => 'Bajhang', 'slug' => 'bajhang-tour', 'type' => 'village', 'lat' => 29.7123, 'lng' => 81.2345, 'alt' => 900],
-                ['name' => 'Bajura', 'slug' => 'bajura', 'type' => 'village', 'lat' => 29.6456, 'lng' => 81.4567, 'alt' => 1500],
-                ['name' => 'Bajhang', 'slug' => 'bajhang-tour-return', 'type' => 'village', 'lat' => 29.7123, 'lng' => 81.2345, 'alt' => 900],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 120, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
+// BAJHANG–BAJURA TOUR (FIXED)
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Bajhang–Bajura Tour',
+        'slug' => 'bajhang-bajura',
+        'description' => 'Tour of Bajhang and Bajura districts in the far west of Nepal.',
+        'duration_days' => 3,
+        'max_altitude' => 1500,
+        'season' => 'Spring/Autumn',
+    ],
+    'waypoints' => [
+        ['name' => 'Bajhang', 'slug' => 'bajhang-tour-start', 'type' => 'village', 'lat' => 29.7123, 'lng' => 81.2345, 'alt' => 900],
+        ['name' => 'Bajura', 'slug' => 'bajura-tour', 'type' => 'village', 'lat' => 29.6456, 'lng' => 81.4567, 'alt' => 1500],
+        ['name' => 'Bajhang', 'slug' => 'bajhang-tour-end', 'type' => 'village', 'lat' => 29.7123, 'lng' => 81.2345, 'alt' => 900],
+    ],
+    'segments' => [
+        ['from' => 'bajhang-tour-start', 'to' => 'bajura-tour', 'dist' => 80, 'time' => 4.0],
+        ['from' => 'bajura-tour', 'to' => 'bajhang-tour-end', 'dist' => 80, 'time' => 4.0],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 120, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
         $this->command->info('✅ Bajhang–Bajura Tour seeded.');
 
+        // ==========================================
+// BANDIPUR VILLAGE TOUR (FIXED)
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Bandipur Village Tour',
+        'slug' => 'bandipur',
+        'description' => 'Tour of the beautiful hilltop village of Bandipur with its Newari architecture and mountain views.',
+        'duration_days' => 2,
+        'max_altitude' => 1030,
+        'season' => 'All Year',
+    ],
+    'waypoints' => [
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-bandipur', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+        ['name' => 'Bandipur', 'slug' => 'bandipur-tour', 'type' => 'village', 'lat' => 27.9123, 'lng' => 84.4123, 'alt' => 1030],
+        ['name' => 'Kathmandu', 'slug' => 'kathmandu-bandipur-return', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
+    ],
+    'segments' => [
+        ['from' => 'kathmandu-bandipur', 'to' => 'bandipur-tour', 'dist' => 130, 'time' => 6.0],
+        ['from' => 'bandipur-tour', 'to' => 'kathmandu-bandipur-return', 'dist' => 130, 'time' => 6.0],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
         $this->command->info('🎉 City & Cultural Tours Complete! 25 destinations seeded.');
     }
 }
