@@ -12,13 +12,15 @@ class Route extends Model
 
     protected $fillable = [
         'name', 'slug', 'description', 'difficulty',
-        'duration_days', 'max_altitude', 'season', 'is_active'
+        'duration_days', 'max_altitude', 'season', 'is_active', 'segments',
     ];
 
     protected $casts = [
         'duration_days' => 'integer',
         'max_altitude' => 'integer',
         'is_active' => 'boolean',
+        'segments' => 'array',
+
     ];
 
     public function segments()

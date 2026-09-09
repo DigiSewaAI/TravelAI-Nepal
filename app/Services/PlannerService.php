@@ -37,13 +37,20 @@ class PlannerService
             throw ValidationException::withMessages(['destination' => 'Route not found.']);
         }
 
-        $route->refresh();
-        $route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
+        // ✅ Load segments with relations
+$route->load(['segments.fromWaypoint', 'segments.toWaypoint', 'costs']);
 
-        if ($route->segments->isEmpty()) {
-            $this->ensureSegmentsForTour($route);
-            $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
-        }
+// ✅ Use the loaded relation (not the JSON attribute)
+$loadedSegments = $route->getRelation('segments');
+
+if ($loadedSegments->isEmpty()) {
+    $this->ensureSegmentsForTour($route);
+    $route->load(['segments.fromWaypoint', 'segments.toWaypoint']);
+    $loadedSegments = $route->getRelation('segments');
+}
+
+// ✅ Use eager-loaded segments for building overnight segments
+$segments = $loadedSegments->sortBy('sequence');
 
         // ============================================================
         // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER
@@ -52,7 +59,6 @@ class PlannerService
         $dayNumber = 1;
         $mergedSegment = null;
         $mergedWaypoints = [];
-        $segments = $route->segments()->orderBy('sequence')->get();
 
         foreach ($segments as $segment) {
             $toWaypoint = $segment->toWaypoint;
@@ -307,10 +313,10 @@ unset($dayData);
                 'model_version' => 'latest',
                 'prompt_version' => 'v4',
                 'route_snapshot' => [
-                    'route_id' => $route->id,
-                    'name' => $route->name,
-                    'segments' => $route->segments->toArray(),
-                ],
+    'route_id' => $route->id,
+    'name' => $route->name,
+    'segments' => $route->segments ? $route->segments->toArray() : $route->segments()->get()->toArray(),
+],
                 'validation_status' => $usedFallback ? 'fallback' : 'valid',
                 'fallback_used' => $usedFallback,
                 'validation_errors' => null,

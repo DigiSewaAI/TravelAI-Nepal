@@ -33,9 +33,14 @@ class ItineraryValidator
             ]);
         }
 
-        $validWaypointIds = $route->segments->pluck('from_waypoint_id')
-            ->merge($route->segments->pluck('to_waypoint_id'))
-            ->unique()->toArray();
+        // ✅ Get segments safely (fix: handle null/empty)
+$segments = $route->segments()->get();
+$validWaypointIds = [];
+if ($segments->isNotEmpty()) {
+    $validWaypointIds = $segments->pluck('from_waypoint_id')
+        ->merge($segments->pluck('to_waypoint_id'))
+        ->unique()->toArray();
+}
 
         $dayServicesMap = $context['day_services'] ?? [];
         $hasValidDays = false;
