@@ -368,33 +368,101 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
             ],
+                'segments' => [
+        ['from' => 'janakpur', 'to' => 'janaki-temple', 'dist' => 0.5, 'time' => 0.2],
+        ['from' => 'janaki-temple', 'to' => 'vivaha-mandap', 'dist' => 0.3, 'time' => 0.1],
+    ],
         ]);
         $this->command->info('✅ Janakpur Tour seeded.');
 
         // ==========================================
-        // 15. MUKTINATH TEMPLE TOUR
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Muktinath Temple Tour',
-                'slug' => 'muktinath-temple-tour',
-                'description' => 'Tour of the sacred Muktinath Temple, a pilgrimage site for both Hindus and Buddhists.',
-                'duration_days' => 2,
-                'max_altitude' => 3800,
-                'season' => 'Spring/Autumn',
-            ],
-            'waypoints' => [
-                ['name' => 'Pokhara', 'slug' => 'pokhara-muktinath', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Jomsom', 'slug' => 'jomsom-muktinath-tour', 'type' => 'village', 'lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
-                ['name' => 'Muktinath Temple', 'slug' => 'muktinath-temple', 'type' => 'landmark', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Jomsom)', 'amount' => 150, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Muktinath Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
-                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
+// 15. MUKTINATH TEMPLE TOUR
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Muktinath Temple Tour',
+        'slug' => 'muktinath-temple-tour',
+        'description' => 'Tour of the sacred Muktinath Temple, a pilgrimage site for both Hindus and Buddhists.',
+        'duration_days' => 2,
+        'max_altitude' => 3800,
+        'season' => 'Spring/Autumn',
+    ],
+    'waypoints' => [
+        ['name' => 'Pokhara', 'slug' => 'pokhara-muktinath', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+        ['name' => 'Jomsom', 'slug' => 'jomsom-muktinath-tour', 'type' => 'village', 'lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
+        ['name' => 'Muktinath Temple', 'slug' => 'muktinath-temple', 'type' => 'landmark', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Jomsom)', 'amount' => 150, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Muktinath Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
+        ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+    'segments' => [
+        ['from' => 'pokhara-muktinath', 'to' => 'jomsom-muktinath-tour', 'dist' => 180, 'time' => 8.0],
+        ['from' => 'jomsom-muktinath-tour', 'to' => 'muktinath-temple', 'dist' => 30, 'time' => 2.0],
+    ],
+]);
         $this->command->info('✅ Muktinath Temple Tour seeded.');
+        // ==========================================
+// 25. PALPA (TANSEN & RANI MAHAL) TOUR
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Palpa (Tansen, Rani Mahal) Tour',
+        'slug' => 'palpa-tour',
+        'description' => 'Explore the historic hill town of Tansen and the beautiful Rani Mahal palace.',
+        'duration_days' => 2,
+        'max_altitude' => 1350,
+        'season' => 'All Year',
+    ],
+    'waypoints' => [
+        ['name' => 'Pokhara', 'slug' => 'pokhara-palpa', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+        ['name' => 'Tansen', 'slug' => 'tansen-palpa', 'type' => 'village', 'lat' => 27.8689, 'lng' => 83.5467, 'alt' => 1350],
+        ['name' => 'Rani Mahal', 'slug' => 'rani-mahal', 'type' => 'landmark', 'lat' => 27.8045, 'lng' => 83.4912, 'alt' => 500],
+        ['name' => 'Tansen', 'slug' => 'tansen-return-palpa', 'type' => 'village', 'lat' => 27.8689, 'lng' => 83.5467, 'alt' => 1350],
+        ['name' => 'Pokhara', 'slug' => 'pokhara-return-palpa', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+    ],
+    'segments' => [
+        ['from' => 'pokhara-palpa', 'to' => 'tansen-palpa', 'dist' => 80, 'time' => 4.0],
+        ['from' => 'tansen-palpa', 'to' => 'rani-mahal', 'dist' => 25, 'time' => 1.5],
+        ['from' => 'rani-mahal', 'to' => 'tansen-return-palpa', 'dist' => 25, 'time' => 1.5],
+        ['from' => 'tansen-return-palpa', 'to' => 'pokhara-return-palpa', 'dist' => 80, 'time' => 4.0],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Tansen)', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Rani Mahal Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
+        ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
+$this->command->info('✅ Palpa Tour seeded.');
+
+// ==========================================
+// 26. TANSEN HILL TOWN TOUR
+// ==========================================
+$this->helper->seedTour([
+    'route' => [
+        'name' => 'Tansen Hill Town Tour',
+        'slug' => 'tansen-hill-town-tour',
+        'description' => 'Discover the charming hill town of Tansen with its Newari architecture and panoramic mountain views.',
+        'duration_days' => 2,
+        'max_altitude' => 1350,
+        'season' => 'All Year',
+    ],
+    'waypoints' => [
+        ['name' => 'Pokhara', 'slug' => 'pokhara-tansen', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+        ['name' => 'Tansen', 'slug' => 'tansen-town', 'type' => 'village', 'lat' => 27.8689, 'lng' => 83.5467, 'alt' => 1350],
+        ['name' => 'Pokhara', 'slug' => 'pokhara-tansen-return', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+    ],
+    'segments' => [
+        ['from' => 'pokhara-tansen', 'to' => 'tansen-town', 'dist' => 80, 'time' => 4.0],
+        ['from' => 'tansen-town', 'to' => 'pokhara-tansen-return', 'dist' => 80, 'time' => 4.0],
+    ],
+    'costs' => [
+        ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Tansen)', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
+        ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
+    ],
+]);
+$this->command->info('✅ Tansen Hill Town Tour seeded.');
 
         // ==========================================
         // 16. JOMSOM–KAGBENI–MUKTINATH TOUR
@@ -671,6 +739,6 @@ $this->helper->seedTour([
         ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
     ],
 ]);
-        $this->command->info('🎉 City & Cultural Tours Complete! 25 destinations seeded.');
+        $this->command->info('🎉 City & Cultural Tours Complete! 27 destinations seeded.');
     }
 }
