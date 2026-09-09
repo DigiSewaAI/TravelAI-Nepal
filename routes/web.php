@@ -148,12 +148,18 @@ Route::prefix('provider')->name('provider.')->group(function () {
     Route::post('/quotation/generate', [App\Http\Controllers\Provider\QuotationController::class, 'generate'])->name('quotation.generate');
 
     // Quotation Requests
-    Route::prefix('quotation-requests')->name('quotation-requests.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
-        Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
-        Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
-        Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
-    });
+Route::prefix('quotation-requests')->name('quotation-requests.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Provider\QuotationRequestController::class, 'index'])->name('index');
+    Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
+    Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
+    Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
+    
+    // ✅ NEW ROUTES
+    Route::get('/{quotationRequest}/edit', [App\Http\Controllers\Provider\QuotationRequestController::class, 'edit'])->name('edit');
+    Route::put('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'update'])->name('update');
+    Route::get('/{quotationRequest}/preview', [App\Http\Controllers\Provider\QuotationRequestController::class, 'preview'])->name('preview');
+    Route::post('/{quotationRequest}/send', [App\Http\Controllers\Provider\QuotationRequestController::class, 'send'])->name('send');
+});
 });
 // Provider profile page (old, but keep for now)
 Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->name('public.provider.profile');

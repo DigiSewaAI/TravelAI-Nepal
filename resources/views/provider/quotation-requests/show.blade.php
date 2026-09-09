@@ -116,26 +116,72 @@
         @endif
     </div>
 
-    {{-- Quotation Section: Generate OR Show + Send Email --}}
-    @if($quotationRequest->status === 'completed')
+    {{-- =============================================== --}}
+    {{-- QUOTATION SECTION --}}
+    {{-- =============================================== --}}
+
+    @if(!empty($quotationRequest->quotation_data))
         {{-- Quotation Already Generated --}}
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-bold mb-4 text-green-600">✅ Quotation Generated</h3>
-            <div class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono">
-                {{ $quotationRequest->quotation_text ?? 'Quotation not available.' }}
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">📄 Quotation</h3>
+                <span class="px-3 py-1 text-sm rounded-full
+                    @if($quotationRequest->quotation_status === 'draft') bg-gray-100 text-gray-800
+                    @elseif($quotationRequest->quotation_status === 'reviewed') bg-blue-100 text-blue-800
+                    @elseif($quotationRequest->quotation_status === 'edited') bg-yellow-100 text-yellow-800
+                    @elseif($quotationRequest->quotation_status === 'sent') bg-green-100 text-green-800
+                    @else bg-gray-100 text-gray-800 @endif">
+                    {{ ucfirst($quotationRequest->quotation_status) }}
+                </span>
             </div>
-            {{-- Send Email Button --}}
-            <div class="mt-4">
-                <form action="{{ route('provider.quotation-requests.send-email', $quotationRequest) }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
-                        <i class="fas fa-envelope"></i> Send Email to Traveler
-                    </button>
-                </form>
-            </div>
+
+            @if($quotationRequest->quotation_status === 'sent')
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <p class="text-green-700">
+                        <i class="fas fa-check-circle"></i> 
+                        Sent on {{ $quotationRequest->sent_at ? \Carbon\Carbon::parse($quotationRequest->sent_at)->format('M d, Y H:i') : 'N/A' }}
+                    </p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono">
+                    {{ $quotationRequest->quotation_text ?? 'Quotation not available.' }}
+                </div>
+            @else
+                {{-- Show Quotation Text (if exists) --}}
+                <div class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono mb-4">
+                    @if($quotationRequest->quotation_text)
+                        {{ $quotationRequest->quotation_text }}
+                    @else
+                        Quotation not available.
+                    @endif
+                </div>
+
+                {{-- Actions --}}
+                <div class="flex gap-3 flex-wrap">
+                    <a href="{{ route('provider.quotation-requests.edit', $quotationRequest) }}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-edit"></i> Edit Quotation
+                    </a>
+                    <a href="{{ route('provider.quotation-requests.preview', $quotationRequest) }}" 
+                       target="_blank"
+                       class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-eye"></i> Preview
+                    </a>
+                    <form action="{{ route('provider.quotation-requests.send', $quotationRequest) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Send this quotation to the traveler?')"
+                                class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
+                            <i class="fas fa-envelope"></i> Send to Traveler
+                        </button>
+                    </form>
+                    <a href="{{ route('provider.quotation-requests.index') }}" 
+                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+                        ← Back to Requests
+                    </a>
+                </div>
+            @endif
         </div>
     @else
-        {{-- Generate Quotation Form --}}
+        {{-- No Quotation Generated Yet --}}
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-bold mb-4">Generate Quotation</h3>
             <p class="text-sm text-gray-500 mb-4">AI will use the itinerary above to generate a professional quotation.</p>

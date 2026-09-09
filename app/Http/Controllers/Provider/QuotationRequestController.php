@@ -215,7 +215,7 @@ Ensure the grand_total is the sum of all item totals.**";
     /**
      * Format AI response into readable quotation text.
      */
-    private function formatQuotationText(array $quotationData, $provider, $quotationRequest): string
+    public function formatQuotationText(array $quotationData, $provider, $quotationRequest): string
     {
         $travelerName = $quotationRequest->traveler_name ?? $quotationRequest->traveler->name ?? 'Traveler';
         
@@ -295,14 +295,18 @@ Ensure the grand_total is the sum of all item totals.**";
             $content .= "\n";
         }
         
-        if (isset($q['contact_information'])) {
-            $c = $q['contact_information'];
-            $content .= "CONTACT US\n----------\n";
-            $content .= "Email: " . ($c['email'] ?? 'N/A') . "\n";
-            $content .= "Phone: " . ($c['phone'] ?? 'N/A') . "\n";
-            $content .= "Website: " . ($c['website'] ?? 'N/A') . "\n";
-            $content .= "Address: " . ($c['address'] ?? 'N/A') . "\n";
-        }
+        // ✅ Contact Information – provider fallback if N/A
+$c = $q['contact_information'] ?? [];
+$email = ($c['email'] ?? 'N/A') !== 'N/A' ? $c['email'] : ($provider->contact_email ?? 'N/A');
+$phone = ($c['phone'] ?? 'N/A') !== 'N/A' ? $c['phone'] : ($provider->contact_phone ?? 'N/A');
+$website = ($c['website'] ?? 'N/A') !== 'N/A' ? $c['website'] : ($provider->website ?? 'N/A');
+$address = ($c['address'] ?? 'N/A') !== 'N/A' ? $c['address'] : ($provider->address ?? 'N/A');
+
+$content .= "CONTACT US\n----------\n";
+$content .= "Email: {$email}\n";
+$content .= "Phone: {$phone}\n";
+$content .= "Website: {$website}\n";
+$content .= "Address: {$address}\n";
         
         return $content;
     }
@@ -382,4 +386,279 @@ Ensure the grand_total is the sum of all item totals.**";
             return back()->with('error', 'Failed to send email. Please try again.');
         }
     }
+    /**
+ * Check if the current provider owns this quotation request.
+ */
+private function authorizeProvider(QuotationRequest $request): void
+{
+    $provider = Auth::user()->getCurrentProvider();
+    if (!$provider || $request->provider_id !== $provider->id) {
+        abort(403, 'Unauthorized.');
+    }
+}
+/**
+ * Show the quotation edit form.
+ */
+public function edit(QuotationRequest $quotationRequest)
+{
+    $this->authorizeProvider($quotationRequest);
+    
+    if ($quotationRequest->isQuotationSent()) {
+        abort(403, 'Quotation already sent. Cannot edit.');
+    }
+    
+    // AI draft
+    $draft = $quotationRequest->quotation_data['quotation'] ?? [];
+    
+    // Final quotation – handle both structures
+    if ($quotationRequest->quotation_final) {
+        $finalWrapper = $quotationRequest->quotation_final;
+        $final = $finalWrapper['quotation'] ?? [];
+        
+        // If cost_breakdown wrapper exists, use it; otherwise use root
+        if (isset($final['cost_breakdown']) && is_array($final['cost_breakdown'])) {
+            $final = $final;
+        }
+        // else: $final already has items at root
+    } else {
+        $final = $draft;
+    }
+    
+    // Ensure items exist
+    if (!isset($final['cost_breakdown']) && isset($final['items'])) {
+        // Items are at root – wrap them
+        $final['cost_breakdown'] = [
+            'items' => $final['items'],
+            'grand_total' => $final['grand_total'] ?? 0,
+            'currency' => $final['currency'] ?? 'USD',
+        ];
+        unset($final['items']);
+    }
+    
+    return view('provider.quotation-requests.edit', compact(
+        'quotationRequest', 'draft', 'final'
+    ));
+}
+/**
+ * Update the quotation with provider edits.
+ */
+public function update(Request $request, QuotationRequest $quotationRequest)
+{
+    $this->authorizeProvider($quotationRequest);
+    
+    if ($quotationRequest->isQuotationSent()) {
+        return response()->json(['error' => 'Quotation already sent.'], 403);
+    }
+    
+    $validated = $request->validate([
+        'items' => 'required|array|min:1',
+        'items.*.description' => 'required|string|max:255',
+        'items.*.per_person' => 'required|numeric|min:0',
+        'items.*.quantity' => 'nullable|integer|min:1',
+        'discount' => 'nullable|numeric|min:0',
+        'terms' => 'nullable|array',
+        'terms.*' => 'nullable|string|max:500',
+        'special_notes' => 'nullable|string|max:1000',
+    ]);
+    
+    // Recalculate
+    $recalculated = $this->recalculateQuotation(
+        $validated['items'],
+        $validated['discount'] ?? 0
+    );
+    
+    // Build final data with cost_breakdown structure
+    $draft = $quotationRequest->quotation_data['quotation'] ?? [];
+    $finalData = [
+        'greeting' => $draft['greeting'] ?? '',
+        'overview' => $draft['overview'] ?? '',
+        'day_by_day_breakdown' => $draft['day_by_day_breakdown'] ?? [],
+        'cost_breakdown' => $recalculated,
+        'terms_and_conditions' => $validated['terms'] ?? $draft['terms_and_conditions'] ?? [],
+        'special_notes' => $validated['special_notes'] ?? '',
+        'contact_information' => [
+            'email' => $quotationRequest->provider->contact_email ?? 'N/A',
+            'phone' => $quotationRequest->provider->contact_phone ?? 'N/A',
+            'website' => $quotationRequest->provider->website ?? 'N/A',
+            'address' => $quotationRequest->provider->address ?? 'N/A',
+        ],
+    ];
+    
+    $quotationWrapper = ['quotation' => $finalData];
+    
+    $quotationRequest->quotation_final = $quotationWrapper;
+    $quotationRequest->quotation_status = 'edited';
+    $quotationRequest->edited_at = now();
+    $quotationRequest->edited_by = auth()->id();
+    $quotationRequest->quotation_text = $this->formatQuotationText(
+        $quotationWrapper,
+        $quotationRequest->provider,
+        $quotationRequest
+    );
+    $quotationRequest->save();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Quotation updated successfully.',
+        'quotation_text' => $quotationRequest->quotation_text,
+    ]);
+}
+/**
+ * Preview the quotation as it will appear in email.
+ */
+public function preview(QuotationRequest $quotationRequest)
+{
+    $this->authorizeProvider($quotationRequest);
+    
+    $provider = Auth::user()->getCurrentProvider();
+    
+    // Use final if exists, otherwise draft
+    if ($quotationRequest->quotation_final) {
+        $finalData = $quotationRequest->quotation_final;
+        $quotationText = $quotationRequest->quotation_text;
+    } else {
+        $draft = $quotationRequest->quotation_data['quotation'] ?? [];
+        $finalData = ['quotation' => $draft];
+        $quotationText = $this->formatQuotationText(
+            $finalData,
+            $provider,
+            $quotationRequest
+        );
+    }
+    
+    return view('emails.quotation', [
+        'quotationRequest' => $quotationRequest,
+        'quotationText' => $quotationText,
+        'provider' => $provider,
+        'travelerName' => $quotationRequest->traveler_name ?? 'Traveler',
+        'preview' => true, // Preview mode (can hide "Visit TravelAI Nepal" button if needed)
+    ]);
+}
+/**
+ * Send the final quotation to the traveler.
+ */
+public function send(Request $request, QuotationRequest $quotationRequest)
+{
+    $this->authorizeProvider($quotationRequest);
+    
+    if ($quotationRequest->isQuotationSent()) {
+        return response()->json(['error' => 'Quotation already sent.'], 403);
+    }
+    
+    $provider = Auth::user()->getCurrentProvider();
+    
+    // If no final exists, use draft as final (provider made no changes)
+    if (!$quotationRequest->quotation_final) {
+        $draft = $quotationRequest->quotation_data['quotation'] ?? [];
+        
+        // Validate draft has items
+        if (empty($draft['cost_breakdown']['items'])) {
+            return response()->json([
+                'error' => 'No quotation data found. Please generate AI quotation first.'
+            ], 400);
+        }
+        
+        // Wrap and save as final
+        $finalData = $this->recalculateQuotation(
+            $draft['cost_breakdown']['items'] ?? [],
+            0
+        );
+        $finalData['greeting'] = $draft['greeting'] ?? '';
+        $finalData['overview'] = $draft['overview'] ?? '';
+        $finalData['day_by_day_breakdown'] = $draft['day_by_day_breakdown'] ?? [];
+        $finalData['terms_and_conditions'] = $draft['terms_and_conditions'] ?? [];
+        $finalData['contact_information'] = $draft['contact_information'] ?? [];
+        
+        $quotationRequest->quotation_final = ['quotation' => $finalData];
+        $quotationRequest->quotation_status = 'reviewed';
+        $quotationRequest->quotation_text = $this->formatQuotationText(
+            ['quotation' => $finalData],
+            $provider,
+            $quotationRequest
+        );
+        $quotationRequest->save();
+    }
+    
+    // ✅ Recalculate server-side (security: trust nothing from client)
+    $finalWrapper = $quotationRequest->quotation_final;
+    $finalData = $finalWrapper['quotation'] ?? [];
+    
+    $recalculated = $this->recalculateQuotation(
+        $finalData['cost_breakdown']['items'] ?? [],
+        $finalData['discount'] ?? 0
+    );
+    $finalData['cost_breakdown']['items'] = $recalculated['items'];
+    $finalData['cost_breakdown']['grand_total'] = $recalculated['grand_total'];
+    $finalData['discount'] = $recalculated['discount'];
+    
+    // Re-wrap
+    $quotationRequest->quotation_final = ['quotation' => $finalData];
+    
+    // Regenerate text
+    $quotationRequest->quotation_text = $this->formatQuotationText(
+        ['quotation' => $finalData],
+        $provider,
+        $quotationRequest
+    );
+    $quotationRequest->save();
+    
+    // ✅ Send email FIRST
+    $email = $quotationRequest->traveler_email ?? $quotationRequest->traveler->email ?? null;
+    if (!$email) {
+        return response()->json(['error' => 'No traveler email address found.'], 400);
+    }
+    
+    try {
+        Mail::to($email)->send(new \App\Mail\QuotationMail($quotationRequest));
+    } catch (\Exception $e) {
+        \Log::error('Quotation email failed: ' . $e->getMessage(), [
+            'quotation_request_id' => $quotationRequest->id,
+        ]);
+        return response()->json([
+            'error' => 'Email sending failed. Please try again.',
+            'debug' => config('app.debug') ? $e->getMessage() : null,
+        ], 500);
+    }
+    
+    // ✅ Only now mark as sent
+$quotationRequest->quotation_status = 'sent';
+$quotationRequest->sent_at = now(); // ✅ Laravel helper le Carbon instance फर्काउँछ
+$quotationRequest->save();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Quotation sent successfully to traveler.',
+    ]);
+}
+/**
+ * Recalculate totals server-side.
+ * This is a security method – never trust client-calculated totals.
+ */
+private function recalculateQuotation(array $items, float $discount = 0): array
+{
+    $total = 0;
+    $currency = 'USD';
+    
+    foreach ($items as &$item) {
+        $quantity = $item['quantity'] ?? 1;
+        $perPerson = (float) $item['per_person'];
+        $total = (float) ($perPerson * $quantity);
+        
+        $item['total'] = round($total, 2);
+        $item['quantity'] = (int) $quantity;
+        $item['per_person'] = round($perPerson, 2);
+    }
+    
+    $subtotal = array_sum(array_column($items, 'total'));
+    $grandTotal = round($subtotal - $discount, 2);
+    if ($grandTotal < 0) $grandTotal = 0;
+    
+    return [
+        'items' => $items,
+        'currency' => $currency,
+        'subtotal' => round($subtotal, 2),
+        'discount' => round($discount, 2),
+        'grand_total' => $grandTotal,
+    ];
+}
 }

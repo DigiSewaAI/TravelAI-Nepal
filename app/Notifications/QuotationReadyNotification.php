@@ -27,10 +27,24 @@ class QuotationReadyNotification extends Notification
 {
     $quotationRequest = $this->quotationRequest;
     $quotationText = $quotationRequest->quotation_text;
+    
+    // If no text, generate from final or data
+    if (empty($quotationText)) {
+        if ($quotationRequest->quotation_final) {
+            $controller = app(\App\Http\Controllers\Provider\QuotationRequestController::class);
+            $quotationText = $controller->formatQuotationText(
+                $quotationRequest->quotation_final,
+                $quotationRequest->provider,
+                $quotationRequest
+            );
+        } else {
+            $quotationText = $quotationRequest->quotation_text ?? 'Quotation not available.';
+        }
+    }
 
     return (new MailMessage)
         ->subject('📄 Your Quotation is Ready!')
-        ->greeting('Hello ' . ($quotationRequest->traveler_name ?? $quotationRequest->traveler->name ?? 'Traveler') . '!')
+        ->greeting('Hello ' . ($quotationRequest->traveler_name ?? 'Traveler') . '!')
         ->line("Your quotation from **{$quotationRequest->provider->name}** is ready.")
         ->line("Please find the quotation details below:")
         ->line('')
@@ -38,13 +52,4 @@ class QuotationReadyNotification extends Notification
         ->action('View Quotation', route('traveler.dashboard'))
         ->line('Thank you for using TravelAI Nepal!');
 }
-
-    public function toArray($notifiable)
-    {
-        return [
-            'quotation_request_id' => $this->quotationRequest->id,
-            'provider_name' => $this->quotationRequest->provider->name,
-            'message' => 'Your quotation is ready.',
-        ];
-    }
 }
