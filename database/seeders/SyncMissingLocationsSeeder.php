@@ -9,28 +9,42 @@ use App\Models\ServiceCategory;
 use App\Models\Provider;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SyncMissingLocationsSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('🔍 Syncing missing locations for overnight waypoints...');
+        $this->command->info('🔍 Syncing missing locations & fixing overnight flags...');
 
-        // Get all overnight waypoints without location_id
+        // 1️⃣ Landmark type → is_overnight_stop = false
+        $landmarks = Waypoint::where('type', 'landmark')
+            ->where('is_overnight_stop', true)
+            ->get();
+
+        $this->command->info("📌 Found {$landmarks->count()} landmarks marked as overnight. Setting to false...");
+        foreach ($landmarks as $waypoint) {
+            $waypoint->is_overnight_stop = false;
+            $waypoint->save();
+        }
+
+        // 2️⃣ Habitable (village/neighborhood) waypoints without location_id
         $waypoints = Waypoint::whereNull('location_id')
+            ->whereIn('type', ['village', 'neighborhood'])
             ->where('is_overnight_stop', true)
             ->get();
 
         $total = $waypoints->count();
-        $this->command->info("📊 Found {$total} overnight waypoints without location_id.");
+        $this->command->info("📊 Found {$total} habitable overnight waypoints without location_id.");
 
         if ($total === 0) {
-            $this->command->info('✅ All overnight waypoints already have location_id!');
+            $this->command->info('✅ All habitable overnight waypoints already have location_id!');
+            // Still we have fixed landmarks
+            $this->command->info("✅ Landmarks set to non-overnight: {$landmarks->count()}");
             return;
         }
 
-        // Ensure we have a remote provider for services
+        // Ensure provider exists (without email column)
         $user = User::firstOrCreate(
             ['email' => 'remote-providers@travelai.com'],
             [
@@ -40,7 +54,6 @@ class SyncMissingLocationsSeeder extends Seeder
             ]
         );
 
-        // ✅ FIX: Provider doesn't have email column; find by user_id
         $provider = Provider::where('user_id', $user->id)->first();
         if (!$provider) {
             $provider = Provider::create([
@@ -87,18 +100,18 @@ class SyncMissingLocationsSeeder extends Seeder
             $waypoint->save();
             $updated++;
 
-            // Ensure there is at least one hotel service for this location
+            // Ensure hotel service exists
             $service = Service::where('location_id', $location->id)
                 ->where('service_category_id', $hotelCat->id)
                 ->first();
 
             if (!$service) {
-                // Create a basic mid-range lodge
+                $slug = Str::slug($cityName) . '-mid-range-lodge';
                 Service::create([
                     'provider_id' => $provider->id,
                     'service_category_id' => $hotelCat->id,
                     'name' => "{$cityName} Mid-Range Lodge",
-                    'slug' => strtolower(str_replace(' ', '-', $cityName)) . '-mid-range-lodge',
+                    'slug' => $slug,
                     'description' => "Mid-range lodge at {$cityName}",
                     'price' => 25,
                     'currency' => 'USD',
@@ -113,6 +126,7 @@ class SyncMissingLocationsSeeder extends Seeder
         $this->command->info("✅ Sync completed!");
         $this->command->info("   📌 Locations created: {$created}");
         $this->command->info("   📌 Waypoints updated: {$updated}");
+        $this->command->info("   📌 Landmarks set to non-overnight: {$landmarks->count()}");
     }
 
     private function guessState(string $city): string
@@ -163,6 +177,20 @@ class SyncMissingLocationsSeeder extends Seeder
             'Nar Phu' => 'Manang',
             'Tilicho Lake' => 'Manang',
             'Kang La Pass' => 'Manang',
+            'Dole' => 'Solukhumbu',
+            'Machhermo' => 'Solukhumbu',
+            'Gokyo' => 'Solukhumbu',
+            'Kande' => 'Gandaki',
+            'Bandipur' => 'Gandaki',
+            'Dharan' => 'Koshi',
+            'Dhankuta' => 'Koshi',
+            'Bhedetar' => 'Koshi',
+            'Biratnagar' => 'Koshi',
+            'Butwal' => 'Lumbini',
+            'Siddharthanagar' => 'Lumbini',
+            'Surkhet' => 'Karnali',
+            'Birendranagar' => 'Karnali',
+            'Kalikot' => 'Karnali',
         ];
         return $map[$city] ?? 'Bagmati';
     }
