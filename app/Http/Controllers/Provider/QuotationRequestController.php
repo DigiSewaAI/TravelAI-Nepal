@@ -77,19 +77,42 @@ class QuotationRequestController extends Controller
             $prompt = $this->buildQuotationPrompt($quotationRequest, $provider);
 
             // Generate with extraction disabled, higher max_tokens (6000)
-            $response = $this->llm->generateItinerary($prompt, 'en', 'qwen/qwen3.6-27b', false, 6000);
+            $response = $this->llm->generateItinerary($prompt, 'en', 'openai/gpt-oss-20b', false, 8000);
 
             $rawContent = is_array($response) && isset($response['content']) ? $response['content'] : (string) $response;
 
             $quotationData = $this->extractQuotationJson($rawContent);
 
-            $quotationText = $this->formatQuotationText($quotationData, $provider, $quotationRequest);
+// ✅ Rebuild day_by_day_breakdown from ORIGINAL itinerary (not AI)
+$itineraryDays = $quotationRequest->itinerary_data['days'] ?? [];
+$dayBreakdown = [];
+foreach ($itineraryDays as $day) {
+    $services = [];
+    if (!empty($day['items']) && is_array($day['items'])) {
+        foreach ($day['items'] as $item) {
+            $services[] = $item['title'] ?? 'Service';
+        }
+    }
+    $dayBreakdown[] = [
+        'day' => $day['day_number'] ?? 0,
+        'route' => $day['title'] ?? '',
+        'description' => $day['description'] ?? '',
+        'services_included' => $services,
+    ];
+}
 
-            $quotationRequest->update([
-                'status' => 'completed',
-                'quotation_data' => $quotationData,
-                'quotation_text' => $quotationText,
-            ]);
+// Add day_by_day_breakdown to quotation data (if not already present)
+if (empty($quotationData['quotation']['day_by_day_breakdown'])) {
+    $quotationData['quotation']['day_by_day_breakdown'] = $dayBreakdown;
+}
+
+$quotationText = $this->formatQuotationText($quotationData, $provider, $quotationRequest);
+
+$quotationRequest->update([
+    'status' => 'completed',
+    'quotation_data' => $quotationData,
+    'quotation_text' => $quotationText,
+]);
 
             if ($quotationRequest->traveler) {
                 try {
@@ -124,52 +147,53 @@ class QuotationRequestController extends Controller
      * Build the AI prompt using itinerary data.
      */
     private function buildQuotationPrompt(QuotationRequest $request, $provider): string
-    {
-        $itinerary = $request->itinerary_data;
-        $input = $request->traveler_input;
+{
+    $itinerary = $request->itinerary_data;
+    $input = $request->traveler_input;
 
-        // Extract group size from message
-        $groupSize = 1;
-        if ($request->message) {
-            preg_match('/(\d+)\s*pax/i', $request->message, $matches);
-            if (!empty($matches[1])) {
-                $groupSize = (int) $matches[1];
-            }
+    // Extract group size from message
+    $groupSize = 1;
+    if ($request->message) {
+        preg_match('/(\d+)\s*pax/i', $request->message, $matches);
+        if (!empty($matches[1])) {
+            $groupSize = (int) $matches[1];
         }
-        if ($groupSize === 1 && $request->message) {
-            preg_match('/(\d+)\s*people/i', $request->message, $matches);
-            if (!empty($matches[1])) {
-                $groupSize = (int) $matches[1];
-            }
+    }
+    if ($groupSize === 1 && $request->message) {
+        preg_match('/(\d+)\s*people/i', $request->message, $matches);
+        if (!empty($matches[1])) {
+            $groupSize = (int) $matches[1];
         }
+    }
 
-        $daysText = '';
-        if (isset($itinerary['days'])) {
-            foreach ($itinerary['days'] as $day) {
-                $daysText .= "Day {$day['day_number']}: {$day['title']}\n";
-                if (!empty($day['description'])) {
-                    $daysText .= "  Description: {$day['description']}\n";
+    $daysText = '';
+    if (isset($itinerary['days'])) {
+        foreach ($itinerary['days'] as $day) {
+            $daysText .= "Day {$day['day_number']}: {$day['title']}\n";
+            if (!empty($day['description'])) {
+                $daysText .= "  Description: {$day['description']}\n";
+            }
+            if (isset($day['items'])) {
+                foreach ($day['items'] as $item) {
+                    $daysText .= "  - {$item['title']}" . (!empty($item['description']) ? ": {$item['description']}" : '') . "\n";
                 }
-                if (isset($day['items'])) {
-                    foreach ($day['items'] as $item) {
-                        $daysText .= "  - {$item['title']}" . (!empty($item['description']) ? ": {$item['description']}" : '') . "\n";
-                    }
-                }
-                $daysText .= "\n";
             }
+            $daysText .= "\n";
         }
+    }
 
-        $services = $provider->services()->where('status', 'active')->pluck('name')->join(', ') ?: 'Various services available';
+    $services = $provider->services()->where('status', 'active')->pluck('name')->join(', ') ?: 'Various services available';
 
-        return "Generate a professional quotation for a traveler based on the following itinerary.
+    // ✅ Use HEREDOC to avoid escaping issues
+    return <<<PROMPT
+Generate a professional quotation for a traveler based on the following itinerary.
 
 TRAVELER REQUEST:
-- Destination: " . ($input['destination'] ?? 'N/A') . "
-- Days: " . ($input['days'] ?? 'N/A') . "
-- Budget: $" . ($input['budget'] ?? 'N/A') . "
-- Travel Style: " . ($input['travel_style'] ?? 'N/A') . "
-- Interests: " . implode(', ', $input['interests'] ?? []) . "
-- **Group Size: {$groupSize} pax** (IMPORTANT: Calculate all costs based on this group size)
+- Destination: {$input['destination']}
+- Days: {$input['days']}
+- Budget: \${$input['budget']}
+- Travel Style: {$input['travel_style']}
+- Group Size: {$groupSize} pax (IMPORTANT: Calculate all costs based on this group size)
 
 PROVIDER: {$provider->name}
 AVAILABLE SERVICES: {$services}
@@ -177,41 +201,46 @@ AVAILABLE SERVICES: {$services}
 ITINERARY:
 {$daysText}
 
-Please provide:
-1. A warm greeting to the traveler
-2. Overview of how you can fulfill this itinerary for a group of {$groupSize} people
-3. Day-by-day breakdown of services you will provide (accommodation, meals, guide, transport, permits, etc.)
-4. **Cost breakdown** with:
-   - **Per person cost** for each item
-   - **Total cost** for each item ({$groupSize} x per person)
-   - **Grand total** (sum of all total costs)
-   - Use USD currency
-5. Terms and conditions
-6. Contact information
+Provide:
+1. A warm greeting (1-2 sentences)
+2. Service overview for {$groupSize} pax (2-3 sentences)
+3. Cost breakdown with items (per person, quantity, total) in USD
+4. Terms and conditions (3-5 items)
+5. Contact information
 
-**IMPORTANT: Output ONLY a valid JSON object with key 'quotation'. Do NOT include any thinking process, explanations, or markdown. Your entire response must be a single valid JSON object.
+CRITICAL INSTRUCTIONS:
+- Output ONLY a valid JSON object. No markdown, no thinking, no extra text.
+- All numbers must be numeric.
+- Grand total must equal the sum of all item totals and should be close to the budget.
 
-The JSON structure should be:
+Return ONLY this JSON structure:
 {
-  \"quotation\": {
-    \"greeting\": \"...\",
-    \"overview\": \"...\",
-    \"day_by_day_breakdown\": [...],
-    \"cost_breakdown\": {
-      \"currency\": \"USD\",
-      \"items\": [
-        {\"description\": \"...\", \"per_person\": 100, \"total\": 100}
+  "quotation": {
+    "greeting": "A warm greeting to the traveler",
+    "overview": "Service overview for {$groupSize} pax",
+    "cost_breakdown": {
+      "currency": "USD",
+      "items": [
+        {"description": "Trekking Guide & Porter Service", "per_person": 250, "quantity": 1, "total": 250},
+        {"description": "Accommodation", "per_person": 200, "quantity": 1, "total": 200},
+        {"description": "Meals", "per_person": 180, "quantity": 1, "total": 180},
+        {"description": "Trekking Permits", "per_person": 50, "quantity": 1, "total": 50},
+        {"description": "Transportation", "per_person": 80, "quantity": 1, "total": 80},
+        {"description": "Emergency Support", "per_person": 40, "quantity": 1, "total": 40}
       ],
-      \"grand_total\": 100
+      "grand_total": 800
     },
-    \"terms_and_conditions\": [...],
-    \"contact_information\": {...}
+    "terms_and_conditions": ["Term 1", "Term 2", "Term 3"],
+    "contact_information": {
+      "email": "provider email",
+      "phone": "provider phone",
+      "website": "provider website",
+      "address": "provider address"
+    }
   }
 }
-
-Ensure the grand_total is the sum of all item totals.**";
-    }
-
+PROMPT;
+}
     /**
      * Format AI response into readable quotation text.
      */
@@ -236,18 +265,26 @@ Ensure the grand_total is the sum of all item totals.**";
             $content .= (is_string($ov) ? $ov : ($ov['description'] ?? 'N/A')) . "\n\n";
         }
         
-        if (isset($q['day_by_day_breakdown'])) {
-            $content .= "DAY-BY-DAY BREAKDOWN\n--------------------\n";
-            foreach ($q['day_by_day_breakdown'] as $day) {
-                $content .= "Day {$day['day']}: {$day['route']}\n";
-                if (isset($day['services'])) {
-                    foreach ($day['services'] as $key => $value) {
-                        $content .= "  {$key}: {$value}\n";
-                    }
-                }
-                $content .= "\n";
+        if (isset($q['day_by_day_breakdown']) && is_array($q['day_by_day_breakdown'])) {
+    $content .= "DAY-BY-DAY BREAKDOWN\n--------------------\n";
+    foreach ($q['day_by_day_breakdown'] as $day) {
+        $dayNum = $day['day'] ?? '?';
+        $route = $day['route'] ?? '';
+        $content .= "Day {$dayNum}: {$route}\n";
+        
+        // Handle both 'services_included' (array) and 'services' (key-value)
+        if (!empty($day['services_included']) && is_array($day['services_included'])) {
+            foreach ($day['services_included'] as $service) {
+                $content .= "  - {$service}\n";
+            }
+        } elseif (!empty($day['services']) && is_array($day['services'])) {
+            foreach ($day['services'] as $key => $value) {
+                $content .= "  {$key}: {$value}\n";
             }
         }
+        $content .= "\n";
+    }
+}
         
         if (isset($q['cost_breakdown'])) {
             $p = $q['cost_breakdown'];
@@ -315,46 +352,95 @@ $content .= "Address: {$address}\n";
      * Extract JSON from LLM response (handles markdown, extra text, etc.)
      */
     private function extractQuotationJson($content): array
-    {
-        if (is_array($content)) {
-            if (isset($content['quotation'])) {
-                return $content;
-            }
-            return ['quotation' => $content];
+{
+    if (is_array($content)) {
+        if (isset($content['quotation'])) {
+            return $content;
         }
-
-        if (!is_string($content)) {
-            throw new \Exception('Invalid content type for JSON extraction.');
-        }
-
-        // Remove <think> tags and any other unwanted text
-        $cleaned = preg_replace('/<think>.*?<\/think>/s', '', $content);
-        $cleaned = preg_replace('/<[^>]+>/', '', $cleaned);
-
-        // Find JSON from the first { to the last }
-        if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
-            $json = $matches[0];
-            // Fix potential unclosed braces
-            $open = substr_count($json, '{');
-            $close = substr_count($json, '}');
-            if ($open > $close) {
-                $json .= str_repeat('}', $open - $close);
-            }
-            $decoded = json_decode($json, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
-            }
-        }
-
-        // Try to decode the whole cleaned content
-        $decoded = json_decode($cleaned, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            return $decoded;
-        }
-
-        Log::error('Failed to extract JSON from quotation response', ['content' => $content]);
-        throw new \Exception('Failed to extract JSON from AI response. Please adjust your prompt.');
+        return ['quotation' => $content];
     }
+
+    if (!is_string($content)) {
+        throw new \Exception('Invalid content type for JSON extraction.');
+    }
+
+    // Remove <think> tags and other unwanted text
+    $cleaned = preg_replace('/<think>.*?<\/think>/s', '', $content);
+    $cleaned = preg_replace('/```json\s*/i', '', $cleaned);
+    $cleaned = preg_replace('/```\s*/', '', $cleaned);
+    $cleaned = trim($cleaned);
+
+    // Try direct decode
+    $decoded = json_decode($cleaned, true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+        return isset($decoded['quotation']) ? $decoded : ['quotation' => $decoded];
+    }
+
+    // Find JSON object from first { to last }
+    if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
+        $json = $matches[0];
+        
+        // Fix unclosed braces
+        $open = substr_count($json, '{');
+        $close = substr_count($json, '}');
+        if ($open > $close) {
+            $json .= str_repeat('}', $open - $close);
+        }
+        
+        // Fix unclosed brackets
+        $openB = substr_count($json, '[');
+        $closeB = substr_count($json, ']');
+        if ($openB > $closeB) {
+            $json .= str_repeat(']', $openB - $closeB);
+        }
+        
+        // Remove trailing commas
+        $json = preg_replace('/,\s*}/', '}', $json);
+        $json = preg_replace('/,\s*]/', ']', $json);
+        
+        $decoded = json_decode($json, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return isset($decoded['quotation']) ? $decoded : ['quotation' => $decoded];
+        }
+    }
+
+    // ✅ FALLBACK: Build a basic quotation from raw text
+Log::warning('Failed to extract JSON, using fallback', [
+    'content_preview' => substr($content, 0, 500),
+    'content_length' => strlen($content),
+]);
+
+// ✅ Try to salvage partial JSON (find greeting + overview)
+$greeting = 'Dear Traveler, thank you for your request.';
+$overview = 'We are pleased to provide this quotation for your trek.';
+
+// Try to extract greeting and overview from partial JSON
+if (preg_match('/"greeting"\s*:\s*"([^"]+)"/', $cleaned, $m)) {
+    $greeting = $m[1];
+}
+if (preg_match('/"overview"\s*:\s*"([^"]+)"/', $cleaned, $m)) {
+    $overview = $m[1];
+}
+
+// ❌ Do NOT put raw JSON in overview
+return [
+    'quotation' => [
+        'greeting' => $greeting,
+        'overview' => $overview,
+        'day_by_day_breakdown' => [],
+        'cost_breakdown' => [
+            'currency' => 'USD',
+            'items' => [],
+            'grand_total' => 0,
+        ],
+        'terms_and_conditions' => [
+            'Quotation valid for 30 days.',
+            '50% deposit required to confirm booking.',
+        ],
+        'contact_information' => [],
+    ]
+];
+}
 
     /**
      * Send the quotation email to the traveler.
@@ -542,23 +628,19 @@ public function send(Request $request, QuotationRequest $quotationRequest)
     $this->authorizeProvider($quotationRequest);
     
     if ($quotationRequest->isQuotationSent()) {
-        return response()->json(['error' => 'Quotation already sent.'], 403);
+        return back()->with('error', 'Quotation already sent.');
     }
     
     $provider = Auth::user()->getCurrentProvider();
     
-    // If no final exists, use draft as final (provider made no changes)
+    // If no final exists, use draft
     if (!$quotationRequest->quotation_final) {
         $draft = $quotationRequest->quotation_data['quotation'] ?? [];
         
-        // Validate draft has items
         if (empty($draft['cost_breakdown']['items'])) {
-            return response()->json([
-                'error' => 'No quotation data found. Please generate AI quotation first.'
-            ], 400);
+            return back()->with('error', 'No quotation data found. Please generate AI quotation first.');
         }
         
-        // Wrap and save as final
         $finalData = $this->recalculateQuotation(
             $draft['cost_breakdown']['items'] ?? [],
             0
@@ -579,7 +661,7 @@ public function send(Request $request, QuotationRequest $quotationRequest)
         $quotationRequest->save();
     }
     
-    // ✅ Recalculate server-side (security: trust nothing from client)
+    // Recalculate server-side
     $finalWrapper = $quotationRequest->quotation_final;
     $finalData = $finalWrapper['quotation'] ?? [];
     
@@ -591,10 +673,7 @@ public function send(Request $request, QuotationRequest $quotationRequest)
     $finalData['cost_breakdown']['grand_total'] = $recalculated['grand_total'];
     $finalData['discount'] = $recalculated['discount'];
     
-    // Re-wrap
     $quotationRequest->quotation_final = ['quotation' => $finalData];
-    
-    // Regenerate text
     $quotationRequest->quotation_text = $this->formatQuotationText(
         ['quotation' => $finalData],
         $provider,
@@ -602,33 +681,25 @@ public function send(Request $request, QuotationRequest $quotationRequest)
     );
     $quotationRequest->save();
     
-    // ✅ Send email FIRST
+    // Send email
     $email = $quotationRequest->traveler_email ?? $quotationRequest->traveler->email ?? null;
     if (!$email) {
-        return response()->json(['error' => 'No traveler email address found.'], 400);
+        return back()->with('error', 'No traveler email address found.');
     }
     
     try {
         Mail::to($email)->send(new \App\Mail\QuotationMail($quotationRequest));
     } catch (\Exception $e) {
-        \Log::error('Quotation email failed: ' . $e->getMessage(), [
-            'quotation_request_id' => $quotationRequest->id,
-        ]);
-        return response()->json([
-            'error' => 'Email sending failed. Please try again.',
-            'debug' => config('app.debug') ? $e->getMessage() : null,
-        ], 500);
+        Log::error('Quotation email failed: ' . $e->getMessage());
+        return back()->with('error', 'Email sending failed. Please try again.');
     }
     
-    // ✅ Only now mark as sent
-$quotationRequest->quotation_status = 'sent';
-$quotationRequest->sent_at = now(); // ✅ Laravel helper le Carbon instance फर्काउँछ
-$quotationRequest->save();
+    // Mark sent only after email success
+    $quotationRequest->quotation_status = 'sent';
+    $quotationRequest->sent_at = now();
+    $quotationRequest->save();
     
-    return response()->json([
-        'success' => true,
-        'message' => 'Quotation sent successfully to traveler.',
-    ]);
+    return back()->with('success', 'Quotation sent successfully to traveler.');
 }
 /**
  * Recalculate totals server-side.

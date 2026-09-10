@@ -373,8 +373,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         })
-        .then(res => res.json())
+                .then(res => {
+            // Content-Type check गर्छ – JSON हो कि HTML (redirect) हो
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return res.json();
+            }
+            // HTML response आयो (back() redirect) → page reload
+            window.location.href = '{{ route("provider.quotation-requests.show", $quotationRequest) }}';
+            return null;
+        })
         .then(data => {
+            if (data === null) return; // Already redirect भयो
             showLoading(false);
             if (data.success) {
                 showMessage('success', data.message || 'Quotation sent successfully!');

@@ -42,6 +42,7 @@ return [
     'view' => 'View',
     'no_checkins_yet' => 'No check-ins yet.',
     'na' => 'N/A',
+    'website' => 'Website',
 
     // ======================
     // PROVIDER PROFILE

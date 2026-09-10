@@ -34,6 +34,21 @@
             <p class="text-sm text-gray-500">{{ __('messages.contact_phone') }}</p>
             <p class="font-medium">{{ $provider->contact_phone ?? __('messages.na') }}</p>
         </div>
+
+        {{-- ✅ NEW: Website --}}
+        <div class="col-span-2">
+            <p class="text-sm text-gray-500">{{ __('messages.website') ?? 'Website' }}</p>
+            @if($provider->website)
+                <a href="{{ $provider->website }}" target="_blank" 
+                   class="font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                    {{ $provider->website }}
+                    <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                </a>
+            @else
+                <p class="font-medium">{{ __('messages.na') }}</p>
+            @endif
+        </div>
+
         <div class="col-span-2">
             <p class="text-sm text-gray-500">{{ __('messages.address') }}</p>
             <p class="font-medium">{{ $provider->address ?? __('messages.na') }}</p>

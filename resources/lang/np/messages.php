@@ -56,6 +56,7 @@ return [
     'no_description_provided' => 'कुनै विवरण प्रदान गरिएको छैन।',
     'edit_profile' => 'प्रोफाइल सम्पादन गर्नुहोस्',
     'back_to_dashboard' => 'ड्यासबोर्डमा फर्कनुहोस्',
+    'website' => 'वेबसाइट',
 
     // ======================
     // PROVIDER PROFILE EDIT

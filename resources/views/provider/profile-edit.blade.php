@@ -71,6 +71,17 @@
                 @enderror
             </div>
 
+            {{-- ✅ NEW: Website Field --}}
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.website') ?? 'Website' }}</label>
+                <input type="url" name="website" value="{{ old('website', $provider->website) }}"
+                       placeholder="https://example.com"
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @error('website')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.address') }}</label>
                 <textarea name="address" rows="2" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('address', $provider->address) }}</textarea>

@@ -19,6 +19,7 @@ class Provider extends Model
         'contact_email',
         'contact_phone',
         'address',
+        'website',
         'verification_status',
         'is_active',
     ];

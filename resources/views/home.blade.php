@@ -534,9 +534,12 @@
 
       // ------ Days Rendering ------
       days.forEach(day => {
-        html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
-        html += `<h3 class="text-lg font-bold text-blue-700">{{ __('messages.day') }} ${day.day_number}: ${day.title}</h3>`;
-        html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
+    // ✅ Strip duplicate "Day X:" prefix
+    const cleanTitle = (day.title || '').replace(/^Day\s*\d+\s*[:：]\s*/i, '').trim();
+    
+    html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
+    html += `<h3 class="text-lg font-bold text-blue-700">{{ __('messages.day') }} ${day.day_number}: ${cleanTitle}</h3>`;
+    html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
         if (day.distance_km) html += `<p class="text-xs text-gray-400 mt-1">📏 ${day.distance_km} km  |  ⛰️ ${day.altitude_m || '{{ __('messages.na') }}'} m</p>`;
         if (day.items && day.items.length > 0) {
           html += `<ul class="list-disc ml-5 mt-2 space-y-1">`;
