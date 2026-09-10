@@ -132,6 +132,21 @@
                               placeholder="Any special instructions for the traveler">{{ $final['special_notes'] ?? '' }}</textarea>
                 </div>
 
+                {{-- ✅ Provider Budget Note --}}
+<div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+    <label class="text-xs text-gray-700 font-semibold">
+        💬 {{ __('messages.budget_note') }} 
+        <span class="text-gray-500 font-normal">– {{ __('messages.budget_note_hint') }}</span>
+    </label>
+    <textarea name="provider_budget_note" 
+              id="providerBudgetNoteInput" 
+              rows="3" 
+              class="w-full border rounded px-3 py-2 text-sm mt-2"
+              placeholder="{{ __('messages.budget_note_placeholder') }}">{{ $final['provider_budget_note'] ?? '' }}</textarea>
+    <p class="text-xs text-gray-500 mt-1">
+        ⓘ {{ __('messages.budget_note_info') }}
+    </p>
+</div>
                 {{-- Actions --}}
                 <div class="mt-6 flex flex-wrap gap-3">
                     <button type="button" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
@@ -411,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Build form data
+        // Build form data
     function buildFormData() {
         const rows = itemsContainer.querySelectorAll('.item-row');
         const items = [];
@@ -425,14 +440,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const terms = termsInput.value.split('\n').filter(t => t.trim());
 
+        // ✅ Get budget note (may not exist on older pages, so safe check)
+        const budgetNoteInput = document.getElementById('providerBudgetNoteInput');
+
         return {
             items: items,
             discount: parseFloat(discountInput.value) || 0,
             terms: terms,
             special_notes: specialNotesInput.value,
+            provider_budget_note: budgetNoteInput ? budgetNoteInput.value : '',
         };
     }
-
     // Helpers
     function showLoading(show) {
         loading.classList.toggle('hidden', !show);

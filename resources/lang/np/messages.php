@@ -57,6 +57,10 @@ return [
     'edit_profile' => 'प्रोफाइल सम्पादन गर्नुहोस्',
     'back_to_dashboard' => 'ड्यासबोर्डमा फर्कनुहोस्',
     'website' => 'वेबसाइट',
+    'budget_note' => 'बजेट नोट',
+'budget_note_hint' => 'यात्रीलाई बजेटको बारेमा custom सन्देश',
+'budget_note_placeholder' => 'जस्तै: यो package तपाईंको बजेट भन्दा अलि बढी छ, तर हामी flexible payment terms दिन सक्छौं...',
+'budget_note_info' => 'खाली छोड्यो भने system ले automatic budget comparison message generate गर्छ।',
 
     // ======================
     // PROVIDER PROFILE EDIT

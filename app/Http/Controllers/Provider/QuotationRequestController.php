@@ -327,9 +327,74 @@ PROMPT;
             }
             
             $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($grandTotal, 2));
+            }  
+
+// ✅ NEW: Budget Comparison Section
+$travelerBudget = $quotationRequest->traveler_input['budget'] ?? null;
+if ($travelerBudget && is_numeric($travelerBudget) && $travelerBudget > 0) {
+    $budget = (float) $travelerBudget;
+    $finalTotal = (float) $grandTotal;
+    $difference = $finalTotal - $budget;
+    $percentDiff = round(($difference / $budget) * 100, 1);
+    
+    $content .= "BUDGET COMPARISON\n";
+    $content .= "-----------------\n";
+    $content .= "Traveler's Budget: USD " . number_format($budget, 2) . "\n";
+    $content .= "Our Quotation:     USD " . number_format($finalTotal, 2) . "\n";
+    
+    if ($finalTotal > $budget) {
+        $content .= sprintf("Difference:        +USD %s (%s%% over budget)\n\n", 
+            number_format($difference, 2), $percentDiff);
+    } else {
+        $savings = abs($difference);
+        $content .= sprintf("Difference:        -USD %s (%s%% under budget)\n\n", 
+            number_format($savings, 2), abs($percentDiff));
+    }
+    
+    // ✅ Check if provider wrote custom note
+    $providerNote = trim($q['provider_budget_note'] ?? '');
+    
+    if (!empty($providerNote)) {
+        // Provider को custom message
+        $content .= "📝 " . $providerNote . "\n\n";
+    } else {
+        // Automatic message (English only)
+        if ($finalTotal > $budget) {
+            if ($percentDiff <= 10) {
+                $content .= "📌 NOTE: Our quotation is slightly above your stated budget. We can discuss\n";
+                $content .= "   minor adjustments or payment flexibility to accommodate your needs.\n\n";
+            } elseif ($percentDiff <= 25) {
+                $content .= "📌 NOTE: Our quotation exceeds your budget by " . $percentDiff . "%. This reflects the\n";
+                $content .= "   quality and completeness of our package. We are open to discussing:\n";
+                $content .= "   • Alternative accommodation options\n";
+                $content .= "   • Adjusted service inclusions\n";
+                $content .= "   • Flexible payment terms\n\n";
+            } else {
+                $content .= "📌 NOTE: Our quotation significantly exceeds your budget (" . $percentDiff . "%). To\n";
+                $content .= "   accommodate your budget, we can customize this package by:\n";
+                $content .= "   • Using budget-tier accommodations\n";
+                $content .= "   • Reducing certain inclusions\n";
+                $content .= "   • Adjusting the itinerary scope\n";
+                $content .= "   Please contact us to discuss a tailored option.\n\n";
+            }
+        } else {
+            $savings = abs($difference);
+            if ($savings == 0) {
+                $content .= "✅ GOOD NEWS: Our quotation matches your budget exactly. We look forward to\n";
+                $content .= "   providing you with an excellent trekking experience.\n\n";
+            } elseif ($percentDiff >= -15) {
+                $content .= "✅ GOOD NEWS: Our quotation fits comfortably within your budget. We will\n";
+                $content .= "   provide the full package as described, with high-quality service.\n\n";
+            } else {
+                $content .= "✅ EXCELLENT NEWS: Our quotation is well within your budget (saving you USD " . number_format($savings, 2) . ").\n";
+                $content .= "   We can offer this complete package at the quoted price, or discuss\n";
+                $content .= "   upgrading certain services using the available budget difference.\n\n";
+            }
         }
-        
-        if (isset($q['terms_and_conditions']) && is_array($q['terms_and_conditions'])) {
+    }
+}
+
+if (isset($q['terms_and_conditions']) && is_array($q['terms_and_conditions'])) {
     $content .= "TERMS & CONDITIONS\n-------------------\n";
     $i = 1;
     foreach ($q['terms_and_conditions'] as $term) {
@@ -545,15 +610,16 @@ public function update(Request $request, QuotationRequest $quotationRequest)
     }
     
     $validated = $request->validate([
-        'items' => 'required|array|min:1',
-        'items.*.description' => 'required|string|max:255',
-        'items.*.per_person' => 'required|numeric|min:0',
-        'items.*.quantity' => 'nullable|integer|min:1',
-        'discount' => 'nullable|numeric|min:0',
-        'terms' => 'nullable|array',
-        'terms.*' => 'nullable|string|max:500',
-        'special_notes' => 'nullable|string|max:1000',
-    ]);
+    'items' => 'required|array|min:1',
+    'items.*.description' => 'required|string|max:255',
+    'items.*.per_person' => 'required|numeric|min:0',
+    'items.*.quantity' => 'nullable|integer|min:1',
+    'discount' => 'nullable|numeric|min:0',
+    'terms' => 'nullable|array',
+    'terms.*' => 'nullable|string|max:500',
+    'special_notes' => 'nullable|string|max:1000',
+    'provider_budget_note' => 'nullable|string|max:2000', // ✅ NEW
+]);
     
     // Recalculate
     $recalculated = $this->recalculateQuotation(
@@ -564,19 +630,20 @@ public function update(Request $request, QuotationRequest $quotationRequest)
     // Build final data with cost_breakdown structure
     $draft = $quotationRequest->quotation_data['quotation'] ?? [];
     $finalData = [
-        'greeting' => $draft['greeting'] ?? '',
-        'overview' => $draft['overview'] ?? '',
-        'day_by_day_breakdown' => $draft['day_by_day_breakdown'] ?? [],
-        'cost_breakdown' => $recalculated,
-        'terms_and_conditions' => $validated['terms'] ?? $draft['terms_and_conditions'] ?? [],
-        'special_notes' => $validated['special_notes'] ?? '',
-        'contact_information' => [
-            'email' => $quotationRequest->provider->contact_email ?? 'N/A',
-            'phone' => $quotationRequest->provider->contact_phone ?? 'N/A',
-            'website' => $quotationRequest->provider->website ?? 'N/A',
-            'address' => $quotationRequest->provider->address ?? 'N/A',
-        ],
-    ];
+    'greeting' => $draft['greeting'] ?? '',
+    'overview' => $draft['overview'] ?? '',
+    'day_by_day_breakdown' => $draft['day_by_day_breakdown'] ?? [],
+    'cost_breakdown' => $recalculated,
+    'terms_and_conditions' => $validated['terms'] ?? $draft['terms_and_conditions'] ?? [],
+    'special_notes' => $validated['special_notes'] ?? '',
+    'provider_budget_note' => $validated['provider_budget_note'] ?? '', // ✅ NEW
+    'contact_information' => [
+        'email' => $quotationRequest->provider->contact_email ?? 'N/A',
+        'phone' => $quotationRequest->provider->contact_phone ?? 'N/A',
+        'website' => $quotationRequest->provider->website ?? 'N/A',
+        'address' => $quotationRequest->provider->address ?? 'N/A',
+    ],
+];
     
     $quotationWrapper = ['quotation' => $finalData];
     

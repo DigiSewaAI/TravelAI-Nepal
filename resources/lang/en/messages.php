@@ -43,6 +43,10 @@ return [
     'no_checkins_yet' => 'No check-ins yet.',
     'na' => 'N/A',
     'website' => 'Website',
+    'budget_note' => 'Budget Note',
+'budget_note_hint' => 'Custom message to traveler about budget',
+'budget_note_placeholder' => 'e.g., This package slightly exceeds your budget, but we can offer flexible payment terms...',
+'budget_note_info' => 'If left empty, the system will auto-generate a budget comparison message.',
 
     // ======================
     // PROVIDER PROFILE
