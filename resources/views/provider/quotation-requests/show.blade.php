@@ -98,22 +98,27 @@
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <h3 class="text-lg font-bold mb-4">Itinerary</h3>
         @if(isset($quotationRequest->itinerary_data['days']))
-            @foreach($quotationRequest->itinerary_data['days'] as $day)
-                <div class="border-b border-gray-100 pb-3 mb-3 last:border-0">
-                    <h4 class="font-semibold text-blue-700">Day {{ $day['day_number'] }}: {{ $day['title'] }}</h4>
-                    <p class="text-sm text-gray-600">{{ $day['description'] ?? '' }}</p>
-                    @if(isset($day['items']))
-                        <ul class="list-disc ml-5 text-sm text-gray-600">
-                            @foreach($day['items'] as $item)
-                                <li>{{ $item['title'] }} – {{ $item['description'] ?? '' }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-            @endforeach
-        @else
-            <p class="text-gray-500">No itinerary data available.</p>
-        @endif
+    @foreach($quotationRequest->itinerary_data['days'] as $day)
+        @php
+            // ✅ Strip duplicate "Day X:" prefix
+            $cleanTitle = preg_replace('/^Day\s*\d+\s*[:：]\s*/i', '', $day['title'] ?? '');
+            $cleanTitle = trim($cleanTitle);
+        @endphp
+        <div class="border-b border-gray-100 pb-3 mb-3 last:border-0">
+            <h4 class="font-semibold text-blue-700">Day {{ $day['day_number'] }}: {{ $cleanTitle }}</h4>
+            <p class="text-sm text-gray-600">{{ $day['description'] ?? '' }}</p>
+            @if(isset($day['items']))
+                <ul class="list-disc ml-5 text-sm text-gray-600">
+                    @foreach($day['items'] as $item)
+                        <li>{{ $item['title'] }} – {{ $item['description'] ?? '' }}</li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    @endforeach
+@else
+    <p class="text-gray-500">No itinerary data available.</p>
+@endif
     </div>
 
     {{-- =============================================== --}}

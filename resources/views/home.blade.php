@@ -130,18 +130,30 @@
   </div>
 
     <!-- Quotation Request Modal -->
-  <div id="quotationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+  <div id="quotationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-start justify-center z-50 overflow-y-auto py-8">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
       <h3 class="text-xl font-bold mb-4">Request Quotation</h3>
       <p class="text-sm text-gray-600 mb-4">Select a provider to send your itinerary for a quotation.</p>
       <form id="quotationRequestForm">
         <input type="hidden" name="planner_result_id" id="plannerResultId">
         <div class="mb-4">
-          <label class="block font-medium mb-1">Select Provider</label>
-          <select name="provider_id" id="providerSelect" class="w-full border rounded-lg px-4 py-2" required>
-            <option value="">Loading providers...</option>
-          </select>
-        </div>
+    <label class="block font-medium mb-1">Select Provider *</label>
+    
+    {{-- Search Box --}}
+    <input type="text" 
+           id="providerSearch" 
+           placeholder="Search provider by name..." 
+           class="w-full border rounded-lg px-4 py-2 mb-2"
+           autocomplete="off">
+    
+    {{-- Provider Dropdown --}}
+    <select name="provider_id" id="providerSelect" class="w-full border rounded-lg px-4 py-2" required size="1">
+        <option value="">Loading providers...</option>
+    </select>
+    
+    {{-- Selected Provider Display --}}
+    <p id="selectedProviderName" class="text-xs text-gray-500 mt-1"></p>
+</div>
 
         <div class="mb-4">
     <label class="block font-medium mb-1">Your Full Name *</label>
@@ -688,25 +700,77 @@ if (userEmail) document.getElementById('travelerEmail').value = userEmail;
         document.getElementById('quotationRequestForm').reset();
     }
 
-    function loadProviders() {
-        const select = document.getElementById('providerSelect');
-        select.innerHTML = '<option value="">Loading...</option>';
-        fetch('/api/providers/list')
-            .then(res => res.json())
-            .then(data => {
-                select.innerHTML = '';
-                if (data.providers && data.providers.length) {
-                    data.providers.forEach(p => {
-                        select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-                    });
-                } else {
-                    select.innerHTML = '<option value="">No providers available</option>';
-                }
-            })
-            .catch(() => {
-                select.innerHTML = '<option value="">Error loading providers</option>';
-            });
+    let allProviders = []; // Store all providers globally
+
+function loadProviders() {
+    const select = document.getElementById('providerSelect');
+    const searchInput = document.getElementById('providerSearch');
+    const selectedDisplay = document.getElementById('selectedProviderName');
+    
+    select.innerHTML = '<option value="">Loading...</option>';
+    searchInput.value = '';
+    selectedDisplay.textContent = '';
+    
+    fetch('/api/providers/list')
+        .then(res => res.json())
+        .then(data => {
+            allProviders = data.providers || [];
+            renderProviderOptions(allProviders);
+        })
+        .catch(() => {
+            select.innerHTML = '<option value="">Error loading providers</option>';
+        });
+}
+
+function renderProviderOptions(providers) {
+    const select = document.getElementById('providerSelect');
+    select.innerHTML = '';
+    
+    if (providers.length === 0) {
+        select.innerHTML = '<option value="">No providers found</option>';
+        return;
     }
+    
+    // Add default option
+    select.innerHTML = '<option value="">-- Select a provider --</option>';
+    
+    providers.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+}
+
+// ✅ Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('providerSearch');
+    const select = document.getElementById('providerSelect');
+    const selectedDisplay = document.getElementById('selectedProviderName');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            if (query === '') {
+                renderProviderOptions(allProviders);
+            } else {
+                const filtered = allProviders.filter(p => 
+                    p.name.toLowerCase().includes(query)
+                );
+                renderProviderOptions(filtered);
+            }
+        });
+    }
+    
+    if (select) {
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (this.value) {
+                selectedDisplay.textContent = '✅ Selected: ' + selectedOption.text;
+            } else {
+                selectedDisplay.textContent = '';
+            }
+        });
+    }
+});
 
     document.getElementById('quotationRequestForm').addEventListener('submit', async function(e) {
         e.preventDefault();

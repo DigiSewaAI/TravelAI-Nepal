@@ -270,6 +270,11 @@ PROMPT;
     foreach ($q['day_by_day_breakdown'] as $day) {
         $dayNum = $day['day'] ?? '?';
         $route = $day['route'] ?? '';
+        
+        // ✅ Strip duplicate "Day X:" prefix
+        $route = preg_replace('/^Day\s*\d+\s*[:：]\s*/i', '', $route);
+        $route = trim($route);
+        
         $content .= "Day {$dayNum}: {$route}\n";
         
         // Handle both 'services_included' (array) and 'services' (key-value)
@@ -325,12 +330,15 @@ PROMPT;
         }
         
         if (isset($q['terms_and_conditions']) && is_array($q['terms_and_conditions'])) {
-            $content .= "TERMS & CONDITIONS\n-------------------\n";
-            foreach ($q['terms_and_conditions'] as $i => $term) {
-                $content .= ($i+1) . ". " . $term . "\n";
-            }
-            $content .= "\n";
-        }
+    $content .= "TERMS & CONDITIONS\n-------------------\n";
+    $i = 1;
+    foreach ($q['terms_and_conditions'] as $term) {
+        $term = trim($term);
+        if (empty($term)) continue; // ✅ Skip empty terms
+        $content .= ($i++) . ". " . $term . "\n";
+    }
+    $content .= "\n";
+}
         
         // ✅ Contact Information – provider fallback if N/A
 $c = $q['contact_information'] ?? [];
