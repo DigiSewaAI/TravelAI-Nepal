@@ -202,7 +202,7 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Bimthang', 'slug' => 'bimthang', 'type' => 'village', 'lat' => 28.6123, 'lng' => 85.0489, 'alt' => 3720],
                 ['name' => 'Dharapani', 'slug' => 'dharapani-manaslu-return', 'type' => 'village', 'lat' => 28.5289, 'lng' => 84.3545, 'alt' => 1860],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'soti-khola', 'to' => 'machhakhola', 'dist' => 8.0, 'time' => 4.0, 'gain' => 200],
                 ['from' => 'machhakhola', 'to' => 'dobhan', 'dist' => 6.0, 'time' => 3.0, 'gain' => 170],
                 ['from' => 'dobhan', 'to' => 'bhulbhule', 'dist' => 7.0, 'time' => 3.5, 'gain' => 200],
@@ -210,10 +210,14 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['from' => 'laprak', 'to' => 'ghap', 'dist' => 7.0, 'time' => 3.5, 'gain' => 340],
                 ['from' => 'ghap', 'to' => 'dharapani-manaslu', 'dist' => 10.0, 'time' => 5.0, 'gain' => 680],
                 ['from' => 'dharapani-manaslu', 'to' => 'sama-gaon', 'dist' => 12.0, 'time' => 6.0, 'gain' => 1660],
+                ['from' => 'sama-gaon', 'to' => 'sama-gaon', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sama-gaon', 'to' => 'samdo', 'dist' => 5.0, 'time' => 3.0, 'gain' => 340],
+                ['from' => 'samdo', 'to' => 'samdo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'samdo', 'to' => 'dharmashala', 'dist' => 6.0, 'time' => 3.5, 'gain' => 600],
+                ['from' => 'dharmashala', 'to' => 'dharmashala', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dharmashala', 'to' => 'larkya-la', 'dist' => 4.0, 'time' => 3.0, 'gain' => 700],
                 ['from' => 'larkya-la', 'to' => 'bimthang', 'dist' => 8.0, 'time' => 4.0, 'loss' => 1440],
+                ['from' => 'bimthang', 'to' => 'bimthang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'bimthang', 'to' => 'dharapani-manaslu-return', 'dist' => 18.0, 'time' => 7.0, 'loss' => 1860],
             ],
             'costs' => [

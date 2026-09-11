@@ -42,15 +42,25 @@ class EverestRegionSeeder extends Seeder
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-gokyo-return', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Lukla', 'slug' => 'lukla-gokyo-return', 'type' => 'village', 'lat' => 27.6869, 'lng' => 86.7314, 'alt' => 2860],
             ],
-            'segments' => [
+                        'segments' => [
+                // Outbound (Days 1-6)
                 ['from' => 'lukla-gokyo', 'to' => 'phakding-gokyo', 'dist' => 8.0, 'time' => 3.0, 'loss' => 250],
                 ['from' => 'phakding-gokyo', 'to' => 'namche-gokyo', 'dist' => 10.5, 'time' => 5.0, 'gain' => 830],
+                // Namche acclimatization rest
+                ['from' => 'namche-gokyo', 'to' => 'namche-gokyo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-gokyo', 'to' => 'dole', 'dist' => 8.0, 'time' => 4.0, 'gain' => 640],
                 ['from' => 'dole', 'to' => 'machhermo', 'dist' => 5.0, 'time' => 2.5, 'gain' => 390],
                 ['from' => 'machhermo', 'to' => 'gokyo', 'dist' => 7.0, 'time' => 3.5, 'gain' => 280],
+                // Gokyo Ri side trip (round trip same day)
                 ['from' => 'gokyo', 'to' => 'gokyo-ri', 'dist' => 3.0, 'time' => 2.0, 'gain' => 610],
-                ['from' => 'gokyo', 'to' => 'namche-gokyo-return', 'dist' => 20.0, 'time' => 8.0, 'loss' => 1310],
-                ['from' => 'namche-gokyo-return', 'to' => 'lukla-gokyo-return', 'dist' => 18.5, 'time' => 7.0, 'loss' => 580],
+                ['from' => 'gokyo-ri', 'to' => 'gokyo', 'dist' => 3.0, 'time' => 1.5, 'loss' => 610],
+                // Gokyo rest day (lake exploration)
+                ['from' => 'gokyo', 'to' => 'gokyo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Return (Days 9-12)
+                ['from' => 'gokyo', 'to' => 'dole', 'dist' => 7.0, 'time' => 3.5, 'loss' => 670],
+                ['from' => 'dole', 'to' => 'namche-gokyo-return', 'dist' => 8.0, 'time' => 4.0, 'loss' => 640],
+                ['from' => 'namche-gokyo-return', 'to' => 'phakding-gokyo', 'dist' => 10.5, 'time' => 5.0, 'loss' => 830],
+                ['from' => 'phakding-gokyo', 'to' => 'lukla-gokyo-return', 'dist' => 8.0, 'time' => 3.0, 'gain' => 250],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'Sagarmatha National Park Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true, 'metadata' => ['verified' => true, 'source' => 'NTB']],
@@ -76,6 +86,9 @@ class EverestRegionSeeder extends Seeder
             ],
             'waypoints' => [
                 ['name' => 'Lukla', 'slug' => 'lukla-3p', 'type' => 'village', 'lat' => 27.6869, 'lng' => 86.7314, 'alt' => 2860],
+                                ['name' => 'Phakding', 'slug' => 'phakding-3p', 'type' => 'village', 'lat' => 27.7408, 'lng' => 86.7125, 'alt' => 2610],
+                ['name' => 'Dzongla', 'slug' => 'dzongla', 'type' => 'village', 'lat' => 27.9289, 'lng' => 86.7534, 'alt' => 4830],
+                ['name' => 'Thagnak', 'slug' => 'thagnak', 'type' => 'village', 'lat' => 27.9278, 'lng' => 86.7234, 'alt' => 4700],
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-3p', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Tengboche', 'slug' => 'tengboche-3p', 'type' => 'village', 'lat' => 27.8361, 'lng' => 86.7643, 'alt' => 3860],
                 ['name' => 'Dingboche', 'slug' => 'dingboche-3p', 'type' => 'village', 'lat' => 27.8927, 'lng' => 86.8242, 'alt' => 4410],
@@ -89,19 +102,45 @@ class EverestRegionSeeder extends Seeder
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-3p-return', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Lukla', 'slug' => 'lukla-3p-return', 'type' => 'village', 'lat' => 27.6869, 'lng' => 86.7314, 'alt' => 2860],
             ],
-            'segments' => [
-                ['from' => 'lukla-3p', 'to' => 'namche-3p', 'dist' => 18.5, 'time' => 8.0, 'gain' => 580],
+                        'segments' => [
+                // Days 1-2: Approach via Phakding
+                ['from' => 'lukla-3p', 'to' => 'phakding-3p', 'dist' => 8.0, 'time' => 3.0, 'loss' => 250],
+                ['from' => 'phakding-3p', 'to' => 'namche-3p', 'dist' => 10.5, 'time' => 5.0, 'gain' => 830],
+                // Day 3: Namche acclimatization
+                ['from' => 'namche-3p', 'to' => 'namche-3p', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Days 4-5: Tengboche, Dingboche
                 ['from' => 'namche-3p', 'to' => 'tengboche-3p', 'dist' => 9.0, 'time' => 5.0, 'gain' => 420],
                 ['from' => 'tengboche-3p', 'to' => 'dingboche-3p', 'dist' => 10.0, 'time' => 5.0, 'gain' => 550],
+                // Day 6: Dingboche acclimatization
+                ['from' => 'dingboche-3p', 'to' => 'dingboche-3p', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 7: Kongma La crossing
                 ['from' => 'dingboche-3p', 'to' => 'kongma-la', 'dist' => 6.0, 'time' => 4.0, 'gain' => 1125],
                 ['from' => 'kongma-la', 'to' => 'lobuche-3p', 'dist' => 5.0, 'time' => 3.0, 'loss' => 595],
+                // Day 8: Lobuche → Gorak Shep
                 ['from' => 'lobuche-3p', 'to' => 'gorak-3p', 'dist' => 5.5, 'time' => 3.5, 'gain' => 200],
+                // Day 9: EBC round trip
                 ['from' => 'gorak-3p', 'to' => 'ebc-3p', 'dist' => 3.5, 'time' => 2.5, 'gain' => 224],
-                ['from' => 'gorak-3p', 'to' => 'cho-la', 'dist' => 12.0, 'time' => 6.0, 'gain' => 280],
-                ['from' => 'cho-la', 'to' => 'gokyo-3p', 'dist' => 6.0, 'time' => 3.5, 'loss' => 670],
+                ['from' => 'ebc-3p', 'to' => 'gorak-3p', 'dist' => 3.5, 'time' => 2.0, 'loss' => 224],
+                // Day 10: Gorak Shep rest
+                ['from' => 'gorak-3p', 'to' => 'gorak-3p', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 11: Gorak Shep → Dzongla
+                ['from' => 'gorak-3p', 'to' => 'dzongla', 'dist' => 10.0, 'time' => 5.0, 'loss' => 310],
+                // Day 12: Cho La crossing
+                ['from' => 'dzongla', 'to' => 'cho-la', 'dist' => 5.0, 'time' => 3.0, 'gain' => 590],
+                ['from' => 'cho-la', 'to' => 'thagnak', 'dist' => 5.0, 'time' => 3.0, 'loss' => 720],
+                // Day 13: Thagnak → Gokyo
+                ['from' => 'thagnak', 'to' => 'gokyo-3p', 'dist' => 5.0, 'time' => 3.0, 'gain' => 50],
+                // Day 14: Gokyo Ri side trip
+                ['from' => 'gokyo-3p', 'to' => 'gokyo-3p', 'dist' => 6.0, 'time' => 3.5, 'gain' => 610, 'loss' => 610],
+                // Day 15: Gokyo rest
+                ['from' => 'gokyo-3p', 'to' => 'gokyo-3p', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 16: Renjo La crossing
                 ['from' => 'gokyo-3p', 'to' => 'renjo-la', 'dist' => 8.0, 'time' => 4.5, 'gain' => 610],
                 ['from' => 'renjo-la', 'to' => 'namche-3p-return', 'dist' => 12.0, 'time' => 6.0, 'loss' => 1920],
+                // Day 17: Namche → Lukla
                 ['from' => 'namche-3p-return', 'to' => 'lukla-3p-return', 'dist' => 18.5, 'time' => 7.0, 'loss' => 580],
+                // Day 18: Departure buffer
+                ['from' => 'lukla-3p-return', 'to' => 'lukla-3p-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'Sagarmatha National Park Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],

@@ -458,6 +458,9 @@ class WaypointLocationSeeder extends Seeder
 
     // Phase 4N.5b1_fix — Makalu-Barun exception:
     'Barun Valley',
+
+    // Phase 4N.5b2 — Saipal exception:
+    'Saipal Base Camp',
 ];
         foreach ($explicitOvernightExceptions as $name) {
             Waypoint::where('name', $name)->update(['is_overnight_stop' => true]);

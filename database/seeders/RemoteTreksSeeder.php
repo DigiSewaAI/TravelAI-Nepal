@@ -372,13 +372,13 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Nauli', 'slug' => 'nauli', 'type' => 'village', 'lat' => 29.75, 'lng' => 81.30, 'alt' => 3800],
                 ['name' => 'Saipal Base Camp', 'slug' => 'saipal-bc', 'type' => 'checkpoint', 'lat' => 29.8123, 'lng' => 81.3012, 'alt' => 4200],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'bajhang', 'to' => 'dati', 'dist' => 10.0, 'time' => 5.0, 'gain' => 600, 'loss' => 0],
                 ['from' => 'dati', 'to' => 'jhulaghat', 'dist' => 8.0, 'time' => 4.0, 'gain' => 700, 'loss' => 0],
                 ['from' => 'jhulaghat', 'to' => 'kanda', 'dist' => 8.0, 'time' => 5.0, 'gain' => 1000, 'loss' => 0],
+                ['from' => 'kanda', 'to' => 'kanda', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'kanda', 'to' => 'nauli', 'dist' => 8.0, 'time' => 5.0, 'gain' => 600, 'loss' => 0],
                 ['from' => 'nauli', 'to' => 'saipal-bc', 'dist' => 8.0, 'time' => 5.0, 'gain' => 400, 'loss' => 0],
-                ['from' => 'saipal-bc', 'to' => 'saipal-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'saipal-bc', 'to' => 'saipal-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'saipal-bc', 'to' => 'nauli', 'dist' => 8.0, 'time' => 4.5, 'gain' => 0, 'loss' => 400],
                 ['from' => 'nauli', 'to' => 'kanda', 'dist' => 8.0, 'time' => 4.5, 'gain' => 0, 'loss' => 600],
