@@ -41,3 +41,8 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
+
+# Database backups — NEVER commit (contains user data, ~8MB each)
+backup_before_*.sql
+backup_*.sql
+*.sql
