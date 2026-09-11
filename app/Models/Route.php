@@ -11,17 +11,26 @@ class Route extends Model
     use SoftDeletes, HasSafetyStatus;
 
     protected $fillable = [
-        'name', 'slug', 'description', 'difficulty',
-        'duration_days', 'max_altitude', 'season', 'is_active', 'segments',
-    ];
+    'name',
+    'slug',
+    'description',
+    'difficulty',
+    'route_type',
+    'duration_days',
+    'recommended_days',
+    'max_altitude',
+    'season',
+    'is_active',
+    'segments',
+];
 
     protected $casts = [
-        'duration_days' => 'integer',
-        'max_altitude' => 'integer',
-        'is_active' => 'boolean',
-        'segments' => 'array',
-
-    ];
+    'duration_days' => 'integer',
+    'recommended_days' => 'integer',    // ✅ ADDED
+    'max_altitude' => 'integer',
+    'is_active' => 'boolean',
+    'segments' => 'array',
+];
 
     public function segments()
     {
@@ -39,6 +48,6 @@ class Route extends Model
     }
     public function serviceCategory()
 {
-    return $this->belongsTo(ServiceCategory::class);
+    return $this->belongsTo(ServiceCategory::class, 'service_category_id');  // ✅ explicit FK
 }
 }

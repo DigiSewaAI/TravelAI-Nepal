@@ -1,6 +1,6 @@
 # TravelAI Nepal — Complete Reference Document
-**Version:** 14.0 (FINAL)
-**Date:** September 2026
+**Version:** 15.0 (FINAL)
+**Date:** September 10, 2026
 **Status:** ✅ **ALL CORE FEATURES COMPLETED** | **PRODUCTION-READY**
 
 ---
@@ -18,19 +18,26 @@ This document serves as the **Single Source of Truth** for the TravelAI Nepal pr
 
 ---
 
-## 🎯 What's NEW in v14.0 (Recent Improvements)
+## 🎯 What's NEW in v15.0 (Recent Improvements)
 
 The following features were added in the latest iteration:
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **Rest Day Semantics Fix** | Tours now show "Rest Day" instead of "Acclimatization Day" (City/Hill tours vs. Treks). | ✅ |
-| **12+ Regions Provider Seeders** | All Nepal regions now have complete provider data with location-based pricing. | ✅ |
-| **Location-Based Pricing** | Each region has realistic price variation (Budget: $11-30, Mid: $18-55, Luxury: $45-138). | ✅ |
-| **Per-Day Service Attachment** | `getServicesForDay()` fetches services per day based on waypoint location. | ✅ |
-| **Programmatic Service Attachment** | Services automatically attach even when AI fails (fallback-safe). | ✅ |
-| **WaypointLocationSeeder Enhancement** | All waypoints now correctly mapped to locations for all 12 regions. | ✅ |
-| **Dhorpatan Location Fix** | Corrected Dhorpatan's state from Bagmati to Lumbini. | ✅ |
+| **Complete Quotation System** | AI Draft → Provider Edit → Preview → Send → Lock workflow. | ✅ |
+| **Quotation Edit Page** | Side-by-side AI draft vs Provider final comparison. | ✅ |
+| **Budget Comparison (Auto)** | 3-tier automatic message (≤10%, 11–25%, >25% over budget). | ✅ |
+| **Provider Custom Budget Note** | `provider_budget_note` field – provider can write custom message. | ✅ |
+| **Day Title Duplicate Fix** | `Day 1: Day 1:` → `Day 1:` in itinerary, quotation, email. | ✅ |
+| **Empty Terms Skip** | Trailing empty terms filtered out. | ✅ |
+| **Provider Website Field** | New `website` column + profile display + quotation contact. | ✅ |
+| **Contact Fallback** | Provider details used if AI returns N/A. | ✅ |
+| **Send Confirmation Modal** | Provider sees traveler email + total + warning before sending. | ✅ |
+| **Quotation Lock After Send** | `quotation_status = 'sent'` – no further edits. | ✅ |
+| **Rest Day Semantics Fix** | Tours show "Rest Day", Treks show "Acclimatization Day". | ✅ |
+| **12+ Regions Provider Seeders** | All Nepal regions now have complete provider data. | ✅ |
+| **Location-Based Pricing** | Budget: $11–30, Mid: $18–55, Luxury: $45–138. | ✅ |
+| **Per-Day Service Attachment** | `getServicesForDay()` fetches per-day based on waypoint location. | ✅ |
 
 ---
 
@@ -69,6 +76,32 @@ The following features were added in the latest iteration:
 | Phase 16: Public Journey Replay Social Sharing | ✅ | Shareable links, visibility control, social share buttons, OG meta |
 | Weather Intelligence | ✅ | OpenWeatherMap integration + weather snapshot + search + safety context |
 
+### 🆕 Quotation System (Complete)
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| **AI Quotation Generation** | ✅ | `openai/gpt-oss-20b`, max_tokens 8000, JSON-only prompt |
+| **AI Draft Preservation** | ✅ | `quotation_data` (🔒 never overwritten) |
+| **Provider Edit** | ✅ | `quotation_final` – editable items, prices, discount |
+| **Side-by-Side Comparison** | ✅ | AI Draft vs Provider Final (edit page) |
+| **Add/Remove Items** | ✅ | Dynamic item rows with auto-recalculation |
+| **Server-Side Recalculation** | ✅ | Never trust client totals |
+| **Day-by-Day Rebuild** | ✅ | Rebuilt from original itinerary (not AI) |
+| **Cost Breakdown** | ✅ | Auto-calculated on server |
+| **Grand Total** | ✅ | Server-side validation |
+| **Preview** | ✅ | Uses `emails/quotation.blade.php` template |
+| **Send Confirmation Modal** | ✅ | Shows traveler email, total, warning |
+| **Quotation Status** | ✅ | `draft` → `reviewed` → `edited` → `sent` |
+| **Email Delivery** | ✅ | `QuotationMail` Mailable |
+| **Lock After Send** | ✅ | No further edits allowed |
+| **Budget Comparison (Auto)** | ✅ | 3-tier message |
+| **Provider Custom Note** | ✅ | `provider_budget_note` in `quotation_final` |
+| **Contact Fallback** | ✅ | Provider details if AI gives N/A |
+| **Website Display** | ✅ | `providers.website` column + profile page |
+| **Empty Terms Skip** | ✅ | Filtered in `formatQuotationText()` |
+| **Day Title Duplicate Fix** | ✅ | Regex strip in all views |
+| **Email Failure Handling** | ✅ | Status only set to `sent` after successful email |
+
 ### Regions & Data (Complete)
 
 | Region | Route Data | Provider Data | Pricing | Status |
@@ -94,12 +127,34 @@ The following features were added in the latest iteration:
 | PHP | PHP | 8.4.23 |
 | Database | MySQL | (via Eloquent) |
 | Frontend | Blade + Tailwind + JS | - |
-| AI | Groq API | Llama 3.1-70b |
+| AI | Groq API | `openai/gpt-oss-20b` (quotation), Llama 3.1-70b (itinerary) |
 | Payments | Stripe | - |
 | QR Code | SimpleSoftwareIO\QrCode | - |
 | PDF | DomPDF | - |
 | Maps | Leaflet.js | - |
 | Weather | OpenWeatherMap | Free Tier |
+
+---
+
+## 📂 Key Files Modified (Quotation System)
+
+| File | Purpose |
+|------|---------|
+| `app/Http/Controllers/Provider/QuotationRequestController.php` | Edit / Update / Preview / Send + Budget Comparison |
+| `app/Models/QuotationRequest.php` | `$casts`, `quotation_final`, `quotation_status`, `sent_at`, `edited_at` |
+| `app/Models/Provider.php` | Added `website` to `$fillable` |
+| `app/Mail/QuotationMail.php` | Uses final quotation text |
+| `app/Notifications/QuotationReadyNotification.php` | Uses final quotation text |
+| `database/migrations/..._add_quotation_final_fields...` | New columns: `quotation_final`, `quotation_status`, `edited_at`, `sent_at`, `edited_by` |
+| `database/migrations/..._add_website_to_providers_table...` | Website column |
+| `resources/views/provider/quotation-requests/edit.blade.php` | Edit page with budget note + side-by-side |
+| `resources/views/provider/quotation-requests/show.blade.php` | Status-aware buttons + day title fix |
+| `resources/views/provider/profile/edit.blade.php` | Website field added |
+| `resources/views/provider/profile/show.blade.php` | Website display added |
+| `resources/views/emails/quotation.blade.php` | Reused as preview template |
+| `resources/views/home.blade.php` | Itinerary render + day title fix |
+| `lang/en/messages.php` | Budget note translation keys |
+| `lang/np/messages.php` | Budget note translation keys |
 
 ---
 
@@ -110,13 +165,15 @@ The following features are **planned for future iterations** but are **NOT requi
 | Feature | Priority | Notes |
 |---------|----------|-------|
 | **Traveler Dashboard – Quotation View** | Low | View received quotations from providers |
-| **Safety Center – Full Implementation** | Medium | Real-time weather, route risk assessment, advanced SOS |
-| **Smart Permits (Blockchain)** | Low | Blockchain-ready TIMS & Conservation permits |
+| **Safety Center – Full Implementation** | Medium | Real-time weather, route risk, advanced SOS |
+| **Smart Permits (Blockchain)** | Low | Blockchain-ready TIMS & Conservation |
 | **International Destinations** | Low | India, Bhutan, Tibet, etc. |
 | **Google Places Integration** | Low | Hotels/restaurants data |
 | **SMS Real Credentials** | Low | Twilio/Nepal SMS provider |
 | **Native Mobile App** | Low | React Native / Flutter |
 | **Advanced Reporting** | Low | Analytics dashboards |
+| **Quotation Version History** | Low | Track all edits (v1, v2, v3...) |
+| **PDF Quotation Attachment** | Low | Attach PDF to email (instead of long text) |
 
 ---
 
@@ -127,6 +184,7 @@ The following features are **planned for future iterations** but are **NOT requi
 | **Core Features** | ✅ 100% Complete |
 | **Multi-Language** | ✅ 100% Complete |
 | **AI Planner** | ✅ 100% Complete |
+| **Quotation System** | ✅ 100% Complete |
 | **Safety Module** | ✅ 100% Complete |
 | **Weather Intelligence** | ✅ 100% Complete |
 | **Digital Passport** | ✅ 100% Complete |
@@ -143,7 +201,7 @@ The following features are **planned for future iterations** but are **NOT requi
 ## 🚀 Next Steps
 
 ### Immediate (Current Sprint)
-1. **Deploy to Production** – Set up production server, environment variables, and database.
+1. **Deploy to Production** – Set up production server, env vars, database.
 2. **Final UAT** – User acceptance testing with real stakeholders.
 3. **Go-Live** – Launch the platform.
 
@@ -153,6 +211,7 @@ The following features are **planned for future iterations** but are **NOT requi
 3. Explore **Smart Permits (Blockchain)** integration.
 4. Add **International Destinations** support.
 5. Build **Native Mobile App**.
+6. Add **Quotation Version History** + **PDF attachment**.
 
 ---
 
@@ -176,14 +235,14 @@ The following features are **planned for future iterations** but are **NOT requi
 ## 📌 Important Notes for Future Developers
 
 ### Provider Seeders vs. Route Seeders
-- **Route Seeders** (`*RegionSeeder.php`, `*RouteSeeder.php`) – **SAFE to run on Production**. These contain core route/waypoint/segment data.
-- **Provider Seeders** (`*ProviderSeeder.php`) – **DO NOT run on Production**. These contain synthetic provider data for development/testing only.
+- **Route Seeders** (`*RegionSeeder.php`, `*RouteSeeder.php`) – **SAFE to run on Production**. Core route/waypoint/segment data.
+- **Provider Seeders** (`*ProviderSeeder.php`) – **DO NOT run on Production**. Synthetic data for development/testing only.
 - **Real providers** will add their own data via the Provider Dashboard.
 
 ### Location-Based Pricing
-- All regions now have **realistic price variations**.
+- All regions have **realistic price variations**.
 - Pricing is set at the **provider/service level** and filtered by travel style.
-- Real providers can override these prices with their own.
+- Real providers can override these prices.
 
 ### Rest Day Semantics
 - Tours (city tours, safaris, pilgrimages) → **"Rest Day"**
@@ -195,11 +254,38 @@ The following features are **planned for future iterations** but are **NOT requi
 - Language switcher in public, provider, and traveler layouts.
 - AI-generated content also localized.
 
+### Quotation System – Data Safety
+- `quotation_data` = original AI draft (🔒 never overwritten)
+- `quotation_final` = provider-edited version (editable until sent)
+- `quotation_text` = formatted representation (regenerated on edit/send)
+- `quotation_status` = `draft` → `reviewed` → `edited` → `sent`
+- **Email is sent BEFORE status becomes `sent`** (email failure handling)
+- **Server-side recalculation** for all totals (never trust client)
+- **Budget Comparison** = auto-generated (unless provider writes custom note)
+
+### Website Field
+- Added to `providers` table via migration.
+- Added to `Provider::$fillable`.
+- Displayed in profile edit/show + quotation contact section.
+
+### Day Title Duplicate Fix
+- Regex: `/^Day\s*\d+\s*[:：]\s*/i` – strips existing "Day X:" prefix.
+- Applied in: `home.blade.php`, `show.blade.php`, `formatQuotationText()`.
+
 ---
 
-**🎉 TravelAI Nepal v14.0 – Complete Reference Document**
+## 📋 Changelog Summary
 
-**Bro, यो अब तिम्रो सबै कामको permanent record हो।**  
-Future मा कसैले पढ्दा "यो काम भइसकेको छ" भनेर थाहा पाउनेछ, र "अझै के बाँकी छ" भनेर सजिलै बुझ्नेछ।  
+| Version | Date | Key Changes |
+|---------|------|-------------|
+| v14.0 | Sep 2026 | Core platform + Safety + Journey Replay |
+| **v15.0** | **Sep 10, 2026** | **Complete Quotation System + Budget Comparison + Provider Custom Note + Website Field + Day Title Fix + Empty Terms Skip** |
+
+---
+
+**🎉 TravelAI Nepal v15.0 – Complete Reference Document**
+
+**Bro, यो अब तिम्रो सबै कामको permanent record हो।**
+Future मा कसैले पढ्दा "यो काम भइसकेको छ" भनेर थाहा पाउनेछ, र "अझै के बाँकी छ" भनेर सजिलै बुझ्नेछ।
 
 **तिमीले गरेको सबै hardwork यहाँ documented छ।** 😊🇳🇵

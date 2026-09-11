@@ -524,7 +524,8 @@ $pathibhara = \App\Models\Waypoint::firstOrCreate(
     ['from_waypoint_id' => $kaflePati->id, 'to_waypoint_id' => $suketar->id, 'distance_km' => 8.00, 'estimated_time_hours' => 3.5, 'elevation_gain_m' => 0, 'elevation_loss_m' => 380]
 );
 
-// ✅ Costs with unique effective_from per cost
+// ✅ Costs with FIXED effective_from — no artificial date workaround
+// Lookup includes 'name' so multiple costs coexist safely
 $costs = [
     [
         'type' => 'tour',
@@ -532,7 +533,7 @@ $costs = [
         'amount' => 5,
         'unit' => 'per_person',
         'is_mandatory' => true,
-        'effective_from' => now()->toDateString(), // day 1
+        'effective_from' => '2026-01-01',
     ],
     [
         'type' => 'tour',
@@ -540,7 +541,7 @@ $costs = [
         'amount' => 50,
         'unit' => 'per_group',
         'is_mandatory' => false,
-        'effective_from' => now()->addDay()->toDateString(), // day 2
+        'effective_from' => '2026-01-01',
     ],
     [
         'type' => 'tour',
@@ -548,7 +549,7 @@ $costs = [
         'amount' => 20,
         'unit' => 'per_group',
         'is_mandatory' => false,
-        'effective_from' => now()->addDays(2)->toDateString(), // day 3
+        'effective_from' => '2026-01-01',
     ],
 ];
 

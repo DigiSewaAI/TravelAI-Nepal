@@ -15,29 +15,71 @@ class AssignRouteCategoriesSeeder extends Seeder
         Route::all()->each(function ($route) use ($categories) {
             $name = $route->name;
 
-            // Determine category based on route name
-            if (stripos($name, 'Trek') !== false || stripos($name, 'trek') !== false) {
-                $cat = 'trek';
-            } elseif (stripos($name, 'Tour') !== false || stripos($name, 'tour') !== false ||
-                      stripos($name, 'Safari') !== false || stripos($name, 'Heritage') !== false ||
-                      stripos($name, 'Circuit') !== false || stripos($name, 'Pilgrimage') !== false ||
-                      stripos($name, 'City') !== false || stripos($name, 'Lakeside') !== false) {
-                $cat = 'tour';
-            } elseif (stripos($name, 'Rafting') !== false || stripos($name, 'Paragliding') !== false ||
-                      stripos($name, 'Bungee') !== false || stripos($name, 'Activity') !== false ||
-                      stripos($name, 'Adventure') !== false) {
-                $cat = 'activity';
+            if (preg_match('/\b(Rafting|Paragliding|Bungee|Bungee Jumping|Zip-?line|Zip-?lining|Kayaking|Skydiving|Canyoning|Rock Climbing|Mountain Biking|Hot Air Ballooning)\b/i', $name)) {
+                $type = 'activity';
+            } elseif (stripos($name, 'Safari') !== false) {
+                $type = 'tour';
+            } elseif (preg_match('/\bTrek\b/i', $name)) {
+                $type = 'trek';
+            } elseif (preg_match('/\b(Tour|Heritage|Pilgrimage|Sightseeing)\b/i', $name)) {
+                $type = 'tour';
+            } elseif (preg_match('/\b(Village|City|Hill Station|Tea Garden)\b/i', $name)) {
+                $type = 'tour';
+            } elseif (preg_match('/\b(Circuit|Pass|Base Camp)\b/i', $name)) {
+                $type = 'trek';
             } else {
-                $cat = 'trek'; // default
+                $type = 'trek';
             }
 
-            if (isset($categories[$cat])) {
-                $route->service_category_id = $categories[$cat];
-                $route->save();
+            $manualOverrides = [
+                'kanchenjunga-circuit' => 'trek',
+                'annapurna-circuit' => 'trek',
+                'dolpo-circuit' => 'trek',
+                'lumbini-circuit' => 'tour',
+                'lumbini-mayadevi' => 'tour',
+                'pathibhara-temple-pilgrimage' => 'tour',
+                'muktinath-pilgrimage' => 'tour',
+                'janaki-temple-pilgrimage' => 'tour',
+                'mardi-himal' => 'trek',
+                'gokyo-lakes' => 'trek',
+                'three-passes' => 'trek',
+                'upper-mustang' => 'trek',
+                'lower-mustang' => 'trek',
+                'jomsom-muktinath' => 'trek',
+                'khopra-ridge' => 'trek',
+                'mohare-danda' => 'trek',
+                'sikles' => 'trek',
+                'panchase' => 'trek',
+            ];
+            if (isset($manualOverrides[$route->slug])) {
+                $type = $manualOverrides[$route->slug];
             }
+
+            $route->route_type = $type;
+
+            $catSlug = match ($type) {
+                'trek' => 'trek',
+                'tour' => 'tour',
+                'activity' => 'activity',
+                'service' => 'experience',
+                default => 'trek',
+            };
+
+            if (isset($categories[$catSlug])) {
+                $route->service_category_id = $categories[$catSlug];
+            }
+
+            $route->save();
         });
 
-        $this->command->info('✅ Route categories assigned.');
-        $this->command->info('   📌 Total routes updated: ' . Route::count());
+        $this->command->info('✅ Route types & categories assigned.');
+
+        $distribution = Route::select('route_type')
+            ->groupBy('route_type')
+            ->selectRaw('route_type, count(*) as cnt')
+            ->get();
+        foreach ($distribution as $d) {
+            $this->command->info("   {$d->route_type}: {$d->cnt}");
+        }
     }
 }

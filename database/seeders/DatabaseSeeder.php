@@ -12,61 +12,90 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * PHASE 4B — Reordered DatabaseSeeder (dependency-safe)
      */
     public function run(): void
     {
-        // Create a test user (for development)
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // ═══════════════════════════════════════════════════════
+        // PHASE 4B — Reordered DatabaseSeeder (dependency-safe)
+        // ═══════════════════════════════════════════════════════
+
+        // ─── 1. Base / reference data ───
+        $this->call([
+            ProviderTypeSeeder::class,
+            ServiceCategorySeeder::class,
+            PlanSeeder::class,
+
+            // ─── 2. Locations (must exist before waypoint sync) ───
+            LocationSeeder::class,
         ]);
 
-        // Call all seeders in correct order
+        // ─── 3. Route seeders (create routes + waypoints + segments + costs) ───
         $this->call([
-            ProviderTypeSeeder::class,      // Phase 1: Provider types
-            ServiceCategorySeeder::class,   // Phase 1: Service categories
-            PlanSeeder::class,              // Phase 8: Subscription plans
-            
-            // ✅ Phase 3-4: Base route seeders (ABC, EBC, Langtang)
-            AbcRouteSeeder::class,          // Annapurna Base Camp
-            EbcRouteSeeder::class,          // Everest Base Camp
-            LangtangRouteSeeder::class,     // Langtang Valley
-            
-            // ✅ Phase 4: Annapurna Region (12 destinations)
+            AbcRouteSeeder::class,
+            EbcRouteSeeder::class,
+            LangtangRouteSeeder::class,
             AnnapurnaRegionSeeder::class,
-            
-            // ✅ Everest Region (6 destinations)
             EverestRegionSeeder::class,
-            
-            // ✅ Langtang, Helambu & Manaslu Region (7 destinations)
             LangtangHelambuManasluRegionSeeder::class,
-            
-            // ✅ Mustang & Dolpo Region (8 destinations)
             MustangDolpoRegionSeeder::class,
-            
-            // ✅ Kanchenjunga & Makalu Region
             KanchenjungaMakaluRegionSeeder::class,
-            
-            // ✅ Remote Treks (13 destinations)
             RemoteTreksSeeder::class,
-            
-            // ✅ City & Cultural Tours (23 destinations)
             CityCulturalToursSeeder::class,
-            
-            // ✅ National Parks (6 destinations)
             NationalParksSeeder::class,
-            
-            // ✅ NEW: Religious Sites
             ReligiousSitesSeeder::class,
-
             AdventureActivitiesSeeder::class,
             HiddenGemsSeeder::class,
-
-            
-            // ✅ Demo providers with services, bookings & reviews
-            TourismProvidersSeeder::class,
-
-
         ]);
+
+        // ─── 4. Waypoint ↔ Location sync ───
+        //         (needs waypoints + locations to exist)
+        $this->call([
+            WaypointLocationSeeder::class,
+            SyncMissingLocationsSeeder::class,
+        ]);
+
+        // ─── 5. Route category assignment ───
+        //         (needs routes + service_categories)
+        $this->call([
+            AssignRouteCategoriesSeeder::class,
+        ]);
+
+        // ─── 6. Provider seeders per region ───
+        //         (need locations + service_categories + users)
+        $this->call([
+            AnnapurnaProviderSeeder::class,
+            EverestProviderSeeder::class,
+            LangtangProviderSeeder::class,
+            ManasluProviderSeeder::class,
+            KanchenjungaMakaluProviderSeeder::class,
+            MustangDolpoProviderSeeder::class,
+            NationalParksProviderSeeder::class,
+            ReligiousSitesProviderSeeder::class,
+            HiddenGemsProviderSeeder::class,
+            CityCulturalProviderSeeder::class,
+            AdventureActivitiesProviderSeeder::class,
+            RemoteTreksProviderSeeder::class,
+        ]);
+
+        // ─── 7. Base services + location assignment ───
+        $this->call([
+            ServiceSeeder::class,
+            ServiceLocationSeeder::class,
+        ]);
+
+        // ─── 8. Tourism providers (with services, reviews) ───
+        $this->call([
+            TourismProvidersSeeder::class,
+        ]);
+
+        // ─── 9. Final assignments (need all above) ───
+        $this->call([
+            AssignProviderTypesSeeder::class,
+        ]);
+
+        // ─── 10. Testing data (dev only) ───
+        // $this->call([TestingDataSeeder::class]); // ← uncomment if needed
     }
 }

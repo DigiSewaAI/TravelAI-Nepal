@@ -66,6 +66,7 @@ class EbcRouteSeeder extends Seeder
             ['from' => 'phakding', 'to' => 'namche-bazaar', 'dist' => 10.5, 'time' => 5.0, 'gain' => 830, 'loss' => 0],
             ['from' => 'namche-bazaar', 'to' => 'tengboche', 'dist' => 9.0, 'time' => 5.0, 'gain' => 420, 'loss' => 0],
             ['from' => 'tengboche', 'to' => 'dingboche', 'dist' => 10.0, 'time' => 5.0, 'gain' => 550, 'loss' => 0],
+            ['from' => 'dingboche', 'to' => 'dingboche', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ['from' => 'dingboche', 'to' => 'lobuche', 'dist' => 9.5, 'time' => 5.5, 'gain' => 530, 'loss' => 0],
             ['from' => 'lobuche', 'to' => 'gorak-shep', 'dist' => 5.5, 'time' => 3.5, 'gain' => 200, 'loss' => 0],
             ['from' => 'gorak-shep', 'to' => 'ebc', 'dist' => 3.5, 'time' => 2.5, 'gain' => 224, 'loss' => 0],
@@ -136,15 +137,15 @@ class EbcRouteSeeder extends Seeder
             ],
         ];
 
-        foreach ($costs as $cost) {
+                foreach ($costs as $cost) {
             RouteCost::updateOrCreate(
                 [
                     'route_id' => $route->id,
                     'type' => $cost['type'],
+                    'name' => $cost['name'],                          // ✅ ADDED
                     'effective_from' => $cost['from'],
                 ],
                 [
-                    'name' => $cost['name'],
                     'amount' => $cost['amount'],
                     'currency' => 'NPR',
                     'unit' => $cost['unit'],

@@ -50,6 +50,7 @@ class PlannerController extends Controller
                     'breakdown' => $result['breakdown'] ?? [],
                     'currency' => 'NPR',
                     'planner_result_id' => $result['result']->id ?? null, // ✅ NEW – Itinerary ID for quotation requests
+                    'metadata' => $result['metadata'] ?? null,
                 ],
             ]);
         } catch (ValidationException $e) {

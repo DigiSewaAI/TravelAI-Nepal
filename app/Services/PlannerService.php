@@ -131,6 +131,18 @@ $segments = $segments->sortBy('sequence');
             $dayServicesMap[$i] = collect();
         }
 
+        
+        // ─── Route data sufficiency check ───
+        $routeDataDays = count($overnightSegments);
+        $requestedDays = $input['days'];
+        $routeDataMismatch = $requestedDays > $routeDataDays;
+
+        if ($routeDataMismatch) {
+            Log::warning("⚠️ Requested {$requestedDays} days but route has {$routeDataDays} verified segments", [
+                'route' => $route->name,
+            ]);
+        }
+
         // ============================================================
         // COST CALCULATION
         // ============================================================
@@ -152,23 +164,11 @@ $segments = $segments->sortBy('sequence');
         // ============================================================
         $validated = $this->validator->validate($aiResponse, $route, $input, $context, $locale);
 
+                // ============================================================
+        // Phase 4H — No buffer day conversion.
+        // Validator now skips "no data" days entirely.
+        // Verified days are returned as-is.
         // ============================================================
-        // BUFFER DAY FIX
-        // ============================================================
-        $noDataCount = 0;
-        foreach ($validated['days'] as $index => $day) {
-            if (strpos($day['title'], 'No Itinerary Data') !== false ||
-                strpos($day['title'], 'कोई यात्रा डेटा नहीं') !== false ||
-                strpos($day['title'], '无行程数据') !== false ||
-                strpos($day['title'], 'यात्रा डेटा छैन') !== false) {
-                $noDataCount++;
-                if ($noDataCount > 1) {
-                    $dayNumber = $day['day_number'];
-                    $validated['days'][$index]['title'] = "Day {$dayNumber}: Buffer Day";
-                    $validated['days'][$index]['description'] = "This day is kept as an extra buffer for the journey.";
-                }
-            }
-        }
 
         // ============================================================
 // ATTACH SERVICES TO DAYS
@@ -220,58 +220,15 @@ foreach ($validated['days'] as &$dayData) {
         }
     }
 
-    // 🔥 Style-matched hotel override (पहिले यो check गरौं)
-    $waypointName = $waypoint->name;
-    $style = $input['travel_style'] ?? 'mid_range';
-
-    $styleMatchedHotel = Service::where('status', 'active')
-        ->where('name', 'LIKE', "%{$waypointName}%")
-        ->whereHas('category', function($q) {
-            $q->where('slug', 'hotel');
-        })
-        ->whereHas('provider.styles', function($q) use ($style) {
-            $q->where('style_slug', $style);
-        })
-        ->first();
-
-    if ($styleMatchedHotel) {
-        $bestService = [
-            'id' => $styleMatchedHotel->id,
-            'name' => $styleMatchedHotel->name,
-            'price' => (float) $styleMatchedHotel->price,
-            'currency' => $styleMatchedHotel->currency ?? 'NPR',
-            'provider' => $styleMatchedHotel->provider->name ?? 'TravelAI Partner',
-            'location_id' => $styleMatchedHotel->location_id,
-        ];
-        Log::info("✅ Override with style-matched hotel: {$bestService['name']} for Day {$dayNumber}");
-    } else {
-        // यदि style-matched hotel छैन भने, fallback guide खोज
-        $guide = Service::where('status', 'active')
-            ->where('name', 'LIKE', "%{$waypointName}%")
-            ->whereHas('category', function($q) {
-                $q->where('slug', 'guide');
-            })
-            ->first();
-
-        if ($guide) {
-            $bestService = [
-                'id' => $guide->id,
-                'name' => $guide->name ?? 'Unknown Guide',
-                'price' => (float) ($guide->price ?? 0),
-                'currency' => $guide->currency ?? 'NPR',
-                'provider' => $guide->provider->name ?? 'TravelAI Partner',
-                'location_id' => $guide->location_id,
-            ];
-            Log::info("✅ Guide fallback found: {$bestService['name']} for Day {$dayNumber}");
-        } else {
-            Log::info("❌ No service found for: {$waypointName} (Day {$dayNumber})");
-        }
-    }
+        // 🔥 Delegate to centralized service resolver (Phase 4F — LIKE removed)
+    $bestService = $this->getServiceForWaypoint($waypoint, $input);
 
     if (!$bestService) {
-        Log::info("ℹ️ No service found for Day {$dayNumber} ({$waypoint->name})");
+        Log::info("ℹ️ No service resolved for Day {$dayNumber} ({$waypoint->name})");
         continue;
     }
+
+    Log::info("✅ Service resolved for Day {$dayNumber}: {$bestService['name']}");
 
     $priceNpr = $bestService['price'];
     if (strtoupper($bestService['currency'] ?? 'NPR') === 'USD') {
@@ -301,8 +258,8 @@ unset($dayData);
         // ============================================================
         // SAVE TO DB
         // ============================================================
-        $result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown) {
-            $plannerRequest = PlannerRequest::create([
+$result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown, $routeDataDays, $requestedDays, $routeDataMismatch) {
+                $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
                 'session_id' => session()->getId(),
                 'route_id' => $route->id,
@@ -400,7 +357,7 @@ unset($dayData);
                         'unit' => 'note',
                         'is_mandatory' => false,
                         'provider_name' => 'System',
-                        'message' => "Your budget of {$input['budget']} USD is " . round($overPercent, 0) . "% over the estimated cost. Consider increasing your budget or choosing a more affordable style.",
+                                                'message' => "Estimated cost is " . round($overPercent, 0) . "% over your budget of {$input['budget']} USD. Consider increasing your budget or choosing a more affordable style.",
                     ];
                     Log::info("⚠️ Budget warning added: {$overPercent}% over budget");
                 }
@@ -408,12 +365,18 @@ unset($dayData);
 
             Log::info("💰 Total cost: NPR {$totalCost}, Budget: NPR {$budgetNpr}");
 
-            return [
+                        return [
                 'request' => $plannerRequest,
                 'result' => $plannerResult,
                 'days' => $plannerResult->days()->with('items')->get(),
                 'total_cost' => $totalCost,
                 'breakdown' => $finalBreakdown,
+                'metadata' => [
+                    'route_data_days' => $routeDataDays,
+                    'requested_days' => $requestedDays,
+                    'data_sufficiency' => $routeDataMismatch ? 'insufficient' : 'sufficient',
+                    'recommended_days' => $route->recommended_days ?? $routeDataDays,
+                ],
             ];
         });
 
@@ -570,19 +533,42 @@ unset($dayData);
     // ==========================================
     protected function buildFallbackResponse(Route $route, array $input, string $locale = 'en', array $overnightSegments = []): array
 {
-    // ✅ Always fetch fresh segments from DB with relations loaded
-    $freshSegments = $route->segments()
-        ->with(['fromWaypoint', 'toWaypoint'])
-        ->orderBy('sequence')
-        ->get();
+    // ✅ Phase 4H-fix: Use passed $overnightSegments (merged by overnight rules)
+    // instead of raw segments. This prevents pass/peak waypoints from
+    // becoming overnight stops.
+    if (!empty($overnightSegments)) {
+        // Extract the merged segments from the passed structure
+        $freshSegments = collect();
+        foreach ($overnightSegments as $item) {
+            $seg = $item['segment'];
+            // Load waypoint relations if not already loaded
+            if (!$seg->relationLoaded('fromWaypoint')) {
+                $seg->load('fromWaypoint', 'toWaypoint');
+            }
+            $freshSegments->push($seg);
+        }
 
-    if ($freshSegments->isEmpty()) {
-        // If no segments, create a dummy one
-        $this->ensureSegmentsForTour($route);
+        // Fallback: if somehow empty, reload from DB
+        if ($freshSegments->isEmpty()) {
+            $freshSegments = $route->segments()
+                ->with(['fromWaypoint', 'toWaypoint'])
+                ->orderBy('sequence')
+                ->get();
+        }
+    } else {
+        // Legacy path — load raw segments
         $freshSegments = $route->segments()
             ->with(['fromWaypoint', 'toWaypoint'])
             ->orderBy('sequence')
             ->get();
+
+        if ($freshSegments->isEmpty()) {
+            $this->ensureSegmentsForTour($route);
+            $freshSegments = $route->segments()
+                ->with(['fromWaypoint', 'toWaypoint'])
+                ->orderBy('sequence')
+                ->get();
+        }
     }
 
     $days = [];
@@ -653,7 +639,9 @@ if ($route->slug === 'pokhara-paragliding') {
 
 // ✅ For tours, try to get hotel by location
 $isTour = $this->isTourRoute($route);
-if (!$service && $isTour) {
+if (!$service && $isTour && $to->location_id !== null) {
+    // Phase 4N.1b: Guard against null location — Laravel's where('col', null)
+    // translates to WHERE col IS NULL, which incorrectly matches orphan services.
     $service = Service::where('status', 'active')
         ->where('location_id', $to->location_id)
         ->whereHas('category', function($q) {
@@ -788,72 +776,67 @@ if (!$service && $to) {
     // ==========================================
     // ✅ GET SINGLE SERVICE FOR WAYPOINT (with style filter and formatService)
     // ==========================================
-    protected function getServiceForWaypoint(Waypoint $waypoint, array $input): ?array
+        protected function getServiceForWaypoint(Waypoint $waypoint, array $input): ?array
     {
-        $waypointName = $waypoint->name;
+        // ─── Guard 1: overnight eligibility ───
+        if (!$waypoint->is_overnight_stop) {
+            Log::info("⏭️ Skipping non-overnight waypoint: {$waypoint->name}");
+            return null;
+        }
+
+        // ─── Guard 2: waypoint type ───
+        $nonAccommodationTypes = ['pass', 'lake', 'viewpoint', 'landmark', 'checkpoint'];
+        if (in_array($waypoint->type, $nonAccommodationTypes)) {
+            Log::info("⏭️ Skipping {$waypoint->type} waypoint: {$waypoint->name}");
+            return null;
+        }
+
+        // ─── Guard 3: location_id must exist ───
+        if (!$waypoint->location_id) {
+            Log::info("⏭️ No location_id for waypoint: {$waypoint->name}");
+            return null;
+        }
+
         $style = $input['travel_style'] ?? 'mid_range';
-        Log::info("🔍 getServiceForWaypoint called for: {$waypointName} (style: {$style})");
+        Log::info("📍 getServiceForWaypoint called for: {$waypoint->name} (style: {$style})");
 
         try {
-            // 1. Try hotel with matching style
+            // ─── Tier 1: Style-matched hotel at same location ───
             $hotel = Service::where('status', 'active')
-                ->where('name', 'LIKE', "%{$waypointName}%")
-                ->whereHas('category', function($q) {
-                    $q->where('slug', 'hotel');
-                })
-                ->whereHas('provider.styles', function($q) use ($style) {
-                    $q->where('style_slug', $style);
-                })
+                ->where('location_id', $waypoint->location_id)
+                ->whereHas('category', fn($q) => $q->where('slug', 'hotel'))
+                ->whereHas('provider.styles', fn($q) => $q->where('style_slug', $style))
                 ->first();
 
             if ($hotel) {
-                Log::info("✅ Found style-matched hotel: {$hotel->name}");
+                Log::info("✅ Style-matched hotel: {$hotel->name} for {$waypoint->name}");
                 return $this->formatService($hotel);
             }
 
-            // 2. If no style-matched hotel, try any hotel
+            // ─── Tier 2: Any hotel at same location ───
             $hotel = Service::where('status', 'active')
-                ->where('name', 'LIKE', "%{$waypointName}%")
-                ->whereHas('category', function($q) {
-                    $q->where('slug', 'hotel');
-                })
+                ->where('location_id', $waypoint->location_id)
+                ->whereHas('category', fn($q) => $q->where('slug', 'hotel'))
                 ->first();
 
             if ($hotel) {
-                Log::info("✅ Found any hotel (style fallback): {$hotel->name}");
+                Log::info("✅ Any hotel (style fallback): {$hotel->name} for {$waypoint->name}");
                 return $this->formatService($hotel);
             }
 
-            // 3. Try guide with style
+            // ─── Tier 3: Guide service at same location ───
             $guide = Service::where('status', 'active')
-                ->where('name', 'LIKE', "%{$waypointName}%")
-                ->whereHas('category', function($q) {
-                    $q->where('slug', 'guide');
-                })
-                ->whereHas('provider.styles', function($q) use ($style) {
-                    $q->where('style_slug', $style);
-                })
+                ->where('location_id', $waypoint->location_id)
+                ->whereHas('category', fn($q) => $q->where('slug', 'guide'))
                 ->first();
 
             if ($guide) {
-                Log::info("✅ Found style-matched guide: {$guide->name}");
+                Log::info("✅ Guide fallback: {$guide->name} for {$waypoint->name}");
                 return $this->formatService($guide);
             }
 
-            // 4. Try any guide
-            $guide = Service::where('status', 'active')
-                ->where('name', 'LIKE', "%{$waypointName}%")
-                ->whereHas('category', function($q) {
-                    $q->where('slug', 'guide');
-                })
-                ->first();
-
-            if ($guide) {
-                Log::info("✅ Found any guide (style fallback): {$guide->name}");
-                return $this->formatService($guide);
-            }
-
-            Log::info("❌ No service found for: {$waypointName}");
+            // ─── No service found — NO LIKE fallback ───
+            Log::info("❌ No service at location_id={$waypoint->location_id} for {$waypoint->name}");
             return null;
 
         } catch (\Exception $e) {
@@ -953,15 +936,46 @@ if (!$service && $to) {
     // ✅ Do nothing – segments already exist from seeder/Tinker
 }
 
-    protected function resolveRoute(?string $destination): ?Route
+        protected function resolveRoute(?string $destination): ?Route
     {
         if (!$destination) {
-            return Route::where('is_active', true)->first();
+            return Route::where('is_active', true)->orderBy('id')->first();
         }
-        return Route::where('name', 'LIKE', "%{$destination}%")
-            ->orWhere('slug', 'LIKE', "%{$destination}%")
-            ->where('is_active', true)
+
+        // ─── Tier 1: Exact slug match (deterministic, preferred) ───
+        $route = Route::where('is_active', true)
+            ->where('slug', $destination)
             ->first();
+        if ($route) {
+            Log::info("🎯 Route resolved by exact slug: {$route->slug}");
+            return $route;
+        }
+
+        // ─── Tier 2: Exact name match (case-insensitive) ───
+        $route = Route::where('is_active', true)
+            ->whereRaw('LOWER(name) = ?', [strtolower($destination)])
+            ->first();
+        if ($route) {
+            Log::info("🎯 Route resolved by exact name: {$route->name}");
+            return $route;
+        }
+
+        // ─── Tier 3: Fuzzy fallback (correctly grouped) ───
+        $route = Route::where('is_active', true)
+            ->where(function ($q) use ($destination) {
+                $q->where('name', 'LIKE', "%{$destination}%")
+                  ->orWhere('slug', 'LIKE', "%{$destination}%");
+            })
+            ->orderBy('id')
+            ->first();
+
+        if ($route) {
+            Log::info("🎯 Route resolved by fuzzy match: {$route->slug} (input: {$destination})");
+        } else {
+            Log::warning("❌ Route not found for: {$destination}");
+        }
+
+        return $route;
     }
 
     private function translateName(string $name, string $prefix, string $locale): string
@@ -1028,17 +1042,10 @@ if (!$service && $to) {
     }
 
     private function isTourRoute(Route $route): bool
-    {
-        if (stripos($route->name, 'Trek') !== false) {
-            return false;
-        }
-
-        $tourKeywords = ['Tour', 'Safari', 'Heritage', 'Pilgrimage', 'Circuit', 'Sightseeing'];
-        foreach ($tourKeywords as $keyword) {
-            if (stripos($route->name, $keyword) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
+{
+    // Phase 4N.1b: Use route_type column (set by AssignRouteCategoriesSeeder)
+    // instead of keyword matching. This eliminates the "Kanchenjunga Circuit"
+    // false positive caused by the "Circuit" keyword.
+    return $route->route_type === 'tour';
+}
 }

@@ -16,7 +16,7 @@ class Location extends Model
         'city',
         'latitude',
         'longitude',
-        'is_habitable', // added
+        'is_habitable',
     ];
 
     protected $casts = [
@@ -24,4 +24,16 @@ class Location extends Model
         'longitude' => 'decimal:8',
         'is_habitable' => 'boolean',
     ];
+
+    // Relationships
+
+    /**
+     * ✅ ADDED (Phase 4A — A-6)
+     * Reverse relationship: Location has many Waypoints.
+     * Used in Phase 4F service matching hierarchy.
+     */
+    public function waypoints()
+    {
+        return $this->hasMany(Waypoint::class);
+    }
 }

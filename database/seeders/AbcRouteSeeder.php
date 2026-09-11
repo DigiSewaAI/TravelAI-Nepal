@@ -109,15 +109,15 @@ class AbcRouteSeeder extends Seeder
             ['type' => 'food_estimate', 'name' => 'Daily Food Budget', 'amount' => 2500, 'unit' => 'per_day', 'mandatory' => false, 'from' => '2026-01-01', 'until' => '2026-12-31'],
         ];
 
-        foreach ($costs as $cost) {
+                foreach ($costs as $cost) {
             RouteCost::updateOrCreate(
                 [
                     'route_id' => $route->id,
                     'type' => $cost['type'],
+                    'name' => $cost['name'],                          // ✅ ADDED
                     'effective_from' => $cost['from'],
                 ],
                 [
-                    'name' => $cost['name'],
                     'amount' => $cost['amount'],
                     'currency' => 'NPR',
                     'unit' => $cost['unit'],

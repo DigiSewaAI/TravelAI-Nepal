@@ -127,15 +127,15 @@ class LangtangRouteSeeder extends Seeder
             ],
         ];
 
-        foreach ($costs as $cost) {
+                foreach ($costs as $cost) {
             RouteCost::updateOrCreate(
                 [
                     'route_id' => $route->id,
                     'type' => $cost['type'],
+                    'name' => $cost['name'],                          // ✅ ADDED
                     'effective_from' => $cost['from'],
                 ],
                 [
-                    'name' => $cost['name'],
                     'amount' => $cost['amount'],
                     'currency' => 'NPR',
                     'unit' => $cost['unit'],

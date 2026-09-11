@@ -46,6 +46,14 @@ class WaypointLocationSeeder extends Seeder
             'Machhapuchhre Base Camp' => 'Machhapuchhre Base Camp',
             'Annapurna Base Camp' => 'Annapurna Base Camp',
 
+            // Mardi Himal route
+            'Pothana' => 'Pothana',
+            'Forest Camp' => 'Forest Camp',
+            'Low Camp' => 'Low Camp',
+            'High Camp' => 'High Camp',
+            'Mardi Himal Base Camp' => 'Mardi Himal Base Camp',
+            'Siding Village' => 'Siding Village',
+
             // ============================================================
             // EVEREST REGION
             // ============================================================
@@ -57,6 +65,7 @@ class WaypointLocationSeeder extends Seeder
             'Lobuche' => 'Lobuche',
             'Gorak Shep' => 'Gorak Shep',
             'Everest Base Camp' => 'Everest Base Camp',
+            'Gokyo' => 'Gokyo',
 
             // ============================================================
             // LANGTANG REGION
@@ -65,6 +74,13 @@ class WaypointLocationSeeder extends Seeder
             'Lama Hotel' => 'Lama Hotel',
             'Langtang Village' => 'Langtang',
             'Kyangjin Gompa' => 'Kyangjin Gompa',
+            'Dhunche' => 'Dhunche',
+            'Gosaikunda' => 'Gosaikunda',
+            'Chandanbari' => 'Gosaikunda',
+            'Sing Gompa' => 'Gosaikunda',
+            'Ghopte' => 'Gosaikunda',
+            'Chisapani' => 'Gosaikunda',
+            'Sundarijal' => 'Gosaikunda',
 
             // ============================================================
             // MUSTANG / DOLPO
@@ -108,7 +124,6 @@ class WaypointLocationSeeder extends Seeder
             'Mumbuk' => 'Tumlingtar',
             'Yangri Kharka' => 'Tumlingtar',
             'Makalu Base Camp' => 'Makalu Base Camp',
-            'Barun Valley' => 'Barun Valley',
 
             // ============================================================
             // MANASLU REGION
@@ -126,6 +141,21 @@ class WaypointLocationSeeder extends Seeder
             'Bimthang' => 'Bimthang',
             'Tilije' => 'Tilije',
             'Tal' => 'Tal',
+            'Larkya La' => 'Larkya La',
+
+            // ============================================================
+            // API HIMAL REGION
+            // ============================================================
+            'Darchula' => 'Darchula',
+            'Sitapur' => 'Sitapur',
+            'Khalanga' => 'Khalanga',
+            'Api Base Camp' => 'Api Base Camp',
+            'Gokuleshwar' => 'Gokuleshwar',
+            'Bitule' => 'Bitule',
+            'Khandeshwari' => 'Khandeshwari',
+            'Chiureni' => 'Chiureni',
+            'Makarigaun' => 'Makarigaun',
+            'Seti (Api)' => 'Seti (Api)',
 
             // ============================================================
             // CITIES / TOURS (Existing)
@@ -149,7 +179,7 @@ class WaypointLocationSeeder extends Seeder
             'Patan' => 'Patan',
 
             // ============================================================
-            // CITY TOURS - Start/End waypoints (Existing)
+            // CITY TOURS - Start/End waypoints
             // ============================================================
             'Tansen Hill Town Tour Start' => 'Tansen',
             'Tansen Hill Town Tour End' => 'Tansen',
@@ -183,6 +213,8 @@ class WaypointLocationSeeder extends Seeder
             'Seti River' => 'Seti River',
             'Sarangkot' => 'Sarangkot',
             'Kusma Bridge' => 'Kusma Bridge',
+            'Paragliding in Pokhara Start' => 'Sarangkot',
+            'Paragliding in Pokhara End' => 'Sarangkot',
 
             // ============================================================
             // RELIGIOUS SITES - Pathibhara
@@ -190,23 +222,11 @@ class WaypointLocationSeeder extends Seeder
             'Pathibhara Temple' => 'Pathibhara',
             'Pathibhara Devi Temple' => 'Pathibhara',
             'Pathibhara' => 'Pathibhara',
-            'Suketar' => 'Suketar',
             'Taplejung' => 'Taplejung',
 
             // ============================================================
-            // ✅ NEW: Kathmandu Heritage / City Tours waypoints
+            // KATHMANDU HERITAGE / CITY TOURS waypoints
             // ============================================================
-            // ============================================================
-// ✅ FIX: Start/End slugs for Heritage & City Tours
-// ============================================================
-'kathmandu-heritage-start' => 'Kathmandu',
-'kathmandu-heritage-end'   => 'Kathmandu',
-'kathmandu-city-tour-start'=> 'Kathmandu',
-'kathmandu-city-tour-end'  => 'Kathmandu',
-
-// ✅ Durbar Square slugs (Heritage & City)
-'kathmandu-durbar'        => 'Kathmandu',
-'kathmandu-durbar-city'   => 'Kathmandu',
             'Swayambhunath Stupa' => 'Kathmandu',
             'Boudhanath Stupa' => 'Kathmandu',
             'Pashupatinath Temple' => 'Kathmandu',
@@ -218,15 +238,62 @@ class WaypointLocationSeeder extends Seeder
             'Bhaktapur Durbar Square' => 'Bhaktapur',
 
             // ============================================================
-// ✅ FIX: City Tour start/end slugs
-// ============================================================
-'kathmandu-city-start' => 'Kathmandu',
-'kathmandu-city-end'   => 'Kathmandu',
-
-            // ============================================================
             // OTHER
             // ============================================================
             'Sindhuli' => 'Sindhuli',
+            'Dhorpatan' => 'Dhorpatan',
+            'Rara Lake' => 'Rara Lake',
+            'Simikot' => 'Simikot',
+
+            // ============================================================
+            // DOLPO REGION (Batch 2)
+            // ============================================================
+            'Chhetra' => 'Chhetra',
+            'Chaurikot' => 'Chaurikot',
+            'Kagmara Phedi' => 'Kagmara Phedi',
+            'Kagmara La' => 'Kagmara La',
+            'Pungmo' => 'Pungmo',
+            'Phoksundo Bhanjyang' => 'Phoksundo Bhanjyang',
+            'Ringmo' => 'Ringmo',
+            'Nisal' => 'Nisal',
+            'Jeng La' => 'Jeng La',
+            'Tokyu Gaon' => 'Tokyu Gaon',
+            'Dho Tarap' => 'Dho Tarap',
+            'Chharka' => 'Chharka',
+            'Sangda La' => 'Sangda La',
+            'Sangda Village' => 'Sangda Village',
+            'Chhepka' => 'Chhepka',
+            'Dunai' => 'Dunai',
+            'Juphal' => 'Juphal',
+
+            // Batch 3 — Makalu-Barun + Damodar Kunda
+            'Langmale Kharka' => 'Langmale Kharka',
+            'Barun Valley' => 'Barun Pokhari',
+            'Yara' => 'Yara',
+            'Ghara' => 'Ghara',
+            'Bajhang' => 'Bajhang',
+            'Bajura' => 'Bajura',
+            'Jumla' => 'Jumla',
+            'Dolakha' => 'Dolakha',
+            'Rolwaling' => 'Rolwaling',
+            'Bardiya' => 'Bardiya',
+            'Kanchanpur' => 'Kanchanpur',
+
+            // Batch 4 — Humla
+            'Chhipra' => 'Chhipra',
+            'Torpa' => 'Torpa',
+            'Kermi' => 'Kermi',
+            'Yalbang' => 'Yalbang',
+            'Muchu' => 'Muchu',
+            'Yari' => 'Yari',
+            // Batch 4 — Rolwaling
+            'Singati' => 'Singati',
+            'Jagat' => 'Jagat',
+            'Simigaon' => 'Simigaon',
+            'Dongang' => 'Dongang',
+            // Batch 4 — Saipal
+            'Kanda' => 'Kanda',
+            'Nauli' => 'Nauli',
         ];
 
         $totalUpdated = 0;
@@ -240,17 +307,21 @@ class WaypointLocationSeeder extends Seeder
         // ============================================================
         foreach (Waypoint::all() as $waypoint) {
             $waypointName = trim($waypoint->name);
+            $waypointSlug = trim($waypoint->slug ?? '');
             $locationName = null;
 
-            // Exact match
+            // Exact match (name OR slug)
             foreach ($map as $key => $value) {
-                if (strtolower($waypointName) === strtolower($key)) {
+                if (
+                    strtolower($waypointName) === strtolower($key) ||
+                    strtolower($waypointSlug) === strtolower($key)
+                ) {
                     $locationName = $value;
                     break;
                 }
             }
 
-            // Partial match
+            // Partial match (name only)
             if (!$locationName) {
                 foreach ($map as $key => $value) {
                     if (stripos($waypointName, $key) !== false) {
@@ -267,20 +338,9 @@ class WaypointLocationSeeder extends Seeder
                     $waypoint->location_id = $location->id;
                     $waypoint->save();
                     $totalUpdated++;
-                    $this->command->info("✅ {$waypoint->name} → {$location->city}");
                 } else {
-                    // Fallback for some Annapurna waypoints if location not found
-                    $fallbackLocation = Location::where('city', 'LIKE', "%Manang%")->first();
-                    if ($fallbackLocation && in_array($waypointName, ['Yak Kharka', 'Thorong Phedi', 'Thorong La'])) {
-                        $waypoint->location_id = $fallbackLocation->id;
-                        $waypoint->save();
-                        $totalFallback++;
-                        Log::warning("⚠️ Fallback: {$waypoint->name} → Manang (location '{$locationName}' not found)");
-                        $this->command->warn("⚠️ Fallback: {$waypoint->name} → Manang (please run LocationSeeder first)");
-                    } else {
-                        Log::warning("❌ Location not found for: {$locationName} (Waypoint: {$waypoint->name})");
-                        $totalNotFound++;
-                    }
+                    Log::warning("❌ Location not found for: {$locationName} (Waypoint: {$waypoint->name})");
+                    $totalNotFound++;
                 }
             } else {
                 Log::info("ℹ️ No mapping for waypoint: {$waypoint->name}");
@@ -289,20 +349,120 @@ class WaypointLocationSeeder extends Seeder
         }
 
         // ============================================================
-        // STEP 2: Set is_overnight_stop for ALL waypoints
-        // (Thorong La and EBC are explicitly false)
+        // ✅ STEP 2: Set is_overnight_stop = false ONLY for specific waypoints
+        // (Do NOT touch other waypoints – preserve manual fixes)
         // ============================================================
-        $nonOvernightNames = ['Thorong La', 'Everest Base Camp'];
+        $explicitNonOvernight = [
+            // ─── High-altitude passes ───
+            'Thorong La', 'Thorong La Pass',
+            'Kang La', 'Larkya La', 'Cho La', 'Renjo La',
+            'Kongma La', 'Mirgin La', 'Rupina La', 'French Col',
+            'Lauribina Pass',
 
-        foreach (Waypoint::all() as $waypoint) {
-            $isOvernight = !in_array($waypoint->name, $nonOvernightNames);
-            $waypoint->is_overnight_stop = $isOvernight;
-            $waypoint->save();
+            // Dolpo passes
+            'Damodar Kunda',
+            'Kagmara La', 'Jeng La', 'Sangda La',
 
-            if (!$isOvernight) {
-                $this->command->info("🚫 Set is_overnight_stop=false for: {$waypoint->name}");
+            // ─── Base camps without lodges ───
+            'Everest Base Camp',
+            'Kanchenjunga North Base Camp', 'Kanchenjunga South Base Camp',
+            'Makalu Base Camp', 'Dhaulagiri Base Camp',
+            'Mardi Himal Base Camp', 'Tilicho Base Camp',
+
+            // ─── Lakes (non-habitable) ───
+            'Gosaikunda', 'Panch Pokhari',
+            'Phoksundo Lake', 'Rara Lake', 'Dhorpatan Lake',
+            'Khaptad Lake', 'Kataiya Lake', 'Sikta Lake', 'Tilicho Lake',
+            'Damodar Kunda', 'Tso Rolpa', 'Kapuche Lake',
+
+            // ─── Landmarks / monuments ───
+            'Barahi Temple', 'Rani Mahal', 'Ranighat',
+            'Pathibhara Temple', 'Pathibhara Devi Temple',
+            'Swayambhunath Stupa', 'Boudhanath Stupa', 'Pashupatinath Temple',
+            'Kathmandu Durbar Square', 'Patan Durbar Square', 'Bhaktapur Durbar Square',
+            'Muktinath Temple', 'Janaki Temple', 'Mayadevi Temple',
+            'Ashoka Pillar', 'Ram Sita Vivaha Mandap',
+            'Chilancho Stupa', 'Bajrayogini Temple', 'Nyatapola Temple',
+            'Pottery Square', 'Golden Temple', 'Doleshwar Mahadev',
+            'Poon Hill',
+
+            // ─── Viewpoints (no lodges) ───
+            'Dhulikhel Viewpoint', 'Kakani Viewpoint',
+
+            // ─── Rivers / bridges ───
+            'Kali Gandaki River', 'Trishuli River',
+            'Bhote Koshi River', 'Seti River', 'Kusma Bridge',
+
+            // ─── Entrance gates / non-habitable landmarks ───
+            'World Peace Pagoda', 'Gupteshwor Cave',
+            'Kakrebihar', 'Aryaghat',
+            'Gorkha Durbar', 'Gorkha Kalika Temple',
+            'Chitwan National Park Entrance', 'Dhorpatan Entrance',
+            'Panauti Durbar Square', 'Khokana Durbar Square',
+            'Bungamati Temple', 'Sindhuli Fort', 'Dakshinkali Temple',
+            'Chandragiri Temple', 'Changunarayan Temple',
+            'Gorakhnath Temple', 'Baglung Kalika Temple',
+        ];
+        foreach ($explicitNonOvernight as $wpName) {
+            $updated = Waypoint::where('name', $wpName)->update(['is_overnight_stop' => false]);
+            if ($updated > 0) {
+                $this->command->info("🚫 is_overnight_stop=false → {$wpName}");
             }
         }
+
+        // ============================================================
+        // 🆕 STEP 2.5 (Phase 4N): Type-based is_overnight_stop enforcement
+        // ═══════════════════════════════════════════════════════════════
+        // Phase 4A migration पछि नयाँ waypoints default false मा आए।
+        // यो rule ले सधैं correct state राख्छ र STEP 2 को explicit
+        // non-overnight लाई override गर्छ (exceptions को लागि)।
+        // ============================================================
+        $this->command->info('🔧 Phase 4N: Enforcing type-based overnight rules...');
+
+        // Rule 1: सबै village/city → overnight = true
+        $villageCount = Waypoint::whereIn('type', ['village', 'city'])
+            ->update(['is_overnight_stop' => true]);
+        $this->command->info("   ✅ Villages/cities overnight: {$villageCount}");
+
+        // Rule 2: Non-village types → default false
+        $nonVillageCount = Waypoint::whereIn('type', ['pass', 'peak', 'lake', 'landmark', 'viewpoint', 'checkpoint'])
+            ->update(['is_overnight_stop' => false]);
+        $this->command->info("   ✅ Non-village non-overnight: {$nonVillageCount}");
+
+        // Rule 3: Exceptions — non-village waypoints WITH lodging
+        // (यी STEP 2 ले false बनाएको भए पनि यहाँ true हुन्छन्)
+        $explicitOvernightExceptions = [
+    // Phase 4N original:
+    'Annapurna Base Camp',
+    'Sarangkot',
+    'Bhedetar Viewpoint',
+    'Phoksundo Lake',
+    'Shey Gompa',
+    'Mu Gompa',
+    'Namobuddha',
+    'Sundarijal',
+    'Bandipur Bazaar',
+    'Chitwan National Park',
+    'Lumbini Garden',
+
+    // Phase 4N.1c — checkpoint-type base camps:
+    'Api Base Camp',
+    'Makalu Base Camp',
+    'Kyangjin Gompa',
+    'Machhapuchhre Base Camp',
+    'Kanchenjunga North Base Camp',
+    'Kanchenjunga South Base Camp',
+
+    // Phase 4N.5b1 — Bardiya safari exception:
+    'Karnali River',
+
+    // Phase 4N.5b1_fix — Makalu-Barun exception:
+    'Barun Valley',
+];
+        foreach ($explicitOvernightExceptions as $name) {
+            Waypoint::where('name', $name)->update(['is_overnight_stop' => true]);
+        }
+        $this->command->info("   ✅ Exceptions applied: " . count($explicitOvernightExceptions));
 
         // ============================================================
         // 🔥 STEP 3: EXPLICIT FORCE SET for Annapurna Circuit waypoints
@@ -334,14 +494,11 @@ class WaypointLocationSeeder extends Seeder
                     $waypoint->location_id = $location->id;
                     $waypoint->is_overnight_stop = $data['overnight'];
                     $waypoint->save();
-                    $this->command->info("🔒 FORCE SET: {$name} → location_id={$location->id}, overnight=" . ($data['overnight'] ? 'true' : 'false'));
                 } else {
                     Log::warning("⚠️ Explicit set skipped: Location '{$data['location']}' not found for waypoint '{$name}'");
-                    $this->command->warn("⚠️ Explicit set skipped: Location '{$data['location']}' not found for waypoint '{$name}'");
                 }
             } else {
                 Log::warning("⚠️ Explicit set skipped: Waypoint '{$name}' not found");
-                $this->command->warn("⚠️ Explicit set skipped: Waypoint '{$name}' not found");
             }
         }
 
@@ -354,10 +511,8 @@ class WaypointLocationSeeder extends Seeder
         $this->command->newLine();
         $this->command->info("✅ Waypoint Location Seeder Completed!");
         $this->command->info("   📌 Location mappings updated: {$totalUpdated}");
-        $this->command->info("   ⚠️  Fallback (Manang): {$totalFallback}");
         $this->command->info("   ❌ Not Found / Skipped: {$totalNotFound}");
         $this->command->info("   🏨 Overnight stops: {$totalOvernight}");
         $this->command->info("   🚫 Non-overnight stops: {$totalNonOvernight}");
-        $this->command->info("   📌 Non-overnight waypoints: " . implode(', ', $nonOvernightNames));
     }
 }

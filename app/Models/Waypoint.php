@@ -18,7 +18,8 @@ class Waypoint extends Model
         'latitude',
         'longitude',
         'altitude',
-        'is_overnight_stop', // added
+        'location_id',
+        'is_overnight_stop',
         'description',
         'metadata',
         'safety_status',
@@ -29,6 +30,7 @@ class Waypoint extends Model
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'altitude' => 'integer',
+        'location_id' => 'integer',
         'is_overnight_stop' => 'boolean',
         'metadata' => 'array',
         'safety_updated_at' => 'datetime',
@@ -48,18 +50,23 @@ class Waypoint extends Model
     }
 
     // Relationships
-    public function fromSegments()
-    {
-        return $this->hasMany(RouteSegment::class, 'from_waypoint_id');
-    }
+public function fromSegments()
+{
+    return $this->hasMany(RouteSegment::class, 'from_waypoint_id');
+}
 
-    public function toSegments()
-    {
-        return $this->hasMany(RouteSegment::class, 'to_waypoint_id');
-    }
+public function toSegments()
+{
+    return $this->hasMany(RouteSegment::class, 'to_waypoint_id');
+}
 
-    public function qrScans()
-    {
-        return $this->hasMany(QrScan::class);
-    }
+public function location()
+{
+    return $this->belongsTo(Location::class, 'location_id');
+}
+
+public function qrScans()
+{
+    return $this->hasMany(QrScan::class);
+}
 }

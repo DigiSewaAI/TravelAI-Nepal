@@ -17,7 +17,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Pokhara', 'latitude' => 28.2096, 'longitude' => 83.9857, 'is_habitable' => true],
 
             // ============================================================
-            // ANNAPURNA REGION (with all overnight stops as separate locations)
+            // ANNAPURNA REGION
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Lamjung', 'city' => 'Besisahar', 'latitude' => 28.2398, 'longitude' => 84.3824, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Lamjung', 'city' => 'Bahundanda', 'latitude' => 28.3312, 'longitude' => 84.3601, 'is_habitable' => true],
@@ -26,8 +26,6 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Chame', 'latitude' => 28.5581, 'longitude' => 84.3587, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Pisang', 'latitude' => 28.6194, 'longitude' => 84.2027, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Manang', 'latitude' => 28.6664, 'longitude' => 84.1248, 'is_habitable' => true],
-
-            // High-altitude stops (separate locations)
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Yak Kharka', 'latitude' => 28.7123, 'longitude' => 84.0877, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Thorong Phedi', 'latitude' => 28.7525, 'longitude' => 84.0649, 'is_habitable' => true],
             // ❌ Thorong La – non-habitable (pass only)
@@ -47,7 +45,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Myagdi', 'city' => 'Ghasa', 'latitude' => 28.6123, 'longitude' => 83.6456, 'is_habitable' => true],
 
             // ============================================================
-            // ✅ थपिएका 15 LOCATIONS (ABC, Mardi Himal को लागि)
+            // ABC, Mardi Himal (additional locations)
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Tadapani', 'latitude' => 28.5107, 'longitude' => 83.7435, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Chhomrong', 'latitude' => 28.5332, 'longitude' => 83.7589, 'is_habitable' => true],
@@ -58,7 +56,6 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Deurali', 'latitude' => 28.5844, 'longitude' => 83.7893, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Machhapuchhre Base Camp', 'latitude' => 28.5923, 'longitude' => 83.7956, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Annapurna Base Camp', 'latitude' => 28.6005, 'longitude' => 83.8001, 'is_habitable' => true],
-
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Pothana', 'latitude' => 28.3714, 'longitude' => 83.8309, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Forest Camp', 'latitude' => 28.3915, 'longitude' => 83.7912, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Low Camp', 'latitude' => 28.3997, 'longitude' => 83.7745, 'is_habitable' => true],
@@ -75,7 +72,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Dingboche', 'latitude' => 27.8927, 'longitude' => 86.8242, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Lobuche', 'latitude' => 27.9358, 'longitude' => 86.8087, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Gorak Shep', 'latitude' => 27.9812, 'longitude' => 86.8274, 'is_habitable' => true],
-            // ❌ Everest Base Camp – non-habitable (no lodge)
+            // ❌ Everest Base Camp – non-habitable
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Everest Base Camp', 'latitude' => 28.0057, 'longitude' => 86.8294, 'is_habitable' => false],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Gokyo', 'latitude' => 27.9585, 'longitude' => 86.7428, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Phakding', 'latitude' => 27.7432, 'longitude' => 86.7123, 'is_habitable' => true],
@@ -94,7 +91,8 @@ class LocationSeeder extends Seeder
             // MUSTANG / DOLPO
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Lo Manthang', 'latitude' => 28.9456, 'longitude' => 83.9123, 'is_habitable' => true],
-            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Jumla', 'latitude' => 29.2750, 'longitude' => 82.1589, 'is_habitable' => true],
+            // ✅ Jumla is its own district, not Dolpa
+            ['country' => 'Nepal', 'state' => 'Jumla', 'city' => 'Jumla', 'latitude' => 29.2750, 'longitude' => 82.1589, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Shey Gompa', 'latitude' => 29.4123, 'longitude' => 82.7123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Phoksundo Lake', 'latitude' => 29.4456, 'longitude' => 82.8345, 'is_habitable' => true],
 
@@ -113,7 +111,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Barun Valley', 'latitude' => 27.5789, 'longitude' => 87.4012, 'is_habitable' => true],
 
             // ============================================================
-            // MANASLU REGION (already present)
+            // MANASLU REGION
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Arughat', 'latitude' => 28.0456, 'longitude' => 84.8123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gorkha', 'city' => 'Soti Khola', 'latitude' => 28.0789, 'longitude' => 84.8345, 'is_habitable' => true],
@@ -130,17 +128,29 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Tal', 'latitude' => 28.4456, 'longitude' => 84.6789, 'is_habitable' => true],
 
             // ============================================================
+            // API HIMAL REGION
+            // ============================================================
+            // ✅ Darchula is its own district
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Darchula', 'latitude' => 29.8456, 'longitude' => 80.5345, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Sitapur', 'latitude' => 29.8789, 'longitude' => 80.5567, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Khalanga', 'latitude' => 29.9123, 'longitude' => 80.5789, 'is_habitable' => true],
+            // ✅ Api Base Camp – habitable (tent/camping)
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Api Base Camp', 'latitude' => 30.0123, 'longitude' => 80.6000, 'is_habitable' => true],
+            // Additional waypoints for Api Himal trek
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Gokuleshwar', 'latitude' => 29.8356, 'longitude' => 80.5345, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Bitule', 'latitude' => 29.8456, 'longitude' => 80.5567, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Khandeshwari', 'latitude' => 29.8678, 'longitude' => 80.5789, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Chiureni', 'latitude' => 29.8891, 'longitude' => 80.6012, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Makarigaun', 'latitude' => 29.9123, 'longitude' => 80.6234, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Darchula', 'city' => 'Seti (Api)', 'latitude' => 29.9345, 'longitude' => 80.6456, 'is_habitable' => true],
+
+            // ============================================================
             // OTHER REMOTE REGIONS
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Simikot', 'latitude' => 29.9789, 'longitude' => 82.0123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Myagdi', 'city' => 'Dhaulagiri', 'latitude' => 28.8456, 'longitude' => 83.7012, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Bajhang', 'latitude' => 29.7123, 'longitude' => 81.2345, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Bajura', 'city' => 'Bajura', 'latitude' => 29.6456, 'longitude' => 81.4567, 'is_habitable' => true],
-            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Darchula', 'latitude' => 29.8456, 'longitude' => 80.5345, 'is_habitable' => true],
-            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Sitapur', 'latitude' => 29.8789, 'longitude' => 80.5567, 'is_habitable' => true],
-            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Khalanga', 'latitude' => 29.9123, 'longitude' => 80.5789, 'is_habitable' => true],
-            // ✅ Api Base Camp – now habitable (tent/camping)
-            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Api Base Camp', 'latitude' => 30.0123, 'longitude' => 80.6000, 'is_habitable' => true],
 
             // ============================================================
             // NATIONAL PARKS & CITIES
@@ -190,7 +200,7 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Manang', 'city' => 'Phu', 'latitude' => 28.6512, 'longitude' => 84.1589, 'is_habitable' => true],
 
             // ============================================================
-            // ADDITIONAL RIVERS & VIEWPOINTS (already present)
+            // ADDITIONAL RIVERS & VIEWPOINTS
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Trishuli River', 'latitude' => 27.9123, 'longitude' => 84.8123, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Sindhupalchok', 'city' => 'Bhote Koshi River', 'latitude' => 27.8456, 'longitude' => 85.9234, 'is_habitable' => true],
@@ -199,6 +209,54 @@ class LocationSeeder extends Seeder
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Sarangkot', 'latitude' => 28.2456, 'longitude' => 83.9456, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Kusma Bridge', 'latitude' => 28.2096, 'longitude' => 83.9857, 'is_habitable' => true],
 
+                        // ============================================================
+            // DOLPO REGION — Batch 2 canonical locations
+            // ============================================================
+            ['country' => 'Nepal', 'state' => 'Jumla', 'city' => 'Chhetra', 'latitude' => 29.30, 'longitude' => 82.22, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Jumla', 'city' => 'Chaurikot', 'latitude' => 29.34, 'longitude' => 82.28, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Jumla', 'city' => 'Kagmara Phedi', 'latitude' => 29.38, 'longitude' => 82.36, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Jumla', 'city' => 'Kagmara La', 'latitude' => 29.41, 'longitude' => 82.42, 'is_habitable' => false],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Pungmo', 'latitude' => 29.43, 'longitude' => 82.50, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Phoksundo Bhanjyang', 'latitude' => 29.47, 'longitude' => 82.86, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Ringmo', 'latitude' => 29.45, 'longitude' => 82.85, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Nisal', 'latitude' => 29.50, 'longitude' => 83.02, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Jeng La', 'latitude' => 29.46, 'longitude' => 83.08, 'is_habitable' => false],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Tokyu Gaon', 'latitude' => 29.42, 'longitude' => 83.12, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Dho Tarap', 'latitude' => 29.35, 'longitude' => 83.15, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Chharka', 'latitude' => 29.25, 'longitude' => 83.20, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Sangda La', 'latitude' => 29.10, 'longitude' => 83.30, 'is_habitable' => false],
+            ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Sangda Village', 'latitude' => 28.95, 'longitude' => 83.45, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Chhepka', 'latitude' => 29.30, 'longitude' => 82.90, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Dunai', 'latitude' => 29.15, 'longitude' => 82.95, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolpa', 'city' => 'Juphal', 'latitude' => 29.10, 'longitude' => 82.98, 'is_habitable' => true],
+
+                        // ============================================================
+            // BATCH 3 — Makalu-Barun + Damodar Kunda
+            // ============================================================
+            ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Langmale Kharka', 'latitude' => 27.56, 'longitude' => 87.39, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Sankhuwasabha', 'city' => 'Barun Pokhari', 'latitude' => 27.62, 'longitude' => 87.43, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Yara', 'latitude' => 29.02, 'longitude' => 83.85, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Mustang', 'city' => 'Ghara', 'latitude' => 28.99, 'longitude' => 83.88, 'is_habitable' => true],
+
+                        // ============================================================
+            // BATCH 4 — Humla / Rolwaling / Saipal intermediate stops
+            // ============================================================
+            // Humla — Karnali valley
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Chhipra',  'latitude' => 29.92, 'longitude' => 81.95, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Torpa',    'latitude' => 29.88, 'longitude' => 81.98, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Kermi',    'latitude' => 29.85, 'longitude' => 82.02, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Yalbang',  'latitude' => 29.83, 'longitude' => 82.04, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Muchu',    'latitude' => 29.80, 'longitude' => 82.06, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Humla', 'city' => 'Yari',     'latitude' => 29.79, 'longitude' => 82.08, 'is_habitable' => true],
+            // Rolwaling — Tamakoshi valley
+            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Singati',  'latitude' => 27.68, 'longitude' => 86.20, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Jagat',    'latitude' => 27.70, 'longitude' => 86.23, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Simigaon', 'latitude' => 27.73, 'longitude' => 86.25, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Dolakha', 'city' => 'Dongang',  'latitude' => 27.76, 'longitude' => 86.26, 'is_habitable' => true],
+            // Saipal — Bajhang valley
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Kanda',  'latitude' => 29.72, 'longitude' => 81.28, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Nauli',  'latitude' => 29.75, 'longitude' => 81.30, 'is_habitable' => true],
+            
             // ============================================================
             // HIDDEN GEMS
             // ============================================================
