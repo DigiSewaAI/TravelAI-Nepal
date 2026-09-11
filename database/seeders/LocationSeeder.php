@@ -264,11 +264,13 @@ class LocationSeeder extends Seeder
         ];
 
         foreach ($locations as $loc) {
-            Location::firstOrCreate(
-                ['city' => $loc['city']],
-                $loc
-            );
-        }
+    // Phase 4O: updateOrCreate ensures is_habitable stays correct
+    // on re-runs (firstOrCreate skips existing rows)
+    Location::updateOrCreate(
+        ['city' => $loc['city']],
+        $loc
+    );
+}
 
         $this->command->info('✅ LocationSeeder completed: ' . count($locations) . ' locations.');
         $this->command->info('   📌 Non‑habitable: Thorong La, Everest Base Camp (is_habitable=false).');

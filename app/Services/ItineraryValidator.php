@@ -278,18 +278,6 @@ if (count($filteredDays) > $requestedDays) {
                 $altitude = $waypoint ? $waypoint->altitude : null;
             }
 
-            // ─── Phase 4N.5b: Skip low-altitude rest days ONLY for high-altitude treks ───
-// For trek routes above 3000m: rest days below 3000m are likely accidental
-//   (Jomsom-style mid-route rests that don't serve acclimatization)
-// For tours/safaris/low-altitude treks: rest days at any altitude are legitimate
-//   (Bardiya safari rest at Karnali River, etc.)
-$isHighAltitudeRoute = $route->max_altitude && $route->max_altitude >= 3000;
-
-if ($isRestDay && $isHighAltitudeRoute && ($altitude === null || $altitude < 3000)) {
-    Log::info("⏭️ Skipping low-altitude rest day at waypoint ID: " . ($day['overnight_waypoint_id'] ?? 'null'));
-    continue;
-}
-
                         $originalTitle = $day['title'] ?? '';
 
             // Phase 4H: Skip "no data" days entirely — no padding

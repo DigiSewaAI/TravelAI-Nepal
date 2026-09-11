@@ -16,12 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 class PlannerService
 {
-    protected LlmService $llm;
     protected ItineraryValidator $validator;
 
-    public function __construct(LlmService $llm, ItineraryValidator $validator)
+    public function __construct(ItineraryValidator $validator)
     {
-        $this->llm = $llm;
         $this->validator = $validator;
     }
 
@@ -466,66 +464,6 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
             'day_services' => $dayServicesMap,
             'day_diagnostics' => $dayDiagnostics,
         ];
-    }
-
-    protected function buildPrompt(array $context, array $input, string $locale = 'en'): string
-    {
-        $segments = $context['segments'];
-        $total = count($segments);
-        if ($total > 6) {
-            $segments = array_merge(
-                array_slice($segments, 0, 3),
-                array_slice($segments, -3)
-            );
-        }
-        $context['segments'] = $segments;
-
-        $dayServicesForPrompt = [];
-        foreach ($context['day_services'] as $dayNumber => $services) {
-            $dayServicesForPrompt[$dayNumber] = $services->map(function ($svc) {
-                return [
-                    'id' => $svc['id'],
-                    'name' => $svc['name'],
-                    'category' => $svc['category'],
-                    'price' => (float) $svc['price'],
-                ];
-            })->take(6)->values()->toArray();
-        }
-
-        $payload = [
-            'instruction' => 'Generate a personalized day-by-day itinerary for a Nepal trek. Use ONLY the provided data.',
-            'user_request' => [
-                'days' => $input['days'],
-                'budget' => $input['budget'],
-                'style' => $input['travel_style'] ?? 'mid_range',
-                'interests' => $input['interests'] ?? [],
-                'fitness' => $input['fitness_level'] ?? 'moderate',
-            ],
-            'route_data' => [
-                'name' => $context['route_name'],
-                'difficulty' => $context['difficulty'],
-                'max_altitude' => $context['max_altitude'],
-                'segments' => $segments,
-            ],
-            'day_services' => $dayServicesForPrompt,
-            'cost_breakdown' => $context['cost_breakdown']['breakdown'] ?? [],
-            'locale' => $locale,
-            'rules' => [
-                'For each day, use ONLY services from that day\'s "day_services" list.',
-                'If a service is used, include its "id" as "service_id" in that day\'s item.',
-                'You may also include items without service_id (e.g., free activities).',
-                'Do NOT invent any waypoints, distances, or costs.',
-                'Return valid JSON with a "days" array.',
-                "IMPORTANT: ALL text content (titles, descriptions, item names, cost labels) MUST be in the language: " . match($locale) {
-                    'hi' => 'Hindi (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. Everything else must be in Hindi.',
-                    'zh' => 'Chinese (Simplified Chinese characters). ONLY waypoint names like "Nayapul" can remain in English. Everything else must be in Chinese.',
-                    'np' => 'Nepali (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. Everything else must be in Nepali.',
-                    default => 'English.',
-                },
-            ],
-        ];
-
-        return json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     // ==========================================
@@ -1022,23 +960,6 @@ if (!$service && $to) {
         $key = $prefix . '.' . Str::slug($name, '_');
         $translated = __($key, [], $locale);
         return ($translated !== $key) ? $translated : $name;
-    }
-
-    private function isLanguageCorrect(array $data, string $locale): bool
-    {
-        if (!in_array($locale, ['hi', 'np'])) {
-            return true;
-        }
-
-        $strings = [];
-        array_walk_recursive($data, function ($value) use (&$strings) {
-            if (is_string($value) && !is_numeric($value)) {
-                $strings[] = $value;
-            }
-        });
-
-        $text = implode(' ', $strings);
-        return preg_match('/[\x{0900}-\x{097F}]/u', $text) === 1;
     }
 
     private function isTourRoute(Route $route): bool

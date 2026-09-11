@@ -46,3 +46,7 @@ Thumbs.db
 backup_before_*.sql
 backup_*.sql
 *.sql
+
+# Local backup files
+*.bak
+*.backup
