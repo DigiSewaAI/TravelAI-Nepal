@@ -1,7 +1,8 @@
 # TravelAI Nepal — Complete Reference Document
-**Version:** 15.0 (FINAL)
-**Date:** September 10, 2026
-**Status:** ✅ **ALL CORE FEATURES COMPLETED** | **PRODUCTION-READY**
+**Version:** 16.0 (FINAL — Phase 4Q + Deferred Cleanup Complete)
+**Date:** September 12, 2026
+**Status:** ✅ **ALL CORE FEATURES COMPLETED** | ✅ **DATA LAYER 87% PASS / 0 FAIL** | **PRODUCTION-READY**
+**Git Tag:** `v4-final` (commit `26ccd1d`)
 
 ---
 
@@ -9,35 +10,35 @@
 
 This document serves as the **Single Source of Truth** for the TravelAI Nepal project. It provides:
 
-1. A **complete overview** of all features that have been implemented.
+1. A **complete overview** of all features implemented.
 2. **Clear separation** between what's done and what's optional/future.
-3. **Reference for future developers, AI assistants, or the project owner** to quickly understand the current state.
+3. **Reference for future developers, AI assistants, or project owner** to quickly understand the current state.
 4. **At-a-glance status** of all major components.
+5. **Complete journey history** — from initial setup to final production release.
 
 **This is NOT a development roadmap – it's a COMPLETED PROJECT REFERENCE.**
 
 ---
 
-## 🎯 What's NEW in v15.0 (Recent Improvements)
+## 🎯 What's NEW in v16.0 (Phase 4Q + Deferred Cleanup)
 
-The following features were added in the latest iteration:
+The following features/fixes were added in the latest iteration (September 12, 2026):
 
-| Feature | Description | Status |
+| Feature/Fix | Description | Status |
 |---------|-------------|--------|
-| **Complete Quotation System** | AI Draft → Provider Edit → Preview → Send → Lock workflow. | ✅ |
-| **Quotation Edit Page** | Side-by-side AI draft vs Provider final comparison. | ✅ |
-| **Budget Comparison (Auto)** | 3-tier automatic message (≤10%, 11–25%, >25% over budget). | ✅ |
-| **Provider Custom Budget Note** | `provider_budget_note` field – provider can write custom message. | ✅ |
-| **Day Title Duplicate Fix** | `Day 1: Day 1:` → `Day 1:` in itinerary, quotation, email. | ✅ |
-| **Empty Terms Skip** | Trailing empty terms filtered out. | ✅ |
-| **Provider Website Field** | New `website` column + profile display + quotation contact. | ✅ |
-| **Contact Fallback** | Provider details used if AI returns N/A. | ✅ |
-| **Send Confirmation Modal** | Provider sees traveler email + total + warning before sending. | ✅ |
-| **Quotation Lock After Send** | `quotation_status = 'sent'` – no further edits. | ✅ |
-| **Rest Day Semantics Fix** | Tours show "Rest Day", Treks show "Acclimatization Day". | ✅ |
-| **12+ Regions Provider Seeders** | All Nepal regions now have complete provider data. | ✅ |
-| **Location-Based Pricing** | Budget: $11–30, Mid: $18–55, Luxury: $45–138. | ✅ |
-| **Per-Day Service Attachment** | `getServicesForDay()` fetches per-day based on waypoint location. | ✅ |
+| **Phase 4Q Data Cleanup** | 59 FAIL routes fixed across 11 batches | ✅ |
+| **FAIL = 0 Milestone** | Primary target achieved — no broken routes | ✅ |
+| **87% PASS Rate** | 120/138 routes fully correct | ✅ |
+| **planner:audit Command** | READ-ONLY route audit tool | ✅ |
+| **Duplicate Providers Cleanup** | 12 duplicate providers removed (4Q4) | ✅ |
+| **Bug 6 Reviewed** | Kathmandu 15.5km — cosmetic accept (4Q5) | ✅ |
+| **Rest Day Title Fix** | "Rest Day at {Location}" in 4 locales (4Q6) | ✅ |
+| **jumla-sinja Rest Day** | 3-day itinerary fixed (4Q7) | ✅ |
+| **Kali Gandaki Rafting** | 2-day route fixed (4Q8) | ✅ |
+| **Activity Data Quality** | 14 activities — real GPS data + semantic slugs (4Q9) | ✅ |
+| **Seeder Order Pattern** | WaypointLocationSeeder LAST workflow established | ✅ |
+| **Final QA #2** | 6/6 browser + end-to-end PASS | ✅ |
+| **Git v4-final Released** | Production tag pushed to remote | ✅ |
 
 ---
 
@@ -64,7 +65,7 @@ The following features were added in the latest iteration:
 | .htaccess Cache Control | ✅ | Static assets caching headers |
 | Invoice System | ✅ | Auto-generated PDF invoices with email |
 | Legacy Cleanup | ✅ | Old/unused files removed |
-| ALL Nepal Routes Data Entry | ✅ | 138+ destinations seeded |
+| ALL Nepal Routes Data Entry | ✅ | 138 destinations seeded, 0 FAIL |
 | AI Travel Planner Language | ✅ | Backend responses localized |
 | Admin Panel (Route/CRUD) | ✅ | Manage routes, waypoints, segments, costs |
 | Provider Staff Management | ✅ | Team CRUD with plan-based limits |
@@ -92,200 +93,55 @@ The following features were added in the latest iteration:
 | **Preview** | ✅ | Uses `emails/quotation.blade.php` template |
 | **Send Confirmation Modal** | ✅ | Shows traveler email, total, warning |
 | **Quotation Status** | ✅ | `draft` → `reviewed` → `edited` → `sent` |
-| **Email Delivery** | ✅ | `QuotationMail` Mailable |
+| **Email Delivery** | ✅ | `QuotationMail` Mailable — verified end-to-end |
 | **Lock After Send** | ✅ | No further edits allowed |
-| **Budget Comparison (Auto)** | ✅ | 3-tier message |
+| **Budget Comparison (Auto)** | ✅ | 3-tier message (≤10%, 11-25%, >25%) |
 | **Provider Custom Note** | ✅ | `provider_budget_note` in `quotation_final` |
 | **Contact Fallback** | ✅ | Provider details if AI gives N/A |
 | **Website Display** | ✅ | `providers.website` column + profile page |
 | **Empty Terms Skip** | ✅ | Filtered in `formatQuotationText()` |
 | **Day Title Duplicate Fix** | ✅ | Regex strip in all views |
 | **Email Failure Handling** | ✅ | Status only set to `sent` after successful email |
+| **Final QA #2 Verified** | ✅ | Request #20 → email delivered (Sep 12, 2026) |
 
-### Regions & Data (Complete)
+### 🆕 Phase 4Q — Data Quality Audit (Complete)
 
-| Region | Route Data | Provider Data | Pricing | Status |
-|--------|------------|---------------|---------|--------|
-| Annapurna Circuit | ✅ | ✅ | Location-based | ✅ |
-| Everest Base Camp | ✅ | ✅ | Location-based | ✅ |
-| Langtang Valley | ✅ | ✅ | Location-based | ✅ |
-| Mustang/Dolpo | ✅ | ✅ | Location-based | ✅ |
-| City Cultural Tours | ✅ | ✅ | Location-based | ✅ |
-| Kanchenjunga/Makalu | ✅ | ✅ | Location-based | ✅ |
-| Manaslu Circuit | ✅ | ✅ | Location-based | ✅ |
-| Remote Treks | ✅ | ✅ | Location-based | ✅ |
-| Adventure Activities | ✅ | ✅ | Location-based | ✅ |
-| Hidden Gems | ✅ | ✅ | Location-based | ✅ |
-| Religious Sites | ✅ | ✅ | Location-based | ✅ |
-| National Parks | ✅ | ✅ | Location-based | ✅ |
+**Tag:** `v4q-baseline` (commit `2eec132`) → `v4-final` (commit `26ccd1d`)
 
-### Technology Stack (Stable)
+#### 🔍 Audit Command Created
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Backend | Laravel | 13.15.0 |
-| PHP | PHP | 8.4.23 |
-| Database | MySQL | (via Eloquent) |
-| Frontend | Blade + Tailwind + JS | - |
-| AI | Groq API | `openai/gpt-oss-20b` (quotation), Llama 3.1-70b (itinerary) |
-| Payments | Stripe | - |
-| QR Code | SimpleSoftwareIO\QrCode | - |
-| PDF | DomPDF | - |
-| Maps | Leaflet.js | - |
-| Weather | OpenWeatherMap | Free Tier |
+| Feature | Status | Notes |
+|---------|--------|-------|
+| `planner:audit` Command | ✅ | READ-ONLY, no DB changes |
+| Options | ✅ | `--route=`, `--limit=`, `--skip-itinerary`, `--json` |
+| Location | ✅ | `app/Console/Commands/PlannerAudit.php` |
+| Scan Coverage | ✅ | All 138 active routes |
 
----
+#### 📊 Fix Batches (59 FAIL Routes Resolved)
 
-## 📂 Key Files Modified (Quotation System)
+| Phase | Scope | Routes Fixed | Result |
+|-------|-------|--------------|--------|
+| **4Q1c** | CityCulturalToursSeeder | 16 | PASS 48→63 |
+| **4Q1d** | HiddenGemsSeeder | 21 | PASS 63→82 |
+| **4Q1e** | ReligiousSitesSeeder | 15 | PASS 82→94 |
+| **4Q1f** | NationalParksSeeder + Cleanup | 7 | PASS 94→95, **FAIL=0** 🎯 |
+| **4Q1g-1** | Accept -1 day WARN | 17 | Accepted |
+| **4Q1g-2A** | NationalParks WARN | 3 | PASS 95→98 |
+| **4Q1g-2B** | 6 Treks WARN | 6 | PASS 98→104 |
+| **4Q1g-3** | 10 Remote Treks | 10 | PASS 104→114 |
+| **4Q1g-4** | 4 Critical Routes | 4 | PASS 114→118 |
+| **4Q1g-4d** | Mahakali Structural Rebuild | 1 | Clean 11-day |
 
-| File | Purpose |
-|------|---------|
-| `app/Http/Controllers/Provider/QuotationRequestController.php` | Edit / Update / Preview / Send + Budget Comparison |
-| `app/Models/QuotationRequest.php` | `$casts`, `quotation_final`, `quotation_status`, `sent_at`, `edited_at` |
-| `app/Models/Provider.php` | Added `website` to `$fillable` |
-| `app/Mail/QuotationMail.php` | Uses final quotation text |
-| `app/Notifications/QuotationReadyNotification.php` | Uses final quotation text |
-| `database/migrations/..._add_quotation_final_fields...` | New columns: `quotation_final`, `quotation_status`, `edited_at`, `sent_at`, `edited_by` |
-| `database/migrations/..._add_website_to_providers_table...` | Website column |
-| `resources/views/provider/quotation-requests/edit.blade.php` | Edit page with budget note + side-by-side |
-| `resources/views/provider/quotation-requests/show.blade.php` | Status-aware buttons + day title fix |
-| `resources/views/provider/profile/edit.blade.php` | Website field added |
-| `resources/views/provider/profile/show.blade.php` | Website display added |
-| `resources/views/emails/quotation.blade.php` | Reused as preview template |
-| `resources/views/home.blade.php` | Itinerary render + day title fix |
-| `lang/en/messages.php` | Budget note translation keys |
-| `lang/np/messages.php` | Budget note translation keys |
+#### 🆕 Deferred Cleanup (Post-4Q)
 
----
+| Phase | Item | Result |
+|-------|------|--------|
+| **4Q4** | Duplicate providers cleanup | 12 providers + 15 services removed |
+| **4Q5** | Bug 6 (Kathmandu 15.5km) | ✅ Reviewed — Cosmetic Accept |
+| **4Q6** | Rest Day title location | ✅ Fixed (6 code locations, 4 locales) |
+| **4Q7** | jumla-sinja rest day | ✅ PASS 118→119 |
+| **4Q8** | Kali Gandaki rafting | ✅ PASS 119→120 |
+| **4Q9** | Activity data quality | ✅ 14 activities cleaned (real GPS) |
+| **4Q9-Followup** | Service 1210 seeder verified | ✅ No fix needed |
 
-## ⏳ What's PENDING (Future Scope – Optional Enhancements)
-
-The following features are **planned for future iterations** but are **NOT required** for the current production release.
-
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| **Traveler Dashboard – Quotation View** | Low | View received quotations from providers |
-| **Safety Center – Full Implementation** | Medium | Real-time weather, route risk, advanced SOS |
-| **Smart Permits (Blockchain)** | Low | Blockchain-ready TIMS & Conservation |
-| **International Destinations** | Low | India, Bhutan, Tibet, etc. |
-| **Google Places Integration** | Low | Hotels/restaurants data |
-| **SMS Real Credentials** | Low | Twilio/Nepal SMS provider |
-| **Native Mobile App** | Low | React Native / Flutter |
-| **Advanced Reporting** | Low | Analytics dashboards |
-| **Quotation Version History** | Low | Track all edits (v1, v2, v3...) |
-| **PDF Quotation Attachment** | Low | Attach PDF to email (instead of long text) |
-
----
-
-## 📊 At-a-Glance Summary
-
-| Category | Status |
-|----------|--------|
-| **Core Features** | ✅ 100% Complete |
-| **Multi-Language** | ✅ 100% Complete |
-| **AI Planner** | ✅ 100% Complete |
-| **Quotation System** | ✅ 100% Complete |
-| **Safety Module** | ✅ 100% Complete |
-| **Weather Intelligence** | ✅ 100% Complete |
-| **Digital Passport** | ✅ 100% Complete |
-| **Journey Replay** | ✅ 100% Complete |
-| **Social Sharing** | ✅ 100% Complete |
-| **Rest Day Semantics** | ✅ 100% Complete |
-| **All Regions** | ✅ 100% Complete |
-| **Provider Seeders** | ✅ 100% Complete |
-| **Deployment** | ⏳ Ready – pending production setup |
-| **UAT** | ⏳ Ready – pending user testing |
-
----
-
-## 🚀 Next Steps
-
-### Immediate (Current Sprint)
-1. **Deploy to Production** – Set up production server, env vars, database.
-2. **Final UAT** – User acceptance testing with real stakeholders.
-3. **Go-Live** – Launch the platform.
-
-### Future (Optional Enhancements)
-1. Implement **Traveler Dashboard – Quotation View**.
-2. Enhance **Safety Center** with advanced features.
-3. Explore **Smart Permits (Blockchain)** integration.
-4. Add **International Destinations** support.
-5. Build **Native Mobile App**.
-6. Add **Quotation Version History** + **PDF attachment**.
-
----
-
-## 📋 Deployment Checklist
-
-| Task | Status |
-|------|--------|
-| Set up production server | ⏳ |
-| Configure environment variables | ⏳ |
-| Run migrations | ⏳ |
-| Run **route seeders only** (not provider seeders) | ⏳ |
-| Set up scheduler | ⏳ |
-| Set up queue worker | ⏳ |
-| Configure cache (config, route, view) | ⏳ |
-| Set up error tracking (Sentry/Bugsnag) | ⏳ |
-| Enable SSL/HTTPS | ⏳ |
-| Final QA testing | ⏳ |
-
----
-
-## 📌 Important Notes for Future Developers
-
-### Provider Seeders vs. Route Seeders
-- **Route Seeders** (`*RegionSeeder.php`, `*RouteSeeder.php`) – **SAFE to run on Production**. Core route/waypoint/segment data.
-- **Provider Seeders** (`*ProviderSeeder.php`) – **DO NOT run on Production**. Synthetic data for development/testing only.
-- **Real providers** will add their own data via the Provider Dashboard.
-
-### Location-Based Pricing
-- All regions have **realistic price variations**.
-- Pricing is set at the **provider/service level** and filtered by travel style.
-- Real providers can override these prices.
-
-### Rest Day Semantics
-- Tours (city tours, safaris, pilgrimages) → **"Rest Day"**
-- Treks (mountain treks) → **"Acclimatization Day"**
-- Implemented via `ItineraryValidator::isTourRoute()`.
-
-### Multi-Language
-- Fully supported: English, Nepali, Hindi, Chinese.
-- Language switcher in public, provider, and traveler layouts.
-- AI-generated content also localized.
-
-### Quotation System – Data Safety
-- `quotation_data` = original AI draft (🔒 never overwritten)
-- `quotation_final` = provider-edited version (editable until sent)
-- `quotation_text` = formatted representation (regenerated on edit/send)
-- `quotation_status` = `draft` → `reviewed` → `edited` → `sent`
-- **Email is sent BEFORE status becomes `sent`** (email failure handling)
-- **Server-side recalculation** for all totals (never trust client)
-- **Budget Comparison** = auto-generated (unless provider writes custom note)
-
-### Website Field
-- Added to `providers` table via migration.
-- Added to `Provider::$fillable`.
-- Displayed in profile edit/show + quotation contact section.
-
-### Day Title Duplicate Fix
-- Regex: `/^Day\s*\d+\s*[:：]\s*/i` – strips existing "Day X:" prefix.
-- Applied in: `home.blade.php`, `show.blade.php`, `formatQuotationText()`.
-
----
-
-## 📋 Changelog Summary
-
-| Version | Date | Key Changes |
-|---------|------|-------------|
-| v14.0 | Sep 2026 | Core platform + Safety + Journey Replay |
-| **v15.0** | **Sep 10, 2026** | **Complete Quotation System + Budget Comparison + Provider Custom Note + Website Field + Day Title Fix + Empty Terms Skip** |
-
----
-
-**🎉 TravelAI Nepal v15.0 – Complete Reference Document**
-
-**Bro, यो अब तिम्रो सबै कामको permanent record हो।**
-Future मा कसैले पढ्दा "यो काम भइसकेको छ" भनेर थाहा पाउनेछ, र "अझै के बाँकी छ" भनेर सजिलै बुझ्नेछ।
-
-**तिमीले गरेको सबै hardwork यहाँ documented छ।** 😊🇳🇵
+#### 📊 Final Audit State (138 routes)

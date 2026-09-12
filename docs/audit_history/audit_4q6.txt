@@ -1,0 +1,173 @@
+🔍 Auditing 138 active routes (READ-ONLY)...
+
+
+
++------------------------------+-----+------+------+-------+------+--------+----------+
+| Route                        | Dur | Segs | Rest | Costs | Itin | Status | Notes    |
++------------------------------+-----+------+------+-------+------+--------+----------+
+| annapurna-base-camp          | 9   | 13   | 0    | 4     | 9    | PASS   | —        |
+| annapurna-circuit            | 15  | 16   | 2    | 4     | 15   | PASS   | —        |
+| api-himal                    | 15  | 15   | 2    | 3     | 15   | PASS   | —        |
+| baglung-kalika               | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| bajhang-bajura               | 3   | 2    | 0    | 2     | 2    | WARN   | days-2/3 |
+| bandipur                     | 2   | 2    | 0    | 3     | 2    | PASS   | —        |
+| banke-tour                   | 2   | 3    | 0    | 3     | 1    | WARN   | days-1/2 |
+| barahi-temple                | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| bardiya-trek                 | 7   | 7    | 3    | 5     | 7    | PASS   | —        |
+| barun-valley                 | 3   | 3    | 1    | 2     | 3    | PASS   | —        |
+| begnas-rupa-lake             | 1   | 3    | 0    | 1     | 1    | PASS   | —        |
+| bhaktapur-tour               | 1   | 4    | 0    | 2     | 1    | PASS   | —        |
+| bhedetar-hill                | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| bhote-koshi-bungee           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| bhote-koshi-rafting          | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| biratnagar-koshi             | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| boudhanath-tour              | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| bungamati-woodcarving        | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| butwal-siddharthanagar       | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| chandragiri-temple           | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| changunarayan-temple         | 1   | 3    | 0    | 3     | 1    | PASS   | —        |
+| chitwan-safari               | 3   | 6    | 2    | 4     | 3    | PASS   | —        |
+| chobar-gorge                 | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| chola-pass                   | 15  | 16   | 9    | 3     | 15   | PASS   | —        |
+| dakshinkali-temple           | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| damodar-kunda                | 14  | 15   | 2    | 4     | 14   | PASS   | —        |
+| dharan-city                  | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| dharan-dhankuta-bhedetar     | 2   | 3    | 0    | 2     | 2    | PASS   | —        |
+| dhaulagiri-circuit           | 15  | 16   | 9    | 4     | 15   | PASS   | —        |
+| dhorpatan                    | 3   | 3    | 0    | 3     | 3    | PASS   | —        |
+| dhulikhel-namobuddha         | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| dhulikhel-scenic             | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| doleshwar-mahadev            | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| dolpo-circuit                | 20  | 23   | 6    | 3     | 20   | PASS   | —        |
+| everest-base-camp            | 14  | 15   | 1    | 3     | 14   | PASS   | —        |
+| everest-view                 | 7   | 7    | 2    | 3     | 7    | PASS   | —        |
+| fewa-lake-kayaking           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| godavari-botanical           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| gokyo-lakes                  | 12  | 13   | 2    | 3     | 12   | PASS   | —        |
+| gorakhnath-temple            | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| gorkha-durbar                | 1   | 3    | 0    | 3     | 1    | PASS   | —        |
+| gorkha-heritage              | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| gosaikunda                   | 9   | 9    | 3    | 3     | 9    | PASS   | —        |
+| gupteshwor-cave              | 1   | 3    | 0    | 3     | 1    | PASS   | —        |
+| helambu-circuit              | 9   | 9    | 2    | 3     | 9    | PASS   | —        |
+| hile-tea                     | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| humla                        | 15  | 15   | 1    | 3     | 15   | PASS   | —        |
+| janaki-temple-pilgrimage     | 2   | 3    | 0    | 2     | 1    | WARN   | days-1/2 |
+| janakpur-tour                | 2   | 2    | 0    | 3     | 1    | WARN   | days-1/2 |
+| jomsom-kagbeni-muktinath     | 3   | 3    | 0    | 3     | 3    | PASS   | —        |
+| jomsom-muktinath             | 7   | 7    | 3    | 3     | 7    | PASS   | —        |
+| jumla-sinja                  | 3   | 2    | 0    | 2     | 2    | WARN   | days-2/3 |
+| kakani-gurje                 | 3   | 2    | 0    | 1     | 2    | WARN   | days-2/3 |
+| kakani-hill                  | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| kali-gandaki-rafting         | 2   | 2    | 0    | 2     | 1    | WARN   | days-1/2 |
+| kalikot-sinja                | 2   | 2    | 0    | 2     | 2    | PASS   | —        |
+| kanchenjunga-circuit         | 23  | 24   | 5    | 4     | 23   | PASS   | —        |
+| kanchenjunga-north           | 18  | 18   | 2    | 4     | 18   | PASS   | —        |
+| kanchenjunga-south           | 18  | 18   | 4    | 4     | 18   | PASS   | —        |
+| kapilavastu-tour             | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| kathmandu-city-tour          | 2   | 8    | 0    | 3     | 1    | WARN   | days-1/2 |
+| kathmandu-heritage           | 1   | 5    | 0    | 3     | 1    | PASS   | —        |
+| kathmandu-mountain-biking    | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| khaptad-tour                 | 3   | 3    | 0    | 3     | 3    | PASS   | —        |
+| khokana-traditional          | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| khopra-ridge                 | 8   | 5    | 0    | 2     | 7    | WARN   | days-7/8 |
+| kirtipur-ancient             | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| kirtipur-tour                | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| koshi-tappu                  | 2   | 3    | 0    | 3     | 1    | WARN   | days-1/2 |
+| kusma-bungee                 | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| langtang-valley              | 7   | 7    | 1    | 3     | 7    | PASS   | —        |
+| lauribina-pass               | 8   | 9    | 4    | 3     | 8    | PASS   | —        |
+| lower-mustang                | 7   | 7    | 2    | 3     | 7    | PASS   | —        |
+| lumbini-circuit              | 2   | 1    | 0    | 3     | 1    | WARN   | days-1/2 |
+| lumbini-mayadevi             | 2   | 4    | 0    | 2     | 1    | WARN   | days-1/2 |
+| mahakali-river               | 11  | 15   | 6    | 2     | 11   | PASS   | —        |
+| makalu-barun                 | 19  | 19   | 2    | 4     | 19   | PASS   | —        |
+| makalu-base-camp             | 17  | 17   | 2    | 4     | 17   | PASS   | —        |
+| manakamana-temple            | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| manaslu-circuit              | 15  | 16   | 4    | 4     | 15   | PASS   | —        |
+| mardi-himal                  | 6   | 6    | 0    | 3     | 5    | WARN   | days-5/6 |
+| marpha-tukuche-kobang        | 2   | 3    | 0    | 2     | 2    | PASS   | —        |
+| mohare-danda                 | 6   | 6    | 3    | 2     | 6    | PASS   | —        |
+| muktinath-pilgrimage         | 3   | 3    | 0    | 3     | 2    | WARN   | days-2/3 |
+| muktinath-temple-tour        | 2   | 2    | 0    | 3     | 2    | PASS   | —        |
+| nagarjun-rock-climbing       | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| nagarkot-sunrise             | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| namobuddha-monastery         | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| nar-phu                      | 11  | 9    | 4    | 3     | 11   | PASS   | —        |
+| nuwakot-durbar               | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| palpa-tour                   | 2   | 4    | 0    | 3     | 2    | PASS   | —        |
+| panauti-heritage             | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| panauti-khokana-bungamati    | 1   | 4    | 0    | 2     | 1    | PASS   | —        |
+| panch-pokhari                | 8   | 8    | 5    | 2     | 8    | PASS   | —        |
+| panchase                     | 5   | 5    | 2    | 1     | 5    | PASS   | —        |
+| pashupatinath-tour           | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| patan-tour                   | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| pathibhara-temple-pilgrimage | 3   | 4    | 0    | 3     | 3    | PASS   | —        |
+| pharping-chobar              | 2   | 3    | 0    | 1     | 2    | PASS   | —        |
+| pharping-monastery           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| phoksundo-lake               | 11  | 12   | 2    | 3     | 11   | PASS   | —        |
+| pokhara-ballooning           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| pokhara-city-tour            | 2   | 3    | 0    | 3     | 1    | WARN   | days-1/2 |
+| pokhara-paragliding          | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| pokhara-skydiving            | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| pokhara-zipline              | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| poon-hill                    | 5   | 7    | 0    | 3     | 5    | PASS   | —        |
+| ranighat-rani-mahal          | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| rara-lake                    | 9   | 9    | 5    | 3     | 9    | PASS   | —        |
+| renjo-la                     | 13  | 14   | 7    | 3     | 13   | PASS   | —        |
+| rolwaling                    | 13  | 14   | 2    | 3     | 13   | PASS   | —        |
+| rupina-la                    | 13  | 11   | 5    | 4     | 13   | PASS   | —        |
+| saipal                       | 13  | 13   | 3    | 3     | 13   | PASS   | —        |
+| sankhu-bajrayogini           | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| sankhu-historical            | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| sarangkot-sunrise            | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| seti-river-rafting           | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| sherpa-cultural              | 7   | 6    | 0    | 3     | 6    | WARN   | days-6/7 |
+| shey-gompa-dolpa             | 3   | 3    | 1    | 2     | 3    | PASS   | —        |
+| shivapuri-nagarjun           | 2   | 3    | 0    | 2     | 2    | PASS   | —        |
+| shuklaphanta                 | 2   | 3    | 0    | 3     | 1    | WARN   | days-1/2 |
+| sikles                       | 6   | 6    | 3    | 1     | 6    | PASS   | —        |
+| simikot-humla                | 3   | 3    | 0    | 2     | 3    | PASS   | —        |
+| simikot-remote               | 2   | 2    | 0    | 2     | 1    | WARN   | days-1/2 |
+| sindhuli-fort                | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| sinja-valley                 | 2   | 2    | 0    | 2     | 1    | WARN   | days-1/2 |
+| sundarijal-canyoning         | 1   | 2    | 0    | 2     | 1    | PASS   | —        |
+| sundarijal-nagarkot          | 3   | 3    | 0    | 1     | 3    | PASS   | —        |
+| surkhet-birendranagar        | 1   | 3    | 0    | 2     | 1    | PASS   | —        |
+| swayambhunath-tour           | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| tamang-heritage              | 7   | 6    | 0    | 3     | 6    | WARN   | days-6/7 |
+| tansen-hill-town-tour        | 2   | 2    | 0    | 2     | 2    | PASS   | —        |
+| three-passes                 | 18  | 22   | 5    | 4     | 18   | PASS   | —        |
+| tilicho-lake                 | 11  | 9    | 5    | 2     | 11   | PASS   | —        |
+| trishuli-rafting             | 1   | 1    | 0    | 2     | 1    | PASS   | —        |
+| tsum-valley                  | 11  | 11   | 2    | 3     | 11   | PASS   | —        |
+| upper-dolpo                  | 18  | 21   | 5    | 3     | 18   | PASS   | —        |
+| upper-mustang                | 12  | 12   | 4    | 4     | 12   | PASS   | —        |
++------------------------------+-----+------+------+-------+------+--------+----------+
+
+📊 Summary:
+   ✅ PASS: 118
+   ⚠️  WARN: 20
+   ❌ FAIL: 0
+
+⚠️  WARN routes:
+   - bajhang-bajura: days-2/3
+   - banke-tour: days-1/2
+   - janaki-temple-pilgrimage: days-1/2
+   - janakpur-tour: days-1/2
+   - jumla-sinja: days-2/3
+   - kakani-gurje: days-2/3
+   - kali-gandaki-rafting: days-1/2
+   - kathmandu-city-tour: days-1/2
+   - khopra-ridge: days-7/8
+   - koshi-tappu: days-1/2
+   - lumbini-circuit: days-1/2
+   - lumbini-mayadevi: days-1/2
+   - mardi-himal: days-5/6
+   - muktinath-pilgrimage: days-2/3
+   - pokhara-city-tour: days-1/2
+   - sherpa-cultural: days-6/7
+   - shuklaphanta: days-1/2
+   - simikot-remote: days-1/2
+   - sinja-valley: days-1/2
+   - tamang-heritage: days-6/7
