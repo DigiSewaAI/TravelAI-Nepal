@@ -58,6 +58,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-bhote', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Bhote Koshi River', 'slug' => 'bhote-koshi-river', 'type' => 'landmark', 'lat' => 27.9123, 'lng' => 85.9345, 'alt' => 600],
             ],
+            'segments' => [
+                ['from' => 'kathmandu-bhote', 'to' => 'bhote-koshi-river', 'dist' => 95.0, 'time' => 3.5, 'loss' => 800],
+                ['from' => 'bhote-koshi-river', 'to' => 'kathmandu-bhote', 'dist' => 95.0, 'time' => 3.5, 'gain' => 800],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Rafting Package (Full Day)', 'amount' => 70, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Lunch & Equipment', 'amount' => 15, 'unit' => 'per_person', 'mandatory' => false],
@@ -82,6 +86,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Pokhara', 'slug' => 'pokhara-kali', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Kali Gandaki River', 'slug' => 'kali-gandaki-river', 'type' => 'landmark', 'lat' => 28.3123, 'lng' => 83.7123, 'alt' => 800],
             ],
+            'segments' => [
+                ['from' => 'pokhara-kali', 'to' => 'kali-gandaki-river', 'dist' => 60.0, 'time' => 5.0, 'loss' => 600],
+                ['from' => 'kali-gandaki-river', 'to' => 'pokhara-kali', 'dist' => 60.0, 'time' => 5.0, 'gain' => 600],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Rafting Package (2 Days)', 'amount' => 120, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Accommodation & Meals', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => false],
@@ -105,6 +113,10 @@ class AdventureActivitiesSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-seti', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Seti River', 'slug' => 'seti-river', 'type' => 'landmark', 'lat' => 28.2345, 'lng' => 84.0123, 'alt' => 600],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-seti', 'to' => 'seti-river', 'dist' => 20.0, 'time' => 1.5, 'loss' => 200],
+                ['from' => 'seti-river', 'to' => 'pokhara-seti', 'dist' => 20.0, 'time' => 1.5, 'gain' => 200],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Rafting Package (Half Day)', 'amount' => 40, 'unit' => 'per_person', 'mandatory' => false],
@@ -154,6 +166,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Pokhara', 'slug' => 'pokhara-kusma', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Kusma Bridge', 'slug' => 'kusma-bridge', 'type' => 'landmark', 'lat' => 28.2123, 'lng' => 83.7123, 'alt' => 800],
             ],
+            'segments' => [
+                ['from' => 'pokhara-kusma', 'to' => 'kusma-bridge', 'dist' => 65.0, 'time' => 3.0, 'loss' => 100],
+                ['from' => 'kusma-bridge', 'to' => 'pokhara-kusma', 'dist' => 65.0, 'time' => 3.0, 'gain' => 100],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Bungee Jump (Single)', 'amount' => 85, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Photo/Video Package', 'amount' => 20, 'unit' => 'per_person', 'mandatory' => false],
@@ -177,6 +193,10 @@ class AdventureActivitiesSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-bungee-bhote', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Bhote Koshi Bridge', 'slug' => 'bhote-koshi-bridge', 'type' => 'landmark', 'lat' => 27.9123, 'lng' => 85.9345, 'alt' => 600],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-bungee-bhote', 'to' => 'bhote-koshi-bridge', 'dist' => 95.0, 'time' => 3.5, 'loss' => 800],
+                ['from' => 'bhote-koshi-bridge', 'to' => 'kathmandu-bungee-bhote', 'dist' => 95.0, 'time' => 3.5, 'gain' => 800],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Bungee Jump (Single)', 'amount' => 75, 'unit' => 'per_person', 'mandatory' => false],
@@ -202,6 +222,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Pokhara', 'slug' => 'pokhara-zip', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Zip-line Start Point', 'slug' => 'zipline-start', 'type' => 'landmark', 'lat' => 28.2567, 'lng' => 83.9567, 'alt' => 1200],
             ],
+            'segments' => [
+                ['from' => 'pokhara-zip', 'to' => 'zipline-start', 'dist' => 15.0, 'time' => 0.5, 'gain' => 773],
+                ['from' => 'zipline-start', 'to' => 'pokhara-zip', 'dist' => 15.0, 'time' => 0.5, 'loss' => 773],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Zip-line Ride', 'amount' => 50, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Photo Package', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => false],
@@ -225,6 +249,10 @@ class AdventureActivitiesSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-mtb', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Shivapuri National Park', 'slug' => 'shivapuri-mtb', 'type' => 'landmark', 'lat' => 27.7891, 'lng' => 85.3567, 'alt' => 1500],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-mtb', 'to' => 'shivapuri-mtb', 'dist' => 15.0, 'time' => 1.5, 'gain' => 600],
+                ['from' => 'shivapuri-mtb', 'to' => 'kathmandu-mtb', 'dist' => 15.0, 'time' => 1.5, 'loss' => 600],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Bike Rental (Full Day)', 'amount' => 25, 'unit' => 'per_person', 'mandatory' => false],
@@ -250,6 +278,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-nagarjun', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Nagarjun Forest', 'slug' => 'nagarjun-forest', 'type' => 'landmark', 'lat' => 27.7567, 'lng' => 85.3891, 'alt' => 1600],
             ],
+            'segments' => [
+                ['from' => 'kathmandu-nagarjun', 'to' => 'nagarjun-forest', 'dist' => 10.0, 'time' => 0.5, 'loss' => 100],
+                ['from' => 'nagarjun-forest', 'to' => 'kathmandu-nagarjun', 'dist' => 10.0, 'time' => 0.5, 'gain' => 100],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Climbing Package (Half Day)', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Equipment Rental', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => false],
@@ -273,6 +305,10 @@ class AdventureActivitiesSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-canyoning', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Sundarijal', 'slug' => 'sundarijal-canyoning', 'type' => 'landmark', 'lat' => 28.0821, 'lng' => 85.4243, 'alt' => 1350],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-canyoning', 'to' => 'sundarijal-canyoning', 'dist' => 15.0, 'time' => 1.0, 'gain' => 100],
+                ['from' => 'sundarijal-canyoning', 'to' => 'kathmandu-canyoning', 'dist' => 15.0, 'time' => 1.0, 'loss' => 100],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Canyoning Package (Half Day)', 'amount' => 40, 'unit' => 'per_person', 'mandatory' => false],
@@ -298,6 +334,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Pokhara', 'slug' => 'pokhara-skydive', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Skydiving Drop Zone', 'slug' => 'skydive-zone', 'type' => 'landmark', 'lat' => 28.1789, 'lng' => 83.9789, 'alt' => 827],
             ],
+            'segments' => [
+                ['from' => 'pokhara-skydive', 'to' => 'skydive-zone', 'dist' => 12.0, 'time' => 0.5, 'loss' => 27],
+                ['from' => 'skydive-zone', 'to' => 'pokhara-skydive', 'dist' => 12.0, 'time' => 0.5, 'gain' => 27],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Tandem Skydive', 'amount' => 250, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Photo/Video Package', 'amount' => 50, 'unit' => 'per_person', 'mandatory' => false],
@@ -322,6 +362,10 @@ class AdventureActivitiesSeeder extends Seeder
                 ['name' => 'Pokhara', 'slug' => 'pokhara-balloon', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Balloon Launch Site', 'slug' => 'balloon-launch', 'type' => 'landmark', 'lat' => 28.2234, 'lng' => 83.9567, 'alt' => 827],
             ],
+            'segments' => [
+                ['from' => 'pokhara-balloon', 'to' => 'balloon-launch', 'dist' => 10.0, 'time' => 0.5, 'loss' => 27],
+                ['from' => 'balloon-launch', 'to' => 'pokhara-balloon', 'dist' => 10.0, 'time' => 0.5, 'gain' => 27],
+            ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Balloon Ride (1 Hour)', 'amount' => 180, 'unit' => 'per_person', 'mandatory' => false],
                 ['type' => 'activity', 'name' => 'Breakfast Included', 'amount' => 20, 'unit' => 'per_person', 'mandatory' => false],
@@ -345,6 +389,10 @@ class AdventureActivitiesSeeder extends Seeder
             'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-kayak', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Fewa Lake', 'slug' => 'fewa-lake-kayak', 'type' => 'lake', 'lat' => 28.2231, 'lng' => 83.9490, 'alt' => 800],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-kayak', 'to' => 'fewa-lake-kayak', 'dist' => 5.0, 'time' => 0.3, 'loss' => 27],
+                ['from' => 'fewa-lake-kayak', 'to' => 'pokhara-kayak', 'dist' => 5.0, 'time' => 0.3, 'gain' => 27],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Kayak Rental (Half Day)', 'amount' => 15, 'unit' => 'per_person', 'mandatory' => false],

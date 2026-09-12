@@ -55,9 +55,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Gorkha', 'slug' => 'gorkha-heritage', 'type' => 'village', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
+                        'waypoints' => [
+                ['name' => 'Gorkha', 'slug' => 'gorkha-town', 'type' => 'village', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
                 ['name' => 'Gorkha Durbar', 'slug' => 'gorkha-durbar-heritage', 'type' => 'landmark', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'gorkha-town', 'to' => 'gorkha-durbar-heritage', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'gorkha-durbar-heritage', 'to' => 'gorkha-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 40, 'unit' => 'per_group', 'mandatory' => false],
@@ -66,30 +70,6 @@ class HiddenGemsSeeder extends Seeder
         ]);
 
         $this->command->info('✅ Gorkha seeded.');
-
-        // ==========================================
-        // 3. TANSEN
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Tansen Hill Town Tour',
-                'slug' => 'tansen',
-                'description' => 'Tour of Tansen, a historic hill town with Newari architecture and views of the Himalayas.',
-                'duration_days' => 2,
-                'max_altitude' => 1350,
-                'season' => 'All Year',
-            ],
-            'waypoints' => [
-                ['name' => 'Tansen', 'slug' => 'tansen', 'type' => 'village', 'lat' => 27.8456, 'lng' => 83.5123, 'alt' => 1350],
-                ['name' => 'Srinagar Hill', 'slug' => 'srinagar-hill-tansen', 'type' => 'viewpoint', 'lat' => 27.8567, 'lng' => 83.5234, 'alt' => 1500],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
-
-        $this->command->info('✅ Tansen seeded.');
 
         // ==========================================
         // 4. DHULIKHEL
@@ -103,9 +83,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1550,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Dhulikhel', 'slug' => 'dhulikhel-scenic', 'type' => 'village', 'lat' => 27.6223, 'lng' => 85.5456, 'alt' => 1550],
+                        'waypoints' => [
+                ['name' => 'Dhulikhel', 'slug' => 'dhulikhel-town', 'type' => 'village', 'lat' => 27.6223, 'lng' => 85.5456, 'alt' => 1550],
                 ['name' => 'Dhulikhel Viewpoint', 'slug' => 'dhulikhel-view', 'type' => 'viewpoint', 'lat' => 27.6323, 'lng' => 85.5456, 'alt' => 1700],
+            ],
+            'segments' => [
+                ['from' => 'dhulikhel-town', 'to' => 'dhulikhel-view', 'dist' => 1.5, 'time' => 0.5],
+                ['from' => 'dhulikhel-view', 'to' => 'dhulikhel-town', 'dist' => 1.5, 'time' => 0.5],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -127,9 +111,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Panauti', 'slug' => 'panauti-heritage', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.5345, 'alt' => 1350],
+                        'waypoints' => [
+                ['name' => 'Panauti', 'slug' => 'panauti-town', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.5345, 'alt' => 1350],
                 ['name' => 'Panauti Durbar Square', 'slug' => 'panauti-ds', 'type' => 'landmark', 'lat' => 27.6123, 'lng' => 85.5345, 'alt' => 1350],
+            ],
+            'segments' => [
+                ['from' => 'panauti-town', 'to' => 'panauti-ds', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'panauti-ds', 'to' => 'panauti-town', 'dist' => 0.3, 'time' => 0.1],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
@@ -151,9 +139,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1700,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Namobuddha', 'slug' => 'namobuddha-monastery', 'type' => 'landmark', 'lat' => 27.5891, 'lng' => 85.5567, 'alt' => 1700],
+                        'waypoints' => [
+                ['name' => 'Namobuddha', 'slug' => 'namobuddha-site', 'type' => 'landmark', 'lat' => 27.5891, 'lng' => 85.5567, 'alt' => 1700],
                 ['name' => 'Namobuddha Stupa', 'slug' => 'namobuddha-stupa', 'type' => 'landmark', 'lat' => 27.5891, 'lng' => 85.5567, 'alt' => 1700],
+            ],
+            'segments' => [
+                ['from' => 'namobuddha-site', 'to' => 'namobuddha-stupa', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'namobuddha-stupa', 'to' => 'namobuddha-site', 'dist' => 0.3, 'time' => 0.1],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -175,9 +167,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1400,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Kirtipur', 'slug' => 'kirtipur-ancient', 'type' => 'village', 'lat' => 27.6756, 'lng' => 85.2789, 'alt' => 1400],
+                        'waypoints' => [
+                ['name' => 'Kirtipur', 'slug' => 'kirtipur-town', 'type' => 'village', 'lat' => 27.6756, 'lng' => 85.2789, 'alt' => 1400],
                 ['name' => 'Chilancho Stupa', 'slug' => 'chilancho-stupa', 'type' => 'landmark', 'lat' => 27.6789, 'lng' => 85.2812, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'kirtipur-town', 'to' => 'chilancho-stupa', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'chilancho-stupa', 'to' => 'kirtipur-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -199,9 +195,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Sankhu', 'slug' => 'sankhu-historical', 'type' => 'village', 'lat' => 27.7345, 'lng' => 85.4567, 'alt' => 1350],
+                        'waypoints' => [
+                ['name' => 'Sankhu', 'slug' => 'sankhu-town', 'type' => 'village', 'lat' => 27.7345, 'lng' => 85.4567, 'alt' => 1350],
                 ['name' => 'Bajrayogini Temple', 'slug' => 'bajrayogini-sankhu', 'type' => 'landmark', 'lat' => 27.7423, 'lng' => 85.4634, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'sankhu-town', 'to' => 'bajrayogini-sankhu', 'dist' => 2.0, 'time' => 0.5],
+                ['from' => 'bajrayogini-sankhu', 'to' => 'sankhu-town', 'dist' => 2.0, 'time' => 0.5],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
@@ -223,9 +223,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Khokana', 'slug' => 'khokana-traditional', 'type' => 'village', 'lat' => 27.6456, 'lng' => 85.2989, 'alt' => 1300],
+                        'waypoints' => [
+                ['name' => 'Khokana', 'slug' => 'khokana-town', 'type' => 'village', 'lat' => 27.6456, 'lng' => 85.2989, 'alt' => 1300],
                 ['name' => 'Khokana Durbar Square', 'slug' => 'khokana-ds', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2989, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'khokana-town', 'to' => 'khokana-ds', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'khokana-ds', 'to' => 'khokana-town', 'dist' => 0.3, 'time' => 0.1],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -247,9 +251,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Bungamati', 'slug' => 'bungamati-woodcarving', 'type' => 'village', 'lat' => 27.6345, 'lng' => 85.3123, 'alt' => 1300],
+                        'waypoints' => [
+                ['name' => 'Bungamati', 'slug' => 'bungamati-town', 'type' => 'village', 'lat' => 27.6345, 'lng' => 85.3123, 'alt' => 1300],
                 ['name' => 'Bungamati Temple', 'slug' => 'bungamati-temple', 'type' => 'landmark', 'lat' => 27.6345, 'lng' => 85.3123, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'bungamati-town', 'to' => 'bungamati-temple', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'bungamati-temple', 'to' => 'bungamati-town', 'dist' => 0.3, 'time' => 0.1],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -271,9 +279,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1200,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Chobar', 'slug' => 'chobar-gorge', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.2901, 'alt' => 1200],
-                ['name' => 'Chobar Gorge', 'slug' => 'chobar-gorge', 'type' => 'landmark', 'lat' => 27.6123, 'lng' => 85.2901, 'alt' => 1200],
+                        'waypoints' => [
+                ['name' => 'Chobar', 'slug' => 'chobar-town', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.2901, 'alt' => 1200],
+                ['name' => 'Chobar Gorge', 'slug' => 'chobar-gorge-view', 'type' => 'landmark', 'lat' => 27.6123, 'lng' => 85.2901, 'alt' => 1200],
+            ],
+            'segments' => [
+                ['from' => 'chobar-town', 'to' => 'chobar-gorge-view', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'chobar-gorge-view', 'to' => 'chobar-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
@@ -295,9 +307,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1400,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Godavari', 'slug' => 'godavari-botanical', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.3345, 'alt' => 1400],
+                        'waypoints' => [
+                ['name' => 'Godavari', 'slug' => 'godavari-town', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.3345, 'alt' => 1400],
                 ['name' => 'Botanical Garden', 'slug' => 'botanical-garden', 'type' => 'landmark', 'lat' => 27.6123, 'lng' => 85.3345, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'godavari-town', 'to' => 'botanical-garden', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'botanical-garden', 'to' => 'godavari-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -319,9 +335,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Pharping', 'slug' => 'pharping-monastery', 'type' => 'village', 'lat' => 27.6456, 'lng' => 85.2678, 'alt' => 1300],
-                ['name' => 'Pharping Monastery', 'slug' => 'pharping-monastery', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2678, 'alt' => 1300],
+                        'waypoints' => [
+                ['name' => 'Pharping', 'slug' => 'pharping-town', 'type' => 'village', 'lat' => 27.6456, 'lng' => 85.2678, 'alt' => 1300],
+                ['name' => 'Pharping Monastery', 'slug' => 'pharping-cave', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2678, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'pharping-town', 'to' => 'pharping-cave', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'pharping-cave', 'to' => 'pharping-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -343,9 +363,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 2000,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Kakani', 'slug' => 'kakani-hill', 'type' => 'village', 'lat' => 27.8123, 'lng' => 85.4567, 'alt' => 2000],
+                        'waypoints' => [
+                ['name' => 'Kakani', 'slug' => 'kakani-town', 'type' => 'village', 'lat' => 27.8123, 'lng' => 85.4567, 'alt' => 2000],
                 ['name' => 'Kakani Viewpoint', 'slug' => 'kakani-view', 'type' => 'viewpoint', 'lat' => 27.8123, 'lng' => 85.4567, 'alt' => 2000],
+            ],
+            'segments' => [
+                ['from' => 'kakani-town', 'to' => 'kakani-view', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'kakani-view', 'to' => 'kakani-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
@@ -367,9 +391,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1500,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Nuwakot', 'slug' => 'nuwakot-durbar', 'type' => 'village', 'lat' => 27.9123, 'lng' => 85.6123, 'alt' => 1500],
-                ['name' => 'Nuwakot Durbar', 'slug' => 'nuwakot-durbar', 'type' => 'landmark', 'lat' => 27.9123, 'lng' => 85.6123, 'alt' => 1500],
+                        'waypoints' => [
+                ['name' => 'Nuwakot', 'slug' => 'nuwakot-town', 'type' => 'village', 'lat' => 27.9123, 'lng' => 85.6123, 'alt' => 1500],
+                ['name' => 'Nuwakot Durbar', 'slug' => 'nuwakot-palace', 'type' => 'landmark', 'lat' => 27.9123, 'lng' => 85.6123, 'alt' => 1500],
+            ],
+            'segments' => [
+                ['from' => 'nuwakot-town', 'to' => 'nuwakot-palace', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'nuwakot-palace', 'to' => 'nuwakot-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 40, 'unit' => 'per_group', 'mandatory' => false],
@@ -391,9 +419,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 800,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Sindhuli', 'slug' => 'sindhuli-fort', 'type' => 'village', 'lat' => 27.4567, 'lng' => 85.9123, 'alt' => 800],
-                ['name' => 'Sindhuli Fort', 'slug' => 'sindhuli-fort', 'type' => 'landmark', 'lat' => 27.4567, 'lng' => 85.9123, 'alt' => 800],
+                        'waypoints' => [
+                ['name' => 'Sindhuli', 'slug' => 'sindhuli-town', 'type' => 'village', 'lat' => 27.4567, 'lng' => 85.9123, 'alt' => 800],
+                ['name' => 'Sindhuli Fort', 'slug' => 'sindhuli-fort-view', 'type' => 'landmark', 'lat' => 27.4567, 'lng' => 85.9123, 'alt' => 800],
+            ],
+            'segments' => [
+                ['from' => 'sindhuli-town', 'to' => 'sindhuli-fort-view', 'dist' => 1.0, 'time' => 0.3],
+                ['from' => 'sindhuli-fort-view', 'to' => 'sindhuli-town', 'dist' => 1.0, 'time' => 0.3],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -415,9 +447,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1800,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Bhedetar', 'slug' => 'bhedetar-hill', 'type' => 'village', 'lat' => 26.8567, 'lng' => 87.3789, 'alt' => 1800],
+                        'waypoints' => [
+                ['name' => 'Bhedetar', 'slug' => 'bhedetar-town', 'type' => 'village', 'lat' => 26.8567, 'lng' => 87.3789, 'alt' => 1800],
                 ['name' => 'Bhedetar Viewpoint', 'slug' => 'bhedetar-view', 'type' => 'viewpoint', 'lat' => 26.8567, 'lng' => 87.3789, 'alt' => 1800],
+            ],
+            'segments' => [
+                ['from' => 'bhedetar-town', 'to' => 'bhedetar-view', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'bhedetar-view', 'to' => 'bhedetar-town', 'dist' => 0.5, 'time' => 0.2],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -439,9 +475,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 1500,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Hile', 'slug' => 'hile-tea', 'type' => 'village', 'lat' => 27.2345, 'lng' => 87.3456, 'alt' => 1500],
+                        'waypoints' => [
+                ['name' => 'Hile', 'slug' => 'hile-town', 'type' => 'village', 'lat' => 27.2345, 'lng' => 87.3456, 'alt' => 1500],
                 ['name' => 'Hile Tea Gardens', 'slug' => 'hile-tea-gardens', 'type' => 'landmark', 'lat' => 27.2345, 'lng' => 87.3456, 'alt' => 1500],
+            ],
+            'segments' => [
+                ['from' => 'hile-town', 'to' => 'hile-tea-gardens', 'dist' => 1.0, 'time' => 0.3],
+                ['from' => 'hile-tea-gardens', 'to' => 'hile-town', 'dist' => 1.0, 'time' => 0.3],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
@@ -463,9 +503,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Dharan', 'slug' => 'dharan-city', 'type' => 'city', 'lat' => 26.7891, 'lng' => 87.3123, 'alt' => 350],
+                        'waypoints' => [
+                ['name' => 'Dharan', 'slug' => 'dharan-town', 'type' => 'city', 'lat' => 26.7891, 'lng' => 87.3123, 'alt' => 350],
                 ['name' => 'Bishnupaduka Temple', 'slug' => 'bishnupaduka', 'type' => 'landmark', 'lat' => 26.7891, 'lng' => 87.3123, 'alt' => 350],
+            ],
+            'segments' => [
+                ['from' => 'dharan-town', 'to' => 'bishnupaduka', 'dist' => 2.0, 'time' => 0.5],
+                ['from' => 'bishnupaduka', 'to' => 'dharan-town', 'dist' => 2.0, 'time' => 0.5],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -487,9 +531,14 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 3500,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
-                ['name' => 'Barun Valley', 'slug' => 'barun-valley', 'type' => 'village', 'lat' => 27.5789, 'lng' => 87.4012, 'alt' => 3500],
+                        'waypoints' => [
+                ['name' => 'Barun Valley', 'slug' => 'barun-town', 'type' => 'village', 'lat' => 27.5789, 'lng' => 87.4012, 'alt' => 3500],
                 ['name' => 'Barun River', 'slug' => 'barun-river', 'type' => 'landmark', 'lat' => 27.5789, 'lng' => 87.4012, 'alt' => 3500],
+            ],
+            'segments' => [
+                ['from' => 'barun-town', 'to' => 'barun-river', 'dist' => 5.0, 'time' => 1.5, 'gain' => 200],
+                ['from' => 'barun-river', 'to' => 'barun-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'barun-river', 'to' => 'barun-town', 'dist' => 5.0, 'time' => 1.5, 'loss' => 200],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 150, 'unit' => 'per_group', 'mandatory' => false],
@@ -511,9 +560,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 2950,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
-                ['name' => 'Simikot', 'slug' => 'simikot-remote', 'type' => 'village', 'lat' => 29.9789, 'lng' => 82.0123, 'alt' => 2950],
+                        'waypoints' => [
+                ['name' => 'Simikot', 'slug' => 'simikot-town', 'type' => 'village', 'lat' => 29.9789, 'lng' => 82.0123, 'alt' => 2950],
                 ['name' => 'Simikot Gompa', 'slug' => 'simikot-gompa', 'type' => 'landmark', 'lat' => 29.9789, 'lng' => 82.0123, 'alt' => 2950],
+            ],
+            'segments' => [
+                ['from' => 'simikot-town', 'to' => 'simikot-gompa', 'dist' => 2.0, 'time' => 0.5, 'gain' => 50],
+                ['from' => 'simikot-gompa', 'to' => 'simikot-town', 'dist' => 2.0, 'time' => 0.5, 'loss' => 50],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
@@ -535,9 +588,13 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 2500,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
-                ['name' => 'Sinja Valley', 'slug' => 'sinja-valley', 'type' => 'village', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
+                        'waypoints' => [
+                ['name' => 'Sinja Valley', 'slug' => 'sinja-town', 'type' => 'village', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
                 ['name' => 'Sinja Ruins', 'slug' => 'sinja-ruins', 'type' => 'landmark', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
+            ],
+            'segments' => [
+                ['from' => 'sinja-town', 'to' => 'sinja-ruins', 'dist' => 2.0, 'time' => 0.5, 'gain' => 50],
+                ['from' => 'sinja-ruins', 'to' => 'sinja-town', 'dist' => 2.0, 'time' => 0.5, 'loss' => 50],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
@@ -559,9 +616,14 @@ class HiddenGemsSeeder extends Seeder
                 'max_altitude' => 4200,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
-                ['name' => 'Shey Gompa', 'slug' => 'shey-gompa-dolpa', 'type' => 'landmark', 'lat' => 29.4123, 'lng' => 82.7123, 'alt' => 4200],
-                ['name' => 'Shey Gompa', 'slug' => 'shey-gompa-dolpa', 'type' => 'landmark', 'lat' => 29.4123, 'lng' => 82.7123, 'alt' => 4200],
+                        'waypoints' => [
+                ['name' => 'Shey Gompa Town', 'slug' => 'shey-gompa-town', 'type' => 'village', 'lat' => 29.4123, 'lng' => 82.7123, 'alt' => 4200],
+                ['name' => 'Shey Gompa Monastery', 'slug' => 'shey-gompa-monastery', 'type' => 'landmark', 'lat' => 29.4123, 'lng' => 82.7123, 'alt' => 4200],
+            ],
+            'segments' => [
+                ['from' => 'shey-gompa-town', 'to' => 'shey-gompa-monastery', 'dist' => 1.0, 'time' => 0.3, 'gain' => 50],
+                ['from' => 'shey-gompa-monastery', 'to' => 'shey-gompa-monastery', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'shey-gompa-monastery', 'to' => 'shey-gompa-town', 'dist' => 1.0, 'time' => 0.3, 'loss' => 50],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 150, 'unit' => 'per_group', 'mandatory' => false],

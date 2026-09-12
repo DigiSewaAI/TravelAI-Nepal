@@ -30,10 +30,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-pashu', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Pashupatinath Temple', 'slug' => 'pashupatinath-temple', 'type' => 'landmark', 'lat' => 27.7108, 'lng' => 85.3482, 'alt' => 1350],
                 ['name' => 'Aryaghat', 'slug' => 'aryaghat', 'type' => 'landmark', 'lat' => 27.7123, 'lng' => 85.3491, 'alt' => 1350],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-pashu', 'to' => 'pashupatinath-temple', 'dist' => 5.0, 'time' => 0.3, 'loss' => 50],
+                ['from' => 'pashupatinath-temple', 'to' => 'aryaghat', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'aryaghat', 'to' => 'kathmandu-pashu', 'dist' => 5.3, 'time' => 0.3, 'gain' => 50],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Temple Entrance Fee', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => true],
@@ -55,10 +60,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-boudha', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Boudhanath Stupa', 'slug' => 'boudhanath-stupa', 'type' => 'landmark', 'lat' => 27.7215, 'lng' => 85.3629, 'alt' => 1350],
                 ['name' => 'Monasteries', 'slug' => 'boudha-monasteries', 'type' => 'landmark', 'lat' => 27.7234, 'lng' => 85.3634, 'alt' => 1350],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-boudha', 'to' => 'boudhanath-stupa', 'dist' => 7.0, 'time' => 0.4, 'loss' => 50],
+                ['from' => 'boudhanath-stupa', 'to' => 'boudha-monasteries', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'boudha-monasteries', 'to' => 'kathmandu-boudha', 'dist' => 7.0, 'time' => 0.4, 'gain' => 50],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Stupa Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -105,10 +115,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 3800,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-muktinath-pil', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Jomsom', 'slug' => 'jomsom-muktinath-pil', 'type' => 'village', 'lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
                 ['name' => 'Muktinath Temple', 'slug' => 'muktinath-pil-temple', 'type' => 'landmark', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-muktinath-pil', 'to' => 'jomsom-muktinath-pil', 'dist' => 180.0, 'time' => 8.0, 'gain' => 1873],
+                ['from' => 'jomsom-muktinath-pil', 'to' => 'muktinath-pil-temple', 'dist' => 22.0, 'time' => 2.0, 'gain' => 1100],
+                ['from' => 'muktinath-pil-temple', 'to' => 'jomsom-muktinath-pil', 'dist' => 22.0, 'time' => 2.0, 'loss' => 1100],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Temple Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -131,10 +146,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 80,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Janakpur', 'slug' => 'janakpur-pil', 'type' => 'village', 'lat' => 26.7234, 'lng' => 85.9234, 'alt' => 80],
                 ['name' => 'Janaki Temple', 'slug' => 'janaki-temple-pil', 'type' => 'landmark', 'lat' => 26.7234, 'lng' => 85.9234, 'alt' => 80],
                 ['name' => 'Ram Sita Vivaha Mandap', 'slug' => 'vivaha-mandap-pil', 'type' => 'landmark', 'lat' => 26.7245, 'lng' => 85.9245, 'alt' => 80],
+            ],
+            'segments' => [
+                ['from' => 'janakpur-pil', 'to' => 'janaki-temple-pil', 'dist' => 0.5, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'janaki-temple-pil', 'to' => 'vivaha-mandap-pil', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'vivaha-mandap-pil', 'to' => 'janakpur-pil', 'dist' => 0.6, 'time' => 0.2, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Temple Donation', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => false],
@@ -156,11 +176,17 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 150,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Lumbini', 'slug' => 'lumbini-mayadevi', 'type' => 'village', 'lat' => 27.4689, 'lng' => 83.2767, 'alt' => 150],
+                        'waypoints' => [
+                ['name' => 'Lumbini', 'slug' => 'lumbini-town', 'type' => 'village', 'lat' => 27.4689, 'lng' => 83.2767, 'alt' => 150],
                 ['name' => 'Mayadevi Temple', 'slug' => 'mayadevi-temple', 'type' => 'landmark', 'lat' => 27.4698, 'lng' => 83.2762, 'alt' => 150],
                 ['name' => 'Ashoka Pillar', 'slug' => 'ashoka-pillar-maya', 'type' => 'landmark', 'lat' => 27.4702, 'lng' => 83.2774, 'alt' => 150],
                 ['name' => 'Monasteries', 'slug' => 'lumbini-monasteries', 'type' => 'landmark', 'lat' => 27.4723, 'lng' => 83.2812, 'alt' => 150],
+            ],
+            'segments' => [
+                ['from' => 'lumbini-town', 'to' => 'mayadevi-temple', 'dist' => 0.5, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'mayadevi-temple', 'to' => 'ashoka-pillar-maya', 'dist' => 0.2, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'ashoka-pillar-maya', 'to' => 'lumbini-monasteries', 'dist' => 0.5, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'lumbini-monasteries', 'to' => 'lumbini-town', 'dist' => 0.5, 'time' => 0.2, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Lumbini Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -207,10 +233,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-gorkha', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Gorkha Durbar', 'slug' => 'gorkha-durbar', 'type' => 'landmark', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
+                ['name' => 'Gorkha Durbar', 'slug' => 'gorkha-durbar-palace', 'type' => 'landmark', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
                 ['name' => 'Gorkha Kalika Temple', 'slug' => 'gorkha-kalika', 'type' => 'landmark', 'lat' => 28.0156, 'lng' => 84.6156, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-gorkha', 'to' => 'gorkha-durbar-palace', 'dist' => 145.0, 'time' => 5.0, 'loss' => 100],
+                ['from' => 'gorkha-durbar-palace', 'to' => 'gorkha-kalika', 'dist' => 0.5, 'time' => 0.2, 'gain' => 0],
+                ['from' => 'gorkha-kalika', 'to' => 'kathmandu-gorkha', 'dist' => 145.5, 'time' => 5.0, 'gain' => 100],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Durbar Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -220,31 +251,6 @@ class ReligiousSitesSeeder extends Seeder
         ]);
 
         $this->command->info('✅ Gorkha Durbar seeded.');
-
-        // ==========================================
-        // 9. PALPA (TANSEN, RANI MAHAL)
-        // ==========================================
-        $this->helper->seedTour([
-            'route' => [
-                'name' => 'Palpa (Tansen, Rani Mahal) Tour',
-                'slug' => 'palpa-tansen-rani',
-                'description' => 'Tour of Tansen and Rani Mahal, the historical palace built by General Khadga Shumsher on the banks of the Kali Gandaki.',
-                'duration_days' => 2,
-                'max_altitude' => 1350,
-                'season' => 'All Year',
-            ],
-            'waypoints' => [
-                ['name' => 'Tansen', 'slug' => 'tansen', 'type' => 'village', 'lat' => 27.8456, 'lng' => 83.5123, 'alt' => 1350],
-                ['name' => 'Rani Mahal', 'slug' => 'rani-mahal', 'type' => 'landmark', 'lat' => 27.8123, 'lng' => 83.5345, 'alt' => 800],
-                ['name' => 'Srinagar Hill', 'slug' => 'srinagar-hill', 'type' => 'landmark', 'lat' => 27.8567, 'lng' => 83.5234, 'alt' => 1500],
-            ],
-            'costs' => [
-                ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 60, 'unit' => 'per_group', 'mandatory' => false],
-                ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 10, 'unit' => 'per_group', 'mandatory' => false],
-            ],
-        ]);
-
-        $this->command->info('✅ Palpa (Tansen, Rani Mahal) seeded.');
 
         // ==========================================
         // 10. RANIGHAT (RANI MAHAL)
@@ -258,10 +264,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 800,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Tansen', 'slug' => 'tansen-ranighat', 'type' => 'village', 'lat' => 27.8456, 'lng' => 83.5123, 'alt' => 1350],
                 ['name' => 'Ranighat', 'slug' => 'ranighat', 'type' => 'landmark', 'lat' => 27.8123, 'lng' => 83.5345, 'alt' => 800],
                 ['name' => 'Kali Gandaki River', 'slug' => 'kali-gandaki-ranighat', 'type' => 'landmark', 'lat' => 27.8145, 'lng' => 83.5367, 'alt' => 800],
+            ],
+            'segments' => [
+                ['from' => 'tansen-ranighat', 'to' => 'ranighat', 'dist' => 8.0, 'time' => 1.5, 'loss' => 550],
+                ['from' => 'ranighat', 'to' => 'kali-gandaki-ranighat', 'dist' => 0.3, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'kali-gandaki-ranighat', 'to' => 'tansen-ranighat', 'dist' => 8.3, 'time' => 2.0, 'gain' => 550],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -283,10 +294,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1400,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-dakshinkali', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Dakshinkali Temple', 'slug' => 'dakshinkali-temple', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2789, 'alt' => 1400],
+                ['name' => 'Dakshinkali Temple', 'slug' => 'dakshinkali-temple-view', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2789, 'alt' => 1400],
                 ['name' => 'Dakshinkali River', 'slug' => 'dakshinkali-river', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2789, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-dakshinkali', 'to' => 'dakshinkali-temple-view', 'dist' => 22.0, 'time' => 1.0, 'loss' => 0],
+                ['from' => 'dakshinkali-temple-view', 'to' => 'dakshinkali-river', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'dakshinkali-river', 'to' => 'kathmandu-dakshinkali', 'dist' => 22.0, 'time' => 1.0, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
@@ -308,10 +324,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 2551,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-chandragiri', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Chandragiri Temple', 'slug' => 'chandragiri-temple', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2456, 'alt' => 2551],
+                ['name' => 'Chandragiri Temple', 'slug' => 'chandragiri-temple-top', 'type' => 'landmark', 'lat' => 27.6456, 'lng' => 85.2456, 'alt' => 2551],
                 ['name' => 'Cable Car Station', 'slug' => 'chandragiri-cable', 'type' => 'landmark', 'lat' => 27.6567, 'lng' => 85.2345, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'kathmandu-chandragiri', 'to' => 'chandragiri-cable', 'dist' => 15.0, 'time' => 0.8, 'loss' => 0],
+                ['from' => 'chandragiri-cable', 'to' => 'chandragiri-temple-top', 'dist' => 2.5, 'time' => 0.2, 'gain' => 1151],
+                ['from' => 'chandragiri-temple-top', 'to' => 'kathmandu-chandragiri', 'dist' => 17.5, 'time' => 1.0, 'loss' => 1151],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Cable Car Ticket (Round Trip)', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => false],
@@ -333,10 +354,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 950,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-gupteshwor', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Gupteshwor Cave', 'slug' => 'gupteshwor-cave', 'type' => 'landmark', 'lat' => 28.2318, 'lng' => 83.9341, 'alt' => 950],
+                ['name' => 'Gupteshwor Cave', 'slug' => 'gupteshwor-cave-view', 'type' => 'landmark', 'lat' => 28.2318, 'lng' => 83.9341, 'alt' => 950],
                 ['name' => 'Davis Falls', 'slug' => 'davis-falls', 'type' => 'landmark', 'lat' => 28.2323, 'lng' => 83.9323, 'alt' => 950],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-gupteshwor', 'to' => 'gupteshwor-cave-view', 'dist' => 5.0, 'time' => 0.3, 'gain' => 123],
+                ['from' => 'gupteshwor-cave-view', 'to' => 'davis-falls', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'davis-falls', 'to' => 'pokhara-gupteshwor', 'dist' => 5.0, 'time' => 0.3, 'loss' => 123],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Cave Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -359,10 +385,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 800,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-barahi', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Barahi Temple', 'slug' => 'barahi-temple', 'type' => 'landmark', 'lat' => 28.2181, 'lng' => 83.9482, 'alt' => 800],
+                ['name' => 'Barahi Temple', 'slug' => 'barahi-temple-island', 'type' => 'landmark', 'lat' => 28.2181, 'lng' => 83.9482, 'alt' => 800],
                 ['name' => 'Fewa Lake', 'slug' => 'fewa-lake-barahi', 'type' => 'landmark', 'lat' => 28.2231, 'lng' => 83.9490, 'alt' => 800],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-barahi', 'to' => 'fewa-lake-barahi', 'dist' => 2.0, 'time' => 0.2, 'loss' => 27],
+                ['from' => 'fewa-lake-barahi', 'to' => 'barahi-temple-island', 'dist' => 0.5, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'barahi-temple-island', 'to' => 'pokhara-barahi', 'dist' => 2.5, 'time' => 0.3, 'gain' => 27],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Boat Ride (Round Trip)', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => false],
@@ -384,10 +415,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1300,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Gorkha', 'slug' => 'gorkha-gorakhnath', 'type' => 'village', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
-                ['name' => 'Gorakhnath Temple', 'slug' => 'gorakhnath-temple', 'type' => 'landmark', 'lat' => 28.0156, 'lng' => 84.6156, 'alt' => 1300],
+                ['name' => 'Gorakhnath Temple', 'slug' => 'gorakhnath-temple-view', 'type' => 'landmark', 'lat' => 28.0156, 'lng' => 84.6156, 'alt' => 1300],
                 ['name' => 'Gorkha Bazaar', 'slug' => 'gorkha-bazaar', 'type' => 'village', 'lat' => 28.0123, 'lng' => 84.6123, 'alt' => 1300],
+            ],
+            'segments' => [
+                ['from' => 'gorkha-gorakhnath', 'to' => 'gorakhnath-temple-view', 'dist' => 0.5, 'time' => 0.2, 'gain' => 50],
+                ['from' => 'gorakhnath-temple-view', 'to' => 'gorkha-bazaar', 'dist' => 0.5, 'time' => 0.2, 'loss' => 50],
+                ['from' => 'gorkha-bazaar', 'to' => 'gorkha-gorakhnath', 'dist' => 0.3, 'time' => 0.1, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -409,10 +445,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1400,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Bhaktapur', 'slug' => 'bhaktapur-doleshwar', 'type' => 'village', 'lat' => 27.6722, 'lng' => 85.4295, 'alt' => 1400],
-                ['name' => 'Doleshwar Mahadev Temple', 'slug' => 'doleshwar-mahadev', 'type' => 'landmark', 'lat' => 27.6678, 'lng' => 85.4345, 'alt' => 1400],
+                ['name' => 'Doleshwar Mahadev Temple', 'slug' => 'doleshwar-temple', 'type' => 'landmark', 'lat' => 27.6678, 'lng' => 85.4345, 'alt' => 1400],
                 ['name' => 'Bhaktapur Durbar Square', 'slug' => 'bhaktapur-ds-doleshwar', 'type' => 'landmark', 'lat' => 27.6719, 'lng' => 85.4284, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'bhaktapur-doleshwar', 'to' => 'doleshwar-temple', 'dist' => 2.0, 'time' => 0.3, 'loss' => 0],
+                ['from' => 'doleshwar-temple', 'to' => 'bhaktapur-ds-doleshwar', 'dist' => 0.7, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'bhaktapur-ds-doleshwar', 'to' => 'bhaktapur-doleshwar', 'dist' => 0.5, 'time' => 0.2, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 10, 'unit' => 'per_group', 'mandatory' => false],
@@ -434,10 +475,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1500,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Bhaktapur', 'slug' => 'bhaktapur-changu', 'type' => 'village', 'lat' => 27.6722, 'lng' => 85.4295, 'alt' => 1400],
-                ['name' => 'Changunarayan Temple', 'slug' => 'changunarayan-temple', 'type' => 'landmark', 'lat' => 27.7123, 'lng' => 85.4234, 'alt' => 1500],
+                ['name' => 'Changunarayan Temple', 'slug' => 'changunarayan-temple-view', 'type' => 'landmark', 'lat' => 27.7123, 'lng' => 85.4234, 'alt' => 1500],
                 ['name' => 'Changunarayan Village', 'slug' => 'changunarayan-village', 'type' => 'village', 'lat' => 27.7145, 'lng' => 85.4245, 'alt' => 1500],
+            ],
+            'segments' => [
+                ['from' => 'bhaktapur-changu', 'to' => 'changunarayan-temple-view', 'dist' => 8.0, 'time' => 0.5, 'gain' => 100],
+                ['from' => 'changunarayan-temple-view', 'to' => 'changunarayan-village', 'dist' => 0.3, 'time' => 0.1, 'loss' => 0],
+                ['from' => 'changunarayan-village', 'to' => 'bhaktapur-changu', 'dist' => 8.0, 'time' => 0.5, 'loss' => 100],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Temple Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -460,10 +506,15 @@ class ReligiousSitesSeeder extends Seeder
                 'max_altitude' => 1000,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Baglung', 'slug' => 'baglung-kalika', 'type' => 'village', 'lat' => 28.3123, 'lng' => 83.6123, 'alt' => 1000],
+                        'waypoints' => [
+                ['name' => 'Baglung', 'slug' => 'baglung-town', 'type' => 'village', 'lat' => 28.3123, 'lng' => 83.6123, 'alt' => 1000],
                 ['name' => 'Baglung Kalika Temple', 'slug' => 'baglung-kalika-temple', 'type' => 'landmark', 'lat' => 28.3156, 'lng' => 83.6156, 'alt' => 1000],
                 ['name' => 'Baglung Bazaar', 'slug' => 'baglung-bazaar', 'type' => 'village', 'lat' => 28.3123, 'lng' => 83.6123, 'alt' => 1000],
+            ],
+            'segments' => [
+                ['from' => 'baglung-town', 'to' => 'baglung-kalika-temple', 'dist' => 1.0, 'time' => 0.3, 'gain' => 0],
+                ['from' => 'baglung-kalika-temple', 'to' => 'baglung-bazaar', 'dist' => 0.5, 'time' => 0.2, 'loss' => 0],
+                ['from' => 'baglung-bazaar', 'to' => 'baglung-town', 'dist' => 0.3, 'time' => 0.1, 'gain' => 0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],

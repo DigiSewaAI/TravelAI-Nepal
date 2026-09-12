@@ -171,9 +171,12 @@ class EverestRegionSeeder extends Seeder
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-ev', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Tengboche', 'slug' => 'tengboche-ev', 'type' => 'village', 'lat' => 27.8361, 'lng' => 86.7643, 'alt' => 3860],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'lukla-ev', 'to' => 'phakding-ev', 'dist' => 8.0, 'time' => 3.0, 'loss' => 250],
                 ['from' => 'phakding-ev', 'to' => 'namche-ev', 'dist' => 10.5, 'time' => 5.0, 'gain' => 830],
+                // Namche acclimatization (2 rest days)
+                ['from' => 'namche-ev', 'to' => 'namche-ev', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'namche-ev', 'to' => 'namche-ev', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-ev', 'to' => 'tengboche-ev', 'dist' => 9.0, 'time' => 5.0, 'gain' => 420],
                 ['from' => 'tengboche-ev', 'to' => 'namche-ev', 'dist' => 9.0, 'time' => 4.0, 'loss' => 420],
                 ['from' => 'namche-ev', 'to' => 'lukla-ev', 'dist' => 18.5, 'time' => 7.0, 'loss' => 580],
@@ -210,13 +213,27 @@ class EverestRegionSeeder extends Seeder
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-chola-return', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Lukla', 'slug' => 'lukla-chola-return', 'type' => 'village', 'lat' => 27.6869, 'lng' => 86.7314, 'alt' => 2860],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'lukla-chola', 'to' => 'namche-chola', 'dist' => 18.5, 'time' => 8.0, 'gain' => 580],
+                // Rest at Namche ×2 (acclimatization)
+                ['from' => 'namche-chola', 'to' => 'namche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'namche-chola', 'to' => 'namche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-chola', 'to' => 'tengboche-chola', 'dist' => 9.0, 'time' => 5.0, 'gain' => 420],
+                // Rest at Tengboche
+                ['from' => 'tengboche-chola', 'to' => 'tengboche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tengboche-chola', 'to' => 'dingboche-chola', 'dist' => 10.0, 'time' => 5.0, 'gain' => 550],
+                // Rest at Dingboche ×3 (acclimatization + Chola Pass base)
+                ['from' => 'dingboche-chola', 'to' => 'dingboche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'dingboche-chola', 'to' => 'dingboche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'dingboche-chola', 'to' => 'dingboche-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dingboche-chola', 'to' => 'chola-pass', 'dist' => 12.0, 'time' => 6.0, 'gain' => 1010],
                 ['from' => 'chola-pass', 'to' => 'gokyo-chola', 'dist' => 6.0, 'time' => 3.5, 'loss' => 670],
+                // Rest at Gokyo ×2 (Chola recovery + Gokyo Ri)
+                ['from' => 'gokyo-chola', 'to' => 'gokyo-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'gokyo-chola', 'to' => 'gokyo-chola', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'gokyo-chola', 'to' => 'namche-chola-return', 'dist' => 20.0, 'time' => 8.0, 'loss' => 1310],
+                // Rest at Namche (return buffer)
+                ['from' => 'namche-chola-return', 'to' => 'namche-chola-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-chola-return', 'to' => 'lukla-chola-return', 'dist' => 18.5, 'time' => 7.0, 'loss' => 580],
             ],
             'costs' => [
@@ -251,13 +268,25 @@ class EverestRegionSeeder extends Seeder
                 ['name' => 'Namche Bazaar', 'slug' => 'namche-renjo-return', 'type' => 'village', 'lat' => 27.8042, 'lng' => 86.7106, 'alt' => 3440],
                 ['name' => 'Lukla', 'slug' => 'lukla-renjo-return', 'type' => 'village', 'lat' => 27.6869, 'lng' => 86.7314, 'alt' => 2860],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'lukla-renjo', 'to' => 'namche-renjo', 'dist' => 18.5, 'time' => 8.0, 'gain' => 580],
+                // Rest at Namche ×2 (acclimatization)
+                ['from' => 'namche-renjo', 'to' => 'namche-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'namche-renjo', 'to' => 'namche-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-renjo', 'to' => 'dole-renjo', 'dist' => 8.0, 'time' => 4.0, 'gain' => 640],
+                // Rest at Dole
+                ['from' => 'dole-renjo', 'to' => 'dole-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dole-renjo', 'to' => 'machhermo-renjo', 'dist' => 5.0, 'time' => 2.5, 'gain' => 390],
+                // Rest at Machhermo
+                ['from' => 'machhermo-renjo', 'to' => 'machhermo-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'machhermo-renjo', 'to' => 'gokyo-renjo', 'dist' => 7.0, 'time' => 3.5, 'gain' => 280],
+                // Rest at Gokyo ×2 (Renjo La prep)
+                ['from' => 'gokyo-renjo', 'to' => 'gokyo-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'gokyo-renjo', 'to' => 'gokyo-renjo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'gokyo-renjo', 'to' => 'renjo-la', 'dist' => 8.0, 'time' => 4.5, 'gain' => 610],
                 ['from' => 'renjo-la', 'to' => 'namche-renjo-return', 'dist' => 12.0, 'time' => 6.0, 'loss' => 1920],
+                // Rest at Namche (return buffer)
+                ['from' => 'namche-renjo-return', 'to' => 'namche-renjo-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'namche-renjo-return', 'to' => 'lukla-renjo-return', 'dist' => 18.5, 'time' => 7.0, 'loss' => 580],
             ],
             'costs' => [

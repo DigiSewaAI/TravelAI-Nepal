@@ -369,10 +369,10 @@ class WaypointLocationSeeder extends Seeder
             'Makalu Base Camp', 'Dhaulagiri Base Camp',
             'Mardi Himal Base Camp', 'Tilicho Base Camp',
 
-            // ─── Lakes (non-habitable) ───
+                        // ─── Lakes (non-habitable) ───
             'Gosaikunda', 'Panch Pokhari',
-            'Phoksundo Lake', 'Rara Lake', 'Dhorpatan Lake',
-            'Khaptad Lake', 'Kataiya Lake', 'Sikta Lake', 'Tilicho Lake',
+            'Phoksundo Lake', 'Rara Lake',
+            'Kataiya Lake', 'Sikta Lake', 'Tilicho Lake',
             'Damodar Kunda', 'Tso Rolpa', 'Kapuche Lake',
 
             // ─── Landmarks / monuments ───
@@ -431,7 +431,7 @@ class WaypointLocationSeeder extends Seeder
 
         // Rule 3: Exceptions — non-village waypoints WITH lodging
         // (यी STEP 2 ले false बनाएको भए पनि यहाँ true हुन्छन्)
-        $explicitOvernightExceptions = [
+                $explicitOvernightExceptions = [
     // Phase 4N original:
     'Annapurna Base Camp',
     'Sarangkot',
@@ -461,6 +461,29 @@ class WaypointLocationSeeder extends Seeder
 
     // Phase 4N.5b2 — Saipal exception:
     'Saipal Base Camp',
+
+        // Phase 4Q1g-2A — NationalParks lodges (Batch 4 fix):
+    'Khaptad Lake',                    // lodge at lake
+    'Khaptad National Park Entrance',  // checkpost + lodging
+    'Dhorpatan Entrance',              // checkpost + basic lodge
+    'Dhorpatan Lake',                  // basic lodge at lake
+
+        // Phase 4Q1g-2B — Panchase treks (Batch 5 fix):
+    'Panchase Bhanjyang',              // basic lodge at viewpoint
+    'Panchase Lake',                   // basic lodge at lake
+
+        // Phase 4Q1g-3 — Remote treks with lodges at landmark type:
+    'Gosaikunda',                      // pilgrimage lodge at lake
+    'Mohare Danda',                    // community lodge at viewpoint
+    'Panch Pokhari',                   // pilgrimage lodge at five lakes
+    'Rara Lake',                       // national park lodge
+
+        // Phase 4Q1g-3 fix — trek structure has rest day here:
+    'Kapuche Lake',                    // basic teahouse at lake
+    'Tilicho Lake',                    // trek structure has rest day here
+
+    // Phase 4Q1g-4 — Dhaulagiri BC exception:
+    'Dhaulagiri Base Camp',            // real BC has tents/lodging
 ];
         foreach ($explicitOvernightExceptions as $name) {
             Waypoint::where('name', $name)->update(['is_overnight_stop' => true]);

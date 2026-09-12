@@ -404,7 +404,6 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
         $days = $input['days'] ?? $route->duration_days;
         $total = 0;
         $breakdown = [];
-
         foreach ($route->costs as $cost) {
             $amount = $cost->amount;
             if (strtoupper($cost->currency) === 'USD') {
@@ -413,7 +412,12 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
             if ($cost->unit === 'per_day') {
                 $amount *= $days;
             }
-            $breakdown[$cost->type] = [
+
+            // ✅ Phase 4P Fix: unique key per cost (was $cost->type → collision)
+            // Include cost id + slug of name to guarantee uniqueness
+            $key = $cost->type . '_' . $cost->id . '_' . \Str::slug($cost->name ?? 'unnamed');
+
+            $breakdown[$key] = [
                 'name' => $this->translateName($cost->name, 'cost', $locale),
                 'amount' => $amount,
                 'currency' => 'NPR',

@@ -38,10 +38,19 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Rara Lake', 'slug' => 'rara-lake', 'type' => 'landmark', 'lat' => 29.3789, 'lng' => 82.3891, 'alt' => 2990],
                 ['name' => 'Jumla', 'slug' => 'jumla-rara-return', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
             ],
-            'segments' => [
+                        'segments' => [
+                // Rest at Jumla ×2 (travel prep)
+                ['from' => 'jumla-rara', 'to' => 'jumla-rara', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'jumla-rara', 'to' => 'jumla-rara', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'jumla-rara', 'to' => 'gothichaur', 'dist' => 8.0, 'time' => 4.0, 'gain' => 260],
+                // Rest at Gothichaur (acclimatization)
+                ['from' => 'gothichaur', 'to' => 'gothichaur', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'gothichaur', 'to' => 'chautha', 'dist' => 8.0, 'time' => 4.0, 'gain' => 200],
+                // Rest at Chautha (before lake)
+                ['from' => 'chautha', 'to' => 'chautha', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'chautha', 'to' => 'rara-lake', 'dist' => 8.0, 'time' => 4.0, 'gain' => 190],
+                // Rest at Rara Lake (lake exploration)
+                ['from' => 'rara-lake', 'to' => 'rara-lake', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'rara-lake', 'to' => 'jumla-rara-return', 'dist' => 24.0, 'time' => 10.0, 'loss' => 650],
             ],
             'costs' => [
@@ -114,9 +123,17 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Panch Pokhari', 'slug' => 'panch-pokhari', 'type' => 'landmark', 'lat' => 27.8234, 'lng' => 85.7567, 'alt' => 4100],
                 ['name' => 'Chautara', 'slug' => 'chautara-return', 'type' => 'village', 'lat' => 27.7567, 'lng' => 85.7123, 'alt' => 1400],
             ],
-            'segments' => [
+                        'segments' => [
+                // Rest at Chautara (arrival)
+                ['from' => 'chautara', 'to' => 'chautara', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'chautara', 'to' => 'dhunge', 'dist' => 10.0, 'time' => 5.0, 'gain' => 600],
+                // Rest at Dhunge ×2 (acclimatization)
+                ['from' => 'dhunge', 'to' => 'dhunge', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'dhunge', 'to' => 'dhunge', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dhunge', 'to' => 'panch-pokhari', 'dist' => 12.0, 'time' => 6.0, 'gain' => 2100],
+                // Rest at Panch Pokhari ×2 (pilgrimage)
+                ['from' => 'panch-pokhari', 'to' => 'panch-pokhari', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'panch-pokhari', 'to' => 'panch-pokhari', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'panch-pokhari', 'to' => 'chautara-return', 'dist' => 22.0, 'time' => 9.0, 'loss' => 2700],
             ],
             'costs' => [
@@ -245,14 +262,29 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Tukuche', 'slug' => 'tukuche', 'type' => 'village', 'lat' => 28.8123, 'lng' => 83.7456, 'alt' => 2600],
                 ['name' => 'Bagh Kharka', 'slug' => 'bagh-kharka-return', 'type' => 'village', 'lat' => 28.7123, 'lng' => 83.6123, 'alt' => 2100],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'bagh-kharka', 'to' => 'dobang-dhaulagiri', 'dist' => 8.0, 'time' => 4.0, 'gain' => 600],
+                // Rest at Dobang
+                ['from' => 'dobang-dhaulagiri', 'to' => 'dobang-dhaulagiri', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dobang-dhaulagiri', 'to' => 'jungle-camp-dhaulagiri', 'dist' => 8.0, 'time' => 4.0, 'gain' => 500],
-                ['from' => 'jungle-camp-dhaulagiri', 'to' => 'italian-bc', 'dist' => 8.0, 'time' => 4.0, 'gain' => 460],
+                // Rest at Jungle Camp
+                ['from' => 'jungle-camp-dhaulagiri', 'to' => 'jungle-camp-dhaulagiri', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                                ['from' => 'jungle-camp-dhaulagiri', 'to' => 'italian-bc', 'dist' => 8.0, 'time' => 4.0, 'gain' => 460],
+                // Rest at Italian BC ×3 (acclimatization)
+                ['from' => 'italian-bc', 'to' => 'italian-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'italian-bc', 'to' => 'italian-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'italian-bc', 'to' => 'italian-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'italian-bc', 'to' => 'dhaulagiri-bc', 'dist' => 8.0, 'time' => 4.5, 'gain' => 1090],
+                // Rest at Dhaulagiri BC ×2 (acclimatization + French Col prep)
+                ['from' => 'dhaulagiri-bc', 'to' => 'dhaulagiri-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'dhaulagiri-bc', 'to' => 'dhaulagiri-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dhaulagiri-bc', 'to' => 'french-col', 'dist' => 8.0, 'time' => 4.5, 'gain' => 610],
                 ['from' => 'french-col', 'to' => 'tukuche', 'dist' => 12.0, 'time' => 6.0, 'loss' => 2760],
+                // Rest at Tukuche (recovery)
+                ['from' => 'tukuche', 'to' => 'tukuche', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tukuche', 'to' => 'bagh-kharka-return', 'dist' => 14.0, 'time' => 6.0, 'loss' => 500],
+                // Rest at Bagh Kharka (departure buffer)
+                ['from' => 'bagh-kharka-return', 'to' => 'bagh-kharka-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'ACAP Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],
@@ -284,11 +316,29 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Mahakali River', 'slug' => 'mahakali-river', 'type' => 'landmark', 'lat' => 29.6456, 'lng' => 80.6789, 'alt' => 1500],
                 ['name' => 'Darchula', 'slug' => 'darchula-return', 'type' => 'village', 'lat' => 29.8456, 'lng' => 80.6123, 'alt' => 700],
             ],
-            'segments' => [
+                                    'segments' => [
+                // Forward (Days 1-3)
                 ['from' => 'darchula', 'to' => 'sitapur', 'dist' => 10.0, 'time' => 5.0, 'gain' => 200],
+                // Rest at Sitapur ×2 (acclimatization + tea garden)
+                ['from' => 'sitapur', 'to' => 'sitapur', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'sitapur', 'to' => 'sitapur', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sitapur', 'to' => 'khalanga', 'dist' => 12.0, 'time' => 6.0, 'gain' => 300],
+                // Rest at Khalanga ×2 (exploration + market)
+                                // Rest at Khalanga ×3 (exploration + market + buffer)
+                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'khalanga', 'to' => 'mahakali-river', 'dist' => 14.0, 'time' => 7.0, 'gain' => 300],
-                ['from' => 'mahakali-river', 'to' => 'darchula-return', 'dist' => 36.0, 'time' => 14.0, 'loss' => 800],
+                // Rest at Mahakali River ×3 (rafting + exploration + buffer)
+                ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Return gradual (Days 11)
+                ['from' => 'mahakali-river', 'to' => 'khalanga', 'dist' => 14.0, 'time' => 6.0, 'loss' => 300],
+                ['from' => 'khalanga', 'to' => 'sitapur', 'dist' => 12.0, 'time' => 5.0, 'loss' => 300],
+                ['from' => 'sitapur', 'to' => 'darchula-return', 'dist' => 10.0, 'time' => 4.0, 'loss' => 200],
+                // Departure rest
+                ['from' => 'darchula-return', 'to' => 'darchula-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'TIMS Card', 'amount' => 20, 'unit' => 'per_person', 'mandatory' => true],

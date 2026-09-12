@@ -107,11 +107,17 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 'max_altitude' => 1400,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Bhaktapur', 'slug' => 'bhaktapur', 'type' => 'village', 'lat' => 27.6722, 'lng' => 85.4295, 'alt' => 1400],
                 ['name' => 'Bhaktapur Durbar Square', 'slug' => 'bhaktapur-ds-tour', 'type' => 'landmark', 'lat' => 27.6719, 'lng' => 85.4284, 'alt' => 1400],
                 ['name' => 'Nyatapola Temple', 'slug' => 'nyatapola', 'type' => 'landmark', 'lat' => 27.6725, 'lng' => 85.4303, 'alt' => 1400],
                 ['name' => 'Pottery Square', 'slug' => 'pottery-square', 'type' => 'landmark', 'lat' => 27.6713, 'lng' => 85.4314, 'alt' => 1400],
+            ],
+            'segments' => [
+                ['from' => 'bhaktapur', 'to' => 'bhaktapur-ds-tour', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'bhaktapur-ds-tour', 'to' => 'nyatapola', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'nyatapola', 'to' => 'pottery-square', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'pottery-square', 'to' => 'bhaktapur', 'dist' => 13.0, 'time' => 0.5],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Bhaktapur Entrance Fee', 'amount' => 15, 'unit' => 'per_person', 'mandatory' => true],
@@ -132,10 +138,15 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 'max_altitude' => 1350,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Patan', 'slug' => 'patan', 'type' => 'village', 'lat' => 27.6736, 'lng' => 85.3251, 'alt' => 1350],
                 ['name' => 'Patan Durbar Square', 'slug' => 'patan-ds-tour', 'type' => 'landmark', 'lat' => 27.6732, 'lng' => 85.3249, 'alt' => 1350],
                 ['name' => 'Golden Temple', 'slug' => 'golden-temple', 'type' => 'landmark', 'lat' => 27.6741, 'lng' => 85.3263, 'alt' => 1350],
+            ],
+            'segments' => [
+                ['from' => 'patan', 'to' => 'patan-ds-tour', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'patan-ds-tour', 'to' => 'golden-temple', 'dist' => 0.3, 'time' => 0.1],
+                ['from' => 'golden-temple', 'to' => 'patan', 'dist' => 5.0, 'time' => 0.3],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Patan Entrance Fee', 'amount' => 10, 'unit' => 'per_person', 'mandatory' => true],
@@ -161,6 +172,11 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['name' => 'Kirtipur', 'slug' => 'kirtipur', 'type' => 'village', 'lat' => 27.6756, 'lng' => 85.2789, 'alt' => 1400],
                 ['name' => 'Chilancho Stupa', 'slug' => 'chilancho', 'type' => 'landmark', 'lat' => 27.6789, 'lng' => 85.2812, 'alt' => 1400],
             ],
+                        'segments' => [
+                ['from' => 'kathmandu-kirtipur', 'to' => 'kirtipur', 'dist' => 5.0, 'time' => 0.4],
+                ['from' => 'kirtipur', 'to' => 'chilancho', 'dist' => 0.5, 'time' => 0.2],
+                ['from' => 'chilancho', 'to' => 'kathmandu-kirtipur', 'dist' => 5.0, 'time' => 0.3],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
@@ -184,6 +200,11 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['name' => 'Kathmandu', 'slug' => 'kathmandu-sankhu', 'type' => 'village', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
                 ['name' => 'Sankhu', 'slug' => 'sankhu', 'type' => 'village', 'lat' => 27.7345, 'lng' => 85.4567, 'alt' => 1350],
                 ['name' => 'Bajrayogini Temple', 'slug' => 'bajrayogini', 'type' => 'landmark', 'lat' => 27.7423, 'lng' => 85.4634, 'alt' => 1400],
+            ],
+                        'segments' => [
+                ['from' => 'kathmandu-sankhu', 'to' => 'sankhu', 'dist' => 20.0, 'time' => 1.0],
+                ['from' => 'sankhu', 'to' => 'bajrayogini', 'dist' => 2.0, 'time' => 0.5],
+                ['from' => 'bajrayogini', 'to' => 'kathmandu-sankhu', 'dist' => 20.0, 'time' => 1.0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -265,6 +286,11 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['name' => 'Dhulikhel', 'slug' => 'dhulikhel', 'type' => 'village', 'lat' => 27.6223, 'lng' => 85.5456, 'alt' => 1550],
                 ['name' => 'Namobuddha Monastery', 'slug' => 'namobuddha', 'type' => 'landmark', 'lat' => 27.5891, 'lng' => 85.5567, 'alt' => 1700],
             ],
+                        'segments' => [
+                ['from' => 'kathmandu-dhulikhel', 'to' => 'dhulikhel', 'dist' => 30.0, 'time' => 1.2],
+                ['from' => 'dhulikhel', 'to' => 'namobuddha', 'dist' => 12.0, 'time' => 0.5],
+                ['from' => 'namobuddha', 'to' => 'kathmandu-dhulikhel', 'dist' => 30.0, 'time' => 1.2],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -289,6 +315,12 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['name' => 'Panauti', 'slug' => 'panauti', 'type' => 'village', 'lat' => 27.6123, 'lng' => 85.5345, 'alt' => 1350],
                 ['name' => 'Khokana', 'slug' => 'khokana', 'type' => 'village', 'lat' => 27.6456, 'lng' => 85.2989, 'alt' => 1300],
                 ['name' => 'Bungamati', 'slug' => 'bungamati', 'type' => 'village', 'lat' => 27.6345, 'lng' => 85.3123, 'alt' => 1300],
+            ],
+                        'segments' => [
+                ['from' => 'kathmandu-pkb', 'to' => 'panauti', 'dist' => 35.0, 'time' => 1.5],
+                ['from' => 'panauti', 'to' => 'khokana', 'dist' => 25.0, 'time' => 1.0],
+                ['from' => 'khokana', 'to' => 'bungamati', 'dist' => 3.0, 'time' => 0.2],
+                ['from' => 'bungamati', 'to' => 'kathmandu-pkb', 'dist' => 9.0, 'time' => 0.4],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
@@ -338,6 +370,11 @@ $this->command->info('✅ Kathmandu City Tour seeded.');
                 ['name' => 'Lumbini', 'slug' => 'lumbini-kapilavastu', 'type' => 'village', 'lat' => 27.4689, 'lng' => 83.2767, 'alt' => 150],
                 ['name' => 'Kapilavastu', 'slug' => 'kapilavastu', 'type' => 'village', 'lat' => 27.5345, 'lng' => 83.0234, 'alt' => 150],
                 ['name' => 'Tilaurakot', 'slug' => 'tilaurakot', 'type' => 'landmark', 'lat' => 27.5456, 'lng' => 83.0123, 'alt' => 150],
+            ],
+                        'segments' => [
+                ['from' => 'lumbini-kapilavastu', 'to' => 'kapilavastu', 'dist' => 25.0, 'time' => 1.0],
+                ['from' => 'kapilavastu', 'to' => 'tilaurakot', 'dist' => 3.0, 'time' => 0.2],
+                ['from' => 'tilaurakot', 'to' => 'lumbini-kapilavastu', 'dist' => 25.0, 'time' => 1.0],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 40, 'unit' => 'per_group', 'mandatory' => false],
@@ -482,6 +519,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Kagbeni', 'slug' => 'kagbeni-jkm', 'type' => 'village', 'lat' => 28.8145, 'lng' => 83.7812, 'alt' => 2800],
                 ['name' => 'Muktinath Temple', 'slug' => 'muktinath-jkm', 'type' => 'landmark', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
             ],
+                        'segments' => [
+                ['from' => 'pokhara-jkm', 'to' => 'jomsom-jkm', 'dist' => 180.0, 'time' => 8.0, 'gain' => 1900],
+                ['from' => 'jomsom-jkm', 'to' => 'kagbeni-jkm', 'dist' => 8.0, 'time' => 1.5, 'gain' => 100],
+                ['from' => 'kagbeni-jkm', 'to' => 'muktinath-jkm', 'dist' => 10.0, 'time' => 2.5, 'gain' => 1000],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Jomsom)', 'amount' => 200, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Muktinath Entrance Fee', 'amount' => 5, 'unit' => 'per_person', 'mandatory' => true],
@@ -508,6 +550,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Tukuche', 'slug' => 'tukuche-mtk', 'type' => 'village', 'lat' => 28.7567, 'lng' => 83.6891, 'alt' => 2590],
                 ['name' => 'Kobang', 'slug' => 'kobang', 'type' => 'village', 'lat' => 28.7789, 'lng' => 83.6678, 'alt' => 2800],
             ],
+                        'segments' => [
+                ['from' => 'pokhara-mtk', 'to' => 'marpha-mtk', 'dist' => 180.0, 'time' => 8.0, 'gain' => 1840],
+                ['from' => 'marpha-mtk', 'to' => 'tukuche-mtk', 'dist' => 5.0, 'time' => 1.0, 'loss' => 80],
+                ['from' => 'tukuche-mtk', 'to' => 'kobang', 'dist' => 5.0, 'time' => 1.0, 'gain' => 210],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle (Pokhara–Marpha)', 'amount' => 180, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -533,6 +580,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Dhankuta', 'slug' => 'dhankuta', 'type' => 'village', 'lat' => 26.8234, 'lng' => 87.3456, 'alt' => 1200],
                 ['name' => 'Bhedetar', 'slug' => 'bhedetar', 'type' => 'village', 'lat' => 26.8567, 'lng' => 87.3789, 'alt' => 1800],
             ],
+                        'segments' => [
+                ['from' => 'biratnagar-ddb', 'to' => 'dharan', 'dist' => 45.0, 'time' => 1.5, 'gain' => 270],
+                ['from' => 'dharan', 'to' => 'dhankuta', 'dist' => 25.0, 'time' => 1.0, 'gain' => 850],
+                ['from' => 'dhankuta', 'to' => 'bhedetar', 'dist' => 15.0, 'time' => 0.7, 'gain' => 600],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 100, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -556,6 +608,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Biratnagar', 'slug' => 'biratnagar-koshi', 'type' => 'village', 'lat' => 26.4567, 'lng' => 87.2789, 'alt' => 80],
                 ['name' => 'Koshi Barrage', 'slug' => 'koshi-barrage', 'type' => 'landmark', 'lat' => 26.4789, 'lng' => 87.3123, 'alt' => 80],
                 ['name' => 'Koshi Tappu Wildlife Reserve', 'slug' => 'koshi-tappu', 'type' => 'landmark', 'lat' => 26.5123, 'lng' => 87.3456, 'alt' => 80],
+            ],
+                        'segments' => [
+                ['from' => 'biratnagar-koshi', 'to' => 'koshi-barrage', 'dist' => 15.0, 'time' => 0.5],
+                ['from' => 'koshi-barrage', 'to' => 'koshi-tappu', 'dist' => 10.0, 'time' => 0.3],
+                ['from' => 'koshi-tappu', 'to' => 'biratnagar-koshi', 'dist' => 25.0, 'time' => 0.8],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 50, 'unit' => 'per_group', 'mandatory' => false],
@@ -581,6 +638,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Siddharthanagar', 'slug' => 'siddharthanagar', 'type' => 'village', 'lat' => 27.5345, 'lng' => 83.4567, 'alt' => 150],
                 ['name' => 'Bhairahawa', 'slug' => 'bhairahawa', 'type' => 'village', 'lat' => 27.5234, 'lng' => 83.4567, 'alt' => 150],
             ],
+                        'segments' => [
+                ['from' => 'butwal', 'to' => 'siddharthanagar', 'dist' => 22.0, 'time' => 0.8],
+                ['from' => 'siddharthanagar', 'to' => 'bhairahawa', 'dist' => 2.0, 'time' => 0.1],
+                ['from' => 'bhairahawa', 'to' => 'butwal', 'dist' => 22.0, 'time' => 0.8],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 15, 'unit' => 'per_group', 'mandatory' => false],
@@ -604,6 +666,11 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Surkhet', 'slug' => 'surkhet', 'type' => 'village', 'lat' => 28.6123, 'lng' => 81.6123, 'alt' => 600],
                 ['name' => 'Birendranagar', 'slug' => 'birendranagar', 'type' => 'village', 'lat' => 28.6456, 'lng' => 81.6456, 'alt' => 600],
                 ['name' => 'Kakrebihar', 'slug' => 'kakrebihar', 'type' => 'landmark', 'lat' => 28.6789, 'lng' => 81.6789, 'alt' => 600],
+            ],
+                        'segments' => [
+                ['from' => 'surkhet', 'to' => 'birendranagar', 'dist' => 5.0, 'time' => 0.3],
+                ['from' => 'birendranagar', 'to' => 'kakrebihar', 'dist' => 3.0, 'time' => 0.2],
+                ['from' => 'kakrebihar', 'to' => 'surkhet', 'dist' => 5.0, 'time' => 0.3],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 30, 'unit' => 'per_group', 'mandatory' => false],
@@ -629,6 +696,10 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 ['name' => 'Kalikot', 'slug' => 'kalikot', 'type' => 'village', 'lat' => 28.7891, 'lng' => 81.8123, 'alt' => 1800],
                 ['name' => 'Sinja Valley', 'slug' => 'sinja-valley', 'type' => 'village', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
             ],
+                        'segments' => [
+                ['from' => 'surkhet-ks', 'to' => 'kalikot', 'dist' => 120.0, 'time' => 6.0, 'gain' => 1200],
+                ['from' => 'kalikot', 'to' => 'sinja-valley', 'dist' => 40.0, 'time' => 2.0, 'gain' => 700],
+            ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 80, 'unit' => 'per_group', 'mandatory' => false],
                 ['type' => 'tour', 'name' => 'Guide Service', 'amount' => 20, 'unit' => 'per_group', 'mandatory' => false],
@@ -649,9 +720,13 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 'season' => 'Spring/Autumn',
             ],
             'waypoints' => [
-                ['name' => 'Jumla', 'slug' => 'jumla-sinja', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
+                                ['name' => 'Jumla', 'slug' => 'jumla-town', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
                 ['name' => 'Sinja Valley', 'slug' => 'sinja-jumla', 'type' => 'village', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
                 ['name' => 'Jumla', 'slug' => 'jumla-sinja-return', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
+            ],
+                                    'segments' => [
+                ['from' => 'jumla-town', 'to' => 'sinja-jumla', 'dist' => 35.0, 'time' => 2.0, 'loss' => 160],
+                ['from' => 'sinja-jumla', 'to' => 'jumla-sinja-return', 'dist' => 35.0, 'time' => 2.0, 'gain' => 160],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 60, 'unit' => 'per_group', 'mandatory' => false],
@@ -673,10 +748,15 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 'season' => 'Spring/Autumn',
             ],
             'waypoints' => [
-                ['name' => 'Simikot', 'slug' => 'simikot-humla', 'type' => 'village', 'lat' => 29.9789, 'lng' => 82.0123, 'alt' => 2950],
+                                ['name' => 'Simikot', 'slug' => 'simikot-town', 'type' => 'village', 'lat' => 29.9789, 'lng' => 82.0123, 'alt' => 2950],
                 ['name' => 'Sipsi', 'slug' => 'sipsi-humla', 'type' => 'village', 'lat' => 29.9123, 'lng' => 82.0345, 'alt' => 3400],
                 ['name' => 'Jhari', 'slug' => 'jhari-humla', 'type' => 'village', 'lat' => 29.8456, 'lng' => 82.0567, 'alt' => 3700],
                 ['name' => 'Hilsa', 'slug' => 'hilsa-humla', 'type' => 'village', 'lat' => 29.7789, 'lng' => 82.0789, 'alt' => 4200],
+            ],
+                                    'segments' => [
+                ['from' => 'simikot-town', 'to' => 'sipsi-humla', 'dist' => 10.0, 'time' => 1.5, 'gain' => 450],
+                ['from' => 'sipsi-humla', 'to' => 'jhari-humla', 'dist' => 8.0, 'time' => 1.5, 'gain' => 300],
+                ['from' => 'jhari-humla', 'to' => 'hilsa-humla', 'dist' => 12.0, 'time' => 2.0, 'gain' => 500],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle', 'amount' => 100, 'unit' => 'per_group', 'mandatory' => false],

@@ -177,12 +177,19 @@ class AnnapurnaRegionSeeder extends Seeder
                 ['name' => 'Kang La Pass', 'slug' => 'kang-la', 'type' => 'pass', 'lat' => 28.6897, 'lng' => 84.1123, 'alt' => 5320],
                 ['name' => 'Ngawal', 'slug' => 'ngawal', 'type' => 'village', 'lat' => 28.7048, 'lng' => 84.0582, 'alt' => 3650],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'koto', 'to' => 'nar-phedi', 'dist' => 8.0, 'time' => 4.0, 'gain' => 220],
                 ['from' => 'nar-phedi', 'to' => 'nar', 'dist' => 10.0, 'time' => 5.0, 'gain' => 1210],
+                // Rest at Nar ×2 (high altitude acclimatization)
+                ['from' => 'nar', 'to' => 'nar', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'nar', 'to' => 'nar', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'nar', 'to' => 'phu', 'dist' => 6.0, 'time' => 3.0, 'loss' => 30],
+                // Rest at Phu (valley exploration)
+                ['from' => 'phu', 'to' => 'phu', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'phu', 'to' => 'kang-la', 'dist' => 8.0, 'time' => 4.5, 'gain' => 1240],
                 ['from' => 'kang-la', 'to' => 'ngawal', 'dist' => 6.0, 'time' => 3.5, 'loss' => 1670],
+                // Rest at Ngawal (end recovery)
+                ['from' => 'ngawal', 'to' => 'ngawal', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'ACAP Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],
@@ -213,10 +220,19 @@ class AnnapurnaRegionSeeder extends Seeder
                 ['name' => 'Tilicho Lake', 'slug' => 'tilicho-lake', 'type' => 'landmark', 'lat' => 28.7346, 'lng' => 84.0098, 'alt' => 4919],
                 ['name' => 'Muktinath', 'slug' => 'muktinath', 'type' => 'village', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
             ],
-            'segments' => [
+                        'segments' => [
+                // Rest at Manang ×2 (acclimatization)
+                ['from' => 'manang', 'to' => 'manang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'manang', 'to' => 'manang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'manang', 'to' => 'khangsar', 'dist' => 6.0, 'time' => 3.0, 'gain' => 190],
+                // Rest at Khangsar (arrival)
+                ['from' => 'khangsar', 'to' => 'khangsar', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'khangsar', 'to' => 'tilicho-bc', 'dist' => 8.0, 'time' => 4.5, 'gain' => 420],
+                // Rest at Tilicho BC (lake day prep)
+                ['from' => 'tilicho-bc', 'to' => 'tilicho-bc', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tilicho-bc', 'to' => 'tilicho-lake', 'dist' => 4.0, 'time' => 2.5, 'gain' => 769],
+                // Rest at Tilicho Lake (exploration)
+                ['from' => 'tilicho-lake', 'to' => 'tilicho-lake', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tilicho-lake', 'to' => 'muktinath', 'dist' => 14.0, 'time' => 6.0, 'loss' => 1119],
             ],
             'costs' => [
@@ -282,10 +298,16 @@ class AnnapurnaRegionSeeder extends Seeder
                 ['name' => 'Mohare Danda', 'slug' => 'mohare-danda', 'type' => 'landmark', 'lat' => 28.3987, 'lng' => 83.7468, 'alt' => 3300],
                 ['name' => 'Danda Kharka', 'slug' => 'danda-kharka', 'type' => 'village', 'lat' => 28.4205, 'lng' => 83.7312, 'alt' => 2800],
             ],
-            'segments' => [
+                        'segments' => [
+                // Rest at Kalikasthan (arrival)
+                ['from' => 'kalikasthan', 'to' => 'kalikasthan', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'kalikasthan', 'to' => 'banthanti-mohare', 'dist' => 6.0, 'time' => 3.0, 'gain' => 810],
+                // Rest at Banthanti (acclimatization)
+                ['from' => 'banthanti-mohare', 'to' => 'banthanti-mohare', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'banthanti-mohare', 'to' => 'mohare-danda', 'dist' => 4.0, 'time' => 2.5, 'gain' => 1120],
                 ['from' => 'mohare-danda', 'to' => 'danda-kharka', 'dist' => 5.0, 'time' => 2.0, 'loss' => 500],
+                // Rest at Danda Kharka (end buffer)
+                ['from' => 'danda-kharka', 'to' => 'danda-kharka', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'ACAP Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],
@@ -313,9 +335,16 @@ class AnnapurnaRegionSeeder extends Seeder
                 ['name' => 'Sikles', 'slug' => 'sikles', 'type' => 'village', 'lat' => 28.2918, 'lng' => 84.0357, 'alt' => 1980],
                 ['name' => 'Kapuche Lake', 'slug' => 'kapuche', 'type' => 'landmark', 'lat' => 28.3154, 'lng' => 84.0503, 'alt' => 2200],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'pokhara-sikles', 'to' => 'sikles', 'dist' => 15.0, 'time' => 6.0, 'gain' => 1153],
+                // Rest at Sikles ×2 (Gurung village culture + acclimatization)
+                ['from' => 'sikles', 'to' => 'sikles', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'sikles', 'to' => 'sikles', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sikles', 'to' => 'kapuche', 'dist' => 5.0, 'time' => 2.5, 'gain' => 220],
+                // Rest at Kapuche Lake (nature exploration)
+                ['from' => 'kapuche', 'to' => 'kapuche', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Rest at Pokhara return (buffer)
+                ['from' => 'kapuche', 'to' => 'pokhara-sikles', 'dist' => 20.0, 'time' => 8.0, 'loss' => 1373],
             ],
             'costs' => [
                 ['type' => 'food_estimate', 'name' => 'Daily Food Budget', 'amount' => 20, 'unit' => 'per_day', 'mandatory' => false],
@@ -343,10 +372,14 @@ class AnnapurnaRegionSeeder extends Seeder
                 ['name' => 'Panchase Bhanjyang', 'slug' => 'panchase-bhanjyang', 'type' => 'landmark', 'lat' => 28.2703, 'lng' => 83.9508, 'alt' => 2490],
                 ['name' => 'Panchase Lake', 'slug' => 'panchase-lake', 'type' => 'landmark', 'lat' => 28.2815, 'lng' => 83.9456, 'alt' => 2100],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'pokhara-panchase', 'to' => 'bhamarkot', 'dist' => 8.0, 'time' => 4.0, 'gain' => 463],
                 ['from' => 'bhamarkot', 'to' => 'panchase-bhanjyang', 'dist' => 5.0, 'time' => 2.5, 'gain' => 1200],
+                // Rest at Panchase Bhanjyang (sunrise viewpoint)
+                ['from' => 'panchase-bhanjyang', 'to' => 'panchase-bhanjyang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'panchase-bhanjyang', 'to' => 'panchase-lake', 'dist' => 3.0, 'time' => 1.5, 'loss' => 390],
+                // Rest at Panchase Lake (nature exploration)
+                ['from' => 'panchase-lake', 'to' => 'panchase-lake', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'food_estimate', 'name' => 'Daily Food Budget', 'amount' => 20, 'unit' => 'per_day', 'mandatory' => false],
@@ -418,10 +451,15 @@ class AnnapurnaRegionSeeder extends Seeder
                 'max_altitude' => 650,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
+                        'waypoints' => [
                 ['name' => 'Pokhara', 'slug' => 'pokhara-begnas', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
                 ['name' => 'Begnas Lake', 'slug' => 'begnas-lake', 'type' => 'landmark', 'lat' => 28.1734, 'lng' => 84.0741, 'alt' => 650],
                 ['name' => 'Rupa Lake', 'slug' => 'rupa-lake', 'type' => 'landmark', 'lat' => 28.1578, 'lng' => 84.0987, 'alt' => 600],
+            ],
+            'segments' => [
+                ['from' => 'pokhara-begnas', 'to' => 'begnas-lake', 'dist' => 15.0, 'time' => 0.5, 'loss' => 177],
+                ['from' => 'begnas-lake', 'to' => 'rupa-lake', 'dist' => 5.0, 'time' => 0.3, 'loss' => 50],
+                ['from' => 'rupa-lake', 'to' => 'pokhara-begnas', 'dist' => 18.0, 'time' => 0.6, 'gain' => 227],
             ],
             'costs' => [
                 ['type' => 'tour', 'name' => 'Private Vehicle (Round Trip)', 'amount' => 25, 'unit' => 'per_group', 'mandatory' => false],

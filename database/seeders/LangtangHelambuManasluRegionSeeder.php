@@ -79,12 +79,18 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Chisapani', 'slug' => 'chisapani-gosaikunda', 'type' => 'village', 'lat' => 28.1356, 'lng' => 85.4283, 'alt' => 2300],
                 ['name' => 'Sundarijal', 'slug' => 'sundarijal', 'type' => 'village', 'lat' => 28.0821, 'lng' => 85.4243, 'alt' => 1350],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'dhunche', 'to' => 'sing-gompa', 'dist' => 8.0, 'time' => 4.0, 'gain' => 1300],
+                // Rest at Sing Gompa (acclimatization)
+                ['from' => 'sing-gompa', 'to' => 'sing-gompa', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sing-gompa', 'to' => 'chandanbari', 'dist' => 3.0, 'time' => 1.5, 'gain' => 80],
                 ['from' => 'chandanbari', 'to' => 'gosaikunda', 'dist' => 6.0, 'time' => 3.5, 'gain' => 1050],
+                // Rest at Gosaikunda (pilgrimage day)
+                ['from' => 'gosaikunda', 'to' => 'gosaikunda', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'gosaikunda', 'to' => 'ghopte', 'dist' => 5.0, 'time' => 3.0, 'loss' => 940],
                 ['from' => 'ghopte', 'to' => 'chisapani-gosaikunda', 'dist' => 7.0, 'time' => 3.5, 'loss' => 1140],
+                // Rest at Chisapani (buffer)
+                ['from' => 'chisapani-gosaikunda', 'to' => 'chisapani-gosaikunda', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'chisapani-gosaikunda', 'to' => 'sundarijal', 'dist' => 8.0, 'time' => 4.0, 'loss' => 950],
             ],
             'costs' => [
@@ -119,11 +125,15 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Sermathang', 'slug' => 'sermathang', 'type' => 'village', 'lat' => 28.0987, 'lng' => 85.5891, 'alt' => 2610],
                 ['name' => 'Melamchi Bazaar', 'slug' => 'melamchi-bazaar', 'type' => 'village', 'lat' => 28.0456, 'lng' => 85.4987, 'alt' => 1270],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'sundarijal-helambu', 'to' => 'chisapani-helambu', 'dist' => 10.0, 'time' => 5.0, 'gain' => 950],
                 ['from' => 'chisapani-helambu', 'to' => 'gul-bhanjyang', 'dist' => 5.0, 'time' => 3.0, 'gain' => 400],
                 ['from' => 'gul-bhanjyang', 'to' => 'tharepati', 'dist' => 6.0, 'time' => 3.5, 'gain' => 790],
+                // Rest at Tharepati (high ridge acclimatization)
+                ['from' => 'tharepati', 'to' => 'tharepati', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tharepati', 'to' => 'melamchi-gaon', 'dist' => 5.0, 'time' => 2.5, 'loss' => 390],
+                // Rest at Melamchi Gaon (culture day)
+                ['from' => 'melamchi-gaon', 'to' => 'melamchi-gaon', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'melamchi-gaon', 'to' => 'tarkeghyang', 'dist' => 4.0, 'time' => 2.0, 'loss' => 360],
                 ['from' => 'tarkeghyang', 'to' => 'sermathang', 'dist' => 5.0, 'time' => 2.5, 'loss' => 130],
                 ['from' => 'sermathang', 'to' => 'melamchi-bazaar', 'dist' => 12.0, 'time' => 5.0, 'loss' => 1340],
@@ -158,12 +168,20 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Ghopte', 'slug' => 'ghopte-lauribina', 'type' => 'village', 'lat' => 28.1589, 'lng' => 85.4127, 'alt' => 3440],
                 ['name' => 'Sundarijal', 'slug' => 'sundarijal-lauribina', 'type' => 'village', 'lat' => 28.0821, 'lng' => 85.4243, 'alt' => 1350],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'dhunche-lauribina', 'to' => 'sing-gompa-lauribina', 'dist' => 8.0, 'time' => 4.0, 'gain' => 1300],
+                // Rest at Sing Gompa (acclimatization)
+                ['from' => 'sing-gompa-lauribina', 'to' => 'sing-gompa-lauribina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sing-gompa-lauribina', 'to' => 'gosaikunda-lauribina', 'dist' => 8.0, 'time' => 4.5, 'gain' => 1130],
+                // Rest at Gosaikunda (pilgrimage + acclimatization)
+                ['from' => 'gosaikunda-lauribina', 'to' => 'gosaikunda-lauribina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'gosaikunda-lauribina', 'to' => 'lauribina-pass', 'dist' => 2.0, 'time' => 1.5, 'gain' => 230],
                 ['from' => 'lauribina-pass', 'to' => 'ghopte-lauribina', 'dist' => 5.0, 'time' => 2.5, 'loss' => 1170],
+                // Rest at Ghopte (recovery after pass)
+                ['from' => 'ghopte-lauribina', 'to' => 'ghopte-lauribina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'ghopte-lauribina', 'to' => 'sundarijal-lauribina', 'dist' => 15.0, 'time' => 6.0, 'loss' => 2090],
+                // Rest at Sundarijal (end buffer)
+                ['from' => 'sundarijal-lauribina', 'to' => 'sundarijal-lauribina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'Langtang National Park Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],
@@ -255,7 +273,7 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Mu Gompa', 'slug' => 'mu-gompa', 'type' => 'landmark', 'lat' => 28.6345, 'lng' => 85.0123, 'alt' => 3700],
                 ['name' => 'Dharapani', 'slug' => 'dharapani-tsum-return', 'type' => 'village', 'lat' => 28.5289, 'lng' => 84.3545, 'alt' => 1860],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'soti-tsum', 'to' => 'machha-tsum', 'dist' => 8.0, 'time' => 4.0, 'gain' => 200],
                 ['from' => 'machha-tsum', 'to' => 'laprak-tsum', 'dist' => 12.0, 'time' => 6.0, 'gain' => 900],
                 ['from' => 'laprak-tsum', 'to' => 'gumbadanda', 'dist' => 8.0, 'time' => 4.0, 'gain' => 340],
@@ -263,7 +281,11 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['from' => 'lokpa', 'to' => 'chumling', 'dist' => 6.0, 'time' => 3.0, 'gain' => 206],
                 ['from' => 'chumling', 'to' => 'chhokang-paro', 'dist' => 8.0, 'time' => 4.0, 'gain' => 624],
                 ['from' => 'chhokang-paro', 'to' => 'nile', 'dist' => 5.0, 'time' => 2.5, 'gain' => 351],
+                // Rest at Nile (altitude preparation)
+                ['from' => 'nile', 'to' => 'nile', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'nile', 'to' => 'mu-gompa', 'dist' => 6.0, 'time' => 3.0, 'gain' => 339],
+                // Rest at Mu Gompa (Tibet border exploration)
+                ['from' => 'mu-gompa', 'to' => 'mu-gompa', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'mu-gompa', 'to' => 'dharapani-tsum-return', 'dist' => 28.0, 'time' => 10.0, 'loss' => 1840],
             ],
             'costs' => [
@@ -297,12 +319,21 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
                 ['name' => 'Nar Phu', 'slug' => 'nar-phu-rupina', 'type' => 'village', 'lat' => 28.6127, 'lng' => 84.2108, 'alt' => 4110],
                 ['name' => 'Manang', 'slug' => 'manang-rupina', 'type' => 'village', 'lat' => 28.6664, 'lng' => 84.1248, 'alt' => 3540],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'soti-rupina', 'to' => 'dharapani-rupina', 'dist' => 22.0, 'time' => 10.0, 'gain' => 1160],
+                // Rest at Dharapani (arrival recovery)
+                ['from' => 'dharapani-rupina', 'to' => 'dharapani-rupina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'dharapani-rupina', 'to' => 'sama-rupina', 'dist' => 10.0, 'time' => 5.0, 'gain' => 1660],
+                // Rest at Sama Gaon ×2 (high altitude acclimatization)
+                ['from' => 'sama-rupina', 'to' => 'sama-rupina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'sama-rupina', 'to' => 'sama-rupina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sama-rupina', 'to' => 'samdo-rupina', 'dist' => 5.0, 'time' => 3.0, 'gain' => 340],
+                // Rest at Samdo (pass preparation)
+                ['from' => 'samdo-rupina', 'to' => 'samdo-rupina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'samdo-rupina', 'to' => 'rupina-la', 'dist' => 7.0, 'time' => 4.0, 'gain' => 780],
                 ['from' => 'rupina-la', 'to' => 'nar-phu-rupina', 'dist' => 12.0, 'time' => 6.0, 'loss' => 530],
+                // Rest at Nar Phu (remote valley exploration)
+                ['from' => 'nar-phu-rupina', 'to' => 'nar-phu-rupina', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'nar-phu-rupina', 'to' => 'manang-rupina', 'dist' => 10.0, 'time' => 5.0, 'loss' => 570],
             ],
             'costs' => [

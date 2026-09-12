@@ -42,14 +42,21 @@ class MustangDolpoRegionSeeder extends Seeder
                 ['name' => 'Lo Manthang', 'slug' => 'lo-manthang', 'type' => 'village', 'lat' => 28.9456, 'lng' => 83.9123, 'alt' => 3810],
                 ['name' => 'Jomsom', 'slug' => 'jomsom-um-return', 'type' => 'village', 'lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'jomsom-um', 'to' => 'kagbeni', 'dist' => 6.0, 'time' => 3.0, 'gain' => 100],
+                // Rest at Kagbeni (acclimatization)
+                ['from' => 'kagbeni', 'to' => 'kagbeni', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'kagbeni', 'to' => 'tangbe', 'dist' => 5.0, 'time' => 2.5, 'gain' => 150],
                 ['from' => 'tangbe', 'to' => 'chhusang', 'dist' => 5.0, 'time' => 2.5, 'gain' => 70],
                 ['from' => 'chhusang', 'to' => 'chele', 'dist' => 6.0, 'time' => 3.0, 'gain' => 30],
                 ['from' => 'chele', 'to' => 'ghemi', 'dist' => 8.0, 'time' => 4.0, 'gain' => 460],
+                // Rest at Ghemi (village exploration)
+                ['from' => 'ghemi', 'to' => 'ghemi', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'ghemi', 'to' => 'tsarang', 'dist' => 6.0, 'time' => 3.0, 'gain' => 110],
                 ['from' => 'tsarang', 'to' => 'lo-manthang', 'dist' => 6.0, 'time' => 3.0, 'gain' => 190],
+                // Rest at Lo Manthang ×2 (kingdom exploration)
+                ['from' => 'lo-manthang', 'to' => 'lo-manthang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                ['from' => 'lo-manthang', 'to' => 'lo-manthang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'lo-manthang', 'to' => 'jomsom-um-return', 'dist' => 42.0, 'time' => 14.0, 'loss' => 1110],
             ],
             'costs' => [
@@ -83,10 +90,14 @@ class MustangDolpoRegionSeeder extends Seeder
                 ['name' => 'Ghasa', 'slug' => 'ghasa', 'type' => 'village', 'lat' => 28.6123, 'lng' => 83.6456, 'alt' => 2010],
                 ['name' => 'Marpha', 'slug' => 'marpha', 'type' => 'village', 'lat' => 28.7345, 'lng' => 83.7123, 'alt' => 2670],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'jomsom-lm', 'to' => 'kagbeni-lm', 'dist' => 6.0, 'time' => 3.0, 'gain' => 100],
                 ['from' => 'kagbeni-lm', 'to' => 'muktinath-lm', 'dist' => 8.0, 'time' => 4.5, 'gain' => 1000],
+                // Rest at Muktinath (temple exploration + acclimatization)
+                ['from' => 'muktinath-lm', 'to' => 'muktinath-lm', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'muktinath-lm', 'to' => 'tatopani-lm', 'dist' => 16.0, 'time' => 6.0, 'loss' => 2610],
+                // Rest at Tatopani (hot springs)
+                ['from' => 'tatopani-lm', 'to' => 'tatopani-lm', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'tatopani-lm', 'to' => 'ghasa', 'dist' => 8.0, 'time' => 4.0, 'gain' => 820],
                 ['from' => 'ghasa', 'to' => 'marpha', 'dist' => 14.0, 'time' => 5.0, 'gain' => 660],
             ],
@@ -119,11 +130,17 @@ class MustangDolpoRegionSeeder extends Seeder
                 ['name' => 'Muktinath', 'slug' => 'muktinath-jm', 'type' => 'village', 'lat' => 28.8177, 'lng' => 83.8849, 'alt' => 3800],
                 ['name' => 'Jomsom', 'slug' => 'jomsom-jm-return', 'type' => 'village', 'lat' => 28.7850, 'lng' => 83.7312, 'alt' => 2700],
             ],
-            'segments' => [
+                        'segments' => [
                 ['from' => 'jomsom-jm', 'to' => 'kagbeni-jm', 'dist' => 6.0, 'time' => 3.0, 'gain' => 100],
+                // Rest at Kagbeni (monastery + acclimatization)
+                ['from' => 'kagbeni-jm', 'to' => 'kagbeni-jm', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'kagbeni-jm', 'to' => 'khingar', 'dist' => 7.0, 'time' => 3.5, 'gain' => 400],
                 ['from' => 'khingar', 'to' => 'muktinath-jm', 'dist' => 6.0, 'time' => 3.0, 'gain' => 600],
+                // Rest at Muktinath (temple pilgrimage + rest)
+                ['from' => 'muktinath-jm', 'to' => 'muktinath-jm', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'muktinath-jm', 'to' => 'jomsom-jm-return', 'dist' => 19.0, 'time' => 7.0, 'loss' => 1100],
+                // Rest at Jomsom (departure prep / buffer)
+                ['from' => 'jomsom-jm-return', 'to' => 'jomsom-jm-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'ACAP Permit', 'amount' => 30, 'unit' => 'per_person', 'mandatory' => true],
