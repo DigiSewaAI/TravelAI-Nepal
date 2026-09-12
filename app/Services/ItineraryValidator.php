@@ -140,7 +140,11 @@ if ($segments->isNotEmpty()) {
                 'altitude_m' => $to->altitude,
                 'items' => [
                     [
-                        'title' => $isRestDay ? 'Rest Day' : 'Trekking Day',
+                                                'title' => $isRestDay
+                            ? (app()->getLocale() === 'np'
+                                ? "{$to->name}मा आराम दिन"
+                                : "Rest Day at {$to->name}")
+                            : 'Trekking Day',
                         'description' => $isRestDay ? 'Rest and relax.' : "Hike from {$from->name} to {$to->name}",
                         'time_of_day' => 'morning',
                         'cost' => 0,
@@ -170,11 +174,11 @@ if ($segments->isNotEmpty()) {
             }
 
             $waypointName = $waypoint ? $waypoint->name : 'Unknown';
-            $titleRest = match($locale) {
-                'hi' => $isTour ? "आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
-                'zh' => $isTour ? "休息日" : "{$waypointName} 适应日",
-                'np' => $isTour ? "आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
-                default => $isTour ? "Rest Day" : "Acclimatization Day at {$waypointName}",
+                                    $titleRest = match($locale) {
+                'hi' => $isTour ? "{$waypointName} में आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
+                'zh' => $isTour ? "在{$waypointName}休息" : "{$waypointName} 适应日",
+                'np' => $isTour ? "{$waypointName} मा आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
+                default => $isTour ? "Rest Day at {$waypointName}" : "Acclimatization Day at {$waypointName}",
             };
 
             $days[] = [
@@ -185,10 +189,14 @@ if ($segments->isNotEmpty()) {
                 'distance_km' => 0,
                 'estimated_time_hours' => 0,
                 'altitude_m' => $altitude,
-                'items' => [
+                                'items' => [
                     [
-                        'title' => 'Rest Day',
-                        'description' => 'Rest and relax.',
+                        'title' => app()->getLocale() === 'np'
+                            ? "{$waypointName}मा आराम दिन"
+                            : "Rest Day at {$waypointName}",
+                        'description' => app()->getLocale() === 'np'
+                            ? "{$waypointName}मा आराम र acclimatize।"
+                            : "Rest and relax at {$waypointName}.",
                         'time_of_day' => 'morning',
                         'cost' => 0,
                         'pricing_source' => 'system_estimate',
@@ -367,11 +375,11 @@ if (count($filteredDays) > $requestedDays) {
                         default => "No trekking today. Rest and acclimatize at {$waypoint->name}.",
                     };
                 } else {
-                    $normalizedDay['title'] = match($locale) {
-                        'hi' => "आराम दिन",
-                        'zh' => "休息日",
-                        'np' => "आराम दिन",
-                        default => "Rest Day",
+                                        $normalizedDay['title'] = match($locale) {
+                        'hi' => "{$waypoint->name} में आराम दिन",
+                        'zh' => "在{$waypoint->name}休息",
+                        'np' => "{$waypoint->name}मा आराम दिन",
+                        default => "Rest Day at {$waypoint->name}",
                     };
                     $normalizedDay['description'] = match($locale) {
                         'hi' => "आजको दिन आराम गर्नुहोस्।",

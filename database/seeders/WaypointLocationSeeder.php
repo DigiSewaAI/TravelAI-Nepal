@@ -291,9 +291,29 @@ class WaypointLocationSeeder extends Seeder
             'Jagat' => 'Jagat',
             'Simigaon' => 'Simigaon',
             'Dongang' => 'Dongang',
-            // Batch 4 — Saipal
+                        // Batch 4 — Saipal
             'Kanda' => 'Kanda',
             'Nauli' => 'Nauli',
+
+            // Phase 4Q9 — Activity waypoints location mapping
+            'Nagarjun Forest' => 'Kathmandu',
+            'Shivapuri National Park' => 'Kathmandu',
+            'Fewa Lake' => 'Pokhara',
+            'Bhote Koshi Bridge' => 'Bhote Koshi',
+            'Zip-line Start Point' => 'Pokhara',
+            'Sarangkot Zipline Start' => 'Pokhara',
+            'Skydiving Drop Zone' => 'Pokhara',
+            'Pame Drop Zone' => 'Pokhara',
+            'Balloon Launch Site' => 'Pokhara',
+            'Pokhara Balloon Launch' => 'Pokhara',
+            'Hemja Landing' => 'Pokhara',
+            'Sarangkot Launch Point' => 'Sarangkot',
+            'Pokhara Landing Zone' => 'Pokhara',
+            'Pokhara Landing' => 'Pokhara',
+            'Pokhara Skydiving Landing' => 'Pokhara',
+            'Balloon Max Altitude Point' => 'Pokhara',
+            'Charaudi (Put-in)' => 'Trishuli River',
+            'Fishling (Take-out)' => 'Trishuli River',
         ];
 
         $totalUpdated = 0;
@@ -482,8 +502,11 @@ class WaypointLocationSeeder extends Seeder
     'Kapuche Lake',                    // basic teahouse at lake
     'Tilicho Lake',                    // trek structure has rest day here
 
-    // Phase 4Q1g-4 — Dhaulagiri BC exception:
+            // Phase 4Q1g-4 — Dhaulagiri BC exception:
     'Dhaulagiri Base Camp',            // real BC has tents/lodging
+
+    // Phase 4Q8 — Kali Gandaki rafting camp:
+    'Kali Gandaki River',              // overnight rafting camp (real 2-day trip)
 ];
         foreach ($explicitOvernightExceptions as $name) {
             Waypoint::where('name', $name)->update(['is_overnight_stop' => true]);

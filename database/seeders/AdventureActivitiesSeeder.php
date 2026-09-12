@@ -30,9 +30,12 @@ class AdventureActivitiesSeeder extends Seeder
                 'max_altitude' => 500,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Kathmandu', 'slug' => 'kathmandu-trishuli', 'type' => 'city', 'lat' => 27.7172, 'lng' => 85.3240, 'alt' => 1400],
-                ['name' => 'Trishuli River', 'slug' => 'trishuli-river', 'type' => 'landmark', 'lat' => 27.8123, 'lng' => 84.9345, 'alt' => 500],
+                        'waypoints' => [
+                ['name' => 'Charaudi (Put-in)', 'slug' => 'charaudi-putin', 'type' => 'village', 'lat' => 27.8500, 'lng' => 84.7500, 'alt' => 400],
+                ['name' => 'Fishling (Take-out)', 'slug' => 'fishling-takeout', 'type' => 'village', 'lat' => 27.8300, 'lng' => 84.7000, 'alt' => 300],
+            ],
+            'segments' => [
+                ['from' => 'charaudi-putin', 'to' => 'fishling-takeout', 'dist' => 15.0, 'time' => 3.5, 'gain' => 0, 'loss' => 100],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Rafting Package (Full Day)', 'amount' => 60, 'unit' => 'per_person', 'mandatory' => false],
@@ -138,9 +141,12 @@ class AdventureActivitiesSeeder extends Seeder
                 'max_altitude' => 1600,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Pokhara', 'slug' => 'pokhara-para', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Sarangkot', 'slug' => 'sarangkot-para', 'type' => 'viewpoint', 'lat' => 28.2446, 'lng' => 83.9453, 'alt' => 1600],
+                                    'waypoints' => [
+                ['name' => 'Sarangkot Launch Point', 'slug' => 'sarangkot-launch', 'type' => 'viewpoint', 'lat' => 28.2446, 'lng' => 83.9453, 'alt' => 1600],
+                ['name' => 'Pokhara Landing Zone', 'slug' => 'pokhara-landing', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+            ],
+            'segments' => [
+                ['from' => 'sarangkot-launch', 'to' => 'pokhara-landing', 'dist' => 5.0, 'time' => 0.5, 'gain' => 0, 'loss' => 773],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Paragliding Flight (20-30 min)', 'amount' => 100, 'unit' => 'per_person', 'mandatory' => false],
@@ -218,13 +224,12 @@ class AdventureActivitiesSeeder extends Seeder
                 'max_altitude' => 1200,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Pokhara', 'slug' => 'pokhara-zip', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Zip-line Start Point', 'slug' => 'zipline-start', 'type' => 'landmark', 'lat' => 28.2567, 'lng' => 83.9567, 'alt' => 1200],
+                        'waypoints' => [
+                ['name' => 'Sarangkot Zipline Start', 'slug' => 'sarangkot-zip-start', 'type' => 'viewpoint', 'lat' => 28.2446, 'lng' => 83.9453, 'alt' => 1600],
+                ['name' => 'Hemja Landing', 'slug' => 'hemja-landing', 'type' => 'village', 'lat' => 28.2367, 'lng' => 83.9100, 'alt' => 1050],
             ],
             'segments' => [
-                ['from' => 'pokhara-zip', 'to' => 'zipline-start', 'dist' => 15.0, 'time' => 0.5, 'gain' => 773],
-                ['from' => 'zipline-start', 'to' => 'pokhara-zip', 'dist' => 15.0, 'time' => 0.5, 'loss' => 773],
+                ['from' => 'sarangkot-zip-start', 'to' => 'hemja-landing', 'dist' => 1.8, 'time' => 0.1, 'gain' => 0, 'loss' => 550],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Zip-line Ride', 'amount' => 50, 'unit' => 'per_person', 'mandatory' => false],
@@ -330,13 +335,12 @@ class AdventureActivitiesSeeder extends Seeder
                 'max_altitude' => 4500,
                 'season' => 'All Year',
             ],
-            'waypoints' => [
-                ['name' => 'Pokhara', 'slug' => 'pokhara-skydive', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Skydiving Drop Zone', 'slug' => 'skydive-zone', 'type' => 'landmark', 'lat' => 28.1789, 'lng' => 83.9789, 'alt' => 827],
+                        'waypoints' => [
+                ['name' => 'Pame Drop Zone', 'slug' => 'pame-dropzone', 'type' => 'village', 'lat' => 28.2345, 'lng' => 83.9567, 'alt' => 4000],
+                ['name' => 'Pokhara Skydiving Landing', 'slug' => 'pokhara-skydive-landing', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
             ],
             'segments' => [
-                ['from' => 'pokhara-skydive', 'to' => 'skydive-zone', 'dist' => 12.0, 'time' => 0.5, 'loss' => 27],
-                ['from' => 'skydive-zone', 'to' => 'pokhara-skydive', 'dist' => 12.0, 'time' => 0.5, 'gain' => 27],
+                ['from' => 'pame-dropzone', 'to' => 'pokhara-skydive-landing', 'dist' => 20.0, 'time' => 0.5, 'gain' => 0, 'loss' => 3173],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Tandem Skydive', 'amount' => 250, 'unit' => 'per_person', 'mandatory' => false],
@@ -358,13 +362,13 @@ class AdventureActivitiesSeeder extends Seeder
                 'max_altitude' => 1500,
                 'season' => 'Spring/Autumn',
             ],
-            'waypoints' => [
-                ['name' => 'Pokhara', 'slug' => 'pokhara-balloon', 'type' => 'city', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
-                ['name' => 'Balloon Launch Site', 'slug' => 'balloon-launch', 'type' => 'landmark', 'lat' => 28.2234, 'lng' => 83.9567, 'alt' => 827],
+                        'waypoints' => [
+                ['name' => 'Pokhara Balloon Launch', 'slug' => 'pokhara-balloon-launch', 'type' => 'village', 'lat' => 28.2096, 'lng' => 83.9857, 'alt' => 827],
+                ['name' => 'Balloon Max Altitude Point', 'slug' => 'balloon-max-alt', 'type' => 'landmark', 'lat' => 28.2200, 'lng' => 83.9700, 'alt' => 1500],
             ],
             'segments' => [
-                ['from' => 'pokhara-balloon', 'to' => 'balloon-launch', 'dist' => 10.0, 'time' => 0.5, 'loss' => 27],
-                ['from' => 'balloon-launch', 'to' => 'pokhara-balloon', 'dist' => 10.0, 'time' => 0.5, 'gain' => 27],
+                ['from' => 'pokhara-balloon-launch', 'to' => 'balloon-max-alt', 'dist' => 5.0, 'time' => 0.5, 'gain' => 673, 'loss' => 0],
+                ['from' => 'balloon-max-alt', 'to' => 'pokhara-balloon-launch', 'dist' => 5.0, 'time' => 0.5, 'gain' => 0, 'loss' => 673],
             ],
             'costs' => [
                 ['type' => 'activity', 'name' => 'Balloon Ride (1 Hour)', 'amount' => 180, 'unit' => 'per_person', 'mandatory' => false],

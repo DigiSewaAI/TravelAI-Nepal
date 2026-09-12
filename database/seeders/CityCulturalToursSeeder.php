@@ -720,12 +720,14 @@ $this->command->info('✅ Tansen Hill Town Tour seeded.');
                 'season' => 'Spring/Autumn',
             ],
             'waypoints' => [
-                                ['name' => 'Jumla', 'slug' => 'jumla-town', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
+                ['name' => 'Jumla', 'slug' => 'jumla-town', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
                 ['name' => 'Sinja Valley', 'slug' => 'sinja-jumla', 'type' => 'village', 'lat' => 28.8234, 'lng' => 81.8456, 'alt' => 2500],
                 ['name' => 'Jumla', 'slug' => 'jumla-sinja-return', 'type' => 'village', 'lat' => 29.2750, 'lng' => 82.1589, 'alt' => 2340],
             ],
-                                    'segments' => [
+                                                                        'segments' => [
                 ['from' => 'jumla-town', 'to' => 'sinja-jumla', 'dist' => 35.0, 'time' => 2.0, 'loss' => 160],
+                // Rest at Sinja (Day 2 — cultural exploration)
+                ['from' => 'sinja-jumla', 'to' => 'sinja-jumla', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
                 ['from' => 'sinja-jumla', 'to' => 'jumla-sinja-return', 'dist' => 35.0, 'time' => 2.0, 'gain' => 160],
             ],
             'costs' => [

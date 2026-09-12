@@ -179,12 +179,20 @@ foreach ($validated['days'] as &$dayData) {
         continue;
     }
 
-    // REST DAY
+        // REST DAY
     if ((float) $dayData['distance_km'] == 0) {
+        $restWpName = \App\Models\Waypoint::find(
+            $dayData['overnight_waypoint_id'] ?? 0
+        )?->name ?? 'the lodge';
+
         $dayData['items'] = [
             [
-                'title' => 'Rest Day',
-                'description' => 'Rest and relax at the lodge.',
+                'title' => app()->getLocale() === 'np'
+                    ? "{$restWpName}मा आराम दिन"
+                    : "Rest Day at {$restWpName}",
+                'description' => app()->getLocale() === 'np'
+                    ? "{$restWpName}मा आराम र acclimatize।"
+                    : "Rest and relax at {$restWpName}.",
                 'time_of_day' => 'morning',
                 'cost' => 0,
                 'pricing_source' => 'system_estimate',
@@ -669,10 +677,14 @@ if (!$service && $to) {
             'distance_km' => 0,
             'estimated_time_hours' => 0,
             'altitude_m' => $altitude,
-            'items' => [
+                        'items' => [
                 [
-                    'title' => 'Rest Day',
-                    'description' => 'Rest and relax.',
+                    'title' => app()->getLocale() === 'np'
+                        ? "{$waypointName}मा आराम दिन"
+                        : "Rest Day at {$waypointName}",
+                    'description' => app()->getLocale() === 'np'
+                        ? "{$waypointName}मा आराम र acclimatize।"
+                        : "Rest and relax at {$waypointName}.",
                     'time_of_day' => 'morning',
                     'cost' => 0,
                     'pricing_source' => 'system_estimate',

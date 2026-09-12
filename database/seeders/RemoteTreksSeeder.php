@@ -316,29 +316,29 @@ class RemoteTreksSeeder extends Seeder
                 ['name' => 'Mahakali River', 'slug' => 'mahakali-river', 'type' => 'landmark', 'lat' => 29.6456, 'lng' => 80.6789, 'alt' => 1500],
                 ['name' => 'Darchula', 'slug' => 'darchula-return', 'type' => 'village', 'lat' => 29.8456, 'lng' => 80.6123, 'alt' => 700],
             ],
-                                    'segments' => [
-                // Forward (Days 1-3)
-                ['from' => 'darchula', 'to' => 'sitapur', 'dist' => 10.0, 'time' => 5.0, 'gain' => 200],
-                // Rest at Sitapur ×2 (acclimatization + tea garden)
+                                                'segments' => [
+                // Day 1: Darchula → Sitapur (arrival)
+                ['from' => 'darchula', 'to' => 'sitapur', 'dist' => 10.0, 'time' => 4.0, 'gain' => 200, 'loss' => 0],
+                // Day 2: Sitapur rest (acclimatization)
                 ['from' => 'sitapur', 'to' => 'sitapur', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'sitapur', 'to' => 'sitapur', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'sitapur', 'to' => 'khalanga', 'dist' => 12.0, 'time' => 6.0, 'gain' => 300],
-                // Rest at Khalanga ×2 (exploration + market)
-                                // Rest at Khalanga ×3 (exploration + market + buffer)
-                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'khalanga', 'to' => 'mahakali-river', 'dist' => 14.0, 'time' => 7.0, 'gain' => 300],
-                // Rest at Mahakali River ×3 (rafting + exploration + buffer)
+                // Day 3: Sitapur → Khalanga
+                ['from' => 'sitapur', 'to' => 'khalanga', 'dist' => 12.0, 'time' => 5.0, 'gain' => 300, 'loss' => 0],
+                // Day 4: Khalanga → Mahakali River
+                ['from' => 'khalanga', 'to' => 'mahakali-river', 'dist' => 14.0, 'time' => 6.0, 'gain' => 200, 'loss' => 0],
+                // Day 5: Mahakali River rest (rafting/exploration) — exception
                 ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'mahakali-river', 'to' => 'mahakali-river', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                // Return gradual (Days 11)
-                ['from' => 'mahakali-river', 'to' => 'khalanga', 'dist' => 14.0, 'time' => 6.0, 'loss' => 300],
-                ['from' => 'khalanga', 'to' => 'sitapur', 'dist' => 12.0, 'time' => 5.0, 'loss' => 300],
-                ['from' => 'sitapur', 'to' => 'darchula-return', 'dist' => 10.0, 'time' => 4.0, 'loss' => 200],
-                // Departure rest
-                ['from' => 'darchula-return', 'to' => 'darchula-return', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 6: Mahakali River → Khalanga (return)
+                ['from' => 'mahakali-river', 'to' => 'khalanga', 'dist' => 14.0, 'time' => 5.0, 'gain' => 0, 'loss' => 200],
+                // Day 7: Khalanga rest (exploration)
+                ['from' => 'khalanga', 'to' => 'khalanga', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 8: Khalanga → Sitapur (return)
+                ['from' => 'khalanga', 'to' => 'sitapur', 'dist' => 12.0, 'time' => 4.0, 'gain' => 0, 'loss' => 300],
+                // Day 9: Sitapur → Darchula (return)
+                ['from' => 'sitapur', 'to' => 'darchula', 'dist' => 10.0, 'time' => 4.0, 'gain' => 0, 'loss' => 200],
+                // Day 10: Darchula rest (departure prep)
+                ['from' => 'darchula', 'to' => 'darchula', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
+                // Day 11: Darchula buffer (weather/permits)
+                ['from' => 'darchula', 'to' => 'darchula', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'TIMS Card', 'amount' => 20, 'unit' => 'per_person', 'mandatory' => true],
