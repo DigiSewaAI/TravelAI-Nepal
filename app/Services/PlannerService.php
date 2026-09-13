@@ -549,28 +549,54 @@ $mergedWaypoints = [];
 // Extract the intermediate waypoint (e.g. Kusma Bridge) from the route's
 // original segments, otherwise the round-trip branch never fires and the
 // title falls back to "Start → Start".
-$targetWaypoint = $to; // default: end waypoint
-if ($from->id === $to->id && $distance > 0) {
-    $intermediate = \App\Models\Waypoint::whereIn(
-        'id',
-        $route->segments()
-            ->orderBy('sequence')
-            ->pluck('to_waypoint_id')
-            ->unique()
-            ->reject(fn($id) => $id === $to->id)
-            ->values()
-            ->toArray()
-    )->first();
+// Phase 4R-fix-4 (corrected): Round-trip detection ONLY for tours/activities.
+// Treks must NEVER be RT — consecutive waypoints often share a location_id
+// (e.g. Bahundanda → "Besisahar" location), which would wrongly trigger RT.
+$isRoundTrip = false;
+if (in_array($route->route_type, ['tour', 'activity'])) {
+    $rtSameId   = ($from->id === $to->id);
+    $rtSameName = (strcasecmp(trim($from->name ?? ''), trim($to->name ?? '')) === 0);
+    // Phase 4R-fix-4b: Single-segment tour where from/to share a location
+    // but have different names (e.g. "Lumbini Circuit Start" vs "... End").
+    // Only for tours with exactly 1 raw segment — prevents Annapurna-style
+    // false positives on multi-segment treks.
+    $singleLocTour = ($route->route_type === 'tour'
+        && $route->segments()->count() === 1
+        && $from->location_id !== null
+        && $from->location_id === $to->location_id);
+    $isRoundTrip = ($rtSameId || $rtSameName || $singleLocTour);
+}
 
-    if ($intermediate) {
-        $mergedWaypoints = [$intermediate->name];
-        $targetWaypoint = $intermediate;
-        Log::info("🔁 Round-trip detected: {$from->name} → {$intermediate->name} → {$to->name}");
+$targetWaypoint = $to; // default: end waypoint
+if ($isRoundTrip && $distance > 0) {
+    $intermediateIds = $route->segments()
+        ->orderBy('sequence')
+        ->pluck('to_waypoint_id')
+        ->unique()
+        ->reject(fn($id) => $id === $to->id)
+        ->values()
+        ->toArray();
+
+    $intermediates = \App\Models\Waypoint::whereIn('id', $intermediateIds)
+        ->where(function($q) use ($to) {
+            $q->whereNull('location_id')
+              ->orWhere('location_id', '!=', $to->location_id);
+        })
+        ->get()
+        ->sortBy(fn($wp) => array_search($wp->id, $intermediateIds))
+        ->values();
+
+    if ($intermediates->isNotEmpty()) {
+        $mergedWaypoints = $intermediates->pluck('name')->toArray();
+        $targetWaypoint = $intermediates->first();
+        Log::info("🔁 Round-trip detected: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
+    } else {
+        Log::info("🎫 Single-location tour detected: {$route->slug}");
     }
 }
 
         // Title & description based on locale
-        if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
+        if ($isRoundTrip && $distance > 0 && !empty($mergedWaypoints)) {
             $landmarkName = implode(' → ', $mergedWaypoints);
             $title = match($locale) {
                 'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
@@ -583,7 +609,16 @@ if ($from->id === $to->id && $distance > 0) {
                 'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
                 'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
                 default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+                        };
+        } elseif ($isRoundTrip && $distance > 0) {
+            // Phase 4R-fix-4: Same-location RT — use route name.
+            $title = match($locale) {
+                'hi' => "दिन {$dayNumber}: {$route->name}",
+                'zh' => "第 {$dayNumber} 天: {$route->name}",
+                'np' => "दिन {$dayNumber}: {$route->name}",
+                default => "Day {$dayNumber}: {$route->name}",
             };
+            $desc = "Explore {$from->name}. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : "");
         } else {
             $title = match($locale) {
                 'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
