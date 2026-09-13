@@ -50,3 +50,9 @@ backup_*.sql
 # Local backup files
 *.bak
 *.backup
+
+# Phase 4R patch backups — never commit
+*.bak_before_*
+**/*.bak_before_*
+app/Services/*.bak_before_*
+database/seeders/*.bak_before_*
