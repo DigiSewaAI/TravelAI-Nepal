@@ -880,11 +880,24 @@ if (!$service && $targetWaypoint) {
             return null;
         }
 
-        // ─── Guard 2: waypoint type ───
+                // ─── Guard 2: waypoint type ───
+        // Phase 4R-fix-7: Some checkpoints (e.g. Machhapuchhre Base Camp, Api BC,
+        // Makalu BC) have real lodges. Allow them through if a lodge service
+        // exists at their location — otherwise apply the non-accommodation skip.
         $nonAccommodationTypes = ['pass', 'lake', 'viewpoint', 'landmark', 'checkpoint'];
         if (in_array($waypoint->type, $nonAccommodationTypes)) {
-            Log::info("⏭️ Skipping {$waypoint->type} waypoint: {$waypoint->name}");
-            return null;
+            $isCheckpointWithLodge = false;
+            if ($waypoint->type === 'checkpoint' && $waypoint->location_id) {
+                $isCheckpointWithLodge = Service::where('status', 'active')
+                    ->where('location_id', $waypoint->location_id)
+                    ->whereHas('category', fn($q) => $q->where('slug', 'hotel'))
+                    ->exists();
+            }
+            if (!$isCheckpointWithLodge) {
+                Log::info("⏭️ Skipping {$waypoint->type} waypoint: {$waypoint->name}");
+                return null;
+            }
+            Log::info("✅ Checkpoint with lodge allowed: {$waypoint->name}");
         }
 
         // ─── Guard 3: location_id must exist ───
