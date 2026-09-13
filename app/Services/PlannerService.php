@@ -226,9 +226,15 @@ foreach ($validated['days'] as &$dayData) {
         }
     }
 
+                // Phase 4R-fix-3: For activity routes, keep fallback-provided items.
+    // Hotel/guide override is WRONG for activities (e.g. "Pokhara Hotel" on zipline).
+    if ($route->route_type === 'activity') {
+        Log::info("⏭️ Skipping service override for activity route: {$route->slug}");
+        continue;
+    }
+
         // 🔥 Delegate to centralized service resolver (Phase 4F — LIKE removed)
     $bestService = $this->getServiceForWaypoint($waypoint, $input);
-
     if (!$bestService) {
         Log::info("ℹ️ No service resolved for Day {$dayNumber} ({$waypoint->name})");
         continue;
@@ -638,11 +644,59 @@ if (!$service && $isTour && $targetWaypoint->location_id !== null) {
 
 // ✅ Only call getServiceForWaypoint if no service found yet AND we have a waypoint
 if (!$service && $targetWaypoint) {
-    $service = $this->getServiceForWaypoint($targetWaypoint, $input);
+    // Phase 4R-fix-2: Activity routes need activity service, NOT hotel/guide.
+    // For activities, prefer an 'activity' category service at the target
+    // waypoint's location. If not found, leave null — the label will use
+    // the route name instead of "Trekking Day".
+        if ($route->route_type === 'activity') {
+        if ($targetWaypoint->location_id !== null) {
+            // Phase 4R-fix-3b: Match activity service by route name keywords
+            // (e.g. "Kayaking in Fewa Lake" → service with "kayaking"/"fewa"/"lake").
+            // Without this, ->first() returns wrong activity (e.g. Paragliding for Kayaking).
+                        // Phase 4R-fix-3c: Filter out common location words that cause
+            // false matches (e.g. "Pokhara" matches "Paragliding in Pokhara"
+            // for the zipline route, wrongly attaching paragliding service).
+            $stopWords = [
+                'pokhara', 'kathmandu', 'nepal', 'city', 'tour',
+                'adventure', 'activity', 'lake', 'river', 'valley',
+            ];
+            $routeWords = array_filter(
+                preg_split('/[\s\-]+/', strtolower($route->name)),
+                fn($w) => strlen($w) >= 4 && !in_array($w, $stopWords)
+            );
+
+            $actQuery = Service::where('status', 'active')
+                ->where('location_id', $targetWaypoint->location_id)
+                ->whereHas('category', fn($q) => $q->where('slug', 'activity'));
+
+            $actService = null;
+            if (!empty($routeWords)) {
+                $actService = (clone $actQuery)
+                    ->where(function($q) use ($routeWords) {
+                        foreach ($routeWords as $word) {
+                            $q->orWhere('name', 'LIKE', "%{$word}%");
+                        }
+                    })
+                    ->first();
+            }
+            // No fallback to "any activity" — better to show route name than wrong activity.
+
+            if ($actService) {
+                $service = $this->formatService($actService);
+                Log::info("✅ Activity service attached: {$actService->name}");
+            } else {
+                Log::info("ℹ️ No matching activity service at loc={$targetWaypoint->location_id} for {$route->slug}");
+            }
+        }
+    } else {
+        $service = $this->getServiceForWaypoint($targetWaypoint, $input);
+    }
 }
 
         $serviceCost = $service ? $service['price'] * 133 : 0;
-        $serviceName = $service ? $service['name'] : 'Trekking Day';
+        $serviceName = $service
+    ? $service['name']
+    : ($route->route_type === 'activity' ? $route->name : 'Trekking Day');
         $serviceId = $service ? $service['id'] : null;
         $pricingSource = $service ? 'provider_service' : 'system_estimate';
 
@@ -657,7 +711,8 @@ if (!$service && $targetWaypoint) {
             'items' => [
                 [
                     'title' => $serviceName,
-                    'description' => "Trek from {$from->name} to {$targetWaypoint->name}",
+                    'description' => ($route->route_type === 'activity' ? 'Activity at ' : 'Trek from ')
+    . "{$from->name} to {$targetWaypoint->name}",
                     'time_of_day' => 'morning',
                     'cost' => $serviceCost,
                     'pricing_source' => $pricingSource,
