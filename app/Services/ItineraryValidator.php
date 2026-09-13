@@ -347,8 +347,9 @@ if (count($filteredDays) > $requestedDays) {
                         'pricing_source' => $item['pricing_source'] ?? 'system_estimate',
                         'pricing_snapshot' => $item['pricing_snapshot'] ?? null,
                         'service_id' => $item['service_id'] ?? null,
-                        'is_optional' => $item['is_optional'] ?? false,
+                                                'is_optional' => $item['is_optional'] ?? false,
                         'metadata' => $item['metadata'] ?? null,
+                        'provider' => $item['provider'] ?? null,
                     ];
                 }, $day['items'] ?? []),
             ];

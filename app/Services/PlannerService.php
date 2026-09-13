@@ -179,20 +179,45 @@ foreach ($validated['days'] as &$dayData) {
         continue;
     }
 
-        // REST DAY
-    if ((float) $dayData['distance_km'] == 0) {
-        $restWpName = \App\Models\Waypoint::find(
-            $dayData['overnight_waypoint_id'] ?? 0
-        )?->name ?? 'the lodge';
+            // REST DAY
+if ((float) $dayData['distance_km'] == 0) {
+    $restWp = \App\Models\Waypoint::find($dayData['overnight_waypoint_id'] ?? 0);
+    $restWpName = $restWp?->name ?? 'the lodge';
+
+    // Phase 4R-fix-6: Attach lodge service so rest day includes accommodation cost.
+    $restService = $restWp ? $this->getServiceForWaypoint($restWp, $input) : null;
+
+    if ($restService) {
+        $restPriceNpr = (float) $restService['price'];
+        if (strtoupper($restService['currency'] ?? 'NPR') === 'USD') {
+            $restPriceNpr *= 133;
+        }
 
         $dayData['items'] = [
             [
                 'title' => app()->getLocale() === 'np'
                     ? "{$restWpName}मा आराम दिन"
                     : "Rest Day at {$restWpName}",
-                'description' => app()->getLocale() === 'np'
-                    ? "{$restWpName}मा आराम र acclimatize।"
-                    : "Rest and relax at {$restWpName}.",
+                'description' => $restService['name'] . ' – Rest and acclimatize.',
+                'time_of_day' => 'afternoon',
+                'cost' => $restPriceNpr,
+                'currency' => 'NPR',
+                'pricing_source' => 'provider_service',
+                'pricing_snapshot' => null,
+                'service_id' => $restService['id'],
+                'is_optional' => false,
+                'metadata' => null,
+                'provider' => $restService['provider'] ?? null,
+            ]
+        ];
+        Log::info("✅ Rest day service attached: {$restService['name']} (NPR {$restPriceNpr})");
+    } else {
+        $dayData['items'] = [
+            [
+                'title' => app()->getLocale() === 'np'
+                    ? "{$restWpName}मा आराम दिन"
+                    : "Rest Day at {$restWpName}",
+                'description' => "Rest and relax at {$restWpName}.",
                 'time_of_day' => 'morning',
                 'cost' => 0,
                 'pricing_source' => 'system_estimate',
@@ -202,8 +227,10 @@ foreach ($validated['days'] as &$dayData) {
                 'metadata' => null,
             ]
         ];
-        continue;
+        Log::info("ℹ️ No lodge for rest day at {$restWpName}");
     }
+    continue;
+}
 
     $waypointId = $dayData['overnight_waypoint_id'] ?? null;
     if (!$waypointId) {

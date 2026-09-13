@@ -14,6 +14,11 @@ class LocationSeeder extends Seeder
             // MAJOR CITIES & DISTRICTS (NEPAL)
             // ============================================================
             ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Kathmandu', 'latitude' => 27.7172, 'longitude' => 85.3240, 'is_habitable' => true],
+                        // Phase 4R-fix-5: 4 villages missing location entries
+            ['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Tseram', 'latitude' => 27.5485, 'longitude' => 88.0012, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Dzongla', 'latitude' => 27.9473, 'longitude' => 86.7720, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Thagnak', 'latitude' => 27.9045, 'longitude' => 86.7180, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Nuwakot', 'latitude' => 27.9100, 'longitude' => 85.1650, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Pokhara', 'latitude' => 28.2096, 'longitude' => 83.9857, 'is_habitable' => true],
 
             // ============================================================
