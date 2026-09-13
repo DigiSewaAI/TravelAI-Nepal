@@ -615,49 +615,57 @@ if ($isRoundTrip && $distance > 0) {
                 }
                 Log::info("🔁 Trek day-hike RT: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
             }
-    } else {
-        // Tours/activities: existing location-filtered extraction
-        $intermediateIds = $route->segments()
-            ->orderBy('sequence')
-            ->pluck('to_waypoint_id')
-            ->unique()
-            ->reject(fn($id) => $id === $to->id)
-            ->values()
-            ->toArray();
-
-        $intermediates = \App\Models\Waypoint::whereIn('id', $intermediateIds)
-            ->where(function($q) use ($to) {
-                $q->whereNull('location_id')
-                  ->orWhere('location_id', '!=', $to->location_id);
-            })
-            ->get()
-            ->sortBy(fn($wp) => array_search($wp->id, $intermediateIds))
-            ->values();
-
-        if ($intermediates->isNotEmpty()) {
-            $mergedWaypoints = $intermediates->pluck('name')->toArray();
-            $targetWaypoint = $intermediates->first();
-            Log::info("🔁 Round-trip detected: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
         } else {
-            Log::info("🎫 Single-location tour detected: {$route->slug}");
+        // Phase 4S: For tours/activities, use attached merged_waypoints
+        // (works for city tours where all waypoints share one location)
+        $attached = $seg->merged_waypoints ?? [];
+        if (!empty($attached)) {
+            $mergedWaypoints = $attached;
+            $validWpIds = $route->segments()->pluck('from_waypoint_id')
+                ->merge($route->segments()->pluck('to_waypoint_id'))
+                ->unique()->toArray();
+            $first = \App\Models\Waypoint::where('name', $attached[0])
+                ->whereIn('id', $validWpIds)
+                ->first();
+            if ($first) {
+                $targetWaypoint = $first;
+            }
+            Log::info("🔁 Tour RT: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
+        } else {
+            Log::info("🎫 Single-location tour: {$route->slug}");
         }
     }
 }
-        // Title & description based on locale
+
+        // Phase 4S: "Hotel (City)" display for 2+ day tours
+        $fromDisplay = $from->name;
+        $toDisplay = $to->name;
+        if ($route->route_type === 'tour' && $route->duration_days >= 2) {
+            $fromGeneric = preg_match('/(\s|^)(start|end)(\s|$)/i', $from->name);
+            $toGeneric = preg_match('/(\s|^)(start|end)(\s|$)/i', $to->name);
+            if (!$fromGeneric && $from->is_overnight_stop && in_array($from->type, ['village', 'city'])) {
+                $fromDisplay = "Hotel ({$from->name})";
+            }
+            if (!$toGeneric && $to->is_overnight_stop && in_array($to->type, ['village', 'city'])) {
+                $toDisplay = "Hotel ({$to->name})";
+            }
+        }
+
+                // Title & description based on locale
         if ($isRoundTrip && $distance > 0 && !empty($mergedWaypoints)) {
             $landmarkName = implode(' → ', $mergedWaypoints);
-            $title = match($locale) {
-                'hi' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                'zh' => "第 {$dayNumber} 天: {$from->name} → {$landmarkName} → {$to->name}",
-                'np' => "दिन {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
-                default => "Day {$dayNumber}: {$from->name} → {$landmarkName} → {$to->name}",
+                        $title = match($locale) {
+                'hi' => "दिन {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
+                'zh' => "第 {$dayNumber} 天: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
+                'np' => "दिन {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
+                default => "Day {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
             };
-            $desc = match($locale) {
-                'hi' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
-                'zh' => "从 {$from->name} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                'np' => "{$from->name} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                default => "Round trip from {$from->name} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
-                        };
+                        $desc = match($locale) {
+                'hi' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
+                'zh' => "从 {$fromDisplay} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                'np' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
+                default => "Round trip from {$fromDisplay} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+            };
         } elseif ($isRoundTrip && $distance > 0) {
             // Phase 4R-fix-4: Same-location RT — use route name.
             $title = match($locale) {
@@ -668,11 +676,11 @@ if ($isRoundTrip && $distance > 0) {
             };
             $desc = "Explore {$from->name}. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : "");
         } else {
-            $title = match($locale) {
-                'hi' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                'zh' => "第 {$dayNumber} 天: {$from->name} → {$to->name}",
-                'np' => "दिन {$dayNumber}: {$from->name} → {$to->name}",
-                default => "Day {$dayNumber}: {$from->name} → {$to->name}",
+                        $title = match($locale) {
+                'hi' => "दिन {$dayNumber}: {$fromDisplay} → {$toDisplay}",
+                'zh' => "第 {$dayNumber} 天: {$fromDisplay} → {$toDisplay}",
+                'np' => "दिन {$dayNumber}: {$fromDisplay} → {$toDisplay}",
+                default => "Day {$dayNumber}: {$fromDisplay} → {$toDisplay}",
             };
             $desc = match($locale) {
                 'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
@@ -794,11 +802,12 @@ if (!$service && $targetWaypoint) {
             'items' => [
                 [
                     'title' => $serviceName,
-                    'description' => ($route->route_type === 'activity' ? 'Activity at ' 
-    : ($route->route_type === 'tour' ? 'Tour at ' : 'Trek from '))
-    . (($isRoundTrip && empty($mergedWaypoints)) 
-        ? $from->name 
-        : "{$from->name} to {$targetWaypoint->name}"),
+                                                            'description' => (($isRoundTrip && empty($mergedWaypoints))
+                        ? (($route->route_type === 'activity' ? 'Activity at ' 
+                            : ($route->route_type === 'tour' ? 'Tour at ' : 'Trek at ')) . $fromDisplay)
+                        : (($route->route_type === 'activity' ? 'Activity from ' 
+                            : ($route->route_type === 'tour' ? 'Tour from ' : 'Trek from ')) 
+                            . "{$fromDisplay} to {$targetWaypoint->name}")),
                     'time_of_day' => 'morning',
                     'cost' => $serviceCost,
                     'pricing_source' => $pricingSource,
