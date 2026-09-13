@@ -133,13 +133,18 @@ class SemanticAudit extends Command
             $issues[] = "too-few-segs (dur {$route->duration_days}d, segs {$segments->count()}, need {$minSegs})";
         }
 
-        // ─── Check 5: Distance/speed — only flag truly unrealistic ───
+                // ─── Check 5: Distance/speed — only flag truly unrealistic ───
         foreach ($segments as $s) {
             if ($s->distance_km <= 0 || $s->estimated_time_hours <= 0) continue;
             $speed = $s->distance_km / $s->estimated_time_hours;
 
             // Walking tier (short distance): 1-7 km/h realistic
             if ($s->distance_km < 25) {
+                // Phase 4R-fix-14: only treks require walking-speed validation.
+                // Tours use vehicles (20-40 km/h realistic); activities have
+                // their own speeds (zipline 50+ km/h, rafting 5-10 km/h).
+                if ($routeType !== 'trek') continue;
+
                 if ($speed > 8) {
                     $issues[] = "walking-speed-unrealistic (seq {$s->sequence}: {$s->distance_km}km/{$s->estimated_time_hours}hr = " . round($speed, 1) . " km/h)";
                 } elseif ($speed < 1 && $s->distance_km > 3) {
@@ -215,6 +220,11 @@ class SemanticAudit extends Command
         }
 
         // Trek = duration >= 3 AND max_alt > 1500
+                // Phase 4R-fix-15: pilgrimage routes use vehicles (flights/jeeps), not walking
+        if (str_contains($route->slug, 'pilgrimage')) {
+            return 'tour';
+        }
+
         if ($route->duration_days >= 3 && $route->max_altitude > 1500) {
             return 'trek';
         }
