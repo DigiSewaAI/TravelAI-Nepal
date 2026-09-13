@@ -59,6 +59,7 @@ class Phase4RFixSeeder extends Seeder
                 $this->command->info("✅ khopra-ridge -> 6d");
             }
         }
+
         // Phase 4R-fix-10: Tier 3 data fixes
         // 3a: simikot-humla max_altitude 3000 -> 4200
         $r4 = Route::where('slug', 'simikot-humla')->first();
@@ -88,6 +89,51 @@ class Phase4RFixSeeder extends Seeder
             $this->command->info("✅ kathmandu-city-end slug fixed");
         }
 
-        $this->command->info('✅ Phase 4R-fix-9 complete.');
+        // Phase 4R-fix-12: kathmandu-heritage-end slug fix
+        $wpH = \App\Models\Waypoint::where('slug', 'kathmandu-heritage-end')->first();
+        if ($wpH) {
+            $wpH->slug = 'kathmandu-heritage-tour-end';
+            $wpH->save();
+            $this->command->info("✅ kathmandu-heritage-end slug fixed");
+        }
+
+        // Phase 4R-fix-13: T5a — 6 tour return segments
+        $seeds = [
+            ['dharan-dhankuta-bhedetar', 410, 407, 4, 60.0,  2.0],
+            ['janakpur-tour',            395, 393, 3, 0.5,   0.2],
+            ['kalikot-sinja',            422, 420, 3, 160.0, 8.0],
+            ['marpha-tukuche-kobang',    406, 403, 4, 185.0, 8.0],
+            ['muktinath-temple-tour',    398, 396, 3, 210.0, 9.0],
+        ];
+        foreach ($seeds as [$slug, $from, $to, $seq, $dist, $time]) {
+            $r = Route::where('slug', $slug)->first();
+            if (!$r) continue;
+            if (!$r->segments()->where('from_waypoint_id', $from)->where('to_waypoint_id', $to)->exists()) {
+                RouteSegment::create([
+                    'route_id' => $r->id,
+                    'from_waypoint_id' => $from,
+                    'to_waypoint_id' => $to,
+                    'sequence' => $seq,
+                    'distance_km' => $dist,
+                    'estimated_time_hours' => $time,
+                    'elevation_gain_m' => 0,
+                    'elevation_loss_m' => 0,
+                ]);
+                $this->command->info("✅ {$slug} +return segment");
+            }
+        }
+
+        // T5a-4: koshi-tappu duplicate waypoint fix (444 → 441)
+        $kt = Route::where('slug', 'koshi-tappu')->first();
+        if ($kt) {
+            $seg = $kt->segments()->where('sequence', 3)->first();
+            if ($seg && $seg->to_waypoint_id === 444) {
+                $seg->to_waypoint_id = 441;
+                $seg->save();
+                $this->command->info("✅ koshi-tappu seq3: 444 → 441");
+            }
+        }
+
+        $this->command->info('✅ Phase 4R-fix-9/10/12/13 complete.');
     }
 }

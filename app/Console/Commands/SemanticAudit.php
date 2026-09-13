@@ -147,10 +147,11 @@ class SemanticAudit extends Command
                 }
             }
             // Vehicle tier (long distance): 15-60 km/h realistic
-            else {
+                        else {
                 if ($speed > 70) {
                     $issues[] = "vehicle-speed-unrealistic (seq {$s->sequence}: " . round($speed, 1) . " km/h)";
-                } elseif ($speed < 8) {
+                } elseif ($speed < 8 && $routeType === 'tour') {
+                    // Phase 4R-fix-12: treks allow slow walking (remote Himalaya)
                     $issues[] = "long-dist-too-slow (seq {$s->sequence}: {$s->distance_km}km/" . $s->estimated_time_hours . "hr)";
                 }
             }
