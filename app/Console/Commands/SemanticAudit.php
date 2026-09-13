@@ -89,10 +89,15 @@ class SemanticAudit extends Command
         }
 
         // ─── Check 2: Tour — should have return (round-trip) ───
-        if ($routeType === 'tour' && $route->duration_days <= 2) {
+                // Phase 4R-fix-11: skip 1-day tours (no return needed); allow same location_id
+        if ($routeType === 'tour' && $route->duration_days > 1 && $route->duration_days <= 2) {
             $first = $segments->first();
             $last = $segments->last();
-            $isRoundTrip = $first->from_waypoint_id === $last->to_waypoint_id;
+            $firstWp = Waypoint::find($first->from_waypoint_id);
+            $lastWp  = Waypoint::find($last->to_waypoint_id);
+            $isRoundTrip = ($first->from_waypoint_id === $last->to_waypoint_id)
+                || ($firstWp && $lastWp && $firstWp->location_id !== null
+                    && $firstWp->location_id === $lastWp->location_id);
             if (!$isRoundTrip) {
                 $issues[] = "tour-no-return (first != last)";
             }
@@ -104,7 +109,8 @@ class SemanticAudit extends Command
         $last = $segments->last();
         $isRoundTrip = $first->from_waypoint_id === $last->to_waypoint_id;
 
-        if (str_contains($nameLower, 'circuit') && !$isRoundTrip && $route->duration_days > 3) {
+                // Phase 4R-fix-11: only flag TOURS (trek circuits are loop-style, no return expected)
+        if ($routeType === 'tour' && str_contains($nameLower, 'circuit') && !$isRoundTrip && $route->duration_days > 3) {
             $issues[] = "circuit-no-return";
         }
         if (str_contains($nameLower, 'base camp') || str_contains($nameLower, 'base-camp')) {
@@ -177,7 +183,9 @@ class SemanticAudit extends Command
                 $from = Waypoint::find($s->from_waypoint_id);
                 $to = Waypoint::find($s->to_waypoint_id);
                 foreach ([$from, $to] as $wp) {
-                    if ($wp && preg_match('/-(start|end)$/', $wp->slug)) {
+                                        // Phase 4R-fix-11: exclude descriptive slugs like *-tour-start
+                    if ($wp && preg_match('/-(start|end)$/', $wp->slug)
+                        && !str_contains($wp->slug, 'tour')) {
                         $issues[] = "generic-wp-slug ({$wp->slug})";
                         break 2;
                     }
