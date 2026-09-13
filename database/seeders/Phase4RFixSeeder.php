@@ -59,6 +59,34 @@ class Phase4RFixSeeder extends Seeder
                 $this->command->info("✅ khopra-ridge -> 6d");
             }
         }
+        // Phase 4R-fix-10: Tier 3 data fixes
+        // 3a: simikot-humla max_altitude 3000 -> 4200
+        $r4 = Route::where('slug', 'simikot-humla')->first();
+        if ($r4 && $r4->max_altitude !== 4200) {
+            $r4->max_altitude = 4200;
+            $r4->save();
+            $this->command->info("✅ simikot-humla max_altitude -> 4200");
+        }
+
+        // 3b: generic waypoint slugs
+        $wp = \App\Models\Waypoint::where('slug', 'kathmandu-heritage-start')->first();
+        if ($wp) {
+            $wp->slug = 'kathmandu-heritage-tour-start';
+            $wp->save();
+            $this->command->info("✅ kathmandu-heritage-start slug fixed");
+        }
+        $wp1 = \App\Models\Waypoint::where('slug', 'kathmandu-city-start')->first();
+        if ($wp1) {
+            $wp1->slug = 'kathmandu-city-tour-departure';
+            $wp1->save();
+            $this->command->info("✅ kathmandu-city-start slug fixed");
+        }
+        $wp2 = \App\Models\Waypoint::where('slug', 'kathmandu-city-end')->first();
+        if ($wp2) {
+            $wp2->slug = 'kathmandu-city-tour-arrival';
+            $wp2->save();
+            $this->command->info("✅ kathmandu-city-end slug fixed");
+        }
 
         $this->command->info('✅ Phase 4R-fix-9 complete.');
     }
