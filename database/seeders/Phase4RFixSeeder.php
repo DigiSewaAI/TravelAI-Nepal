@@ -133,7 +133,34 @@ class Phase4RFixSeeder extends Seeder
                 $this->command->info("✅ koshi-tappu seq3: 444 → 441");
             }
         }
+        // Phase 4R-fix-16: T5b — nagarkot + three-passes fixes
+        // nagarkot-sunrise: unrealistic 6hr → 1hr (vehicle)
+                $nag = Route::where('slug', 'nagarkot-sunrise')->first();
+        if ($nag) {
+            foreach ($nag->segments()->get() as $seg) {
+                if ($seg->estimated_time_hours != 1.0) {
+                    $seg->estimated_time_hours = 1.0;
+                    $seg->save();
+                }
+            }
+            $this->command->info("✅ nagarkot-sunrise: times → 1.0hr");
+        }
 
+        // three-passes: Gokyo Ri day-hike split
+        $tp = Route::where('slug', 'three-passes')->first();
+        if ($tp) {
+            $gokyoRi = \App\Models\Waypoint::where('slug', 'gokyo-ri')->first();
+            $seg18 = $tp->segments()->where('sequence', 18)->first();
+            if ($gokyoRi && $seg18 && $seg18->to_waypoint_id === 112 && $seg18->from_waypoint_id === 112) {
+                $seg18->from_waypoint_id = $gokyoRi->id;
+                $seg18->to_waypoint_id = 112;
+                $seg18->distance_km = 3.0;
+                $seg18->estimated_time_hours = 2.5;
+                $seg18->elevation_loss_m = 610;
+                $seg18->save();
+                $this->command->info("✅ three-passes seq18: Gokyo Ri → Gokyo");
+            }
+        }
         $this->command->info('✅ Phase 4R-fix-9/10/12/13 complete.');
     }
 }
