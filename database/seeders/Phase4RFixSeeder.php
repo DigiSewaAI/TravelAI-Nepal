@@ -161,6 +161,62 @@ class Phase4RFixSeeder extends Seeder
                 $this->command->info("✅ three-passes seq18: Gokyo Ri → Gokyo");
             }
         }
+                // Phase 4R-fix-19: Tier 2 — 3 trek rest days
+        $rm = Route::where('slug', 'mardi-himal')->first();
+        if ($rm) {
+            $seg4 = $rm->segments()->where('sequence', 4)->first();
+            if ($seg4) {
+                $hcId = $seg4->to_waypoint_id;
+                if (!$rm->segments()->where('from_waypoint_id', $hcId)->where('to_waypoint_id', $hcId)->exists()) {
+                    $rm->segments()->where('sequence', 6)->update(['sequence' => 7]);
+                    $rm->segments()->where('sequence', 5)->update(['sequence' => 6]);
+                    RouteSegment::create([
+                        'route_id' => $rm->id, 'from_waypoint_id' => $hcId, 'to_waypoint_id' => $hcId,
+                        'sequence' => 5, 'distance_km' => 0.0, 'estimated_time_hours' => 0.0,
+                        'elevation_gain_m' => 0, 'elevation_loss_m' => 0,
+                    ]);
+                    $this->command->info("✅ mardi-himal: +rest at High Camp");
+                }
+            }
+        }
+
+        $rs = Route::where('slug', 'sherpa-cultural')->first();
+        if ($rs) {
+            $seg2 = $rs->segments()->where('sequence', 2)->first();
+            if ($seg2) {
+                $nmId = $seg2->to_waypoint_id;
+                if (!$rs->segments()->where('from_waypoint_id', $nmId)->where('to_waypoint_id', $nmId)->exists()) {
+                    foreach ([6,5,4,3] as $old) {
+                        $rs->segments()->where('sequence', $old)->update(['sequence' => $old + 1]);
+                    }
+                    RouteSegment::create([
+                        'route_id' => $rs->id, 'from_waypoint_id' => $nmId, 'to_waypoint_id' => $nmId,
+                        'sequence' => 3, 'distance_km' => 0.0, 'estimated_time_hours' => 0.0,
+                        'elevation_gain_m' => 0, 'elevation_loss_m' => 0,
+                    ]);
+                    $this->command->info("✅ sherpa-cultural: +rest at Namche");
+                }
+            }
+        }
+
+        $rt = Route::where('slug', 'tamang-heritage')->first();
+        if ($rt) {
+            $seg3 = $rt->segments()->where('sequence', 3)->first();
+            if ($seg3) {
+                $brId = $seg3->to_waypoint_id;
+                if (!$rt->segments()->where('from_waypoint_id', $brId)->where('to_waypoint_id', $brId)->exists()) {
+                    foreach ([6,5,4] as $old) {
+                        $rt->segments()->where('sequence', $old)->update(['sequence' => $old + 1]);
+                    }
+                    RouteSegment::create([
+                        'route_id' => $rt->id, 'from_waypoint_id' => $brId, 'to_waypoint_id' => $brId,
+                        'sequence' => 4, 'distance_km' => 0.0, 'estimated_time_hours' => 0.0,
+                        'elevation_gain_m' => 0, 'elevation_loss_m' => 0,
+                    ]);
+                    $this->command->info("✅ tamang-heritage: +rest at Briddim");
+                }
+            }
+        }
         $this->command->info('✅ Phase 4R-fix-9/10/12/13 complete.');
     }
 }

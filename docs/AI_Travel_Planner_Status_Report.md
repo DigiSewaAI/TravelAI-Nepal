@@ -1,8 +1,8 @@
-# 📊 TravelAI Nepal — Complete System Status Report (v4.4 → v4.5 — MASTER REFERENCE)
+# 📊 TravelAI Nepal — Complete System Status Report (v4.5 — MASTER REFERENCE)
 
 **Date:** September 13, 2026  
 **Version:** 4.5 (Phase 4Q + Phase 4R — SEMANTICALLY CLEAN, PRODUCTION READY)  
-**Latest Tag:** `v4r-semantic-clean` (commit `27cc3c8`)  
+**Latest Tag:** `v4r-duplicate-fix` (commit `e1b871c`)  
 **Previous Baseline:** `v4q-baseline` (commit `2eec132`) → `v4-final` (commit `26ccd1d`)  
 **Purpose:** यो report future reference हो। यदि नयाँ DeepSeek instance आयो भने यो file देखाएर काम continue गर्न सकिन्छ।
 
@@ -13,7 +13,7 @@
 | Category | Status | Notes |
 |---|---|---|
 | **System Logic** | ✅ 100% | Core logic स्थिर |
-| **PlannerService** | ✅ 100% | Round-trip, activities, tours, rest days, MBC |
+| **PlannerService** | ✅ 100% | Round-trip, activities, tours, rest days, MBC, trek day-hike |
 | **ItineraryValidator** | ✅ 100% | Provider field preserved |
 | **Quotation System** | ✅ 100% | End-to-end verified |
 | **Semantic Audit** | ✅ **138/138 PASS, 0 ISSUES** | Phase 4R complete |
@@ -171,7 +171,7 @@ Fix: Service 1210 location_id 3 → 105
 
 ## 🎯 PHASE 4R — Semantic Data Fixes (September 13, 2026)
 
-**Tag:** `v4r-semantic-clean` | **Commit:** `27cc3c8`  
+**Latest Tag:** `v4r-duplicate-fix` | **Commit:** `e1b871c`  
 **Achievement:** Semantic audit 75 → **138 PASS, 0 ISSUES**
 
 ### ✅ Phase 4R-fix-1 — Round-trip activity title collapse
@@ -382,86 +382,54 @@ Fix: Service 1210 location_id 3 → 105
 
 ---
 
-## 📊 Final Audit State (138 routes — PRODUCTION)
+### ✅ Phase 4R-fix-17 — Cosmetic fixes (description, label, day-hike)
+**Tag:** (included in `v4r-duplicate-fix`, commit `e1b871c`)
 
-### Semantic Audit (`php artisan planner:semantic-audit`)
+**Issues Fixed (from browser test):**
 
+| # | Route | Before | After |
+|---|-------|--------|-------|
+| 1 | fewa-lake-kayaking | "Pokhara to Pokhara" | "Activity at Pokhara" |
+| 2 | bhaktapur-tour | "Trekking Day" label | "Bhaktapur Durbar Square Tour" |
+| 3 | everest-base-camp Day 8 | "Gorak Shep → Gorak Shep" | "Gorak Shep → Everest Base Camp → Gorak Shep" |
 
+**Root Cause:**
+1. Item description = `"Activity at {$from->name} to {$targetWaypoint->name}"` — RT मा दुवै same
+2. Tour मा service NULL → fallback "Trekking Day"
+3. Trek day-hike (EBC) merge भयो — title collapse
 
+**Fix (4 changes in `buildFallbackResponse()`):**
+1. `merged_waypoints` attached from `$overnightSegments` (carry-through)
+2. Trek RT detection: `from->id === to->id && distance > 1`
+3. Service label: `in_array($route_type, ['activity', 'tour'])` → route name
+4. Description: RT empty-merged → `$from->name` (round-trip loop); else normal
+5. Tour prefix: "Tour at " (was "Trek from ")
 
+**Verified:**
+- Kayaking: "Activity at Pokhara" ✅
+- Bhaktapur: item = "Bhaktapur Durbar Square Tour" ✅
+- EBC Day 8: "Gorak Shep → Everest Base Camp → Gorak Shep" ✅
 
----
-
-## 📁 Key Files Reference
-
-| File | Purpose |
-|------|---------|
-| `app/Services/PlannerService.php` | Core itinerary generation |
-| `app/Services/ItineraryValidator.php` | Validation + normalize |
-| `app/Console/Commands/SemanticAudit.php` | Semantic audit rules |
-| `app/Console/Commands/PlannerAudit.php` | Structural audit |
-| `database/seeders/Phase4RFixSeeder.php` | Phase 4R data fixes (idempotent) |
-| `database/seeders/WaypointLocationSeeder.php` | Waypoint location mapping (LAST) |
-| `database/seeders/LocationSeeder.php` | Location master data |
-
----
-
-## 🔧 Important Rules
-
-1. **WaypointLocationSeeder LAST** — अन्य seeder पछि मात्र चलाउने (is_overnight_stop reset हुन्छ)
-2. **Backup पहिले** — Code change अघि `copy ...bak_before_X`
-3. **Tinker single-line** — Multi-line paste गर्दा टुक्रिन्छ
-4. **`git add <specific file>`** — `.` होइन (junk files avoid)
-5. **One step, verify, next** — Kusma pattern follow
-6. **NO overclaiming** — Browser PASS नभएसम्म "fixed" नभन्ने
+**File:** `app/Services/PlannerService.php`
 
 ---
 
-## 🎯 Next Steps (Phase 4R-END + Future)
+### ✅ Phase 4R-fix-18 — Scoped waypoint lookup (duplicate EBC)
+**Tag:** `v4r-duplicate-fix` (commit `e1b871c`)
 
-| Priority | Task | Effort |
-|----------|------|--------|
-| **P1** | 15 WARN city tours fix (Hotel format + return segments) | 2-3 hr |
-| **P2** | "Hotel (City)" display logic | 30 min |
-| **P3** | `travel_mode` field for segments (vehicle vs walking) | 1-2 hr |
-| **P4** | `.bak_before_*` files gitignore cleanup | 5 min |
-| **P5** | Mobile/PWA browser verification | Optional |
+**Issue:** three-passes itinerary generate गर्दा `ValidationException: Day 9: unknown waypoint ID 26`।
 
----
+**Root Cause:**
+- Waypoint ID 26 = "Everest Base Camp" (legacy duplicate, type=peak)
+- Waypoint ID 110 = "Everest Base Camp" (actual three-passes मा use भएको)
+- Fix-17 को `Waypoint::where('name', 'Everest Base Camp')->first()` ले **ID 26** फर्कायो — गलत
+- Validator ले "ID 26 route segments मा छैन" भनेर reject
 
-## 🏆 Achievement Summary (Sept 12-13, 2026)
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Semantic PASS | 75 | **138** |
-| Semantic ISSUES | 63 | **0** |
-| Structural FAIL | 0 | 0 |
-| Activities fixed | 0 | 14 |
-| Tours fixed | 0 | 10 |
-| Treks fixed | 0 | 5+ |
-| BC locations | 0 | 2 |
-| Audit rules tuned | 0 | 5 |
-| Total commits (4R) | 0 | **14** |
-| Total tags (4R) | 0 | **14** |
-
----
-
-## 📌 For Future DeepSeek Instance
-
-**यो file पढेपछि:**
-
-1. `git log --oneline -15` — recent commits verify
-2. `git tag | findstr v4r` — Phase 4R tags list
-3. `php artisan planner:semantic-audit` — 138/0 expected
-4. `php artisan planner:audit` — 123/15/0 expected
-5. Backup check: `dir *.bak_before_*`
-
-**Phase 4R complete। Phase 4R-END (city tours) अगाडि बढ्न सकिन्छ।**
-
----
-
-**🏁 TravelAI Nepal — Production Ready (v4.5)**
-
-*Generated: September 13, 2026*  
-*Last updated by: Phase 4R session (14 commits)*  
-*Maintainer: Reference for future sessions*
+**Fix:** Duplicate-name lookup मा route segments scope:
+```php
+$validWpIds = $route->segments()->pluck('from_waypoint_id')
+    ->merge($route->segments()->pluck('to_waypoint_id'))
+    ->unique()->toArray();
+$first = Waypoint::where('name', $attached[0])
+    ->whereIn('id', $validWpIds)
+    ->first();
