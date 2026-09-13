@@ -2,7 +2,7 @@
 
 **Date:** September 13, 2026  
 **Version:** 4.5 (Phase 4Q + Phase 4R — SEMANTICALLY CLEAN, PRODUCTION READY)  
-**Latest Tag:** `v4r-duplicate-fix` (commit `e1b871c`)  
+**Latest Tag:** `v4r-final` (commit pending)  
 **Previous Baseline:** `v4q-baseline` (commit `2eec132`) → `v4-final` (commit `26ccd1d`)  
 **Purpose:** यो report future reference हो। यदि नयाँ DeepSeek instance आयो भने यो file देखाएर काम continue गर्न सकिन्छ।
 
@@ -17,7 +17,7 @@
 | **ItineraryValidator** | ✅ 100% | Provider field preserved |
 | **Quotation System** | ✅ 100% | End-to-end verified |
 | **Semantic Audit** | ✅ **138/138 PASS, 0 ISSUES** | Phase 4R complete |
-| **Structural Audit** | ✅ 123 PASS, 15 WARN, 0 FAIL | WARN = intentional HOLD |
+| **Structural Audit** | ✅ **126 PASS, 12 WARN, 0 FAIL** | WARN = intentional HOLD |
 | **Data Layer** | ✅ Production Ready | All critical fixes applied |
 | **Overall** | 🟢 **~100% Production Ready** | Ready for v4.5 |
 
@@ -169,9 +169,9 @@ Fix: Service 1210 location_id 3 → 105
 
 ---
 
-## 🎯 PHASE 4R — Semantic Data Fixes (September 13, 2026)
+## 🎯 PHASE 4R — Semantic Data Fixes (Sept 12-13, 2026)
 
-**Latest Tag:** `v4r-duplicate-fix` | **Commit:** `e1b871c`  
+**Latest Tag:** `v4r-final` | **Commits:** 20+ | **Duration:** 2 days  
 **Achievement:** Semantic audit 75 → **138 PASS, 0 ISSUES**
 
 ### ✅ Phase 4R-fix-1 — Round-trip activity title collapse
@@ -398,7 +398,7 @@ Fix: Service 1210 location_id 3 → 105
 2. Tour मा service NULL → fallback "Trekking Day"
 3. Trek day-hike (EBC) merge भयो — title collapse
 
-**Fix (4 changes in `buildFallbackResponse()`):**
+**Fix (5 changes in `buildFallbackResponse()`):**
 1. `merged_waypoints` attached from `$overnightSegments` (carry-through)
 2. Trek RT detection: `from->id === to->id && distance > 1`
 3. Service label: `in_array($route_type, ['activity', 'tour'])` → route name
@@ -420,12 +420,13 @@ Fix: Service 1210 location_id 3 → 105
 **Issue:** three-passes itinerary generate गर्दा `ValidationException: Day 9: unknown waypoint ID 26`।
 
 **Root Cause:**
-- Waypoint ID 26 = "Everest Base Camp" (legacy duplicate, type=peak)
-- Waypoint ID 110 = "Everest Base Camp" (actual three-passes मा use भएको)
+- Waypoint ID 26 = "Everest Base Camp" (legacy duplicate, slug='ebc')
+- Waypoint ID 110 = "Everest Base Camp" (three-passes use, slug='ebc-3p')
 - Fix-17 को `Waypoint::where('name', 'Everest Base Camp')->first()` ले **ID 26** फर्कायो — गलत
 - Validator ले "ID 26 route segments मा छैन" भनेर reject
 
 **Fix:** Duplicate-name lookup मा route segments scope:
+
 ```php
 $validWpIds = $route->segments()->pluck('from_waypoint_id')
     ->merge($route->segments()->pluck('to_waypoint_id'))
