@@ -519,17 +519,19 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
     // ✅ Phase 4H-fix: Use passed $overnightSegments (merged by overnight rules)
     // instead of raw segments. This prevents pass/peak waypoints from
     // becoming overnight stops.
-    if (!empty($overnightSegments)) {
-        // Extract the merged segments from the passed structure
-        $freshSegments = collect();
-        foreach ($overnightSegments as $item) {
-            $seg = $item['segment'];
-            // Load waypoint relations if not already loaded
-            if (!$seg->relationLoaded('fromWaypoint')) {
-                $seg->load('fromWaypoint', 'toWaypoint');
+            if (!empty($overnightSegments)) {
+            // Extract the merged segments from the passed structure
+            $freshSegments = collect();
+            foreach ($overnightSegments as $item) {
+                $seg = $item['segment'];
+                // Load waypoint relations if not already loaded
+                if (!$seg->relationLoaded('fromWaypoint')) {
+                    $seg->load('fromWaypoint', 'toWaypoint');
+                }
+                // Phase 4R-fix-17: carry merged_waypoints for trek day-hike RT detection
+                $seg->merged_waypoints = $item['merged_waypoints'] ?? [];
+                $freshSegments->push($seg);
             }
-            $freshSegments->push($seg);
-        }
 
         // Fallback: if somehow empty, reload from DB
         if ($freshSegments->isEmpty()) {
@@ -583,45 +585,64 @@ $isRoundTrip = false;
 if (in_array($route->route_type, ['tour', 'activity'])) {
     $rtSameId   = ($from->id === $to->id);
     $rtSameName = (strcasecmp(trim($from->name ?? ''), trim($to->name ?? '')) === 0);
-    // Phase 4R-fix-4b: Single-segment tour where from/to share a location
-    // but have different names (e.g. "Lumbini Circuit Start" vs "... End").
-    // Only for tours with exactly 1 raw segment — prevents Annapurna-style
-    // false positives on multi-segment treks.
     $singleLocTour = ($route->route_type === 'tour'
         && $route->segments()->count() === 1
         && $from->location_id !== null
         && $from->location_id === $to->location_id);
     $isRoundTrip = ($rtSameId || $rtSameName || $singleLocTour);
+} elseif ($route->route_type === 'trek' && $from->id === $to->id && $distance > 1) {
+    // Phase 4R-fix-17: Trek day-hike (e.g. Gorak Shep → EBC → Gorak Shep)
+    $isRoundTrip = true;
 }
 
 $targetWaypoint = $to; // default: end waypoint
 if ($isRoundTrip && $distance > 0) {
-    $intermediateIds = $route->segments()
-        ->orderBy('sequence')
-        ->pluck('to_waypoint_id')
-        ->unique()
-        ->reject(fn($id) => $id === $to->id)
-        ->values()
-        ->toArray();
-
-    $intermediates = \App\Models\Waypoint::whereIn('id', $intermediateIds)
-        ->where(function($q) use ($to) {
-            $q->whereNull('location_id')
-              ->orWhere('location_id', '!=', $to->location_id);
-        })
-        ->get()
-        ->sortBy(fn($wp) => array_search($wp->id, $intermediateIds))
-        ->values();
-
-    if ($intermediates->isNotEmpty()) {
-        $mergedWaypoints = $intermediates->pluck('name')->toArray();
-        $targetWaypoint = $intermediates->first();
-        Log::info("🔁 Round-trip detected: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
+    if ($route->route_type === 'trek') {
+        // Phase 4R-fix-17: use attached merged_waypoints (from overnightSegments)
+                    $attached = $seg->merged_waypoints ?? [];
+            if (!empty($attached)) {
+                $mergedWaypoints = $attached;
+                // Phase 4R-fix-18: scope lookup to actual route segments
+                // (avoid duplicate-named waypoints like two "Everest Base Camp")
+                $validWpIds = $route->segments()->pluck('from_waypoint_id')
+                    ->merge($route->segments()->pluck('to_waypoint_id'))
+                    ->unique()->toArray();
+                $first = \App\Models\Waypoint::where('name', $attached[0])
+                    ->whereIn('id', $validWpIds)
+                    ->first();
+                if ($first) {
+                    $targetWaypoint = $first;
+                }
+                Log::info("🔁 Trek day-hike RT: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
+            }
     } else {
-        Log::info("🎫 Single-location tour detected: {$route->slug}");
+        // Tours/activities: existing location-filtered extraction
+        $intermediateIds = $route->segments()
+            ->orderBy('sequence')
+            ->pluck('to_waypoint_id')
+            ->unique()
+            ->reject(fn($id) => $id === $to->id)
+            ->values()
+            ->toArray();
+
+        $intermediates = \App\Models\Waypoint::whereIn('id', $intermediateIds)
+            ->where(function($q) use ($to) {
+                $q->whereNull('location_id')
+                  ->orWhere('location_id', '!=', $to->location_id);
+            })
+            ->get()
+            ->sortBy(fn($wp) => array_search($wp->id, $intermediateIds))
+            ->values();
+
+        if ($intermediates->isNotEmpty()) {
+            $mergedWaypoints = $intermediates->pluck('name')->toArray();
+            $targetWaypoint = $intermediates->first();
+            Log::info("🔁 Round-trip detected: {$from->name} → " . implode(', ', $mergedWaypoints) . " → {$to->name}");
+        } else {
+            Log::info("🎫 Single-location tour detected: {$route->slug}");
+        }
     }
 }
-
         // Title & description based on locale
         if ($isRoundTrip && $distance > 0 && !empty($mergedWaypoints)) {
             $landmarkName = implode(' → ', $mergedWaypoints);
@@ -758,7 +779,7 @@ if (!$service && $targetWaypoint) {
         $serviceCost = $service ? $service['price'] * 133 : 0;
         $serviceName = $service
     ? $service['name']
-    : ($route->route_type === 'activity' ? $route->name : 'Trekking Day');
+    : (in_array($route->route_type, ['activity', 'tour']) ? $route->name : 'Trekking Day');
         $serviceId = $service ? $service['id'] : null;
         $pricingSource = $service ? 'provider_service' : 'system_estimate';
 
@@ -773,8 +794,11 @@ if (!$service && $targetWaypoint) {
             'items' => [
                 [
                     'title' => $serviceName,
-                    'description' => ($route->route_type === 'activity' ? 'Activity at ' : 'Trek from ')
-    . "{$from->name} to {$targetWaypoint->name}",
+                    'description' => ($route->route_type === 'activity' ? 'Activity at ' 
+    : ($route->route_type === 'tour' ? 'Tour at ' : 'Trek from '))
+    . (($isRoundTrip && empty($mergedWaypoints)) 
+        ? $from->name 
+        : "{$from->name} to {$targetWaypoint->name}"),
                     'time_of_day' => 'morning',
                     'cost' => $serviceCost,
                     'pricing_source' => $pricingSource,
