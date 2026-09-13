@@ -192,51 +192,53 @@ class LangtangHelambuManasluRegionSeeder extends Seeder
 
         $this->command->info('✅ Lauribina Pass Trek seeded.');
 
-        // ==========================================
-        // 5. MANASLU CIRCUIT
+                // 5. MANASLU CIRCUIT
         // ==========================================
         $this->helper->seedRoute([
             'route' => [
                 'name' => 'Manaslu Circuit Trek',
                 'slug' => 'manaslu-circuit',
-                'description' => 'Epic trek around Mount Manaslu (8163m) crossing the Larkya La Pass (5160m) with diverse cultural landscapes.',
+                'description' => 'Epic trek around Mount Manaslu (8163m) crossing the Larkya La Pass (5160m) through diverse cultural landscapes.',
                 'difficulty' => 'hard',
-                'duration_days' => 15,
+                'duration_days' => 14,
                 'max_altitude' => 5160,
                 'season' => 'Spring/Autumn',
             ],
             'waypoints' => [
-                ['name' => 'Soti Khola', 'slug' => 'soti-khola', 'type' => 'village', 'lat' => 28.3456, 'lng' => 84.7223, 'alt' => 700],
-                ['name' => 'Machhakhola', 'slug' => 'machhakhola', 'type' => 'village', 'lat' => 28.3812, 'lng' => 84.7345, 'alt' => 900],
-                ['name' => 'Dobhan', 'slug' => 'dobhan', 'type' => 'village', 'lat' => 28.4123, 'lng' => 84.7567, 'alt' => 1070],
-                ['name' => 'Bhulbhule', 'slug' => 'bhulbhule', 'type' => 'village', 'lat' => 28.4456, 'lng' => 84.7823, 'alt' => 1270],
-                ['name' => 'Laprak', 'slug' => 'laprak', 'type' => 'village', 'lat' => 28.4789, 'lng' => 84.8123, 'alt' => 1800],
-                ['name' => 'Ghap', 'slug' => 'ghap', 'type' => 'village', 'lat' => 28.5123, 'lng' => 84.8456, 'alt' => 2140],
-                ['name' => 'Dharapani', 'slug' => 'dharapani-manaslu', 'type' => 'village', 'lat' => 28.5289, 'lng' => 84.3545, 'alt' => 1860],
-                ['name' => 'Sama Gaon', 'slug' => 'sama-gaon', 'type' => 'village', 'lat' => 28.5345, 'lng' => 84.9823, 'alt' => 3520],
-                ['name' => 'Samdo', 'slug' => 'samdo', 'type' => 'village', 'lat' => 28.5567, 'lng' => 85.0023, 'alt' => 3860],
-                ['name' => 'Dharmashala', 'slug' => 'dharmashala', 'type' => 'village', 'lat' => 28.5891, 'lng' => 85.0123, 'alt' => 4460],
-                ['name' => 'Larkya La', 'slug' => 'larkya-la', 'type' => 'pass', 'lat' => 28.6123, 'lng' => 85.0234, 'alt' => 5160],
-                ['name' => 'Bimthang', 'slug' => 'bimthang', 'type' => 'village', 'lat' => 28.6123, 'lng' => 85.0489, 'alt' => 3720],
-                ['name' => 'Dharapani', 'slug' => 'dharapani-manaslu-return', 'type' => 'village', 'lat' => 28.5289, 'lng' => 84.3545, 'alt' => 1860],
+                ['name' => 'Soti Khola', 'slug' => 'soti-khola', 'type' => 'village', 'lat' => 28.0789, 'lng' => 84.8345, 'alt' => 700],
+                ['name' => 'Machhakhola', 'slug' => 'machhakhola', 'type' => 'village', 'lat' => 28.1123, 'lng' => 84.8567, 'alt' => 900],
+                ['name' => 'Jagat', 'slug' => 'jagat-manaslu', 'type' => 'village', 'lat' => 28.1456, 'lng' => 84.8789, 'alt' => 1350],
+                ['name' => 'Deng', 'slug' => 'deng', 'type' => 'village', 'lat' => 28.1789, 'lng' => 84.9012, 'alt' => 1800],
+                ['name' => 'Namrung', 'slug' => 'namrung', 'type' => 'village', 'lat' => 28.2123, 'lng' => 84.9234, 'alt' => 2630],
+                ['name' => 'Lho', 'slug' => 'lho', 'type' => 'village', 'lat' => 28.2456, 'lng' => 84.9456, 'alt' => 3180],
+                ['name' => 'Sama Gaon', 'slug' => 'sama-gaon', 'type' => 'village', 'lat' => 28.2789, 'lng' => 84.9678, 'alt' => 3530],
+                ['name' => 'Samdo', 'slug' => 'samdo', 'type' => 'village', 'lat' => 28.3123, 'lng' => 84.9901, 'alt' => 3870],
+                ['name' => 'Dharamsala', 'slug' => 'dharamsala', 'type' => 'village', 'lat' => 28.3456, 'lng' => 85.0123, 'alt' => 4460],
+                ['name' => 'Larkya La', 'slug' => 'larkya-la', 'type' => 'pass', 'lat' => 28.3750, 'lng' => 84.9800, 'alt' => 5160],
+                ['name' => 'Bimthang', 'slug' => 'bimthang', 'type' => 'village', 'lat' => 28.3750, 'lng' => 84.5486, 'alt' => 3720],
+                ['name' => 'Tilije', 'slug' => 'tilije', 'type' => 'village', 'lat' => 28.4125, 'lng' => 84.5911, 'alt' => 2300],
+                ['name' => 'Dharapani', 'slug' => 'dharapani-manaslu-exit', 'type' => 'village', 'lat' => 28.5289, 'lng' => 84.3545, 'alt' => 1860],
+                ['name' => 'Besisahar', 'slug' => 'besisahar-manaslu', 'type' => 'village', 'lat' => 28.2398, 'lng' => 84.3824, 'alt' => 760],
             ],
-                        'segments' => [
-                ['from' => 'soti-khola', 'to' => 'machhakhola', 'dist' => 8.0, 'time' => 4.0, 'gain' => 200],
-                ['from' => 'machhakhola', 'to' => 'dobhan', 'dist' => 6.0, 'time' => 3.0, 'gain' => 170],
-                ['from' => 'dobhan', 'to' => 'bhulbhule', 'dist' => 7.0, 'time' => 3.5, 'gain' => 200],
-                ['from' => 'bhulbhule', 'to' => 'laprak', 'dist' => 9.0, 'time' => 4.5, 'gain' => 530],
-                ['from' => 'laprak', 'to' => 'ghap', 'dist' => 7.0, 'time' => 3.5, 'gain' => 340],
-                ['from' => 'ghap', 'to' => 'dharapani-manaslu', 'dist' => 10.0, 'time' => 5.0, 'gain' => 680],
-                ['from' => 'dharapani-manaslu', 'to' => 'sama-gaon', 'dist' => 12.0, 'time' => 6.0, 'gain' => 1660],
+            'segments' => [
+                ['from' => 'soti-khola', 'to' => 'machhakhola', 'dist' => 8.0, 'time' => 4.0, 'gain' => 200, 'loss' => 0],
+                ['from' => 'machhakhola', 'to' => 'jagat-manaslu', 'dist' => 10.0, 'time' => 5.0, 'gain' => 450, 'loss' => 0],
+                ['from' => 'jagat-manaslu', 'to' => 'deng', 'dist' => 12.0, 'time' => 6.0, 'gain' => 450, 'loss' => 0],
+                ['from' => 'deng', 'to' => 'namrung', 'dist' => 10.0, 'time' => 5.0, 'gain' => 830, 'loss' => 0],
+                ['from' => 'namrung', 'to' => 'lho', 'dist' => 10.0, 'time' => 5.0, 'gain' => 550, 'loss' => 0],
+                ['from' => 'lho', 'to' => 'sama-gaon', 'dist' => 8.0, 'time' => 4.0, 'gain' => 350, 'loss' => 0],
+                // Rest & acclimatization at Sama Gaon
                 ['from' => 'sama-gaon', 'to' => 'sama-gaon', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'sama-gaon', 'to' => 'samdo', 'dist' => 5.0, 'time' => 3.0, 'gain' => 340],
+                ['from' => 'sama-gaon', 'to' => 'samdo', 'dist' => 5.0, 'time' => 3.0, 'gain' => 340, 'loss' => 0],
+                // Rest & acclimatization at Samdo
                 ['from' => 'samdo', 'to' => 'samdo', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'samdo', 'to' => 'dharmashala', 'dist' => 6.0, 'time' => 3.5, 'gain' => 600],
-                ['from' => 'dharmashala', 'to' => 'dharmashala', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'dharmashala', 'to' => 'larkya-la', 'dist' => 4.0, 'time' => 3.0, 'gain' => 700],
-                ['from' => 'larkya-la', 'to' => 'bimthang', 'dist' => 8.0, 'time' => 4.0, 'loss' => 1440],
+                ['from' => 'samdo', 'to' => 'dharamsala', 'dist' => 6.0, 'time' => 3.5, 'gain' => 590, 'loss' => 0],
+                ['from' => 'dharamsala', 'to' => 'larkya-la', 'dist' => 4.0, 'time' => 3.0, 'gain' => 700, 'loss' => 0],
+                ['from' => 'larkya-la', 'to' => 'bimthang', 'dist' => 8.0, 'time' => 4.0, 'gain' => 0, 'loss' => 1440],
                 ['from' => 'bimthang', 'to' => 'bimthang', 'dist' => 0, 'time' => 0, 'gain' => 0, 'loss' => 0],
-                ['from' => 'bimthang', 'to' => 'dharapani-manaslu-return', 'dist' => 18.0, 'time' => 7.0, 'loss' => 1860],
+                ['from' => 'bimthang', 'to' => 'tilije', 'dist' => 10.0, 'time' => 5.0, 'gain' => 0, 'loss' => 1420],
+                ['from' => 'tilije', 'to' => 'dharapani-manaslu-exit', 'dist' => 15.0, 'time' => 6.5, 'gain' => 0, 'loss' => 440],
+
             ],
             'costs' => [
                 ['type' => 'permit', 'name' => 'Manaslu Restricted Area Permit', 'amount' => 100, 'unit' => 'per_person', 'mandatory' => true],

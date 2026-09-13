@@ -13,7 +13,7 @@ class AbcRouteSeeder extends Seeder
     public function run(): void
     {
         // ==========================================
-        // STEP 1: WAYPOINTS
+        // STEP 1: WAYPOINTS (Ghandruk थपियो)
         // ==========================================
         $waypoints = [
             ['name' => 'Nayapul', 'slug' => 'nayapul', 'type' => 'village', 'lat' => 28.3986, 'lng' => 83.7123, 'alt' => 1070],
@@ -30,6 +30,7 @@ class AbcRouteSeeder extends Seeder
             ['name' => 'Deurali', 'slug' => 'deurali', 'type' => 'village', 'lat' => 28.5844, 'lng' => 83.7893, 'alt' => 3230],
             ['name' => 'Machhapuchhre Base Camp', 'slug' => 'mbc', 'type' => 'checkpoint', 'lat' => 28.5923, 'lng' => 83.7956, 'alt' => 3700],
             ['name' => 'Annapurna Base Camp', 'slug' => 'abc', 'type' => 'peak', 'lat' => 28.6005, 'lng' => 83.8001, 'alt' => 4130],
+            ['name' => 'Ghandruk', 'slug' => 'ghandruk', 'type' => 'village', 'lat' => 28.4681, 'lng' => 83.8027, 'alt' => 1940], // ✅ थपियो
         ];
 
         $wpIds = [];
@@ -48,15 +49,15 @@ class AbcRouteSeeder extends Seeder
         }
 
         // ==========================================
-        // STEP 2: ROUTE
+        // STEP 2: ROUTE (duration 12)
         // ==========================================
         $route = Route::updateOrCreate(
             ['slug' => 'annapurna-base-camp'],
             [
                 'name' => 'Annapurna Base Camp Trek',
-                'description' => 'Classic ABC trek via Nayapul – moderate difficulty, 9 days.',
+                'description' => 'Classic ABC trek via Nayapul – moderate difficulty, 12 days.',
                 'difficulty' => 'moderate',
-                'duration_days' => 9,
+                'duration_days' => 12,
                 'max_altitude' => 4130,
                 'season' => 'Spring/Autumn',
                 'is_active' => true,
@@ -66,20 +67,35 @@ class AbcRouteSeeder extends Seeder
         // ==========================================
         // STEP 3: ROUTE SEGMENTS
         // ==========================================
+        // Forward: 7 days (combine गरिएको)
+        // Return: 5 days (ABC → MBC → Bamboo → Chhomrong → Ghandruk → Nayapul)
         $segments = [
-            ['from' => 'nayapul', 'to' => 'birethanti', 'dist' => 10.5, 'time' => 4.5, 'gain' => 500, 'loss' => 0],
-            ['from' => 'birethanti', 'to' => 'tikhedhunga', 'dist' => 8.2, 'time' => 3.5, 'gain' => 515, 'loss' => 0],
-            ['from' => 'tikhedhunga', 'to' => 'ulleri', 'dist' => 5.8, 'time' => 2.5, 'gain' => 420, 'loss' => 0],
-            ['from' => 'ulleri', 'to' => 'ghorepani', 'dist' => 9.1, 'time' => 4.0, 'gain' => 900, 'loss' => 0],
-            ['from' => 'ghorepani', 'to' => 'tadapani', 'dist' => 7.4, 'time' => 3.5, 'gain' => 0, 'loss' => 230],
-            ['from' => 'tadapani', 'to' => 'chhomrong', 'dist' => 8.6, 'time' => 4.0, 'gain' => 0, 'loss' => 460],
-            ['from' => 'chhomrong', 'to' => 'sinuwa', 'dist' => 5.9, 'time' => 2.5, 'gain' => 190, 'loss' => 0],
-            ['from' => 'sinuwa', 'to' => 'bamboo', 'dist' => 4.2, 'time' => 2.0, 'gain' => 0, 'loss' => 25],
-            ['from' => 'bamboo', 'to' => 'dovan', 'dist' => 3.8, 'time' => 2.0, 'gain' => 165, 'loss' => 0],
-            ['from' => 'dovan', 'to' => 'himalaya', 'dist' => 4.5, 'time' => 2.5, 'gain' => 420, 'loss' => 0],
-            ['from' => 'himalaya', 'to' => 'deurali', 'dist' => 3.6, 'time' => 2.0, 'gain' => 310, 'loss' => 0],
-            ['from' => 'deurali', 'to' => 'mbc', 'dist' => 4.2, 'time' => 2.5, 'gain' => 470, 'loss' => 0],
-            ['from' => 'mbc', 'to' => 'abc', 'dist' => 3.8, 'time' => 2.0, 'gain' => 430, 'loss' => 0],
+            // ---------- FORWARD ----------
+            // Day 1: Nayapul → Tikhedhunga (combine 1+2)
+            ['from' => 'nayapul', 'to' => 'birethanti', 'dist' => 2.0, 'time' => 0.5, 'gain' => 0, 'loss' => 45],
+['from' => 'birethanti', 'to' => 'tikhedhunga', 'dist' => 7.5, 'time' => 4.0, 'gain' => 560, 'loss' => 0],
+            // Day 2: Tikhedhunga → Ghorepani (combine 3+4)
+            ['from' => 'tikhedhunga', 'to' => 'ghorepani', 'dist' => 14.9, 'time' => 6.5, 'gain' => 1320, 'loss' => 0],
+            // Day 3: Ghorepani → Chhomrong (combine 5+6)
+            ['from' => 'ghorepani', 'to' => 'chhomrong', 'dist' => 16.0, 'time' => 7.5, 'gain' => 0, 'loss' => 690],
+            // Day 4: Chhomrong → Bamboo (combine 7+8)
+            ['from' => 'chhomrong', 'to' => 'bamboo', 'dist' => 10.1, 'time' => 4.5, 'gain' => 165, 'loss' => 0],
+            // Day 5: Bamboo → Deurali (combine 9+10+11)
+            ['from' => 'bamboo', 'to' => 'deurali', 'dist' => 11.9, 'time' => 6.5, 'gain' => 895, 'loss' => 0],
+            // Day 6: Deurali → ABC (combine 12+13)
+            ['from' => 'deurali', 'to' => 'abc', 'dist' => 8.0, 'time' => 4.5, 'gain' => 900, 'loss' => 0],
+
+            // ---------- RETURN ----------
+            // Day 7: ABC → MBC
+            ['from' => 'abc', 'to' => 'mbc', 'dist' => 3.8, 'time' => 2.0, 'gain' => 0, 'loss' => 430],
+            // Day 8: MBC → Bamboo (via Deurali, Himalaya, Dovan)
+            ['from' => 'mbc', 'to' => 'bamboo', 'dist' => 16.1, 'time' => 9.0, 'gain' => 0, 'loss' => 1365],
+            // Day 9: Bamboo → Chhomrong (via Sinuwa)
+            ['from' => 'bamboo', 'to' => 'chhomrong', 'dist' => 10.1, 'time' => 4.5, 'gain' => 0, 'loss' => 165],
+            // Day 10: Chhomrong → Ghandruk (real trek segment)
+            ['from' => 'chhomrong', 'to' => 'ghandruk', 'dist' => 5.5, 'time' => 3.0, 'gain' => 0, 'loss' => 230],
+            // Day 11: Ghandruk → Nayapul (real trek segment)
+            ['from' => 'ghandruk', 'to' => 'nayapul', 'dist' => 13.0, 'time' => 5.0, 'gain' => 0, 'loss' => 870],
         ];
 
         foreach ($segments as $i => $seg) {
@@ -109,12 +125,12 @@ class AbcRouteSeeder extends Seeder
             ['type' => 'food_estimate', 'name' => 'Daily Food Budget', 'amount' => 2500, 'unit' => 'per_day', 'mandatory' => false, 'from' => '2026-01-01', 'until' => '2026-12-31'],
         ];
 
-                foreach ($costs as $cost) {
+        foreach ($costs as $cost) {
             RouteCost::updateOrCreate(
                 [
                     'route_id' => $route->id,
                     'type' => $cost['type'],
-                    'name' => $cost['name'],                          // ✅ ADDED
+                    'name' => $cost['name'],
                     'effective_from' => $cost['from'],
                 ],
                 [

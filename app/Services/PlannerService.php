@@ -536,7 +536,32 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
 
         $distance = (float) $seg->distance_km;
         $isLongDay = $distance > $maxDailyDistance;
-        $mergedWaypoints = [];
+$mergedWaypoints = [];
+
+// Phase 4R-fix: Populate intermediate waypoints for round-trip activities.
+// Round-trip merged segments have from.id === to.id (e.g. Pokhara → Pokhara).
+// Extract the intermediate waypoint (e.g. Kusma Bridge) from the route's
+// original segments, otherwise the round-trip branch never fires and the
+// title falls back to "Start → Start".
+$targetWaypoint = $to; // default: end waypoint
+if ($from->id === $to->id && $distance > 0) {
+    $intermediate = \App\Models\Waypoint::whereIn(
+        'id',
+        $route->segments()
+            ->orderBy('sequence')
+            ->pluck('to_waypoint_id')
+            ->unique()
+            ->reject(fn($id) => $id === $to->id)
+            ->values()
+            ->toArray()
+    )->first();
+
+    if ($intermediate) {
+        $mergedWaypoints = [$intermediate->name];
+        $targetWaypoint = $intermediate;
+        Log::info("🔁 Round-trip detected: {$from->name} → {$intermediate->name} → {$to->name}");
+    }
+}
 
         // Title & description based on locale
         if ($from->id === $to->id && $distance > 0 && !empty($mergedWaypoints)) {
@@ -589,11 +614,11 @@ if ($route->slug === 'pokhara-paragliding') {
 
 // ✅ For tours, try to get hotel by location
 $isTour = $this->isTourRoute($route);
-if (!$service && $isTour && $to->location_id !== null) {
+if (!$service && $isTour && $targetWaypoint->location_id !== null) {
     // Phase 4N.1b: Guard against null location — Laravel's where('col', null)
     // translates to WHERE col IS NULL, which incorrectly matches orphan services.
-    $service = Service::where('status', 'active')
-        ->where('location_id', $to->location_id)
+        $service = Service::where('status', 'active')
+        ->where('location_id', $targetWaypoint->location_id)
         ->whereHas('category', function($q) {
             $q->where('slug', 'hotel');
         })
@@ -612,8 +637,8 @@ if (!$service && $isTour && $to->location_id !== null) {
 }
 
 // ✅ Only call getServiceForWaypoint if no service found yet AND we have a waypoint
-if (!$service && $to) {
-    $service = $this->getServiceForWaypoint($to, $input);
+if (!$service && $targetWaypoint) {
+    $service = $this->getServiceForWaypoint($targetWaypoint, $input);
 }
 
         $serviceCost = $service ? $service['price'] * 133 : 0;
@@ -625,14 +650,14 @@ if (!$service && $to) {
             'day_number' => $dayNumber,
             'title' => $title,
             'description' => $desc,
-            'overnight_waypoint_id' => $to->id,
-            'distance_km' => $distance,
-            'estimated_time_hours' => (float) $seg->estimated_time_hours,
-            'altitude_m' => $to->altitude,
+            'overnight_waypoint_id' => $targetWaypoint->id,
+'distance_km' => $distance,
+'estimated_time_hours' => (float) $seg->estimated_time_hours,
+'altitude_m' => $targetWaypoint->altitude,
             'items' => [
                 [
                     'title' => $serviceName,
-                    'description' => "Trek from {$from->name} to {$to->name}",
+                    'description' => "Trek from {$from->name} to {$targetWaypoint->name}",
                     'time_of_day' => 'morning',
                     'cost' => $serviceCost,
                     'pricing_source' => $pricingSource,
