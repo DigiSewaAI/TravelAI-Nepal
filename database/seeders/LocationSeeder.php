@@ -17,6 +17,9 @@ class LocationSeeder extends Seeder
                         // Phase 4R-fix-5: 4 villages missing location entries
             ['country' => 'Nepal', 'state' => 'Taplejung', 'city' => 'Tseram', 'latitude' => 27.5485, 'longitude' => 88.0012, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Dzongla', 'latitude' => 27.9473, 'longitude' => 86.7720, 'is_habitable' => true],
+                        // Phase 4R-fix-8: BC locations for Dhaulagiri & Saipal
+            ['country' => 'Nepal', 'state' => 'Myagdi', 'city' => 'Dhaulagiri Base Camp', 'latitude' => 28.6964, 'longitude' => 83.4917, 'is_habitable' => true],
+            ['country' => 'Nepal', 'state' => 'Bajhang', 'city' => 'Saipal Base Camp', 'latitude' => 29.8667, 'longitude' => 81.2167, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Solukhumbu', 'city' => 'Thagnak', 'latitude' => 27.9045, 'longitude' => 86.7180, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Bagmati', 'city' => 'Nuwakot', 'latitude' => 27.9100, 'longitude' => 85.1650, 'is_habitable' => true],
             ['country' => 'Nepal', 'state' => 'Gandaki', 'city' => 'Pokhara', 'latitude' => 28.2096, 'longitude' => 83.9857, 'is_habitable' => true],

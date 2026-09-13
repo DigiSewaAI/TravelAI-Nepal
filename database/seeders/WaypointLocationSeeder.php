@@ -45,6 +45,8 @@ class WaypointLocationSeeder extends Seeder
             'Deurali' => 'Deurali',
             'Machhapuchhre Base Camp' => 'Machhapuchhre Base Camp',
             'Annapurna Base Camp' => 'Annapurna Base Camp',
+            'Dhaulagiri Base Camp' => 'Dhaulagiri Base Camp',
+            'Saipal Base Camp' => 'Saipal Base Camp',
 
             // Mardi Himal route
             'Pothana' => 'Pothana',
