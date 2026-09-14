@@ -1,6 +1,109 @@
 @extends('layouts.public')
 
-@section('title', __('messages.how_it_works_page_title'))
+@section('title', 'How It Works — TravelAI Nepal | AI Trekking in 3 Simple Steps')
+@section('meta_description', 'Learn how TravelAI Nepal works: plan with AI or browse packages, book instantly, check-in with QR, and stay safe. For travelers and travel agencies.')
+@section('meta_keywords', 'how TravelAI works, Nepal trekking booking, AI trip planner steps, digital QR check-in Nepal, travel agency software Nepal')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "How It Works — TravelAI Nepal",
+  "description": "Learn how TravelAI Nepal works for travelers and travel agencies in 3 simple steps.",
+  "url": "{{ url()->current() }}"
+}
+</script>
+
+{{-- ========== JSON-LD: HowTo (Travelers) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "HowTo",
+  "name": "How to plan and book a Nepal trek with TravelAI Nepal",
+  "description": "Plan, book, and safely complete your Nepal trekking adventure using TravelAI Nepal in 3 simple steps.",
+  "totalTime": "PT5M",
+  "estimatedCost": {
+    "@@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "0"
+  },
+  "step": [
+    {
+      "@@type": "HowToStep",
+      "position": 1,
+      "name": "{{ addslashes(__('messages.how_it_works_traveler_step1_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_traveler_step1_desc')) }}"
+    },
+    {
+      "@@type": "HowToStep",
+      "position": 2,
+      "name": "{{ addslashes(__('messages.how_it_works_traveler_step2_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_traveler_step2_desc')) }}"
+    },
+    {
+      "@@type": "HowToStep",
+      "position": 3,
+      "name": "{{ addslashes(__('messages.how_it_works_traveler_step3_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_traveler_step3_desc')) }}"
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: HowTo (Agencies) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "HowTo",
+  "name": "How travel agencies onboard to TravelAI Nepal",
+  "description": "Register, list services, and manage bookings with TravelAI Nepal in 3 simple steps.",
+  "step": [
+    {
+      "@@type": "HowToStep",
+      "position": 1,
+      "name": "{{ addslashes(__('messages.how_it_works_agency_step1_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_agency_step1_desc')) }}"
+    },
+    {
+      "@@type": "HowToStep",
+      "position": 2,
+      "name": "{{ addslashes(__('messages.how_it_works_agency_step2_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_agency_step2_desc')) }}"
+    },
+    {
+      "@@type": "HowToStep",
+      "position": 3,
+      "name": "{{ addslashes(__('messages.how_it_works_agency_step3_title')) }}",
+      "text": "{{ addslashes(__('messages.how_it_works_agency_step3_desc')) }}"
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "How It Works",
+      "item": "{{ url('/how-it-works') }}"
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 
