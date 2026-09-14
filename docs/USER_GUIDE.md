@@ -1,9 +1,14 @@
+```markdown
 # 🌏 TravelAI Nepal — User Guide & Getting Started
 # 🌏 TravelAI Nepal — प्रयोगकर्ता गाइड र सुरुवात
 
 > **📌 Note:** All names, emails, booking IDs, and messages in this guide are **illustrative examples** for demonstration purposes only. Replace them with your actual data when using the platform.
 >
 > **📌 द्रष्टव्य:** यो गाइडमा उल्लेख गरिएका सबै नाम, इमेल, बुकिंग ID, र सन्देशहरू **प्रदर्शनका लागि उदाहरण मात्र** हुन्। प्लेटफर्म प्रयोग गर्दा आफ्नो वास्तविक डाटा प्रयोग गर्नुहोस्।
+
+> **🌐 Multi-Language Support:** The platform now fully supports **4 languages** — English, Nepali (नेपाली), Hindi (हिन्दी), and Chinese (中文). All itineraries, cost breakdowns, budget warnings, and service labels are fully localized.
+>
+> **🌐 बहुभाषी समर्थन:** प्लेटफर्मले अब **४ भाषाहरू** पूर्ण रूपमा समर्थन गर्दछ — अंग्रेजी, नेपाली, हिन्दी, र चिनियाँ। सबै यात्रा कार्यक्रम, लागत विवरण, बजेट चेतावनी, र सेवा लेबलहरू पूर्ण रूपमा स्थानीयकृत छन्।
 
 ---
 
@@ -93,6 +98,8 @@ A spinner appeared: *"Generating..."*
 
 **Shortly after**, the screen scrolled to her personalized itinerary.
 
+**💡 Multi-Language Tip:** The entire itinerary is generated in whichever language is active in the language switcher — English, Nepali, Hindi, or Chinese. All titles, descriptions, rest day labels, and budget warnings are fully localized.
+
 ---
 
 ### Chapter 4: The Itinerary
@@ -114,10 +121,18 @@ A spinner appeared: *"Generating..."*
 **Budget comparison:** Emily's budget of $1,500 was well within range, so the system displayed:
 > ✅ *"Your estimated cost is within budget."*
 
-If she had been over budget, the system would have shown one of three automatic messages:
+If she had been over budget, the system would have shown one of three automatic messages (now fully localized in 4 languages):
 - **≤10% over budget:** Gentle suggestion
 - **11–25% over budget:** Stronger recommendation
 - **>25% over budget:** Detailed customization options
+
+**Example — Hindi budget warning (if over budget):**
+> ⚠️ बजट चेतावनी
+> अनुमानित लागत आपके $500 USD बजट से 66% अधिक है। कृपया बजट बढ़ाएँ या अधिक किफायती शैली चुनें।
+
+**Example — Chinese budget warning:**
+> ⚠️ 预算警告
+> 预计费用超出您 $500 USD 预算 66%。请考虑增加预算或选择更经济的旅行方式。
 
 ---
 
@@ -376,6 +391,8 @@ She also used the **Offline Emergency SOS** feature:
 
 **केही क्षणमा**, स्क्रिन उनको व्यक्तिगत यात्रा कार्यक्रममा स्क्रोल भयो।
 
+**💡 बहुभाषी सुझाव:** सम्पूर्ण यात्रा कार्यक्रम भाषा स्विचरमा सक्रिय भाषामा उत्पन्न हुन्छ — अंग्रेजी, नेपाली, हिन्दी, वा चिनियाँ। सबै शीर्षकहरू, विवरणहरू, आराम दिनको लेबलहरू, र बजेट चेतावनीहरू पूर्ण रूपमा स्थानीयकृत छन्।
+
 ---
 
 ### अध्याय ४: यात्रा कार्यक्रम
@@ -396,7 +413,11 @@ She also used the **Offline Emergency SOS** feature:
 **बजेट तुलना:** एमिलीको बजेट $१,५०० भित्र थियो, त्यसैले प्रणालीले देखायो:
 > ✅ *"तपाईंको अनुमानित लागत बजेट भित्र छ।"*
 
-यदि उनी बजेट भन्दा माथि भएको भए, प्रणालीले तीन-स्तरीय स्वचालित सन्देश देखाउँथ्यो।
+यदि उनी बजेट भन्दा माथि भएको भए, प्रणालीले तीन-स्तरीय स्वचालित सन्देश देखाउँथ्यो (अब ४ भाषामा स्थानीयकृत)।
+
+**उदाहरण — नेपाली बजेट चेतावनी:**
+> ⚠️ बजेट चेतावनी
+> अनुमानित लागत तपाईंको $५०० USD बजेट भन्दा ६६% बढी छ। कृपया बजेट बढाउनुहोस् वा किफायती शैली छान्नुहोस्।
 
 ---
 
@@ -719,7 +740,7 @@ The provider can edit each line:
 The provider can write a custom message:
 > *"We can adjust the package based on your budget. Contact us for a customized option."*
 
-If left empty, the system auto-generates a budget comparison message.
+If left empty, the system auto-generates a budget comparison message (localized in 4 languages).
 
 **Terms & Conditions** — editable, one per line. Empty lines are automatically skipped.
 
@@ -936,7 +957,7 @@ Agency Owner TravelAI Nepal को दर्ता पृष्ठमा जा�
 प्रदायकले अनुकूलित सन्देश लेख्न सक्छिन्:
 > *"हामी तपाईंको बजेटको आधारमा प्याकेज समायोजन गर्न सक्छौं। अनुकूलित विकल्पको लागि सम्पर्क गर्नुहोस्।"*
 
-खाली छोडेमा, प्रणालीले स्वतः बजेट तुलना सन्देश उत्पन्न गर्छ।
+खाली छोडेमा, प्रणालीले स्वतः बजेट तुलना सन्देश उत्पन्न गर्छ (४ भाषामा स्थानीयकृत)।
 
 **नियम र सर्तहरू** — सम्पादन योग्य, प्रति लाइन एक। खाली लाइनहरू स्वतः हटाइन्छ।
 
@@ -1076,6 +1097,7 @@ Agency Owner TravelAI Nepal को दर्ता पृष्ठमा जा�
 | **Digital Passport** — QR-based trek identity | **Digital Passport** — QR आधारित |
 | **Safety Center** — Real-time weather + risk map | **Safety Center** — वास्तविक समय |
 | **Journey Replay** — Cinematic timeline | **Journey Replay** — सिनेमाई टाइमलाइन |
+| **Multi-Language** — 4 languages supported | **बहुभाषी** — ४ भाषाहरू समर्थित |
 
 ---
 
@@ -1091,10 +1113,63 @@ Agency Owner TravelAI Nepal को दर्ता पृष्ठमा जा�
 | **Smart Permits (Blockchain)** | Coming 2026 |
 | **PWA + Offline First** | Installable app, works without internet |
 | **Real-time Safety Score** | Live safety assessment per destination |
-| **Multi-lingual** | Nepali / English / Hindi / Chinese |
+| **Multi-lingual** | Nepali / English / Hindi / Chinese — fully localized |
 | **Weather Intelligence** | OpenWeatherMap integration |
 | **Safety Center** | Live incidents, risk levels, map, destination search |
 | **Quotation System** | AI draft → Provider edit → Preview → Send → Lock |
+
+---
+
+## 🌐 Multi-Language Support (NEW)
+
+**Supported Languages:**
+
+| Code | Language | Coverage |
+|------|----------|----------|
+| `en` | English | 100% |
+| `np` | नेपाली (Nepali) | 100% |
+| `hi` | हिन्दी (Hindi) | 100% |
+| `zh` | 中文 (Chinese) | 100% |
+
+**What's Localized:**
+
+| Layer | EN | NP | HI | ZH |
+|-------|----|----|----|----|
+| Day titles | ✅ | ✅ | ✅ | ✅ |
+| Cost breakdown | ✅ | ✅ | ✅ | ✅ |
+| Rest day titles | ✅ | ✅ | ✅ | ✅ |
+| Service labels | ✅ | ✅ | ✅ | ✅ |
+| Item descriptions | ✅ | ✅ | ✅ | ✅ |
+| Budget warnings | ✅ | ✅ | ✅ | ✅ |
+
+**How to Switch Language:**
+
+1. Look for the **language switcher** in the header (flag icon 🇬🇧/🇳🇵/🇮🇳/🇨🇳)
+2. Click → select your language
+3. Generate a **fresh itinerary** — the entire output will be in your chosen language
+
+**Example Output (Day 1):**
+```
+EN: Day 1: Lukla → Phakding
+NP: दिन 1: Lukla → Phakding
+HI: दिन 1: Lukla → Phakding
+ZH: 第 1 天: Lukla → Phakding
+```
+
+**Example Budget Warning:**
+```
+EN: ⚠️ Budget Warning
+    Estimated cost is 66% over your budget of $500 USD...
+
+NP: ⚠️ बजेट चेतावनी
+    अनुमानित लागत तपाईंको $500 USD बजेट भन्दा 66% बढी छ...
+
+HI: ⚠️ बजट चेतावनी
+    अनुमानित लागत आपके $500 USD बजट से 66% अधिक है...
+
+ZH: ⚠️ 预算警告
+    预计费用超出您 $500 USD 预算 66%...
+```
 
 ---
 
@@ -1112,17 +1187,22 @@ Agency Owner TravelAI Nepal को दर्ता पृष्ठमा जा�
 ## 🎉 Welcome to TravelAI Nepal
 
 **English:**
-> TravelAI Nepal connects travelers directly with local providers — no middlemen, no commission. Whether you're planning your first Himalayan trek or running a multi-person agency, the platform adapts to you.
+> TravelAI Nepal connects travelers directly with local providers — no middlemen, no commission. Whether you're planning your first Himalayan trek or running a multi-person agency, the platform adapts to you. Now available in **4 languages** — English, Nepali, Hindi, and Chinese.
 
 **नेपाली:**
-> TravelAI Nepal ले यात्रुहरूलाई स्थानीय प्रदायकहरूसँग सीधै जोड्छ — कुनै बिचौलिया छैन, कुनै कमिसन छैन। तपाईं पहिलो हिमाली ट्रेकको योजना बनाउँदै हुनुहुन्छ वा एजेन्सी चलाउँदै — प्लेटफर्म तपाईंको लागि अनुकूलन हुन्छ।
+> TravelAI Nepal ले यात्रुहरूलाई स्थानीय प्रदायकहरूसँग सीधै जोड्छ — कुनै बिचौलिया छैन, कुनै कमिसन छैन। तपाईं पहिलो हिमाली ट्रेकको योजना बनाउँदै हुनुहुन्छ वा एजेन्सी चलाउँदै — प्लेटफर्म तपाईंको लागि अनुकूलन हुन्छ। अब **४ भाषाहरूमा** उपलब्ध — अंग्रेजी, नेपाली, हिन्दी, र चिनियाँ।
 
 ---
 
 **🇳🇵 TravelAI Nepal — Redefining Himalayan Adventures with AI 🇳🇵**
 
-**📖 Document Version:** 1.1 (User Guide — Corrected Edition)  
-**📅 Date:** September 12, 2026  
-**🏆 System Version:** v4-final
+**📖 Document Version:** 1.2 (User Guide — Multi-Language Edition)  
+**📅 Date:** September 14, 2026  
+**🏆 System Version:** v4.6 (Phase 4R + 4S + 4T Complete — 138/138 PASS, 4 Languages)  
+**✅ Multi-Language:** Fully supported — EN, NP, HI, ZH
 
 ---
+```
+
+---
+

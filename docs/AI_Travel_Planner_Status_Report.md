@@ -1,10 +1,10 @@
-# 📊 TravelAI Nepal — Complete System Status Report (v4.5 — MASTER REFERENCE)
+# 📊 TravelAI Nepal — Complete System Status Report (v4.6 — MASTER REFERENCE)
 
-**Date:** September 13, 2026  
-**Version:** 4.5 (Phase 4Q + Phase 4R — SEMANTICALLY CLEAN, PRODUCTION READY)  
-**Latest Tag:** `v4r-final` (commit pending)  
-**Previous Baseline:** `v4q-baseline` (commit `2eec132`) → `v4-final` (commit `26ccd1d`)  
-**Purpose:** यो report future reference हो। यदि नयाँ DeepSeek instance आयो भने यो file देखाएर काम continue गर्न सकिन्छ।
+**Date:** September 14, 2026  
+**Version:** 4.6 (Phase 4Q + 4R + 4S + 4T — MULTI-LANGUAGE COMPLETE, PRODUCTION READY)  
+**Latest Tag:** `v4t-multilang-4` (commit `54ead67`)  
+**Previous Baselines:** `v4q-baseline` (`2eec132`) → `v4-final` (`26ccd1d`) → `v4r-final` → `v4s-complete`  
+**Purpose:** यो report future reference हो। नयाँ DeepSeek instance आयो भने यो file देखाएर काम continue गर्न सकिन्छ।
 
 ---
 
@@ -13,13 +13,14 @@
 | Category | Status | Notes |
 |---|---|---|
 | **System Logic** | ✅ 100% | Core logic स्थिर |
-| **PlannerService** | ✅ 100% | Round-trip, activities, tours, rest days, MBC, trek day-hike |
-| **ItineraryValidator** | ✅ 100% | Provider field preserved |
+| **PlannerService** | ✅ 100% | RT, activities, tours, rest days, MBC, day-hike, multi-lang |
+| **ItineraryValidator** | ✅ 100% | Provider field + multi-lang title prefix |
 | **Quotation System** | ✅ 100% | End-to-end verified |
+| **Multi-Language** | ✅ **4/4 (en/np/hi/zh)** | Phase 4T complete |
 | **Semantic Audit** | ✅ **138/138 PASS, 0 ISSUES** | Phase 4R complete |
-| **Structural Audit** | ✅ **126 PASS, 12 WARN, 0 FAIL** | WARN = intentional HOLD |
+| **Structural Audit** | ✅ **138 PASS, 0 WARN, 0 FAIL** | Phase 4S complete |
 | **Data Layer** | ✅ Production Ready | All critical fixes applied |
-| **Overall** | 🟢 **~100% Production Ready** | Ready for v4.5 |
+| **Overall** | 🟢 **100% Production Ready** | v4.6 final |
 
 ---
 
@@ -30,6 +31,7 @@
 - AI ले day-by-day itinerary generate गर्छ
 - Real routes, waypoints, services, costs use गर्छ
 - Provider quotation system मार्फत quote पठाउँछ
+- **4 languages supported**: English, Nepali, Hindi, Chinese
 - **No fake data** — सबै data realistic हुनुपर्छ
 
 ---
@@ -175,172 +177,101 @@ Fix: Service 1210 location_id 3 → 105
 **Achievement:** Semantic audit 75 → **138 PASS, 0 ISSUES**
 
 ### ✅ Phase 4R-fix-1 — Round-trip activity title collapse
-**Tag:** `v4r-kusma-fixed` (commit `85ea88d`)
+**Tag:** `v4r-kusma-fixed` (`85ea88d`)
 
-**Issue:** Fallback template ले round-trip activities लाई "Pokhara → Pokhara" देखाउँथ्यो — बीचको waypoint (Kusma Bridge) हराउँथ्यो।
-
-**Root Cause:** `$mergedWaypoints = []` कहीं populate हुँदैन → round-trip branch कहिल्यै fire हुँदैन।
-
-**Fix:** `buildFallbackResponse()` मा intermediate waypoint extract गर्ने logic थपियो।
-
-**Verified:**
-- kusma-bungee: "Pokhara → Kusma Bridge → Pokhara" ✅
-- bhote-koshi-bungee: "Kathmandu → Bhote Koshi Bridge → Kathmandu" ✅
-
-**File:** `app/Services/PlannerService.php`
+**Issue:** Fallback template ले round-trip activities लाई "Pokhara → Pokhara" देखाउँथ्यो।
+**Root Cause:** `$mergedWaypoints = []` कहीं populate हुँदैन → RT branch कहिल्यै fire हुँदैन।
+**Fix:** `buildFallbackResponse()` मा intermediate waypoint extract logic।
+**Verified:** kusma-bungee, bhote-koshi-bungee ✅
+**File:** `PlannerService.php`
 
 ---
 
 ### ✅ Phase 4R-fix-2/3 — Activity service hotel leak
-**Tag:** `v4r-activity-fix` (commit `e0f128c`)
+**Tag:** `v4r-activity-fix` (`e0f128c`)
 
-**Issue:** Activity routes मा "Pokhara Mid-Range Hotel" attach हुन्थ्यो (zipline, skydiving, आदि)।
-
-**Root Cause:** Fallback + ATTACH loop ले activity routes मा पनि hotel query चलाउँथ्यो।
-
-**Fix:**
-1. ATTACH block मा activity routes skip
-2. Activity service name-match filtering (common words filter)
-3. "Trekking Day" → route name label
-
-**Verified:** 14 activity routes — सबै सही service वा route-name label
-
-**File:** `app/Services/PlannerService.php`
+**Issue:** Activity routes मा "Pokhara Mid-Range Hotel" attach हुन्थ्यो।
+**Fix:** ATTACH skip + name-match filter + "Trekking Day" → route name।
+**Verified:** 14 activity routes ✅
+**File:** `PlannerService.php`
 
 ---
 
 ### ✅ Phase 4R-fix-4 — Tour round-trip detection (trek-safe)
-**Tag:** `v4r-tour-fix` (commit `03a37a9`)
+**Tag:** `v4r-tour-fix` (`03a37a9`)
 
-**Issue:** Tours (kathmandu-city, lumbini) "X → X" title। तर trek fix ले Annapurna मा regression गर्यो।
-
-**Root Cause:** `$rtSameLoc` (same location_id) check गर्दा treks मा falsely trigger (Bahundanda → Besisahar location)।
-
-**Fix:**
-- `route_type` filter: RT only for tour/activity
-- Same-ID, Same-Name check (Same-Loc हटाइयो)
-- Single-loc tour case (1 segment, tour)
-
-**Verified:**
-- kathmandu-city-tour: "Kathmandu City Tour" ✅
-- lumbini-circuit: "Lumbini Buddhist Circuit" ✅
-- swayambhunath: "Swayambhunath Stupa Tour" ✅
-- bhaktapur: "Bhaktapur → Nyatapola → Pottery → Bhaktapur" ✅
-- Annapurna Circuit: unchanged ✅
-
-**File:** `app/Services/PlannerService.php`
+**Issue:** Tours "X → X" title; trek fix ले Annapurna regression।
+**Fix:** `route_type` filter (RT only for tour/activity); Same-ID/Name check; single-loc tour।
+**Verified:** kathmandu, lumbini, swayambhunath, bhaktapur ✅
+**File:** `PlannerService.php`
 
 ---
 
 ### ✅ Phase 4R-fix-5 — Rest day cost + Provider field
-**Tag:** `v4r-restday-provider-fix` (commit `aefc0c4`)
+**Tag:** `v4r-restday-provider-fix` (`aefc0c4`)
 
-**Issue 1:** Rest day मा cost = 0 (lodge attach हुँदैनथ्यो)  
-**Issue 2:** Breakdown मा provider_name = "TravelAI Partner" (actual provider हराउँथ्यो)
-
-**Root Cause:**
-1. Rest day logic ले cost=0 hardcode
-2. `ItineraryValidator::normalize()` ले `provider` field strip गर्थ्यो
-
-**Fix:**
-1. Rest day मा `getServiceForWaypoint()` call + cost attach
-2. Validator मा `'provider' => $item['provider'] ?? null` थपियो
-3. +4 locations (Tseram, Dzongla, Thagnak, Nuwakot) — WaypointLocation fix
-
-**Verified:**
-- Annapurna Day 7 (Rest at Manang): cost=5320, svc=102 ✅
-- Kusma breakdown: provider = "Kusma Bridge Adventure" ✅
-
+**Issue:** Rest day cost=0; provider="TravelAI Partner"।
+**Fix:** Rest day lodge service attach; validator provider field preserve; +4 locations (Tseram, Dzongla, Thagnak, Nuwakot)।
 **Files:** `PlannerService.php`, `ItineraryValidator.php`, `LocationSeeder.php`, `WaypointLocationSeeder.php`
 
 ---
 
 ### ✅ Phase 4R-fix-7 — Checkpoint lodges (MBC, Api BC, Makalu BC)
-**Tag:** `v4r-mbc-fix` (commit `d3810c2`)
+**Tag:** `v4r-mbc-fix` (`d3810c2`)
 
-**Issue:** MBC (Machhapuchhre BC) मा lodge services छन् तर `getServiceForWaypoint()` ले skip गर्थ्यो।
-
-**Root Cause:** `Guard 2` — checkpoint type लाई non-accommodation मान्छ।
-
-**Fix:** Checkpoint type लाई lodge check गरेर allow गर्ने (MBC, Api BC, Makalu BC)।
-
-**Verified:**
-- ABC Day 8: MBC Lodge NPR 3990 ✅
-- 6/6 regression PASS
-
-**File:** `app/Services/PlannerService.php`
+**Issue:** MBC lodge services छन् तर Guard 2 ले skip।
+**Fix:** Checkpoint type lodge check → allow।
+**File:** `PlannerService.php`
 
 ---
 
 ### ✅ Phase 4R-fix-8 — BC Locations (Dhaulagiri, Saipal)
-**Tag:** `v4r-bc-locations` (commit `9fda52e`)
+**Tag:** `v4r-bc-locations` (`9fda52e`)
 
-**Issue:** 2 BC waypoints को location_id NULL → lodge attach हुँदैन।
-
-**Fix:** LocationSeeder + WaypointLocationSeeder मा 2 entries थपियो।
-
-**Verified:**
-- Dhaulagiri BC: loc=294 ✅
-- Saipal BC: loc=295 ✅
-
+**Fix:** 2 BC locations added।
 **Files:** `LocationSeeder.php`, `WaypointLocationSeeder.php`
 
 ---
 
 ### ✅ Phase 4R-fix-9 — Structural fixes (3 routes)
-**Tag:** `v4r-structural-fix` (commit `1f8839c`)
+**Tag:** `v4r-structural-fix` (`1f8839c`)
 
-| Route | Fix |
-|-------|-----|
-| bajhang-bajura | duration 3 → 2 |
-| kakani-gurje | duration 3 → 2 |
-| khopra-ridge | +return segment + duration 8 → 6 |
+- bajhang-bajura: duration 3 → 2
+- kakani-gurje: duration 3 → 2
+- khopra-ridge: +return segment + duration 8 → 6
 
 **File:** `Phase4RFixSeeder.php`
 
 ---
 
 ### ✅ Phase 4R-fix-10 — Data fixes (simikot + slugs)
-**Tag:** `v4r-data-fixes` (commit `90f8eb4`)
+**Tag:** `v4r-data-fixes` (`90f8eb4`)
 
-**Fixes:**
 - simikot-humla: max_altitude 3000 → 4200
-- kathmandu-heritage-start → kathmandu-heritage-tour-start
-- kathmandu-city-start → kathmandu-city-tour-departure
-- kathmandu-city-end → kathmandu-city-tour-arrival
-- kathmandu-heritage-end → kathmandu-heritage-tour-end
+- 5 slug renames (kathmandu heritage/city)
 
 **File:** `Phase4RFixSeeder.php`
 
 ---
 
 ### ✅ Phase 4R-fix-11 — Semantic audit rule tune
-**Tag:** `v4r-audit-tune` (commit `2398ec4`)
+**Tag:** `v4r-audit-tune` (`2398ec4`)
 
 **Rule Fixes:**
 - `tour-no-return`: skip 1-day tours, allow same location_id
-- `circuit-no-return`: only flag TOURS (treks are loop-style)
-- `generic-wp-slug`: exclude `*-tour-start` patterns
+- `circuit-no-return`: only flag TOURS
+- `generic-wp-slug`: exclude `*-tour-start`
 
 **Result:** 75 → 97 PASS
-
-**File:** `app/Console/Commands/SemanticAudit.php`
+**File:** `SemanticAudit.php`
 
 ---
 
 ### ✅ Phase 4R-fix-12/13 — Long-dist rule + 6 tour returns
-**Tag:** `v4r-tour-segments` (commit `57b0610`)
+**Tag:** `v4r-tour-segments` (`57b0610`)
 
-**Rule Fix:** `long-dist-too-slow` only for tours (treks allow slow walking)
-
-**Return Segments Added (6 tours):**
-- dharan-dhankuta-bhedetar
-- janakpur-tour
-- kalikot-sinja
-- koshi-tappu (444 → 441 duplicate fix)
-- marpha-tukuche-kobang
-- muktinath-temple-tour
-
+**Rule Fix:** `long-dist-too-slow` only for tours.
+**Return Segments Added:** dharan-dhankuta, janakpur, kalikot-sinja, koshi-tappu, marpha-tukuche, muktinath-temple-tour।
 **Files:** `SemanticAudit.php`, `Phase4RFixSeeder.php`
 
 ---
@@ -349,108 +280,184 @@ Fix: Service 1210 location_id 3 → 105
 **Tag:** (included in `v4r-pilgrimage-fix`)
 
 **Rule Fix:** Walking-speed check only for `route_type === 'trek'`
-
 **Result:** 97 → 135 PASS
-
-**File:** `app/Console/Commands/SemanticAudit.php`
+**File:** `SemanticAudit.php`
 
 ---
 
 ### ✅ Phase 4R-fix-15 — Pilgrimage classification
-**Tag:** `v4r-pilgrimage-fix` (commit `ae4009e`)
+**Tag:** `v4r-pilgrimage-fix` (`ae4009e`)
 
-**Issue:** muktinath-pilgrimage लाई trek मान्थ्यो (vehicle-based हो)।
-
-**Fix:** `classifyRoute()` मा pilgrimage routes → `tour`
-
+**Fix:** `classifyRoute()` मा pilgrimage → `tour`
 **Result:** 135 → 136 PASS
-
-**File:** `app/Console/Commands/SemanticAudit.php`
+**File:** `SemanticAudit.php`
 
 ---
 
 ### ✅ Phase 4R-fix-16 — Nagarkot time + Three-passes Gokyo Ri
-**Tag:** `v4r-semantic-clean` (commit `27cc3c8`)
+**Tag:** `v4r-semantic-clean` (`27cc3c8`)
 
-**Fixes:**
-- nagarkot-sunrise: time 6.0 → 1.0 hr (vehicle)
-- three-passes seq 17: Gokyo Ri day-hike split (Gokyo → Gokyo Ri → Gokyo)
+- nagarkot-sunrise: time 6.0 → 1.0 hr
+- three-passes seq 17: Gokyo Ri day-hike split
 
 **Result:** 136 → **138 PASS, 0 ISSUES** 🎯
+**File:** `Phase4RFixSeeder.php`
+
+---
+
+### ✅ Phase 4R-fix-17 — Cosmetic fixes
+**Tag:** (included in `v4r-duplicate-fix`, `e1b871c`)
+
+**Fixes:**
+1. fewa-lake: "Pokhara to Pokhara" → "Activity at Pokhara"
+2. bhaktapur: "Trekking Day" → route name
+3. EBC Day 8: "Gorak Shep → Gorak Shep" → "Gorak Shep → EBC → Gorak Shep"
+
+**File:** `PlannerService.php`
+
+---
+
+### ✅ Phase 4R-fix-18 — Scoped waypoint lookup (duplicate EBC)
+**Tag:** `v4r-duplicate-fix` (`e1b871c`)
+
+**Issue:** three-passes → `ValidationException: Day 9: unknown waypoint ID 26`
+**Fix:** Duplicate-name lookup मा route segments scope।
+**File:** `PlannerService.php`
+
+---
+
+### ✅ Phase 4R-fix-19 — 3 trek rest days (Tier 2)
+**Tag:** `v4r-trek-restdays` (`2636334`)
+
+- mardi-himal: +High Camp rest
+- sherpa-cultural: +Namche acclimatization
+- tamang-heritage: +Briddim rest
 
 **File:** `Phase4RFixSeeder.php`
 
 ---
 
-### ✅ Phase 4R-fix-17 — Cosmetic fixes (description, label, day-hike)
-**Tag:** (included in `v4r-duplicate-fix`, commit `e1b871c`)
+### ✅ Phase 4R-cleanup — gitignore .bak_before_*
+**Commit:** `57b1bdf`
 
-**Issues Fixed (from browser test):**
-
-| # | Route | Before | After |
-|---|-------|--------|-------|
-| 1 | fewa-lake-kayaking | "Pokhara to Pokhara" | "Activity at Pokhara" |
-| 2 | bhaktapur-tour | "Trekking Day" label | "Bhaktapur Durbar Square Tour" |
-| 3 | everest-base-camp Day 8 | "Gorak Shep → Gorak Shep" | "Gorak Shep → Everest Base Camp → Gorak Shep" |
-
-**Root Cause:**
-1. Item description = `"Activity at {$from->name} to {$targetWaypoint->name}"` — RT मा दुवै same
-2. Tour मा service NULL → fallback "Trekking Day"
-3. Trek day-hike (EBC) merge भयो — title collapse
-
-**Fix (5 changes in `buildFallbackResponse()`):**
-1. `merged_waypoints` attached from `$overnightSegments` (carry-through)
-2. Trek RT detection: `from->id === to->id && distance > 1`
-3. Service label: `in_array($route_type, ['activity', 'tour'])` → route name
-4. Description: RT empty-merged → `$from->name` (round-trip loop); else normal
-5. Tour prefix: "Tour at " (was "Trek from ")
-
-**Verified:**
-- Kayaking: "Activity at Pokhara" ✅
-- Bhaktapur: item = "Bhaktapur Durbar Square Tour" ✅
-- EBC Day 8: "Gorak Shep → Everest Base Camp → Gorak Shep" ✅
-
-**File:** `app/Services/PlannerService.php`
+**Fix:** `.gitignore` मा `.bak_before_*` + `.bak_4t_*` थपियो।
 
 ---
 
-### ✅ Phase 4R-fix-18 — Scoped waypoint lookup (duplicate EBC)
-**Tag:** `v4r-duplicate-fix` (commit `e1b871c`)
+## 🏁 PHASE 4S — Structural Complete (Sept 14, 2026)
 
-**Issue:** three-passes itinerary generate गर्दा `ValidationException: Day 9: unknown waypoint ID 26`।
+**Latest Tag:** `v4s-complete` (`fdf6c9e`)  
+**Achievement:** Structural audit 126 → **138 PASS, 0 WARN**
 
-**Root Cause:**
-- Waypoint ID 26 = "Everest Base Camp" (legacy duplicate, slug='ebc')
-- Waypoint ID 110 = "Everest Base Camp" (three-passes use, slug='ebc-3p')
-- Fix-17 को `Waypoint::where('name', 'Everest Base Camp')->first()` ले **ID 26** फर्कायो — गलत
-- Validator ले "ID 26 route segments मा छैन" भनेर reject
+### ✅ Phase 4S-1 — Hotel (City) pattern POC
+**Tags:** `v4s-poc-1`, `v4s-poc-1.1`
 
-**Fix:** Duplicate-name lookup मा route segments scope:
+**Fixes:**
+- kathmandu-city-tour: 2-day split with hotel returns
+- "Hotel (City)" display format (tour + overnight + village/city)
+- "Tour from X to Y" prefix (was "Tour at X to Y")
 
-```php
-$validWpIds = $route->segments()->pluck('from_waypoint_id')
-    ->merge($route->segments()->pluck('to_waypoint_id'))
-    ->unique()->toArray();
-$first = Waypoint::where('name', $attached[0])
-    ->whereIn('id', $validWpIds)
-    ->first();
+**Files:** `PlannerService.php`
 
-    ---
+---
 
-## 🏁 Phase 4S — COMPLETE (2026-09-14)
+### ✅ Phase 4S-2 — pokhara-city-tour restructure
+**Tag:** `v4s-poc-2` (`099c7be`)
 
-**Tag:** `v4s-complete` | **Structural: 138/138 PASS, 0 WARN** 🎯
+**Fixes:**
+- 2-day split with hotel returns
+- Phewa Lake (594) location_id = Pokhara
 
-### ✅ Fixed (7 items)
+**File:** DB-only change
 
-| # | Fix | Routes |
-|---|-----|--------|
-| 1 | Hotel (City) pattern — kathmandu-city-tour POC | 1 |
-| 2 | Tour/Activity "from X to Y" prefix | All |
-| 3 | pokhara-city-tour restructure + Phewa Lake loc fix | 1 |
-| 4 | banke-tour + shuklaphanta Hotel pattern | 2 |
-| 5 | 6 tiny routes metadata 2d→1d | 6 |
-| 6 | koshi-tappu metadata 2d→1d | 1 |
-| 7 | three-passes Gokyo rest day | 1 |
+---
 
-### 📊 Final Audit State (100%)
+### ✅ Phase 4S Batch 1 — banke-tour + shuklaphanta
+**Tag:** `v4s-batch-1`
+
+**Fixes:** Both restructured with hotel return segments।
+
+---
+
+### ✅ Phase 4S Batch 2 — 6 tiny routes metadata
+**Tag:** `v4s-batch-2` (`2276e93`)
+
+**Fixes:** duration 2d → 1d for:
+- lumbini-mayadevi, janakpur-tour, janaki-temple-pilgrimage
+- simikot-remote, sinja-valley, lumbini-circuit
+
+---
+
+### ✅ Phase 4S Final — koshi-tappu + three-passes
+**Tag:** `v4s-complete` (`fdf6c9e`)
+
+**Fixes:**
+- koshi-tappu: duration 2d → 1d
+- three-passes: +Gokyo rest day (day 19)
+
+**Result:** **138 PASS, 0 WARN** 🎯
+
+---
+
+## 🌐 PHASE 4T — Multi-Language Complete (Sept 14, 2026)
+
+**Latest Tag:** `v4t-multilang-4` (`54ead67`)  
+**Achievement:** 4 languages × 6 layers = 100% localized
+
+### ✅ Phase 4T-1 — Titles + descriptions + items
+**Tags:** `v4t-multilang` (`3998d42`), `v4t-multilang-2` (`34542a6`)
+
+**Fixes:**
+
+**PlannerService.php:**
+1. Day titles — `match($locale)` for en/np/hi/zh
+2. Item descriptions — "Activity/Tour/Trek from X to Y" (4 langs)
+3. Rest day titles/desc — 4 langs
+4. Service label "Service Included" — 4 langs
+5. "Trekking Day" label — 4 langs
+6. Rest day (no-lodge) title/desc — 4 langs
+
+**ItineraryValidator.php:**
+1. Day title prefix — locale-aware `दिन N: / 第 N 天: / Day N:`
+2. Regex `/u` flag for multibyte (Devanagari/Chinese)
+3. Duplicate prefix fix (hasPrefix check)
+4. Rest day title override — locale-aware
+
+**Blade templates:**
+1. `home.blade.php` — day prefix render + strip regex `/u`
+2. `quotation-requests/show.blade.php` — `@extends` order fix + session messages moved into `@section('content')`
+
+**zh/messages.php:**
+- Cost/service/planner keys added
+
+**Files:** `PlannerService.php`, `ItineraryValidator.php`, `home.blade.php`, `show.blade.php`, `zh/messages.php`
+
+---
+
+### ✅ Phase 4T-3 — `$locale` closure fix
+**Tag:** `v4t-multilang-3` (`5bf51ce`)
+
+**Issue:** `DB::transaction` closure मा `$locale` use list मा थिएन → "Undefined variable $locale" error।
+**Fix:** `$locale` use list मा थपियो।
+**File:** `PlannerService.php`
+
+---
+
+### ✅ Phase 4T-4 — Budget warning 4-language
+**Tag:** `v4t-multilang-4` (`54ead67`)
+
+**Issue:** Budget warning message hardcoded English।
+**Fix:** `match($locale)` blocks for title + message।
+**File:** `PlannerService.php`
+
+**Verified:**
+- EN: `⚠️ Budget Warning` / `Estimated cost is X% over your budget...`
+- NP: `⚠️ बजेट चेतावनी` / `अनुमानित लागत तपाईंको $X USD बजेट भन्दा Y% बढी छ...`
+- HI: `⚠️ बजट चेतावनी` / `अनुमानित लागत आपके $X USD बजट से Y% अधिक है...`
+- ZH: `⚠️ 预算警告` / `预计费用超出您 $X USD 预算 Y%...`
+
+---
+
+## 📊 FINAL AUDIT STATE (138 routes — PRODUCTION)
+
+### Structural Audit (`php artisan planner:audit`)
