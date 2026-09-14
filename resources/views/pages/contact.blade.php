@@ -1,6 +1,99 @@
 @extends('layouts.public')
 
-@section('title', __('messages.contact_page_title'))
+@section('title', 'Contact Us — TravelAI Nepal | Support, Sales & Partnerships')
+@section('meta_description', 'Contact TravelAI Nepal for support, sales, partnerships, or press inquiries. Reach us by email, phone, or visit our office in Lazimpat, Kathmandu.')
+@section('meta_keywords', 'contact TravelAI Nepal, Nepal travel agency contact, trekking support Nepal, partnership inquiry, Kathmandu travel office')
+
+@push('head')
+{{-- ========== JSON-LD: ContactPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "ContactPage",
+  "name": "Contact TravelAI Nepal",
+  "description": "Get in touch with TravelAI Nepal for support, sales, or partnerships.",
+  "url": "{{ url()->current() }}"
+}
+</script>
+
+{{-- ========== JSON-LD: LocalBusiness (TravelAgency) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "TravelAgency",
+  "name": "TravelAI Nepal",
+  "url": "{{ url('/') }}",
+  "logo": "{{ asset('images/logo.png') }}",
+  "image": "{{ asset('images/logo.png') }}",
+  "description": "AI-powered trekking ecosystem connecting travelers with verified local providers in Nepal.",
+  "email": "support@travelai.com",
+  "telephone": "+977-1-4XXXXXX",
+  "address": {
+    "@@type": "PostalAddress",
+    "streetAddress": "Lazimpat",
+    "addressLocality": "Kathmandu",
+    "addressRegion": "Bagmati",
+    "postalCode": "44600",
+    "addressCountry": "NP"
+  },
+  "geo": {
+    "@@type": "GeoCoordinates",
+    "latitude": 27.7172,
+    "longitude": 85.3240
+  },
+  "openingHoursSpecification": [
+    {
+      "@@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ],
+  "sameAs": [
+    "https://twitter.com/travelainepal",
+    "https://www.instagram.com/travelainepal",
+    "https://github.com/travelainepal"
+  ],
+  "contactPoint": [
+    {
+      "@@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@travelai.com",
+      "availableLanguage": ["en", "ne", "hi", "zh"]
+    },
+    {
+      "@@type": "ContactPoint",
+      "contactType": "sales",
+      "email": "sales@travelai.com",
+      "availableLanguage": ["en"]
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Contact",
+      "item": "{{ url('/contact') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- HERO --}}
