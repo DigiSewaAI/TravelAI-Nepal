@@ -434,3 +434,23 @@ $validWpIds = $route->segments()->pluck('from_waypoint_id')
 $first = Waypoint::where('name', $attached[0])
     ->whereIn('id', $validWpIds)
     ->first();
+
+    ---
+
+## 🏁 Phase 4S — COMPLETE (2026-09-14)
+
+**Tag:** `v4s-complete` | **Structural: 138/138 PASS, 0 WARN** 🎯
+
+### ✅ Fixed (7 items)
+
+| # | Fix | Routes |
+|---|-----|--------|
+| 1 | Hotel (City) pattern — kathmandu-city-tour POC | 1 |
+| 2 | Tour/Activity "from X to Y" prefix | All |
+| 3 | pokhara-city-tour restructure + Phewa Lake loc fix | 1 |
+| 4 | banke-tour + shuklaphanta Hotel pattern | 2 |
+| 5 | 6 tiny routes metadata 2d→1d | 6 |
+| 6 | koshi-tappu metadata 2d→1d | 1 |
+| 7 | three-passes Gokyo rest day | 1 |
+
+### 📊 Final Audit State (100%)
