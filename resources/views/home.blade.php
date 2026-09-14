@@ -27,8 +27,6 @@
 @endpush
 
 @section('content')
-
-@section('content')
   <!-- Hero Section -->
   <section id="home" class="hero-bg relative overflow-hidden pt-4 md:pt-8 pb-12 md:pb-16">
     <div class="max-w-7xl mx-auto px-6 md:px-10">
