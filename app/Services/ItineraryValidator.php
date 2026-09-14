@@ -324,10 +324,18 @@ if (count($filteredDays) > $requestedDays) {
 
             // Normal day with trekking data
             $dayNumber = $dayCounter++;
-            $patterns = ['/^Day\s*\d+\s*[:：]/i', '/^दिन\s*\d+\s*[:：]/', '/^第\s*\d+\s*天\s*[:：]/'];
-            $newTitle = preg_replace($patterns, "Day {$dayNumber}: ", $originalTitle);
-            if ($newTitle === $originalTitle) {
-                $newTitle = "Day {$dayNumber}: " . $originalTitle;
+                        $patterns = ['/^Day\s*\d+\s*[:：]\s*/i', '/^दिन\s*\d+\s*[:：]\s*/', '/^第\s*\d+\s*天\s*[:：]\s*/'];
+            $localePrefix = match($locale) {
+                'np' => "दिन {$dayNumber}: ",
+                'hi' => "दिन {$dayNumber}: ",
+                'zh' => "第 {$dayNumber} 天: ",
+                default => "Day {$dayNumber}: ",
+            };
+                        $hasLocalePrefix = preg_match('/^(Day|दिन|第)\s*\d+/u', $originalTitle);
+            if ($hasLocalePrefix) {
+                $newTitle = preg_replace($patterns, $localePrefix, $originalTitle);
+            } else {
+                $newTitle = $localePrefix . $originalTitle;
             }
 
             $normalized['days'][] = [
@@ -362,8 +370,16 @@ if (count($filteredDays) > $requestedDays) {
         foreach ($normalized['days'] as &$normalizedDay) {
             if (isset($normalizedDay['distance_km']) && (float) $normalizedDay['distance_km'] == 0 && !empty($normalizedDay['overnight_waypoint_id'])) {
                 $waypoint = Waypoint::find($normalizedDay['overnight_waypoint_id']);
+                                $dayNum = $normalizedDay['day_number'];
+                $prefixStr = match($locale) {
+                    'np' => "दिन {$dayNum}: ",
+                    'hi' => "दिन {$dayNum}: ",
+                    'zh' => "第 {$dayNum} 天: ",
+                    default => "Day {$dayNum}: ",
+                };
+
                 if ($waypoint && ($waypoint->altitude ?? 0) >= 3000 && !$isTour) {
-                    $normalizedDay['title'] = match($locale) {
+                    $normalizedDay['title'] = $prefixStr . match($locale) {
                         'hi' => "{$waypoint->name} में अनुकूलन दिवस",
                         'zh' => "{$waypoint->name} 适应日",
                         'np' => "{$waypoint->name} मा अनुकूलन दिन",
@@ -375,8 +391,8 @@ if (count($filteredDays) > $requestedDays) {
                         'np' => "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
                         default => "No trekking today. Rest and acclimatize at {$waypoint->name}.",
                     };
-                } else {
-                                        $normalizedDay['title'] = match($locale) {
+                                } else {
+                    $normalizedDay['title'] = $prefixStr . match($locale) {
                         'hi' => "{$waypoint->name} में आराम दिन",
                         'zh' => "在{$waypoint->name}休息",
                         'np' => "{$waypoint->name}मा आराम दिन",

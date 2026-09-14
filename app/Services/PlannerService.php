@@ -198,7 +198,12 @@ if ((float) $dayData['distance_km'] == 0) {
                 'title' => app()->getLocale() === 'np'
                     ? "{$restWpName}मा आराम दिन"
                     : "Rest Day at {$restWpName}",
-                'description' => $restService['name'] . ' – Rest and acclimatize.',
+                'description' => match($locale) {
+    'np' => $restService['name'] . ' – आराम र अनुकूलन।',
+    'hi' => $restService['name'] . ' – आराम और अनुकूलन।',
+    'zh' => $restService['name'] . ' – 休息和适应。',
+    default => $restService['name'] . ' – Rest and acclimatize.',
+},
                 'time_of_day' => 'afternoon',
                 'cost' => $restPriceNpr,
                 'currency' => 'NPR',
@@ -217,7 +222,12 @@ if ((float) $dayData['distance_km'] == 0) {
                 'title' => app()->getLocale() === 'np'
                     ? "{$restWpName}मा आराम दिन"
                     : "Rest Day at {$restWpName}",
-                'description' => "Rest and relax at {$restWpName}.",
+                'description' => match($locale) {
+    'np' => "{$restWpName}मा आराम गर्नुहोस्।",
+    'hi' => "{$restWpName} में आराम करें।",
+    'zh' => "在{$restWpName}休息。",
+    default => "Rest and relax at {$restWpName}.",
+},
                 'time_of_day' => 'morning',
                 'cost' => 0,
                 'pricing_source' => 'system_estimate',
@@ -278,7 +288,12 @@ if ((float) $dayData['distance_km'] == 0) {
     $dayData['items'] = [
         [
             'title' => $bestService['name'],
-            'description' => 'Service Included',
+            'description' => match($locale) {
+    'np' => 'सेवा समावेश',
+    'hi' => 'सेवा शामिल',
+    'zh' => '服务包含',
+    default => 'Service Included',
+},
             'time_of_day' => 'afternoon',
             'cost' => $priceNpr,
             'currency' => 'NPR',
@@ -661,7 +676,7 @@ if ($isRoundTrip && $distance > 0) {
                 default => "Day {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
             };
                         $desc = match($locale) {
-                'hi' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी।" : ""),
+                                'hi' => "{$fromDisplay} से {$landmarkName} तक की यात्रा और वापसी। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लंबा दिन – 15 किमी से अधिक।" : ""),
                 'zh' => "从 {$fromDisplay} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
                 'np' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
                 default => "Round trip from {$fromDisplay} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
@@ -683,7 +698,7 @@ if ($isRoundTrip && $distance > 0) {
                 default => "Day {$dayNumber}: {$fromDisplay} → {$toDisplay}",
             };
             $desc = match($locale) {
-                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे。" . ($isLongDay ? " ⚠️ लामो दिन – 15 किमी भन्दा बढी。" : ""),
+                                'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लंबा दिन – 15 किमी से अधिक।" : ""),
                 'zh' => "从 {$from->name}（{$from->altitude}米）到 {$to->name}（{$to->altitude}米）。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
                 'np' => "{$from->name} ({$from->altitude}मी) देखि {$to->name} ({$to->altitude}मी) सम्म। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
                 default => "From {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
@@ -802,12 +817,24 @@ if (!$service && $targetWaypoint) {
             'items' => [
                 [
                     'title' => $serviceName,
-                                                            'description' => (($isRoundTrip && empty($mergedWaypoints))
-                        ? (($route->route_type === 'activity' ? 'Activity at ' 
-                            : ($route->route_type === 'tour' ? 'Tour at ' : 'Trek at ')) . $fromDisplay)
-                        : (($route->route_type === 'activity' ? 'Activity from ' 
-                            : ($route->route_type === 'tour' ? 'Tour from ' : 'Trek from ')) 
-                            . "{$fromDisplay} to {$targetWaypoint->name}")),
+                                                                                'description' => (function() use ($locale, $route, $fromDisplay, $targetWaypoint, $isRoundTrip, $mergedWaypoints) {
+                        $isSingle = ($isRoundTrip && empty($mergedWaypoints));
+                        $type = $route->route_type;
+                        if ($isSingle) {
+                            return match($locale) {
+                                'np' => "{$fromDisplay} मा " . ($type === 'activity' ? 'गतिविधि' : ($type === 'tour' ? 'भ्रमण' : 'ट्रेक')),
+                                'hi' => "{$fromDisplay} में " . ($type === 'activity' ? 'गतिविधि' : ($type === 'tour' ? 'भ्रमण' : 'ट्रेक')),
+                                'zh' => "在{$fromDisplay}的" . ($type === 'activity' ? '活动' : ($type === 'tour' ? '游览' : '徒步')),
+                                default => ucfirst($type) . " at {$fromDisplay}",
+                            };
+                        }
+                        return match($locale) {
+                            'np' => "{$fromDisplay} बाट {$targetWaypoint->name} सम्म",
+                            'hi' => "{$fromDisplay} से {$targetWaypoint->name} तक",
+                            'zh' => "从{$fromDisplay}到{$targetWaypoint->name}",
+                            default => ucfirst($type) . " from {$fromDisplay} to {$targetWaypoint->name}",
+                        };
+                    })(),
                     'time_of_day' => 'morning',
                     'cost' => $serviceCost,
                     'pricing_source' => $pricingSource,
@@ -847,19 +874,30 @@ if (!$service && $targetWaypoint) {
         $days[] = [
             'day_number' => count($days) + 1,
             'title' => $restTitle,
-            'description' => "No trekking today. Rest and acclimatize at {$waypointName}.",
+            'description' => match($locale) {
+    'np' => "आज ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
+    'hi' => "आज ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
+    'zh' => "今天不徒步。在{$waypointName}休息和适应。",
+    default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+},
             'overnight_waypoint_id' => $waypointId,
             'distance_km' => 0,
             'estimated_time_hours' => 0,
             'altitude_m' => $altitude,
                         'items' => [
                 [
-                    'title' => app()->getLocale() === 'np'
-                        ? "{$waypointName}मा आराम दिन"
-                        : "Rest Day at {$waypointName}",
-                    'description' => app()->getLocale() === 'np'
-                        ? "{$waypointName}मा आराम र acclimatize।"
-                        : "Rest and relax at {$waypointName}.",
+                                        'title' => match($locale) {
+                        'np' => "{$waypointName}मा आराम दिन",
+                        'hi' => "{$waypointName} में आराम दिवस",
+                        'zh' => "在{$waypointName}休息日",
+                        default => "Rest Day at {$waypointName}",
+                    },
+                    'description' => match($locale) {
+                        'np' => "{$waypointName}मा आराम र अनुकूलन।",
+                        'hi' => "{$waypointName} में आराम और अनुकूलन।",
+                        'zh' => "在{$waypointName}休息和适应。",
+                        default => "Rest and relax at {$waypointName}.",
+                    },
                     'time_of_day' => 'morning',
                     'cost' => 0,
                     'pricing_source' => 'system_estimate',
