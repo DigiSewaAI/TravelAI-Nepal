@@ -826,6 +826,7 @@ return [
 'altitude' => '海拔',
 'type' => '类型',
 'region' => '区域',
+'day' => '第',
 'safety_status' => '安全状态',
 'safety_status_tip' => '安全状态根据近期事件更新',
 'no_safety_data' => '此目的地无安全数据',
