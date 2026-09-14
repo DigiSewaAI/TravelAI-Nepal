@@ -1,6 +1,108 @@
 @extends('layouts.public')
 
-@section('title', __('messages.features_page_title'))
+@section('title', 'Features — TravelAI Nepal | AI Travel Planner & Trekking Platform')
+@section('meta_description', 'Discover TravelAI Nepal features: AI trip planner, digital trek passport, offline SOS, agency dashboard, blockchain permits, PWA, real-time safety and more.')
+@section('meta_keywords', 'AI travel planner Nepal, digital trek passport, offline SOS trekking, Nepal trekking platform, blockchain permits Nepal, PWA travel app')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Features — TravelAI Nepal",
+  "description": "Discover all features of TravelAI Nepal — AI-powered travel planner and trekking ecosystem.",
+  "url": "{{ url()->current() }}"
+}
+</script>
+
+{{-- ========== JSON-LD: ItemList (Features) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "ItemList",
+  "name": "TravelAI Nepal Features",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "{{ addslashes(__('messages.ai_trip_planner')) }}",
+      "description": "{{ addslashes(__('messages.features_ai_planner_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "{{ addslashes(__('messages.digital_trek_passport')) }}",
+      "description": "{{ addslashes(__('messages.features_digital_passport_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 3,
+      "name": "{{ addslashes(__('messages.offline_emergency_sos')) }}",
+      "description": "{{ addslashes(__('messages.features_sos_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 4,
+      "name": "{{ addslashes(__('messages.agency_dashboard')) }}",
+      "description": "{{ addslashes(__('messages.features_dashboard_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 5,
+      "name": "{{ addslashes(__('messages.trek_memory_replay')) }}",
+      "description": "{{ addslashes(__('messages.features_memory_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 6,
+      "name": "{{ addslashes(__('messages.smart_permits_blockchain')) }}",
+      "description": "{{ addslashes(__('messages.features_permits_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 7,
+      "name": "{{ addslashes(__('messages.pwa_offline')) }}",
+      "description": "{{ addslashes(__('messages.features_pwa_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 8,
+      "name": "{{ addslashes(__('messages.realtime_safety_score')) }}",
+      "description": "{{ addslashes(__('messages.features_safety_score_desc')) }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 9,
+      "name": "{{ addslashes(__('messages.multilingual')) }}",
+      "description": "{{ addslashes(__('messages.features_multilingual_desc')) }}"
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Features",
+      "item": "{{ url('/features') }}"
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 
