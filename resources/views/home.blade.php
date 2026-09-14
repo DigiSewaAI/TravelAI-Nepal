@@ -547,10 +547,13 @@
       // ------ Days Rendering ------
       days.forEach(day => {
     // ✅ Strip duplicate "Day X:" prefix
-    const cleanTitle = (day.title || '').replace(/^Day\s*\d+\s*[:：]\s*/i, '').trim();
+    const cleanTitle = (day.title || '').replace(/^(Day|दिन|第)\s*\d+\s*(天)?\s*[:：]\s*/u, '').trim();
     
     html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
-    html += `<h3 class="text-lg font-bold text-blue-700">{{ __('messages.day') }} ${day.day_number}: ${cleanTitle}</h3>`;
+    const _locale = '{{ app()->getLocale() }}';
+const _dayPrefix = {np:'दिन', hi:'दिन', zh:'第', en:'Day'}[_locale] || 'Day';
+const _daySuffix = _locale === 'zh' ? ' 天' : '';
+html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_number}${_daySuffix}: ${cleanTitle}</h3>`;
     html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
         if (day.distance_km) html += `<p class="text-xs text-gray-400 mt-1">📏 ${day.distance_km} km  |  ⛰️ ${day.altitude_m || '{{ __('messages.na') }}'} m</p>`;
         if (day.items && day.items.length > 0) {

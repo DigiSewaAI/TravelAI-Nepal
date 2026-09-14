@@ -195,9 +195,12 @@ if ((float) $dayData['distance_km'] == 0) {
 
         $dayData['items'] = [
             [
-                'title' => app()->getLocale() === 'np'
-                    ? "{$restWpName}मा आराम दिन"
-                    : "Rest Day at {$restWpName}",
+                'title' => match($locale) {
+    'np' => "{$restWpName} मा आराम दिन",
+    'hi' => "{$restWpName} में आराम दिवस",
+    'zh' => "在 {$restWpName} 休息日",
+    default => "Rest Day at {$restWpName}",
+},
                 'description' => match($locale) {
     'np' => $restService['name'] . ' – आराम र अनुकूलन।',
     'hi' => $restService['name'] . ' – आराम और अनुकूलन।',
@@ -219,13 +222,16 @@ if ((float) $dayData['distance_km'] == 0) {
     } else {
         $dayData['items'] = [
             [
-                'title' => app()->getLocale() === 'np'
-                    ? "{$restWpName}मा आराम दिन"
-                    : "Rest Day at {$restWpName}",
+                'title' => match($locale) {
+    'np' => "{$restWpName} मा आराम दिन",
+    'hi' => "{$restWpName} में आराम दिवस",
+    'zh' => "在 {$restWpName} 休息日",
+    default => "Rest Day at {$restWpName}",
+},
                 'description' => match($locale) {
-    'np' => "{$restWpName}मा आराम गर्नुहोस्।",
+    'np' => "{$restWpName} मा आराम गर्नुहोस्।",
     'hi' => "{$restWpName} में आराम करें।",
-    'zh' => "在{$restWpName}休息。",
+    'zh' => "在{$restWpName} 休息。",
     default => "Rest and relax at {$restWpName}.",
 },
                 'time_of_day' => 'morning',
@@ -384,8 +390,14 @@ $result = DB::transaction(function () use ($input, $route, $validated, $aiRespon
                     if (($item['pricing_source'] ?? '') === 'provider_service' && !empty($item['service_id'])) {
                         $dayNumber = $dayData['day_number'];
                         $key = "day_{$dayNumber}_service";
-                        $perDayServiceCosts[$key] = [
-                            'name' => "Day {$dayNumber}: {$item['title']}",
+$breakdownDayPrefix = match($locale) {
+    'np' => "दिन {$dayNumber}: ",
+    'hi' => "दिन {$dayNumber}: ",
+    'zh' => "第 {$dayNumber} 天: ",
+    default => "Day {$dayNumber}: ",
+};
+$perDayServiceCosts[$key] = [
+    'name' => $breakdownDayPrefix . $item['title'],
                             'amount' => $item['cost'] ?? 0,
                             'currency' => 'NPR',
                             'unit' => 'total',
@@ -800,9 +812,15 @@ if (!$service && $targetWaypoint) {
 }
 
         $serviceCost = $service ? $service['price'] * 133 : 0;
-        $serviceName = $service
+        $trekkingDayLabel = match($locale) {
+    'np' => 'ट्रेकिङ दिन',
+    'hi' => 'ट्रेकिंग दिवस',
+    'zh' => '徒步日',
+    default => 'Trekking Day',
+};
+$serviceName = $service
     ? $service['name']
-    : (in_array($route->route_type, ['activity', 'tour']) ? $route->name : 'Trekking Day');
+    : (in_array($route->route_type, ['activity', 'tour']) ? $route->name : $trekkingDayLabel);
         $serviceId = $service ? $service['id'] : null;
         $pricingSource = $service ? 'provider_service' : 'system_estimate';
 
@@ -886,16 +904,16 @@ if (!$service && $targetWaypoint) {
             'altitude_m' => $altitude,
                         'items' => [
                 [
-                                        'title' => match($locale) {
-                        'np' => "{$waypointName}मा आराम दिन",
+                                                            'title' => match($locale) {
+                        'np' => "{$waypointName} मा आराम दिन",
                         'hi' => "{$waypointName} में आराम दिवस",
-                        'zh' => "在{$waypointName}休息日",
+                        'zh' => "在 {$waypointName} 休息日",
                         default => "Rest Day at {$waypointName}",
                     },
                     'description' => match($locale) {
-                        'np' => "{$waypointName}मा आराम र अनुकूलन।",
+                        'np' => "{$waypointName} मा आराम र अनुकूलन।",
                         'hi' => "{$waypointName} में आराम और अनुकूलन।",
-                        'zh' => "在{$waypointName}休息和适应。",
+                        'zh' => "在 {$waypointName} 休息和适应。",
                         default => "Rest and relax at {$waypointName}.",
                     },
                     'time_of_day' => 'morning',

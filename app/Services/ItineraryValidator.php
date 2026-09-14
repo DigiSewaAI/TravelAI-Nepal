@@ -324,14 +324,14 @@ if (count($filteredDays) > $requestedDays) {
 
             // Normal day with trekking data
             $dayNumber = $dayCounter++;
-                        $patterns = ['/^Day\s*\d+\s*[:：]\s*/i', '/^दिन\s*\d+\s*[:：]\s*/', '/^第\s*\d+\s*天\s*[:：]\s*/'];
+                                    $patterns = ['/^Day\s*\d+\s*[:：]\s*/iu', '/^दिन\s*\d+\s*[:：]\s*/u', '/^第\s*\d+\s*天\s*[:：]\s*/u'];
             $localePrefix = match($locale) {
                 'np' => "दिन {$dayNumber}: ",
                 'hi' => "दिन {$dayNumber}: ",
                 'zh' => "第 {$dayNumber} 天: ",
                 default => "Day {$dayNumber}: ",
             };
-                        $hasLocalePrefix = preg_match('/^(Day|दिन|第)\s*\d+/u', $originalTitle);
+            $hasLocalePrefix = preg_match('/^(Day|दिन|第)\s*\d+/u', $originalTitle);
             if ($hasLocalePrefix) {
                 $newTitle = preg_replace($patterns, $localePrefix, $originalTitle);
             } else {

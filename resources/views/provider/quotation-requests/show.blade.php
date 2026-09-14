@@ -1,15 +1,3 @@
-@if(session('success'))
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
-        {{ session('error') }}
-    </div>
-@endif
-
 @extends('layouts.provider')
 
 @section('title', 'Quotation Request #' . $quotationRequest->id)
@@ -17,6 +5,17 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
+    @if(session('success'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+            {{ session('error') }}
+        </div>
+    @endif
     {{-- Request Header --}}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="flex justify-between items-start">
@@ -101,11 +100,22 @@
     @foreach($quotationRequest->itinerary_data['days'] as $day)
         @php
             // ✅ Strip duplicate "Day X:" prefix
-            $cleanTitle = preg_replace('/^Day\s*\d+\s*[:：]\s*/i', '', $day['title'] ?? '');
+            $cleanTitle = preg_replace('/^(Day|दिन|第)\s*\d+\s*(天)?\s*[:：]\s*/u', '', $day['title'] ?? '');
             $cleanTitle = trim($cleanTitle);
         @endphp
         <div class="border-b border-gray-100 pb-3 mb-3 last:border-0">
-            <h4 class="font-semibold text-blue-700">Day {{ $day['day_number'] }}: {{ $cleanTitle }}</h4>
+            <h4 class="font-semibold text-blue-700">
+    @php
+        $dayPrefix = match(app()->getLocale()) {
+            'np' => 'दिन',
+            'hi' => 'दिन',
+            'zh' => '第',
+            default => 'Day',
+        };
+        $daySuffix = app()->getLocale() === 'zh' ? ' 天' : '';
+    @endphp
+    {{ $dayPrefix }} {{ $day['day_number'] }}{{ $daySuffix }}: {{ $cleanTitle }}
+</h4>
             <p class="text-sm text-gray-600">{{ $day['description'] ?? '' }}</p>
             @if(isset($day['items']))
                 <ul class="list-disc ml-5 text-sm text-gray-600">
