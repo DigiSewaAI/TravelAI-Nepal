@@ -23,6 +23,47 @@
   }
 }
 </script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is TravelAI Nepal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TravelAI Nepal is an AI-powered trekking ecosystem that connects travelers with verified local agencies, guides, and hotels across Nepal. It offers AI-generated itineraries, digital trek passports, and offline emergency SOS."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the AI itinerary planner work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our AI generates personalized day-by-day itineraries based on your destination, budget, travel duration, fitness level, and interests. It uses a hybrid LLM (Groq/Llama3) and real local pricing data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is TravelAI Nepal free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime. We operate on zero-commission smart contracts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work offline in the mountains?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. TravelAI Nepal is PWA and offline-first. Emergency SOS alerts store your location locally and auto-sync when signal returns. Digital trek passports work without internet."
+      }
+    }
+  ]
+}
+</script>
 @endverbatim
 @endpush
 
@@ -904,4 +945,49 @@ document.addEventListener('DOMContentLoaded', function() {
       autoFill();
     });
   </script>
+
+  {{-- ========== FAQ SECTION ========== --}}
+  <section id="faq" class="py-20 px-6 md:px-10 bg-gray-50">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">FAQ</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Frequently Asked Questions</h2>
+        <p class="text-gray-500 mt-3">Everything you need to know about TravelAI Nepal</p>
+      </div>
+      <div class="space-y-4">
+        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
+          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
+            What is TravelAI Nepal?
+            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="text-gray-600 mt-3">TravelAI Nepal is an AI-powered trekking ecosystem that connects travelers with verified local agencies, guides, and hotels across Nepal. It offers AI-generated itineraries, digital trek passports, and offline emergency SOS.</p>
+        </details>
+
+        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
+          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
+            How does the AI itinerary planner work?
+            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="text-gray-600 mt-3">Our AI generates personalized day-by-day itineraries based on your destination, budget, travel duration, fitness level, and interests. It uses a hybrid LLM (Groq/Llama3) and real local pricing data.</p>
+        </details>
+
+        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
+          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
+            Is TravelAI Nepal free to use?
+            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="text-gray-600 mt-3">Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime. We operate on zero-commission smart contracts.</p>
+        </details>
+
+        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
+          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
+            Does it work offline in the mountains?
+            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="text-gray-600 mt-3">Yes. TravelAI Nepal is PWA and offline-first. Emergency SOS alerts store your location locally and auto-sync when signal returns. Digital trek passports work without internet.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
 @endsection
