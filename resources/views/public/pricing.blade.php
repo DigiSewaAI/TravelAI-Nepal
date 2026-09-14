@@ -1,6 +1,97 @@
 @extends('layouts.public')
 
-@section('title', __('messages.pricing_page_title'))
+@section('title', 'Pricing — TravelAI Nepal | Plans for Travel Agencies & Hotels')
+@section('meta_description', 'Simple, transparent pricing for Nepal tourism businesses. Start free, upgrade anytime. AI-powered platform with zero commission, multi-currency, and 4-language support.')
+@section('meta_keywords', 'Nepal travel agency software, trekking platform pricing, TravelAI Nepal plans, tourism SaaS Nepal, travel agency management software')
+
+@push('head')
+{{-- ========== JSON-LD: Product + AggregateOffer ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Product",
+  "name": "TravelAI Nepal — Travel Agency Platform",
+  "description": "AI-powered platform for Nepal travel agencies. Manage bookings, permits, staff, and clients with zero commission.",
+  "brand": {
+    "@@type": "Brand",
+    "name": "TravelAI Nepal"
+  },
+  "offers": {
+    "@@type": "AggregateOffer",
+    "priceCurrency": "NPR",
+    "lowPrice": "0",
+    "offerCount": "4",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ url('/pricing') }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: FAQPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@@type": "Question",
+      "name": "{{ addslashes(__('messages.faq_q1')) }}",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "{{ addslashes(__('messages.faq_a1')) }}"
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "{{ addslashes(__('messages.faq_q2')) }}",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "{{ addslashes(__('messages.faq_a2')) }}"
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "{{ addslashes(__('messages.faq_q3')) }}",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "{{ addslashes(__('messages.faq_a3')) }}"
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "{{ addslashes(__('messages.faq_q4')) }}",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "{{ addslashes(__('messages.faq_a4')) }}"
+      }
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Pricing",
+      "item": "{{ url('/pricing') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- ========== HERO SECTION ========== --}}

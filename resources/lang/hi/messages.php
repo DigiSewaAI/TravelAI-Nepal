@@ -9,6 +9,24 @@ return [
 'home_default_title' => 'AI के साथ पूरी नेपाल यात्रा की योजना बनाएं',
 'home_meta_description' => 'AI itinerary, भरोसेमंद स्थानीय प्रदाताओं, offline safety और real-time support के साथ अपनी पूरी नेपाल यात्रा की योजना बनाएं। एवरेस्ट, अन्नपूर्णा, पोखरा और बहुत कुछ।',
 'home_meta_keywords' => 'नेपाल यात्रा, नेपाल ट्रेकिंग, AI itinerary, एवरेस्ट बेस कैंप, अन्नपूर्णा ट्रेक, पोखरा टूर, नेपाल ट्रैवल एजेंसी',
+// About Page — Additional
+'about_stats_title' => 'आंकड़ों में',
+'about_stats_routes' => 'नेपाल मार्ग',
+'about_stats_services' => 'पर्यटन सेवाएं',
+'about_stats_providers' => 'विश्वसनीय प्रदाता',
+'about_stats_languages' => 'समर्थित भाषाएं',
+'about_why_title' => 'TravelAI Nepal क्यों?',
+'about_why_subtitle' => 'नेपाल के लिए बनाया गया, AI द्वारा संचालित, स्थानीय लोगों द्वारा विश्वसनीय।',
+'about_why_ai_title' => 'AI-Native प्लेटफॉर्म',
+'about_why_ai_desc' => 'नेपाल का पहला हाइब्रिड LLM-संचालित trekking ecosystem।',
+'about_why_zero_title' => 'शून्य कमीशन',
+'about_why_zero_desc' => 'प्रदाता 100% कमाई रखते हैं। कोई छिपा शुल्क नहीं।',
+'about_why_safety_title' => 'सुरक्षा पहले',
+'about_why_safety_desc' => 'रियल-टाइम ट्रैकिंग, ऑफलाइन SOS, और QR-आधारित चेक-इन।',
+'about_cta_title' => 'आंदोलन में शामिल होने के लिए तैयार?',
+'about_cta_subtitle' => 'आप यात्री हों या ट्रैवल एजेंसी — TravelAI Nepal आपके लिए बनाया गया है।',
+'about_cta_explore' => 'यात्राएं देखें',
+'about_cta_partner' => 'पार्टनर बनें',
 
     // ======================
     // SIDEBAR (Provider)

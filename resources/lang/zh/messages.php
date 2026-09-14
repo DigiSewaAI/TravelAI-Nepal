@@ -8,6 +8,24 @@ return [
 'home_default_title' => '用 AI 规划完整尼泊尔之旅',
 'home_meta_description' => '使用 AI 行程、值得信赖的当地服务商、离线安全保障和实时支持，规划您的整个尼泊尔之旅。珠穆朗玛峰、安纳普尔纳、博卡拉等。',
 'home_meta_keywords' => '尼泊尔旅游, 尼泊尔徒步, AI行程, 珠峰大本营, 安纳普尔纳徒步, 博卡拉旅游, 尼泊尔旅行社',
+// About Page — Additional
+'about_stats_title' => '数据一览',
+'about_stats_routes' => '尼泊尔路线',
+'about_stats_services' => '旅游服务',
+'about_stats_providers' => '可信服务商',
+'about_stats_languages' => '支持语言',
+'about_why_title' => '为什么选择 TravelAI Nepal？',
+'about_why_subtitle' => '为尼泊尔而生，由 AI 驱动，受本地信赖。',
+'about_why_ai_title' => 'AI 原生平台',
+'about_why_ai_desc' => '尼泊尔首个混合 LLM 驱动的徒步生态系统。',
+'about_why_zero_title' => '零佣金',
+'about_why_zero_desc' => '服务商保留 100% 收入。无隐藏费用。',
+'about_why_safety_title' => '安全第一',
+'about_why_safety_desc' => '实时追踪、离线 SOS 和 QR 签到。',
+'about_cta_title' => '准备好加入了吗？',
+'about_cta_subtitle' => '无论您是旅行者还是旅行社 — TravelAI Nepal 都为您而建。',
+'about_cta_explore' => '探索旅程',
+'about_cta_partner' => '成为合作伙伴',
     // ======================
     // SIDEBAR (Provider)
     // ======================

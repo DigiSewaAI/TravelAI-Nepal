@@ -8,6 +8,24 @@ return [
 'home_default_title' => 'Plan Entire Nepal Journey with AI',
 'home_meta_description' => 'Plan your entire Nepal journey with AI itineraries, trusted local providers, offline safety, and real-time support. Everest, Annapurna, Pokhara & more.',
 'home_meta_keywords' => 'Nepal travel, trekking Nepal, AI itinerary, Everest Base Camp, Annapurna Trek, Pokhara tours, Nepal travel agency',
+// About Page — Additional
+'about_stats_title' => 'By the Numbers',
+'about_stats_routes' => 'Nepal Routes',
+'about_stats_services' => 'Tourism Services',
+'about_stats_providers' => 'Trusted Providers',
+'about_stats_languages' => 'Languages Supported',
+'about_why_title' => 'Why TravelAI Nepal?',
+'about_why_subtitle' => 'Built for Nepal, powered by AI, trusted by locals.',
+'about_why_ai_title' => 'AI-Native Platform',
+'about_why_ai_desc' => 'First trekking ecosystem in Nepal with hybrid LLM-powered itineraries.',
+'about_why_zero_title' => 'Zero Commission',
+'about_why_zero_desc' => 'Providers keep 100% of earnings. No hidden fees, no leakage.',
+'about_why_safety_title' => 'Safety First',
+'about_why_safety_desc' => 'Real-time tracking, offline SOS, and QR-based check-ins.',
+'about_cta_title' => 'Ready to join the movement?',
+'about_cta_subtitle' => 'Whether you\'re a traveler or a travel agency — TravelAI Nepal is built for you.',
+'about_cta_explore' => 'Explore Trips',
+'about_cta_partner' => 'Become a Partner',
     // ======================
     // SIDEBAR (Provider)
     // ======================

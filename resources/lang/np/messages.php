@@ -8,6 +8,24 @@ return [
 'home_default_title' => 'AI सँग पूरा नेपाल यात्रा योजना गर्नुहोस्',
 'home_meta_description' => 'AI itinerary, भरपर्दो स्थानीय provider, offline safety र real-time support सँग नेपाल यात्रा योजना गर्नुहोस्।',
 'home_meta_keywords' => 'नेपाल यात्रा, ट्रेकिङ, AI itinerary, सगरमाथा, अन्नपूर्ण',
+// About Page — Additional
+'about_stats_title' => 'अंकमा',
+'about_stats_routes' => 'नेपाल रुटहरू',
+'about_stats_services' => 'पर्यटन सेवाहरू',
+'about_stats_providers' => 'विश्वसनीय प्रदायकहरू',
+'about_stats_languages' => 'समर्थित भाषाहरू',
+'about_why_title' => 'किन TravelAI Nepal?',
+'about_why_subtitle' => 'नेपालको लागि बनेको, AI द्वारा संचालित, स्थानीयहरू द्वारा विश्वसनीय।',
+'about_why_ai_title' => 'AI-Native प्लेटफर्म',
+'about_why_ai_desc' => 'नेपालको पहिलो हाइब्रिड LLM-संचालित trekking ecosystem।',
+'about_why_zero_title' => 'शून्य कमिशन',
+'about_why_zero_desc' => 'प्रदायकहरूले १००% कमाई राख्छन्। कुनै लुकेको शुल्क छैन।',
+'about_why_safety_title' => 'सुरक्षा पहिले',
+'about_why_safety_desc' => 'रियल-टाइम ट्र्याकिङ, अफलाइन SOS, र QR-आधारित चेक-इन।',
+'about_cta_title' => 'आन्दोलनमा सामेल हुन तयार?',
+'about_cta_subtitle' => 'तपाईं यात्री होस् वा ट्राभल एजेन्सी — TravelAI Nepal तपाईंको लागि बनेको छ।',
+'about_cta_explore' => 'यात्रा अन्वेषण',
+'about_cta_partner' => 'साझेदार बन्नुहोस्',
     // ======================
     // SIDEBAR
     // ======================
