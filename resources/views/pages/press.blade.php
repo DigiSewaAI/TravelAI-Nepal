@@ -1,6 +1,126 @@
 @extends('layouts.public')
 
-@section('title', __('messages.press_page_title'))
+@section('title', 'Press & Media — TravelAI Nepal | News, Features & Awards')
+@section('meta_description', 'Latest news, media coverage, interviews, and awards for TravelAI Nepal — Nepal\'s first AI-native trekking ecosystem. Read our press releases and announcements.')
+@section('meta_keywords', 'TravelAI Nepal press, Nepal tourism news, travel tech awards, AI trekking news, Nepal startup media')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Press & Media — TravelAI Nepal",
+  "description": "Latest news, media coverage, interviews, and awards for TravelAI Nepal.",
+  "url": "{{ url()->current() }}"
+}
+</script>
+
+{{-- ========== JSON-LD: NewsArticle (per press release) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "NewsArticle",
+  "headline": "{{ addslashes(__('messages.press_news1_title')) }}",
+  "description": "{{ addslashes(__('messages.press_news1_desc')) }}",
+  "datePublished": "2026-08-15",
+  "dateModified": "{{ now()->toAtomString() }}",
+  "author": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal"
+  },
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "logo": {
+      "@@type": "ImageObject",
+      "url": "{{ asset('images/logo.png') }}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ url()->current() }}"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "NewsArticle",
+  "headline": "{{ addslashes(__('messages.press_news2_title')) }}",
+  "description": "{{ addslashes(__('messages.press_news2_desc')) }}",
+  "datePublished": "2026-07-15",
+  "dateModified": "{{ now()->toAtomString() }}",
+  "author": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal"
+  },
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "logo": {
+      "@@type": "ImageObject",
+      "url": "{{ asset('images/logo.png') }}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ url()->current() }}"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "NewsArticle",
+  "headline": "{{ addslashes(__('messages.press_news3_title')) }}",
+  "description": "{{ addslashes(__('messages.press_news3_desc')) }}",
+  "datePublished": "2026-06-15",
+  "dateModified": "{{ now()->toAtomString() }}",
+  "author": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal"
+  },
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "logo": {
+      "@@type": "ImageObject",
+      "url": "{{ asset('images/logo.png') }}"
+    }
+  },
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ url()->current() }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Press & Media",
+      "item": "{{ url('/press') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- HERO --}}

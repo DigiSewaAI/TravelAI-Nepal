@@ -1,6 +1,80 @@
 @extends('layouts.public')
 
-@section('title', __('messages.careers_page_title'))
+@section('title', 'Careers — TravelAI Nepal | Join Our AI-Native Team')
+@section('meta_description', 'Join TravelAI Nepal — building Nepal\'s first AI-native tourism ecosystem. Explore open roles in engineering, design, marketing, and operations.')
+@section('meta_keywords', 'TravelAI Nepal careers, tourism jobs Nepal, AI startup jobs, Kathmandu tech jobs, Nepal travel tech careers')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Careers — TravelAI Nepal",
+  "description": "Join TravelAI Nepal — building Nepal's first AI-native tourism ecosystem.",
+  "url": "{{ url()->current() }}"
+}
+</script>
+
+{{-- ========== JSON-LD: JobPosting (per job) ========== --}}
+@if(isset($jobs) && count($jobs) > 0)
+@foreach($jobs as $job)
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "JobPosting",
+  "title": "{{ addslashes($job['title']) }}",
+  "description": "{{ addslashes($job['description']) }}",
+  "datePosted": "{{ now()->toAtomString() }}",
+  "employmentType": "FULL_TIME",
+  "hiringOrganization": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "sameAs": "{{ url('/') }}",
+    "logo": "{{ asset('images/logo.png') }}"
+  },
+  "jobLocation": {
+    "@@type": "Place",
+    "address": {
+      "@@type": "PostalAddress",
+      "addressLocality": "{{ addslashes($job['location']) }}",
+      "addressCountry": "NP"
+    }
+  },
+  "applicantLocationRequirements": {
+    "@@type": "Country",
+    "name": "Nepal"
+  },
+  "directApply": true,
+  "url": "{{ url()->current() }}"
+}
+</script>
+@endforeach
+@endif
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Careers",
+      "item": "{{ url('/careers') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- ========== HERO SECTION ========== --}}

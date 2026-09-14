@@ -1,6 +1,49 @@
 @extends('layouts.public')
 
-@section('title', __('messages.gdpr_page_title'))
+@section('title', 'GDPR & Data Safety — TravelAI Nepal | Privacy Compliance')
+@section('meta_description', 'TravelAI Nepal is fully GDPR compliant. Learn how we process, store, and protect your personal data, your rights as a user, and our security standards.')
+@section('meta_keywords', 'GDPR compliance Nepal, data safety, privacy policy, data protection, user rights GDPR, TravelAI Nepal privacy')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "GDPR & Data Safety — TravelAI Nepal",
+  "description": "TravelAI Nepal is fully GDPR compliant. Learn how we process, store, and protect your personal data.",
+  "url": "{{ url()->current() }}",
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "url": "{{ url('/') }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "GDPR & Data Safety",
+      "item": "{{ url('/gdpr') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- HERO --}}
