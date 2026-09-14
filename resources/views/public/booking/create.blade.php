@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
 @section('title', __('messages.booking_create_page_title', ['name' => $service->name]))
+
+@push('head')
+<meta name="robots" content="noindex, nofollow">
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
     <nav class="text-sm text-gray-500 mb-4">

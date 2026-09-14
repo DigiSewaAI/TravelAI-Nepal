@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
 @section('title', __('messages.booking_confirmation_page_title'))
+
+@push('head')
+<meta name="robots" content="noindex, nofollow">
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="text-center mb-8">
