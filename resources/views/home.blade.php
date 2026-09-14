@@ -65,6 +65,109 @@
 }
 </script>
 @endverbatim
+{{-- ===== Safety CTA — scoped styles (isolated to .safety-cta) ===== --}}
+@verbatim
+<style>
+    .safety-cta {
+        position: relative;
+        isolation: isolate;
+    }
+
+    /* Single decorative origin point for the expanding waves (anchored on the icon tile). */
+    .safety-cta .safety-wave-anchor {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .safety-cta .safety-wave {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        margin-left: -12px;
+        margin-top: -12px;
+        border-radius: 50%;
+        border: 2px solid rgba(37, 99, 235, 0.45);
+        background: rgba(59, 130, 246, 0.10);
+        opacity: 0;
+        transform: scale(0.3);
+        /* One-shot: runs once, then holds at end state. No infinite loop. */
+        animation: safetyWaveExpand 2.4s cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+        pointer-events: none;
+        will-change: transform, opacity;
+    }
+
+            /* 6 staggered waves => sequence 1 → 2 → 3 → 4 → 5 → 6, then permanently stopped.
+       Gap = 1.20s (very calm, spacious radar feel). */
+    .safety-cta .safety-wave-1 { animation-delay: 0.40s; }
+    .safety-cta .safety-wave-2 { animation-delay: 1.60s; }
+    .safety-cta .safety-wave-3 { animation-delay: 2.80s; }
+    .safety-cta .safety-wave-4 { animation-delay: 4.00s; }
+    .safety-cta .safety-wave-5 { animation-delay: 5.20s; }
+    .safety-cta .safety-wave-6 { animation-delay: 6.40s; }
+
+    @keyframes safetyWaveExpand {
+        0%   { transform: scale(0.3); opacity: 0.65; }
+        60%  { opacity: 0.25; }
+        100% { transform: scale(5.5); opacity: 0; }
+    }
+
+    /* Persistent live-status dot — gentle continuous pulse after the waves stop. */
+    .safety-cta .safety-status-dot {
+        /* Future dynamic-status hook — override this one variable to reflect
+           real backend safety state:
+              Normal   (Normal) : #10b981  (green)
+              Caution  (Caution): #f59e0b  (amber)
+              High Risk(High)   : #f97316  (orange)
+              Avoid    (Critical): #ef4444 (red)
+        */
+        --safety-dot-color: #10b981;
+        --safety-dot-ring: rgba(16, 185, 129, 0.55);
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--safety-dot-color);
+        box-shadow: 0 0 0 0 var(--safety-dot-ring);
+        animation: safetyStatusPulse 2.6s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+    @keyframes safetyStatusPulse {
+        0%, 100% { opacity: 0.7; box-shadow: 0 0 0 0 var(--safety-dot-ring); }
+        50%      { opacity: 1;   box-shadow: 0 0 0 5px transparent; }
+    }
+
+    /* Mobile: shrink the wave's max scale so it never crowds nearby content. */
+    @media (max-width: 640px) {
+        .safety-cta .safety-wave { animation-name: safetyWaveExpandSm; }
+    }
+    @keyframes safetyWaveExpandSm {
+        0%   { transform: scale(0.3); opacity: 0.55; }
+        60%  { opacity: 0.20; }
+        100% { transform: scale(4); opacity: 0; }
+    }
+
+    /* Reduced motion: kill waves entirely, freeze dot as a static colored indicator. */
+    @media (prefers-reduced-motion: reduce) {
+        .safety-cta .safety-wave {
+            animation: none !important;
+            display: none !important;
+        }
+        .safety-cta .safety-status-dot {
+            animation: none !important;
+            opacity: 1 !important;
+            box-shadow: 0 0 0 2px var(--safety-dot-ring);
+        }
+        .safety-cta { transition: none !important; }
+    }
+</style>
+@endverbatim
 @endpush
 
 @section('content')
@@ -85,13 +188,36 @@
           </div>
           <div class="flex flex-wrap gap-6 mt-10 text-sm text-gray-500">
             <div class="flex items-center gap-1"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.no_hidden_fees') }}</div>
-            <a href="{{ route('safety.index') }}" 
-   class="flex items-center gap-1 hover:underline hover:opacity-80 transition-all duration-200">
-    <i class="fas fa-shield-alt text-blue-500"></i>
-    {{ __('messages.realtime_safety') }}
-    <span class="text-xs text-gray-400 mx-1">·</span>
-    <span class="text-xs text-blue-600 font-medium hover:underline">
-        {{ __('messages.view_status') }}
+            <a href="{{ route('safety.index') }}"
+   class="safety-cta group relative inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-blue-200/80 shadow-sm hover:shadow-lg hover:border-blue-400 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-300 text-left">
+
+    {{-- Shield icon tile — also hosts the wave origin --}}
+    <span class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shrink-0">
+        <i class="fas fa-shield-alt text-base" aria-hidden="true"></i>
+
+                {{-- One-shot wave origin (decorative) --}}
+        <span class="safety-wave-anchor" aria-hidden="true">
+            <span class="safety-wave safety-wave-1"></span>
+            <span class="safety-wave safety-wave-2"></span>
+            <span class="safety-wave safety-wave-3"></span>
+            <span class="safety-wave safety-wave-4"></span>
+            <span class="safety-wave safety-wave-5"></span>
+            <span class="safety-wave safety-wave-6"></span>
+        </span>
+    </span>
+
+    {{-- Text content --}}
+    <span class="flex flex-col leading-tight min-w-0">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+            {{ __('messages.realtime_safety') }}
+            <span class="safety-status-dot"
+                  role="img"
+                  aria-label="{{ __('messages.status_normal') }}"></span>
+        </span>
+        <span class="text-xs text-gray-600 group-hover:text-blue-700 transition-colors flex items-center gap-1">
+            {{ __('messages.view_status') }}
+            <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true"></i>
+        </span>
     </span>
 </a>
             <div class="flex items-center gap-1"><i class="fas fa-headset text-purple-500"></i> {{ __('messages.local_support_24_7') }}</div>
