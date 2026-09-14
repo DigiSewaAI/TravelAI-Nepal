@@ -1,6 +1,49 @@
 @extends('layouts.public')
 
-@section('title', __('messages.terms_page_title'))
+@section('title', 'Terms of Service — TravelAI Nepal | User Agreement')
+@section('meta_description', 'Read TravelAI Nepal\'s Terms of Service. Understand user accounts, bookings, payments, cancellations, liability, and platform rules before using our service.')
+@section('meta_keywords', 'terms of service TravelAI Nepal, user agreement, booking terms, cancellation policy, Nepal travel terms')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Terms of Service — TravelAI Nepal",
+  "description": "Read TravelAI Nepal's Terms of Service — user accounts, bookings, payments, and platform rules.",
+  "url": "{{ url()->current() }}",
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "url": "{{ url('/') }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Terms of Service",
+      "item": "{{ url('/terms') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- HERO --}}

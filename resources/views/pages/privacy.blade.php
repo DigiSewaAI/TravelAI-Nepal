@@ -1,6 +1,49 @@
 @extends('layouts.public')
 
-@section('title', __('messages.privacy_page_title'))
+@section('title', 'Privacy Policy — TravelAI Nepal | How We Protect Your Data')
+@section('meta_description', 'Read TravelAI Nepal\'s Privacy Policy. Learn what data we collect, how we use it, our security measures, third-party sharing, and your data rights.')
+@section('meta_keywords', 'privacy policy TravelAI Nepal, data protection, personal data, GDPR privacy, Nepal travel privacy')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Privacy Policy — TravelAI Nepal",
+  "description": "Read TravelAI Nepal's Privacy Policy — data collection, usage, security, and user rights.",
+  "url": "{{ url()->current() }}",
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "url": "{{ url('/') }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Privacy Policy",
+      "item": "{{ url('/privacy') }}"
+    }
+  ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- HERO --}}
