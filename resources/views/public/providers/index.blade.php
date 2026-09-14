@@ -1,6 +1,21 @@
 @extends('layouts.public')
 
 @section('title', __('messages.providers_page_title'))
+@section('meta_description', 'Browse verified travel providers, agencies, and local operators across Nepal. Compare services, read reviews, and book directly with zero commission.')
+
+@push('head')
+@verbatim
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Travel Providers in Nepal",
+  "description": "Verified travel agencies, trekking operators, and local providers across Nepal.",
+  "url": "http://localhost:8000/providers"
+}
+</script>
+@endverbatim
+@endpush
 
 @section('content')
 

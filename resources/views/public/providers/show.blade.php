@@ -1,6 +1,31 @@
 @extends('layouts.public')
 
 @section('title', $provider->name . ' | TravelAI Nepal')
+@section('meta_description', Str::limit(strip_tags($provider->description ?? 'Verified travel provider in Nepal offering treks, tours, and adventure services.'), 155))
+
+@push('head')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "LocalBusiness",
+  "name": "{{ addslashes($provider->name) }}",
+  "description": "{{ Str::limit(strip_tags($provider->description ?? ''), 200) }}",
+  "url": "{{ url()->current() }}",
+  "image": "{{ $provider->logo_url ? asset('storage/' . $provider->logo_url) : asset('images/logo.png') }}",
+  "address": {
+    "@@type": "PostalAddress",
+    "addressLocality": "{{ $provider->address ?? 'Kathmandu' }}",
+    "addressCountry": "NP"
+  },
+  "contactPoint": {
+    "@@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "{{ $provider->contact_email ?? '' }}",
+    "telephone": "{{ $provider->contact_phone ?? '' }}"
+  }
+}
+</script>
+@endpush
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
