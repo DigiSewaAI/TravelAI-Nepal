@@ -61,7 +61,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact'
 Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');
-Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // ============================================
 // Dynamic robots.txt (domain-agnostic)
