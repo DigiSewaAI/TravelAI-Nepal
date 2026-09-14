@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+@php
+    $htmlLang = match(app()->getLocale()) {
+        'np' => 'ne',
+        'zh' => 'zh-Hans',
+        default => app()->getLocale(),
+    };
+@endphp
+<html lang="{{ $htmlLang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -31,7 +38,39 @@
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- ========== OPEN GRAPH & TWITTER CARDS (DYNAMIC) ========== -->
-@yield('og_meta')
+@hasSection('og_meta')
+    @yield('og_meta')
+@else
+    @include('partials.og-meta')
+@endif
+
+{{-- ========== PUSHED HEAD (JSON-LD from pages) ========== --}}
+@stack('head')
+
+{{-- ========== JSON-LD: Organization ========== --}}
+@verbatim
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TravelAgency",
+  "name": "TravelAI Nepal",
+  "url": "http://localhost:8000",
+  "logo": "http://localhost:8000/images/logo.png",
+  "description": "AI-powered trekking ecosystem connecting travelers with local agencies in Nepal.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kathmandu",
+    "addressRegion": "Bagmati",
+    "addressCountry": "NP"
+  },
+  "sameAs": [
+    "https://twitter.com/travelainepal",
+    "https://www.instagram.com/travelainepal",
+    "https://github.com/travelainepal"
+  ]
+}
+</script>
+@endverbatim
 
     <!-- ========== Tailwind, Font Awesome, Fonts ========== -->
     <script src="https://cdn.tailwindcss.com"></script>
