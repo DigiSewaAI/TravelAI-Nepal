@@ -1,6 +1,32 @@
 @extends('layouts.public')
 
-@section('title', __('messages.plan_entire') . ' ' . __('messages.nepal_journey'))
+@section('title', __('messages.home_default_title'))
+@section('meta_description', __('messages.home_meta_description'))
+@section('meta_keywords', __('messages.home_meta_keywords'))
+
+{{-- ========== JSON-LD: WebSite + FAQPage ========== --}}
+@push('head')
+@verbatim
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TravelAI Nepal",
+  "url": "http://localhost:8000",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "http://localhost:8000/explore?search={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+@endverbatim
+@endpush
+
+@section('content')
 
 @section('content')
   <!-- Hero Section -->
