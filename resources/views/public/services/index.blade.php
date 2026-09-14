@@ -1,6 +1,26 @@
 @extends('layouts.public')
 
 @section('title', __('messages.explore_services_title'))
+@section('meta_description', 'Browse treks, tours, hotels and adventure activities across Nepal. Verified providers, real prices, instant booking.')
+
+@push('head')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    @foreach($services->take(20) as $i => $s)
+    {
+      "@type": "ListItem",
+      "position": {{ $i + 1 }},
+      "url": "{{ route('public.services.show', $s->slug) }}",
+      "name": "{{ addslashes($s->name) }}"
+    }{{ !$loop->last ? ',' : '' }}
+    @endforeach
+  ]
+}
+</script>
+@endpush
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Category Tabs -->

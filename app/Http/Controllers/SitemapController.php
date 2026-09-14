@@ -11,9 +11,18 @@ class SitemapController extends Controller
 {
     public function index()
     {
-        $services = Service::where('status', 'active')->get();
-        $providers = Provider::where('is_active', true)->get();
+        $services  = Service::where('status', 'active')
+            ->select('id', 'slug', 'updated_at')
+            ->orderByDesc('updated_at')
+            ->get();
 
-        return response()->view('sitemap', compact('services', 'providers'))->header('Content-Type', 'text/xml');
+        $providers = Provider::where('is_active', true)
+            ->select('id', 'slug', 'updated_at')
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return response()
+            ->view('sitemap', compact('services', 'providers'))
+            ->header('Content-Type', 'application/xml');
     }
 }

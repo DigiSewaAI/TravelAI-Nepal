@@ -1,6 +1,13 @@
 <?php
 
 return [
+
+// ======================
+// SEO / META
+// ======================
+'home_default_title' => 'AI सँग पूरा नेपाल यात्रा योजना गर्नुहोस्',
+'home_meta_description' => 'AI itinerary, भरपर्दो स्थानीय provider, offline safety र real-time support सँग नेपाल यात्रा योजना गर्नुहोस्।',
+'home_meta_keywords' => 'नेपाल यात्रा, ट्रेकिङ, AI itinerary, सगरमाथा, अन्नपूर्ण',
     // ======================
     // SIDEBAR
     // ======================
@@ -431,6 +438,8 @@ return [
     'copy_failed' => 'प्रतिलिपि गर्न असफल। कृपया चयन गर्नुहोस् र म्यानुअल रूपमा प्रतिलिपि गर्नुहोस्।',
     'anonymous' => 'अज्ञात',
     'smart_contracts_ready' => 'स्मार्ट अनुबन्ध तयार',
+
+    
 
     // ======================
     // FEATURES DATA (JavaScript)

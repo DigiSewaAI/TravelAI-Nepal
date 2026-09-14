@@ -1,6 +1,13 @@
 <?php
 
 return [
+
+// ======================
+// SEO / META
+// ======================
+'home_default_title' => 'Plan Entire Nepal Journey with AI',
+'home_meta_description' => 'Plan your entire Nepal journey with AI itineraries, trusted local providers, offline safety, and real-time support. Everest, Annapurna, Pokhara & more.',
+'home_meta_keywords' => 'Nepal travel, trekking Nepal, AI itinerary, Everest Base Camp, Annapurna Trek, Pokhara tours, Nepal travel agency',
     // ======================
     // SIDEBAR (Provider)
     // ======================
@@ -402,6 +409,8 @@ return [
     'copied_to_clipboard' => 'Itinerary copied to clipboard!',
     'copy_failed' => 'Failed to copy. Please select and copy manually.',
     'anonymous' => 'Anonymous',
+
+    
 
     // ======================
     // FEATURES DATA (JavaScript लागि)

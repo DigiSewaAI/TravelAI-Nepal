@@ -1,0 +1,109 @@
+diff --git a/resources/views/home.blade.php b/resources/views/home.blade.php
+index b6c5e43..8285919 100644
+--- a/resources/views/home.blade.php
++++ b/resources/views/home.blade.php
+@@ -1,6 +1,69 @@
+ @extends('layouts.public')
+ 
+-@section('title', __('messages.plan_entire') . ' ' . __('messages.nepal_journey'))
++@section('title', __('messages.home_default_title'))
++@section('meta_description', __('messages.home_meta_description'))
++@section('meta_keywords', __('messages.home_meta_keywords'))
++
++{{-- ========== JSON-LD: WebSite + FAQPage ========== --}}
++@push('head')
++<script type="application/ld+json">
++{
++  "@context": "https://schema.org",
++  "@type": "WebSite",
++  "name": "{{ __('messages.app_name') }}",
++  "url": "{{ url('/') }}",
++  "potentialAction": {
++    "@type": "SearchAction",
++    "target": {
++      "@type": "EntryPoint",
++      "urlTemplate": "{{ url('/explore') }}?search={search_term_string}"
++    },
++    "query-input": "required name=search_term_string"
++  }
++}
++</script>
++
++<script type="application/ld+json">
++{
++  "@context": "https://schema.org",
++  "@type": "FAQPage",
++  "mainEntity": [
++    {
++      "@type": "Question",
++      "name": "{{ addslashes(__('messages.faq_q1')) }}",
++      "acceptedAnswer": {
++        "@type": "Answer",
++        "text": "{{ addslashes(__('messages.faq_a1')) }}"
++      }
++    },
++    {
++      "@type": "Question",
++      "name": "{{ addslashes(__('messages.faq_q2')) }}",
++      "acceptedAnswer": {
++        "@type": "Answer",
++        "text": "{{ addslashes(__('messages.faq_a2')) }}"
++      }
++    },
++    {
++      "@type": "Question",
++      "name": "{{ addslashes(__('messages.faq_q3')) }}",
++      "acceptedAnswer": {
++        "@type": "Answer",
++        "text": "{{ addslashes(__('messages.faq_a3')) }}"
++      }
++    },
++    {
++      "@type": "Question",
++      "name": "{{ addslashes(__('messages.faq_q4')) }}",
++      "acceptedAnswer": {
++        "@type": "Answer",
++        "text": "{{ addslashes(__('messages.faq_a4')) }}"
++      }
++    }
++  ]
++}
++</script>
++@endpush
+ 
+ @section('content')
+   <!-- Hero Section -->
+@@ -359,6 +422,33 @@ class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8
+     </div>
+   </section>
+ 
++  
++  {{-- ========== FAQ SECTION ========== --}}
++  <section id="faq" class="py-20 px-6 md:px-10 bg-gray-50">
++    <div class="max-w-4xl mx-auto">
++      <div class="text-center mb-12">
++        <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">FAQ</span>
++        <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900">{{ __('messages.faq_title') }}</h2>
++      </div>
++      <div class="space-y-4">
++        @foreach([
++          ['q' => __('messages.faq_q1'), 'a' => __('messages.faq_a1')],
++          ['q' => __('messages.faq_q2'), 'a' => __('messages.faq_a2')],
++          ['q' => __('messages.faq_q3'), 'a' => __('messages.faq_a3')],
++          ['q' => __('messages.faq_q4'), 'a' => __('messages.faq_a4')],
++        ] as $faq)
++        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
++          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
++            {{ $faq['q'] }}
++            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
++          </summary>
++          <p class="text-gray-600 mt-3">{{ $faq['a'] }}</p>
++        </details>
++        @endforeach
++      </div>
++    </div>
++  </section>
++
+   <!-- All JavaScript blocks (rendering, AI itinerary, check-ins) -->
+   <script>
+     // ========== Translation Helper ==========

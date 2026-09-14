@@ -37,6 +37,8 @@ use App\Http\Controllers\SitemapController;
 
 use App\Http\Controllers\Public\JourneyReplayController as PublicJourneyReplayController;
 use App\Http\Controllers\Traveler\ShareController;
+use Illuminate\Support\Facades\Response;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +62,64 @@ Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy'
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+
+// ============================================
+// Dynamic robots.txt (domain-agnostic)
+// ============================================
+Route::get('/robots.txt', function () {
+    $lines = [
+        '# TravelAI Nepal - robots.txt',
+        '',
+        'User-agent: *',
+        'Allow: /',
+        '',
+        '# ===== Block private / auth areas =====',
+        'Disallow: /login',
+        'Disallow: /register',
+        'Disallow: /logout',
+        'Disallow: /password/',
+        'Disallow: /admin/',
+        'Disallow: /provider/',
+        'Disallow: /traveler/',
+        'Disallow: /currency/switch',
+        'Disallow: /webhook/',
+        '',
+        '# ===== Old / redirected URLs =====',
+        'Disallow: /agencies',
+        '',
+        '# ===== QR / check-in internal =====',
+        'Disallow: /scan/',
+        'Disallow: /booking/qr/',
+        '',
+        '# ===== API & internal tools =====',
+        'Disallow: /api/',
+        'Disallow: /telescope/',
+        'Disallow: /horizon/',
+        'Disallow: /_ignition/',
+        'Disallow: /livewire/',
+        '',
+        '# ===== Storage =====',
+        'Disallow: /storage/',
+        '',
+        '# ===== Search result pages (duplicate content) =====',
+        'Disallow: /search',
+        'Disallow: /*?q=',
+        'Disallow: /*?sort=',
+        'Disallow: /*?*filter=',
+        'Disallow: /*?page=',
+        '',
+        '# ===== Tracking params (duplicate content) =====',
+        'Disallow: /*?utm_',
+        'Disallow: /*?ref=',
+        'Disallow: /*?fbclid=',
+        '',
+        '# ===== Sitemap =====',
+        'Sitemap: ' . url('/sitemap.xml'),
+    ];
+
+    return Response::make(implode("\n", $lines), 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+});
 
 // =============================================
 // 2. PUBLIC MARKETPLACE (Phase 7)
