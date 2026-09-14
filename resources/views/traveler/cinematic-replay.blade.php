@@ -2,6 +2,10 @@
 
 @section('title', 'Cinematic Journey Replay - TravelAI Nepal')
 
+@push('head')
+<meta name="robots" content="noindex, nofollow">
+@endpush
+
 @section('content')
 <div id="cinematic-replay" class="fixed inset-0 bg-black z-50 overflow-hidden">
     <div id="scene-container" class="w-full h-full relative">

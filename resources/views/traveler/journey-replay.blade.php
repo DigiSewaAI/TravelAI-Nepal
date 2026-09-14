@@ -2,6 +2,10 @@
 
 @section('title', 'My Journey Replay - TravelAI Nepal')
 
+@push('head')
+<meta name="robots" content="noindex, nofollow">
+@endpush
+
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl">
 
