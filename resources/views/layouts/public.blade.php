@@ -18,7 +18,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png?v=3') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico?v=3') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png?v=3') }}">
-    <link rel="manifest" href="{{ asset('site.webmanifest?v=3') }}">
     <meta name="msapplication-TileColor" content="#2563eb">
     <meta name="theme-color" content="#2563eb">
 
@@ -36,6 +35,13 @@
     <meta name="robots" content="index, follow">
     <meta name="author" content="{{ __('messages.app_name') }}">
     <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- ========== HREFLANG (multilingual) ========== --}}
+<link rel="alternate" hreflang="en" href="{{ url()->current() }}">
+<link rel="alternate" hreflang="ne" href="{{ route('lang.switch', 'np') }}">
+<link rel="alternate" hreflang="hi" href="{{ route('lang.switch', 'hi') }}">
+<link rel="alternate" hreflang="zh-Hans" href="{{ route('lang.switch', 'zh') }}">
+<link rel="alternate" hreflang="x-default" href="{{ url()->current() }}">
 
     <!-- ========== OPEN GRAPH & TWITTER CARDS (DYNAMIC) ========== -->
 @hasSection('og_meta')
