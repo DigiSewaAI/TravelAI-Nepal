@@ -6,12 +6,12 @@
 @push('head')
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "ItemList",
+  "@@context": "https://schema.org",
+  "@@type": "ItemList",
   "itemListElement": [
     @foreach($services->take(20) as $i => $s)
     {
-      "@type": "ListItem",
+      "@@type": "ListItem",
       "position": {{ $i + 1 }},
       "url": "{{ route('public.services.show', $s->slug) }}",
       "name": "{{ addslashes($s->name) }}"

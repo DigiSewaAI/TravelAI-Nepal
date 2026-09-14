@@ -6,19 +6,19 @@
 @push('head')
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "TouristTrip",
+  "@@context": "https://schema.org",
+  "@@type": "TouristTrip",
   "name": "{{ addslashes($service->name) }}",
   "description": "{{ Str::limit(strip_tags($service->description), 200) }}",
   "image": "{{ $service->cover_image ? asset('storage/' . $service->cover_image) : asset('images/default-share.jpg') }}",
   "url": "{{ url()->current() }}",
   "provider": {
-    "@type": "LocalBusiness",
+    "@@type": "LocalBusiness",
     "name": "{{ addslashes($service->provider->name) }}",
     "url": "{{ route('public.providers.show', $service->provider->slug ?? $service->provider->id) }}"
   },
   "offers": {
-    "@type": "Offer",
+    "@@type": "Offer",
     "price": "{{ $service->price }}",
     "priceCurrency": "{{ $service->currency ?? 'USD' }}",
     "availability": "https://schema.org/InStock",
