@@ -318,7 +318,7 @@ unset($dayData);
         // ============================================================
         // SAVE TO DB
         // ============================================================
-$result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown, $routeDataDays, $requestedDays, $routeDataMismatch) {
+$result = DB::transaction(function () use ($input, $route, $validated, $aiResponse, $usedFallback, $costBreakdown, $routeDataDays, $requestedDays, $routeDataMismatch, $locale) {
                 $plannerRequest = PlannerRequest::create([
                 'user_id' => auth()->id() ?? null,
                 'session_id' => session()->getId(),
