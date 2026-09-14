@@ -416,14 +416,25 @@ $perDayServiceCosts[$key] = [
             if ($input['budget'] > 0 && $totalCost > $budgetNpr) {
                 $overPercent = (($totalCost - $budgetNpr) / $budgetNpr) * 100;
                 if ($overPercent > 10) {
+                                        $overPctRounded = round($overPercent, 0);
                     $finalBreakdown['budget_insufficient'] = [
-                        'name' => '⚠️ Budget Warning',
+                        'name' => match($locale) {
+                            'np' => '⚠️ बजेट चेतावनी',
+                            'hi' => '⚠️ बजट चेतावनी',
+                            'zh' => '⚠️ 预算警告',
+                            default => '⚠️ Budget Warning',
+                        },
                         'amount' => 0,
                         'currency' => 'NPR',
                         'unit' => 'note',
                         'is_mandatory' => false,
                         'provider_name' => 'System',
-                                                'message' => "Estimated cost is " . round($overPercent, 0) . "% over your budget of {$input['budget']} USD. Consider increasing your budget or choosing a more affordable style.",
+                        'message' => match($locale) {
+                            'np' => "अनुमानित लागत तपाईंको \${$input['budget']} USD बजेट भन्दा {$overPctRounded}% बढी छ। कृपया बजेट बढाउनुहोस् वा किफायती शैली छान्नुहोस्।",
+                            'hi' => "अनुमानित लागत आपके \${$input['budget']} USD बजट से {$overPctRounded}% अधिक है। कृपया बजट बढ़ाएँ या अधिक किफायती शैली चुनें।",
+                            'zh' => "预计费用超出您 \${$input['budget']} USD 预算 {$overPctRounded}%。请考虑增加预算或选择更经济的旅行方式。",
+                            default => "Estimated cost is {$overPctRounded}% over your budget of \${$input['budget']} USD. Consider increasing your budget or choosing a more affordable style.",
+                        },
                     ];
                     Log::info("⚠️ Budget warning added: {$overPercent}% over budget");
                 }
