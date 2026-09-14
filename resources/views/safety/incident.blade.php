@@ -1,6 +1,40 @@
 @extends('layouts.public')
 
-@section('title', $incident->title)
+@section('title', $incident->title . ' — Safety Incident | TravelAI Nepal')
+@section('meta_description', 'Safety incident report: ' . Str::limit(strip_tags($incident->description ?? $incident->title), 150))
+
+@push('head')
+{{-- 🔒 Incident pages: noindex, follow — don't index individual incidents, but pass link equity --}}
+<meta name="robots" content="noindex, follow">
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Travel Safety",
+      "item": "{{ url('/travel-safety') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 3,
+      "name": "{{ addslashes(Str::limit($incident->title, 50)) }}",
+      "item": "{{ url()->current() }}"
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

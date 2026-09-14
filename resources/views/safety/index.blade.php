@@ -1,6 +1,91 @@
 @extends('layouts.public')
 
-@section('title', __('messages.travel_safety_nepal'))
+@section('title', 'Travel Safety — Nepal | Real-Time Updates & Weather | TravelAI Nepal')
+@section('meta_description', 'Real-time safety updates, weather intelligence, and live incident tracking across Nepal. Check destination safety status, advisory level, and trek safety tips.')
+@section('meta_keywords', 'Nepal travel safety, trekking safety Nepal, real-time safety updates, Nepal weather, incident tracking, safe trekking Nepal')
+
+@push('head')
+{{-- ========== JSON-LD: WebPage ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebPage",
+  "name": "Travel Safety — Nepal",
+  "description": "Real-time safety updates, weather intelligence, and live incident tracking across Nepal.",
+  "url": "{{ url()->current() }}",
+  "inLanguage": "en",
+  "publisher": {
+    "@@type": "Organization",
+    "name": "TravelAI Nepal",
+    "url": "{{ url('/') }}"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: FAQPage (Safety) ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@@type": "Question",
+      "name": "Is it safe to travel in Nepal right now?",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "TravelAI Nepal provides real-time safety updates for all 138+ destinations across Nepal. Check each destination's safety status — Normal, Caution, High Risk, or Avoid — based on live incident reports, weather conditions, and AI-driven risk assessments."
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "How does TravelAI Nepal track trekking safety?",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "We combine real-time weather data from OpenWeatherMap, verified incident reports from local sources, AI-driven risk scoring, and traveler check-ins via QR code to provide comprehensive safety intelligence for every trekking route in Nepal."
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "What should I do in case of a trekking emergency in Nepal?",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "Use TravelAI Nepal's offline Emergency SOS feature — it stores your location locally and auto-syncs when signal returns, alerting your agency, guides, and rescue teams instantly. Always carry emergency contacts and inform your agency about your route."
+      }
+    },
+    {
+      "@@type": "Question",
+      "name": "What are the current safety levels in Nepal?",
+      "acceptedAnswer": {
+        "@@type": "Answer",
+        "text": "TravelAI Nepal uses four safety levels: Normal (green — no known issues), Caution (yellow — minor advisories), High Risk (orange — significant concerns), and Avoid (red — do not travel). Each destination is continuously monitored and updated in real-time."
+      }
+    }
+  ]
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Travel Safety",
+      "item": "{{ url('/travel-safety') }}"
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

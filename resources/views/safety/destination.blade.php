@@ -1,6 +1,63 @@
 @extends('layouts.public')
 
-@section('title', $entity->name . ' - ' . __('messages.safety_status'))
+@section('title', $entity->name . ' — Travel Safety & Weather | TravelAI Nepal')
+@section('meta_description', 'Real-time safety status, weather, and incident updates for ' . $entity->name . ' in Nepal. Check advisory level, risk score, and trekking safety tips.')
+@section('meta_keywords', $entity->name . ' safety, ' . $entity->name . ' weather, ' . $entity->name . ' Nepal, trekking safety ' . $entity->name . ', Nepal travel advisory')
+
+@push('head')
+{{-- ========== JSON-LD: TouristDestination ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "TouristDestination",
+  "name": "{{ addslashes($entity->name) }}",
+  "description": "Real-time safety, weather, and incident updates for {{ addslashes($entity->name) }} in Nepal.",
+  "url": "{{ url()->current() }}",
+  @if($entity->latitude && $entity->longitude)
+  "geo": {
+    "@@type": "GeoCoordinates",
+    "latitude": "{{ $entity->latitude }}",
+    "longitude": "{{ $entity->longitude }}"
+  },
+  @endif
+  @if($entity->altitude)
+  "elevation": "{{ $entity->altitude }}",
+  @endif
+  "address": {
+    "@@type": "PostalAddress",
+    "addressCountry": "NP"
+  }
+}
+</script>
+
+{{-- ========== JSON-LD: BreadcrumbList ========== --}}
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 2,
+      "name": "Travel Safety",
+      "item": "{{ url('/travel-safety') }}"
+    },
+    {
+      "@@type": "ListItem",
+      "position": 3,
+      "name": "{{ addslashes($entity->name) }}",
+      "item": "{{ url()->current() }}"
+    }
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
