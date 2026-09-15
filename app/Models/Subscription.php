@@ -20,7 +20,7 @@ class Subscription extends Model
 
     protected $casts = [
         'start_date' => 'date',
-        'end_date' => 'date',
+        'end_date' => 'datetime',
     ];
 
     // Relationships
@@ -53,7 +53,15 @@ class Subscription extends Model
     // Helpers
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        if ($this->end_date === null) {
+            return true;
+        }
+
+        return $this->end_date->isFuture();
     }
 
     public function isPending(): bool

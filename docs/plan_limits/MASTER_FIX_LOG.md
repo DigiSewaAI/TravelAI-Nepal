@@ -1,8 +1,8 @@
 # TravelAI Nepal — MASTER FIX LOG
-## Specification v1.5 + Implementation Status (FIX-01 → FIX-03)
+## Specification v1.5 + Implementation Status (FIX-01 → FIX-04)
 
 **Date:** 2026-09-15
-**Status:** FIX-01 ✅ | FIX-02 ✅ | FIX-03 ✅ (committed) | FIX-04+ ⏸️ pending
+**Status:** FIX-01 ✅ | FIX-02 ✅ | FIX-03 ✅ (committed) | FIX-04 🟡 (implemented, awaiting approval) | FIX-05+ ⏸️ pending
 **Reference Spec:** v1.5 (full version available in `docs/plan_limits/FIX_SPECIFICATION.md`)
 
 ═══════════════════════════════════════════════════════
@@ -14,7 +14,7 @@
 | FIX-01 | Enterprise requires_contact + invalid-plan rejection | ✅ APPROVED | committed |
 | FIX-02 | Auth middleware on provider routes | ✅ APPROVED | committed |
 | FIX-03 | Booking path repair + IDOR + quota infrastructure | ✅ APPROVED | committed |
-| FIX-04 | Subscription::isActive() expiry correction | ⏸️ pending | — |
+| FIX-04 | Subscription::isActive() exact datetime expiry | 🟡 IMPLEMENTED | awaiting approval |
 | FIX-05 | Feature gating | ⏸️ pending | — |
 | FIX-06 | Booking quota enforcement | ⏸️ pending | — |
 | FIX-07 | Subscription expiry automation | ⏸️ pending | — |
@@ -183,6 +183,129 @@ Migrations:
 - All 31 existing bookings have quota_month populated
 
 ═══════════════════════════════════════════════════════
+FIX-04 — Subscription::isActive() Exact Datetime Expiry
+═══════════════════════════════════════════════════════
+
+STATUS: 🟡 IMPLEMENTED — AWAITING MASTER APPROVAL
+
+## Files Changed (1 modified + 1 new)
+
+Modified:
+  app/Models/Subscription.php
+    - $casts['end_date']: 'date' → 'datetime'
+    - isActive() logic corrected
+
+New:
+  database/migrations/2026_09_15_061433_change_subscriptions_end_date_to_datetime.php
+    - DATE NULL → DATETIME NULL
+    - Pre/post logging of existing rows
+    - Reversible via down()
+
+## Migration (Master-approved OPTION A)
+
+  subscriptions.end_date: DATE NULL → DATETIME NULL
+
+  Existing 4 rows converted to midnight datetimes:
+    - 2026-10-02 → 2026-10-02 00:00:00
+  No artificial hour offsets applied.
+  No production data modified beyond type conversion.
+
+  Rollback (down()):
+    DATETIME NULL → DATE NULL
+
+## Logic Change
+
+BEFORE:
+  public function isActive(): bool {
+      return $this->status === 'active';
+  }
+
+AFTER:
+  public function isActive(): bool {
+      if ($this->status !== 'active') {
+          return false;
+      }
+      if ($this->end_date === null) {
+          return true;
+      }
+      return $this->end_date->isFuture();
+  }
+
+CASTS:
+  BEFORE: 'end_date' => 'date'
+  AFTER:  'end_date' => 'datetime'
+
+SEMANTIC RULE (frozen):
+  status === active AND (end_date IS NULL OR end_date > now())
+
+NO date-only comparisons used.
+NO endOfDay() workaround used.
+
+## Verification (all PASS)
+
+| # | Test | Expected | Actual | Status |
+|---|------|----------|--------|--------|
+| T1 | Active + future | TRUE | TRUE | ✅ PASS |
+| T2 | Active + later today | TRUE | TRUE | ✅ PASS |
+| T3 | Active + earlier today | FALSE | FALSE | ✅ PASS |
+| T4 | Active + yesterday | FALSE | FALSE | ✅ PASS |
+| T5 | Active + exact boundary (now()) | FALSE | FALSE | ✅ PASS |
+| T6 | Cancelled + future | FALSE | FALSE | ✅ PASS |
+| T7 | Active + NULL end_date | TRUE | TRUE | ✅ PASS |
+
+CRITICAL PROOF (T3):
+  end_date = 2026-09-15 05:17:20 (earlier today)
+  Result: FALSE ✅
+  Proves exact datetime semantics (not date-only)
+
+CRITICAL PROOF (T5):
+  Clock: 2026-09-15 15:00:00
+  end_date: 2026-09-15 15:00:00
+  Result: FALSE ✅
+  Boundary condition (end_date <= now → false) verified.
+
+## Regression (Real DB Subscriptions)
+
+| Sub | Provider | Plan | Status | End Date | isActive |
+|-----|----------|------|--------|----------|----------|
+| 1 | 14 | Business | active | 2026-10-02 00:00:00 | TRUE ✅ |
+| 2 | 15 | Free | active | 2026-10-02 00:00:00 | TRUE ✅ |
+| 3 | 16 | Professional | active | 2026-10-02 00:00:00 | TRUE ✅ |
+| 4 | 17 | Enterprise | active | 2026-10-02 00:00:00 | TRUE ✅ |
+
+All active subscriptions still evaluate as active.
+No legitimate access disrupted.
+
+FIX-01, FIX-02, FIX-03 files unchanged.
+
+## Data Hygiene
+
+  Subscriptions: 4 → 4 ✅
+  Users:        39 → 39 ✅
+  Bookings:     31 → 31 ✅
+  Providers:   726 → 726 ✅
+
+NO temporary records created.
+NO existing records modified for testing.
+All tests used in-memory Carbon/model instances.
+
+## Deferred to FIX-07
+
+Automatic expiry automation (scheduled job to flip status from
+'active' to 'expired') remains explicitly FIX-07 scope.
+
+Current state after FIX-04:
+  DB row may still show status = 'active'
+  isActive() correctly returns FALSE after end_date
+  FIX-07 will handle state synchronization.
+
+## Note on isActive() callers
+
+isActive() currently has zero callers in app/*.php.
+This is not a defect — it is preparatory infrastructure for
+FIX-05 (feature gating) which will consume it.
+
+═══════════════════════════════════════════════════════
 SPEC REFERENCE — v1.5
 ═══════════════════════════════════════════════════════
 
@@ -200,12 +323,13 @@ Key sections summary:
 - § B0: Feature source-of-truth (User → Provider → Subscription → Plan)
 - § C1: Enterprise requires_contact
 - § D1: Feature gating middleware
+- § F1: Subscription::isActive() exact datetime (FIX-04)
 - § G2: Webhook signature + lease-based idempotency
 - § G3: Payment Option A (Contact Sales, prices visible)
 - § J2: Named rate limiters
 - § L0: Recursive staff cleanup audit
 - § M5: ai_usage migration ALTER strategy
-- § O: FIX-01 → FIX-16 normalized IDs
+- § O: FIX-01 → FIX-18 normalized IDs
 - § Q: 7 migrations with rollback
 - § R: Transaction boundaries
 - § S: Authorization boundaries
@@ -222,7 +346,7 @@ DEFERRED / OUT-OF-SCOPE NOTES
    - app/Http/Controllers/Agency/* (Agency scope)
    - app/Models/SosAlert.php (SOS scope)
    - app/Jobs/SendSosNotification.php (SOS scope)
-   
+
    These are outside FIX-03 scope and deferred.
 
 2. Migration timestamps:
@@ -238,13 +362,18 @@ DEFERRED / OUT-OF-SCOPE NOTES
    - FIX-02 preserved controller-level authorization
    - Dedicated FIX for authorization audit TBD
 
+5. Automatic subscription expiry: FIX-07
+   - isActive() now correct (FIX-04)
+   - Scheduled status flip to be added in FIX-07
+
 ═══════════════════════════════════════════════════════
 VERDICTS
 ═══════════════════════════════════════════════════════
 
-FIX-01: PASS (approved)
-FIX-02: PASS (approved)
-FIX-03: PASS (approved)
+FIX-01: ✅ PASS (approved + committed)
+FIX-02: ✅ PASS (approved + committed)
+FIX-03: ✅ PASS (approved + committed)
+FIX-04: 🟡 IMPLEMENTED (awaiting master approval)
 
 ═══════════════════════════════════════════════════════
 CHANGELOG
@@ -253,4 +382,6 @@ CHANGELOG
 2026-09-15: FIX-01 implemented, tested, approved, committed
 2026-09-15: FIX-02 implemented, tested, approved, committed
 2026-09-15: FIX-03 implemented, tested, approved, committed
-2026-09-15: Consolidated MASTER_FIX_LOG.md created
+2026-09-15: MASTER_FIX_LOG.md created
+2026-09-15: FIX-04 implemented, tested, awaiting approval
+2026-09-15: MASTER_FIX_LOG.md updated with FIX-04
