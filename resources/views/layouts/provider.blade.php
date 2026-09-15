@@ -149,12 +149,14 @@
                     <span>Team</span>
                 </a>
 
-                <!-- Analytics (Phase 11) -->
-                <a href="{{ route('provider.analytics.index') }}" 
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">
-                    <i class="fas fa-chart-bar w-5"></i>
-                    <span>{{ __('messages.analytics') }}</span>
-                </a>
+                {{-- Analytics (Phase 11) — FIX-05 Phase 3: feature-gated --}}
+@if(Auth::check() && Auth::user()->ownProvider()?->hasFeature('full_analytics'))
+<a href="{{ route('provider.analytics.index') }}"
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">
+    <i class="fas fa-chart-bar w-5"></i>
+    <span>{{ __('messages.analytics') }}</span>
+</a>
+@endif
 
                 <!-- Check-ins (Phase 12) -->
                 <a href="{{ route('provider.checkins.index') }}" 

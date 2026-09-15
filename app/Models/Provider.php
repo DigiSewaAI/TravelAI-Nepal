@@ -93,6 +93,37 @@ class Provider extends Model
         return $subscription ? $subscription->plan : null;
     }
 
+    /**
+     * Check if the provider's active subscription plan includes a feature.
+     * Centralized entitlement check (FIX-05 Phase 3).
+     *
+     * @param string $feature  Canonical slug: advanced_dashboard,
+     *                         full_analytics, white_label,
+     *                         custom_logo, priority_support
+     */
+    public function hasFeature(string $feature): bool
+    {
+        $subscription = $this->activeSubscription()->first();
+
+        if (!$subscription || !$subscription->isActive()) {
+            return false;
+        }
+
+        $plan = $subscription->plan;
+
+        if (!$plan) {
+            return false;
+        }
+
+        $features = $plan->features;
+
+        if (!is_array($features)) {
+            return false;
+        }
+
+        return in_array($feature, $features, true);
+    }
+
     public function documents()
     {
         return $this->hasMany(VerificationDocument::class);

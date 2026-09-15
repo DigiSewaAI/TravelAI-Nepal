@@ -195,8 +195,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
 
     // Analytics (Phase 11)
+    Route::middleware('feature:full_analytics')->group(function () {
     Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/export', [App\Http\Controllers\Provider\AnalyticsController::class, 'export'])->name('analytics.export');
+});
 
     // Checkins
     Route::get('/checkins', [App\Http\Controllers\Provider\CheckinController::class, 'index'])->name('checkins.index');

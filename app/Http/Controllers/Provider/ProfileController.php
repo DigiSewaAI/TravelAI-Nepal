@@ -53,15 +53,21 @@ class ProfileController extends Controller
         'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
     ]);
 
-    // Logo upload
-    if ($request->hasFile('logo')) {
-        if ($provider->logo_url) {
-            Storage::disk('public')->delete($provider->logo_url);
-        }
-        $path = $request->file('logo')->store('providers/logos', 'public');
-        $validated['logo_url'] = $path;
+    // Logo upload — FIX-05 Phase 3: gate by custom_logo feature
+if ($request->hasFile('logo')) {
+    if (!$provider->hasFeature('custom_logo')) {
+        return back()
+            ->withErrors(['logo' => 'Your plan does not include Custom Logo. Please upgrade to upload a logo.'])
+            ->withInput();
     }
-    unset($validated['logo']); // ✅ logo field हटाउने (column होइन)
+
+    if ($provider->logo_url) {
+        Storage::disk('public')->delete($provider->logo_url);
+    }
+    $path = $request->file('logo')->store('providers/logos', 'public');
+    $validated['logo_url'] = $path;
+}
+unset($validated['logo']);
 
     // 🔥 Cover image upload
     if ($request->hasFile('cover_image')) {
