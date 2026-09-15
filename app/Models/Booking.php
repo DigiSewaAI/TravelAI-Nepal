@@ -13,15 +13,14 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'trekker_id',
-        'trek_id',
+        'traveler_id',
+        'service_id',
         'booking_date',
         'start_date',
         'status',
+        'quota_month',
         'qr_code',
         'invoice_url',
-        'traveler_id',
-        'service_id',
         'qr_token',
         'qr_token_expires_at',
         // NEW share fields
@@ -73,7 +72,7 @@ class Booking extends Model
         $secret = config('app.key');
         $waypointId = $waypointId ?? 0;
         $data = $this->id . '|' . $waypointId . '|' . $this->created_at->timestamp;
-        
+
         return hash_hmac('sha256', $data, $secret);
     }
 

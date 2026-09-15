@@ -39,7 +39,7 @@
                 <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.booking_id_label') }}</span><span class="font-medium">#{{ $booking->id }}</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.service') }}</span><span class="font-medium">{{ $booking->service->name ?? __('messages.na') }}</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.provider') }}</span><span class="font-medium">{{ $booking->service->provider->name ?? __('messages.na') }}</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.traveler') }}</span><span class="font-medium">{{ $booking->traveler->name ?? $booking->trekker->name ?? __('messages.guest') }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.traveler') }}</span><span class="font-medium">{{ $booking->traveler->name ?? __('messages.guest') }}</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.start_date') }}</span><span class="font-medium">{{ $booking->start_date->format('Y-m-d') }}</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">{{ __('messages.status') }}</span>
                     <span class="px-2 py-0.5 rounded-full text-xs 

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // ✅ Import trait
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 // 🔥 Import the notification class
 use App\Notifications\BookingStatusUpdated;
 
@@ -37,20 +37,38 @@ class BookingController extends Controller
     }
 
     public function updateStatus(Request $request, Booking $booking)
-    {
-        $this->authorize('update', $booking);
+{
+    $this->authorize('update', $booking);
 
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,completed,cancelled',
-        ]);
+    $request->validate([
+        'status' => 'required|in:pending,confirmed,completed,cancelled,rejected',
+    ]);
 
-        $booking->update(['status' => $request->status]);
+    $newStatus = $request->status;
 
-        // 🔥 Send notification to the traveler
-        if ($booking->traveler) {
-            $booking->traveler->notify(new BookingStatusUpdated($booking));
+    DB::transaction(function () use ($booking, $newStatus) {
+        $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
+
+        $oldStatus = $locked->status;
+
+        if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
+            throw new \DomainException(
+                "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
+            );
         }
 
-        return back()->with('success', 'Booking status updated and traveler notified.');
+        if ($oldStatus === $newStatus) {
+            return;
+        }
+
+        $locked->status = $newStatus;
+        $locked->save();
+    });
+
+    if ($booking->fresh()->traveler) {
+        $booking->fresh()->traveler->notify(new BookingStatusUpdated($booking->fresh()));
     }
+
+    return back()->with('success', 'Booking status updated and traveler notified.');
+}
 }
