@@ -1,8 +1,8 @@
 # TravelAI Nepal — MASTER FIX LOG
-## Specification v1.5 + Implementation Status (FIX-01 → FIX-04)
+## Specification v1.5 + Implementation Status (FIX-01 → FIX-05)
 
 **Date:** 2026-09-15
-**Status:** FIX-01 ✅ | FIX-02 ✅ | FIX-03 ✅ (committed) | FIX-04 🟡 (implemented, awaiting approval) | FIX-05+ ⏸️ pending
+**Status:** FIX-01 ✅ | FIX-02 ✅ | FIX-03 ✅ | FIX-04 ✅ (committed) | FIX-05 🟡 (Phase 2 approved, Phase 3 in progress) | FIX-06+ ⏸️ pending
 **Reference Spec:** v1.5 (full version available in `docs/plan_limits/FIX_SPECIFICATION.md`)
 
 ═══════════════════════════════════════════════════════
@@ -11,11 +11,13 @@
 
 | FIX | Title | Status | Commit |
 |-----|-------|--------|--------|
-| FIX-01 | Enterprise requires_contact + invalid-plan rejection | ✅ APPROVED | committed |
-| FIX-02 | Auth middleware on provider routes | ✅ APPROVED | committed |
-| FIX-03 | Booking path repair + IDOR + quota infrastructure | ✅ APPROVED | committed |
-| FIX-04 | Subscription::isActive() exact datetime expiry | 🟡 IMPLEMENTED | awaiting approval |
-| FIX-05 | Feature gating | ⏸️ pending | — |
+| FIX-01 | Enterprise requires_contact + invalid-plan rejection | ✅ APPROVED | 0622334 |
+| FIX-02 | Auth middleware on provider routes | ✅ APPROVED | f07437e |
+| FIX-03 | Booking path repair + IDOR + quota infrastructure | ✅ APPROVED | 580c2a6 |
+| FIX-04 | Subscription::isActive() exact datetime expiry | ✅ APPROVED | 65fc2d4 |
+| FIX-05 Phase 1 | Pre-implementation audit | ✅ COMPLETE | — |
+| FIX-05 Phase 2 | Plan feature normalization (Option A) | ✅ APPROVED | pending commit |
+| FIX-05 Phase 3 | Centralized feature gating | 🟡 IN PROGRESS | — |
 | FIX-06 | Booking quota enforcement | ⏸️ pending | — |
 | FIX-07 | Subscription expiry automation | ⏸️ pending | — |
 | FIX-08 | Stripe webhook signature + idempotency | ⏸️ pending | — |
@@ -34,7 +36,7 @@
 FIX-01 — Enterprise requires_contact + invalid-plan rejection
 ═══════════════════════════════════════════════════════
 
-STATUS: ✅ APPROVED & COMMITTED
+STATUS: ✅ APPROVED & COMMITTED (0622334)
 
 ## Files Changed (10 modified + 3 new + 1 migration)
 Modified:
@@ -59,329 +61,220 @@ New:
 ## Verification (all PASS)
   Enterprise isContactOnly() = true
   Enterprise isFree() = false
-  Free/Pro/Business unchanged
-  plan=enterprise → 302 /contact-sales, 0 subs created
-  plan=invalid → 422 validation
-  CSRF active
+  plan=enterprise → 302 /contact-sales
+  plan=invalid → 422
   Data hygiene: 726/39/1169/4 preserved
 
 ═══════════════════════════════════════════════════════
 FIX-02 — Auth Middleware on Provider Routes
 ═══════════════════════════════════════════════════════
 
-STATUS: ✅ APPROVED & COMMITTED
+STATUS: ✅ APPROVED & COMMITTED (f07437e)
 
 ## Files Changed (1)
   routes/web.php — line 167
 
 ## Change
-  BEFORE: Route::prefix('provider')->name('provider.')->group(...)
-  AFTER:  Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(...)
+  Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(...)
 
 ## Verification (all PASS)
-  Guest /provider/dashboard → 302 /login
-  Guest /provider/analytics → 302 /login (was 500)
-  Guest /provider/services/create → 302 /login (was 200)
-  Guest /provider/staff → 302 /login (was 500)
-  Guest /provider/subscriptions → 302 /login
-  Guest /provider/bookings → 302 /login
-  Authenticated provider → all 200 (unchanged)
-  CSRF still 419 for guest POST
-  Data hygiene: unchanged
+  Guest provider routes → 302 /login (all 6 tested)
+  Authenticated provider → 200 unchanged
 
 ═══════════════════════════════════════════════════════
 FIX-03 — Booking Path Repair + IDOR + Quota Infrastructure
 ═══════════════════════════════════════════════════════
 
-STATUS: ✅ APPROVED & COMMITTED
+STATUS: ✅ APPROVED & COMMITTED (580c2a6)
 
 ## Files Changed (4 modified + 6 new + 3 migrations)
-
-Modified:
-  app/Http/Controllers/Public/BookingController.php
-  app/Http/Controllers/Provider/BookingController.php
-  app/Models/Booking.php
-  resources/views/public/booking/confirmation.blade.php
-
-New:
-  app/Support/QuotaPeriod.php
-  app/Support/BookingStatusTransitions.php
-  app/Models/BookingUsage.php
-  app/Services/BookingLimitService.php
-
-Migrations:
-  database/migrations/2026_09_15_051845_add_quota_month_to_bookings.php
-  database/migrations/2026_09_15_051914_create_booking_usage_table.php
-  database/migrations/2026_09_15_052646_backfill_bookings_quota_month.php
-
-## Migration
-  M1: ADD bookings.quota_month VARCHAR(7) NULL AFTER status + index
-  M2: Backfill from created_at → quota_month (NPT), chunked, idempotent
-  M3: CREATE booking_usage (id, provider_id, month, count, timestamps) UNIQUE(provider_id, month)
+Modified: Public/BookingController, Provider/BookingController, Booking model, confirmation.blade
+New: QuotaPeriod, BookingStatusTransitions, BookingUsage, BookingLimitService
+Migrations: add_quota_month_to_bookings, create_booking_usage_table, backfill_bookings_quota_month
 
 ## Key Changes
-
-1. **Legacy Trekker removal**
-   - Public\BookingController no longer references Trekker
-   - Booking::$fillable: removed 'trekker_id', 'trek_id'; added 'quota_month'
-   - confirmation.blade.php: removed $booking->trekker fallback
-
-2. **Signed URL confirmation authorization**
-   - URL::temporarySignedRoute('public.booking.confirmation', +24h)
-   - Guest requires valid signature
-   - Owner (traveler_id === auth id) OR provider (own service) bypass signature
-   - All other → 403
-
-3. **Status transitions**
-   - app/Support/BookingStatusTransitions.php with frozen map
-   - pending → [confirmed, cancelled, rejected]
-   - confirmed → [completed, cancelled]
-   - Terminal: completed, cancelled, rejected
-   - Provider\BookingController::updateStatus() uses lockForUpdate() + transition check
-
-4. **Quota infrastructure (no enforcement wiring)**
-   - QuotaPeriod::current() / forDate() (NPT)
-   - BookingLimitService::reserve(), release(), getUsage()
-   - Free=10, Pro=100, Business=1000, Enterprise=-1
-   - Enforcement wiring reserved for FIX-06
+- Removed legacy Trekker references
+- Signed URL confirmation authorization (+24h)
+- Status transition map (terminal states)
+- BookingLimitService (no enforcement wiring — FIX-06)
 
 ## Verification (all PASS)
-
-### Runtime Booking Test
-- Direct controller call → 302 signed URL
-- Booking 72 created: traveler_id=114, service_id=27, quota_month=2026-09, status=pending
-- No SQL exception (trekkers removed)
-
-### Confirmation Security Tests
-| Test | Result |
-|------|--------|
-| Guest no signature (booking 27) | 403 ✅ |
-| Tampered signature | 403 ✅ |
-| Valid signed URL | 200, 18958 bytes ✅ |
-| **Signature reuse A→B (CRITICAL)** | **403** ✅ |
-| Unrelated user (david.chen) | 403 ✅ |
-| Owner (shresthaxok) | 200 ✅ |
-| Provider own booking (anjuregmimesh) | 200 ✅ |
-| Cross-provider (Provider 14 → booking 32) | 403 ✅ |
-| Expired signed URL (guest) | 403 ✅ |
-
-### Quota Infrastructure Tests
-| Plan | Provider | Limit | Result |
-|------|----------|-------|--------|
-| Free | 15 | 10 | ✅ |
-| Professional | 16 | 100 | ✅ |
-| Enterprise | 17 | -1 | ✅ |
-
-### Status Transitions
-- pending → confirmed: OK ✅
-- cancelled → pending: rejected ✅
-
-### Data Hygiene
-- BEFORE: 31 bookings, 39 users, 726 providers
-- AFTER: 31 bookings, 39 users, 726 providers
-- Zero test records remaining
-- All 31 existing bookings have quota_month populated
+- Public booking → 302 signed URL, no SQL error
+- 9/9 confirmation security tests PASS (incl. signature reuse A→B = 403)
+- Quota service: Free=10, Pro=100, Enterprise=-1
+- Data hygiene: 31/39/726 preserved
 
 ═══════════════════════════════════════════════════════
 FIX-04 — Subscription::isActive() Exact Datetime Expiry
 ═══════════════════════════════════════════════════════
 
-STATUS: 🟡 IMPLEMENTED — AWAITING MASTER APPROVAL
+STATUS: ✅ APPROVED & COMMITTED (65fc2d4)
 
 ## Files Changed (1 modified + 1 new)
-
-Modified:
-  app/Models/Subscription.php
-    - $casts['end_date']: 'date' → 'datetime'
-    - isActive() logic corrected
-
-New:
-  database/migrations/2026_09_15_061433_change_subscriptions_end_date_to_datetime.php
-    - DATE NULL → DATETIME NULL
-    - Pre/post logging of existing rows
-    - Reversible via down()
+Modified: app/Models/Subscription.php ($casts, isActive logic)
+New: migration 2026_09_15_061433_change_subscriptions_end_date_to_datetime.php
 
 ## Migration (Master-approved OPTION A)
-
   subscriptions.end_date: DATE NULL → DATETIME NULL
-
-  Existing 4 rows converted to midnight datetimes:
-    - 2026-10-02 → 2026-10-02 00:00:00
-  No artificial hour offsets applied.
-  No production data modified beyond type conversion.
-
-  Rollback (down()):
-    DATETIME NULL → DATE NULL
+  Existing 4 rows → midnight datetimes
 
 ## Logic Change
+  IF status != active → false
+  IF end_date == null → true
+  ELSE return end_date->isFuture()
 
-BEFORE:
-  public function isActive(): bool {
-      return $this->status === 'active';
-  }
+## Verification (7/7 PASS)
+  T1 (future) TRUE, T2 (later today) TRUE, T3 (earlier today) FALSE
+  T4 (yesterday) FALSE, T5 (exact boundary) FALSE
+  T6 (non-active) FALSE, T7 (null) TRUE
 
-AFTER:
-  public function isActive(): bool {
-      if ($this->status !== 'active') {
-          return false;
-      }
-      if ($this->end_date === null) {
-          return true;
-      }
-      return $this->end_date->isFuture();
-  }
+═══════════════════════════════════════════════════════
+FIX-05 — Feature Gating (3-PHASE APPROACH)
+═══════════════════════════════════════════════════════
 
-CASTS:
-  BEFORE: 'end_date' => 'date'
-  AFTER:  'end_date' => 'datetime'
+STATUS: 🟡 IN PROGRESS — Phase 2 approved, Phase 3 implementing
 
-SEMANTIC RULE (frozen):
-  status === active AND (end_date IS NULL OR end_date > now())
+## Phase 1 — Pre-Implementation Audit
+STATUS: ✅ COMPLETE
 
-NO date-only comparisons used.
-NO endOfDay() workaround used.
+Findings:
+- plans.features DB values were human-readable strings (not slugs)
+- Business MISSING "Advanced Dashboard"
+- Enterprise MISSING "Advanced Dashboard", "Full Analytics", "White-label"
+- Marketing copy mixed into features array
+- No hasFeature(), canUse(), or feature middleware existed
+- No feature-related policies
+- Analytics accessible to Free (200), no route gate
+- Profile logo upload accessible to all plans
 
-## Verification (all PASS)
+## Phase 2 — Plan Feature Normalization (Option A)
+STATUS: ✅ APPROVED
 
-| # | Test | Expected | Actual | Status |
-|---|------|----------|--------|--------|
-| T1 | Active + future | TRUE | TRUE | ✅ PASS |
-| T2 | Active + later today | TRUE | TRUE | ✅ PASS |
-| T3 | Active + earlier today | FALSE | FALSE | ✅ PASS |
-| T4 | Active + yesterday | FALSE | FALSE | ✅ PASS |
-| T5 | Active + exact boundary (now()) | FALSE | FALSE | ✅ PASS |
-| T6 | Cancelled + future | FALSE | FALSE | ✅ PASS |
-| T7 | Active + NULL end_date | TRUE | TRUE | ✅ PASS |
+Migration: database/migrations/2026_09_15_063111_normalize_plan_features_to_slugs.php
 
-CRITICAL PROOF (T3):
-  end_date = 2026-09-15 05:17:20 (earlier today)
-  Result: FALSE ✅
-  Proves exact datetime semantics (not date-only)
+Canonical matrix (frozen):
+  free         → []
+  professional → ["advanced_dashboard","custom_logo"]
+  business     → ["advanced_dashboard","full_analytics","white_label","custom_logo"]
+  enterprise   → ["advanced_dashboard","full_analytics","white_label","custom_logo","priority_support"]
 
-CRITICAL PROOF (T5):
-  Clock: 2026-09-15 15:00:00
-  end_date: 2026-09-15 15:00:00
-  Result: FALSE ✅
-  Boundary condition (end_date <= now → false) verified.
+Verification (all PASS):
+  - All 4 plans normalized correctly
+  - Zero unknown slugs, zero duplicates
+  - Zero marketing strings remain
+  - Counts unchanged (4/726/4/39/31)
+  - Other columns unchanged (name, price, limits, requires_contact)
+  - down() restores exact prior values
 
-## Regression (Real DB Subscriptions)
+## Phase 3 — Centralized Feature Gating
+STATUS: 🟡 IN PROGRESS — Authorized by Master
 
-| Sub | Provider | Plan | Status | End Date | isActive |
-|-----|----------|------|--------|----------|----------|
-| 1 | 14 | Business | active | 2026-10-02 00:00:00 | TRUE ✅ |
-| 2 | 15 | Free | active | 2026-10-02 00:00:00 | TRUE ✅ |
-| 3 | 16 | Professional | active | 2026-10-02 00:00:00 | TRUE ✅ |
-| 4 | 17 | Enterprise | active | 2026-10-02 00:00:00 | TRUE ✅ |
+Canonical slugs (frozen):
+  advanced_dashboard
+  full_analytics
+  white_label
+  custom_logo
+  priority_support
 
-All active subscriptions still evaluate as active.
-No legitimate access disrupted.
+Canonical entitlement matrix (frozen):
+              Free   Pro   Business   Enterprise
+advanced_dashboard DENY  ALLOW  ALLOW      ALLOW
+full_analytics     DENY  DENY   ALLOW      ALLOW
+white_label        DENY  DENY   ALLOW      ALLOW
+custom_logo        DENY  ALLOW  ALLOW      ALLOW
+priority_support   DENY  DENY   DENY       ALLOW
 
-FIX-01, FIX-02, FIX-03 files unchanged.
+Requirements:
+- Centralized mechanism (e.g. Provider::hasFeature())
+- Requires Subscription::isActive() === true (FIX-04)
+- Plan inheritance forbidden
+- Hardcoded plan-name checks forbidden
+- Route middleware enforcement (not UI-only)
+- Direct URL access must be blocked
+- HTTP 403 for authenticated user lacking entitlement
+- /provider/analytics → Business+ only (currently Free gets 200)
 
-## Data Hygiene
+To implement:
+- Provider::hasFeature(string $slug): bool
+- Generic middleware `feature:{slug}`
+- Route application to real protected surfaces
+- UI conditional hiding where surfaces exist
 
-  Subscriptions: 4 → 4 ✅
-  Users:        39 → 39 ✅
-  Bookings:     31 → 31 ✅
-  Providers:   726 → 726 ✅
-
-NO temporary records created.
-NO existing records modified for testing.
-All tests used in-memory Carbon/model instances.
-
-## Deferred to FIX-07
-
-Automatic expiry automation (scheduled job to flip status from
-'active' to 'expired') remains explicitly FIX-07 scope.
-
-Current state after FIX-04:
-  DB row may still show status = 'active'
-  isActive() correctly returns FALSE after end_date
-  FIX-07 will handle state synchronization.
-
-## Note on isActive() callers
-
-isActive() currently has zero callers in app/*.php.
-This is not a defect — it is preparatory infrastructure for
-FIX-05 (feature gating) which will consume it.
+Out of scope:
+- Do NOT invent routes/features that don't exist
+- Do NOT redesign dashboard
+- Do NOT modify normalized feature data
 
 ═══════════════════════════════════════════════════════
 SPEC REFERENCE — v1.5
 ═══════════════════════════════════════════════════════
 
-Full v1.5 specification is maintained in:
-  docs/plan_limits/FIX_SPECIFICATION.md
+Full v1.5 specification: docs/plan_limits/FIX_SPECIFICATION.md
 
-Key sections summary:
-
+Key sections:
 - § A0: QuotaPeriod helper (Asia/Kathmandu)
-- § A1: Booking quota rules (creation-based, terminal states)
-- § A3: AI quota reserve/finalize/release architecture
-- § A7: Guest email conflict rules (traveler-only attach)
+- § A1: Booking quota rules
+- § A3: AI quota reserve/finalize/release
+- § A7: Guest email conflict rules
 - § A9: Expired subscription → Free fallback
-- § B1: Public booking flow + signed URL confirmation
-- § B0: Feature source-of-truth (User → Provider → Subscription → Plan)
+- § B0: Feature source-of-truth
+- § B1: Public booking + signed URL confirmation
 - § C1: Enterprise requires_contact
 - § D1: Feature gating middleware
-- § F1: Subscription::isActive() exact datetime (FIX-04)
-- § G2: Webhook signature + lease-based idempotency
-- § G3: Payment Option A (Contact Sales, prices visible)
+- § F1: Subscription isActive exact datetime
+- § G2: Webhook signature + lease
+- § G3: Payment Option A
 - § J2: Named rate limiters
-- § L0: Recursive staff cleanup audit
-- § M5: ai_usage migration ALTER strategy
-- § O: FIX-01 → FIX-18 normalized IDs
-- § Q: 7 migrations with rollback
+- § L0: Staff cleanup audit
+- § M5: ai_usage migration ALTER
+- § O: FIX-01 → FIX-18 IDs
+- § Q: Migrations with rollback
 - § R: Transaction boundaries
 - § S: Authorization boundaries
-- § T: Regression test suite
+- § T: Regression suite
 - § U: Master approval checklist
 
 ═══════════════════════════════════════════════════════
 DEFERRED / OUT-OF-SCOPE NOTES
 ═══════════════════════════════════════════════════════
 
-1. Legacy Trekker references remain in dead/unrouted code:
-   - app/Http/Controllers/TrekBookingController.php (not routed)
-   - app/Http/Controllers/Api/SosController.php (SOS scope)
-   - app/Http/Controllers/Agency/* (Agency scope)
-   - app/Models/SosAlert.php (SOS scope)
-   - app/Jobs/SendSosNotification.php (SOS scope)
+1. Legacy Trekker references in dead/unrouted code
+   (TrekBookingController, SosController, Agency controllers)
+   — outside FIX-03 scope
 
-   These are outside FIX-03 scope and deferred.
+2. Booking confirmation email: not implemented
+   (QUEUE_CONNECTION=sync; no BookingConfirmationMail)
 
-2. Migration timestamps:
-   - Actual migrations use runtime-generated timestamps
-   - Names match purpose; not exact master-spec timestamps
+3. Automatic subscription expiry: FIX-07
+   (isActive() correct in FIX-04; status flip scheduled for FIX-07)
 
-3. Booking confirmation email: not implemented in FIX-03
-   - QUEUE_CONNECTION=sync (local)
-   - No BookingConfirmationMail exists
-   - Future scope
+4. Non-provider authorization testing: deferred to dedicated FIX
 
-4. Non-provider authorization testing: deferred
-   - FIX-02 preserved controller-level authorization
-   - Dedicated FIX for authorization audit TBD
-
-5. Automatic subscription expiry: FIX-07
-   - isActive() now correct (FIX-04)
-   - Scheduled status flip to be added in FIX-07
+5. Marketing strings removed from plans.features — now stored only in
+   `limits` (numeric) and `description` (human-readable)
 
 ═══════════════════════════════════════════════════════
 VERDICTS
 ═══════════════════════════════════════════════════════
 
-FIX-01: ✅ PASS (approved + committed)
-FIX-02: ✅ PASS (approved + committed)
-FIX-03: ✅ PASS (approved + committed)
-FIX-04: 🟡 IMPLEMENTED (awaiting master approval)
+FIX-01:              ✅ PASS (approved + committed)
+FIX-02:              ✅ PASS (approved + committed)
+FIX-03:              ✅ PASS (approved + committed)
+FIX-04:              ✅ PASS (approved + committed)
+FIX-05 Phase 1:      ✅ COMPLETE
+FIX-05 Phase 2:      ✅ PASS (approved, awaiting commit as part of FIX-05)
+FIX-05 Phase 3:      🟡 IN PROGRESS
 
 ═══════════════════════════════════════════════════════
 CHANGELOG
 ═══════════════════════════════════════════════════════
 
-2026-09-15: FIX-01 implemented, tested, approved, committed
-2026-09-15: FIX-02 implemented, tested, approved, committed
-2026-09-15: FIX-03 implemented, tested, approved, committed
+2026-09-15: FIX-01 implemented, approved, committed (0622334)
+2026-09-15: FIX-02 implemented, approved, committed (f07437e)
+2026-09-15: FIX-03 implemented, approved, committed (580c2a6)
+2026-09-15: FIX-04 implemented, approved, committed (65fc2d4)
 2026-09-15: MASTER_FIX_LOG.md created
-2026-09-15: FIX-04 implemented, tested, awaiting approval
-2026-09-15: MASTER_FIX_LOG.md updated with FIX-04
+2026-09-15: FIX-05 Phase 1 audit complete (discrepancy found)
+2026-09-15: FIX-05 Phase 2 approved (feature normalization)
+2026-09-15: FIX-05 Phase 3 authorized (feature gating)
+2026-09-15: MASTER_FIX_LOG.md updated with FIX-05 phases
