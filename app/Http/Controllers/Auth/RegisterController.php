@@ -64,6 +64,13 @@ class RegisterController extends Controller
         return back()->withErrors(['plan' => 'Selected plan not found.'])->withInput();
     }
 
+    // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
+if ($plan->isContactOnly()) {
+    return redirect()
+        ->route('public.contact-sales')
+        ->with('info', __('messages.enterprise_requires_contact'));
+}
+
     // ✅ Determine billing interval
     $billingInterval = $request->input('billing_interval', 'monthly');
 
@@ -118,7 +125,7 @@ class RegisterController extends Controller
             $provider->types()->attach($providerTypeId);
 
             // ✅ Create subscription with billing interval
-            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+            $isFree = $plan->isFree();
 
             $subscriptionData = [
                 'provider_id' => $provider->id,

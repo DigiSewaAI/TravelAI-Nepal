@@ -26,6 +26,13 @@ return [
 'about_cta_subtitle' => 'तपाईं यात्री होस् वा ट्राभल एजेन्सी — TravelAI Nepal तपाईंको लागि बनेको छ।',
 'about_cta_explore' => 'यात्रा अन्वेषण',
 'about_cta_partner' => 'साझेदार बन्नुहोस्',
+
+'enterprise_requires_contact'  => 'Enterprise को लागि विशेष मूल्य निर्धारण आवश्यक छ। कृपया हाम्रो बिक्री टोलीसँग सम्पर्क गर्नुहोस्।',
+'contact_sales_title'          => 'बिक्री सम्पर्क',
+'contact_sales_description'    => 'हाम्रो बिक्री टोलीले तपाईंको संस्थाको लागि उपयुक्त Enterprise योजना तयार गर्न मद्दत गर्नेछ।',
+'contact_sales_email_label'    => 'इमेल',
+'contact_sales_phone_label'    => 'फोन',
+'contact_sales_back'           => 'गृहपृष्ठमा फर्कनुहोस्',
     // ======================
     // SIDEBAR
     // ======================

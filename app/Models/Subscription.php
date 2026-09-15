@@ -72,9 +72,12 @@ class Subscription extends Model
     }
 
     public function isFree(): bool
-    {
-        return ($this->plan->price_monthly ?? 0) == 0 && ($this->plan->price_yearly ?? 0) == 0;
+{
+    if (!$this->plan) {
+        return false;
     }
+    return $this->plan->isFree();
+}
 
     // ✅ Billing interval helpers
     public function isMonthly(): bool

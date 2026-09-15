@@ -53,6 +53,9 @@ Route::get('/features', [PageController::class, 'features'])->name('pages.featur
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('pages.how-it-works');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('pages.pricing');
+
+Route::get('/contact-sales', [\App\Http\Controllers\PublicPage\ContactSalesController::class, 'show'])
+    ->name('public.contact-sales');
 // Footer Pages (Company & Legal)
 Route::get('/about', [PageController::class, 'about'])->name('pages.about');
 Route::get('/careers', [PageController::class, 'careers'])->name('pages.careers');

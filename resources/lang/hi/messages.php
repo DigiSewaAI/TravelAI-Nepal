@@ -28,6 +28,13 @@ return [
 'about_cta_explore' => 'यात्राएं देखें',
 'about_cta_partner' => 'पार्टनर बनें',
 
+'enterprise_requires_contact'  => 'Enterprise के लिए कस्टम मूल्य निर्धारण आवश्यक है। कृपया हमारी बिक्री टीम से संपर्क करें।',
+'contact_sales_title'          => 'बिक्री संपर्क',
+'contact_sales_description'    => 'हमारी बिक्री टीम आपकी संस्था के लिए उपयुक्त Enterprise योजना बनाने में मदद करेगी।',
+'contact_sales_email_label'    => 'ईमेल',
+'contact_sales_phone_label'    => 'फोन',
+'contact_sales_back'           => 'होम पर वापस जाएं',
+
     // ======================
     // SIDEBAR (Provider)
     // ======================

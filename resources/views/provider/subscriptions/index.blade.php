@@ -14,8 +14,10 @@
                 <div>
                     <span class="text-2xl font-bold text-blue-600">{{ $currentSubscription->plan->name }}</span>
                     <p class="text-gray-500 text-sm">{{ $currentSubscription->plan->description }}</p>
-                    <div class="mt-2">
-                        @if($currentSubscription->plan->price_monthly == 0)
+                                        <div class="mt-2">
+                        @if($currentSubscription->plan->isContactOnly())
+                            <span class="text-sm text-blue-600 font-semibold">{{ __('messages.contact_for_pricing') }}</span>
+                        @elseif($currentSubscription->plan->price_monthly == 0)
                             <span class="text-sm text-green-600 font-semibold">{{ __('messages.free_plan') }}</span>
                         @else
                             <span class="text-sm text-gray-600">${{ number_format($currentSubscription->plan->price_monthly, 2) }} / {{ __('messages.month') }}</span>
@@ -59,8 +61,10 @@
                 <div class="border rounded-lg p-4 hover:shadow-md transition">
                     <h3 class="font-bold text-gray-800">{{ $plan->name }}</h3>
                     <p class="text-gray-500 text-sm">{{ $plan->description }}</p>
-                    <div class="mt-2">
-                        @if($plan->price_monthly == 0)
+                                        <div class="mt-2">
+                        @if($plan->isContactOnly())
+                            <span class="text-sm font-semibold text-blue-600">{{ __('messages.contact_for_pricing') }}</span>
+                        @elseif($plan->price_monthly == 0)
                             <span class="text-lg font-bold text-green-600">{{ __('messages.free') }}</span>
                         @elseif($plan->price_monthly !== null)
                             <span class="text-lg font-bold text-gray-800">${{ number_format($plan->price_monthly, 2) }}</span>
@@ -81,11 +85,18 @@
                         @endif
                     </ul>
 
-                    <!-- Action -->
+                                        <!-- Action -->
                     @if($currentSubscription && $currentSubscription->plan_id === $plan->id)
                         <span class="mt-3 inline-block bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-lg w-full text-center">
                             {{ __('messages.current_plan_label') }}
                         </span>
+                    @elseif($plan->isContactOnly())
+                        {{-- FIX-01: Enterprise → Contact Sales (no POST upgrade) --}}
+                        <form method="GET" action="{{ route('public.contact-sales') }}" class="mt-3">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition">
+                                <i class="fas fa-headset mr-1"></i> {{ __('messages.contact_for_pricing') }}
+                            </button>
+                        </form>
                     @else
                         <form method="POST" action="{{ $currentSubscription ? route('provider.subscriptions.upgrade') : route('provider.subscriptions.store') }}" class="mt-3">
                             @csrf

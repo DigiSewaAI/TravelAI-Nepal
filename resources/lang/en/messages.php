@@ -26,6 +26,13 @@ return [
 'about_cta_subtitle' => 'Whether you\'re a traveler or a travel agency — TravelAI Nepal is built for you.',
 'about_cta_explore' => 'Explore Trips',
 'about_cta_partner' => 'Become a Partner',
+
+'enterprise_requires_contact'  => 'Enterprise requires a custom quote. Please contact our sales team.',
+'contact_sales_title'          => 'Contact Sales',
+'contact_sales_description'    => 'Our sales team will help you set up an Enterprise plan tailored to your organization.',
+'contact_sales_email_label'    => 'Email',
+'contact_sales_phone_label'    => 'Phone',
+'contact_sales_back'           => 'Back to home',
     // ======================
     // SIDEBAR (Provider)
     // ======================

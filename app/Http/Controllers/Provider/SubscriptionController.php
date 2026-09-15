@@ -55,6 +55,13 @@ class SubscriptionController extends Controller
         $plan = Plan::findOrFail($request->plan_id);
         $billingInterval = $request->input('billing_interval', 'monthly');
 
+        // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
+        if ($plan->isContactOnly()) {
+            return redirect()
+                ->route('public.contact-sales')
+                ->with('info', __('messages.enterprise_requires_contact'));
+        }
+
         // Check if already has an active subscription
         $existing = $provider->subscriptions()
             ->where('status', 'active')
@@ -92,8 +99,8 @@ class SubscriptionController extends Controller
             ]);
 
             // For free plans, activate immediately even in production
-            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
-            
+            $isFree = $plan->isFree();
+
             if ($isFree) {
                 $subscription->status = 'active';
                 $subscription->start_date = now();
@@ -132,6 +139,13 @@ class SubscriptionController extends Controller
 
         $plan = Plan::findOrFail($request->plan_id);
         $billingInterval = $request->input('billing_interval', 'monthly');
+
+        // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
+        if ($plan->isContactOnly()) {
+            return redirect()
+                ->route('public.contact-sales')
+                ->with('info', __('messages.enterprise_requires_contact'));
+        }
 
         // Check if already on this plan
         $current = $provider->subscriptions()
@@ -178,8 +192,8 @@ class SubscriptionController extends Controller
             ]);
 
             // For free plans, activate immediately even in production
-            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
-            
+            $isFree = $plan->isFree();
+
             if ($isFree) {
                 $subscription->status = 'active';
                 $subscription->start_date = now();
@@ -249,6 +263,13 @@ class SubscriptionController extends Controller
         $plan = $subscription->plan;
         $billingInterval = $subscription->billing_interval ?? 'monthly';
 
+        // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
+        if ($plan->isContactOnly()) {
+            return redirect()
+                ->route('public.contact-sales')
+                ->with('info', __('messages.enterprise_requires_contact'));
+        }
+
         // 🌍 Environment check
         $isLocal = app()->environment('local');
 
@@ -266,7 +287,7 @@ class SubscriptionController extends Controller
             return back()->with('success', 'Subscription resumed successfully!');
         } else {
             // 🔒 PRODUCTION: Check if free plan
-            $isFree = ($plan->price_monthly ?? 0) == 0 && ($plan->price_yearly ?? 0) == 0;
+            $isFree = $plan->isFree();
 
             // If free, reactivate immediately
             if ($isFree) {
