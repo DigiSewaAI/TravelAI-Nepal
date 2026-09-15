@@ -41,7 +41,11 @@ class BookingController extends Controller
 
         try {
             $booking = DB::transaction(function () use ($service, $validated) {
-                $traveler = $this->resolveTraveler($validated);
+    $provider = $service->provider;
+
+    app(\App\Services\BookingLimitService::class)->reserve($provider);
+
+    $traveler = $this->resolveTraveler($validated);
 
                 return Booking::create([
                     'traveler_id' => $traveler->id,

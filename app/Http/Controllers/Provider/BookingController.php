@@ -47,23 +47,33 @@ class BookingController extends Controller
     $newStatus = $request->status;
 
     DB::transaction(function () use ($booking, $newStatus) {
-        $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
+    $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
-        $oldStatus = $locked->status;
+    $oldStatus = $locked->status;
 
-        if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
-            throw new \DomainException(
-                "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
-            );
-        }
+    if ($oldStatus === $newStatus) {
+        return;  // idempotent no-op
+    }
 
-        if ($oldStatus === $newStatus) {
-            return;
-        }
+    if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
+        throw new \DomainException(
+            "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
+        );
+    }
 
-        $locked->status = $newStatus;
-        $locked->save();
-    });
+    $wasCancelled = in_array($oldStatus, ['cancelled', 'rejected'], true);
+    $nowCancelled = in_array($newStatus, ['cancelled', 'rejected'], true);
+
+    $locked->status = $newStatus;
+    $locked->save();
+
+    if (!$wasCancelled && $nowCancelled) {
+        app(\App\Services\BookingLimitService::class)->release(
+            $locked->service->provider,
+            $locked->quota_month
+        );
+    }
+});
 
     if ($booking->fresh()->traveler) {
         $booking->fresh()->traveler->notify(new BookingStatusUpdated($booking->fresh()));
