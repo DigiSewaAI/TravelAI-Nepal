@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schedule;
 use App\Jobs\Safety\FetchSafetySourcesJob;
 use App\Jobs\Safety\VerifyExpiredIncidentsJob;   // ✅ New Phase 4 Job
 use App\Jobs\Safety\UpdateSafetyStatusesJob;      // ✅ New Phase 4 Job
+use App\Jobs\ExpireSubscriptionsJob;              // FIX-07
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,6 @@ Schedule::job(new VerifyExpiredIncidentsJob)->daily();
 
 // Phase 4: Update safety statuses for all entities – runs every 15 minutes
 Schedule::job(new UpdateSafetyStatusesJob)->everyFifteenMinutes();
+
+// FIX-07: Subscription expiry – runs daily
+Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
