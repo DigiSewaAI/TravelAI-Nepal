@@ -164,7 +164,7 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // =======================================
 // 6. PROVIDER DASHBOARD ROUTES
 // =======================================
-Route::prefix('provider')->name('provider.')->group(function () {
+Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
