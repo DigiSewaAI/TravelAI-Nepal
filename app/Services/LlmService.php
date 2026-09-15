@@ -16,9 +16,9 @@ class LlmService
         $this->apiKey = config('services.groq.api_key');
         $this->model = config('services.groq.model', 'qwen/qwen3.6-27b');
 
-        Log::info('LlmService initialized', [
+                Log::info('LlmService initialized', [
             'model' => $this->model,
-            'api_key_prefix' => substr($this->apiKey ?? '', 0, 10) . '...'
+            'api_key_configured' => !empty($this->apiKey),
         ]);
     }
 
