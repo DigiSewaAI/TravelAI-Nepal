@@ -110,7 +110,7 @@ class PaymentService
         try {
             $stripePayment = $this->stripe->paymentIntents->retrieve($paymentIntentId);
 
-            $payment = Payment::where('payment_id', $paymentIntentId)->first();
+            $payment = Payment::where('payment_id', $paymentIntentId)->lockForUpdate()->first();
             if (!$payment) {
                 Log::error("Payment not found: {$paymentIntentId}");
                 return false;
@@ -172,7 +172,7 @@ class PaymentService
             return false;
         }
 
-        Log::info("Webhook received: {$eventType}", ['data' => $data]);
+        Log::info("Stripe webhook event: {$eventType}");
 
         switch ($eventType) {
             case 'payment_intent.succeeded':

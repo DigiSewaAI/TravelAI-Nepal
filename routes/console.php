@@ -7,6 +7,7 @@ use App\Jobs\Safety\FetchSafetySourcesJob;
 use App\Jobs\Safety\VerifyExpiredIncidentsJob;   // ✅ New Phase 4 Job
 use App\Jobs\Safety\UpdateSafetyStatusesJob;      // ✅ New Phase 4 Job
 use App\Jobs\ExpireSubscriptionsJob;              // FIX-07
+use App\Jobs\CleanupStripeWebhookEventsJob;       // FIX-08
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,6 @@ Schedule::job(new UpdateSafetyStatusesJob)->everyFifteenMinutes();
 
 // FIX-07: Subscription expiry – runs daily
 Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
+
+// FIX-08: Stripe webhook event retention cleanup – runs daily
+Schedule::job(new CleanupStripeWebhookEventsJob)->daily()->withoutOverlapping();

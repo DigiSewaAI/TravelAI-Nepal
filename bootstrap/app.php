@@ -24,7 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\Localization::class,
         ]);
 
-        // CSRF अपवाद यहाँ राख्नुपर्दैन, किनकि API मा CSRF हुँदैन
+                // CSRF exception: Stripe webhook authenticates via Stripe-Signature
+        $middleware->validateCsrfTokens(except: [
+            'webhook/stripe',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
