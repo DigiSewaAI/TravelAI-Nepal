@@ -75,11 +75,12 @@ class InvoiceController extends Controller
         }
 
         // ✅ PDF generation – DomPDF प्रयोग गर्नुहोस्
-        try {
+                try {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.invoices.pdf', compact('invoice'));
             return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'PDF generation failed: ' . $e->getMessage());
+            \Log::error('Invoice PDF generation failed', ['invoice_id' => $invoice->id, 'error_class' => get_class($e)]);
+            return redirect()->back()->with('error', 'PDF generation failed. Please try again.');
         }
     }
 }

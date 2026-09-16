@@ -166,14 +166,14 @@ if ($plan->isContactOnly()) {
         return redirect()->route('home')
             ->with('success', '🎉 Account created successfully! Welcome to TravelAI Nepal.');
 
-    } catch (\Exception $e) {
+            } catch (\Exception $e) {
         DB::rollBack();
         \Log::error('Registration failed: ' . $e->getMessage(), [
             'email' => $request->email,
             'provider_type' => $request->provider_type ?? null,
         ]);
         return back()->withErrors([
-            'error' => 'Registration failed: ' . $e->getMessage()
+            'error' => 'Registration failed. Please try again.'
         ])->withInput();
     }
 }

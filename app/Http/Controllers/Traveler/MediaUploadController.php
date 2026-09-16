@@ -81,11 +81,11 @@ class MediaUploadController extends Controller
                 'media_id' => $media->id,
             ]);
 
-        } catch (\Exception $e) {
+                } catch (\Exception $e) {
             Log::error('Upload error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => '❌ ' . $e->getMessage(),
+                'message' => '❌ Upload failed. Please try again.',
             ], 500);
         }
     }
@@ -111,10 +111,10 @@ class MediaUploadController extends Controller
             return redirect()->route('traveler.dashboard')
                              ->with('upload_success', '✅ Memory deleted successfully!');
 
-        } catch (\Exception $e) {
+                } catch (\Exception $e) {
             Log::error('Delete error: ' . $e->getMessage());
             return redirect()->route('traveler.dashboard')
-                             ->with('upload_error', '❌ ' . $e->getMessage());
+                             ->with('upload_error', '❌ Delete failed. Please try again.');
         }
     }
 }

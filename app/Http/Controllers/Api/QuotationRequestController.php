@@ -164,11 +164,9 @@ class QuotationRequestController extends Controller
                 'file'        => $e->getFile(),
                 'line'        => $e->getLine(),
             ]);
-            return response()->json([
+                        return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'message' => 'Something went wrong. Please try again.',
             ], 500);
         }
     }

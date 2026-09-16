@@ -49,15 +49,15 @@ class WaitlistController extends Controller
                 'message' => 'Validation error',
                 'errors' => $e->errors()
             ], 422);
-        } catch (\Exception $e) {
-                        Log::error('Waitlist error', [
+               } catch (\Exception $e) {
+            Log::error('Waitlist error', [
                 'error_class' => get_class($e),
                 'file'        => $e->getFile(),
                 'line'        => $e->getLine(),
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage()
+                'message' => 'Something went wrong. Please try again.',
             ], 500);
         }
     }

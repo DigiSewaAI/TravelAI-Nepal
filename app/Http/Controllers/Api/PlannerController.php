@@ -58,12 +58,10 @@ class PlannerController extends Controller
                 'success' => false,
                 'errors' => $e->errors(),
             ], 422);
-        } catch (\Exception $e) {
+                } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+                'message' => 'Something went wrong. Please try again.',
             ], 500);
         }
     }

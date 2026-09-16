@@ -114,9 +114,9 @@ class QuotationController extends Controller
                 'provider_id' => $provider->id,
             ]);
 
-            return response()->json([
+                        return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Something went wrong. Please try again.',
             ], 500);
         }
     }

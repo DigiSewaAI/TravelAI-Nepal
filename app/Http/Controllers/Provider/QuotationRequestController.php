@@ -174,10 +174,10 @@ class QuotationRequestController extends Controller
             'provider_id' => $provider->id,
         ]);
 
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage(),
-        ], 500);
+                    return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again.',
+            ], 500);
     }
 }
 

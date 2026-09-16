@@ -78,7 +78,7 @@ class ItineraryController extends Controller
                 'message' => $e->getMessage(),
             ], 429);
 
-        } catch (\Exception $e) {
+                } catch (\Exception $e) {
             // FIX-12: release reservation on failure
             if ($reservation) {
                 try {
@@ -94,7 +94,7 @@ class ItineraryController extends Controller
             Log::error('AI Itinerary Generation Failed: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage(),
+                'message' => 'Something went wrong. Please try again.',
             ], 500);
         }
     }
