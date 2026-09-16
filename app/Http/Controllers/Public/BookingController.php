@@ -57,7 +57,12 @@ class BookingController extends Controller
                     'quota_month' => QuotaPeriod::current(),
                 ]);
             });
-        } catch (\DomainException $e) {
+                } catch (\DomainException $e) {
+            Log::warning('Public booking rejected by domain rule', [
+                'service_id'  => $service->id,
+                'provider_id' => $service->provider_id,
+                'reason'      => 'domain_rule',
+            ]);
             return back()->withErrors(['error' => $e->getMessage()])->withInput();
         } catch (\Throwable $e) {
             Log::error('Public booking creation failed', [

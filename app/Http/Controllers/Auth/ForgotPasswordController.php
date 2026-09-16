@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ForgotPasswordController extends Controller
 {
@@ -19,7 +20,9 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    use SendsPasswordResetEmails;
+        use SendsPasswordResetEmails {
+        sendResetLinkEmail as protected traitSendResetLinkEmail;
+    }
 
     /**
      * Display the form to request a password reset link.
@@ -29,6 +32,21 @@ class ForgotPasswordController extends Controller
     public function showLinkRequestForm()
     {
         return view('auth.passwords.email');
+    }
+
+    /**
+     * FIX-07: Log password-reset security event (hashed identity only).
+     * Records the request, not account existence, to avoid enumeration.
+     * Delegates actual behavior to trait (no duplicate validation).
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        Log::info('Password reset requested', [
+            'email_hash' => hash('sha256', strtolower(trim($request->input('email', '')))),
+            'ip_hash'    => hash('sha256', $request->ip() ?? 'unknown'),
+        ]);
+
+        return $this->traitSendResetLinkEmail($request);
     }
 
     // (Optional) Override the broker if needed

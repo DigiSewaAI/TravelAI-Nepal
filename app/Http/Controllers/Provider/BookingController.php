@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 // 🔥 Import the notification class
 use App\Notifications\BookingStatusUpdated;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -64,7 +65,7 @@ class BookingController extends Controller
     $wasCancelled = in_array($oldStatus, ['cancelled', 'rejected'], true);
     $nowCancelled = in_array($newStatus, ['cancelled', 'rejected'], true);
 
-    $locked->status = $newStatus;
+        $locked->status = $newStatus;
     $locked->save();
 
     if (!$wasCancelled && $nowCancelled) {
@@ -73,6 +74,20 @@ class BookingController extends Controller
             $locked->quota_month
         );
     }
+
+    $bookingId = $locked->id;
+    $providerId = $locked->service->provider_id;
+    $oldStatusCapture = $oldStatus;
+    $newStatusCapture = $newStatus;
+
+    DB::afterCommit(function () use ($bookingId, $providerId, $oldStatusCapture, $newStatusCapture) {
+        Log::info('Booking status transitioned', [
+            'booking_id'  => $bookingId,
+            'provider_id' => $providerId,
+            'old_status'  => $oldStatusCapture,
+            'new_status'  => $newStatusCapture,
+        ]);
+    });
 });
 
     if ($booking->fresh()->traveler) {

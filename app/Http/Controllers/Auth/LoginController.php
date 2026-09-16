@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -28,17 +29,26 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
+                if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            // Redirect based on role
             $user = Auth::user();
+
+            Log::info('User logged in', [
+                'user_id' => $user->id,
+                'role'    => $user->role,
+            ]);
+
+            // Redirect based on role
             if ($user->isSuperAdmin()) {
     return redirect()->intended(route('admin.dashboard'));
 } elseif ($user->isProviderOwner() || $user->role === 'manager' || $user->role === 'staff') {
     // प्रोभाइडर प्रोफाइल छ कि जाँच गरौं
-    if (!$user->provider) {
-        // सत्र बन्द गरौं वा लगआउट नगरी फिर्ता पठाऔं
+        if (!$user->provider) {
+        Log::warning('Login blocked: provider profile missing', [
+            'user_id' => $user->id,
+            'role'    => $user->role,
+        ]);
         auth()->logout();
         return redirect()->route('login')->withErrors([
             'email' => 'Your account is not linked to a provider profile. Please contact support.'
@@ -49,6 +59,11 @@ class LoginController extends Controller
     return redirect()->intended(route('traveler.dashboard'));
 }
         }
+
+                Log::warning('Failed login attempt', [
+            'email_hash' => hash('sha256', strtolower(trim($request->input('email', '')))),
+            'ip_hash'    => hash('sha256', $request->ip() ?? 'unknown'),
+        ]);
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Provider;
 use App\Support\QuotaPeriod;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookingLimitService
 {
@@ -26,7 +27,16 @@ class BookingLimitService
             ->whereRaw('count < ?', [$max])
             ->increment('count');
 
-        if ($affected > 0) {
+                if ($affected > 0) {
+            $providerId = $provider->id;
+            $limitSnapshot = $max;
+            DB::afterCommit(function () use ($providerId, $month, $limitSnapshot) {
+                Log::info('Booking quota reserved', [
+                    'provider_id' => $providerId,
+                    'quota_month' => $month,
+                    'limit'       => $limitSnapshot,
+                ]);
+            });
             return $month;
         }
 
@@ -35,7 +45,12 @@ class BookingLimitService
             ->where('month', $month)
             ->exists();
 
-        if ($exists) {
+                if ($exists) {
+            Log::warning('Booking quota limit reached', [
+                'provider_id' => $provider->id,
+                'quota_month' => $month,
+                'limit'       => $max,
+            ]);
             throw new \DomainException("Booking limit reached ({$max}/month).");
         }
 
@@ -47,6 +62,15 @@ class BookingLimitService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+                        $providerId = $provider->id;
+            $limitSnapshot = $max;
+            DB::afterCommit(function () use ($providerId, $month, $limitSnapshot) {
+                Log::info('Booking quota initialized', [
+                    'provider_id' => $providerId,
+                    'quota_month' => $month,
+                    'limit'       => $limitSnapshot,
+                ]);
+            });
             return $month;
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
             return $this->reserve($provider);
@@ -56,13 +80,23 @@ class BookingLimitService
     /**
      * Release one slot from the ORIGINAL quota month.
      */
-    public function release(Provider $provider, string $quotaMonth): void
+        public function release(Provider $provider, string $quotaMonth): void
     {
-        DB::table('booking_usage')
+        $affected = DB::table('booking_usage')
             ->where('provider_id', $provider->id)
             ->where('month', $quotaMonth)
             ->where('count', '>', 0)
             ->decrement('count');
+
+        if ($affected > 0) {
+            $providerId = $provider->id;
+            DB::afterCommit(function () use ($providerId, $quotaMonth) {
+                Log::info('Booking quota released', [
+                    'provider_id' => $providerId,
+                    'quota_month' => $quotaMonth,
+                ]);
+            });
+        }
     }
 
     /**
