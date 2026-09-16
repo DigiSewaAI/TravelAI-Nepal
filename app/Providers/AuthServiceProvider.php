@@ -10,12 +10,14 @@ use App\Models\Service;
 use App\Models\Booking;
 use App\Models\Invoice;
 use App\Models\User;          // <-- Added for Staff Policy
+use App\Models\ProviderStaff; // FIX-14: canonical staff model
 
 // Import Policies
 use App\Policies\ServicePolicy;
 use App\Policies\BookingPolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\ProviderPolicy;  // <-- Added for User/Staff
+use App\Policies\StaffPolicy;     // FIX-14: staff membership policy
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,10 +27,11 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Service::class => ServicePolicy::class,
-        Booking::class => BookingPolicy::class,
-        Invoice::class => InvoicePolicy::class,
-        User::class    => ProviderPolicy::class, // <-- Staff/Provider authorization
+        Service::class       => ServicePolicy::class,
+        Booking::class       => BookingPolicy::class,
+        Invoice::class       => InvoicePolicy::class,
+        User::class          => ProviderPolicy::class, // <-- Staff/Provider authorization
+        ProviderStaff::class => StaffPolicy::class,    // FIX-14: staff membership policy
     ];
 
     /**

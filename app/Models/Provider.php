@@ -42,21 +42,29 @@ class Provider extends Model
         return $this->belongsToMany(ProviderType::class, 'provider_provider_type');
     }
 
-    /**
-     * Get all staff members (users with provider_id = this provider)
-     * This replaces the old ProviderStaff relationship.
+        /**
+     * FIX-14: Canonical staff relationship.
+     * Returns ProviderStaff memberships (join table).
+     * Do NOT use User->provider_id — that column does not exist.
      */
     public function staff()
     {
-        return $this->hasMany(User::class, 'provider_id');
+        return $this->hasMany(ProviderStaff::class, 'provider_id');
     }
 
     /**
-     * Alias for staff() for clarity
+     * FIX-14: Alias returning User models (via provider_staff join).
      */
     public function staffUsers()
     {
-        return $this->staff();
+        return $this->hasManyThrough(
+            User::class,
+            ProviderStaff::class,
+            'provider_id',  // FK on provider_staff → providers
+            'id',           // FK on users (matched by provider_staff.user_id)
+            'id',           // local key on providers
+            'user_id'       // local key on provider_staff
+        );
     }
 
     public function services()

@@ -10,19 +10,19 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Provider;
 use App\Models\Review;
 use App\Models\Booking;
+use App\Models\ProviderStaff;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
+        protected $fillable = [
         'name',
         'email',
         'password',
         'role',
         'phone',
         'avatar',
-        'provider_id', // 👈 Staff/Provider Owner को लागि
         // ✅ New Fields (Phase 1)
         'passport_public_id',
         'passport_privacy',
@@ -54,25 +54,46 @@ class User extends Authenticatable
         return $this->hasOne(Provider::class, 'user_id');
     }
 
-    /**
-     * Get the provider this user belongs to (for staff users).
-     * Uses provider_id field on the users table.
+        /**
+     * FIX-14: Get the provider this user is staff at (via provider_staff).
+     * Canonical relationship — uses provider_staff join table.
      */
     public function staffProvider()
     {
-        return $this->belongsTo(Provider::class, 'provider_id');
+        return $this->hasOneThrough(
+            Provider::class,
+            ProviderStaff::class,
+            'user_id',      // FK on provider_staff → users
+            'id',           // FK on providers (via provider_staff.provider_id)
+            'id',           // local key on users
+            'provider_id'   // local key on provider_staff
+        );
     }
 
     /**
-     * Alias for staffProvider() – returns the provider this user is associated with.
-     * Works for both staff and provider_owner (via provider_id).
+     * FIX-14: All staff memberships for this user (may be multiple).
+     */
+    public function staffMemberships()
+    {
+        return $this->hasMany(ProviderStaff::class, 'user_id');
+    }
+
+        /**
+     * FIX-14: Returns the provider this user is associated with.
+     * - provider_owner: their owned provider
+     * - staff: their staff provider (via provider_staff)
+     * - else: null
+     * Returns a Provider instance (not a Relation) for direct use.
      */
     public function associatedProvider()
     {
-        if ($this->provider_id) {
-            return $this->belongsTo(Provider::class, 'provider_id');
+        if ($this->isProviderOwner()) {
+            return $this->provider;
         }
-        return $this->hasOne(Provider::class, 'user_id');
+        if ($this->isStaff()) {
+            return $this->staffProvider;
+        }
+        return null;
     }
 
     /**
@@ -152,26 +173,27 @@ class User extends Authenticatable
      * Provider Owner: their own provider(s)
      * Staff: the provider they belong to (via provider_id)
      */
-    public function accessibleProviderIds(): array
+        public function accessibleProviderIds(): array
     {
-        // Super Admin can access everything
         if ($this->isSuperAdmin()) {
             return Provider::pluck('id')->toArray();
         }
 
         $ids = [];
 
-        // Provider Owner: their own providers
         if ($this->isProviderOwner()) {
             $ids = $this->providers()->pluck('id')->toArray();
         }
 
-        // Staff: the provider they belong to
-        if ($this->isStaff() && $this->provider_id) {
-            $ids[] = $this->provider_id;
+        // FIX-14: Staff membership via provider_staff (canonical)
+        if ($this->isStaff()) {
+            $staffProviderIds = ProviderStaff::where('user_id', $this->id)
+                ->pluck('provider_id')
+                ->toArray();
+            $ids = array_merge($ids, $staffProviderIds);
         }
 
-        return array_unique($ids);
+        return array_values(array_unique($ids));
     }
 
     /**
@@ -180,7 +202,7 @@ class User extends Authenticatable
      * For staff: returns the provider they belong to.
      * For super_admin: returns null (use providers() instead).
      */
-    public function getCurrentProvider()
+        public function getCurrentProvider()
     {
         if ($this->isSuperAdmin()) {
             return null;
@@ -190,7 +212,8 @@ class User extends Authenticatable
             return $this->provider;
         }
 
-        if ($this->isStaff() && $this->provider_id) {
+        // FIX-14: Staff resolves via canonical provider_staff membership
+        if ($this->isStaff()) {
             return $this->staffProvider;
         }
 
