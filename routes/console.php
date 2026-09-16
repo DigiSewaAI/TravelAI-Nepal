@@ -29,10 +29,10 @@ Artisan::command('inspire', function () {
 Schedule::job(new FetchSafetySourcesJob)->everyFiveMinutes()->withoutOverlapping();
 
 // Phase 4: Verify expired/stale incidents – runs daily
-Schedule::job(new VerifyExpiredIncidentsJob)->daily();
+Schedule::job(new VerifyExpiredIncidentsJob)->daily()->withoutOverlapping();
 
 // Phase 4: Update safety statuses for all entities – runs every 15 minutes
-Schedule::job(new UpdateSafetyStatusesJob)->everyFifteenMinutes();
+Schedule::job(new UpdateSafetyStatusesJob)->everyFifteenMinutes()->withoutOverlapping();
 
 // FIX-07: Subscription expiry – runs daily
 Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
