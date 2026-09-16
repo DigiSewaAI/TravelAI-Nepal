@@ -16,7 +16,7 @@ class MediaUploadController extends Controller
     {
         try {
             // ✅ Debug: Log incoming request
-            Log::info('Upload request received', $request->all());
+                        Log::info('Media upload request received');
 
             $request->validate([
                 'checkpoint' => 'required|string',

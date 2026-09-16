@@ -13,7 +13,7 @@ class WaitlistController extends Controller
     public function store(Request $request)
     {
         try {
-            Log::info('Waitlist store called', ['email' => $request->email]);
+                        Log::info('Waitlist store called');
 
             // ✅ Validation लाई पनि try भित्रै राख्यौं
             $validated = $request->validate([
@@ -26,9 +26,11 @@ class WaitlistController extends Controller
             // ✅ Send confirmation email
             try {
                 Mail::to($validated['email'])->send(new \App\Mail\WaitlistConfirmation($validated['email']));
-                Log::info('Waitlist confirmation email sent to: ' . $validated['email']);
+                                Log::info('Waitlist confirmation email sent');
             } catch (\Exception $e) {
-                Log::error('Failed to send waitlist confirmation email: ' . $e->getMessage());
+                                Log::error('Failed to send waitlist confirmation email', [
+                    'error_class' => get_class($e),
+                ]);
                 // Email नपठाए पनि request सफल मान्ने
             }
 
@@ -39,9 +41,8 @@ class WaitlistController extends Controller
 
         // ✅ अब Validation Exception लाई पनि छुट्टै समात्छौं
         } catch (ValidationException $e) {
-            Log::warning('Waitlist validation failed', [
+                        Log::warning('Waitlist validation failed', [
                 'errors' => $e->errors(),
-                'email' => $request->email
             ]);
             return response()->json([
                 'success' => false,
@@ -49,9 +50,10 @@ class WaitlistController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Waitlist error: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+                        Log::error('Waitlist error', [
+                'error_class' => get_class($e),
+                'file'        => $e->getFile(),
+                'line'        => $e->getLine(),
             ]);
             return response()->json([
                 'success' => false,

@@ -25,9 +25,9 @@ class PlannerService
 
     public function generate(array $input, string $locale = 'en'): array
     {
-        Log::info('🔍 [PlannerService] generate called', [
+                Log::info('PlannerService generate called', [
             'locale' => $locale,
-            'input' => $input,
+            'input_keys' => array_keys($input),
         ]);
 
         $route = $this->resolveRoute($input['destination'] ?? null);
@@ -1179,9 +1179,11 @@ $serviceName = $service
             ->first();
 
         if ($route) {
-            Log::info("🎯 Route resolved by fuzzy match: {$route->slug} (input: {$destination})");
+                        Log::info('Route resolved by fuzzy match', [
+                'route_slug' => $route->slug,
+            ]);
         } else {
-            Log::warning("❌ Route not found for: {$destination}");
+                        Log::warning('Route not found');
         }
 
         return $route;

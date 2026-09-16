@@ -36,10 +36,8 @@ class QuotationRequestController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('🔍 [QuotationRequest] store STARTED', [
+                Log::info('QuotationRequest store started', [
             'user_id' => Auth::id(),
-            'session_id' => session()->getId(),
-            'payload' => $request->all()
         ]);
 
         try {
@@ -52,7 +50,10 @@ class QuotationRequestController extends Controller
     'message' => 'nullable|string|max:500',
 ]);
 
-            Log::info('✅ [QuotationRequest] Validation passed', ['validated' => $validated]);
+                        Log::info('QuotationRequest validation passed', [
+                'planner_result_id' => $validated['planner_result_id'] ?? null,
+                'provider_id'       => $validated['provider_id'] ?? null,
+            ]);
 
             $user = Auth::user();
 
@@ -158,10 +159,10 @@ class QuotationRequestController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            Log::error('🚨 [QuotationRequest] Unexpected error: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                        Log::error('QuotationRequest unexpected error', [
+                'error_class' => get_class($e),
+                'file'        => $e->getFile(),
+                'line'        => $e->getLine(),
             ]);
             return response()->json([
                 'success' => false,

@@ -52,9 +52,8 @@ class LlmService
      */
     public function generateItinerary(string $prompt, string $locale = 'en', ?string $model = null, bool $extract = true, int $maxTokens = 3000): array
     {
-        Log::info('🔍 [LlmService] generateItinerary called', [
+                Log::info('LlmService generateItinerary called', [
             'locale' => $locale,
-            'prompt_preview' => substr($prompt, 0, 500),
             'prompt_length' => strlen($prompt),
         ]);
 
@@ -71,10 +70,8 @@ class LlmService
                     'prompt_length' => strlen($prompt),
                 ]);
 
-                Log::info('🔍 [LlmService] Sending to Groq', [
+                                Log::info('LlmService sending to Groq', [
                     'model' => $modelToUse,
-                    'system_prompt' => $this->getSystemPrompt($locale),
-                    'user_prompt_preview' => substr($prompt, 0, 300),
                     'temperature' => 0.2,
                 ]);
 
@@ -100,8 +97,7 @@ class LlmService
                     $data = $response->json();
                     $content = $data['choices'][0]['message']['content'] ?? '';
 
-                    Log::info('🔍 [LlmService] Raw Groq Response', [
-                        'raw_content' => $content,
+                                        Log::info('LlmService raw Groq response received', [
                         'content_length' => strlen($content),
                     ]);
 
@@ -129,9 +125,8 @@ class LlmService
                     continue;
                 }
 
-                Log::error('Groq API failed', [
+                                Log::error('Groq API failed', [
                     'status' => $response->status(),
-                    'body' => $response->body(),
                 ]);
                 throw new \Exception("Groq API error: " . $response->body());
 
@@ -205,7 +200,9 @@ class LlmService
 
     protected function extractJson(string $content): array
     {
-        Log::info('LLM Raw Response', ['content' => substr($content, 0, 500)]);
+                Log::info('LlmService: LLM response received', [
+            'content_length' => strlen($content),
+        ]);
 
         // Remove <think> tags
         $cleaned = preg_replace('/<think>.*?<\/think>/s', '', $content);
@@ -241,8 +238,8 @@ class LlmService
             }
         }
 
-        Log::error('Failed to extract JSON', [
-            'content_preview' => substr($content, 0, 300),
+                Log::error('Failed to extract JSON', [
+            'content_length' => strlen($content),
             'json_error' => json_last_error_msg()
         ]);
 
