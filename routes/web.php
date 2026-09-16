@@ -155,11 +155,11 @@ Route::get('/providers/{provider:slug}', [ProviderController::class, 'show'])->n
 // 3. AUTH ROUTES (User Guard)
 // =======================================
 Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 Route::get('/register', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
+Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->middleware('throttle:auth');
 
 // =======================================
 // 6. PROVIDER DASHBOARD ROUTES
@@ -423,7 +423,7 @@ Route::get('/lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 // ✅ Planner Route – web middleware को session पाउँछ
-Route::post('/api/planner/generate', [App\Http\Controllers\Api\PlannerController::class, 'generate']);
+Route::post('/api/planner/generate', [App\Http\Controllers\Api\PlannerController::class, 'generate'])->middleware('throttle:ai');
 
 Route::get('/test-lang', function () {
     app()->setLocale('hi');
@@ -442,7 +442,7 @@ Route::get('/safety/search', [App\Http\Controllers\SafetyController::class, 'sea
     ->name('safety.search');
 
 // API
-Route::get('/api/safety/markers', [App\Http\Controllers\SafetyController::class, 'markers'])->name('api.safety.markers');
+Route::get('/api/safety/markers', [App\Http\Controllers\SafetyController::class, 'markers'])->middleware('throttle:api')->name('api.safety.markers');
 
 // Admin safety (add to admin group)
 Route::prefix('admin/safety')->name('admin.safety.')->middleware(['auth', 'admin'])->group(function () {
