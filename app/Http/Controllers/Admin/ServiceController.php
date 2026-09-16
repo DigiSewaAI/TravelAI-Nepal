@@ -7,9 +7,11 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ServiceController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $services = Service::with(['provider', 'category'])->latest()->paginate(20);
@@ -29,9 +31,15 @@ class ServiceController extends Controller
         return back()->with('success', 'Service status updated.');
     }
 
-    public function destroy(Service $service)
+        public function destroy(Service $service)
     {
+        // FIX-15 D3: explicit delete authorization
+        $this->authorize('delete', $service);
+
         $service->delete();
-        return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
+
+        return redirect()
+            ->route('admin.services.index')
+            ->with('success', 'Service deleted successfully.');
     }
 }

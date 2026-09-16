@@ -173,6 +173,35 @@ class Provider extends Model
             default => 1,
         };
     }
+        /**
+     * FIX-15: Get the maximum number of active service listings allowed
+     * for the provider's current plan.
+     * Returns -1 for unlimited (Enterprise).
+     *
+     * Mirrors getMaxStaffAttribute() semantics. Callers must convert -1
+     * to PHP_INT_MAX for boundary comparison.
+     */
+    public function getMaxListingsAttribute(): int
+    {
+        $plan = $this->getActivePlanAttribute();
+
+        if (!$plan) {
+            return 3; // Free plan default
+        }
+
+        if (isset($plan->limits['max_listings'])) {
+            return (int) $plan->limits['max_listings'];
+        }
+
+        // Fallback by plan slug
+        return match ($plan->slug) {
+            'free' => 3,
+            'professional' => 20,
+            'business' => 100,
+            'enterprise' => -1,
+            default => 3,
+        };
+    }
     public function styles()
 {
     return $this->hasMany(ProviderStyle::class, 'provider_id');
