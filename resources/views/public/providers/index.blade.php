@@ -1,8 +1,7 @@
 @extends('layouts.public')
 
 @section('title', __('messages.providers_page_title'))
-@section('meta_description', 'Browse verified travel providers, agencies, and local operators across Nepal. Compare services, read reviews, and book directly with zero commission.')
-
+@section('meta_description', 'Browse verified travel providers, agencies, and local operators across Nepal. Compare services, read reviews, and book directly.')
 @push('head')
 @verbatim
 <script type="application/ld+json">

@@ -349,8 +349,7 @@ return [
     'for_trekkers_agencies' => 'For trekkers & travel agencies — unified experience',
     'for_travel_agencies' => 'For travel agencies',
     'supercharge_business' => 'Supercharge your trekking business',
-    'supercharge_desc' => 'Join Nepal\'s first AI-native OS that automates booking, permits, and client management. Zero commission smart contracts, digital contracts & real-time analytics.',
-    'supercharge_bullet1' => 'Reduce manual work by 80% with AI quotations & itineraries',
+    'supercharge_desc' => 'Join Nepal\'s first AI-native OS that automates booking, permits, and client management. Digital contracts & real-time analytics.',    'supercharge_bullet1' => 'Reduce manual work by 80% with AI quotations & itineraries',
     'supercharge_bullet2' => 'Own branded dashboard – no commission leakage',
     'supercharge_bullet3' => 'Access global trekker network & blockchain-ready permits',
     'trusted_by_early' => 'Trusted by early partners: Himalayan Guides, Nepal Eco Treks, & more',
@@ -360,7 +359,7 @@ return [
     'permits_issued' => 'Permits issued (auto)',
     'ai_revenue_forecast' => 'AI revenue forecast',
     'less_paperwork' => '80% less paperwork → agencies scale faster',
-    'zero_commission_smart_contract' => 'Zero commission smart contract ready',
+    'zero_commission_smart_contract' => 'Digital contracts ready',
     'ready_to_transform' => 'Ready to transform Nepal trekking?',
     'waitlist_text' => 'Join the waitlist — early agencies and trekkers get 6 months free + lifetime discounted upgrades.',
     'email_placeholder' => 'Your email address',
@@ -469,7 +468,7 @@ return [
     // ======================
 // STATS BANNER
 // ======================
-'smart_contracts_ready' => 'Smart Contracts Ready',
+'smart_contracts_ready' => 'Digital Contracts Ready',
 'time_ago' => ':time ago',
 // ======================
 // ABOUT PAGE
@@ -825,7 +824,7 @@ return [
 'faq_q1' => 'Can I switch plans later?',
 'faq_a1' => 'Yes, you can upgrade, downgrade, or cancel your plan at any time from your dashboard.',
 'faq_q2' => 'What payment methods do you accept?',
-'faq_a2' => 'We accept credit/debit cards, eSewa, Khalti, and bank transfers.',
+'faq_a2' => 'We currently accept credit/debit card payments through Stripe. For other payment options or paid-plan activation, please contact sales.',
 'faq_q3' => 'Is there a free trial?',
 'faq_a3' => 'Yes, the Free plan is always available with basic features. Upgrade anytime.',
 'faq_q4' => 'What happens if I exceed my plan limits?',

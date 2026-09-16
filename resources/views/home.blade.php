@@ -50,7 +50,7 @@
       "name": "Is TravelAI Nepal free to use?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime. We operate on zero-commission smart contracts."
+                "text": "Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime."
       }
     },
     {
@@ -1102,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Is TravelAI Nepal free to use?
             <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
           </summary>
-          <p class="text-gray-600 mt-3">Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime. We operate on zero-commission smart contracts.</p>
+                    <p class="text-gray-600 mt-3">Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime.</p>
         </details>
 
         <details class="bg-white rounded-xl border border-gray-200 p-5 group">

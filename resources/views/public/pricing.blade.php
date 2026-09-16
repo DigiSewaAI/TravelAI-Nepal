@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Pricing — TravelAI Nepal | Plans for Travel Agencies & Hotels')
-@section('meta_description', 'Simple, transparent pricing for Nepal tourism businesses. Start free, upgrade anytime. AI-powered platform with zero commission, multi-currency, and 4-language support.')
+@section('meta_description', 'Simple, transparent pricing for Nepal tourism businesses. Start free, upgrade anytime. AI-powered platform with direct booking, multi-currency, and 4-language support.')
 @section('meta_keywords', 'Nepal travel agency software, trekking platform pricing, TravelAI Nepal plans, tourism SaaS Nepal, travel agency management software')
 
 @push('head')
@@ -11,8 +11,7 @@
   "@@context": "https://schema.org",
   "@@type": "Product",
   "name": "TravelAI Nepal — Travel Agency Platform",
-  "description": "AI-powered platform for Nepal travel agencies. Manage bookings, permits, staff, and clients with zero commission.",
-  "brand": {
+  "description": "AI-powered platform for Nepal travel agencies. Manage bookings, permits, staff, and clients.",  "brand": {
     "@@type": "Brand",
     "name": "TravelAI Nepal"
   },
