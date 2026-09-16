@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail; // ✅ Mail Facade
 use App\Mail\QuotationMail; // ✅ Mailable Class
+use App\Exceptions\AiQuotaExceededException;
 
 class QuotationRequestController extends Controller
 {
@@ -65,83 +66,120 @@ class QuotationRequestController extends Controller
      * Generate AI quotation from the itinerary data.
      */
     public function generateQuotation(Request $request, QuotationRequest $quotationRequest)
-    {
-        $provider = Auth::user()->getCurrentProvider();
-        if (!$provider || $quotationRequest->provider_id !== $provider->id) {
-            abort(403, 'Unauthorized.');
-        }
-
-        try {
-            $this->aiLimit->checkAndIncrement($provider);
-
-            $prompt = $this->buildQuotationPrompt($quotationRequest, $provider);
-
-            // Generate with extraction disabled, higher max_tokens (6000)
-            $response = $this->llm->generateItinerary($prompt, 'en', 'openai/gpt-oss-20b', false, 8000);
-
-            $rawContent = is_array($response) && isset($response['content']) ? $response['content'] : (string) $response;
-
-            $quotationData = $this->extractQuotationJson($rawContent);
-
-// ✅ Rebuild day_by_day_breakdown from ORIGINAL itinerary (not AI)
-$itineraryDays = $quotationRequest->itinerary_data['days'] ?? [];
-$dayBreakdown = [];
-foreach ($itineraryDays as $day) {
-    $services = [];
-    if (!empty($day['items']) && is_array($day['items'])) {
-        foreach ($day['items'] as $item) {
-            $services[] = $item['title'] ?? 'Service';
-        }
+{
+    $provider = Auth::user()->getCurrentProvider();
+    if (!$provider || $quotationRequest->provider_id !== $provider->id) {
+        abort(403, 'Unauthorized.');
     }
-    $dayBreakdown[] = [
-        'day' => $day['day_number'] ?? 0,
-        'route' => $day['title'] ?? '',
-        'description' => $day['description'] ?? '',
-        'services_included' => $services,
-    ];
-}
 
-// Add day_by_day_breakdown to quotation data (if not already present)
-if (empty($quotationData['quotation']['day_by_day_breakdown'])) {
-    $quotationData['quotation']['day_by_day_breakdown'] = $dayBreakdown;
-}
+    $reservation = null;
 
-$quotationText = $this->formatQuotationText($quotationData, $provider, $quotationRequest);
+    try {
+        // FIX-12: crash-safe reservation (short transaction)
+        $reservation = $this->aiLimit->reserve(
+            $provider,
+            'provider.quotation-requests.generate',
+            [
+                'quotation_request_id' => $quotationRequest->id,
+                'provider_id'          => $provider->id,
+            ]
+        );
 
-$quotationRequest->update([
-    'status' => 'completed',
-    'quotation_data' => $quotationData,
-    'quotation_text' => $quotationText,
-]);
+        $prompt = $this->buildQuotationPrompt($quotationRequest, $provider);
 
-            if ($quotationRequest->traveler) {
-                try {
-                    $quotationRequest->traveler->notify(
-                        new \App\Notifications\QuotationReadyNotification($quotationRequest)
-                    );
-                } catch (\Exception $e) {
-                    Log::error('Failed to send notification: ' . $e->getMessage());
+        // FIX-12: LLM call OUTSIDE any DB transaction
+        $response = $this->llm->generateItinerary($prompt, 'en', 'openai/gpt-oss-20b', false, 8000);
+
+        $rawContent = is_array($response) && isset($response['content'])
+            ? $response['content']
+            : (string) $response;
+
+        $quotationData = $this->extractQuotationJson($rawContent);
+
+        // Rebuild day_by_day_breakdown from ORIGINAL itinerary (not AI)
+        $itineraryDays = $quotationRequest->itinerary_data['days'] ?? [];
+        $dayBreakdown = [];
+        foreach ($itineraryDays as $day) {
+            $services = [];
+            if (!empty($day['items']) && is_array($day['items'])) {
+                foreach ($day['items'] as $item) {
+                    $services[] = $item['title'] ?? 'Service';
                 }
             }
-
-            return response()->json([
-                'success' => true,
-                'quotation' => $quotationText,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Quotation generation failed', [
-                'error' => $e->getMessage(),
-                'request_id' => $quotationRequest->id,
-                'provider_id' => $provider->id,
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            $dayBreakdown[] = [
+                'day'                => $day['day_number'] ?? 0,
+                'route'              => $day['title'] ?? '',
+                'description'        => $day['description'] ?? '',
+                'services_included'  => $services,
+            ];
         }
+
+        if (empty($quotationData['quotation']['day_by_day_breakdown'])) {
+            $quotationData['quotation']['day_by_day_breakdown'] = $dayBreakdown;
+        }
+
+        $quotationText = $this->formatQuotationText($quotationData, $provider, $quotationRequest);
+
+        $quotationRequest->update([
+            'status'          => 'completed',
+            'quotation_data'  => $quotationData,
+            'quotation_text'  => $quotationText,
+        ]);
+
+        if ($quotationRequest->traveler) {
+            try {
+                $quotationRequest->traveler->notify(
+                    new \App\Notifications\QuotationReadyNotification($quotationRequest)
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification: ' . $e->getMessage());
+            }
+        }
+
+        // FIX-12: mark reservation completed (short transaction)
+        $this->aiLimit->finalize($reservation);
+
+        return response()->json([
+            'success'   => true,
+            'quotation' => $quotationText,
+        ]);
+
+    } catch (AiQuotaExceededException $e) {
+        Log::info('AI quota exceeded', [
+            'provider_id' => $provider->id,
+            'endpoint'    => 'provider.quotation-requests.generate',
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 429);
+
+    } catch (\Exception $e) {
+        // FIX-12: release reservation on failure (short transaction)
+        if ($reservation) {
+            try {
+                $this->aiLimit->release($reservation);
+            } catch (\Throwable $releaseError) {
+                Log::error('Failed to release AI reservation', [
+                    'reservation_id' => $reservation->id,
+                    'error'          => $releaseError->getMessage(),
+                ]);
+            }
+        }
+
+        Log::error('Quotation generation failed', [
+            'error'       => $e->getMessage(),
+            'request_id'  => $quotationRequest->id,
+            'provider_id' => $provider->id,
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
     }
+}
 
     /**
      * Build the AI prompt using itinerary data.

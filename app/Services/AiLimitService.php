@@ -2,72 +2,81 @@
 
 namespace App\Services;
 
+use App\Exceptions\AiQuotaExceededException;
+use App\Models\AiReservation;
 use App\Models\AiUsage;
 use App\Models\Provider;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * FIX-12: Provider-facing AI quota facade.
+ *
+ * Delegates the crash-safe lifecycle to AiReservationService.
+ * Retains getUsage() for dashboard display.
+ *
+ * Lifecycle contract:
+ *   reservation = reserve(provider, endpoint, payload)   [short TX]
+ *   try:    LLM call
+ *           finalize(reservation)
+ *   catch:  release(reservation)
+ *
+ * NEVER hold a DB transaction across the LLM call.
+ */
 class AiLimitService
 {
+    public function __construct(
+        protected AiReservationService $reservations
+    ) {}
+
     /**
-     * Check if the provider has reached their AI request limit.
-     * If not, increment the usage count.
-     * 
-     * @throws \Exception
+     * Reserve one AI slot. Idempotent within a 1-minute window
+     * keyed by identity + endpoint + payload.
+     *
+     * @throws AiQuotaExceededException
      */
-    public function checkAndIncrement(Provider $provider): void
+    public function reserve(Provider $provider, string $endpoint, array $payload): AiReservation
     {
-        $plan = $provider->getActivePlanAttribute();
-        
-        if (!$plan) {
-            // Free plan default: 5 requests per month
-            $maxRequests = 5;
-        } else {
-            $maxRequests = $plan->limits['max_ai_requests'] ?? 5;
-        }
+        $identity = 'provider:' . $provider->id;
+        $key = AiReservationService::generateIdempotencyKey($identity, $endpoint, $payload);
 
-        // Unlimited (-1)
-        if ($maxRequests == -1) {
-            return;
-        }
-
-        $month = now()->format('Y-m');
-        
-        $usage = AiUsage::firstOrCreate([
-            'provider_id' => $provider->id,
-            'month' => $month,
-        ]);
-
-        if ($usage->count >= $maxRequests) {
-            throw new \Exception("You have reached your AI request limit of {$maxRequests} for this month. Please upgrade your plan to continue using AI features.");
-        }
-
-        $usage->increment('count');
-        
-        Log::info('AI usage incremented', [
-            'provider_id' => $provider->id,
-            'month' => $month,
-            'new_count' => $usage->fresh()->count,
-        ]);
+        return $this->reservations->reserveForProvider($provider, $endpoint, $key);
     }
 
     /**
-     * Get current usage and limit for a provider.
+     * Mark reservation as completed. Atomic; safe against double-finalize.
+     */
+    public function finalize(AiReservation $reservation): void
+    {
+        $this->reservations->finalize($reservation);
+    }
+
+    /**
+     * Release a reservation on explicit failure. Atomic claim + counter decrement.
+     * Safe against double-release (only one worker wins the status UPDATE).
+     */
+    public function release(AiReservation $reservation): void
+    {
+        $this->reservations->release($reservation);
+    }
+
+    /**
+     * Read current usage + limit for UI display. Non-mutating.
      */
     public function getUsage(Provider $provider): array
     {
-        $month = now()->format('Y-m');
-        $usage = AiUsage::firstOrCreate([
-            'provider_id' => $provider->id,
-            'month' => $month,
-        ]);
+        $month = AiReservationService::providerPeriod();
+
+        $usage = AiUsage::firstOrCreate(
+            ['provider_id' => $provider->id, 'month' => $month],
+            ['count' => 0]
+        );
 
         $plan = $provider->getActivePlanAttribute();
         $limit = $plan ? ($plan->limits['max_ai_requests'] ?? 5) : 5;
 
         return [
-            'used' => $usage->count,
-            'limit' => $limit,
-            'remaining' => $limit == -1 ? -1 : max(0, $limit - $usage->count),
+            'used'         => (int) $usage->count,
+            'limit'        => (int) $limit,
+            'remaining'    => $limit == -1 ? -1 : max(0, $limit - $usage->count),
             'is_unlimited' => $limit == -1,
         ];
     }

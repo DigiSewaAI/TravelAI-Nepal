@@ -2,52 +2,56 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * FIX-12: Now routes through LlmService (no direct Groq).
+ *
+ * Preserves the existing string-return contract using ERROR_PREFIX
+ * to signal failure without throwing. This lets the controller
+ * distinguish success from failure for quota finalize/release.
+ */
 class ItineraryGenerator
 {
+    /**
+     * Error marker. If the returned string starts with this prefix,
+     * the caller must treat the result as a failure.
+     */
+    public const ERROR_PREFIX = '❌';
+
+    public function __construct(
+        protected LlmService $llm
+    ) {}
+
     public function generate(array $data): string
     {
-        $apiKey = env('GROQ_API_KEY');
-        
-        if (!$apiKey) {
-            Log::error('GROQ_API_KEY is missing in .env file');
-            return "⚠️ API key not configured. Please add GROQ_API_KEY to your .env file.";
+        if (empty(config('services.groq.api_key'))) {
+            Log::error('GROQ_API_KEY is missing in config');
+            return self::ERROR_PREFIX . ' API key not configured. Please add GROQ_API_KEY to your .env file.';
         }
 
         $prompt = $this->buildPrompt($data);
-        
-        // ✅ Model Name Update गरियो – अब `llama-3.1-8b-instant` को सट्टा `openai/gpt-oss-20b`
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
-            'Content-Type' => 'application/json',
-        ])->timeout(60)->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => 'openai/gpt-oss-20b', // ✅ यहाँ बदलियो
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are a professional travel planner for any destination worldwide. Provide detailed, practical itineraries with daily activities, accommodation suggestions, transport options, and local tips. Use local currency where appropriate. Always respond in English.'
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $prompt
-                ]
-            ],
-            'temperature' => 0.7,
-            'max_tokens' => 1500,
-        ]);
 
-        if ($response->successful()) {
-            return $response->json()['choices'][0]['message']['content'];
+        try {
+            $content = $this->llm->generateRawText(
+                prompt: $prompt,
+                systemPrompt: 'You are a professional travel planner for any destination worldwide. Provide detailed, practical itineraries with daily activities, accommodation suggestions, transport options, and local tips. Use local currency where appropriate. Always respond in English.',
+                model: 'openai/gpt-oss-20b',
+                maxTokens: 1500,
+                timeout: 60
+            );
+
+            if (trim($content) === '') {
+                Log::error('ItineraryGenerator: empty LLM response');
+                return self::ERROR_PREFIX . ' Unable to generate itinerary at this moment. Please try again later.';
+            }
+
+            return $content;
+
+        } catch (\Exception $e) {
+            Log::error('Itinerary generation failed: ' . $e->getMessage());
+            return self::ERROR_PREFIX . ' Unable to generate itinerary at this moment. Please try again later.';
         }
-
-        // 🔥 Detailed Error Logging
-        $errorBody = $response->body();
-        Log::error('Groq API Error: ' . $errorBody);
-        
-        // 🔥 User-friendly Error Message
-        return "⚠️ Unable to generate itinerary at this moment. Please try again later.";
     }
 
     private function buildPrompt(array $data): string

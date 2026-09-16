@@ -10,6 +10,7 @@ use App\Services\AiLimitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Exceptions\AiQuotaExceededException;
 
 class QuotationController extends Controller
 {
@@ -39,10 +40,10 @@ class QuotationController extends Controller
         return view('provider.quotation.create', compact('services', 'usage'));
     }
 
-    public function generate(Request $request)
+        public function generate(Request $request)
     {
         $provider = Auth::user()->getCurrentProvider();
-        
+
         if (!$provider) {
             abort(403, 'No provider found.');
         }
@@ -55,21 +56,59 @@ class QuotationController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $reservation = null;
+
         try {
-            $this->aiLimit->checkAndIncrement($provider);
+            // FIX-12: crash-safe reservation (short transaction)
+            $reservation = $this->aiLimit->reserve(
+                $provider,
+                'provider.quotation.generate',
+                [
+                    'provider_id'   => $provider->id,
+                    'service_id'    => $validated['service_id'] ?? null,
+                    'customer_name' => $validated['customer_name'],
+                ]
+            );
+
             $prompt = $this->buildQuotationPrompt($provider, $validated);
-            
-            // ✅ Quotation को लागि 'qwen/qwen3.6-27b' Model प्रयोग गर्ने
+
+            // FIX-12: LLM call OUTSIDE any DB transaction
             $response = $this->llm->generateItinerary($prompt, 'en', 'qwen/qwen3.6-27b');
-            
+
             $quotation = $this->formatQuotation($response, $provider, $validated);
+
+            // FIX-12: mark reservation completed (short transaction)
+            $this->aiLimit->finalize($reservation);
 
             return response()->json([
                 'success' => true,
                 'quotation' => $quotation,
             ]);
 
+        } catch (AiQuotaExceededException $e) {
+            Log::info('AI quota exceeded', [
+                'provider_id' => $provider->id,
+                'endpoint'    => 'provider.quotation.generate',
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 429);
+
         } catch (\Exception $e) {
+            // FIX-12: release reservation on failure (short transaction)
+            if ($reservation) {
+                try {
+                    $this->aiLimit->release($reservation);
+                } catch (\Throwable $releaseError) {
+                    Log::error('Failed to release AI reservation', [
+                        'reservation_id' => $reservation->id,
+                        'error'          => $releaseError->getMessage(),
+                    ]);
+                }
+            }
+
             Log::error('Quotation generation failed', [
                 'error' => $e->getMessage(),
                 'provider_id' => $provider->id,

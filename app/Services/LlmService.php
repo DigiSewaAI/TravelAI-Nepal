@@ -159,6 +159,50 @@ class LlmService
         throw new \Exception('Max retries exceeded for Groq API.');
     }
 
+        /**
+     * FIX-12: Generate raw text response (no JSON extraction).
+     * Used by ItineraryGenerator for free-form itinerary output.
+     * Preserves the existing raw-string contract.
+     */
+    public function generateRawText(
+        string $prompt,
+        string $systemPrompt = 'You are a helpful assistant.',
+        ?string $model = null,
+        int $maxTokens = 1500,
+        int $timeout = 60
+    ): string {
+        $modelToUse = $model ?? $this->model;
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Content-Type' => 'application/json',
+        ])
+        ->withOptions([
+            'verify' => false,
+            'timeout' => $timeout,
+        ])
+        ->post('https://api.groq.com/openai/v1/chat/completions', [
+            'model' => $modelToUse,
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => $maxTokens,
+        ]);
+
+        if (!$response->successful()) {
+            Log::error('LlmService::generateRawText failed', [
+                'status' => $response->status(),
+                'model' => $modelToUse,
+            ]);
+            throw new \Exception('Groq raw text error: HTTP ' . $response->status());
+        }
+
+        $data = $response->json();
+        return (string) ($data['choices'][0]['message']['content'] ?? '');
+    }
+
     protected function extractJson(string $content): array
     {
         Log::info('LLM Raw Response', ['content' => substr($content, 0, 500)]);

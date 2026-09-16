@@ -8,6 +8,7 @@ use App\Jobs\Safety\VerifyExpiredIncidentsJob;   // ✅ New Phase 4 Job
 use App\Jobs\Safety\UpdateSafetyStatusesJob;      // ✅ New Phase 4 Job
 use App\Jobs\ExpireSubscriptionsJob;              // FIX-07
 use App\Jobs\CleanupStripeWebhookEventsJob;       // FIX-08
+use App\Jobs\ReleaseStaleAiReservationsJob;       // FIX-12
 
 /*
 |--------------------------------------------------------------------------
@@ -38,3 +39,6 @@ Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
 
 // FIX-08: Stripe webhook event retention cleanup – runs daily
 Schedule::job(new CleanupStripeWebhookEventsJob)->daily()->withoutOverlapping();
+
+// FIX-12: Release stale AI reservations — every 5 minutes
+Schedule::job(new ReleaseStaleAiReservationsJob)->everyFiveMinutes()->withoutOverlapping();
