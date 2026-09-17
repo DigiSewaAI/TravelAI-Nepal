@@ -34,11 +34,12 @@
 </script>
 @endverbatim
 
-{{-- ========== Leaflet + Globe.gl (async) ========== --}}
+{{-- ========== Leaflet + Globe.gl + TopoJSON (async) ========== --}}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script src="//unpkg.com/globe.gl" defer></script>
 <script src="//unpkg.com/three" defer></script>
+<script src="https://unpkg.com/topojson-client@3" defer></script>
 
 <style>
     /* ═══════════════ GLOBE (Responsive) ═══════════════ */
@@ -107,6 +108,18 @@
         /* Multi-language heading spacing */
     .globe-heading { line-height: 1.4 !important; }
     .globe-heading span.inline-block { line-height: 1.4; }
+
+    /* ═══════════════ DISTRICT BOUNDARY LAYER (GLOBE-02) ═══════════════ */
+    .leaflet-districts-pane {
+        /* z-index set in JS (350) - below markers */
+    }
+    .district-tooltip {
+        background: #fff !important;
+        border: 1px solid rgba(0,0,0,.08) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
+        padding: 6px 10px !important;
+    }
 
 </style>
 @endpush
@@ -270,6 +283,13 @@
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> {{ __('messages.activity') }}</div>
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> {{ __('messages.pilgrimage') }}</div>
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> {{ __('messages.wildlife') }}</div>
+            </div>
+            {{-- GLOBE-02: Boundary attribution (CC BY 4.0) --}}
+            <div class="absolute bottom-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-1.5 text-[10px] text-gray-600 max-w-[240px] leading-tight">
+                Boundaries:
+                <a href="https://localboundries.oknp.org" target="_blank" rel="noopener"
+                   class="text-blue-600 hover:underline">Open Knowledge Nepal</a>
+                (CC BY 4.0)
             </div>
         </div>
     </div>
@@ -692,6 +712,71 @@ function initMap() {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CartoDB', subdomains: 'abcd', maxZoom: 19
     }).addTo(map);
+
+    // ─────────── DISTRICT BOUNDARY LAYER (GLOBE-02) ───────────
+    // Source: Open Knowledge Nepal localboundaries (CC BY 4.0)
+    // TopoJSON object: "districts" - 77 polygons
+    map.createPane('districtsPane');
+    map.getPane('districtsPane').style.zIndex = 350;
+
+    const districtBaseStyle = {
+        fillColor: '#2563eb',
+        fillOpacity: 0.04,
+        color: '#2563eb',
+        weight: 1,
+        opacity: 0.35,
+    };
+
+    const districtHoverStyle = {
+        fillOpacity: 0.15,
+        weight: 2,
+        opacity: 0.85,
+    };
+
+    function titleCaseDistrict(s) {
+        return String(s).toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    fetch('/map/nepal-districts.topojson')
+        .then(function (res) { return res.json(); })
+        .then(function (topo) {
+            if (typeof topojson === 'undefined') {
+                console.warn('topojson-client not loaded; skipping district layer');
+                return;
+            }
+            const geo = topojson.feature(topo, topo.objects.districts);
+
+            L.geoJSON(geo, {
+                pane: 'districtsPane',
+                style: function () { return districtBaseStyle; },
+                onEachFeature: function (feature, layer) {
+                    const props = feature.properties || {};
+                    const displayName = titleCaseDistrict(props.DISTRICT || '');
+                    const provinceName = props.PR_NAME || '';
+
+                    const tooltipHtml =
+                        '<div style="font-weight:600;font-size:12px;color:#111827;">' + displayName + '</div>' +
+                        '<div style="font-size:10px;color:#6b7280;margin-top:1px;">' + provinceName + '</div>';
+
+                    layer.bindTooltip(tooltipHtml, {
+                        sticky: true,
+                        direction: 'top',
+                        className: 'district-tooltip',
+                    });
+
+                    layer.on('mouseover', function () {
+                        layer.setStyle(districtHoverStyle);
+                    });
+                    layer.on('mouseout', function () {
+                        layer.setStyle(districtBaseStyle);
+                    });
+                },
+            }).addTo(map);
+        })
+        .catch(function (err) {
+            console.warn('District boundary layer failed to load:', err);
+        });
+
 
     const mapPins = [
         { lat: 27.9881, lng: 86.9250, name: 'Everest Base Camp', category: 'trek', days: 14, price: 1180, slug: 'everest-base-camp' },

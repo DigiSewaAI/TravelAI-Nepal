@@ -1,0 +1,18 @@
+Administrative boundary data for Nepal (district level)
+
+Source    : Open Knowledge Nepal - localboundaries
+Live site : https://localboundries.oknp.org
+Repo      : https://github.com/openknowledgenp/localboundaries
+License   : Creative Commons Attribution 4.0 International (CC BY 4.0)
+            https://creativecommons.org/licenses/by/4.0/
+
+Attribution is required in the application UI.
+See map bottom-right corner.
+
+File      : nepal-districts.topojson
+Raw size  : 336.53 KB (344,605 bytes)
+Gzip size : 127.16 KB
+Retrieved : 2026-09-17
+Format    : TopoJSON (object name: "districts")
+
+SHA256    : 75e921b08a830cf669d8ca0e5c744351ffbdf86a089d61790e8a0e95efd349c6
