@@ -7,6 +7,7 @@ use App\Observers\RouteObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +32,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // F8-03: Force HTTPS scheme in production (behind TLS-terminating proxy)
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         // Register Route Observer
         Route::observe(RouteObserver::class);
 
