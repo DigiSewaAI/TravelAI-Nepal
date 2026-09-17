@@ -283,14 +283,27 @@
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> {{ __('messages.activity') }}</div>
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> {{ __('messages.pilgrimage') }}</div>
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> {{ __('messages.wildlife') }}</div>
-            </div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background-color: #991b1b;"></span> Cities</div>
+                        </div>
             {{-- GLOBE-02: Boundary attribution (CC BY 4.0) --}}
             <div class="absolute bottom-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-1.5 text-[10px] text-gray-600 max-w-[240px] leading-tight">
                 Boundaries:
-                <a href="https://localboundries.oknp.org" target="_blank" rel="noopener"
+                                <a href="https://localboundries.oknp.org" target="_blank" rel="noopener"
                    class="text-blue-600 hover:underline">Open Knowledge Nepal</a>
                 (CC BY 4.0)
             </div>
+            {{-- GLOBE-03 v2: Hint badge (top-right, auto-hide at zoom >= 9) --}}
+                        <div id="waypointHint" class="absolute top-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-2 text-xs text-gray-700 font-medium leading-tight max-w-[240px] transition-opacity duration-300">
+                📍 <span id="waypointCountHint">8</span> mapped cities · zoom in to explore
+            </div>
+        </div>
+        {{-- GLOBE-03 v2: Mapped Cities discovery chips --}}
+        <div class="mt-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">📍 Mapped Cities</span>
+                <span id="mappedCitiesCount" class="text-[10px] text-gray-400"></span>
+            </div>
+            <div id="mappedCitiesChips" class="chips-scroll flex gap-2 overflow-x-auto pb-1"></div>
         </div>
     </div>
 </section>
@@ -631,6 +644,96 @@
 @push('scripts')
 <script>
 // ═══════════════════════════════════════════════════════════
+// GLOBE-03: Shared map data loader (single fetch)
+// ═══════════════════════════════════════════════════════════
+var __mapDataPromise = null;
+function loadMapData() {
+    if (!__mapDataPromise) {
+        __mapDataPromise = fetch('/api/map/init')
+            .then(function(r) { return r.json(); })
+            .then(function(json) { return json && json.data ? json.data : null; })
+            .catch(function(err) { console.warn('Map API fetch failed:', err); return null; });
+    }
+    return __mapDataPromise;
+}
+
+// GLOBE-03 D4: Dedup city waypoints by rounded coordinate (4 decimals)
+// Does NOT mutate source. Aggregates names for popup.
+function groupCityWaypoints(waypoints) {
+    if (!Array.isArray(waypoints)) return [];
+    var groups = {};
+    waypoints.forEach(function (w) {
+        if (!w || w.type !== 'city') return;
+        var lat = Number(w.lat);
+        var lng = Number(w.lng);
+        if (!isFinite(lat) || !isFinite(lng)) return;
+        var key = lat.toFixed(4) + ',' + lng.toFixed(4);
+        if (!groups[key]) {
+            groups[key] = {
+                lat: w.lat,
+                lng: w.lng,
+                names: [],
+                types: {},
+                altitudes: [],
+                count: 0,
+            };
+        }
+        if (groups[key].names.indexOf(w.name) === -1) {
+            groups[key].names.push(w.name);
+        }
+        groups[key].types[w.type] = true;
+        var alt = w.altitude;
+        if (alt !== null && alt !== undefined && alt !== '' && groups[key].altitudes.indexOf(alt) === -1) {
+            groups[key].altitudes.push(alt);
+        }
+        groups[key].count++;
+    });
+    var result = [];
+    for (var k in groups) {
+        if (!groups.hasOwnProperty(k)) continue;
+        groups[k].typeList = Object.keys(groups[k].types);
+        result.push(groups[k]);
+    }
+    return result;
+}
+
+// GLOBE-03 v2: Build Mapped Cities chips below the map
+function buildCityChips(cityGroups, map) {
+    var container = document.getElementById('mappedCitiesChips');
+    var countLabel = document.getElementById('mappedCitiesCount');
+    var hintCount = document.getElementById('waypointCountHint');
+    if (!container) return;
+
+    // Sort by count descending (largest first)
+    var sorted = cityGroups.slice().sort(function (a, b) { return b.count - a.count; });
+
+    container.innerHTML = '';
+    sorted.forEach(function (g) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:border-red-400 hover:text-red-700 hover:bg-red-50 transition whitespace-nowrap';
+        chip.setAttribute('data-city', g.names[0]);
+        chip.setAttribute('data-count', g.count);
+
+        chip.innerHTML =
+            '<span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: #991b1b;"></span>' +
+            '<span>' + g.names[0] + '</span>' +
+            '<span class="text-gray-400 font-normal">(' + g.count + ')</span>';
+
+        chip.addEventListener('click', function () {
+            map.flyTo([g.lat, g.lng], 11, { duration: 1.2 });
+            if (g._marker) {
+                setTimeout(function () { g._marker.openPopup(); }, 1300);
+            }
+        });
+
+        container.appendChild(chip);
+    });
+
+    if (countLabel) countLabel.textContent = '(' + cityGroups.length + ')';
+    if (hintCount) hintCount.textContent = cityGroups.length;
+}
+// ═══════════════════════════════════════════════════════════
 // GLOBE
 // ═══════════════════════════════════════════════════════════
 function initGlobe() {
@@ -660,12 +763,42 @@ function initGlobe() {
     ];
     const colorMap = { trek:'#2563eb', tour:'#7c3aed', activity:'#f59e0b', pilgrimage:'#ec4899', wildlife:'#10b981' };
 
-    globe.pointsData(pins)
-        .pointLat('lat').pointLng('lng')
-        .pointColor(d => colorMap[d.category] || '#2563eb')
-        .pointAltitude(0.012).pointRadius(0.42)
-        .pointLabel(d => '<div style="background:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#111827;">' + d.name + '</div>')
-        .onPointClick(function() { const s = document.getElementById('mapSection'); if (s) s.scrollIntoView({ behavior: 'smooth' }); });
+        // GLOBE-03: Hero pins + city waypoints (H1) combined into pointsData
+    loadMapData().then(function (mapData) {
+                // GLOBE-03 D4: Use grouped city waypoints
+        var cityGroups = [];
+        if (mapData && Array.isArray(mapData.waypoints)) {
+            cityGroups = groupCityWaypoints(mapData.waypoints);
+        }
+        var cityPoints = cityGroups.map(function (g) {
+            return {
+                lat: g.lat,
+                lng: g.lng,
+                name: g.names[0] + (g.count > 1 ? ' (' + g.count + ' waypoints)' : ''),
+                _kind: 'waypoint',
+                _altitude: g.altitudes.length > 0 ? g.altitudes[0] : null,
+                _count: g.count,
+            };
+        });
+        var heroPoints = pins.map(function (p) { p._kind = 'hero'; return p; });
+        var allPoints = heroPoints.concat(cityPoints);
+
+        globe.pointsData(allPoints)
+            .pointLat('lat').pointLng('lng')
+                        .pointColor(function (d) {
+                                return d._kind === 'waypoint' ? '#991b1b' : (colorMap[d.category] || '#2563eb');
+            })
+            .pointAltitude(0.012)
+            .pointRadius(function (d) { return d._kind === 'waypoint' ? 0.25 : 0.42; })
+            .pointLabel(function (d) {
+                var alt = (d._kind === 'waypoint' && d._altitude) ? ' (' + d._altitude + 'm)' : '';
+                return '<div style="background:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#111827;">' + d.name + alt + '</div>';
+            })
+            .onPointClick(function () {
+                var s = document.getElementById('mapSection');
+                if (s) s.scrollIntoView({ behavior: 'smooth' });
+            });
+    });
 
     globe.ringsData(pins).ringLat('lat').ringLng('lng')
         .ringColor(function() { return function(t) { return 'rgba(37,99,235,' + (1 - t) + ')'; }; })
@@ -773,9 +906,68 @@ function initMap() {
                 },
             }).addTo(map);
         })
-        .catch(function (err) {
+                .catch(function (err) {
             console.warn('District boundary layer failed to load:', err);
         });
+
+        // ─────────── WAYPOINT MARKERS (GLOBE-03, H1 + D4 dedup) ───────────
+    // Source: /api/map/init (shared promise — no additional fetch)
+    // Visual: green circleMarker, distinct from hero pins
+    // Behavior: always visible (not affected by .map-filter)
+    // D4: 25 city waypoints grouped by rounded coordinate → ~7 unique markers
+    loadMapData().then(function (mapData) {
+        if (!mapData || !Array.isArray(mapData.waypoints)) return;
+        var cityGroups = groupCityWaypoints(mapData.waypoints);
+        if (cityGroups.length === 0) return;
+
+        var wpLayer = L.layerGroup();
+        cityGroups.forEach(function (g) {
+                        var marker = L.circleMarker([g.lat, g.lng], {
+                radius: 7,
+                                fillColor: '#991b1b',
+                color: '#ffffff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
+            });
+
+            var title = g.names[0] + (g.count > 1 ? ' (' + g.count + ' waypoints)' : '');
+
+            var altLine = (g.altitudes.length > 0)
+                ? '<div style="font-size:11px;color:#6b7280;margin-top:2px;">Alt: ' + g.altitudes[0] + ' m</div>'
+                : '';
+
+            var nameList = (g.count > 1 && g.names.length > 1)
+                ? '<div style="font-size:10px;color:#6b7280;margin-top:3px;border-top:1px solid #e5e7eb;padding-top:3px;">'
+                    + 'At this location: ' + g.names.join(', ') + '</div>'
+                : '';
+
+            var popup =
+                '<div style="font-weight:600;font-size:13px;color:#111827;">' + title + '</div>' +
+                '<div style="font-size:11px;color:#6b7280;margin-top:2px;">Type: ' + g.typeList.join(', ') + '</div>' +
+                altLine +
+                nameList;
+
+                        marker.bindPopup(popup);
+            marker.addTo(wpLayer);
+            g._marker = marker; // GLOBE-03 v2: for chip navigation
+        });
+        wpLayer.addTo(map);
+        buildCityChips(cityGroups, map); // GLOBE-03 v2
+    });
+
+    // GLOBE-03 v2: Hint badge auto-hide at zoom >= 9
+    map.on('zoomend', function () {
+        var hint = document.getElementById('waypointHint');
+        if (!hint) return;
+        if (map.getZoom() >= 9) {
+            hint.style.opacity = '0';
+            hint.style.pointerEvents = 'none';
+        } else {
+            hint.style.opacity = '1';
+            hint.style.pointerEvents = 'auto';
+        }
+    });
 
 
     const mapPins = [
