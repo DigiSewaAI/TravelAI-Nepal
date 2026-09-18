@@ -335,4 +335,158 @@ class MapDataController extends Controller
             'meta'           => ['generated_at' => now()->toIso8601String()],
         ];
     }
+
+    /**
+     * GLOBE-07: Session-scoped latest journey.
+     *
+     * Resolves the latest planner result for the current session and
+     * returns an ordered itinerary-day geometry + route metadata.
+     *
+     * - Read-only, session-scoped only (NO result-ID lookup)
+     * - Reuses existing route geometry builder for route overlay
+     * - 404 when no journey exists for the session
+     */
+    public function journey(): JsonResponse
+    {
+        $sessionId = session()->getId();
+
+        if (!$sessionId) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'no_journey_found',
+            ], 404);
+        }
+
+        // Session-scoped cache key (session id never leaves this method)
+        $cacheKey = 'map:journey:v1:' . hash('sha256', $sessionId);
+
+        $payload = Cache::remember(
+            $cacheKey,
+            300,
+            fn () => $this->buildJourneyPayload($sessionId)
+        );
+
+        if ($payload === null) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'no_journey_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $payload,
+        ]);
+    }
+
+    /**
+     * Build the latest journey for a session.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function buildJourneyPayload(string $sessionId): ?array
+    {
+        $request = DB::table('planner_requests')
+            ->where('session_id', $sessionId)
+            ->orderByDesc('id')
+            ->first(['id', 'route_id', 'destination', 'days']);
+
+        if (!$request) {
+            return null;
+        }
+
+        $result = DB::table('planner_results')
+            ->where('request_id', $request->id)
+            ->first(['id']);
+
+        if (!$result) {
+            return null;
+        }
+
+        $days = DB::table('itinerary_days')
+            ->where('result_id', $result->id)
+            ->orderBy('day_number')
+            ->get(['day_number', 'title', 'overnight_waypoint_id', 'distance_km', 'altitude_m']);
+
+        if ($days->isEmpty()) {
+            return null;
+        }
+
+        // Resolve waypoints
+        $wpIds = $days->pluck('overnight_waypoint_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $waypoints = Waypoint::query()
+            ->whereIn('id', $wpIds)
+            ->whereNull('deleted_at')
+            ->select(['id', 'name', 'latitude', 'longitude', 'altitude'])
+            ->get()
+            ->keyBy('id');
+
+        // Build journey markers (overnight stops)
+        $geometry = [];
+        $gapDays  = 0;
+
+        foreach ($days as $day) {
+            $wpId = $day->overnight_waypoint_id;
+
+            if (!$wpId || !isset($waypoints[$wpId])) {
+                $gapDays++;
+                continue;
+            }
+
+            $wp = $waypoints[$wpId];
+            if ($wp->latitude === null || $wp->longitude === null) {
+                $gapDays++;
+                continue;
+            }
+
+            $geometry[] = [
+                'day_number' => $day->day_number,
+                'lat'        => (float) $wp->latitude,
+                'lng'        => (float) $wp->longitude,
+                'altitude'   => $wp->altitude,
+                'wp_id'      => $wp->id,
+                'wp_name'    => $wp->name,
+            ];
+        }
+
+        // Route overlay (reuse existing GLOBE-06 builder, active routes only)
+        $routeMeta     = null;
+        $routeGeometry = null;
+
+        if ($request->route_id) {
+            $routeRow = DB::table('routes')
+                ->where('id', $request->route_id)
+                ->where('is_active', true)
+                ->whereNull('deleted_at')
+                ->first(['slug']);
+
+            if ($routeRow) {
+                $routePayload = $this->buildRoutePayload($routeRow->slug);
+                if ($routePayload) {
+                    $routeMeta     = $routePayload['route'];
+                    $routeGeometry = $routePayload['geometry'];
+                }
+            }
+        }
+
+        return [
+            'journey' => [
+                'destination'   => $request->destination,
+                'days_count'    => $days->count(),
+                'verified_days' => count($geometry),
+                'gap_days'      => $gapDays,
+            ],
+            'route'          => $routeMeta,
+            'route_geometry' => $routeGeometry,
+            'geometry'       => $geometry,
+            'meta'           => [
+                'generated_at' => now()->toIso8601String(),
+            ],
+        ];
+    }
 }

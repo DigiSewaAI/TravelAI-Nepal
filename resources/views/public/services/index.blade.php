@@ -121,7 +121,7 @@
         box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
         padding: 6px 10px !important;
     }
-    
+
     /* ═══════════════ DISTRICT PANEL (GLOBE-04) ═══════════════ */
     .district-panel {
         transform: translateY(100%);
@@ -374,6 +374,25 @@
                 <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold mt-1">{{ __('messages.zero_commission') }}</p>
             </div>
         </div>
+    </div>
+</section>
+{{-- ══════════════════════════════════════════════════════════ --}}
+{{-- GLOBE-07: JOURNEY VIEWER                                --}}
+{{-- ══════════════════════════════════════════════════════════ --}}
+<section id="journeyViewer" class="py-12 bg-gray-50 border-y border-gray-100">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">🗺️ Your Journey</h2>
+                <p class="text-sm text-gray-500 mt-1">Visualize your latest planned route.</p>
+            </div>
+            <button id="viewJourneyBtn" type="button"
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+                View Journey
+            </button>
+        </div>
+        <div id="journeyMeta" class="hidden rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700"></div>
+        <div id="journeyError" class="hidden mt-2 text-sm text-red-600"></div>
     </div>
 </section>
 
@@ -698,6 +717,10 @@ var __selectedRouteSlug = null;
 var __leafletRouteLayer = null;
 var __globeRouteAccessorsSet = false;
 var __routeRequestToken = 0;
+// GLOBE-07: Journey viewer state
+var __leafletJourneyRouteLayer = null;
+var __leafletJourneyMarkersLayer = null;
+var __globeJourneyCoords = null;
 function loadMapData() {
     if (!__mapDataPromise) {
         __mapDataPromise = fetch('/api/map/init')
@@ -1385,6 +1408,183 @@ function hideRouteError() {
     }
 }
 
+// ═══════════════ GLOBE-07: JOURNEY VIEWER ═══════════════
+
+function initJourneyViewer() {
+    var btn = document.getElementById('viewJourneyBtn');
+    if (!btn) return;
+    btn.addEventListener('click', loadJourney);
+}
+
+function loadJourney() {
+    var btn = document.getElementById('viewJourneyBtn');
+    var meta = document.getElementById('journeyMeta');
+    var err = document.getElementById('journeyError');
+
+    // Reset previous journey
+    clearJourneyLayers();
+    if (meta) { meta.innerHTML = ''; meta.classList.add('hidden'); }
+    if (err) { err.classList.add('hidden'); err.textContent = ''; }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
+
+    fetch('/api/map/journey/latest')
+        .then(function (r) {
+            return r.json().then(function (j) {
+                return { status: r.status, body: j };
+            });
+        })
+        .then(function (res) {
+            if (btn) { btn.disabled = false; btn.textContent = 'View Journey'; }
+
+            if (!res.body || !res.body.success) {
+                if (err) {
+                    err.textContent = 'No recent journey found for this session.';
+                    err.classList.remove('hidden');
+                }
+                return;
+            }
+
+            var data = res.body.data || {};
+            var journey = data.journey || {};
+            var esc = (typeof escapeHtmlSafe === 'function') ? escapeHtmlSafe : function (s) { return String(s); };
+
+            // Metadata panel
+            var html = '<div class="font-semibold text-gray-800 mb-1">' + esc(journey.destination || 'Journey') + '</div>';
+            html += '<div class="grid grid-cols-3 gap-2 text-gray-600">';
+            html += '<span>Days: <strong>' + (journey.days_count || 0) + '</strong></span>';
+            html += '<span>Mapped: <strong>' + (journey.verified_days || 0) + '</strong></span>';
+            html += '<span>Gaps: <strong>' + (journey.gap_days || 0) + '</strong></span>';
+            html += '</div>';
+            if (data.route) {
+                html += '<div class="mt-2 pt-2 border-t border-gray-100 text-gray-600">';
+                html += 'Route: <strong>' + esc(data.route.name || '') + '</strong>';
+                html += ' · ' + esc(data.route.type || '') + ' · ' + esc(data.route.difficulty || '');
+                html += '</div>';
+            }
+            if (meta) {
+                meta.innerHTML = html;
+                meta.classList.remove('hidden');
+            }
+
+            // Render route polyline (reuse GLOBE-06 contract shape)
+            if (Array.isArray(data.route_geometry) && data.route_geometry.length >= 2) {
+                renderJourneyRouteOnLeaflet(data.route_geometry);
+                renderJourneyRouteOnGlobe(data.route_geometry);
+            }
+
+            // Render journey markers (overnight stops)
+            if (Array.isArray(data.geometry) && data.geometry.length > 0) {
+                renderJourneyMarkers(data.geometry);
+            }
+        })
+        .catch(function (e) {
+            if (btn) { btn.disabled = false; btn.textContent = 'View Journey'; }
+            console.warn('Journey fetch failed:', e);
+            if (err) {
+                err.textContent = 'Could not load journey.';
+                err.classList.remove('hidden');
+            }
+        });
+}
+
+function renderJourneyRouteOnLeaflet(routeGeometry) {
+    if (!__nepalMapInstance) return;
+    var latlngs = routeGeometry.map(function (p) { return [p.lat, p.lng]; });
+    __leafletJourneyRouteLayer = L.polyline(latlngs, {
+        color: '#dc2626',
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '6,4',
+    }).addTo(__nepalMapInstance);
+}
+
+function renderJourneyRouteOnGlobe(routeGeometry) {
+    if (!__globeInstance) return;
+    var coords = routeGeometry.map(function (p) { return [p.lat, p.lng, 0.015]; });
+    __globeJourneyCoords = coords;
+    if (!__globeRouteAccessorsSet) {
+        __globeInstance
+            .pathPoints('coords')
+            .pathPointLat(function (p) { return p[0]; })
+            .pathPointLng(function (p) { return p[1]; })
+            .pathPointAlt(function (p) { return p[2]; })
+            .pathColor(function () { return '#dc2626'; })
+            .pathStroke(2)
+            .pathTransitionDuration(600);
+        __globeRouteAccessorsSet = true;
+    }
+    __globeInstance.pathsData([{ coords: coords }]);
+}
+
+function renderJourneyMarkers(geometry) {
+    if (!__nepalMapInstance) return;
+
+    // Aggregate duplicate consecutive waypoints (e.g. Day 6 + Day 7 same wp)
+    var grouped = {};
+    var order = [];
+    geometry.forEach(function (p) {
+        if (!grouped[p.wp_id]) {
+            grouped[p.wp_id] = { lat: p.lat, lng: p.lng, name: p.wp_name, altitude: p.altitude, days: [] };
+            order.push(p.wp_id);
+        }
+        grouped[p.wp_id].days.push(p.day_number);
+    });
+
+    __leafletJourneyMarkersLayer = L.layerGroup();
+
+    order.forEach(function (wpId) {
+        var g = grouped[wpId];
+        var dayLabel = g.days.length > 1
+            ? 'Day ' + g.days[0] + ' · Day ' + g.days[1]
+            : 'Day ' + g.days[0];
+
+        var marker = L.circleMarker([g.lat, g.lng], {
+            radius: 8,
+            fillColor: '#dc2626',
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.95,
+        });
+
+        var altText = (g.altitude !== null && g.altitude !== undefined) ? g.altitude + ' m' : '—';
+        var popup = '<div style="font-weight:600;font-size:13px;color:#111827;">' + g.name + '</div>'
+                  + '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + dayLabel + '</div>'
+                  + '<div style="font-size:11px;color:#6b7280;">Altitude: ' + altText + '</div>';
+
+        marker.bindPopup(popup);
+        marker.addTo(__leafletJourneyMarkersLayer);
+    });
+
+    __leafletJourneyMarkersLayer.addTo(__nepalMapInstance);
+
+    // Fit bounds around all journey markers
+    try {
+        var latlngs = order.map(function (id) { return [grouped[id].lat, grouped[id].lng]; });
+        if (latlngs.length > 0) {
+            var bounds = L.latLngBounds(latlngs);
+            __nepalMapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+        }
+    } catch (e) { /* ignore */ }
+}
+
+function clearJourneyLayers() {
+    if (__leafletJourneyRouteLayer && __nepalMapInstance) {
+        __nepalMapInstance.removeLayer(__leafletJourneyRouteLayer);
+    }
+    if (__leafletJourneyMarkersLayer && __nepalMapInstance) {
+        __nepalMapInstance.removeLayer(__leafletJourneyMarkersLayer);
+    }
+    __leafletJourneyRouteLayer = null;
+    __leafletJourneyMarkersLayer = null;
+
+    if (__globeInstance && __globeJourneyCoords) {
+        __globeInstance.pathsData([]);
+    }
+    __globeJourneyCoords = null;
+}
+
 // ═══════════════════════════════════════════════════════════
 // INIT + HANDLERS
 // ═══════════════════════════════════════════════════════════
@@ -1399,6 +1599,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initGlobe();
     initMap();
     initRouteSelector();  // GLOBE-06
+    initJourneyViewer();  // GLOBE-07
 
     // Quick chips → submit hero form
     document.querySelectorAll('.quick-chip').forEach(function(chip) {

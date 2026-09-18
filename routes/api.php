@@ -24,3 +24,8 @@ Route::get('/map/init', [MapDataController::class, 'init'])
 Route::get('/map/route/{slug}', [MapDataController::class, 'route'])
     ->middleware('throttle:api')
     ->name('api.map.route');
+
+// GLOBE-07: Session-scoped latest journey — 30/min + web middleware for session access
+Route::get('/map/journey/latest', [MapDataController::class, 'journey'])
+    ->middleware(['web', 'throttle:api'])
+    ->name('api.map.journey.latest');
