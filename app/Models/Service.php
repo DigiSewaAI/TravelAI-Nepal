@@ -92,4 +92,13 @@ class Service extends Model
     {
         return $this->reviews()->count();
     }
+    // =====================================================
+    // PROVIDER ITINERARY (PROVIDER-ITINERARY-04)
+    // =====================================================
+
+    public function itineraryDays()
+    {
+        return $this->hasMany(ServiceItineraryDay::class)
+            ->orderBy('day_number');
+    }
 }
