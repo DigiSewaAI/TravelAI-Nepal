@@ -57,3 +57,5 @@ backup_*.sql
 app/Services/*.bak_before_*
 database/seeders/*.bak_before_*
 .env.testing
+# Ngrok binary (temporary, for local tunneling)
+ngrok
