@@ -17,6 +17,9 @@ use App\Http\Controllers\Provider\DashboardController as ProviderDashboardContro
 use App\Http\Controllers\Provider\ProfileController as ProviderProfileController;
 use App\Http\Controllers\Provider\ServiceController as ProviderServiceController;
 use App\Http\Controllers\Provider\BookingController as ProviderBookingController;
+use App\Http\Controllers\Provider\ItineraryDayController;
+use App\Http\Controllers\Provider\ItineraryItemController;
+use App\Http\Controllers\Provider\ItineraryDayMediaController;
 use App\Http\Controllers\Public\ProviderController;
 
 // ✅ Phase 8 – Provider Subscription & Verification
@@ -171,6 +174,32 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::put('/profile', [ProviderProfileController::class, 'update'])->name('profile.update');
 
     Route::resource('services', ProviderServiceController::class);
+
+    // ─── PROVIDER-ITINERARY-05: Service Itinerary Editor ───
+    // SL2: explicit routes only (no Route::resource)
+    // SL7: day + item reorder separate endpoints
+    // Route order trap: /reorder must come before /{id} routes
+    Route::prefix('services/{service}/itinerary')
+        ->name('services.itinerary.')
+        ->group(function () {
+            Route::get('/', [ItineraryDayController::class, 'index'])->name('index');
+
+            // Days — reorder BEFORE parameterized routes
+            Route::post('/days/reorder', [ItineraryDayController::class, 'reorder'])->name('days.reorder');
+            Route::post('/days', [ItineraryDayController::class, 'store'])->name('days.store');
+            Route::put('/days/{day}', [ItineraryDayController::class, 'update'])->name('days.update');
+            Route::delete('/days/{day}', [ItineraryDayController::class, 'destroy'])->name('days.destroy');
+
+            // Items — reorder BEFORE parameterized routes
+            Route::post('/items/reorder', [ItineraryItemController::class, 'reorder'])->name('items.reorder');
+            Route::post('/days/{day}/items', [ItineraryItemController::class, 'store'])->name('items.store');
+            Route::put('/items/{item}', [ItineraryItemController::class, 'update'])->name('items.update');
+            Route::delete('/items/{item}', [ItineraryItemController::class, 'destroy'])->name('items.destroy');
+
+            // Media
+            Route::post('/days/{day}/media', [ItineraryDayMediaController::class, 'store'])->name('media.store');
+            Route::delete('/media/{media}', [ItineraryDayMediaController::class, 'destroy'])->name('media.destroy');
+        });
 
     Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [ProviderBookingController::class, 'show'])->name('bookings.show');
