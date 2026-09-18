@@ -20,6 +20,7 @@ class Service extends Model
         'cover_image',
         'gallery',
         'status',
+        'itinerary_status',
         'location_id',
     ];
 
@@ -101,4 +102,19 @@ class Service extends Model
         return $this->hasMany(ServiceItineraryDay::class)
             ->orderBy('day_number');
     }
+
+    // =====================================================
+    // PROVIDER-ITINERARY-07: Lifecycle helpers
+    // =====================================================
+
+    public function isItineraryPublished(): bool
+    {
+        return $this->itinerary_status === 'published';
+    }
+
+    public function isItineraryDraft(): bool
+    {
+        return $this->itinerary_status === 'draft';
+    }
+
 }

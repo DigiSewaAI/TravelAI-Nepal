@@ -199,6 +199,11 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
             // Media
             Route::post('/days/{day}/media', [ItineraryDayMediaController::class, 'store'])->name('media.store');
             Route::delete('/media/{media}', [ItineraryDayMediaController::class, 'destroy'])->name('media.destroy');
+
+            // PROVIDER-ITINERARY-07: Lifecycle actions
+            Route::get('/preview', [ItineraryDayController::class, 'preview'])->name('preview');
+            Route::post('/publish', [ItineraryDayController::class, 'publish'])->name('publish');
+            Route::post('/unpublish', [ItineraryDayController::class, 'unpublish'])->name('unpublish');
         });
 
     Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');

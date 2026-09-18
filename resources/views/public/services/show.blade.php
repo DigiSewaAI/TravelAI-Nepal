@@ -190,7 +190,7 @@
     </div>
 
     {{-- PROVIDER-ITINERARY-06: Public Itinerary Renderer --}}
-    @if($service->itineraryDays->isNotEmpty())
+    @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
         <div class="mt-12">
             <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                 <div>

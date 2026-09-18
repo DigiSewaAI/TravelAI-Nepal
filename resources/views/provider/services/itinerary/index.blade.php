@@ -7,15 +7,61 @@
 <div class="max-w-4xl mx-auto space-y-4">
 
     {{-- Back + Add Day --}}
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
         <a href="{{ route('provider.services.edit', $service) }}"
            class="text-sm text-gray-600 hover:text-gray-900">
             ← Back to service
         </a>
-        <button type="button" onclick="document.getElementById('add-day-panel').classList.toggle('hidden')"
-                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
-            + Add Day
-        </button>
+        <div class="flex items-center gap-2">
+            {{-- Lifecycle status badge --}}
+            @if($service->isItineraryPublished())
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-green-100 text-green-700">
+                    ● Published
+                </span>
+            @else
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">
+                    ○ Draft
+                </span>
+            @endif
+
+            {{-- Preview (always visible) --}}
+            <a href="{{ route('provider.services.itinerary.preview', $service) }}"
+               target="_blank"
+               class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                Preview
+            </a>
+
+            {{-- Publish / Unpublish --}}
+            @if($service->isItineraryPublished())
+                <form method="POST"
+                      action="{{ route('provider.services.itinerary.unpublish', $service) }}"
+                      class="inline"
+                      onsubmit="return confirm('Unpublish itinerary? It will be hidden from public until re-published.');">
+                    @csrf
+                    <button type="submit"
+                            class="text-sm font-semibold px-3 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white transition">
+                        Unpublish
+                    </button>
+                </form>
+            @else
+                <form method="POST"
+                      action="{{ route('provider.services.itinerary.publish', $service) }}"
+                      class="inline"
+                      onsubmit="return confirm('Publish itinerary? It will become visible publicly.');">
+                    @csrf
+                    <button type="submit"
+                            class="text-sm font-semibold px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition">
+                        Publish
+                    </button>
+                </form>
+            @endif
+
+            {{-- Add Day (existing) --}}
+            <button type="button" onclick="document.getElementById('add-day-panel').classList.toggle('hidden')"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                + Add Day
+            </button>
+        </div>
     </div>
 
     {{-- Add Day Panel (hidden by default) --}}

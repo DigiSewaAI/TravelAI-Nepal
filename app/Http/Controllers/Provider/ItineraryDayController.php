@@ -207,4 +207,73 @@ class ItineraryDayController extends Controller
 
         return back()->with('success', 'Days reordered.');
     }
+
+    // =====================================================
+    // PROVIDER-ITINERARY-07: Lifecycle Actions
+    // =====================================================
+
+    /**
+     * Publish the itinerary (service-level, whole-itinerary).
+     *
+     * Requirements (M9):
+     *  - At least 1 day exists
+     *  - Every day has a non-empty title
+     *
+     * Sets services.itinerary_status = 'published'.
+     */
+    public function publish(Service $service)
+    {
+        $this->authorize('update', $service);
+
+        $days = $service->itineraryDays()->get(['id', 'title']);
+
+        if ($days->isEmpty()) {
+            return back()->withErrors([
+                'publish' => 'Cannot publish: itinerary has no days.',
+            ]);
+        }
+
+        $missingTitle = $days->filter(fn ($d) => trim((string) $d->title) === '');
+        if ($missingTitle->isNotEmpty()) {
+            return back()->withErrors([
+                'publish' => 'Cannot publish: every day must have a title.',
+            ]);
+        }
+
+        $service->update(['itinerary_status' => 'published']);
+
+        return back()->with('success', 'Itinerary published.');
+    }
+
+    /**
+     * Unpublish the itinerary — back to draft.
+     * Sets services.itinerary_status = 'draft'.
+     */
+    public function unpublish(Service $service)
+    {
+        $this->authorize('update', $service);
+
+        $service->update(['itinerary_status' => 'draft']);
+
+        return back()->with('success', 'Itinerary unpublished (back to draft).');
+    }
+
+    /**
+     * Provider-only preview of the itinerary.
+     * Does NOT change publication state.
+     */
+    public function preview(Service $service)
+    {
+        $this->authorize('update', $service);
+
+        $service->load([
+            'itineraryDays.items',
+            'itineraryDays.media',
+            'itineraryDays.startWaypoint:id,name,altitude',
+            'itineraryDays.endWaypoint:id,name,altitude',
+            'itineraryDays.overnightWaypoint:id,name,altitude',
+        ]);
+
+        return view('provider.services.itinerary.preview', compact('service'));
+    }
 }
