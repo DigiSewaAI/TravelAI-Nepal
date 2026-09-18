@@ -20,3 +20,7 @@ Route::post('/quotation-request', [QuotationRequestController::class, 'store'])-
 Route::get('/map/init', [MapDataController::class, 'init'])
     ->middleware('throttle:api')
     ->name('api.map.init');
+// GLOBE-06: Public single route geometry — 30/min via throttle:api
+Route::get('/map/route/{slug}', [MapDataController::class, 'route'])
+    ->middleware('throttle:api')
+    ->name('api.map.route');

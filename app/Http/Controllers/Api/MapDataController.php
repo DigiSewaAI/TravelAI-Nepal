@@ -195,4 +195,144 @@ class MapDataController extends Controller
             ->map(fn ($count) => (int) $count)
             ->all();
     }
+
+    /**
+     * GLOBE-06: Public single-route geometry endpoint.
+     *
+     * Resolves an active route by slug and returns its ordered
+     * waypoint-endpoint polyline.
+     *
+     * - Only active routes (is_active=1, deleted_at NULL)
+     * - Only active segments (deleted_at NULL)
+     * - Only active waypoints (deleted_at NULL)
+     * - Uses route_segments — NEVER routes.segments JSON
+     * - Cached 10 min per slug
+     */
+    public function route(string $slug): JsonResponse
+    {
+        $cacheKey = "map:route:v1:{$slug}";
+
+        $payload = Cache::remember(
+            $cacheKey,
+            self::CACHE_TTL,
+            fn () => $this->buildRoutePayload($slug)
+        );
+
+        if ($payload === null) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'route_not_found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $payload,
+        ]);
+    }
+
+    /**
+     * Build ordered geometry for one active route.
+     *
+     * Algorithm:
+     *   1. First segment contributes its FROM waypoint.
+     *   2. Every segment contributes its TO waypoint.
+     *   3. Result = N+1 ordered coordinates for N segments.
+     *
+     * @return array<string, mixed>|null  Null when route/geometry invalid.
+     */
+    private function buildRoutePayload(string $slug): ?array
+    {
+        $route = Route::query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->whereNull('deleted_at')
+            ->select([
+                'id', 'name', 'slug', 'route_type', 'difficulty',
+                'duration_days', 'max_altitude', 'service_category_id',
+            ])
+            ->first();
+
+        if (!$route) {
+            return null;
+        }
+
+        $segments = DB::table('route_segments')
+            ->where('route_id', $route->id)
+            ->whereNull('deleted_at')
+            ->orderBy('sequence')
+            ->get(['id', 'from_waypoint_id', 'to_waypoint_id', 'sequence']);
+
+        $meta = [
+            'id'            => $route->id,
+            'name'          => $route->name,
+            'slug'          => $route->slug,
+            'type'          => $route->route_type,
+            'difficulty'    => $route->difficulty,
+            'duration_days' => $route->duration_days,
+            'max_altitude'  => $route->max_altitude,
+            'category_id'   => $route->service_category_id,
+        ];
+
+        if ($segments->isEmpty()) {
+            return [
+                'route'          => $meta,
+                'geometry'       => [],
+                'segments_count' => 0,
+                'meta'           => ['generated_at' => now()->toIso8601String()],
+            ];
+        }
+
+        $wpIds = $segments
+            ->pluck('from_waypoint_id')
+            ->merge($segments->pluck('to_waypoint_id'))
+            ->unique()
+            ->values()
+            ->all();
+
+        $waypoints = Waypoint::query()
+            ->whereIn('id', $wpIds)
+            ->whereNull('deleted_at')
+            ->select(['id', 'name', 'latitude', 'longitude'])
+            ->get()
+            ->keyBy('id');
+
+        $geometry = [];
+        $seq = 1;
+
+        foreach ($segments as $i => $seg) {
+            if ($i === 0) {
+                $from = $waypoints[$seg->from_waypoint_id] ?? null;
+                if (!$from || $from->latitude === null || $from->longitude === null) {
+                    return null;
+                }
+                $geometry[] = [
+                    'lat'     => (float) $from->latitude,
+                    'lng'     => (float) $from->longitude,
+                    'seq'     => $seq++,
+                    'wp_id'   => $from->id,
+                    'wp_name' => $from->name,
+                ];
+            }
+
+            $to = $waypoints[$seg->to_waypoint_id] ?? null;
+            if (!$to || $to->latitude === null || $to->longitude === null) {
+                return null;
+            }
+            $geometry[] = [
+                'lat'     => (float) $to->latitude,
+                'lng'     => (float) $to->longitude,
+                'seq'     => $seq++,
+                'wp_id'   => $to->id,
+                'wp_name' => $to->name,
+            ];
+        }
+
+        return [
+            'route'          => $meta,
+            'geometry'       => $geometry,
+            'segments_count' => $segments->count(),
+            'meta'           => ['generated_at' => now()->toIso8601String()],
+        ];
+    }
 }

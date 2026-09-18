@@ -294,6 +294,15 @@
         </div>
 
         <div class="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100 bg-white">
+            {{-- GLOBE-06: Route selector — single route visualization --}}
+            <div class="mt-2 mb-4">
+                <label for="routeSelector" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">🗺️ Explore a Route</label>
+                <select id="routeSelector" class="mt-2 w-full md:w-1/2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700">
+                    <option value="">— Select a route —</option>
+                </select>
+                <div id="routeMeta" class="mt-3 hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"></div>
+                <div id="routeError" class="mt-2 hidden text-xs text-red-600"></div>
+            </div>
             <div id="nepalMap" role="img" aria-label="{{ __('messages.map_aria') }}"></div>
             <div class="absolute bottom-4 left-4 z-[500] bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 px-4 py-3 text-xs space-y-1.5">
                 <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> {{ __('messages.trek') }}</div>
@@ -682,6 +691,13 @@
 // ═══════════════════════════════════════════════════════════
 var __mapDataPromise = null;
 var __allWaypointsCache = null;
+// GLOBE-06: Route selector state
+var __nepalMapInstance = null;
+var __globeInstance = null;
+var __selectedRouteSlug = null;
+var __leafletRouteLayer = null;
+var __globeRouteAccessorsSet = false;
+var __routeRequestToken = 0;
 function loadMapData() {
     if (!__mapDataPromise) {
         __mapDataPromise = fetch('/api/map/init')
@@ -936,7 +952,7 @@ function initGlobe() {
         .atmosphereColor('#3b82f6')
         .atmosphereAltitude(0.18)
         .width(el.clientWidth).height(el.clientHeight);
-
+    __globeInstance = globe;
     const NEPAL = { lat: 28.3949, lng: 84.1240 };
     const pins = [
         { lat: 27.9881, lng: 86.9250, name: 'Everest Base Camp', category: 'trek' },
@@ -1037,6 +1053,7 @@ function initMap() {
     if (!el || typeof L === 'undefined') return;
 
     const map = L.map('nepalMap', { center: [28.3949, 84.1240], zoom: 7, zoomControl: true, scrollWheelZoom: false });
+    __nepalMapInstance = map;
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CartoDB', subdomains: 'abcd', maxZoom: 19
@@ -1218,6 +1235,155 @@ function initMap() {
     el.addEventListener('click', function() { map.scrollWheelZoom.enable(); });
     el.addEventListener('mouseleave', function() { map.scrollWheelZoom.disable(); });
 }
+// ═══════════════ GLOBE-06: ROUTE SELECTOR ═══════════════
+
+function initRouteSelector() {
+    var sel = document.getElementById('routeSelector');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+        handleRouteSelect(sel.value);
+    });
+    loadMapData().then(function (mapData) {
+        if (mapData && Array.isArray(mapData.routes)) {
+            populateRouteSelector(mapData.routes);
+        }
+    });
+}
+
+function populateRouteSelector(routes) {
+    var sel = document.getElementById('routeSelector');
+    if (!sel) return;
+    var sorted = routes.slice().sort(function (a, b) {
+        return String(a.name).localeCompare(String(b.name));
+    });
+    sorted.forEach(function (r) {
+        var opt = document.createElement('option');
+        opt.value = r.slug;
+        opt.textContent = r.name + ' · ' + (r.type || '') + ' · ' + (r.difficulty || '');
+        sel.appendChild(opt);
+    });
+}
+
+function handleRouteSelect(slug) {
+    __selectedRouteSlug = slug || null;
+    var token = ++__routeRequestToken;
+
+    clearLeafletRoute();
+    clearGlobeRoute();
+    hideRouteMeta();
+    hideRouteError();
+
+    if (!slug) return;
+
+    fetch('/api/map/route/' + encodeURIComponent(slug))
+        .then(function (r) {
+            return r.json().then(function (j) {
+                return { status: r.status, body: j };
+            });
+        })
+        .then(function (res) {
+            if (token !== __routeRequestToken) return;
+            if (!res.body || !res.body.success) {
+                showRouteError('Route not found');
+                return;
+            }
+            var data = res.body.data || {};
+            if (data.route) showRouteMeta(data.route);
+            if (Array.isArray(data.geometry) && data.geometry.length >= 2) {
+                renderLeafletRoute(data.geometry);
+                renderGlobeRoute(data.geometry);
+            }
+        })
+        .catch(function (err) {
+            if (token !== __routeRequestToken) return;
+            console.warn('Route fetch failed:', err);
+            showRouteError('Could not load route');
+        });
+}
+
+function renderLeafletRoute(geometry) {
+    if (!__nepalMapInstance) return;
+    var latlngs = geometry.map(function (p) { return [p.lat, p.lng]; });
+    __leafletRouteLayer = L.polyline(latlngs, {
+        color: '#dc2626',
+        weight: 4,
+        opacity: 0.9,
+    }).addTo(__nepalMapInstance);
+    try {
+        __nepalMapInstance.fitBounds(__leafletRouteLayer.getBounds(), {
+            padding: [40, 40],
+            maxZoom: 12,
+        });
+    } catch (e) { /* ignore */ }
+}
+
+function clearLeafletRoute() {
+    if (__leafletRouteLayer && __nepalMapInstance) {
+        __nepalMapInstance.removeLayer(__leafletRouteLayer);
+    }
+    __leafletRouteLayer = null;
+}
+
+function renderGlobeRoute(geometry) {
+    if (!__globeInstance) return;
+    var coords = geometry.map(function (p) { return [p.lat, p.lng, 0.015]; });
+    if (!__globeRouteAccessorsSet) {
+        __globeInstance
+            .pathPoints('coords')
+            .pathPointLat(function (p) { return p[0]; })
+            .pathPointLng(function (p) { return p[1]; })
+            .pathPointAlt(function (p) { return p[2]; })
+            .pathColor(function () { return '#dc2626'; })
+            .pathStroke(2)
+            .pathTransitionDuration(600);
+        __globeRouteAccessorsSet = true;
+    }
+    __globeInstance.pathsData([{ coords: coords }]);
+}
+
+function clearGlobeRoute() {
+    if (__globeInstance) {
+        __globeInstance.pathsData([]);
+    }
+}
+
+function showRouteMeta(route) {
+    var el = document.getElementById('routeMeta');
+    if (!el) return;
+    var esc = (typeof escapeHtmlSafe === 'function') ? escapeHtmlSafe : function (s) { return String(s); };
+    var html = '<div class="font-semibold text-gray-800 mb-1">' + esc(route.name || '') + '</div>' +
+        '<div class="grid grid-cols-2 gap-1 text-gray-600">' +
+        '<span>Type: <strong>' + esc(route.type || '—') + '</strong></span>' +
+        '<span>Difficulty: <strong>' + esc(route.difficulty || '—') + '</strong></span>' +
+        '<span>Duration: <strong>' + (route.duration_days ? route.duration_days + ' days' : '—') + '</strong></span>' +
+        '<span>Max altitude: <strong>' + (route.max_altitude ? route.max_altitude + ' m' : '—') + '</strong></span>' +
+        '</div>';
+    el.innerHTML = html;
+    el.classList.remove('hidden');
+}
+
+function hideRouteMeta() {
+    var el = document.getElementById('routeMeta');
+    if (el) {
+        el.classList.add('hidden');
+        el.innerHTML = '';
+    }
+}
+
+function showRouteError(msg) {
+    var el = document.getElementById('routeError');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+function hideRouteError() {
+    var el = document.getElementById('routeError');
+    if (el) {
+        el.classList.add('hidden');
+        el.textContent = '';
+    }
+}
 
 // ═══════════════════════════════════════════════════════════
 // INIT + HANDLERS
@@ -1232,6 +1398,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initGlobe();
     initMap();
+    initRouteSelector();  // GLOBE-06
 
     // Quick chips → submit hero form
     document.querySelectorAll('.quick-chip').forEach(function(chip) {
