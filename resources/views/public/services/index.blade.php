@@ -43,12 +43,13 @@
 
 <style>
     /* ═══════════════ GLOBE (Responsive) ═══════════════ */
-    .globe-wrap-premium {
+        .globe-wrap-premium {
         position: relative;
         width: 100%;
         height: clamp(300px, 50vw, 600px);
-        max-width: 600px;
+        max-width: min(600px, 100%);
         margin: 0 auto;
+        overflow: hidden;
     }
     .globe-glow-premium { position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 65%); pointer-events: none; }
     #globeViz { width: 100%; height: 100%; border-radius: 50%; cursor: grab; position: relative; z-index: 1; }
@@ -119,6 +120,23 @@
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
         padding: 6px 10px !important;
+    }
+    
+    /* ═══════════════ DISTRICT PANEL (GLOBE-04) ═══════════════ */
+    .district-panel {
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .district-panel.is-open {
+        transform: translateY(0);
+    }
+    @media (min-width: 768px) {
+        .district-panel {
+            transform: translateX(100%);
+        }
+        .district-panel.is-open {
+            transform: translateX(0);
+        }
     }
 
 </style>
@@ -292,10 +310,26 @@
                    class="text-blue-600 hover:underline">Open Knowledge Nepal</a>
                 (CC BY 4.0)
             </div>
-            {{-- GLOBE-03 v2: Hint badge (top-right, auto-hide at zoom >= 9) --}}
-                        <div id="waypointHint" class="absolute top-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-2 text-xs text-gray-700 font-medium leading-tight max-w-[240px] transition-opacity duration-300">
+                       {{-- GLOBE-03 v2: Hint badge (top-right, auto-hide at zoom >= 9) --}}
+            <div id="waypointHint" class="absolute top-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-2 text-xs text-gray-700 font-medium leading-tight max-w-[240px] transition-opacity duration-300">
                 📍 <span id="waypointCountHint">8</span> mapped cities · zoom in to explore
             </div>
+            {{-- GLOBE-04: District information panel --}}
+            <aside id="districtPanel" class="district-panel absolute z-[600] bg-white shadow-2xl border-gray-200 inset-x-0 bottom-0 max-h-[60vh] rounded-t-2xl border-t overflow-y-auto md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-80 md:max-h-full md:rounded-none md:rounded-l-2xl md:border-t-0 md:border-l">
+                <div class="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-start z-10">
+                    <div class="min-w-0 flex-1">
+                        <h3 id="districtPanelName" class="font-bold text-gray-900 text-base leading-tight truncate">—</h3>
+                        <p id="districtPanelProvince" class="text-xs text-gray-500 mt-0.5 truncate">—</p>
+                    </div>
+                    <button id="districtPanelClose" type="button" class="flex-shrink-0 ml-2 w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition" aria-label="Close panel">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <div id="districtPanelSummary" class="text-xs text-gray-500 mb-3"></div>
+                    <div id="districtPanelList" class="space-y-2"></div>
+                </div>
+            </aside>
         </div>
         {{-- GLOBE-03 v2: Mapped Cities discovery chips --}}
         <div class="mt-4">
@@ -647,11 +681,18 @@
 // GLOBE-03: Shared map data loader (single fetch)
 // ═══════════════════════════════════════════════════════════
 var __mapDataPromise = null;
+var __allWaypointsCache = null;
 function loadMapData() {
     if (!__mapDataPromise) {
         __mapDataPromise = fetch('/api/map/init')
             .then(function(r) { return r.json(); })
-            .then(function(json) { return json && json.data ? json.data : null; })
+            .then(function(json) {
+                if (json && json.data) {
+                    __allWaypointsCache = json.data.waypoints || [];
+                    return json.data;
+                }
+                return null;
+            })
             .catch(function(err) { console.warn('Map API fetch failed:', err); return null; });
     }
     return __mapDataPromise;
@@ -732,6 +773,154 @@ function buildCityChips(cityGroups, map) {
 
     if (countLabel) countLabel.textContent = '(' + cityGroups.length + ')';
     if (hintCount) hintCount.textContent = cityGroups.length;
+}
+
+// ═══════════════════════════════════════════════════════════
+// GLOBE-04: District Interaction Panel
+// ═══════════════════════════════════════════════════════════
+
+// ---- Shared constants (moved from initMap for panel access) ----
+function titleCaseDistrict(s) {
+    return String(s).toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
+var districtBaseStyle = {
+    fillColor: '#2563eb',
+    fillOpacity: 0.04,
+    color: '#2563eb',
+    weight: 1,
+    opacity: 0.35,
+};
+
+var districtHoverStyle = {
+    fillOpacity: 0.15,
+    weight: 2,
+    opacity: 0.85,
+};
+
+var districtSelectedStyle = {
+    fillColor: '#991b1b',
+    fillOpacity: 0.18,
+    color: '#991b1b',
+    weight: 2,
+    opacity: 0.95
+};
+
+var __selectedDistrictLayer = null;
+
+// ---- District → state mapping (explicit, no fuzzy) ----
+var DISTRICT_STATE_VARIANTS = {
+    'CHITAWAN': 'Chitwan',
+    'DHANUSHA': 'Dhanusa',
+    'KAPILBASTU': 'Kapilavastu',
+    'KABHREPALANCHOK': 'Kavrepalanchok'
+};
+
+var AMBIGUOUS_STATES = ['Bagmati', 'Gandaki', 'Lumbini', 'Rolwaling'];
+
+function normalizeStateName(s) {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function findWaypointsForDistrict(districtName, allWaypoints) {
+    var lookupName = DISTRICT_STATE_VARIANTS[districtName] || districtName;
+
+    for (var i = 0; i < AMBIGUOUS_STATES.length; i++) {
+        if (normalizeStateName(AMBIGUOUS_STATES[i]) === normalizeStateName(lookupName)) {
+            return { status: 'ambiguous', waypoints: [] };
+        }
+    }
+
+    var normalized = normalizeStateName(lookupName);
+    var matches = (allWaypoints || []).filter(function (w) {
+        if (!w || !w.state) return false;
+        return normalizeStateName(w.state) === normalized;
+    });
+
+    return { status: matches.length > 0 ? 'mapped' : 'empty', waypoints: matches };
+}
+
+function escapeHtmlSafe(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+
+function renderDistrictPanelContent(result) {
+    var summary = document.getElementById('districtPanelSummary');
+    var list = document.getElementById('districtPanelList');
+    if (!summary || !list) return;
+
+    if (result.status === 'ambiguous') {
+        summary.textContent = '';
+        list.innerHTML = '<p class="text-xs text-gray-500 italic">District-level waypoint data is not currently mapped for this district.</p>';
+        return;
+    }
+
+    if (result.status === 'empty') {
+        summary.textContent = '';
+        list.innerHTML = '<p class="text-xs text-gray-500 italic">No waypoint data mapped to this district yet.</p>';
+        return;
+    }
+
+    var n = result.waypoints.length;
+    summary.innerHTML = '<span class="font-semibold text-gray-700">' + n + '</span> waypoint' + (n === 1 ? '' : 's') + ' mapped';
+
+    var html = '';
+    result.waypoints.forEach(function (w) {
+        var alt = (w.altitude !== null && w.altitude !== undefined && w.altitude !== '') ? (w.altitude + ' m') : '—';
+        html += '<div class="border border-gray-100 rounded-lg p-2.5 hover:border-gray-300 transition">' +
+            '<div class="font-semibold text-sm text-gray-900 truncate">' + escapeHtmlSafe(w.name || 'Unnamed') + '</div>' +
+            '<div class="flex items-center gap-3 mt-1 text-xs text-gray-500">' +
+                '<span class="capitalize">' + escapeHtmlSafe(w.type || 'unknown') + '</span>' +
+                '<span>Alt: ' + escapeHtmlSafe(alt) + '</span>' +
+            '</div>' +
+        '</div>';
+    });
+    list.innerHTML = html;
+}
+
+function openDistrictPanel(props, layer, map) {
+    var panel = document.getElementById('districtPanel');
+    if (!panel) return;
+
+    var districtName = (props.DISTRICT || '').toUpperCase();
+    var provinceName = props.PR_NAME || '';
+    var displayName = titleCaseDistrict(props.DISTRICT || '');
+
+    document.getElementById('districtPanelName').textContent = displayName;
+    document.getElementById('districtPanelProvince').textContent = provinceName;
+    document.getElementById('districtPanelSummary').textContent = 'Loading...';
+    document.getElementById('districtPanelList').innerHTML = '';
+
+    panel.classList.add('is-open');
+
+    if (__selectedDistrictLayer && __selectedDistrictLayer !== layer) {
+        __selectedDistrictLayer.setStyle(districtBaseStyle);
+    }
+    layer.setStyle(districtSelectedStyle);
+    __selectedDistrictLayer = layer;
+
+    if (map && typeof layer.getBounds === 'function') {
+        try {
+            map.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 10 });
+        } catch (e) { /* ignore */ }
+    }
+
+    loadMapData().then(function () {
+        var allWaypoints = __allWaypointsCache || [];
+        var result = findWaypointsForDistrict(districtName, allWaypoints);
+        renderDistrictPanelContent(result);
+    });
+}
+
+function closeDistrictPanel() {
+    var panel = document.getElementById('districtPanel');
+    if (panel) panel.classList.remove('is-open');
+    if (__selectedDistrictLayer) {
+        __selectedDistrictLayer.setStyle(districtBaseStyle);
+        __selectedDistrictLayer = null;
+    }
 }
 // ═══════════════════════════════════════════════════════════
 // GLOBE
@@ -852,24 +1041,6 @@ function initMap() {
     map.createPane('districtsPane');
     map.getPane('districtsPane').style.zIndex = 350;
 
-    const districtBaseStyle = {
-        fillColor: '#2563eb',
-        fillOpacity: 0.04,
-        color: '#2563eb',
-        weight: 1,
-        opacity: 0.35,
-    };
-
-    const districtHoverStyle = {
-        fillOpacity: 0.15,
-        weight: 2,
-        opacity: 0.85,
-    };
-
-    function titleCaseDistrict(s) {
-        return String(s).toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-    }
-
     fetch('/map/nepal-districts.topojson')
         .then(function (res) { return res.json(); })
         .then(function (topo) {
@@ -897,11 +1068,20 @@ function initMap() {
                         className: 'district-tooltip',
                     });
 
-                    layer.on('mouseover', function () {
-                        layer.setStyle(districtHoverStyle);
+                                        layer.on('mouseover', function () {
+                        if (__selectedDistrictLayer !== layer) {
+                            layer.setStyle(districtHoverStyle);
+                        }
                     });
                     layer.on('mouseout', function () {
-                        layer.setStyle(districtBaseStyle);
+                        if (__selectedDistrictLayer !== layer) {
+                            layer.setStyle(districtBaseStyle);
+                        } else {
+                            layer.setStyle(districtSelectedStyle);
+                        }
+                    });
+                    layer.on('click', function () {
+                        openDistrictPanel(feature.properties || {}, layer, map);
                     });
                 },
             }).addTo(map);
@@ -1036,6 +1216,13 @@ function initMap() {
 // INIT + HANDLERS
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
+    // GLOBE-04: Wire district panel close handlers
+    var _dpc = document.getElementById('districtPanelClose');
+    if (_dpc) _dpc.addEventListener('click', closeDistrictPanel);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDistrictPanel();
+    });
+
     initGlobe();
     initMap();
 
