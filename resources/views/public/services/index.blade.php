@@ -965,7 +965,9 @@ function initGlobe() {
                 lng: g.lng,
                 name: g.names[0] + (g.count > 1 ? ' (' + g.count + ' waypoints)' : ''),
                 _kind: 'waypoint',
-                _altitude: g.altitudes.length > 0 ? g.altitudes[0] : null,
+                // GLOBE-05: only single authoritative altitude is visualized.
+                // Multiple distinct or missing => null => baseline 0.012.
+                _altitude: (g.altitudes.length === 1) ? g.altitudes[0] : null,
                 _count: g.count,
             };
         });
@@ -977,7 +979,12 @@ function initGlobe() {
                         .pointColor(function (d) {
                                 return d._kind === 'waypoint' ? '#991b1b' : (colorMap[d.category] || '#2563eb');
             })
-            .pointAltitude(0.012)
+            .pointAltitude(function (d) {
+                if (d._kind === 'waypoint' && typeof d._altitude === 'number' && isFinite(d._altitude)) {
+                    return Math.max(0.012, d._altitude / 30000);
+                }
+                return 0.012;
+            })
             .pointRadius(function (d) { return d._kind === 'waypoint' ? 0.25 : 0.42; })
             .pointLabel(function (d) {
                 var alt = (d._kind === 'waypoint' && d._altitude) ? ' (' + d._altitude + 'm)' : '';
