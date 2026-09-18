@@ -230,6 +230,11 @@ class ServiceController extends Controller
             'tourDetail',
             'hotelDetail',
             'location',
+            'itineraryDays.items',
+            'itineraryDays.media',
+            'itineraryDays.startWaypoint:id,name,altitude',
+            'itineraryDays.endWaypoint:id,name,altitude',
+            'itineraryDays.overnightWaypoint:id,name,altitude',
         ])
         ->where('slug', $slug)
         ->where('status', 'active')

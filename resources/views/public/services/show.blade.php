@@ -189,6 +189,176 @@
         </div>
     </div>
 
+    {{-- PROVIDER-ITINERARY-06: Public Itinerary Renderer --}}
+    @if($service->itineraryDays->isNotEmpty())
+        <div class="mt-12">
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Itinerary</h2>
+                    <p class="text-sm text-gray-500 mt-1">{{ $service->itineraryDays->count() }} days</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" data-itinerary-action="expand"
+                            class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                        Expand All
+                    </button>
+                    <button type="button" data-itinerary-action="collapse"
+                            class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                        Collapse All
+                    </button>
+                </div>
+            </div>
+
+            <style>
+                .itinerary-day summary { list-style: none; cursor: pointer; }
+                .itinerary-day summary::-webkit-details-marker { display: none; }
+                .itinerary-day summary .fa-chevron-down { transition: transform 0.2s ease; }
+                .itinerary-day[open] summary .fa-chevron-down { transform: rotate(180deg); }
+            </style>
+
+            <div class="space-y-3">
+                @foreach($service->itineraryDays as $index => $day)
+                    <details class="itinerary-day bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" {{ $index === 0 ? 'open' : '' }}>
+                        <summary class="px-5 py-4 flex justify-between items-center hover:bg-gray-50 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">DAY {{ $day->day_number }}</span>
+                                <span class="font-semibold text-gray-900">{{ $day->title }}</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </summary>
+
+                        <div class="px-5 pb-5 pt-2 space-y-4 border-t border-gray-100">
+                            @if($day->description)
+                                <p class="text-sm text-gray-600 leading-relaxed">{{ $day->description }}</p>
+                            @endif
+
+                            @if($day->startWaypoint || $day->overnightWaypoint || $day->endWaypoint)
+                                <div class="flex flex-wrap gap-2">
+                                    @if($day->startWaypoint)
+                                        <span class="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
+                                            <i class="fas fa-play-circle text-gray-400"></i>
+                                            <span class="text-gray-500">Start:</span> {{ $day->startWaypoint->name }}
+                                        </span>
+                                    @endif
+                                    @if($day->overnightWaypoint)
+                                        <span class="inline-flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
+                                            <i class="fas fa-bed text-emerald-500"></i>
+                                            <span class="text-emerald-600">Overnight:</span> {{ $day->overnightWaypoint->name }}
+                                        </span>
+                                    @endif
+                                    @if($day->endWaypoint)
+                                        <span class="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
+                                            <i class="fas fa-flag-checkered text-gray-400"></i>
+                                            <span class="text-gray-500">End:</span> {{ $day->endWaypoint->name }}
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @php
+                                $hasMeta = $day->distance_km || $day->estimated_time_hours || $day->elevation_gain_m || $day->elevation_loss_m || $day->altitude_m || $day->accommodation || !empty($day->meals_included);
+                            @endphp
+                            @if($hasMeta)
+                                <div class="flex flex-wrap gap-2 text-xs text-gray-600">
+                                    @if($day->distance_km)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">📏 {{ $day->distance_km }} km</span>
+                                    @endif
+                                    @if($day->estimated_time_hours)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">⏱ {{ $day->estimated_time_hours }} hrs</span>
+                                    @endif
+                                    @if($day->elevation_gain_m)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">↑ {{ $day->elevation_gain_m }} m</span>
+                                    @endif
+                                    @if($day->elevation_loss_m)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">↓ {{ $day->elevation_loss_m }} m</span>
+                                    @endif
+                                    @if($day->altitude_m)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">⛰ {{ $day->altitude_m }} m</span>
+                                    @endif
+                                    @if($day->accommodation)
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">🏨 {{ $day->accommodation }}</span>
+                                    @endif
+                                    @if(!empty($day->meals_included))
+                                        @php
+                                            $mealMap = ['B' => '🍳', 'L' => '🍱', 'D' => '🍽'];
+                                            $mealText = collect($day->meals_included)->map(fn($m) => $mealMap[$m] ?? $m)->implode(' ');
+                                        @endphp
+                                        <span class="bg-gray-50 border border-gray-200 px-2 py-1 rounded">{{ $mealText }}</span>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if($day->items->isNotEmpty())
+                                <div>
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Activities</h4>
+                                    <ul class="space-y-1.5">
+                                        @foreach($day->items as $item)
+                                            <li class="flex items-start gap-2 text-sm text-gray-700">
+                                                <i class="fas fa-circle text-[6px] text-blue-400 mt-2"></i>
+                                                <div>
+                                                    <span class="font-medium">{{ $item->title }}</span>
+                                                    @if($item->is_optional)
+                                                        <span class="text-xs text-gray-400 italic ml-1">(optional)</span>
+                                                    @endif
+                                                    @if($item->description)
+                                                        <p class="text-xs text-gray-500 mt-0.5">{{ $item->description }}</p>
+                                                    @endif
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            @if($day->media->isNotEmpty())
+                                <div>
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Media</h4>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        @foreach($day->media as $media)
+                                            @if($media->media_type === 'image')
+                                                <a href="{{ asset('storage/' . $media->file_path) }}" target="_blank" rel="noopener"
+                                                   class="block relative group overflow-hidden rounded-lg bg-gray-100">
+                                                    <img src="{{ asset('storage/' . $media->file_path) }}"
+                                                         alt="{{ $media->alt_text ?? $day->title }}"
+                                                         loading="lazy"
+                                                         class="w-full h-24 md:h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                                                </a>
+                                            @else
+                                                <div class="col-span-2 md:col-span-4">
+                                                    <video controls preload="metadata" class="w-full rounded-lg max-h-72 bg-black">
+                                                        <source src="{{ asset('storage/' . $media->file_path) }}">
+                                                        Video unavailable
+                                                    </video>
+                                                    @if($media->alt_text)
+                                                        <p class="text-xs text-gray-500 mt-1">{{ $media->alt_text }}</p>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </details>
+                @endforeach
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.querySelectorAll('[data-itinerary-action]').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            var action = btn.dataset.itineraryAction;
+                            document.querySelectorAll('.itinerary-day').forEach(function (el) {
+                                if (action === 'expand') el.setAttribute('open', '');
+                                else el.removeAttribute('open');
+                            });
+                        });
+                    });
+                });
+            </script>
+        </div>
+    @endif
+
     <!-- Related Services -->
     @if($relatedServices && $relatedServices->count() > 0)
         <div class="mt-12">
