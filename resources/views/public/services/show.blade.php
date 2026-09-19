@@ -408,8 +408,11 @@
                     });
                 });
             </script>
-        </div>
+                </div>
     @endif
+
+    {{-- PROVIDER-ITINERARY-09B-03: Public Future Scheduled Departures --}}
+    @include('public.services._departures', ['service' => $service])
 
     <!-- Related Services -->
     @if($relatedServices && $relatedServices->count() > 0)

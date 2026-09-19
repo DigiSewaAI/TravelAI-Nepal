@@ -224,21 +224,32 @@ class ServiceController extends Controller
         public function show($slug)
     {
         $service = Service::with([
-            'provider',
-            'category',
-            'trekDetail',
-            'tourDetail',
-            'hotelDetail',
-            'location',
-            'itineraryDays.items',
-            'itineraryDays.media',
-            'itineraryDays.startWaypoint:id,name,altitude,latitude,longitude',
-            'itineraryDays.endWaypoint:id,name,altitude,latitude,longitude',
-            'itineraryDays.overnightWaypoint:id,name,altitude,latitude,longitude',
-        ])
-        ->where('slug', $slug)
-        ->where('status', 'active')
-        ->firstOrFail();
+    'provider',
+    'category',
+    'trekDetail',
+    'tourDetail',
+    'hotelDetail',
+    'location',
+    'itineraryDays.items',
+    'itineraryDays.media',
+    'itineraryDays.startWaypoint:id,name,altitude,latitude,longitude',
+    'itineraryDays.endWaypoint:id,name,altitude,latitude,longitude',
+    'itineraryDays.overnightWaypoint:id,name,altitude,latitude,longitude',
+    // PROVIDER-ITINERARY-09B-03: Public future scheduled departures
+    // - scheduled only, end_date >= today (P2)
+    // - reserved seats = SUM(guest_count) for consuming statuses (P3)
+    'departures' => function ($q) {
+        $q->where('status', 'scheduled')
+          ->where('end_date', '>=', now()->toDateString())
+          ->withSum(['bookings as reserved_seats' => function ($qq) {
+              $qq->whereIn('status', ['pending', 'confirmed', 'completed']);
+          }], 'guest_count')
+          ->orderBy('start_date');
+    },
+])
+->where('slug', $slug)
+->where('status', 'active')
+->firstOrFail();
 
         // PROVIDER-ITINERARY-09A: Paginated approved reviews (single authoritative query)
         // - Reuses Service::reviews() relation (already approved-only)
