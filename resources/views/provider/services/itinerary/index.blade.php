@@ -104,7 +104,64 @@
                 @include('provider.services.itinerary._day_card', ['day' => $day, 'service' => $service])
             @endforeach
         </div>
-    @endif
+        @endif
+
+    {{-- PROVIDER-ITINERARY-09B-02: Departures --}}
+    <div class="bg-white rounded-xl shadow-sm border p-5 mt-6">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">
+                    {{ __('messages.departures') }}
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">
+                    {{ $service->departures->count() }} {{ __('messages.departures') }}
+                </p>
+            </div>
+
+            @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
+                <button type="button"
+                        onclick="document.getElementById('add-departure-panel').classList.toggle('hidden')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                    + {{ __('messages.add_departure') }}
+                </button>
+            @else
+                <span class="text-xs text-gray-400 italic">
+                    Publish itinerary with at least one day to enable departures.
+                </span>
+            @endif
+        </div>
+
+        @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
+            <div id="add-departure-panel" class="hidden bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+                <form method="POST" action="{{ route('provider.services.departures.store', $service) }}">
+                    @csrf
+                    @include('provider.services.itinerary._departure_form', [
+                        'departure'   => null,
+                        'submitLabel' => __('messages.add_departure'),
+                    ])
+                </form>
+            </div>
+        @endif
+
+        @if($errors->has('departure'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded mb-3 text-sm">
+                {{ $errors->first('departure') }}
+            </div>
+        @endif
+
+        @if($service->departures->isEmpty())
+            <p class="text-gray-500 text-center py-8 text-sm">{{ __('messages.no_departures_yet') }}</p>
+        @else
+            <div class="space-y-2">
+                @foreach($service->departures->sortBy('start_date') as $departure)
+                    @include('provider.services.itinerary._departure_row', [
+                        'departure' => $departure,
+                        'service'   => $service,
+                    ])
+                @endforeach
+            </div>
+        @endif
+    </div>
 
 </div>
 

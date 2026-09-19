@@ -180,35 +180,46 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     // SL2: explicit routes only (no Route::resource)
     // SL7: day + item reorder separate endpoints
     // Route order trap: /reorder must come before /{id} routes
-    Route::prefix('services/{service}/itinerary')
-        ->name('services.itinerary.')
-        ->group(function () {
-            Route::get('/', [ItineraryDayController::class, 'index'])->name('index');
+   Route::prefix('services/{service}/itinerary')
+    ->name('services.itinerary.')
+    ->group(function () {
+        Route::get('/', [ItineraryDayController::class, 'index'])->name('index');
 
-            // Days — reorder BEFORE parameterized routes
-            Route::post('/days/reorder', [ItineraryDayController::class, 'reorder'])->name('days.reorder');
-            Route::post('/days', [ItineraryDayController::class, 'store'])->name('days.store');
-            Route::put('/days/{day}', [ItineraryDayController::class, 'update'])->name('days.update');
-            Route::delete('/days/{day}', [ItineraryDayController::class, 'destroy'])->name('days.destroy');
+        // Days — reorder BEFORE parameterized routes
+        Route::post('/days/reorder', [ItineraryDayController::class, 'reorder'])->name('days.reorder');
+        Route::post('/days', [ItineraryDayController::class, 'store'])->name('days.store');
+        Route::put('/days/{day}', [ItineraryDayController::class, 'update'])->name('days.update');
+        Route::delete('/days/{day}', [ItineraryDayController::class, 'destroy'])->name('days.destroy');
 
-            // Items — reorder BEFORE parameterized routes
-            Route::post('/items/reorder', [ItineraryItemController::class, 'reorder'])->name('items.reorder');
-            Route::post('/days/{day}/items', [ItineraryItemController::class, 'store'])->name('items.store');
-            Route::put('/items/{item}', [ItineraryItemController::class, 'update'])->name('items.update');
-            Route::delete('/items/{item}', [ItineraryItemController::class, 'destroy'])->name('items.destroy');
+        // Items — reorder BEFORE parameterized routes
+        Route::post('/items/reorder', [ItineraryItemController::class, 'reorder'])->name('items.reorder');
+        Route::post('/days/{day}/items', [ItineraryItemController::class, 'store'])->name('items.store');
+        Route::put('/items/{item}', [ItineraryItemController::class, 'update'])->name('items.update');
+        Route::delete('/items/{item}', [ItineraryItemController::class, 'destroy'])->name('items.destroy');
 
-            // Media
-            Route::post('/days/{day}/media', [ItineraryDayMediaController::class, 'store'])->name('media.store');
-            Route::delete('/media/{media}', [ItineraryDayMediaController::class, 'destroy'])->name('media.destroy');
+        // Media
+        Route::post('/days/{day}/media', [ItineraryDayMediaController::class, 'store'])->name('media.store');
+        Route::delete('/media/{media}', [ItineraryDayMediaController::class, 'destroy'])->name('media.destroy');
 
-                        // PROVIDER-ITINERARY-07: Lifecycle actions
-            Route::get('/preview', [ItineraryDayController::class, 'preview'])->name('preview');
-            Route::post('/publish', [ItineraryDayController::class, 'publish'])->name('publish');
-            Route::post('/unpublish', [ItineraryDayController::class, 'unpublish'])->name('unpublish');
+        // PROVIDER-ITINERARY-07: Lifecycle actions
+        Route::get('/preview', [ItineraryDayController::class, 'preview'])->name('preview');
+        Route::post('/publish', [ItineraryDayController::class, 'publish'])->name('publish');
+        Route::post('/unpublish', [ItineraryDayController::class, 'unpublish'])->name('unpublish');
 
-            // PROVIDER-ITINERARY-08: Waypoint search for day picker
-            Route::get('/waypoints/search', [ItineraryWaypointSearchController::class, 'search'])->name('waypoints.search');
-        });
+        // PROVIDER-ITINERARY-08: Waypoint search for day picker
+        Route::get('/waypoints/search', [ItineraryWaypointSearchController::class, 'search'])->name('waypoints.search');
+    });
+
+// PROVIDER-ITINERARY-09B-02: Departures (sibling group — itinerary भित्र nested होइन)
+Route::prefix('services/{service}/itinerary/departures')
+    ->name('services.departures.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Provider\DepartureController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Provider\DepartureController::class, 'store'])->name('store');
+        Route::put('/{departure}', [\App\Http\Controllers\Provider\DepartureController::class, 'update'])->name('update');
+        Route::post('/{departure}/cancel', [\App\Http\Controllers\Provider\DepartureController::class, 'cancel'])->name('cancel');
+        Route::delete('/{departure}', [\App\Http\Controllers\Provider\DepartureController::class, 'destroy'])->name('destroy');
+    });
 
     Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [ProviderBookingController::class, 'show'])->name('bookings.show');
