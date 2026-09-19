@@ -463,7 +463,7 @@ return [
     'anonymous' => 'अज्ञात',
     'smart_contracts_ready' => 'डिजिटल अनुबन्ध तयार',
 
-    
+
 
     // ======================
     // FEATURES DATA (JavaScript)
@@ -857,6 +857,14 @@ return [
     'season' => 'सिजन',
     'book_this_service' => 'यो सेवा बुक गर्नुहोस्',
     'related_services' => 'सम्बन्धित सेवाहरू',
+    // ======================
+// REVIEWS (Phase 09A)
+// ======================
+'reviews' => 'Reviews',
+'review' => 'Review',
+'write_review' => 'Write a Review',
+'no_reviews_yet' => 'No reviews yet.',
+
 
     // ======================
     // PROVIDERS

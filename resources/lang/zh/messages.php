@@ -822,6 +822,13 @@ return [
 'season' => '季节',
 'book_this_service' => '预订此服务',
 'related_services' => '相关服务',
+// ======================
+// REVIEWS (Phase 09A)
+// ======================
+'reviews' => 'समीक्षाएँ',
+'review' => 'समीक्षा',
+'write_review' => 'समीक्षा लिखें',
+'no_reviews_yet' => 'अभी तक कोई समीक्षा नहीं।',
 
 // ======================
 // PROVIDERS

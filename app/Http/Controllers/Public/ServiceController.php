@@ -221,7 +221,7 @@ class ServiceController extends Controller
     /**
      * Display a single service detail.
      */
-    public function show($slug)
+        public function show($slug)
     {
         $service = Service::with([
             'provider',
@@ -240,16 +240,31 @@ class ServiceController extends Controller
         ->where('status', 'active')
         ->firstOrFail();
 
-        // Related services from same provider (limit 4)
+        // PROVIDER-ITINERARY-09A: Paginated approved reviews (single authoritative query)
+        // - Reuses Service::reviews() relation (already approved-only)
+        // - Eager loads safe user fields only (id, name) — no email/phone/PII
+        $reviews = $service->reviews()
+            ->with('user:id,name')
+            ->latest()
+            ->paginate(5);
+
+        // PROVIDER-ITINERARY-09A: Related services
+        // - Same provider OR same category (Master P1)
+        // - Current service excluded
+        // - Active only
+        // - Deduped by query construction (each service naturally unique)
         $relatedServices = Service::with(['provider:id,name,slug', 'category:id,name,slug'])
-            ->where('provider_id', $service->provider_id)
             ->where('id', '!=', $service->id)
             ->where('status', 'active')
+            ->where(function ($q) use ($service) {
+                $q->where('provider_id', $service->provider_id)
+                  ->orWhere('service_category_id', $service->service_category_id);
+            })
             ->orderByDesc('created_at')
             ->take(4)
             ->get();
 
-        return view('public.services.show', compact('service', 'relatedServices'));
+        return view('public.services.show', compact('service', 'relatedServices', 'reviews'));
     }
 
     /**

@@ -831,6 +831,14 @@ return [
 'related_services' => 'Related Services',
 
 // ======================
+// REVIEWS (Phase 09A)
+// ======================
+'reviews' => 'Reviews',
+'review' => 'Review',
+'write_review' => 'Write a Review',
+'no_reviews_yet' => 'No reviews yet.',
+
+// ======================
 // PROVIDERS
 // ======================
 'providers_page_title' => 'Travel Providers | TravelAI Nepal',

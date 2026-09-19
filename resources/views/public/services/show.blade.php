@@ -445,10 +445,12 @@
                     </div>
                 @endforeach
             </div>
-                </div>
+        </div>
     @endif
-</div>
 
+    {{-- PROVIDER-ITINERARY-09A: Public Reviews --}}
+    @include('public.services._reviews', ['service' => $service, 'reviews' => $reviews])
+</div>
 @push('scripts')
 @if(isset($itineraryMapPoints) && count($itineraryMapPoints) > 0)
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
