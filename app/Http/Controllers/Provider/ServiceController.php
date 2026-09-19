@@ -18,11 +18,13 @@ class ServiceController extends Controller
     use AuthorizesRequests;
 
     public function index()
-    {
-        $provider = Auth::user()->ownProvider();
-        $services = $provider ? $provider->services : collect();
-        return view('provider.services.index', compact('services'));
-    }
+{
+    $provider = Auth::user()->ownProvider();
+    $services = $provider
+        ? $provider->services()->withCount('itineraryDays')->get()
+        : collect();
+    return view('provider.services.index', compact('services'));
+}
 
     public function create()
     {

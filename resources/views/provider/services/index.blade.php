@@ -21,6 +21,7 @@
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.category') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.price') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.status') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.itinerary') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
@@ -31,14 +32,36 @@
                         <td class="py-3 text-sm">{{ $service->category->name ?? 'N/A' }}</td>
                         <td class="py-3 text-sm">Rs. {{ number_format($service->price, 0) }}</td>
                         <td class="py-3 text-sm">
-                            <span class="px-2 py-1 rounded-full text-xs
-                                @if($service->status === 'active') bg-green-100 text-green-800
-                                @else bg-gray-100 text-gray-800 @endif">
-                                @if($service->status === 'active') {{ __('messages.active') }} @else {{ __('messages.inactive') }} @endif
-                            </span>
-                        </td>
-                        <td class="py-3 text-sm">
-                            <a href="{{ route('provider.services.edit', $service) }}" class="text-blue-600 hover:text-blue-800 mr-2">
+    <span class="px-2 py-1 rounded-full text-xs
+        @if($service->status === 'active') bg-green-100 text-green-800
+        @else bg-gray-100 text-gray-800 @endif">
+        @if($service->status === 'active') {{ __('messages.active') }} @else {{ __('messages.inactive') }} @endif
+    </span>
+</td>
+<td class="py-3 text-sm">
+    @php $daysCount = $service->itinerary_days_count ?? 0; @endphp
+    <div class="flex items-center gap-2">
+        @if($daysCount === 0)
+            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
+                {{ __('messages.no_itinerary_yet') }}
+            </span>
+        @elseif($service->itinerary_status === 'published')
+            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                {{ __('messages.published') }}
+            </span>
+        @else
+            <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                {{ __('messages.draft') }}
+            </span>
+        @endif
+        <a href="{{ route('provider.services.itinerary.index', $service) }}"
+           class="text-blue-600 hover:text-blue-800 text-xs font-medium whitespace-nowrap">
+            {{ __('messages.manage_itinerary') }}
+        </a>
+    </div>
+</td>
+<td class="py-3 text-sm">
+    <a href="{{ route('provider.services.edit', $service) }}" class="text-blue-600 hover:text-blue-800 mr-2">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form method="POST" action="{{ route('provider.services.destroy', $service) }}" class="inline"

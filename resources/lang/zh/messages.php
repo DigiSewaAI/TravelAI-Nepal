@@ -129,7 +129,10 @@ return [
     'actions' => '操作',
     'delete_confirm' => '删除此服务？',
     'no_services_yet' => '暂无服务。<a href=":link">添加新服务</a>。',
-
+'itinerary' => '行程',
+'manage_itinerary' => '管理行程',
+'draft' => '草稿',
+'no_itinerary_yet' => '暂无行程',
     // ======================
     // BOOKINGS
     // ======================

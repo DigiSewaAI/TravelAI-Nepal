@@ -134,6 +134,10 @@ return [
     'actions' => 'Actions',
     'delete_confirm' => 'Delete this service?',
     'no_services_yet' => 'No services yet. Click <a href=":link">Add New Service</a> to create one.',
+    'itinerary' => 'Itinerary',
+'manage_itinerary' => 'Manage Itinerary',
+'draft' => 'Draft',
+'no_itinerary_yet' => 'No itinerary',
 
     // ======================
     // BOOKINGS
