@@ -86,7 +86,7 @@
             </div>
         </div>
 
-        <div>
+                <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Meals Included</label>
             @php $meals = $day->meals_included ?? []; @endphp
             <div class="flex gap-4">
@@ -102,6 +102,54 @@
                     <input type="checkbox" name="meals_included[]" value="D"
                            {{ in_array('D', $meals) ? 'checked' : '' }} class="mr-1"> Dinner
                 </label>
+            </div>
+        </div>
+
+        {{-- PROVIDER-ITINERARY-08: Waypoint pickers (searchable, server-side) --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Start Waypoint</label>
+                <div class="relative waypoint-picker" data-search-url="{{ route('provider.services.itinerary.waypoints.search', $service) }}">
+                    <input type="text"
+                           class="w-full px-3 py-2 border rounded-lg text-sm picker-display"
+                           placeholder="Search waypoint..."
+                           value="{{ $day->startWaypoint?->name ?? '' }}"
+                           autocomplete="off">
+                    <input type="hidden" name="start_waypoint_id"
+                           class="picker-value"
+                           value="{{ old('start_waypoint_id', $day->start_waypoint_id) }}">
+                    <div class="picker-results hidden absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Overnight Waypoint</label>
+                <div class="relative waypoint-picker" data-search-url="{{ route('provider.services.itinerary.waypoints.search', $service) }}">
+                    <input type="text"
+                           class="w-full px-3 py-2 border rounded-lg text-sm picker-display"
+                           placeholder="Search waypoint..."
+                           value="{{ $day->overnightWaypoint?->name ?? '' }}"
+                           autocomplete="off">
+                    <input type="hidden" name="overnight_waypoint_id"
+                           class="picker-value"
+                           value="{{ old('overnight_waypoint_id', $day->overnight_waypoint_id) }}">
+                    <div class="picker-results hidden absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">End Waypoint</label>
+                <div class="relative waypoint-picker" data-search-url="{{ route('provider.services.itinerary.waypoints.search', $service) }}">
+                    <input type="text"
+                           class="w-full px-3 py-2 border rounded-lg text-sm picker-display"
+                           placeholder="Search waypoint..."
+                           value="{{ $day->endWaypoint?->name ?? '' }}"
+                           autocomplete="off">
+                    <input type="hidden" name="end_waypoint_id"
+                           class="picker-value"
+                           value="{{ old('end_waypoint_id', $day->end_waypoint_id) }}">
+                    <div class="picker-results hidden absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
+                </div>
             </div>
         </div>
 

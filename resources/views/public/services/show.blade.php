@@ -4,6 +4,7 @@
 @section('meta_description', Str::limit(strip_tags($service->description), 155))
 
 @push('head')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
@@ -42,12 +43,12 @@
         <!-- Gallery/Images -->
         <div>
             @if($service->cover_image)
-                <img src="{{ asset('storage/' . $service->cover_image) }}" 
+                <img src="{{ asset('storage/' . $service->cover_image) }}"
                      alt="{{ $service->name }}"
                      class="w-full rounded-xl shadow-lg object-cover h-96">
             @else
                 <div class="w-full h-96 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center overflow-hidden">
-                    <img src="{{ asset('images/logo.png') }}" 
+                    <img src="{{ asset('images/logo.png') }}"
                          alt="TravelAI Nepal"
                          class="w-48 h-48 object-contain opacity-50">
                 </div>
@@ -60,7 +61,7 @@
             @if(count($gallery) > 0)
                 <div class="grid grid-cols-4 gap-2 mt-2">
                     @foreach(array_slice($gallery, 0, 4) as $image)
-                        <img src="{{ asset('storage/' . $image) }}" 
+                        <img src="{{ asset('storage/' . $image) }}"
                              alt="{{ __('messages.gallery_image') }}"
                              class="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75">
                     @endforeach
@@ -71,7 +72,7 @@
         <!-- Service Details -->
         <div>
             <h1 class="text-3xl font-bold text-gray-900">{{ $service->name }}</h1>
-            
+
             <div class="flex items-center gap-2 mt-2 flex-wrap">
                 <span class="px-2 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
                     {{ $service->category->name ?? __('messages.na') }}
@@ -161,7 +162,7 @@
                 <h3 class="font-semibold text-gray-700">{{ __('messages.provider') }}</h3>
                 <div class="flex items-center gap-3 mt-2">
                     @if($service->provider->logo_url)
-                        <img src="{{ asset('storage/' . $service->provider->logo_url) }}" 
+                        <img src="{{ asset('storage/' . $service->provider->logo_url) }}"
                              alt="{{ $service->provider->name }} logo"
                              class="w-14 h-14 rounded-full object-cover border-2 border-gray-200">
                     @else
@@ -170,7 +171,7 @@
                         </div>
                     @endif
                     <div>
-                        <a href="{{ route('public.providers.show', $service->provider->slug ?? $service->provider->id) }}" 
+                        <a href="{{ route('public.providers.show', $service->provider->slug ?? $service->provider->id) }}"
                            class="font-medium text-gray-800 hover:text-blue-600">
                             {{ $service->provider->name }}
                         </a>
@@ -181,7 +182,7 @@
 
             <!-- Booking Button -->
             <div class="mt-6">
-                <a href="{{ route('public.services.book', $service->slug) }}" 
+                <a href="{{ route('public.services.book', $service->slug) }}"
                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg hover:shadow-xl text-center block">
                     <i class="fas fa-calendar-check mr-2"></i> {{ __('messages.book_this_service') }}
                 </a>
@@ -197,7 +198,7 @@
                     <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Itinerary</h2>
                     <p class="text-sm text-gray-500 mt-1">{{ $service->itineraryDays->count() }} days</p>
                 </div>
-                <div class="flex gap-2">
+                                <div class="flex gap-2">
                     <button type="button" data-itinerary-action="expand"
                             class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
                         Expand All
@@ -208,6 +209,57 @@
                     </button>
                 </div>
             </div>
+
+            {{-- PROVIDER-ITINERARY-08: Mini Leaflet Map --}}
+            @php
+                $itineraryMapPoints = [];
+                foreach ($service->itineraryDays as $d) {
+                    if ($d->startWaypoint && $d->startWaypoint->latitude && $d->startWaypoint->longitude) {
+                        $itineraryMapPoints[] = [
+                            'lat'    => (float) $d->startWaypoint->latitude,
+                            'lng'    => (float) $d->startWaypoint->longitude,
+                            'name'   => $d->startWaypoint->name,
+                            'type'   => 'start',
+                            'day'    => $d->day_number,
+                        ];
+                    }
+                    if ($d->overnightWaypoint && $d->overnightWaypoint->latitude && $d->overnightWaypoint->longitude) {
+                        $itineraryMapPoints[] = [
+                            'lat'    => (float) $d->overnightWaypoint->latitude,
+                            'lng'    => (float) $d->overnightWaypoint->longitude,
+                            'name'   => $d->overnightWaypoint->name,
+                            'type'   => 'overnight',
+                            'day'    => $d->day_number,
+                        ];
+                    }
+                    if ($d->endWaypoint && $d->endWaypoint->latitude && $d->endWaypoint->longitude) {
+                        $itineraryMapPoints[] = [
+                            'lat'    => (float) $d->endWaypoint->latitude,
+                            'lng'    => (float) $d->endWaypoint->longitude,
+                            'name'   => $d->endWaypoint->name,
+                            'type'   => 'end',
+                            'day'    => $d->day_number,
+                        ];
+                    }
+                }
+            @endphp
+
+            @if(count($itineraryMapPoints) > 0)
+                <div id="itineraryMiniMap"
+                     class="mt-6 rounded-xl overflow-hidden border border-gray-100 bg-gray-50"
+                     style="height: 320px;"></div>
+                <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-500">
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#2563eb;"></span> Start
+                    </span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#10b981;"></span> Overnight
+                    </span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#dc2626;"></span> End
+                    </span>
+                </div>
+            @endif
 
             <style>
                 .itinerary-day summary { list-style: none; cursor: pointer; }
@@ -373,11 +425,11 @@
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition border border-gray-100 group">
                         <div class="h-40 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
                             @if($related->cover_image)
-                                <img src="{{ asset('storage/' . $related->cover_image) }}" 
+                                <img src="{{ asset('storage/' . $related->cover_image) }}"
                                      alt="{{ $related->name }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @else
-                                <img src="{{ asset('images/logo.png') }}" 
+                                <img src="{{ asset('images/logo.png') }}"
                                      alt="TravelAI Nepal"
                                      class="w-20 h-20 object-contain opacity-50 group-hover:scale-105 transition-transform duration-300">
                             @endif
@@ -385,7 +437,7 @@
                         <div class="p-3">
                             <h4 class="font-semibold text-gray-800 text-sm truncate">{{ $related->name }}</h4>
                             <p class="text-blue-600 font-bold text-sm">{{ $relFormatted }}</p>
-                            <a href="{{ route('public.services.show', $related->slug) }}" 
+                            <a href="{{ route('public.services.show', $related->slug) }}"
                                class="text-xs text-blue-600 hover:text-blue-800 font-medium group-hover:underline">
                                 {{ __('messages.view_details') }} →
                             </a>
@@ -393,7 +445,66 @@
                     </div>
                 @endforeach
             </div>
-        </div>
+                </div>
     @endif
 </div>
+
+@push('scripts')
+@if(isset($itineraryMapPoints) && count($itineraryMapPoints) > 0)
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('itineraryMiniMap');
+        if (!el || typeof L === 'undefined') return;
+
+        var points = @json($itineraryMapPoints);
+        if (!points.length) return;
+
+        var map = L.map(el, {
+            zoomControl: true,
+            scrollWheelZoom: false,
+            attributionControl: true,
+        });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19,
+        }).addTo(map);
+
+        var colorByType = {
+            start:     '#2563eb',
+            overnight: '#10b981',
+            end:       '#dc2626',
+        };
+
+        var bounds = [];
+        points.forEach(function (p) {
+            var color = colorByType[p.type] || '#6b7280';
+            var marker = L.circleMarker([p.lat, p.lng], {
+                radius: 8,
+                fillColor: color,
+                color: '#ffffff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.95,
+            }).addTo(map);
+
+            var dayLabel = 'Day ' + p.day + ' · ' + p.type.charAt(0).toUpperCase() + p.type.slice(1);
+            var safeName = document.createElement('div');
+            safeName.textContent = p.name;
+            marker.bindPopup(
+                '<div style="font-weight:600;font-size:13px;color:#111827;">' + safeName.innerHTML + '</div>' +
+                '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + dayLabel + '</div>'
+            );
+            bounds.push([p.lat, p.lng]);
+        });
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+        }
+    });
+</script>
+@endif
+@endpush
 @endsection

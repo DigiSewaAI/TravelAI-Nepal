@@ -20,6 +20,7 @@ use App\Http\Controllers\Provider\BookingController as ProviderBookingController
 use App\Http\Controllers\Provider\ItineraryDayController;
 use App\Http\Controllers\Provider\ItineraryItemController;
 use App\Http\Controllers\Provider\ItineraryDayMediaController;
+use App\Http\Controllers\Provider\ItineraryWaypointSearchController;
 use App\Http\Controllers\Public\ProviderController;
 
 // ✅ Phase 8 – Provider Subscription & Verification
@@ -200,10 +201,13 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
             Route::post('/days/{day}/media', [ItineraryDayMediaController::class, 'store'])->name('media.store');
             Route::delete('/media/{media}', [ItineraryDayMediaController::class, 'destroy'])->name('media.destroy');
 
-            // PROVIDER-ITINERARY-07: Lifecycle actions
+                        // PROVIDER-ITINERARY-07: Lifecycle actions
             Route::get('/preview', [ItineraryDayController::class, 'preview'])->name('preview');
             Route::post('/publish', [ItineraryDayController::class, 'publish'])->name('publish');
             Route::post('/unpublish', [ItineraryDayController::class, 'unpublish'])->name('unpublish');
+
+            // PROVIDER-ITINERARY-08: Waypoint search for day picker
+            Route::get('/waypoints/search', [ItineraryWaypointSearchController::class, 'search'])->name('waypoints.search');
         });
 
     Route::get('/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
@@ -256,7 +260,7 @@ Route::prefix('quotation-requests')->name('quotation-requests.')->group(function
     Route::get('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'show'])->name('show');
     Route::post('/{quotationRequest}/generate', [App\Http\Controllers\Provider\QuotationRequestController::class, 'generateQuotation'])->name('generate');
     Route::post('/{quotationRequest}/send-email', [App\Http\Controllers\Provider\QuotationRequestController::class, 'sendQuotationEmail'])->name('send-email');
-    
+
     // ✅ NEW ROUTES
     Route::get('/{quotationRequest}/edit', [App\Http\Controllers\Provider\QuotationRequestController::class, 'edit'])->name('edit');
     Route::put('/{quotationRequest}', [App\Http\Controllers\Provider\QuotationRequestController::class, 'update'])->name('update');
@@ -436,11 +440,11 @@ Route::post('/scan/{booking}', [CheckinController::class, 'checkin']);
 Route::get('/currency/switch', function (Illuminate\Http\Request $request) {
     $currency = $request->input('currency', 'USD');
     $allowed = ['USD', 'NPR'];
-    
+
     if (in_array($currency, $allowed)) {
         session(['display_currency' => $currency]);
     }
-    
+
     return redirect()->back();
 })->name('currency.switch');
 

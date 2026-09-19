@@ -136,7 +136,7 @@
         document.getElementById('day-reorder-form').submit();
     }
 
-    function moveItem(dayId, itemId, direction) {
+        function moveItem(dayId, itemId, direction) {
         var rows = document.querySelectorAll('[data-item-id][data-parent-day="' + dayId + '"]');
         var ids = [];
         rows.forEach(function (r) { ids.push(parseInt(r.dataset.itemId, 10)); });
@@ -150,5 +150,88 @@
         document.getElementById('item-reorder-input').value = JSON.stringify(ids);
         document.getElementById('item-reorder-form').submit();
     }
+
+    // PROVIDER-ITINERARY-08: Waypoint searchable picker (vanilla JS)
+    document.querySelectorAll('.waypoint-picker').forEach(function (picker) {
+        var display   = picker.querySelector('.picker-display');
+        var valueField = picker.querySelector('.picker-value');
+        var results   = picker.querySelector('.picker-results');
+        var searchUrl = picker.dataset.searchUrl;
+        var debounceTimer = null;
+        var requestToken = 0;
+
+        function clearResults() {
+            results.innerHTML = '';
+            results.classList.add('hidden');
+        }
+
+        function showResults(items) {
+            if (!items || items.length === 0) {
+                clearResults();
+                return;
+            }
+            results.innerHTML = '';
+                        items.forEach(function (item) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0';
+                btn.textContent = item.name;
+
+                // Use mousedown + preventDefault to prevent input blur from
+                // hiding dropdown before click registers.
+                btn.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    valueField.value = item.id;
+                    display.value = item.name;
+                    clearResults();
+                });
+
+                results.appendChild(btn);
+            });
+            results.classList.remove('hidden');
+        }
+
+        display.addEventListener('input', function () {
+            var q = display.value.trim();
+            if (q.length < 2) {
+                clearResults();
+                return;
+            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                var myToken = ++requestToken;
+                fetch(searchUrl + '?q=' + encodeURIComponent(q), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (myToken !== requestToken) return;
+                    showResults(data.results || []);
+                })
+                .catch(function () {
+                    if (myToken !== requestToken) return;
+                    clearResults();
+                });
+            }, 250);
+        });
+
+        display.addEventListener('blur', function () {
+            // If provider clears the field, unset the hidden ID
+            if (display.value.trim() === '') {
+                valueField.value = '';
+            }
+            // Delay to allow click on a result to fire first
+            setTimeout(clearResults, 180);
+        });
+
+        display.addEventListener('focus', function () {
+            if (display.value.trim().length >= 2 && results.children.length > 0) {
+                results.classList.remove('hidden');
+            }
+        });
+    });
 </script>
 @endsection

@@ -16,13 +16,16 @@ class ItineraryDayController extends Controller
     /**
      * List itinerary days for a service (main editor page).
      */
-    public function index(Service $service)
+        public function index(Service $service)
     {
         $this->authorize('update', $service);
 
         $service->load([
             'itineraryDays.items',
             'itineraryDays.media',
+            'itineraryDays.startWaypoint:id,name',
+            'itineraryDays.endWaypoint:id,name',
+            'itineraryDays.overnightWaypoint:id,name',
         ]);
 
         return view('provider.services.itinerary.index', compact('service'));
