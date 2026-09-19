@@ -97,10 +97,19 @@ class Service extends Model
     // PROVIDER ITINERARY (PROVIDER-ITINERARY-04)
     // =====================================================
 
-    public function itineraryDays()
+        public function itineraryDays()
     {
         return $this->hasMany(ServiceItineraryDay::class)
             ->orderBy('day_number');
+    }
+
+    // =====================================================
+    // PROVIDER-ITINERARY-09B-01: Departures
+    // =====================================================
+
+    public function departures()
+    {
+        return $this->hasMany(Departure::class);
     }
 
     // =====================================================
