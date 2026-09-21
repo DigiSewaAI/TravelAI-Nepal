@@ -32,7 +32,14 @@ class BookingController extends Controller
         'status' => 'required|in:pending,confirmed,completed,cancelled',
     ]);
 
-    DB::transaction(function () use ($booking, $request) {
+        DB::transaction(function () use ($booking, $request) {
+        // PROVIDER-ITINERARY-09B-04: Canonical lock order
+        // Departure lock FIRST if this booking is departure-bound.
+        $departureId = Booking::where('id', $booking->id)->value('departure_id');
+        if ($departureId !== null) {
+            \App\Models\Departure::where('id', $departureId)->lockForUpdate()->first();
+        }
+
         $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
         $oldStatus = $locked->status;
@@ -40,6 +47,13 @@ class BookingController extends Controller
 
         if ($oldStatus === $newStatus) {
             return;
+        }
+
+        // PROVIDER-ITINERARY-09B-04: Enforce transition rules (was missing)
+        if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
+            throw new \DomainException(
+                "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
+            );
         }
 
         $wasCancelled = in_array($oldStatus, ['cancelled', 'rejected'], true);
@@ -79,7 +93,14 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking)
 {
-    DB::transaction(function () use ($booking) {
+        DB::transaction(function () use ($booking) {
+        // PROVIDER-ITINERARY-09B-04: Canonical lock order
+        // Departure lock FIRST if this booking is departure-bound.
+        $departureId = Booking::where('id', $booking->id)->value('departure_id');
+        if ($departureId !== null) {
+            \App\Models\Departure::where('id', $departureId)->lockForUpdate()->first();
+        }
+
         $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
         $wasConsuming = in_array($locked->status, ['pending', 'confirmed', 'completed'], true);

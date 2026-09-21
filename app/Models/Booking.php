@@ -12,9 +12,11 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+        protected $fillable = [
         'traveler_id',
         'service_id',
+        'departure_id',       // PROVIDER-ITINERARY-09B-04
+        'guest_count',        // PROVIDER-ITINERARY-09B-04
         'booking_date',
         'start_date',
         'status',
@@ -43,9 +45,18 @@ class Booking extends Model
     // RELATIONSHIPS (existing)
     // =============================================
 
-    public function service()
+        public function service()
     {
         return $this->belongsTo(Service::class, 'service_id');
+    }
+
+    /**
+     * PROVIDER-ITINERARY-09B-04: Optional departure this booking belongs to.
+     * NULL for legacy bookings.
+     */
+    public function departure()
+    {
+        return $this->belongsTo(Departure::class, 'departure_id');
     }
 
     public function traveler()

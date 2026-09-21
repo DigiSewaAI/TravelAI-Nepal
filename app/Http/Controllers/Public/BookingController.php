@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Booking;
+use App\Models\Departure;
 use App\Models\User;
 use App\Support\QuotaPeriod;
 use Illuminate\Http\Request;
@@ -22,7 +23,21 @@ class BookingController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
-        return view('public.booking.create', compact('service'));
+        // PROVIDER-ITINERARY-09B-04: Load eligible future departures
+        // Eligible = scheduled + end_date >= today
+        $eligibleDepartures = collect();
+        if ($service->isItineraryPublished() && $service->itineraryDays()->exists()) {
+            $eligibleDepartures = $service->departures()
+                ->where('status', 'scheduled')
+                ->where('end_date', '>=', now()->toDateString())
+                ->withSum(['bookings as reserved_seats' => function ($q) {
+                    $q->whereIn('status', ['pending', 'confirmed', 'completed']);
+                }], 'guest_count')
+                ->orderBy('start_date')
+                ->get();
+        }
+
+        return view('public.booking.create', compact('service', 'eligibleDepartures'));
     }
 
     public function store(Request $request, $serviceSlug)
@@ -31,33 +46,95 @@ class BookingController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+        // PROVIDER-ITINERARY-09B-04: Departure-scoped validation
+        // Determine if this service has eligible departures
+        $hasEligibleDepartures = $service->isItineraryPublished()
+            && $service->itineraryDays()->exists()
+            && $service->departures()
+                ->where('status', 'scheduled')
+                ->where('end_date', '>=', now()->toDateString())
+                ->exists();
+
+        $rules = [
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email|max:255',
+            'phone'      => 'required|string|max:20',
             'start_date' => 'required|date|after_or_equal:today',
-            'message' => 'nullable|string|max:500',
-        ]);
+            'message'    => 'nullable|string|max:500',
+        ];
+
+        if ($hasEligibleDepartures) {
+            $rules['departure_id'] = 'required|integer|exists:departures,id';
+            $rules['guest_count']  = 'required|integer|min:1';
+        } else {
+            $rules['departure_id'] = 'nullable|integer';
+            $rules['guest_count']  = 'nullable|integer|min:1';
+        }
+
+        $validated = $request->validate($rules);
+
+        // Normalize: legacy flow → departure_id null, guest_count 1
+        $departureId = $validated['departure_id'] ?? null;
+        $guestCount  = $departureId ? (int) $validated['guest_count'] : 1;
 
         try {
-            $booking = DB::transaction(function () use ($service, $validated) {
-    $provider = $service->provider;
+            $booking = DB::transaction(function () use ($service, $validated, $departureId, $guestCount) {
+                $provider = $service->provider;
 
-    app(\App\Services\BookingLimitService::class)->reserve($provider);
+                                // PROVIDER-ITINERARY-09B-04: Departure-bound flow (LOCK #1)
+                $departure = null;
+                if ($departureId !== null) {
+                    // Re-verify service eligibility inside transaction
+                    // (defends against user-supplied departure_id on draft/unpublished services)
+                    $freshService = Service::where('id', $service->id)->first();
+                    if (!$freshService
+                        || !$freshService->isItineraryPublished()
+                        || $freshService->itineraryDays()->count() === 0
+                    ) {
+                        throw new \DomainException('This service does not accept departure-based bookings.');
+                    }
 
-    $traveler = $this->resolveTraveler($validated);
+                    $departure = Departure::where('id', $departureId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    // Server-side ownership + eligibility re-verify under lock
+                    if (!$departure
+                        || $departure->service_id !== $service->id
+                        || $departure->status !== 'scheduled'
+                        || $departure->end_date->lt(now()->startOfDay())
+                    ) {
+                        throw new \DomainException('This departure is not available.');
+                    }
+
+                    // Capacity re-check under lock
+                    $reserved = Booking::where('departure_id', $departure->id)
+                        ->whereIn('status', ['pending', 'confirmed', 'completed'])
+                        ->sum('guest_count');
+
+                    if (($reserved + $guestCount) > $departure->capacity) {
+                        throw new \DomainException('This departure does not have enough remaining capacity.');
+                    }
+                }
+
+                // Provider monthly quota reservation (atomic SQL)
+                app(\App\Services\BookingLimitService::class)->reserve($provider);
+
+                $traveler = $this->resolveTraveler($validated);
 
                 return Booking::create([
-                    'traveler_id' => $traveler->id,
-                    'service_id' => $service->id,
+                    'traveler_id'  => $traveler->id,
+                    'service_id'   => $service->id,
+                    'departure_id' => $departure?->id,
+                    'guest_count'  => $guestCount,
                     'booking_date' => now(),
-                    'start_date' => $validated['start_date'],
-                    'status' => 'pending',
-                    'qr_code' => Str::random(32),
-                    'quota_month' => QuotaPeriod::current(),
+                    'start_date'   => $validated['start_date'],
+                    'status'       => 'pending',
+                    'qr_code'      => Str::random(32),
+                    'quota_month'  => QuotaPeriod::current(),
                 ]);
             });
-                } catch (\DomainException $e) {
+        } catch (\DomainException $e) {
             Log::warning('Public booking rejected by domain rule', [
                 'service_id'  => $service->id,
                 'provider_id' => $service->provider_id,
@@ -101,7 +178,7 @@ class BookingController extends Controller
             abort(403, 'You are not authorized to view this booking confirmation.');
         }
 
-        $booking->load(['service.provider', 'traveler']);
+        $booking->load(['service.provider', 'traveler', 'departure']);
 
         return view('public.booking.confirmation', compact('booking'));
     }

@@ -34,8 +34,46 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('public.services.book', $service->slug) }}" class="mt-6 space-y-4">
+                        <form method="POST" action="{{ route('public.services.book', $service->slug) }}" class="mt-6 space-y-4">
                 @csrf
+
+                {{-- PROVIDER-ITINERARY-09B-04: Departure selection (only when eligible departures exist) --}}
+                @if(isset($eligibleDepartures) && $eligibleDepartures->count() > 0)
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.booking_form_departure_label') }} *</label>
+                        <select name="departure_id" id="departure_id" required
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 @error('departure_id') border-red-500 @enderror">
+                            <option value="">{{ __('messages.booking_form_departure_placeholder') }}</option>
+                            @foreach($eligibleDepartures as $dep)
+                                @php
+                                    $reserved  = (int) ($dep->reserved_seats ?? 0);
+                                    $remaining = max(0, $dep->capacity - $reserved);
+                                @endphp
+                                <option value="{{ $dep->id }}"
+                                        data-remaining="{{ $remaining }}"
+                                        {{ old('departure_id') == $dep->id ? 'selected' : '' }}>
+                                    {{ $dep->start_date->format('M d, Y') }} → {{ $dep->end_date->format('M d, Y') }}
+                                    ({{ $remaining }} {{ __('messages.seats') }} {{ __('messages.departure_available') }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('departure_id')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.booking_form_guest_count_label') }} *</label>
+                        <input type="number" name="guest_count" id="guest_count"
+                               value="{{ old('guest_count', 1) }}"
+                               required min="1"
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 @error('guest_count') border-red-500 @enderror">
+                        @error('guest_count')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-gray-400 mt-1" id="guest_count_hint"></p>
+                    </div>
+                @endif
 
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.booking_form_full_name') }} *</label>
@@ -106,6 +144,37 @@
             </div>
             <p class="text-xs text-gray-400 mt-4"><i class="fas fa-lock mr-1"></i> {{ __('messages.booking_secure_notice') }}</p>
         </div>
-    </div>
+        </div>
 </div>
+
+{{-- PROVIDER-ITINERARY-09B-04: guest_count UI hint --}}
+@if(isset($eligibleDepartures) && $eligibleDepartures->count() > 0)
+<script>
+    (function () {
+        var select = document.getElementById('departure_id');
+        var input  = document.getElementById('guest_count');
+        var hint   = document.getElementById('guest_count_hint');
+
+        if (!select || !input || !hint) return;
+
+        function updateLimit() {
+            var opt = select.options[select.selectedIndex];
+            if (!opt || !opt.value) {
+                input.removeAttribute('max');
+                hint.textContent = '';
+                return;
+            }
+            var remaining = parseInt(opt.dataset.remaining || '0', 10);
+            input.max = remaining;
+            hint.textContent = 'Max ' + remaining + ' for this departure';
+            if (parseInt(input.value || '1', 10) > remaining) {
+                input.value = remaining;
+            }
+        }
+
+        select.addEventListener('change', updateLimit);
+        updateLimit();
+    })();
+</script>
+@endif
 @endsection

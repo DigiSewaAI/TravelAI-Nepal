@@ -140,7 +140,10 @@ Route::prefix('explore')->name('public.')->group(function () {
     Route::get('/category/{slug}', [ServiceController::class, 'category'])->name('services.category');
     Route::get('/service/{slug}', [ServiceController::class, 'show'])->name('services.show');
     Route::get('/service/{slug}/book', [PublicBookingController::class, 'create'])->name('services.book');
-    Route::post('/service/{slug}/book', [PublicBookingController::class, 'store']);
+
+    // PROVIDER-ITINERARY-09B-04: Public booking throttle (10/min per IP)
+    Route::post('/service/{slug}/book', [PublicBookingController::class, 'store'])
+        ->middleware('throttle:booking-public');
 });
 
 // Service booking confirmation

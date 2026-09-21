@@ -56,8 +56,13 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by($request->ip())
         );
 
-        RateLimiter::for('sos', fn (Request $request) =>
+                RateLimiter::for('sos', fn (Request $request) =>
             Limit::perMinute(3)->by($request->ip())
+        );
+
+        // PROVIDER-ITINERARY-09B-04: Public booking throttle
+        RateLimiter::for('booking-public', fn (Request $request) =>
+            Limit::perMinute(10)->by($request->ip())
         );
     }
 }

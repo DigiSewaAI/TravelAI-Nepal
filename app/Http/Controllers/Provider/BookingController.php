@@ -47,7 +47,14 @@ class BookingController extends Controller
 
     $newStatus = $request->status;
 
-    DB::transaction(function () use ($booking, $newStatus) {
+        DB::transaction(function () use ($booking, $newStatus) {
+    // PROVIDER-ITINERARY-09B-04: Canonical lock order
+    // Departure lock FIRST if this booking is departure-bound.
+    $departureId = Booking::where('id', $booking->id)->value('departure_id');
+    if ($departureId !== null) {
+        \App\Models\Departure::where('id', $departureId)->lockForUpdate()->first();
+    }
+
     $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
     $oldStatus = $locked->status;
