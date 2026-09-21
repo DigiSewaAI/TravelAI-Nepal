@@ -155,6 +155,7 @@ return [
         'ai_draft_days_hint' => '1–21 days',
         'ai_draft_notes_label' => 'Extra notes (optional)',
         'ai_draft_notes_placeholder' => 'E.g., cultural focus, shorter days…',
+                'ai_draft_verify_warning' => 'AI draft is a starting point. Please verify all places and details before applying.',
         'ai_draft_generate_button' => 'Generate Draft',
         'ai_draft_loading' => 'Generating draft… up to 60 seconds',
         'ai_draft_preview_heading' => 'Preview — :days days',

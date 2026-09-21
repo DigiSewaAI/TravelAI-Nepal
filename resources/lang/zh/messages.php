@@ -149,6 +149,7 @@ return [
         'ai_draft_days_hint' => '1–21 天',
         'ai_draft_notes_label' => '附加备注（可选）',
         'ai_draft_notes_placeholder' => '例如：注重文化、较短行程…',
+        'ai_draft_verify_warning' => 'AI 草稿只是起点。应用前请核实所有地点和细节。',
         'ai_draft_generate_button' => '生成草稿',
         'ai_draft_loading' => '正在生成草稿…最多 60 秒',
         'ai_draft_preview_heading' => '预览 — :days 天',

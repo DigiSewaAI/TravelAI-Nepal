@@ -151,6 +151,7 @@ return [
         'ai_draft_days_hint' => '१–२१ दिन',
         'ai_draft_notes_label' => 'अतिरिक्त नोट्स (वैकल्पिक)',
         'ai_draft_notes_placeholder' => 'जैसे: सांस्कृतिक केंद्रित, छोटे दिन…',
+                'ai_draft_verify_warning' => 'AI ड्राफ्ट एक शुरुआती बिंदु है। लागू करने से पहले सभी स्थानों और विवरणों को सत्यापित करें।',
         'ai_draft_generate_button' => 'ड्राफ्ट बनाएं',
         'ai_draft_loading' => 'ड्राफ्ट बन रहा है… 60 सेकंड तक',
         'ai_draft_preview_heading' => 'पूर्वावलोकन — :days दिन',

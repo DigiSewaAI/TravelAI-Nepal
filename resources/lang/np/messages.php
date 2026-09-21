@@ -154,6 +154,7 @@ return [
         'ai_draft_days_hint' => '१–२१ दिन',
         'ai_draft_notes_label' => 'अतिरिक्त टिप्पणी (वैकल्पिक)',
         'ai_draft_notes_placeholder' => 'जस्तै: सांस्कृतिक केन्द्रित, छोटा दिनहरू…',
+                'ai_draft_verify_warning' => 'AI मस्यौदा एउटा सुरुवाती बिन्दु हो। लागू गर्नु अघि सबै स्थान र विवरण प्रमाणित गर्नुहोस्।',
         'ai_draft_generate_button' => 'मस्यौदा उत्पन्न गर्नुहोस्',
         'ai_draft_loading' => 'मस्यौदा उत्पन्न हुँदै… ६० सेकेन्डसम्म',
         'ai_draft_preview_heading' => 'पूर्वावलोकन — :days दिन',
