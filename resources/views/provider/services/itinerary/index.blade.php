@@ -61,6 +61,15 @@
                     class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
                 + Add Day
             </button>
+                        {{-- PHASE X-01: AI Draft button --}}
+            <button type="button"
+                    onclick="openAiDraftModal(this)"
+                    data-ai-draft-url="{{ route('provider.services.itinerary.ai-draft', $service) }}"
+                    data-ai-draft-apply-url="{{ route('provider.services.itinerary.ai-draft.apply', $service) }}"
+                    data-csrf="{{ csrf_token() }}"
+                    class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                <i class="fas fa-magic mr-1"></i> {{ __('messages.ai_draft_button') }}
+            </button>
         </div>
     </div>
 
@@ -160,8 +169,11 @@
                     ])
                 @endforeach
             </div>
-        @endif
+                @endif
     </div>
+
+    {{-- PHASE X-01: AI Draft Modal --}}
+    @include('provider.services.itinerary._ai_draft_modal')
 
 </div>
 

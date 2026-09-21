@@ -187,6 +187,13 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     ->name('services.itinerary.')
     ->group(function () {
         Route::get('/', [ItineraryDayController::class, 'index'])->name('index');
+                    // PHASE X-01: AI-assisted itinerary draft
+            Route::post('ai-draft', [\App\Http\Controllers\Provider\AiItineraryDraftController::class, 'draft'])
+                ->middleware('throttle:ai')
+                ->name('ai-draft');
+
+            Route::post('ai-draft/apply', [\App\Http\Controllers\Provider\AiItineraryDraftController::class, 'apply'])
+                ->name('ai-draft.apply');
 
         // Days — reorder BEFORE parameterized routes
         Route::post('/days/reorder', [ItineraryDayController::class, 'reorder'])->name('days.reorder');
