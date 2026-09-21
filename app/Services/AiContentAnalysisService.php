@@ -31,10 +31,14 @@ class AiContentAnalysisService
 
 Description: " . $service->description;
 
-            $response = Http::withHeaders([
+                        $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post('https://api.groq.com/v1/chat/completions', [
+            ])
+            ->withOptions([
+                'verify' => !app()->environment('local', 'testing'),
+            ])
+            ->post('https://api.groq.com/v1/chat/completions', [
                 'model' => 'llama3-8b-8192',
                 'messages' => [
                     ['role' => 'system', 'content' => 'You are a tourism expert. Analyze the description and extract structured information.'],
@@ -65,10 +69,14 @@ Description: " . $service->description;
             $prompt = "Analyze this review and return sentiment (positive/neutral/negative), confidence score (0-1), and key themes:
 Review: " . $review->comment;
 
-            $response = Http::withHeaders([
+                        $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post('https://api.groq.com/v1/chat/completions', [
+            ])
+            ->withOptions([
+                'verify' => !app()->environment('local', 'testing'),
+            ])
+            ->post('https://api.groq.com/v1/chat/completions', [
                 'model' => 'llama3-8b-8192',
                 'messages' => [
                     ['role' => 'system', 'content' => 'You are a sentiment analysis expert. Analyze the review.'],

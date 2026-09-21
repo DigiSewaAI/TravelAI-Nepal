@@ -27,7 +27,9 @@ class LlmService
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
         ])
-        ->withOptions(['verify' => false])
+                ->withOptions([
+            'verify' => !app()->environment('local', 'testing'),
+        ])
         ->get('https://api.groq.com/openai/v1/models');
 
         if (!$response->successful()) {
@@ -79,8 +81,8 @@ class LlmService
                     'Authorization' => 'Bearer ' . $this->apiKey,
                     'Content-Type' => 'application/json',
                 ])
-                ->withOptions([
-                    'verify' => false,
+                                ->withOptions([
+                    'verify' => !app()->environment('local', 'testing'),
                     'timeout' => 120,
                 ])
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
@@ -172,8 +174,8 @@ class LlmService
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
         ])
-        ->withOptions([
-            'verify' => false,
+                ->withOptions([
+            'verify' => !app()->environment('local', 'testing'),
             'timeout' => $timeout,
         ])
         ->post('https://api.groq.com/openai/v1/chat/completions', [
@@ -249,13 +251,13 @@ class LlmService
     protected function getSystemPrompt(string $locale): string
     {
         $basePrompt = 'You are a JSON generator. Respond with a valid JSON object only. No other text. Do NOT include any thinking process, explanations, or markdown. Your entire response must be a single valid JSON object.';
-        
+
         $languageInstruction = match($locale) {
             'hi' => ' Generate ALL day titles, descriptions, item names, and any text content EXCLUSIVELY in Hindi language (Devanagari script). ONLY waypoint names like "Nayapul" can remain in English. All other text MUST be in Hindi. Do NOT use English for descriptions or item names.',
             'zh' => ' Generate ALL day titles, descriptions, item names, and any text content EXCLUSIVELY in Chinese language (Simplified Chinese characters). ONLY waypoint names like "Nayapul" can remain in English. All other text MUST be in Chinese. Do NOT use English for descriptions or item names.',
             default => ' Generate all content in English.',
         };
-        
+
         return $basePrompt . $languageInstruction;
     }
 }
