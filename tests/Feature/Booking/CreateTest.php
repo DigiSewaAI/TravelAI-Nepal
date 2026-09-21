@@ -245,23 +245,37 @@ class CreateTest extends TestCase
         $this->assertEquals(0, $reservedAfter);
     }
 
-       // T12 — Reject releases departure seat
+           // T12 — Reject releases departure seat
     //
-    // NOTE: SKIPPED — pre-existing DB enum mismatch.
-    // `bookings.status` DB enum lacks 'rejected' value, but
-    // BookingStatusTransitions and controllers reference it.
-    // Runtime attempt to set status='rejected' fails with
-    // "Data truncated for column 'status'".
-    //
-    // This is a pre-existing inconsistency (predates 09B-04).
-    // Does NOT block 09B-04 scope.
-    // Recommended: separate ticket to extend status enum, OR
-    // remove 'rejected' from application layer entirely.
+    // Previously skipped (DB enum lacked 'rejected'). Fixed by
+    // migration 2026_09_21_050546_extend_bookings_status_enum_rejected.
     public function test_T12_reject_releases_departure_seat(): void
     {
-        $this->markTestSkipped(
-            'DB enum bookings.status missing "rejected". Pre-existing bug — out of 09B-04 scope.'
-        );
+        $dep = $this->makeDeparture(5);
+        $traveler = User::create([
+            'name' => 'T2', 'email' => 't2@example.test',
+            'password' => 'p', 'role' => 'traveler',
+        ]);
+        $booking = Booking::create([
+            'traveler_id'  => $traveler->id,
+            'service_id'   => $this->service->id,
+            'departure_id' => $dep->id,
+            'guest_count'  => 3,
+            'booking_date' => now(),
+            'start_date'   => $dep->start_date,
+            'status'       => 'pending',
+            'qr_code'      => \Str::random(32),
+            'quota_month'  => \App\Support\QuotaPeriod::current(),
+        ]);
+
+        $booking->update(['status' => 'rejected']);
+
+        $reserved = Booking::where('departure_id', $dep->id)
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->sum('guest_count');
+        $this->assertEquals(0, $reserved);
+
+        $this->assertEquals('rejected', $booking->fresh()->status);
     }
 
     // T13 — Admin delete releases departure seat + quota
