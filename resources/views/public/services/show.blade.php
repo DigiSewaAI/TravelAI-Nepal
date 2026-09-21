@@ -465,15 +465,17 @@
         var points = @json($itineraryMapPoints);
         if (!points.length) return;
 
-        var map = L.map(el, {
+                var map = L.map(el, {
             zoomControl: true,
             scrollWheelZoom: false,
             attributionControl: true,
+            maxBounds: [[26.3, 80.0], [30.5, 88.3]],
+            maxBoundsViscosity: 1.0,
+            minZoom: 7
         });
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CartoDB',
-            subdomains: 'abcd',
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            subdomains: 'abc',
             maxZoom: 19,
         }).addTo(map);
 

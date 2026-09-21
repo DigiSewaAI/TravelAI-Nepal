@@ -825,24 +825,26 @@ function titleCaseDistrict(s) {
 
 var districtBaseStyle = {
     fillColor: '#2563eb',
-    fillOpacity: 0.04,
+    fillOpacity: 0.12,
     color: '#2563eb',
-    weight: 1,
-    opacity: 0.35,
-};
-
-var districtHoverStyle = {
-    fillOpacity: 0.15,
     weight: 2,
     opacity: 0.85,
 };
 
+var districtHoverStyle = {
+    fillColor: '#2563eb',
+    fillOpacity: 0.22,
+    color: '#2563eb',
+    weight: 3,
+    opacity: 0.95,
+};
+
 var districtSelectedStyle = {
     fillColor: '#991b1b',
-    fillOpacity: 0.18,
+    fillOpacity: 0.25,
     color: '#991b1b',
-    weight: 2,
-    opacity: 0.95
+    weight: 3,
+    opacity: 1
 };
 
 var __selectedDistrictLayer = null;
@@ -1075,11 +1077,19 @@ function initMap() {
     const el = document.getElementById('nepalMap');
     if (!el || typeof L === 'undefined') return;
 
-    const map = L.map('nepalMap', { center: [28.3949, 84.1240], zoom: 7, zoomControl: true, scrollWheelZoom: false });
+            const map = L.map('nepalMap', {
+        center: [28.3949, 84.1240],
+        zoom: 7,
+        zoomControl: true,
+        scrollWheelZoom: false,
+        maxBounds: [[26.3, 80.0], [30.5, 88.3]],
+        maxBoundsViscosity: 1.0,
+        minZoom: 7
+    });
     __nepalMapInstance = map;
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CartoDB', subdomains: 'abcd', maxZoom: 19
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', subdomains: 'abc', maxZoom: 19
     }).addTo(map);
 
     // ─────────── DISTRICT BOUNDARY LAYER (GLOBE-02) ───────────
