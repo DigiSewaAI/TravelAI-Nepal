@@ -231,12 +231,31 @@
                         ];
                     }
                 }
+
+                // MAP-DUPLICATE-MARKERS-01: Dedup by coordinates
+                // Group markers sharing the same (lat, lng)
+                $groupedPoints = [];
+                foreach ($itineraryMapPoints as $point) {
+                    $key = $point['lat'] . ',' . $point['lng'];
+                    if (!isset($groupedPoints[$key])) {
+                        $groupedPoints[$key] = [
+                            'lat'         => $point['lat'],
+                            'lng'         => $point['lng'],
+                            'name'        => $point['name'],
+                            'occurrences' => [],
+                        ];
+                    }
+                    $groupedPoints[$key]['occurrences'][] = [
+                        'day'  => $point['day'],
+                        'type' => $point['type'],
+                    ];
+                }
+                $groupedPoints = array_values($groupedPoints);
             @endphp
 
             @if(count($itineraryMapPoints) > 0)
-                <div id="itineraryMiniMap"
-                     class="mt-6 rounded-xl overflow-hidden border border-gray-100 bg-gray-50"
-                     style="height: 320px;"></div>
+                                <div id="itineraryMiniMap"
+                     class="mt-6 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 h-80 md:h-[450px]"></div>
                 <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-500">
                     <span class="inline-flex items-center gap-1.5">
                         <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#2563eb;"></span> Start
@@ -479,7 +498,7 @@
         var el = document.getElementById('itineraryMiniMap');
         if (!el || typeof L === 'undefined') return;
 
-        var points = @json($itineraryMapPoints);
+                var points = @json($groupedPoints);
         if (!points.length) return;
 
                 var map = L.map(el, {
@@ -488,7 +507,7 @@
             attributionControl: true,
             maxBounds: [[26.3, 80.0], [30.5, 88.3]],
             maxBoundsViscosity: 1.0,
-            minZoom: 7
+            minZoom: 6
         });
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
@@ -502,8 +521,11 @@
             end:       '#dc2626',
         };
 
-        points.forEach(function (p) {
-            var color = colorByType[p.type] || '#6b7280';
+                points.forEach(function (p) {
+            // MAP-DUPLICATE-MARKERS-01: Grouped point with multiple occurrences
+            var primaryType = p.occurrences[0].type;
+            var color = colorByType[primaryType] || '#6b7280';
+
             var marker = L.circleMarker([p.lat, p.lng], {
                 radius: 8,
                 fillColor: color,
@@ -513,20 +535,22 @@
                 fillOpacity: 0.95,
             }).addTo(map);
 
-            var dayLabel = 'Day ' + p.day + ' · ' + p.type.charAt(0).toUpperCase() + p.type.slice(1);
+            // Multi-day label: "Day 1 · Start, Day 1 · Overnight, Day 2 · Start"
+            var typeLabels = p.occurrences.map(function (o) {
+                return 'Day ' + o.day + ' · ' + o.type.charAt(0).toUpperCase() + o.type.slice(1);
+            }).join(', ');
+
             var safeName = document.createElement('div');
             safeName.textContent = p.name;
+
             marker.bindPopup(
                 '<div style="font-weight:600;font-size:13px;color:#111827;">' + safeName.innerHTML + '</div>' +
-                '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + dayLabel + '</div>'
+                '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + typeLabels + '</div>'
             );
         });
 
-        // Initial: Full Nepal view (country context for foreign travelers)
-        map.fitBounds([
-            [26.35, 80.05],   // SW Nepal
-            [30.45, 88.20]    // NE Nepal
-        ], { padding: [20, 20] });
+                // Initial: Nepal-focused view (zoom 7 = fills container better)
+        map.setView([28.40, 84.10], 7);
     });
 </script>
 @endif
