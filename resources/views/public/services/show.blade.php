@@ -502,7 +502,6 @@
             end:       '#dc2626',
         };
 
-        var bounds = [];
         points.forEach(function (p) {
             var color = colorByType[p.type] || '#6b7280';
             var marker = L.circleMarker([p.lat, p.lng], {
@@ -521,12 +520,13 @@
                 '<div style="font-weight:600;font-size:13px;color:#111827;">' + safeName.innerHTML + '</div>' +
                 '<div style="font-size:11px;color:#6b7280;margin-top:2px;">' + dayLabel + '</div>'
             );
-            bounds.push([p.lat, p.lng]);
         });
 
-        if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
-        }
+        // Initial: Full Nepal view (country context for foreign travelers)
+        map.fitBounds([
+            [26.35, 80.05],   // SW Nepal
+            [30.45, 88.20]    // NE Nepal
+        ], { padding: [20, 20] });
     });
 </script>
 @endif
