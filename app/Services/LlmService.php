@@ -93,6 +93,7 @@ class LlmService
                     ],
                     'temperature' => 0.2,
                     'max_tokens' => $maxTokens,
+                    'response_format' => ['type' => 'json_object'],
                 ]);
 
                 if ($response->successful()) {

@@ -288,24 +288,29 @@ class AiItineraryDraftController extends Controller
     ): string {
         $notesLine = $notes !== '' ? $notes : 'None';
 
-        return <<<PROMPT
-Create a {$days}-day itinerary for this Nepal tourism service:
-
-Service: {$service->name}
+                return <<<PROMPT
+Create a {$days}-day itinerary for: {$service->name}
 Category: {$service->category?->name}
 Destination: {$destination}
-Difficulty: {$difficulty}
 Duration: {$duration} days
-Description: {$description}
+Difficulty: {$difficulty}
+
+SERVICE DESCRIPTION (geographic source of truth):
+{$description}
 
 Provider notes: {$notesLine}
 
-Output EXACT JSON schema:
+GEOGRAPHIC RULE (critical):
+- Use ONLY places mentioned in the description above
+- Do NOT add places from other Nepal regions (e.g., no Everest area unless mentioned)
+- Day titles should be "Place A to Place B" format
+
+JSON output:
 {
   "days": [
     {
       "day_number": 1,
-      "title": "short title (3-8 words)",
+      "title": "Place A to Place B",
       "description": "1-3 sentence overview",
       "distance_km": 8.5,
       "estimated_time_hours": 5.0,
@@ -314,7 +319,7 @@ Output EXACT JSON schema:
       "meals_included": ["B","L","D"],
       "items": [
         {
-          "title": "Activity name",
+          "title": "Activity",
           "description": "Short description",
           "time_of_day": "morning",
           "is_optional": false
@@ -324,14 +329,7 @@ Output EXACT JSON schema:
   ]
 }
 
-STRICT RULES:
-- Exactly {$days} days.
-- day_number starts at 1, increments by 1, no gaps.
-- Do NOT include waypoint IDs, prices, currency, or provider data.
-- time_of_day ∈ {morning, afternoon, evening}
-- meals_included values ∈ {B, L, D} only
-- Omit any field if unknown — use null
-- No markdown, no explanations, JSON only.
+Rules: exactly {$days} days, day_number 1..{$days}, no markdown.
 PROMPT;
     }
 
