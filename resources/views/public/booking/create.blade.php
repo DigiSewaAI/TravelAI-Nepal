@@ -139,7 +139,14 @@
                 <hr>
                 <div class="flex justify-between text-lg font-bold">
                     <span>{{ __('messages.total') }}</span>
-                    <span class="text-blue-600">Rs. {{ number_format($service->price, 0) }}</span>
+                    @php
+    $currencyService = app(\App\Services\CurrencyService::class);
+    $displayCurrency = $currencyService->getDisplayCurrency();
+    $baseCurrency = $service->currency ?? 'USD';
+    $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
+    $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+@endphp
+<span class="text-blue-600">{{ $formattedPrice }}</span>
                 </div>
             </div>
             <p class="text-xs text-gray-400 mt-4"><i class="fas fa-lock mr-1"></i> {{ __('messages.booking_secure_notice') }}</p>
