@@ -192,21 +192,10 @@
 
     {{-- PROVIDER-ITINERARY-06: Public Itinerary Renderer --}}
     @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
-        <div class="mt-12">
-            <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                 <div>
                     <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Itinerary</h2>
                     <p class="text-sm text-gray-500 mt-1">{{ $service->itineraryDays->count() }} days</p>
-                </div>
-                                <div class="flex gap-2">
-                    <button type="button" data-itinerary-action="expand"
-                            class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-                        Expand All
-                    </button>
-                    <button type="button" data-itinerary-action="collapse"
-                            class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-                        Collapse All
-                    </button>
                 </div>
             </div>
 
@@ -266,8 +255,23 @@
                 .itinerary-day summary::-webkit-details-marker { display: none; }
                 .itinerary-day summary .fa-chevron-down { transition: transform 0.2s ease; }
                 .itinerary-day[open] summary .fa-chevron-down { transform: rotate(180deg); }
+
+                /* Fix: Prevent Leaflet map from overriding sticky header */
+                #itineraryMiniMap {
+                    position: relative;
+                    z-index: 1;
+                }
             </style>
 
+            {{-- Expand/Collapse toggle --}}
+            <div class="flex justify-end mb-3">
+                <button type="button" id="itinerary-toggle-all"
+                        data-state="collapsed"
+                        class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition inline-flex items-center gap-2">
+                    <span id="itinerary-toggle-label">Expand All</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform" id="itinerary-toggle-icon"></i>
+                </button>
+            </div>
             <div class="space-y-3">
                 @foreach($service->itineraryDays as $index => $day)
                     <details class="itinerary-day bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" {{ $index === 0 ? 'open' : '' }}>
@@ -395,16 +399,29 @@
                 @endforeach
             </div>
 
-            <script>
+                        <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    document.querySelectorAll('[data-itinerary-action]').forEach(function (btn) {
-                        btn.addEventListener('click', function () {
-                            var action = btn.dataset.itineraryAction;
-                            document.querySelectorAll('.itinerary-day').forEach(function (el) {
-                                if (action === 'expand') el.setAttribute('open', '');
-                                else el.removeAttribute('open');
-                            });
+                    var toggleBtn = document.getElementById('itinerary-toggle-all');
+                    if (!toggleBtn) return;
+
+                    toggleBtn.addEventListener('click', function () {
+                        var isExpanded = this.dataset.state === 'expanded';
+                        var days = document.querySelectorAll('.itinerary-day');
+
+                        days.forEach(function (el) {
+                            if (isExpanded) {
+                                el.removeAttribute('open');
+                            } else {
+                                el.setAttribute('open', '');
+                            }
                         });
+
+                        this.dataset.state = isExpanded ? 'collapsed' : 'expanded';
+
+                        var label = document.getElementById('itinerary-toggle-label');
+                        var icon = document.getElementById('itinerary-toggle-icon');
+                        if (label) label.textContent = isExpanded ? 'Expand All' : 'Collapse All';
+                        if (icon) icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
                     });
                 });
             </script>
