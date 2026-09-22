@@ -291,6 +291,11 @@
                 <button type="button" class="map-filter chip-pill px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600" data-map-filter="tour">🏛️ {{ __('messages.tours') }}</button>
                 <button type="button" class="map-filter chip-pill px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600" data-map-filter="activity">🪂 {{ __('messages.activities') }}</button>
                 <button type="button" class="map-filter chip-pill px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600" data-map-filter="wildlife">🐘 {{ __('messages.wildlife') }}</button>
+                                <button type="button" id="districtToggle"
+                        class="chip-pill px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-600 hover:border-blue-400 transition"
+                        data-state="on">
+                    <i class="fas fa-draw-polygon" aria-hidden="true"></i> {{ __('messages.districts_toggle') }}
+                </button>
             </div>
         </div>
 
@@ -714,6 +719,7 @@ var __allWaypointsCache = null;
 // GLOBE-06: Route selector state
 var __nepalMapInstance = null;
 var __globeInstance = null;
+var __districtLayer = null;
 var __selectedRouteSlug = null;
 var __leafletRouteLayer = null;
 var __globeRouteAccessorsSet = false;
@@ -721,6 +727,9 @@ var __routeRequestToken = 0;
 // GLOBE-07: Journey viewer state
 var __leafletJourneyRouteLayer = null;
 var __leafletJourneyMarkersLayer = null;
+// Phase 2A Item 2: Globe filter state
+var __allGlobePoints = [];
+var __activeFilter = 'all';
 var __globeJourneyCoords = null;
 function loadMapData() {
     if (!__mapDataPromise) {
@@ -1015,6 +1024,7 @@ function initGlobe() {
         });
         var heroPoints = pins.map(function (p) { p._kind = 'hero'; return p; });
         var allPoints = heroPoints.concat(cityPoints);
+        __allGlobePoints = allPoints;  // Phase 2A Item 2: store for filter reactivity
 
         globe.pointsData(allPoints)
             .pointLat('lat').pointLng('lng')
@@ -1048,6 +1058,27 @@ function initGlobe() {
         { lat: 27.7172, lng: 85.3240, text: 'Kathmandu', size: 0.85 }
     ]).labelLat('lat').labelLng('lng').labelText('text').labelSize('size').labelDotRadius(0)
       .labelColor(function() { return 'rgba(37,99,235,.95)'; }).labelResolution(3);
+
+    // Phase 2A Item 1: Nepal highlight (globe polygon layer)
+    fetch('/map/nepal-districts.topojson')
+        .then(function(r) { return r.json(); })
+        .then(function(topo) {
+            if (typeof topojson === 'undefined') {
+                console.warn('topojson-client not loaded; skipping globe Nepal highlight');
+                return;
+            }
+            var geo = topojson.feature(topo, topo.objects.districts);
+
+            globe.polygonsData(geo.features)
+                .polygonCapColor(function() { return 'rgba(37, 99, 235, 0.15)'; })
+                .polygonSideColor(function() { return 'rgba(37, 99, 235, 0.05)'; })
+                .polygonStrokeColor(function() { return '#1e40af'; })
+                .polygonAltitude(0.005)
+                .polygonsTransitionDuration(300);
+        })
+        .catch(function(err) {
+            console.warn('Nepal highlight failed:', err);
+        });
 
     globe.pointOfView({ lat: NEPAL.lat, lng: NEPAL.lng, altitude: 1.85 }, 0);
 
@@ -1108,7 +1139,7 @@ function initMap() {
             }
             const geo = topojson.feature(topo, topo.objects.districts);
 
-            L.geoJSON(geo, {
+            __districtLayer = L.geoJSON(geo, {
                 pane: 'districtsPane',
                 style: function () { return districtBaseStyle; },
                 onEachFeature: function (feature, layer) {
@@ -1248,17 +1279,50 @@ function initMap() {
         markers.push(marker);
     });
 
-    document.querySelectorAll('.map-filter').forEach(function(btn) {
+            document.querySelectorAll('.map-filter').forEach(function(btn) {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.map-filter').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             const filter = btn.dataset.mapFilter;
+            __activeFilter = filter;
+
+            // Existing: Leaflet hero pins filter
             markers.forEach(function(m) {
                 if (filter === 'all' || m.category === filter) { if (!map.hasLayer(m)) m.addTo(map); }
                 else if (map.hasLayer(m)) { map.removeLayer(m); }
             });
+
+            // Phase 2A Item 2: Globe reactivity
+            if (typeof __globeInstance !== 'undefined' && __globeInstance && __allGlobePoints.length > 0) {
+                var filtered = __activeFilter === 'all'
+                    ? __allGlobePoints
+                    : __allGlobePoints.filter(function(p) {
+                        // Waypoints: always visible (matching Leaflet behavior)
+                        // Hero pins: filter by category
+                        return p._kind === 'waypoint' || p.category === __activeFilter;
+                    });
+                __globeInstance.pointsData(filtered);
+            }
         });
     });
+
+    // Phase 2A Item 3: Districts toggle
+    var districtToggle = document.getElementById('districtToggle');
+    if (districtToggle) {
+        districtToggle.addEventListener('click', function() {
+            if (!__districtLayer) return;
+            var isOn = this.dataset.state === 'on';
+            if (isOn) {
+                map.removeLayer(__districtLayer);
+                this.dataset.state = 'off';
+                this.classList.add('opacity-50');
+            } else {
+                __districtLayer.addTo(map);
+                this.dataset.state = 'on';
+                this.classList.remove('opacity-50');
+            }
+        });
+    }
 
     const scrollBtn = document.getElementById('scrollToMap');
     if (scrollBtn) scrollBtn.addEventListener('click', function() {
