@@ -37,8 +37,9 @@
 {{-- ========== Leaflet + Globe.gl + TopoJSON (async) ========== --}}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<script src="//unpkg.com/globe.gl" defer></script>
-<script src="//unpkg.com/three" defer></script>
+<script>window.process = { env: { NODE_ENV: 'production' } };</script>
+<script src="https://unpkg.com/three@0.160.0" defer></script>
+<script src="https://unpkg.com/globe.gl@2.35.0" defer></script>
 <script src="https://unpkg.com/topojson-client@3" defer></script>
 
 <style>
