@@ -163,6 +163,10 @@ return [
         'ai_draft_error_regenerate' => 'अमान्य ड्राफ्ट — पुनः बनाएं।',
         'ai_draft_error_expired' => 'ड्राफ्ट समाप्त। पुनः बनाएं।',
         'ai_draft_applied' => 'AI ड्राफ्ट से :count दिन जोड़े गए',
+                // PROVIDER-EDITOR-UX-01
+        'save_day' => 'दिन सहेजें',
+        'save_next_day' => 'सहेजें और अगला दिन',
+        'unsaved_changes_warning' => 'आपके पास सहेजे नहीं गए परिवर्तन हैं। छोड़ें?',
         'departures_heading'        => 'उपलब्ध प्रस्थान',
 'sold_out'                  => 'सभी सीटें बिक गईं',
 'seats_remaining'           => 'सीटें शेष',

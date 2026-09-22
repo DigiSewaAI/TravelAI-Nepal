@@ -167,6 +167,10 @@ return [
         'ai_draft_error_regenerate' => 'Invalid draft — please regenerate.',
         'ai_draft_error_expired' => 'Draft expired. Please regenerate.',
         'ai_draft_applied' => ':count days added from AI draft',
+                // PROVIDER-EDITOR-UX-01
+        'save_day' => 'Save Day',
+        'save_next_day' => 'Save & Next Day',
+        'unsaved_changes_warning' => 'You have unsaved changes. Leave anyway?',
                 'departures_heading' => 'Available Departures',
         'sold_out' => 'Sold Out',
         'seats_remaining' => 'seats remaining',

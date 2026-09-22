@@ -166,6 +166,10 @@ return [
         'ai_draft_error_regenerate' => 'अमान्य मस्यौदा — पुनः उत्पन्न गर्नुहोस्।',
         'ai_draft_error_expired' => 'मस्यौदा म्याद सकियो। पुनः उत्पन्न गर्नुहोस्।',
         'ai_draft_applied' => 'AI मस्यौदाबाट :count दिन थपियो',
+                // PROVIDER-EDITOR-UX-01
+        'save_day' => 'दिन सुरक्षित गर्नुहोस्',
+        'save_next_day' => 'सुरक्षित गर्नुहोस् र अर्को दिन',
+        'unsaved_changes_warning' => 'तपाईंसँग बचत नगरिएका परिवर्तन छन्। जानु हुन्छ?',
         'departures_heading'        => 'उपलब्ध प्रस्थानहरू',
 'sold_out'                  => 'सबै सिट बिक्री भयो',
 'seats_remaining'           => 'सिट बाँकी',

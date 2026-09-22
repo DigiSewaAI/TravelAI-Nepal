@@ -112,10 +112,20 @@ class ItineraryDayController extends Controller
             'accommodation'          => 'nullable|string|max:255',
         ]);
 
-        $day->update($validated);
+                $day->update($validated);
+
+        // PROVIDER-EDITOR-UX-01: Save & Next Day anchor support
+        $nextDay = $service->itineraryDays()
+            ->where('day_number', '>', $day->day_number)
+            ->orderBy('day_number')
+            ->first();
+
+        $anchor = ($request->input('action') === 'save_next' && $nextDay)
+            ? '#day-' . $nextDay->id
+            : '#day-' . $day->id;
 
         return redirect()
-            ->route('provider.services.itinerary.index', $service)
+            ->to(route('provider.services.itinerary.index', $service) . $anchor)
             ->with('success', 'Day updated.');
     }
 

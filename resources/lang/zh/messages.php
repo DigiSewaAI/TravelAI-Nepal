@@ -161,6 +161,10 @@ return [
         'ai_draft_error_regenerate' => '无效草稿 — 请重新生成。',
         'ai_draft_error_expired' => '草稿已过期。请重新生成。',
         'ai_draft_applied' => '已从 AI 草稿添加 :count 天',
+                // PROVIDER-EDITOR-UX-01
+        'save_day' => '保存日',
+        'save_next_day' => '保存并下一天',
+        'unsaved_changes_warning' => '您有未保存的更改。仍要离开吗？',
         'departures_heading'        => '可用的出发日期',
 'sold_out'                  => '已售罄',
 'seats_remaining'           => '剩余座位',

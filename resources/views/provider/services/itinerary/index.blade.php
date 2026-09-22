@@ -4,6 +4,25 @@
 @section('header', 'Itinerary: ' . $service->name)
 
 @section('content')
+
+{{-- PROVIDER-EDITOR-UX-01: Accordion + sticky styles --}}
+<style>
+    .day-card summary::-webkit-details-marker { display: none; }
+    .day-card summary { list-style: none; }
+    .day-card-summary {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .day-card:not([open]) .day-card-summary {
+        border-bottom: none;
+        border-radius: 0.75rem;
+    }
+    .day-card { scroll-margin-top: 20px; }
+</style>
+
 <div class="max-w-4xl mx-auto space-y-4">
 
     {{-- Back + Add Day --}}
@@ -302,5 +321,29 @@
             }
         });
     });
+
+    // PROVIDER-EDITOR-UX-01: Unsaved changes warning
+    (function () {
+        var formDirty = false;
+        var allowSubmit = false;
+
+        document.addEventListener('input', function (e) {
+            if (e.target.closest('form')) {
+                formDirty = true;
+            }
+        }, true);
+
+        document.addEventListener('submit', function () {
+            allowSubmit = true;
+        }, true);
+
+        window.addEventListener('beforeunload', function (e) {
+            if (formDirty && !allowSubmit) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+    })();
 </script>
 @endsection

@@ -1,26 +1,33 @@
-<div class="bg-white rounded-xl shadow-sm border p-5" data-day-id="{{ $day->id }}">
+<details class="day-card bg-white rounded-xl shadow-sm border"
+         id="day-{{ $day->id }}"
+         data-day-id="{{ $day->id }}"
+         {{ $day->day_number === 1 ? 'open' : '' }}>
 
-    {{-- Header --}}
-    <div class="flex justify-between items-start mb-3">
-        <div>
-            <span class="text-xs font-semibold text-gray-500 uppercase">Day {{ $day->day_number }}</span>
-            <h3 class="text-lg font-semibold text-gray-900">{{ $day->title }}</h3>
+    {{-- Header (sticky, clickable to collapse) --}}
+    <summary class="cursor-pointer p-4 hover:bg-gray-50 rounded-t-xl day-card-summary list-none">
+        <div class="flex justify-between items-start">
+            <div>
+                <span class="text-xs font-semibold text-gray-500 uppercase">Day {{ $day->day_number }}</span>
+                <h3 class="text-lg font-semibold text-gray-900">{{ $day->title }}</h3>
+            </div>
+            <div class="flex items-center gap-1">
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); moveDay({{ $day->id }}, 'up')"
+                        class="text-gray-500 hover:text-gray-800 px-2 py-1 text-sm">↑</button>
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); moveDay({{ $day->id }}, 'down')"
+                        class="text-gray-500 hover:text-gray-800 px-2 py-1 text-sm">↓</button>
+                <form method="POST"
+                      action="{{ route('provider.services.itinerary.days.destroy', [$service, $day]) }}"
+                      class="inline"
+                      onsubmit="event.stopPropagation(); return confirm('Delete this day and all its items/media?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" onclick="event.stopPropagation()" class="text-red-500 hover:text-red-700 px-2 py-1 text-sm">✕</button>
+                </form>
+            </div>
         </div>
-        <div class="flex items-center gap-1">
-            <button type="button" onclick="moveDay({{ $day->id }}, 'up')"
-                    class="text-gray-500 hover:text-gray-800 px-2 py-1 text-sm">↑</button>
-            <button type="button" onclick="moveDay({{ $day->id }}, 'down')"
-                    class="text-gray-500 hover:text-gray-800 px-2 py-1 text-sm">↓</button>
-            <form method="POST"
-                  action="{{ route('provider.services.itinerary.days.destroy', [$service, $day]) }}"
-                  class="inline"
-                  onsubmit="return confirm('Delete this day and all its items/media?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-500 hover:text-red-700 px-2 py-1 text-sm">✕</button>
-            </form>
-        </div>
-    </div>
+    </summary>
+
+    <div class="p-5">
 
     {{-- Day Update Form --}}
     <form method="POST"
@@ -86,7 +93,7 @@
             </div>
         </div>
 
-                <div>
+        <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Meals Included</label>
             @php $meals = $day->meals_included ?? []; @endphp
             <div class="flex gap-4">
@@ -153,9 +160,14 @@
             </div>
         </div>
 
-        <div class="pt-2">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
-                Save Day
+        <div class="pt-2 flex gap-2 flex-wrap">
+            <button type="submit" name="action" value="save"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                {{ __('messages.save_day') }}
+            </button>
+            <button type="submit" name="action" value="save_next"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">
+                {{ __('messages.save_next_day') }} →
             </button>
         </div>
     </form>
@@ -204,4 +216,5 @@
         @include('provider.services.itinerary._media_upload', ['day' => $day, 'service' => $service])
     </div>
 
-</div>
+    </div>{{-- /.p-5 inner --}}
+</details>
