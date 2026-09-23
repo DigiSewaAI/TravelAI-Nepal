@@ -4,6 +4,10 @@
 @section('header', __('messages.manage_services'))
 
 @section('content')
+@php
+    $currencyService = app(\App\Services\CurrencyService::class);
+    $displayCurrency = $currencyService->getDisplayCurrency();
+@endphp
 <div class="bg-white rounded-xl shadow-sm border p-6">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">{{ __('messages.your_services') }}</h2>
@@ -30,7 +34,14 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="py-3 text-sm font-medium">{{ $service->name }}</td>
                         <td class="py-3 text-sm">{{ $service->category->name ?? 'N/A' }}</td>
-                        <td class="py-3 text-sm">Rs. {{ number_format($service->price, 0) }}</td>
+                                                <td class="py-3 text-sm">
+                            @php
+                                $baseCurrency = $service->currency ?? 'USD';
+                                $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
+                                $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                            @endphp
+                            {{ $formattedPrice }}
+                        </td>
                         <td class="py-3 text-sm">
     <span class="px-2 py-1 rounded-full text-xs
         @if($service->status === 'active') bg-green-100 text-green-800
