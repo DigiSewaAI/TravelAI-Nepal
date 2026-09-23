@@ -630,3 +630,44 @@ Protected systems: Zero diff
 **Next:** Phase 4C (Photo Gallery) OR Session Break
 
 ---
+
+---
+
+### 2026-09-23 — Phase 4C CLOSED + PUSHED (Media Lightbox)
+
+**Commit:** `f6026da`
+**Push range:** `adda7ef` → `f6026da`
+**Sync:** Local == Remote ✅ (0/0)
+
+**Files (6):**
+- `resources/views/public/services/_media_lightbox.blade.php` (NEW)
+- `resources/views/public/services/show.blade.php` (M — button trigger + include)
+- 4 lang files (+4 keys each: media_close, media_prev, media_next, media_view_full)
+
+**Stats:** +181 insertions, -9 deletions
+
+**What Shipped:**
+- Vanilla JS lightbox (0 dependency — R21-R24)
+- Prev/Next/Close/Keyboard (Esc, ←, →)/Click-outside close
+- Mobile swipe support
+- Alt-text fallback → day title (R3 honest)
+- Video player preserved native (R20)
+- i18n 4 locales
+
+**Fix During Implementation:**
+- Premature `@endsection` added by Owner (per Master's directive pattern)
+- 500 error caught → Assistant diagnosed → corrected
+- Root cause: Master's directive pattern assumption (not Owner)
+- Lesson logged for future directives
+
+**R6 Verification:** All protected systems untouched
+**Tests:** 41p/1f (pre-existing Safety — unchanged)
+
+**Ticket Update:**
+- I18N-INDENT-CLEANUP-01 — added sub-item (show.blade.php ~line 529, 11 spaces)
+
+**Deploy Platform:** Still deferred
+
+**Next:** Phase 4D (Sunrise + Polish) OR Session close
+
+---
