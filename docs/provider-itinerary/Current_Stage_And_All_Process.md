@@ -3294,3 +3294,131 @@ One bundle commit in future session.
 ~15 min
 
 ---
+
+---
+
+## 🎫 TICKETS — Batch (2026-09-23 / 2026-09-24)
+
+### 🔴 HIGH PRIORITY
+
+**AI-ITINERARY-QUALITY-01**
+Provider AI itinerary quality broken (14→11 days, 3-day loop ×4).
+Root cause: reasoning model + json_object conflict.
+Status: PARTIALLY FIXED (Phase 4G) — chunking pending (Phase 4H).
+Effort: 3-4 hrs (chunking).
+
+**AI-ITINERARY-CHUNKING-01**
+Groq free tier OTPM = 1000 tokens/min. 7+ day treks exceed single-request.
+Fix: Multi-request chunking (3-day chunks, merge server-side).
+Effort: 4-6 hrs (Phase 4H).
+Phase: Next up.
+
+**AI-QUOTATION-BROKEN-01**
+Direct Quotation — model `qwen/qwen3.6-27b` = 404 (non-existent).
+Never worked in production. Confirmed via logs.
+Fix: model typo → `qwen/qwen3.8-27b` (or config-driven).
+Files: `QuotationController.php:76`
+Effort: 5 min.
+
+**AI-REPLAY-BROKEN-01**
+Journey Replay — silent fallback (template, not AI).
+Model `qwen3.6` = 404 → catch → `getFallbackStory()`.
+Users never see AI output. No error shown.
+Fix: model typo + verify fallback quality acceptable.
+Files: `JourneyReplayService.php:182`
+Effort: 15 min.
+
+**WEATHER-SERVICE-LEGACY-FIX-01**
+Legacy WeatherService uses OpenWeatherMap (paid-key pattern).
+Missing config → broken. Safety system dependency (R6).
+Fix: Migrate to Open-Meteo OR remove dead code.
+Effort: 2-3 hrs.
+
+### 🟡 MEDIUM PRIORITY
+
+**AI-LLMSERVICE-FALLBACK-FIX-01**
+`LlmService.php:17` default = `qwen/qwen3.6-27b` (non-existent).
+Fix: default → `qwen/qwen3.8-27b`.
+Effort: 1 min.
+
+**AI-QUOTATION-FORM-INCOMPLETE-01**
+Quotation form missing: days, pax, start_date, accommodation.
+AI cannot generate meaningful quotation without these.
+Fix: Add form fields + update prompt builder.
+Effort: 2 hrs.
+
+**AI-ARCHITECTURE-UNIFY-01**
+4 hardcoded models across codebase. `.env GROQ_MODEL` ignored.
+Fix: Centralize model selection in config.
+Effort: 1-2 hrs.
+
+**AI-MULTIPROVIDER-ROTATION-01** (NEW)
+Add multiple free AI providers (Groq, OpenRouter free, Cerebras, etc.).
+Load distribution + fallback.
+Effort: 2-3 hrs (Phase 4J).
+
+**AI-PUBLIC-PLANNER-VERIFY-01**
+Public AI Planner = DB-driven (not actual AI).
+Marketing says "AI" — potentially misleading.
+Fix: Verify first, then rename OR upgrade to real AI.
+Effort: Verify.
+
+**ELEVATION-DATA-GAP-01**
+`elevation_gain_m`/`elevation_loss_m` = NULL across all records.
+`altitude_m` populated only.
+Fix: Provider UI to populate gain/loss.
+Effort: 2-4 hrs.
+
+**I18N-DUPLICATE-KEY-01**
+`weather_unavailable` × 3 duplicates in 4 locales.
+PHP last-wins → silent override.
+Fix: Audit + deduplicate.
+Effort: 30 min.
+
+**X-03-ROUTE-DATA-INJECTION**
+AI route data injection (Tier 2).
+Effort: 1-2 hrs.
+
+### 🟢 LOW PRIORITY
+
+**MASTER-AI-MD-CREATE-01** (NEW)
+Create `docs/globe/master_ai.md` — complete AI guide A-Z.
+Sections: features, providers, models, limits, multi-provider, troubleshooting, roadmap, tickets.
+Effort: 1-2 hrs.
+Phase: Today (end of session).
+
+**AI-CONTENT-ANALYSIS-DEAD-CODE-01**
+`AiContentAnalysisService.php` — no callers.
+Fix: Delete OR document intent.
+Effort: 15 min.
+
+**SUNSET-INCONSISTENCY-01**
+Public vs dashboard sunset differs by ~19 min.
+Likely cache timing.
+Fix: Investigate (verify only).
+Effort: 30 min.
+
+**I18N-FALLBACK-PATTERN-01**
+`__('key') ?? 'fallback'` = broken pattern.
+Laravel returns key string (not null) when missing → fallback never fires.
+Fix: Audit + fix all instances.
+Effort: 1 hr.
+
+**I18N-INDENT-CLEANUP-01**
+Inconsistent indentation across 4 lang files.
+Fix: Standardize.
+Effort: 30 min.
+
+**DOCS-CONSOLIDATION-01**
+Untracked docs to commit:
+- `docs/globe/TravelAI_Nepal_Master_Handoff_AZ_v4.0.md`
+- `docs/provider-itinerary/Master_Plan_v1.0.md`
+- `docs/plan_limits/FIX-*.md` (7 files)
+Fix: Single bundle commit.
+Effort: 15 min.
+
+**GLOBE-* (6 tickets)**
+Three modules, texture fallback, file structure, mobile zoom, rings filter, 3D journey.
+Effort: Varies (post-MVP).
+
+---
