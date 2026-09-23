@@ -403,14 +403,23 @@
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                                         @foreach($day->media as $media)
                                             @if($media->media_type === 'image')
-                                                <a href="{{ asset('storage/' . $media->file_path) }}" target="_blank" rel="noopener"
-                                                   class="block relative group overflow-hidden rounded-lg bg-gray-100">
-                                                    <img src="{{ asset('storage/' . $media->file_path) }}"
-                                                         alt="{{ $media->alt_text ?? $day->title }}"
-                                                         loading="lazy"
-                                                         class="w-full h-24 md:h-32 object-cover group-hover:scale-105 transition-transform duration-300">
-                                                </a>
-                                            @else
+    <button type="button"
+            class="media-lightbox-trigger block relative group overflow-hidden rounded-lg bg-gray-100 w-full text-left"
+            data-src="{{ asset('storage/' . $media->file_path) }}"
+            data-caption="{{ $media->alt_text ?? $day->title }}"
+            data-day="{{ __('messages.day') }} {{ $day->day_number }}"
+            aria-label="{{ __('messages.media_view_full') }}">
+        <img src="{{ asset('storage/' . $media->file_path) }}"
+             alt="{{ $media->alt_text ?? $day->title }}"
+             loading="lazy"
+             class="w-full h-24 md:h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+        <span class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM11 8v6M8 11h6"/>
+            </svg>
+        </span>
+    </button>
+@else
                                                 <div class="col-span-2 md:col-span-4">
                                                     <video controls preload="metadata" class="w-full rounded-lg max-h-72 bg-black">
                                                         <source src="{{ asset('storage/' . $media->file_path) }}">
@@ -517,7 +526,9 @@
     @endif
 
     {{-- PROVIDER-ITINERARY-09A: Public Reviews --}}
-    @include('public.services._reviews', ['service' => $service, 'reviews' => $reviews])
+           @include('public.services._reviews', ['service' => $service, 'reviews' => $reviews])
+
+@include('public.services._media_lightbox')
 </div>
 
 @push('scripts')
