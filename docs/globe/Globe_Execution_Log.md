@@ -549,3 +549,39 @@ Protected systems: Zero diff
 **Next:** Phase 4 (Rich Experience) OR Session close
 
 ---
+
+---
+
+### 2026-09-23 — Phase 4A CLOSED + PUSHED (Weather Panel)
+
+**Commit:** `fe45542`
+**Push range:** `7818438` → `fe45542`
+**Sync:** Local == Remote ✅ (0/0)
+
+**Files (7):**
+- `app/Services/OpenMeteoService.php` (NEW)
+- `resources/views/public/services/_weather_panel.blade.php` (NEW)
+- `resources/views/public/services/show.blade.php` (+1)
+- 4 lang files (+3 each)
+
+**Stats:** +297/-1
+
+**What Shipped:**
+- Weather panel (Overnight waypoint per day)
+- Open-Meteo API (free, no key, 6hr cache)
+- WMO code → inline SVG icons
+- Google weather 95% match validated
+
+**R6 Verification:**
+- Existing WeatherService UNTOUCHED (empty diff)
+- Safety system safe
+
+**Tests:** 41p/1f (pre-existing Safety)
+
+**New Ticket:** WEATHER-SERVICE-LEGACY-FIX-01 (MEDIUM, deferred)
+
+**Deploy Platform:** Still deferred
+
+**Next:** Phase 4B (Elevation Chart) OR Break
+
+---
