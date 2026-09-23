@@ -585,3 +585,48 @@ Protected systems: Zero diff
 **Next:** Phase 4B (Elevation Chart) OR Break
 
 ---
+
+---
+
+### 2026-09-23 — Phase 4B CLOSED + PUSHED (Altitude Profile Chart)
+
+**Commit:** `3fbafc7`
+**Push range:** `ac83dc0` → `3fbafc7`
+**Sync:** Local == Remote ✅ (0/0)
+
+**Files (6):**
+- `resources/views/public/services/_altitude_profile.blade.php` (NEW)
+- `resources/views/public/services/show.blade.php` (+1 include)
+- 4 lang files (+4 keys each: altitude_profile_heading, altitude_profile_subtitle, altitude_unavailable, days)
+
+**Stats:** +190 insertions, 0 deletions
+
+**What Shipped:**
+- Inline SVG altitude profile chart (0 dependency — R21-R24 compliant)
+- Day-by-day altitude line + area fill gradient
+- Circle markers + altitude labels per day
+- Y-axis gridlines + altitude scale (min/max dynamic)
+- Hide rule: <2 valid points → section hidden
+- i18n: 4 locales (en/np/hi/zh)
+- Legend fix: `__('messages.days')` key added (broken fallback pattern caught pre-impl)
+
+**Data source:** `itinerary_days.altitude_m` ONLY
+**R3 Compliance:** No gain/loss computation (honest data, no invention)
+
+**R6 Verification:**
+- All protected systems untouched
+- WeatherService legacy untouched
+- Safety system safe
+
+**Tests:** 41p/1f (pre-existing Safety failure — unchanged)
+
+**New Tickets (from Phase 4B):**
+- I18N-DUPLICATE-KEY-01 (🟡 MEDIUM) — `weather_unavailable` × 3 duplicates in 4 locales (last-wins override)
+- I18N-FALLBACK-PATTERN-01 (🟢 LOW) — `__('key') ?? 'fallback'` pattern broken (returns key, not null)
+- ELEVATION-DATA-GAP-01 (🟡 MEDIUM) — `elevation_gain_m`/`elevation_loss_m` NULL (provider UI future)
+
+**Deploy Platform:** Still deferred
+
+**Next:** Phase 4C (Photo Gallery) OR Session Break
+
+---
