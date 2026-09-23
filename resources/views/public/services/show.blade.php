@@ -461,7 +461,8 @@
     {{-- ═══════════ /ITINERARY ═══════════ --}}
 
     {{-- PROVIDER-ITINERARY-09B-03: Public Future Scheduled Departures --}}
-    @include('public.services._journey_animation', ['service' => $service])
+        @include('public.services._journey_animation', ['service' => $service])
+    @include('public.services._weather_panel', ['service' => $service])
     @include('public.services._departures', ['service' => $service])
 
     <!-- Related Services -->
