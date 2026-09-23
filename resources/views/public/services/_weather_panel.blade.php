@@ -1,5 +1,5 @@
-{{-- PHASE 4A: Weather Panel (Open-Meteo) --}}
-{{-- Compact weather list for each itinerary day's overnight waypoint --}}
+{{-- PHASE 4A + 4D: Weather Panel with Sunrise/Sunset --}}
+{{-- Compact weather list per itinerary day's overnight waypoint --}}
 
 @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
 
@@ -18,15 +18,34 @@
             (float) $wp->longitude
         );
 
+        $daily = $weatherService->getDailyForecastForCoords(
+            (float) $wp->latitude,
+            (float) $wp->longitude,
+            1
+        );
+
         $wmo = $weather
             ? \App\Services\OpenMeteoService::describeWmoCode($weather['weather_code'] ?? null)
             : null;
+
+        $sunrise = null;
+        $sunset = null;
+        $daylight = null;
+
+        if ($daily && !empty($daily['sunrise'][0])) {
+            $sunrise = \App\Services\OpenMeteoService::formatTime($daily['sunrise'][0]);
+            $sunset = \App\Services\OpenMeteoService::formatTime($daily['sunset'][0] ?? null);
+            $daylight = \App\Services\OpenMeteoService::formatDuration($daily['daylight_duration'][0] ?? null);
+        }
 
         $weatherRows[] = [
             'day'      => $day->day_number,
             'location' => $wp->name,
             'weather'  => $weather,
             'wmo'      => $wmo,
+            'sunrise'  => $sunrise,
+            'sunset'   => $sunset,
+            'daylight' => $daylight,
         ];
     }
 @endphp
@@ -35,34 +54,32 @@
 <section class="mt-8" id="weatherPanelSection">
     <div class="max-w-6xl mx-auto bg-gradient-to-b from-sky-50 to-white border border-gray-200 rounded-3xl p-5 md:p-8 shadow-sm">
 
-        {{-- ─── Header ─── --}}
+        {{-- Header --}}
         <div class="text-center mb-6">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold uppercase tracking-wider mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
                 Live Weather
             </div>
             <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
-                🌤️ {{ __('messages.weather_heading') ?? 'Current Weather' }}
+                🌤️ {{ __('messages.weather_heading') }}
             </h2>
             <p class="text-sm text-gray-500 mt-2 max-w-md mx-auto">
-                {{ count($weatherRows) }}-day weather for overnight stops
+                {{ count($weatherRows) }}-{{ __('messages.days') }} weather for overnight stops
             </p>
         </div>
 
-        {{-- ─── Grid ─── --}}
+        {{-- Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             @foreach($weatherRows as $row)
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-4">
                     <div class="flex items-start justify-between gap-3">
-
-                        {{-- Left: Day + Location + Condition --}}
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-sky-100 text-sky-700 font-bold text-[10px] flex-shrink-0">
                                     {{ $row['day'] }}
                                 </span>
                                 <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                                    {{ __('messages.day') ?? 'Day' }} {{ $row['day'] }}
+                                    {{ __('messages.day') }} {{ $row['day'] }}
                                 </span>
                             </div>
                             <div class="font-semibold text-gray-900 text-sm truncate">
@@ -75,17 +92,15 @@
                                 </div>
                             @else
                                 <div class="text-gray-400 text-[11px] mt-1.5 italic">
-                                    {{ __('messages.weather_unavailable') ?? 'Weather unavailable' }}
+                                    {{ __('messages.weather_unavailable') }}
                                 </div>
                             @endif
                         </div>
 
-                        {{-- Right: Icon + Temp + Wind/Humidity --}}
                         <div class="flex flex-col items-end flex-shrink-0">
                             @if($row['weather'])
                                 @php $iconSlug = $row['wmo']['icon'] ?? 'unknown'; @endphp
 
-                                {{-- WMO icon (inline SVG) --}}
                                 <div class="w-10 h-10 flex items-center justify-center text-sky-500">
                                     @switch($iconSlug)
                                         @case('clear')
@@ -132,14 +147,12 @@
                                     @endswitch
                                 </div>
 
-                                {{-- Temperature --}}
                                 @if($row['weather']['temperature'] !== null)
                                     <div class="text-2xl font-bold text-gray-900 leading-none mt-1">
                                         {{ round($row['weather']['temperature']) }}<span class="text-sm font-normal text-gray-400">°C</span>
                                     </div>
                                 @endif
 
-                                {{-- Wind + Humidity --}}
                                 <div class="text-[10px] text-gray-400 mt-1 flex flex-col items-end gap-0.5">
                                     @if($row['weather']['wind_speed'] !== null)
                                         <span>💨 {{ round($row['weather']['wind_speed']) }} km/h</span>
@@ -158,13 +171,40 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- Phase 4D — Sunrise/Sunset row --}}
+                    @if($row['sunrise'] || $row['sunset'] || $row['daylight'])
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-[11px] text-gray-500">
+                                @if($row['sunrise'])
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="text-amber-500">🌅</span>
+                                        <span class="font-medium">{{ __('messages.sunrise') }}</span>
+                                        <span class="text-gray-700 font-semibold">{{ $row['sunrise'] }}</span>
+                                    </span>
+                                @endif
+                                @if($row['sunset'])
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="text-orange-500">🌇</span>
+                                        <span class="font-medium">{{ __('messages.sunset') }}</span>
+                                        <span class="text-gray-700 font-semibold">{{ $row['sunset'] }}</span>
+                                    </span>
+                                @endif
+                            </div>
+                            @if($row['daylight'])
+                                <div class="mt-1.5 text-[10px] text-gray-400 text-center">
+                                    ☀️ {{ __('messages.daylight') }}: {{ $row['daylight'] }}
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>
 
-        {{-- ─── Footer Note ─── --}}
+        {{-- Footer --}}
         <div class="text-center mt-4 text-[11px] text-gray-400">
-            {{ __('messages.weather_updated_at') ?? 'Updated' }}: {{ now()->format('H:i') }} ·
+            {{ __('messages.weather_updated_at') }}: {{ now()->format('H:i') }} ·
             Data: <a href="https://open-meteo.com" target="_blank" rel="noopener" class="underline hover:text-sky-600">Open-Meteo</a>
         </div>
     </div>

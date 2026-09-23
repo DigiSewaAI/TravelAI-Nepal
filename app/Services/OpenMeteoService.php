@@ -64,6 +64,83 @@ class OpenMeteoService
     }
 
     /**
+     * Fetch daily forecast (sunrise/sunset/daylight) for coordinates.
+     */
+    public function getDailyForecastForCoords(float $lat, float $lng, int $days = 7): ?array
+    {
+        $key = 'weather:meteo:daily:' . round($lat, 4) . ':' . round($lng, 4) . ':' . $days;
+
+        return Cache::remember($key, self::CACHE_TTL, function () use ($lat, $lng, $days) {
+            try {
+                $response = Http::timeout(self::TIMEOUT)
+                    ->acceptJson()
+                    ->get(self::ENDPOINT, [
+                        'latitude'      => $lat,
+                        'longitude'     => $lng,
+                        'daily'         => 'sunrise,sunset,daylight_duration',
+                        'timezone'      => 'auto',
+                        'forecast_days' => $days,
+                    ]);
+
+                if (! $response->successful()) {
+                    Log::warning('OpenMeteo daily HTTP error', [
+                        'lat'    => $lat,
+                        'lng'    => $lng,
+                        'status' => $response->status(),
+                    ]);
+                    return null;
+                }
+
+                $daily = $response->json('daily');
+                if (! is_array($daily)) {
+                    return null;
+                }
+
+                return [
+                    'sunrise'           => $daily['sunrise'] ?? [],
+                    'sunset'            => $daily['sunset'] ?? [],
+                    'daylight_duration' => $daily['daylight_duration'] ?? [],
+                ];
+            } catch (\Throwable $e) {
+                Log::warning('OpenMeteo daily fetch exception', [
+                    'lat'     => $lat,
+                    'lng'     => $lng,
+                    'message' => $e->getMessage(),
+                ]);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Format ISO 8601 time string to friendly 12-hour format.
+     * Example: "2026-09-23T05:42" → "5:42 AM"
+     */
+    public static function formatTime(?string $iso): ?string
+    {
+        if (! $iso) return null;
+        try {
+            return \Carbon\Carbon::parse($iso)->format('g:i A');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Format daylight duration (seconds) to "12h 36m".
+     * Accepts float (Open-Meteo returns 43629.55) or int.
+     * Rounds to nearest second for accuracy.
+     */
+    public static function formatDuration(float|int|null $seconds): ?string
+    {
+        if ($seconds === null || $seconds <= 0) return null;
+        $s = (int) round($seconds);
+        $h = intdiv($s, 3600);
+        $m = intdiv($s % 3600, 60);
+        return $h . 'h ' . str_pad((string) $m, 2, '0', STR_PAD_LEFT) . 'm';
+    }
+
+    /**
      * Map WMO weather code → category icon slug + human label.
      * Returns ['icon' => 'clear'|'cloud'|'rain'|'snow'|'fog'|'storm'|'unknown', 'label' => string]
      */
