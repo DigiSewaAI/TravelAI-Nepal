@@ -28,6 +28,7 @@
 }
 </script>
 @endpush
+
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
     <!-- Breadcrumb -->
@@ -190,16 +191,25 @@
         </div>
     </div>
 
-    {{-- PROVIDER-ITINERARY-06: Public Itinerary Renderer --}}
+    {{-- ═══════════ PROVIDER-ITINERARY-06: Public Itinerary Renderer ═══════════ --}}
     @if($service->isItineraryPublished() && $service->itineraryDays->isNotEmpty())
-                    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Itinerary</h2>
-                    <p class="text-sm text-gray-500 mt-1">{{ $service->itineraryDays->count() }} days</p>
+        <section class="mt-12" id="itinerarySection">
+
+            {{-- ✅ Centered heading (consistency with Journey Animation) --}}
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Day by Day
                 </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+                    {{ __('messages.itinerary') ?? 'Itinerary' }}
+                </h2>
+                <p class="text-sm text-gray-500 mt-2">
+                    {{ $service->itineraryDays->count() }} {{ __('messages.days') ?? 'days' }} · Complete trek plan
+                </p>
             </div>
 
-            {{-- PROVIDER-ITINERARY-08: Mini Leaflet Map --}}
+            {{-- Mini Leaflet Map --}}
             @php
                 $itineraryMapPoints = [];
                 foreach ($service->itineraryDays as $d) {
@@ -233,7 +243,6 @@
                 }
 
                 // MAP-DUPLICATE-MARKERS-01: Dedup by coordinates
-                // Group markers sharing the same (lat, lng)
                 $groupedPoints = [];
                 foreach ($itineraryMapPoints as $point) {
                     $key = $point['lat'] . ',' . $point['lng'];
@@ -254,16 +263,17 @@
             @endphp
 
             @if(count($itineraryMapPoints) > 0)
-                                <div id="itineraryMiniMap"
-                     class="mt-6 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 h-80 md:h-[450px]"></div>
-                <div class="flex flex-wrap gap-3 mt-3 text-xs text-gray-500">
-                    <span class="inline-flex items-center gap-1.5">
+                <div id="itineraryMiniMap"
+                     class="mt-6 rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-50 h-80 md:h-[450px]"></div>
+
+                <div class="flex flex-wrap justify-center gap-3 mt-3 text-xs text-gray-500">
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-2.5 py-1 rounded-full">
                         <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#2563eb;"></span> Start
                     </span>
-                    <span class="inline-flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-2.5 py-1 rounded-full">
                         <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#10b981;"></span> Overnight
                     </span>
-                    <span class="inline-flex items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-2.5 py-1 rounded-full">
                         <span class="inline-block w-2.5 h-2.5 rounded-full" style="background:#dc2626;"></span> End
                     </span>
                 </div>
@@ -283,7 +293,7 @@
             </style>
 
             {{-- Expand/Collapse toggle --}}
-            <div class="flex justify-end mb-3">
+            <div class="flex justify-end mb-3 mt-6">
                 <button type="button" id="itinerary-toggle-all"
                         data-state="collapsed"
                         class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition inline-flex items-center gap-2">
@@ -291,6 +301,8 @@
                     <i class="fas fa-chevron-down text-xs transition-transform" id="itinerary-toggle-icon"></i>
                 </button>
             </div>
+
+            {{-- ✅ Day cards content LEFT-aligned for readability --}}
             <div class="space-y-3">
                 @foreach($service->itineraryDays as $index => $day)
                     <details class="itinerary-day bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" {{ $index === 0 ? 'open' : '' }}>
@@ -418,7 +430,7 @@
                 @endforeach
             </div>
 
-                        <script>
+            <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     var toggleBtn = document.getElementById('itinerary-toggle-all');
                     if (!toggleBtn) return;
@@ -444,17 +456,32 @@
                     });
                 });
             </script>
-                </div>
+        </section>
     @endif
+    {{-- ═══════════ /ITINERARY ═══════════ --}}
 
     {{-- PROVIDER-ITINERARY-09B-03: Public Future Scheduled Departures --}}
+    @include('public.services._journey_animation', ['service' => $service])
     @include('public.services._departures', ['service' => $service])
 
     <!-- Related Services -->
     @if($relatedServices && $relatedServices->count() > 0)
-        <div class="mt-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('messages.related_services') }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <section class="mt-12">
+            {{-- ✅ Centered heading --}}
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                    You May Also Like
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+                    {{ __('messages.related_services') }}
+                </h2>
+                <p class="text-sm text-gray-500 mt-2">
+                    Explore more adventures & services
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach($relatedServices as $related)
                     @php
                         $relBaseCurrency = $related->currency ?? 'USD';
@@ -484,12 +511,13 @@
                     </div>
                 @endforeach
             </div>
-        </div>
+        </section>
     @endif
 
     {{-- PROVIDER-ITINERARY-09A: Public Reviews --}}
     @include('public.services._reviews', ['service' => $service, 'reviews' => $reviews])
 </div>
+
 @push('scripts')
 @if(isset($itineraryMapPoints) && count($itineraryMapPoints) > 0)
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -498,10 +526,10 @@
         var el = document.getElementById('itineraryMiniMap');
         if (!el || typeof L === 'undefined') return;
 
-                var points = @json($groupedPoints);
+        var points = @json($groupedPoints);
         if (!points.length) return;
 
-                var map = L.map(el, {
+        var map = L.map(el, {
             zoomControl: true,
             scrollWheelZoom: false,
             attributionControl: true,
@@ -509,7 +537,8 @@
             maxBoundsViscosity: 1.0,
             minZoom: 6
         });
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             subdomains: 'abc',
             maxZoom: 19,
@@ -521,8 +550,7 @@
             end:       '#dc2626',
         };
 
-                points.forEach(function (p) {
-            // MAP-DUPLICATE-MARKERS-01: Grouped point with multiple occurrences
+        points.forEach(function (p) {
             var primaryType = p.occurrences[0].type;
             var color = colorByType[primaryType] || '#6b7280';
 
@@ -535,7 +563,6 @@
                 fillOpacity: 0.95,
             }).addTo(map);
 
-            // Multi-day label: "Day 1 · Start, Day 1 · Overnight, Day 2 · Start"
             var typeLabels = p.occurrences.map(function (o) {
                 return 'Day ' + o.day + ' · ' + o.type.charAt(0).toUpperCase() + o.type.slice(1);
             }).join(', ');
@@ -549,7 +576,6 @@
             );
         });
 
-                // Initial: Nepal-focused view (zoom 7 = fills container better)
         map.setView([28.40, 84.10], 7);
     });
 </script>
