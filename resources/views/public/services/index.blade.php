@@ -1080,7 +1080,37 @@ function initGlobe() {
             console.warn('Nepal highlight failed:', err);
         });
 
-    globe.pointOfView({ lat: NEPAL.lat, lng: NEPAL.lng, altitude: 1.85 }, 0);
+        globe.pointOfView({ lat: NEPAL.lat, lng: NEPAL.lng, altitude: 1.85 }, 0);
+
+        // Phase 2B: Search → Globe fly-to
+    @if(isset($matchedWaypoint) && $matchedWaypoint)
+        setTimeout(function() {
+            // Stop auto-rotate so globe stays on Pokhara
+            if (typeof controls !== 'undefined' && controls) {
+                controls.autoRotate = false;
+                var autoBtn = document.getElementById('globeAuto');
+                if (autoBtn) autoBtn.classList.remove('active');
+            }
+            if (typeof autoRotate !== 'undefined') {
+                autoRotate = false;
+            }
+
+            if (typeof __globeInstance !== 'undefined' && __globeInstance) {
+                __globeInstance.pointOfView({
+                    lat: {{ $matchedWaypoint->latitude }},
+                    lng: {{ $matchedWaypoint->longitude }},
+                    altitude: 1.5
+                }, 1200);
+            }
+            if (typeof __nepalMapInstance !== 'undefined' && __nepalMapInstance) {
+                __nepalMapInstance.setView(
+                    [{{ $matchedWaypoint->latitude }}, {{ $matchedWaypoint->longitude }}],
+                    11,
+                    { animate: true }
+                );
+            }
+        }, 1500);
+    @endif
 
     let autoRotate = true;
     const controls = globe.controls();

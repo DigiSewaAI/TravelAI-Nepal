@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use App\Models\Waypoint;
 
 class ServiceController extends Controller
 {
@@ -47,6 +48,8 @@ class ServiceController extends Controller
         // ═══════════════════════════════════════════════════════
         // SEARCH (name + description + singular/plural + category)
         // ═══════════════════════════════════════════════════════
+                $matchedWaypoint = null;
+
         if ($request->filled('search')) {
             $searchTerm = trim($request->search);
             $singular = rtrim($searchTerm, 's');
@@ -61,8 +64,38 @@ class ServiceController extends Controller
                       $cq->where('name', 'like', '%' . $searchTerm . '%')
                          ->orWhere('name', 'like', '%' . $singular . '%')
                          ->orWhere('slug', 'like', '%' . strtolower($singular) . '%');
+                  })
+                  // Phase 2B: Extend to waypoints via itinerary days
+                  ->orWhereHas('itineraryDays', function ($dq) use ($searchTerm) {
+                      $dq->whereHas('startWaypoint', function ($wq) use ($searchTerm) {
+                          $wq->where('name', 'like', '%' . $searchTerm . '%');
+                      })->orWhereHas('overnightWaypoint', function ($wq) use ($searchTerm) {
+                          $wq->where('name', 'like', '%' . $searchTerm . '%');
+                      })->orWhereHas('endWaypoint', function ($wq) use ($searchTerm) {
+                          $wq->where('name', 'like', '%' . $searchTerm . '%');
+                      });
                   });
             });
+
+            // Phase 2B: Basic ranking (exact > prefix > contains)
+            $query->orderByRaw("
+                CASE
+                    WHEN services.name = ? THEN 1
+                    WHEN services.name LIKE ? THEN 2
+                    WHEN services.name LIKE ? THEN 3
+                    ELSE 4
+                END
+            ", [$searchTerm, $searchTerm . '%', '%' . $searchTerm . '%']);
+
+            // Phase 2B: Fetch matched waypoint (for globe fly-to)
+            $matchedWaypoint = Waypoint::where('name', 'like', '%' . $searchTerm . '%')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->orderByRaw(
+                    "CASE WHEN name = ? THEN 1 WHEN name LIKE ? THEN 2 ELSE 3 END",
+                    [$searchTerm, $searchTerm . '%']
+                )
+                ->first(['name', 'latitude', 'longitude']);
         }
 
         // ═══════════════════════════════════════════════════════
@@ -209,12 +242,13 @@ class ServiceController extends Controller
 
         $totalCount = array_sum($categoryCounts);
 
-        return view('public.services.index', compact(
+                return view('public.services.index', compact(
             'services',
             'categories',
             'categorySlug',
             'categoryCounts',
-            'totalCount'
+            'totalCount',
+            'matchedWaypoint'
         ));
     }
 
