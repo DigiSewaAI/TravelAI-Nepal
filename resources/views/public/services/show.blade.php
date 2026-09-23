@@ -464,6 +464,7 @@
         @include('public.services._journey_animation', ['service' => $service])
     @include('public.services._weather_panel', ['service' => $service])
     @include('public.services._departures', ['service' => $service])
+    @include('public.services._altitude_profile', ['service' => $service])
 
     <!-- Related Services -->
     @if($relatedServices && $relatedServices->count() > 0)
