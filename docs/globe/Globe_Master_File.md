@@ -1,14 +1,29 @@
+══════════════════════════════════════════════════════════
+MASTER FILE v2.0 — DRAFT (Reality-Aligned)
+TO: Owner (Parashar Regmi) / Master Review
+DATE: 2026-09-23
+STATUS: 🟡 DRAFT — Discovery verification pending
+══════════════════════════════════════════════════════════
+
+Bro, file तयार। **DRAFT** भनेर mark गरेको छु — किनभने STAGE 1-8 discovery अझै चलेको छैन। तर Master ले briefing मा दिनुभएको reality summary पर्याप्त छ foundational rewrite को लागि।
+
+नीचे पूरा file — copy गरेर `docs/globe/Globe_Master_File.md` मा save गर्नु। Save गर्दा **v1.0 लाई backup** राख्नु (`Globe_Master_File_v1.0_backup.md`)।
+
+---
+
 ```markdown
 # 🌍 TravelAI Nepal — Globe Master File
 
-**Version:** 1.0
+**Version:** 2.0 (Reality-Aligned Rewrite)
 **Created:** 2026-09-22
-**Status:** AUTHORITATIVE REFERENCE
+**Rewritten:** 2026-09-23
+**Status:** 🟡 DRAFT — Pending discovery verification
 **Owner:** Parashar Regmi
 **Master:** DeepSeek (Master role)
 **Assistant:** DeepSeek (Implementation role)
+**HEAD:** db52544
 
-> **Single source of truth for Globe system vision, phases, and rules.**
+> **Single source of truth for TravelAI Nepal — vision, existing systems, phases, and rules.**
 
 ---
 
@@ -16,19 +31,25 @@
 
 ### For New Session
 1. Read this file completely
-2. Verify current Git state
-3. Check current phase in Phase Ledger
-4. Wait for Master directive
+2. Verify current Git state (`git log -1`)
+3. Cross-check Phase Ledger (§6) against reality
+4. Check Existing Systems Inventory (§14) — know what's built
+5. Wait for Master directive
 
 ### For Master
 - Reference this file for scope decisions
 - Update Phase Ledger after each closure
+- Update Existing Systems Inventory when new systems ship
 - Keep vision aligned, execution realistic
 
 ### For Assistant
 - Follow phase order strictly
 - No scope expansion without Master GO
 - Report after each phase
+- **Reality > Documented plan** — if code says X, update file
+
+### ⚠️ Document Integrity Rule
+> Master File = living document। Reality ले file भन्दा फरक भन्यो भने — **file update गर्नु** (code touch नगरी)।
 
 ---
 
@@ -49,8 +70,9 @@ Where → What → When → How high → What's next → What I experienced
 - ❌ Google Earth clone नहीं
 - ✅ Nepal-focused journey platform
 - ✅ Free-first (no paid services ever)
-- ✅ Progressive disclosure (not overwhelming)
+- ✅ Progressive disclosure
 - ✅ Foundation → Discovery → Journey → Live → Memory
+- ✅ **Multi-surface**: Public site + Traveler Dashboard + Provider Dashboard + Admin
 
 ---
 
@@ -84,9 +106,41 @@ Where → What → When → How high → What's next → What I experienced
 
 ---
 
-## 🏗️ 3. ARCHITECTURE
+## 🏗️ 3. ARCHITECTURE (Multi-Layer)
 
-### Two Modes
+### Four Surfaces
+```
+┌────────────────────────────────────────────────────┐
+│              🌍 TRAVELAI NEPAL                     │
+├────────────────────────────────────────────────────┤
+│                                                    │
+│  1️⃣ PUBLIC SITE          → Discover + Explore      │
+│     • Globe (Discover Mode)                        │
+│     • Journey Mode (package view)                  │
+│     • Search + Fly-to                              │
+│     • Public service pages                         │
+│                                                    │
+│  2️⃣ TRAVELER DASHBOARD   → My Journey              │
+│     • Bookings + QR check-in                       │
+│     • Live journey tracking                        │
+│     • Photo memories                               │
+│     • Journey Replay (cinematic)                   │
+│     • SOS / Safety panel                           │
+│                                                    │
+│  3️⃣ PROVIDER DASHBOARD   → My Services             │
+│     • Service CRUD + itinerary editor              │
+│     • Booking management                           │
+│     • Media upload                                 │
+│                                                    │
+│  4️⃣ ADMIN               → Platform Control         │
+│     • User + provider management                   │
+│     • Safety incident oversight                    │
+│     • AI quota monitoring                          │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
+### Discover Mode vs Journey Mode (Public Site)
 ```
 ┌─────────────────────────────────────┐
 │         🌍 TRAVELAI GLOBE            │
@@ -125,6 +179,9 @@ Where → What → When → How high → What's next → What I experienced
 - **Districts:** `public/map/nepal-districts.topojson`
 - **Weather:** Open-Meteo API (cached)
 - **Photos:** Provider uploads (`service_itinerary_day_media`)
+- **Check-ins:** `qr_scans` table (verified via STAGE 2)
+- **SOS:** `sos_alerts` table (verified via STAGE 3)
+- **Safety:** `travel_safety_incidents`, `safety_sources` (verified via STAGE 5)
 
 ---
 
@@ -137,171 +194,81 @@ Where → What → When → How high → What's next → What I experienced
 | AI Planner | `PlannerService`, `ItineraryGenerator`, `ItineraryValidator` |
 | AI Quota | `AiReservationService`, `AiLimitService` |
 | GLOBE-01..07 | `MapDataController`, `routes/api.php` GLOBE endpoints |
-| Public Explore | `resources/views/public/services/index.blade.php` (partial) |
+| Public Explore | `resources/views/public/services/index.blade.php` |
 | District TopoJSON | `public/map/nepal-districts.topojson` |
 | Booking | `BookingStatusTransitions`, `BookingLimitService` |
 | Safety | All safety system files |
+| SOS | All SOS files (verify via STAGE 3) |
+| QR Check-in | All QR files (verify via STAGE 2) |
+| Journey Replay | All replay files (verify via STAGE 6) |
 | Subscription/Payment | All billing files |
 
 ---
 
-## 🗺️ 5. PHASE ROADMAP
+## 🗺️ 5. PHASE ROADMAP (Reality-Based)
 
-### PHASE 1 — Foundation Fix (2-3 hrs) 🔴 CURRENT
+### ✅ COMPLETED PHASES
 
-**Goal:** Globe professional appearance + clean console
+#### Phase 1 — Foundation Fix ✅
+- Globe professional appearance
+- Console clean
+- Responsive globe
+- Nepal focus
 
-| Task | Status |
-|---|---|
-| three.js version pin | 🟢 GO |
-| Process shim add | 🟢 GO |
-| Texture URL verify | 🟢 GO |
-| Console error fix | 🟢 GO |
-| Responsive globe | 🟢 GO |
-| Clean controls | 🟢 GO |
-| Nepal focus | 🟢 GO |
-| Marker performance | 🟢 GO |
+#### Phase 2A / 2B — Discovery Mode ✅
+- Nepal highlight + city markers
+- Category filters (Treks/Tours/Hotels)
+- Districts toggle
+- Route highlighting
+- Search bar + Fly-to
 
-**Deliverable:** Globe renders cleanly, no console error, professional look.
+#### Phase 3 — Journey Animation ✅
+- Package → Globe zoom
+- Day-by-day playback
+- Camera animation
+- Waypoint info panel
+- Play/Pause/Prev/Next
 
-**Files:**
-- `resources/views/public/services/index.blade.php`
-- `resources/views/layouts/public.blade.php` (if needed)
+#### Phase 4A / 4B / 4C — Rich Experience ✅
+- Weather (Open-Meteo) + cache
+- Waypoint photo gallery
+- Elevation profile
+- Accommodation + activities
 
-**Test:**
-- T1: Globe renders (Earth texture visible)
-- T2: Console clean (no `process is not defined`)
-- T3: Mobile 375px works
-- T4: Full suite 41p/1f
+#### ✅ COMPLETED (UNDOCUMENTED — VERIFY IN AUDIT)
+These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
-**HOLD:** No commit until COMMIT GO
+- **Traveler Dashboard** — Full user dashboard with bookings, QR, memories, replay
+- **Provider Dashboard** — Full provider dashboard with service + itinerary management
+- **QR Check-in System** — Working, 9 check-ins recorded
+- **Safety System** — Map + incidents + weather integration
+- **Journey Replay** — Cinematic replay with share token
+- **Photo Memories** — Per-checkpoint upload
+- **AI Travel Planner** — Working, 468 requests used
 
----
+> ⚠️ **Detailed file references + commits = STAGE 1-8 audit मा verify हुनेछ।**
 
-### PHASE 2 — Discovery Mode (1-2 days)
+### 🟡 IN PROGRESS
 
-**Goal:** Clean, focused discovery experience
+#### Phase 4D — Sunrise + Polish
+- Sunrise/sunset times
+- Final polish pass
 
-| Task | Priority |
-|---|---|
-| Nepal highlight | P1 |
-| 8 city markers (already exists) | P1 |
-| Category filters (Treks/Tours/Hotels) | P1 |
-| **138 routes HIDDEN by default** | P1 |
-| **77 districts TOGGLE** | P1 |
-| Selected route highlighting | P1 |
-| Basic search bar (LIKE-based) | P2 |
-| Search → Globe fly-to (basic) | P2 |
-| "Fly to Nepal" animation | P2 |
+### 🔒 FUTURE
 
-**Deliverable:** Clean globe, user can search + select + fly-to.
+#### Phase 5 — Live Journey Enhancements
+- Enhanced GPS tracking
+- Family share link (expand)
+- Offline queue improvements
 
-**Files:**
-- `resources/views/public/services/index.blade.php`
-- `app/Http/Controllers/Public/ServiceController.php`
-- `routes/web.php` (search route)
+#### Phase 6 — Memory & Social Enhancements
+- Social media export
+- Shareable journey page improvements
 
-**Test:**
-- T1: Full Nepal initial view
-- T2: Districts toggle works
-- T3: Search returns results
-- T4: Click result → globe flies
-- T5: Mobile
-
----
-
-### PHASE 3 — Journey Animation (2-3 days) ⭐ SIGNATURE
-
-**Goal:** Wow factor — day-by-day animated journey
-
-| Task | Priority |
-|---|---|
-| Package → Globe zoom | P1 |
-| Day-by-day playback | P1 |
-| Camera animation (Globe.gl pointOfView) | P1 |
-| Waypoint info panel | P1 |
-| Play/Pause/Prev/Next controls | P1 |
-| Progress indicator (Day 5/14) | P1 |
-| Photos inline per waypoint | P2 |
-| Elevation inline | P2 |
-
-**Deliverable:** Signature feature — "Play Journey" for any package.
-
-**Files:**
-- `resources/views/public/services/show.blade.php`
-- `resources/views/public/services/_journey_animation.blade.php` (new)
-- `app/Http/Controllers/Public/ServiceController.php`
-
-**Test:**
-- T1: Play starts Day 1 → ends Day N
-- T2: Camera moves with waypoints
-- T3: Panel updates per day
-- T4: Pause/Prev/Next works
-- T5: Mobile
-
----
-
-### PHASE 4 — Rich Experience (1 week)
-
-**Goal:** Info-rich journey + weather
-
-| Task | Priority |
-|---|---|
-| Weather (Open-Meteo) | P1 |
-| Weather cache table + cron | P1 |
-| Waypoint photo gallery | P1 |
-| Elevation profile chart | P1 |
-| Accommodation info | P2 |
-| Activities per day | P2 |
-| Sunrise/sunset | P3 |
-
-**Deliverable:** Trip planner experience — weather + photos + elevation.
-
-**Files:**
-- `app/Services/WeatherService.php` (new)
-- `app/Jobs/RefreshWeatherCacheJob.php` (new)
-- `database/migrations/xxx_create_weather_cache_table.php` (new)
-- `resources/views/public/services/_weather_panel.blade.php` (new)
-- `resources/views/public/services/_elevation_profile.blade.php` (new)
-
-**Test:**
-- T1: Weather loads for 138 destinations
-- T2: Cache refresh works
-- T3: Photos gallery works
-- T4: Elevation chart renders
-- T5: Mobile
-
----
-
-### PHASE 5 — Live Journey (Future, ~1 month)
-
-**Goal:** Live tracking + safety
-
-⚠️ **Complexity Warning:** GPS + battery + connectivity + offline sync
-
-| Task | Priority |
-|---|---|
-| GPS permission | Future |
-| Live location update | Future |
-| QR check-in | Future |
-| Offline queue + sync | Future |
-| Family share link | Future |
-| Safety dashboard | Future |
-
-**HOLD:** Don't promise publicly until ready.
-
----
-
-### PHASE 6 — Memory & Social (Future)
-
-**Goal:** Journey replay + sharing
-
-| Task | Priority |
-|---|---|
-| Journey replay video | Future |
-| Photo timeline | Future |
-| Shareable journey page | Future |
-| Social media export | Future |
+#### Phase 7+ — Platform Evolution
+- Blockchain permits (exploration)
+- PWA offline mode
+- AI planner improvements (R5 protected)
 
 ---
 
@@ -309,12 +276,25 @@ Where → What → When → How high → What's next → What I experienced
 
 | Phase | Status | Commit | Date |
 |---|---|---|---|
-| Phase 1 — Foundation | 🟢 GO | — | — |
-| Phase 2 — Discovery | 🔒 HOLD | — | — |
-| Phase 3 — Journey Animation | 🔒 HOLD | — | — |
-| Phase 4 — Rich Experience | 🔒 HOLD | — | — |
-| Phase 5 — Live | 🔒 FUTURE | — | — |
-| Phase 6 — Memory | 🔒 FUTURE | — | — |
+| Phase 1 — Foundation | ✅ DONE | (verify) | — |
+| Phase 2A — Discovery | ✅ DONE | (verify) | — |
+| Phase 2B — Discovery+ | ✅ DONE | (verify) | — |
+| Phase 3 — Journey Animation | ✅ DONE | (verify) | — |
+| Phase 4A — Weather | ✅ DONE | (verify) | — |
+| Phase 4B — Photos | ✅ DONE | (verify) | — |
+| Phase 4C — Elevation | ✅ DONE | (verify) | — |
+| Traveler Dashboard | ✅ DONE | (verify) | — |
+| Provider Dashboard | ✅ DONE | (verify) | — |
+| QR Check-in | ✅ DONE | (verify) | — |
+| Safety System | ✅ DONE | (verify) | — |
+| Journey Replay | ✅ DONE | (verify) | — |
+| Photo Memories | ✅ DONE | (verify) | — |
+| AI Planner | ✅ DONE | (verify) | — |
+| Phase 4D — Sunrise + Polish | 🟡 NEXT | — | — |
+| Phase 5 — Live Enhancements | 🔒 FUTURE | — | — |
+| Phase 6 — Memory/Social | 🔒 FUTURE | — | — |
+
+> ⚠️ **Commit hashes = STAGE 1-8 audit पछि भरिनेछ।**
 
 ---
 
@@ -334,7 +314,7 @@ Discover → Report → Master Review → Scope Lock → Implement
 | R3 | Never invent data |
 | R4 | Never expand locked scope |
 | R5 | AI Planner SACRED |
-| R6 | GLOBE-01..07 PROTECTED |
+| R6 | Protected systems — explicit auth only |
 | R7 | Explore page protected |
 | R8 | DB safety |
 | R9 | No PII |
@@ -361,8 +341,8 @@ Discover → Report → Master Review → Scope Lock → Implement
 ### Current Versions (Verify Each Session)
 | Component | Version | CDN/Path |
 |---|---|---|
-| three.js | TBD (fix in Phase 1) | unpkg |
-| globe.gl | TBD | unpkg |
+| three.js | (verify) | unpkg |
+| globe.gl | (verify) | unpkg |
 | Leaflet | 1.9.4 | unpkg |
 | topojson-client | 3 | unpkg |
 | Tailwind | v4 (CDN) | CDN |
@@ -370,7 +350,7 @@ Discover → Report → Master Review → Scope Lock → Implement
 | Laravel | 13.x | — |
 | PHP | 8.4.23 | — |
 
-### Key Files
+### Key Files (Partial — full inventory via STAGE 1)
 ```
 resources/views/public/services/index.blade.php       ← Explore + globe
 resources/views/public/services/show.blade.php        ← Service detail
@@ -382,20 +362,37 @@ routes/api.php                                        ← API routes (protected)
 public/map/nepal-districts.topojson                   ← Districts (protected)
 ```
 
+### Additional Systems (Verify in Audit)
+```
+app/Models/QrScan.php                                 ← QR model
+app/Models/SosAlert.php                               ← SOS model
+app/Jobs/SendSosNotification.php                      ← SOS job
+app/Services/Safety/                                  ← Safety services
+app/Services/JourneyReplay/                           ← Replay service
+resources/views/traveler/                             ← Traveler dashboard
+resources/views/provider/                             ← Provider dashboard
+resources/views/admin/                                ← Admin views
+```
+
 ---
 
 ## 📋 9. OPEN TICKETS (Globe-related)
 
 | Ticket | Priority | Status |
 |---|---|---|
-| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Phase 1 in progress |
-| GLOBE-WEATHER-01 (Open-Meteo) | 🟡 MEDIUM | Phase 4 |
-| GLOBE-JOURNEY-ANIMATION-01 | 🔴 HIGH | Phase 3 |
-| GLOBE-SEARCH-01 | 🟡 MEDIUM | Phase 2 |
+| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Phase 4D next |
+| GLOBE-WEATHER-01 | ✅ CLOSED | Phase 4A shipped |
+| GLOBE-JOURNEY-ANIMATION-01 | ✅ CLOSED | Phase 3 shipped |
+| GLOBE-SEARCH-01 | ✅ CLOSED | Phase 2 shipped |
 | GLOBE-LAYER-MANAGER-01 | 🟢 LOW | Phase 2+ |
 | MAP-FULL-NEPAL-VIEW-01 | ✅ CLOSED | Pushed |
 | MAP-DUPLICATE-MARKERS-01 | ✅ CLOSED | Pushed |
 | MAP-ZOOM-LIMITED-01 | ✅ CLOSED | Pushed |
+| **SYSTEM-AUDIT-01** | 🔴 HIGH | In progress (this mission) |
+| **MASTER-FILE-REWRITE-01** | 🔴 HIGH | DRAFT |
+| **QR-RUNTIME-VERIFY-01** | 🟡 MED | STAGE 2 |
+| **SOS-RUNTIME-VERIFY-01** | 🔴 HIGH | STAGE 3 |
+| **DASHBOARD-ARCH-DOC-01** | 🟡 MED | STAGE 4 |
 
 ---
 
@@ -425,27 +422,37 @@ Foreign travelers (Nepal unfamiliar). Design for them.
 ### 8. No Vision Inflation
 Plan ≠ Implementation. Executed commits = truth.
 
+### 9. 🆕 Document Reality
+> Master File must reflect what's ACTUALLY built, not aspirational roadmap.
+
 ---
 
-## 🚦 11. CURRENT STATE (2026-09-22)
+## 🚦 11. CURRENT STATE (2026-09-23)
 
 ### Git
 ```
-Branch:     main
-HEAD:       97e3f72 (synced)
-origin/main: 97e3f72
-Tests:      41p / 1f (pre-existing Safety)
+Branch:       main
+HEAD:         db52544
+Status:       ✅ synced (verify)
 ```
 
-### Sessions Shipped
+### Reality Summary
+- **Systems built:** 12+
+- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C
+- **Bonus systems (undocumented in v1.0):** Traveler Dashboard, Provider Dashboard, QR Check-in, Safety, Journey Replay, Photo Memories, AI Planner
+- **QR check-ins recorded:** 9
+- **AI planner requests used:** 468
+
+### Sessions Shipped (Historical — from v1.0)
 - Currency fix (`d37890f`)
 - Provider Editor UX (`45c4ba2`)
 - Toggle UX bundle (`c3f9c94`)
 - Map bounds fix (`a9a885e`)
 - Map polish bundle (`97e3f72`)
+- ...plus all Phase 1-4C work
 
 ### Next
-Phase 1 — Foundation Fix (2-3 hrs)
+**Master File Rewrite** (this mission) → **Phase 4D** (Sunrise + Polish)
 
 ---
 
@@ -453,8 +460,8 @@ Phase 1 — Foundation Fix (2-3 hrs)
 
 ### If Session Ends
 1. Read this file
-2. Check Git state
-3. Check Phase Ledger
+2. Check Git state (`git log -1`)
+3. Check Phase Ledger + Systems Inventory
 4. Resume from current phase
 
 ### If Master Changes
@@ -463,13 +470,14 @@ Phase 1 — Foundation Fix (2-3 hrs)
 3. Continues workflow
 
 ### If Assistant Changes
-1. New Assistant reads this file + continuity doc
-2. Confirms understanding
-3. Waits for Master directive
+1. New Assistant reads this file
+2. **Reads §14 Existing Systems Inventory**
+3. Confirms understanding
+4. Waits for Master directive
 
 ---
 
-## 🎊 FINAL PRINCIPLE
+## 🎊 13. FINAL PRINCIPLE
 
 > **"Do not build Google Earth. Build Nepal Journey Intelligence.**
 > **Foundation first. Free-first always. Execute one phase at a time.**
@@ -477,89 +485,138 @@ Phase 1 — Foundation Fix (2-3 hrs)
 
 ---
 
-**Document End — Globe Master File v1.0**
+## 🆕 14. EXISTING SYSTEMS INVENTORY
+
+> ⚠️ **DRAFT — Full details pending STAGE 1-8 audit।**
+
+### Public-Facing Systems
+| System | Status | Notes |
+|---|---|---|
+| Globe (Discover Mode) | ✅ Built | Phase 1-2 |
+| Journey Animation | ✅ Built | Phase 3 |
+| Weather Panel | ✅ Built | Phase 4A |
+| Photo Gallery | ✅ Built | Phase 4B |
+| Elevation Profile | ✅ Built | Phase 4C |
+| Search + Fly-to | ✅ Built | Phase 2 |
+| District Layer | ✅ Built | Protected |
+| Route Layer | ✅ Built | — |
+
+### Traveler Systems
+| System | Status | Notes |
+|---|---|---|
+| Traveler Dashboard | ✅ Built | Verify via STAGE 4 |
+| Booking Management | ✅ Built | — |
+| QR Check-in | ✅ Working | 9 records |
+| Journey Replay | ✅ Built | Cinematic |
+| Photo Memories | ✅ Built | Per-checkpoint |
+| SOS Panel | ❓ Unknown | Verify via STAGE 3 |
+| Safety Map | ✅ Built | Verify via STAGE 5 |
+
+### Provider Systems
+| System | Status | Notes |
+|---|---|---|
+| Provider Dashboard | ✅ Built | Verify via STAGE 4 |
+| Service CRUD | ✅ Built | — |
+| Itinerary Editor | ✅ Built | — |
+| Media Upload | ✅ Built | — |
+| Booking Management | ✅ Built | — |
+
+### Admin Systems
+| System | Status | Notes |
+|---|---|---|
+| Admin Views | ✅ Built | Verify via STAGE 4 |
+| User Management | ✅ Built | — |
+| Safety Oversight | ✅ Built | Verify via STAGE 5 |
+
+### Platform Systems
+| System | Status | Notes |
+|---|---|---|
+| AI Travel Planner | ✅ Working | 468 requests — R5 protected |
+| AI Quota System | ✅ Built | R5 protected |
+| Booking Engine | ✅ Built | R6 protected |
+| Notification System | ✅ Built | Verify via STAGE 8 |
+| Auth System | ✅ Built | Verify via STAGE 4 |
+
+> **Action:** STAGE 1-8 audit ले यो inventory verify + expand गर्नेछ।
+
+---
+
+## 🆕 15. TESTING CHECKLIST (Runtime Verification)
+
+> ⚠️ **DRAFT — To be executed during STAGE 2-8 audit।**
+
+### QR Check-in System
+- [ ] Booking detail page shows QR
+- [ ] QR download works
+- [ ] Scan workflow verified (web/mobile?)
+- [ ] Check-in records in `qr_scans` table
+- [ ] Duplicate scan prevented
+- [ ] Invalid QR rejected
+- [ ] QR delivery method confirmed (email/dashboard)
+
+### SOS System
+- [ ] SOS button visible (where?)
+- [ ] Emergency trigger works
+- [ ] Location captured
+- [ ] Notification sent (email/SMS)
+- [ ] Rescue team alert path
+- [ ] Test/dev mode exists
+- [ ] Integration with Safety system
+
+### Traveler Dashboard
+- [ ] Login works
+- [ ] Bookings visible
+- [ ] QR accessible from booking
+- [ ] Journey Replay plays
+- [ ] Photo upload works
+- [ ] SOS panel visible (if exists)
+
+### Provider Dashboard
+- [ ] Login works
+- [ ] Service CRUD works
+- [ ] Itinerary editor functional
+- [ ] Media upload works
+- [ ] Booking notifications received
+
+### Safety System
+- [ ] Safety map loads
+- [ ] Incidents visible
+- [ ] Weather auto-refresh
+- [ ] Risk assessment accurate
+- [ ] Data sources verified
+
+### Journey Replay
+- [ ] Replay loads from booking
+- [ ] Chapters build correctly
+- [ ] Share token generates
+- [ ] Share link works
+
+### AI Planner (R5 — Inspect Only)
+- [ ] Endpoint responds
+- [ ] Quota tracking works
+- [ ] No touch — verify only
+
+---
+
+## 🆕 16. AUDIT MISSION LOG
+
+| Stage | Scope | Status |
+|---|---|---|
+| STAGE 1 | Project structure map | ⏳ Pending |
+| STAGE 2 | QR system audit | ⏳ Pending |
+| STAGE 3 | SOS system audit | ⏳ Pending |
+| STAGE 4 | Dashboard systems audit | ⏳ Pending |
+| STAGE 5 | Safety system audit | ⏳ Pending |
+| STAGE 6 | Journey Replay audit | ⏳ Pending |
+| STAGE 7 | AI Planner audit (inspect only) | ⏳ Pending |
+| STAGE 8 | Booking → QR flow | ⏳ Pending |
+| Deliverable | Discovery Report to Master | ⏳ Pending |
+| Deliverable | Master File v2.0 FINAL | ⏳ Pending |
+
+---
+
+**Document End — Globe Master File v2.0 (DRAFT)**
+**Next revision:** After STAGE 1-8 audit completes
 ```
 
 ---
-
-## 📌 तिम्रो Exact Steps
-
-### Step 1 — File Save गर
-
-**Path:** `docs/globe/Globe_Master_File.md`
-
-**UTF-8 encoding मा save गर।**
-
-### Step 2 — Continuity Doc Reference
-
-`docs/provider-itinerary/Current_Stage_And_All_Process.md` मा append गर:
-
-```markdown
----
-
-## 📌 GLOBE MASTER FILE CREATED (2026-09-22)
-
-**File:** `docs/globe/Globe_Master_File.md`
-**Version:** 1.0
-**Purpose:** Authoritative reference for all Globe phases
-**Phases:** 6 (Foundation → Discovery → Journey → Rich → Live → Memory)
-**Current Phase:** Phase 1 (Foundation Fix)
-**Free-first compliance:** ✅ R21-R24
-
-See Globe_Master_File.md for full details.
-
----
-```
-
-### Step 3 — Phase 1 सुरु गर
-
-**Assistant लाई Phase 1 directive relay गर:**
-- three.js version pin
-- Process shim add
-- Texture URL fix
-- Console error fix
-- Test
-
----
-
-## 💬 छोटो उत्तर (Master Voice)
-
-Bro, **Master File तयार।**
-
-### 🎯 के छ file मा?
-
-1. **Vision** (Nepal Journey Intelligence)
-2. **Free-first constraints** (R21-R24)
-3. **Architecture** (Discovery + Journey modes)
-4. **Protected systems**
-5. **6 Phases** (Foundation → Memory)
-6. **Phase Ledger** (current status)
-7. **Implementation rules**
-8. **Technical stack**
-9. **Open tickets**
-10. **Current state**
-11. **Continuity protocol**
-
-### 🎯 Key Features
-
-- ✅ Vision + Execution merged
-- ✅ Realistic phases (2-3 hrs to 1 month)
-- ✅ Free-first enforced
-- ✅ Freeze point = Phase 1
-- ✅ Every phase has test plan
-- ✅ No vision inflation
-
-### 🎯 तिमी अब
-
-**Step 1 — File save गर** (`docs/globe/Globe_Master_File.md`)
-
-**Step 2 — Continuity doc reference append गर**
-
-**Step 3 — Phase 1 सुरु गर** (Assistant लाई directive relay)
-
-**Step 4 — Execute one phase at a time**
-
-### 🎯 Final Vision
-
-> **"Google Earth होइन — Nepal Journey Intelligence।**
-> **Foundation पहिले। Free-first सधैं। एक phase एक चोटि।"**
