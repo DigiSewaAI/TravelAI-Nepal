@@ -47,8 +47,8 @@
         <div class="mt-6 border-t pt-4">
             <h3 class="font-semibold text-gray-700">📱 {{ __('messages.traveler_booking_qr_heading') }}</h3>
             <div class="mt-2">
-                <img src="{{ route('booking.qr', $booking->id) }}" 
-                     alt="{{ __('messages.traveler_booking_qr_alt') }}" 
+                <img src="{{ route('booking.qr', $booking->id) }}"
+                     alt="{{ __('messages.traveler_booking_qr_alt') }}"
                      class="w-32 h-32 border rounded-lg">
                 <p class="text-xs text-gray-400 mt-1">{{ __('messages.traveler_booking_qr_instruction') }}</p>
             </div>
@@ -56,11 +56,15 @@
 
         {{-- 🔥 DOWNLOAD INVOICE BUTTON --}}
 <div class="mt-6 border-t pt-4 flex justify-end">
-    <a href="{{ route('traveler.bookings.invoice', $booking) }}" 
+    <a href="{{ route('traveler.bookings.invoice', $booking) }}"
        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2" target="_blank">
         <i class="fas fa-file-pdf"></i> {{ __('Download Invoice') }}
     </a>
 </div>
+
+        {{-- PHASE 4E: Dashboard Rich Data --}}
+        @include('traveler.bookings._weather_panel', ['booking' => $booking])
+        @include('traveler.bookings._altitude_profile', ['booking' => $booking])
 
         {{-- Review Section --}}
         @if($booking->review)
@@ -76,7 +80,7 @@
             </div>
         @elseif($booking->status === 'completed')
             <div class="mt-6 border-t pt-4">
-                <a href="{{ route('traveler.reviews.create', $booking) }}" 
+                <a href="{{ route('traveler.reviews.create', $booking) }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
                     <i class="fas fa-star mr-1"></i> {{ __('messages.traveler_booking_write_review') }}
                 </a>
