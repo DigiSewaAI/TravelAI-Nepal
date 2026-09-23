@@ -54,8 +54,8 @@ class AiItineraryDraftController extends Controller
             ], 500);
         }
 
-        // Dynamic token budget: 200/day, floor 1500, cap 4000
-        $maxTokens = min(max($days * 200, 1500), 4000);
+                // Phase 4G: token budget 300/day, floor 2000, cap 8000
+        $adjustedMaxTokens = min(max($days * 300, 2000), 8000);
 
         // Derived prompt inputs (explicit fallback chain — Issue 3)
         $destination = $service->location?->name
@@ -115,16 +115,85 @@ class AiItineraryDraftController extends Controller
                 $service, $days, $destination, $difficulty, $duration, $description, $notes
             );
 
-            $draft = $this->llm->generateItinerary(
-                prompt: $prompt,
-                locale: 'en',
-                model: null,
-                extract: true,
-                maxTokens: $maxTokens,
-            );
+                                    // Phase 4G — Retry loop (OTPM-aware for Groq free tier)
+            $maxAttempts = 2;
+            $attempt     = 0;
+            $validDraft  = null;
+            $lastError   = null;
 
-            // Step 3 — Structure validation
-            $this->validateDraftStructure($draft);
+            // Phase 4G: maxTokens tuned for Groq free-tier OTPM (1000/min)
+            $adjustedMaxTokens = min(max($days * 300, 2000), 8000);
+
+            while ($attempt < $maxAttempts) {
+                $attempt++;
+
+                try {
+                    $candidate = $this->llm->generateItinerary(
+                        prompt:      $prompt,
+                        locale:      'en',
+                        model:       'qwen/qwen3.8-27b',
+                        extract:     true,
+                        maxTokens:   $adjustedMaxTokens,
+                        temperature: 0.5,
+                    );
+
+                    $this->validateDraftStructure($candidate, $days);
+                    $validDraft = $candidate;
+                    break;
+
+                } catch (\InvalidArgumentException $e) {
+                    $lastError = $e->getMessage();
+
+                    \Log::info('AI draft quality fail', [
+                        'attempt'      => $attempt,
+                        'max_attempts' => $maxAttempts,
+                        'error'        => $lastError,
+                        'service_id'   => $service->id,
+                    ]);
+
+                    if ($attempt < $maxAttempts) {
+                        sleep(5);
+                    }
+
+                } catch (\Throwable $e) {
+                    $lastError = $e->getMessage();
+
+                    if (str_contains($lastError, 'rate_limit') ||
+                        str_contains($lastError, 'Request too large') ||
+                        str_contains($lastError, 'tokens per minute')) {
+
+                        $this->reservations->release($reservation);
+
+                        return response()->json([
+                            'error'  => __('messages.ai_draft_error_ratelimit'),
+                            'detail' => 'Free-tier rate limit reached. Please wait 60 seconds and try again.',
+                        ], 429);
+                    }
+
+                    \Log::error('AI draft unexpected fail', [
+                        'attempt'      => $attempt,
+                        'error'        => $lastError,
+                        'service_id'   => $service->id,
+                    ]);
+                }
+            }
+
+            if ($validDraft === null) {
+                try {
+                    $this->reservations->release($reservation);
+                } catch (\Throwable $releaseError) {
+                    \Log::error('AI draft quota release failed', [
+                        'service_id' => $service->id,
+                    ]);
+                }
+
+                return response()->json([
+                    'error'  => __('messages.ai_draft_error_quality'),
+                    'detail' => $lastError,
+                ], 422);
+            }
+
+            $draft = $validDraft;
 
             // Step 4 — Session storage (30-min TTL)
             $draftId = (string) Str::uuid();
@@ -274,8 +343,8 @@ class AiItineraryDraftController extends Controller
             ->with('success', __('messages.ai_draft_applied', ['count' => $insertedDays]));
     }
 
-    /**
-     * Build LLM prompt (explicit fallback chain).
+            /**
+     * Build enhanced LLM prompt with strict structural rules (Phase 4G).
      */
     private function buildPrompt(
         Service $service,
@@ -286,26 +355,49 @@ class AiItineraryDraftController extends Controller
         string $description,
         string $notes
     ): string {
-        $notesLine = $notes !== '' ? $notes : 'None';
+        $notesLine  = $notes !== '' ? $notes : 'None';
+        $shortDesc  = \Str::limit($description, 500, '');
 
-                return <<<PROMPT
-Create a {$days}-day itinerary for: {$service->name}
+        return <<<PROMPT
+You are a Nepal trekking itinerary expert.
+
+Create a realistic {$days}-day itinerary for:
+Service: {$service->name}
 Category: {$service->category?->name}
-Destination: {$destination}
+Region: {$destination}
 Duration: {$duration} days
 Difficulty: {$difficulty}
 
-SERVICE DESCRIPTION (geographic source of truth):
-{$description}
+DESCRIPTION CONTEXT:
+{$shortDesc}
 
 Provider notes: {$notesLine}
 
-GEOGRAPHIC RULE (critical):
-- Use ONLY places mentioned in the description above
-- Do NOT add places from other Nepal regions (e.g., no Everest area unless mentioned)
-- Day titles should be "Place A to Place B" format
+STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 
-JSON output:
+1. COUNT: EXACTLY {$days} days. No more. No less.
+   Day numbers MUST be 1 through {$days} sequentially.
+
+2. ANTI-REPETITION (MANDATORY):
+   - NEVER repeat a route. "Place A to Place B" may appear ONLY ONCE.
+   - Each day's title MUST be UNIQUE.
+   - Each day must introduce a NEW destination or landmark.
+
+3. GEOGRAPHIC CONTINUITY (MANDATORY):
+   - Day N+1 title MUST start from Day N's endpoint.
+   - Example: If Day 3 = "A to B", then Day 4 = "B to C".
+   - NEVER restart from beginning.
+
+4. PROGRESSION:
+   - Progressive trek — no loops back to start.
+   - Natural arc: approach → high point → return (if applicable).
+
+5. GEOGRAPHIC ACCURACY:
+   - Use ONLY places mentioned in description or region context.
+   - Do NOT introduce places from other Nepal regions.
+   - Altitude gain per day must be realistic (< 1000m/day typical).
+
+6. OUTPUT FORMAT — Valid JSON only, no markdown:
 {
   "days": [
     {
@@ -329,42 +421,92 @@ JSON output:
   ]
 }
 
-Rules: exactly {$days} days, day_number 1..{$days}, no markdown.
+7. FINAL CHECK before output:
+   - Count = {$days} exactly
+   - All titles unique
+   - Chain continuous (Day N end = Day N+1 start)
+   - No markdown fences
+
+Now generate the itinerary.
 PROMPT;
     }
 
-    /**
-     * Validate LLM structure. Throws InvalidArgumentException on failure.
+        /**
+     * Validate LLM draft structure + Phase 4G quality checks.
+     * Throws InvalidArgumentException on failure.
      */
-    private function validateDraftStructure(array $draft): void
+    private function validateDraftStructure(array $draft, int $expectedCount = 0): void
     {
         if (!isset($draft['days']) || !is_array($draft['days']) || empty($draft['days'])) {
             throw new \InvalidArgumentException('Missing days array');
         }
 
+        // Phase 4G — Count validation
+        if ($expectedCount > 0 && count($draft['days']) !== $expectedCount) {
+            throw new \InvalidArgumentException(
+                "Day count mismatch: expected {$expectedCount}, got " . count($draft['days'])
+            );
+        }
+
+        // Phase 4G — Duplicate title detection
+        $titles = [];
+        foreach ($draft['days'] as $day) {
+            if (isset($day['title']) && is_string($day['title'])) {
+                $titles[] = strtolower(trim($day['title']));
+            }
+        }
+        if (count($titles) !== count(array_unique($titles))) {
+            throw new \InvalidArgumentException('Duplicate day titles detected');
+        }
+
+        // Phase 4G — Basic geographic continuity check
+        $dayCount = count($draft['days']);
+        for ($i = 1; $i < $dayCount; $i++) {
+            $prevTitle = $draft['days'][$i - 1]['title'] ?? '';
+            $currTitle = $draft['days'][$i]['title']     ?? '';
+
+            if (preg_match('/^(.+?)\s+to\s+(.+)$/i', $prevTitle, $m1) &&
+                preg_match('/^(.+?)\s+to\s+(.+)$/i', $currTitle, $m2)) {
+
+                $prevEnd   = strtolower(trim($m1[2]));
+                $currStart = strtolower(trim($m2[1]));
+
+                $similar = (str_contains($currStart, $prevEnd) ||
+                            str_contains($prevEnd, $currStart) ||
+                            levenshtein($prevEnd, $currStart) <= 3);
+
+                if (!$similar) {
+                    throw new \InvalidArgumentException(
+                        "Day " . ($i + 1) . " does not continue from Day {$i} endpoint"
+                    );
+                }
+            }
+        }
+
+        // Per-day structural checks (existing)
         foreach ($draft['days'] as $i => $day) {
             if (!is_array($day)) {
-                throw new \InvalidArgumentException("Day {$i} not array");
+                throw new \InvalidArgumentException("Day {$i} is not an array");
             }
             if (empty($day['title']) || !is_string($day['title']) || strlen($day['title']) > 255) {
-                throw new \InvalidArgumentException("Day {$i} has invalid title");
+                throw new \InvalidArgumentException("Day {$i} title invalid");
             }
             if (isset($day['items']) && !is_array($day['items'])) {
-                throw new \InvalidArgumentException("Day {$i} items not array");
+                throw new \InvalidArgumentException("Day {$i} items invalid");
             }
             foreach ($day['items'] ?? [] as $j => $item) {
                 if (empty($item['title']) || !is_string($item['title'])) {
-                    throw new \InvalidArgumentException("Day {$i} item {$j} invalid title");
+                    throw new \InvalidArgumentException("Day {$i} item {$j} title invalid");
                 }
                 $tod = $item['time_of_day'] ?? 'morning';
                 if (!in_array($tod, ['morning', 'afternoon', 'evening'], true)) {
-                    throw new \InvalidArgumentException("Day {$i} item {$j} invalid time_of_day");
+                    throw new \InvalidArgumentException("Day {$i} item {$j} time_of_day invalid");
                 }
             }
             if (isset($day['meals_included']) && is_array($day['meals_included'])) {
                 foreach ($day['meals_included'] as $m) {
                     if (!in_array($m, ['B', 'L', 'D'], true)) {
-                        throw new \InvalidArgumentException("Day {$i} invalid meal: {$m}");
+                        throw new \InvalidArgumentException("Day {$i} meal invalid");
                     }
                 }
             }

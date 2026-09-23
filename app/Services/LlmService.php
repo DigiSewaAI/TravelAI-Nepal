@@ -52,7 +52,14 @@ class LlmService
      * @param int $maxTokens Max tokens for the response.
      * @return array
      */
-    public function generateItinerary(string $prompt, string $locale = 'en', ?string $model = null, bool $extract = true, int $maxTokens = 3000): array
+        public function generateItinerary(
+        string $prompt,
+        string $locale = 'en',
+        ?string $model = null,
+        bool $extract = true,
+        int $maxTokens = 3000,
+        float $temperature = 0.2
+    ): array
     {
                 Log::info('LlmService generateItinerary called', [
             'locale' => $locale,
@@ -72,9 +79,9 @@ class LlmService
                     'prompt_length' => strlen($prompt),
                 ]);
 
-                                Log::info('LlmService sending to Groq', [
+                Log::info('LlmService sending to Groq', [
                     'model' => $modelToUse,
-                    'temperature' => 0.2,
+                    'temperature' => $temperature,
                 ]);
 
                 $response = Http::withHeaders([
@@ -91,7 +98,7 @@ class LlmService
                         ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
                         ['role' => 'user', 'content' => $prompt],
                     ],
-                    'temperature' => 0.2,
+                    'temperature' => $temperature,
                     'max_tokens' => $maxTokens,
                     'response_format' => ['type' => 'json_object'],
                 ]);
