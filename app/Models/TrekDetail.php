@@ -9,10 +9,11 @@ class TrekDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+        protected $fillable = [
         'service_id',
         'duration_days',
         'difficulty',
+        'max_pax',
         'itinerary',
         'max_altitude',
         'season',
@@ -20,6 +21,7 @@ class TrekDetail extends Model
 
     protected $casts = [
         'itinerary' => 'array',
+        'max_pax' => 'integer',
     ];
 
     public function service()
