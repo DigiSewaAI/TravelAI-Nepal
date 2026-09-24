@@ -328,13 +328,19 @@ class AiItineraryDraftController extends Controller
                     'accommodation'         => $dayData['accommodation'] ?? null,
                 ]);
 
-                $items = $dayData['items'] ?? [];
+                                $items = $dayData['items'] ?? [];
                 foreach ($items as $sortIndex => $itemData) {
+                    // Phase 4H iter-3: sanitize time_of_day (defensive)
+                    $tod = $itemData['time_of_day'] ?? 'morning';
+                    if (!in_array($tod, ['morning', 'afternoon', 'evening'], true)) {
+                        $tod = 'morning';
+                    }
+
                     ServiceItineraryItem::create([
                         'day_id'       => $day->id,
                         'title'        => Str::limit((string) ($itemData['title'] ?? 'Activity'), 255, ''),
                         'description'  => $itemData['description'] ?? null,
-                        'time_of_day'  => $itemData['time_of_day'] ?? 'morning',
+                        'time_of_day'  => $tod,
                         'sort_order'   => $sortIndex,
                         'is_optional'  => (bool) ($itemData['is_optional'] ?? false),
                         'metadata'     => null,
@@ -778,7 +784,7 @@ PROMPT;
             throw new \InvalidArgumentException('Duplicate titles within chunk');
         }
 
-        foreach ($chunk['days'] as $idx => $day) {
+                foreach ($chunk['days'] as $idx => $day) {
             if (!is_array($day)) {
                 throw new \InvalidArgumentException("Chunk day {$idx} not array");
             }
@@ -787,6 +793,15 @@ PROMPT;
             }
             if (isset($day['items']) && !is_array($day['items'])) {
                 throw new \InvalidArgumentException("Chunk day {$idx} items invalid");
+            }
+            foreach ($day['items'] ?? [] as $j => $item) {
+                if (empty($item['title']) || !is_string($item['title'])) {
+                    throw new \InvalidArgumentException("Chunk day {$idx} item {$j} title invalid");
+                }
+                $tod = $item['time_of_day'] ?? 'morning';
+                if (!in_array($tod, ['morning', 'afternoon', 'evening'], true)) {
+                    throw new \InvalidArgumentException("Chunk day {$idx} item {$j} time_of_day invalid");
+                }
             }
         }
     }
