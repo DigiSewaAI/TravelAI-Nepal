@@ -3596,3 +3596,54 @@ Effort: 1-2 hrs.
 Phase: End of day.
 
 ---
+
+---
+
+## 🎫 TICKETS — 2026-09-24 (Session A + Tomorrow's Plan)
+
+### 🔴 HIGH PRIORITY
+
+**NULL-PRICE-SYSTEMIC-01** (IN PROGRESS)
+Discovery: Test Tour (id=1233, price=NULL) crashed public pages.
+Root cause: `CurrencyService::convert()` null-unsafe → 7 sites vulnerable.
+
+Fix (3 layers):
+  Layer 1: CurrencyService (null-safe) ✅ Session A
+  Layer 2: 6 display sites — Session A: 2/6 done
+    ✅ home.blade.php
+    ✅ public/services/index.blade.php
+    🟡 category.blade.php (Session B)
+    🟡 show.blade.php ×2 (Session B)
+    🟡 booking/create.blade.php (Session B)
+  Layer 3: Test Tour cleanup ✅ done
+
+Status: Session A applied + tested
+Next: Session B (tomorrow)
+
+**SERVICE-NULL-PRICE-UX-01** (🟢 LOW)
+After null-price fix, sites 2+5 show "N/A" in blue styling
+(cosmetic only — non-blocking).
+Fix: Conditional span class for N/A (gray italic)
+Effort: 15 min
+Phase: Post-4M
+
+### 🟡 MEDIUM PRIORITY
+
+**TREK-DIFFICULTY-I18N-01** (🟢 LOW)
+Hardcoded Easy/Moderate/Hard in _fields_trek.blade.php
+Fix: i18n keys + 4 locales
+Effort: 15 min
+Phase: Deferred
+
+**SERVICE-CATEGORY-CHANGE-CLEANUP-01** (🟢 LOW)
+Old detail record orphaned on category change.
+Acceptable behavior (data preservation).
+Fix: Optional cleanup
+Effort: 30 min
+Phase: Deferred
+
+---
+
+## 📅 TOMORROW'S PLAN (2026-09-25)
+
+### Session B — Null Price Fix (3 files)

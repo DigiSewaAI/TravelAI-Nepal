@@ -736,3 +736,46 @@ Protected systems: Zero diff
 **R13:** Specific add (1 file)
 
 ---
+
+---
+
+### 2026-09-24 — NULL PRICE FIX — Session A APPLIED (In Progress)
+
+**Status:** Partial (3 of 6 files) — Session B pending
+
+**Trigger:** Test Tour (id=1233, price=NULL) crashed public pages
+
+**Root Cause:** `CurrencyService::convert()` null-unsafe signature
+→ 7 call sites across 5 files vulnerable
+→ Systemic weakness (not test-data isolation)
+
+**Session A Applied (3 files):**
+1. `app/Services/CurrencyService.php` (Layer 1)
+   - Signature: `float` → `float|int|null`
+   - Null coalescing: `(float) ($amount ?? 0)`
+2. `resources/views/home.blade.php` (Site 1)
+   - Ternary guard + conditional span class
+3. `resources/views/public/services/index.blade.php` (Site 2)
+   - Ternary guard
+
+**Session A Verified:**
+- ✅ Home page loads (no 500)
+- ✅ Explore page loads (search works)
+- ✅ Test Tour deleted (Layer 3 cleanup)
+
+**Session B Pending (3 files — tomorrow):**
+4. `resources/views/public/services/category.blade.php`
+5. `resources/views/public/services/show.blade.php` (Sites 4+5)
+6. `resources/views/public/booking/create.blade.php`
+
+**Ticket:** NULL-PRICE-SYSTEMIC-01 (🔴 HIGH — in progress)
+
+**Lesson:** Null-safety must be layered (service + display + data cleanup)
+
+**Next Session:**
+- Session B completion
+- Full category testing (Trek/Tour/Hotel/Activity/Experience)
+- Verify detail tables populate correctly
+- Resume 4M-2-3+4 testing
+
+---
