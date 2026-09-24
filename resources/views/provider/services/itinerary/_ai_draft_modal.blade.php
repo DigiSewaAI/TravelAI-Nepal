@@ -66,6 +66,21 @@
                 {{ __('messages.ai_draft_loading') }}
             </div>
 
+            {{-- Phase 4H: Progress indicator --}}
+            <div id="ai-draft-progress" class="hidden">
+                <div class="text-center py-6">
+                    <div class="inline-flex flex-col items-center gap-3">
+                        <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div class="text-sm font-semibold text-gray-700" id="ai-draft-progress-chunk"></div>
+                        <div class="text-xs text-gray-500" id="ai-draft-progress-days"></div>
+                        <div class="text-xs text-gray-400 italic">{{ __('messages.ai_draft_progress_wait') }}</div>
+                        <div class="w-64 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="ai-draft-progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="ai-draft-error" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"></div>
         </div>
 
@@ -105,10 +120,47 @@
     var daysInput      = document.getElementById('ai-draft-days');
     var notesInput     = document.getElementById('ai-draft-notes');
 
+    // Phase 4H: Progress elements
+    var progressEl    = document.getElementById('ai-draft-progress');
+    var progressChunk = document.getElementById('ai-draft-progress-chunk');
+    var progressDays  = document.getElementById('ai-draft-progress-days');
+    var progressBar   = document.getElementById('ai-draft-progress-bar');
+
     var aiDraftUrl      = null;
     var aiDraftApplyUrl = null;
     var csrfToken       = null;
     var currentDraftId  = null;
+
+    function startEstimatedProgress(totalDays) {
+        if (!progressEl || !progressChunk || !progressDays || !progressBar) return function(){};
+        if (totalDays <= 5) return function(){};
+
+        var chunkSize    = 3;
+        var totalChunks  = Math.ceil(totalDays / chunkSize);
+        var currentChunk = 1;
+
+        var update = function() {
+            var startDay = (currentChunk - 1) * chunkSize + 1;
+            var endDay   = Math.min(currentChunk * chunkSize, totalDays);
+            progressChunk.textContent = 'Chunk ' + currentChunk + '/' + totalChunks;
+            progressDays.textContent  = 'Days ' + startDay + '-' + endDay + ' of ' + totalDays;
+            progressBar.style.width   = ((currentChunk / totalChunks) * 100) + '%';
+        };
+
+        update();
+        progressEl.classList.remove('hidden');
+
+        var interval = setInterval(function() {
+            if (currentChunk >= totalChunks) {
+                clearInterval(interval);
+                return;
+            }
+            currentChunk++;
+            update();
+        }, 65000);
+
+        return function() { clearInterval(interval); };
+    }
 
     window.openAiDraftModal = function (btn) {
         aiDraftUrl      = btn.dataset.aiDraftUrl;
@@ -143,9 +195,11 @@
         }
     });
 
-    generateBtn.addEventListener('click', async function () {
+        generateBtn.addEventListener('click', async function () {
         var days = parseInt(daysInput.value || '0', 10);
         var notes = notesInput.value || '';
+
+        var stopProgress = startEstimatedProgress(days);
 
         if (days < 1 || days > 21) {
             showError(@json(__('messages.ai_draft_error_generic')));
@@ -181,8 +235,10 @@
             previewStage.classList.remove('hidden');
         } catch (err) {
             showError(err.message || @json(__('messages.ai_draft_error_generic')));
-        } finally {
+                } finally {
             loadingEl.classList.add('hidden');
+            if (typeof stopProgress === 'function') stopProgress();
+            if (progressEl) progressEl.classList.add('hidden');
             generateBtn.disabled = false;
             generateBtn.textContent = @json(__('messages.ai_draft_generate_button'));
         }

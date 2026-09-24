@@ -109,72 +109,81 @@ class AiItineraryDraftController extends Controller
             ], 500);
         }
 
-        // Step 2 — LLM call (OUTSIDE transaction)
+                // Step 2 — LLM call (OUTSIDE transaction)
         try {
-            $prompt = $this->buildPrompt(
-                $service, $days, $destination, $difficulty, $duration, $description, $notes
-            );
+            $validDraft = null;
+            $lastError  = null;
 
-                                    // Phase 4G — Retry loop (OTPM-aware for Groq free tier)
-            $maxAttempts = 2;
-            $attempt     = 0;
-            $validDraft  = null;
-            $lastError   = null;
+            // Phase 4H: chunking for days > 5 (OTPM workaround)
+            if ($days > 5) {
+                $validDraft = $this->chunkAndGenerate(
+                    $service,
+                    $days,
+                    $destination,
+                    $difficulty,
+                    $duration,
+                    $description,
+                    $notes
+                );
 
-            // Phase 4G: maxTokens tuned for Groq free-tier OTPM (1000/min)
-            $adjustedMaxTokens = min(max($days * 300, 2000), 8000);
-
-            while ($attempt < $maxAttempts) {
-                $attempt++;
-
-                try {
-                    $candidate = $this->llm->generateItinerary(
-                        prompt:      $prompt,
-                        locale:      'en',
-                        model:       'qwen/qwen3.8-27b',
-                        extract:     true,
-                        maxTokens:   $adjustedMaxTokens,
-                        temperature: 0.5,
-                    );
-
-                    $this->validateDraftStructure($candidate, $days);
-                    $validDraft = $candidate;
-                    break;
-
-                } catch (\InvalidArgumentException $e) {
-                    $lastError = $e->getMessage();
-
-                    \Log::info('AI draft quality fail', [
-                        'attempt'      => $attempt,
-                        'max_attempts' => $maxAttempts,
-                        'error'        => $lastError,
-                        'service_id'   => $service->id,
+                if ($validDraft === null) {
+                    $lastError = 'Chunked generation failed';
+                    Log::warning('Phase 4H chunking failed', [
+                        'service_id' => $service->id,
+                        'days'       => $days,
                     ]);
+                }
+            } else {
+                // Single-call path (days ≤ 5) — Phase 4G logic
+                $prompt = $this->buildPrompt(
+                    $service, $days, $destination, $difficulty, $duration, $description, $notes
+                );
 
-                    if ($attempt < $maxAttempts) {
-                        sleep(5);
+                $maxAttempts = 2;
+                $attempt     = 0;
+                $adjustedMaxTokens = min(max($days * 300, 2000), 8000);
+
+                while ($attempt < $maxAttempts) {
+                    $attempt++;
+                    try {
+                        $candidate = $this->llm->generateItinerary(
+                            prompt:      $prompt,
+                            locale:      'en',
+                            model:       'qwen/qwen3.8-27b',
+                            extract:     true,
+                            maxTokens:   $adjustedMaxTokens,
+                            temperature: 0.5,
+                        );
+
+                        $this->validateDraftStructure($candidate, $days);
+                        $validDraft = $candidate;
+                        break;
+
+                    } catch (\InvalidArgumentException $e) {
+                        $lastError = $e->getMessage();
+                        Log::info('AI draft quality fail', [
+                            'attempt'    => $attempt,
+                            'error'      => $lastError,
+                            'service_id' => $service->id,
+                        ]);
+                        if ($attempt < $maxAttempts) sleep(5);
+
+                    } catch (\Throwable $e) {
+                        $lastError = $e->getMessage();
+                        if (str_contains($lastError, 'rate_limit') ||
+                            str_contains($lastError, 'Request too large') ||
+                            str_contains($lastError, 'tokens per minute')) {
+                            $this->reservations->release($reservation);
+                            return response()->json([
+                                'error' => __('messages.ai_draft_error_ratelimit'),
+                            ], 429);
+                        }
+                        Log::error('AI draft unexpected fail', [
+                            'attempt' => $attempt,
+                            'error'   => $lastError,
+                        ]);
+                        if ($attempt < $maxAttempts) sleep(5);
                     }
-
-                } catch (\Throwable $e) {
-                    $lastError = $e->getMessage();
-
-                    if (str_contains($lastError, 'rate_limit') ||
-                        str_contains($lastError, 'Request too large') ||
-                        str_contains($lastError, 'tokens per minute')) {
-
-                        $this->reservations->release($reservation);
-
-                        return response()->json([
-                            'error'  => __('messages.ai_draft_error_ratelimit'),
-                            'detail' => 'Free-tier rate limit reached. Please wait 60 seconds and try again.',
-                        ], 429);
-                    }
-
-                    \Log::error('AI draft unexpected fail', [
-                        'attempt'      => $attempt,
-                        'error'        => $lastError,
-                        'service_id'   => $service->id,
-                    ]);
                 }
             }
 
@@ -182,7 +191,7 @@ class AiItineraryDraftController extends Controller
                 try {
                     $this->reservations->release($reservation);
                 } catch (\Throwable $releaseError) {
-                    \Log::error('AI draft quota release failed', [
+                    Log::error('AI draft quota release failed', [
                         'service_id' => $service->id,
                     ]);
                 }
@@ -346,17 +355,91 @@ class AiItineraryDraftController extends Controller
             /**
      * Build enhanced LLM prompt with strict structural rules (Phase 4G).
      */
-    private function buildPrompt(
+                private function buildPrompt(
         Service $service,
         int $days,
         string $destination,
         string $difficulty,
         int|string $duration,
         string $description,
-        string $notes
+        string $notes,
+        ?int $startDay = null,
+        ?int $endDay = null,
+        ?int $totalDays = null,
+        ?string $previousEndpoint = null,
+        ?array $visitedEndpoints = null,
+        ?string $journeyPhase = null,
+        ?array $visitedTitles = null
     ): string {
         $notesLine  = $notes !== '' ? $notes : 'None';
         $shortDesc  = \Str::limit($description, 500, '');
+
+        // Phase 4H: chunk context
+        $chunkContext = '';
+        if ($startDay !== null && $endDay !== null && $totalDays !== null) {
+            $chunkContext = <<<CTX
+
+═══════════════════════════════════════
+CHUNK CONTEXT (CRITICAL)
+═══════════════════════════════════════
+This is days {$startDay} to {$endDay} of a {$totalDays}-day itinerary.
+Generate ONLY these {$days} days.
+Day numbers MUST be {$startDay} through {$endDay} (absolute).
+CTX;
+            if ($previousEndpoint !== null) {
+                $chunkContext .= "\nPrevious day ended at: {$previousEndpoint}\n";
+                $chunkContext .= "Day {$startDay} MUST start from {$previousEndpoint}\n";
+            }
+            $chunkContext .= "\n";
+        }
+
+                        // Phase 4H iter-3: overall journey context with full titles list
+        $journeyContext = '';
+        if (!empty($visitedEndpoints) && $journeyPhase !== null) {
+            $visitedList   = implode(', ', $visitedEndpoints);
+            $daysCompleted = $startDay - 1;
+
+            $journeyContext = <<<JC
+
+═══════════════════════════════════════
+OVERALL JOURNEY CONTEXT (MANDATORY)
+═══════════════════════════════════════
+Days completed: 1-{$daysCompleted} of {$totalDays}
+Places already visited: {$visitedList}
+Current phase: {$journeyPhase}
+
+CONSTRAINTS (NON-NEGOTIABLE):
+  - Do NOT repeat any route from previous days
+  - Do NOT re-visit: {$visitedList}
+  - Follow {$journeyPhase} phase — do not restart ascent if in descend
+  - If summit was already reached, continue descent ONLY
+JC;
+            $journeyContext .= "\n";
+
+            // Phase 4H iter-3: explicit titles list
+            if (!empty($visitedTitles)) {
+                $titlesList = '';
+                foreach ($visitedTitles as $idx => $title) {
+                    $dayNum = $idx + 1;
+                    $titlesList .= "  Day {$dayNum}: {$title}\n";
+                }
+
+                $journeyContext .= <<<TL
+
+═══════════════════════════════════════
+TITLES ALREADY GENERATED (DO NOT REPEAT)
+═══════════════════════════════════════
+{$titlesList}
+RULE: Every title above is LOCKED. Any duplicate title in your output will be REJECTED.
+You must generate ONLY new, unique routes.
+TL;
+                $journeyContext .= "\n";
+            }
+        }
+        // Phase 4H: dynamic day-number rule
+        $dayNumberRule = ($startDay !== null && $endDay !== null)
+            ? "Day numbers MUST be {$startDay} through {$endDay}."
+            : "Day numbers MUST be 1 through {$days} sequentially.";
 
         return <<<PROMPT
 You are a Nepal trekking itinerary expert.
@@ -372,11 +455,11 @@ DESCRIPTION CONTEXT:
 {$shortDesc}
 
 Provider notes: {$notesLine}
-
+{$chunkContext}{$journeyContext}
 STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 
 1. COUNT: EXACTLY {$days} days. No more. No less.
-   Day numbers MUST be 1 through {$days} sequentially.
+   {$dayNumberRule}
 
 2. ANTI-REPETITION (MANDATORY):
    - NEVER repeat a route. "Place A to Place B" may appear ONLY ONCE.
@@ -429,6 +512,283 @@ STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 
 Now generate the itinerary.
 PROMPT;
+    }
+        /**
+     * Phase 4H iter-3: Orchestrator with auto-retry on duplicate detection.
+     * Tries full draft up to 2 times before giving up.
+     */
+    private function chunkAndGenerate(
+        Service $service,
+        int $totalDays,
+        string $destination,
+        string $difficulty,
+        int|string $duration,
+        string $description,
+        string $notes,
+        int $chunkSize = 3
+    ): ?array {
+        $maxDraftAttempts = 2;
+
+        for ($draftAttempt = 1; $draftAttempt <= $maxDraftAttempts; $draftAttempt++) {
+            $result = $this->generateAllChunks(
+                $service,
+                $totalDays,
+                $destination,
+                $difficulty,
+                $duration,
+                $description,
+                $notes,
+                $chunkSize
+            );
+
+            if ($result !== null) {
+                return $result;
+            }
+
+            if ($draftAttempt < $maxDraftAttempts) {
+                Log::info('Phase 4H full draft retry', [
+                    'attempt'    => $draftAttempt,
+                    'max'        => $maxDraftAttempts,
+                    'service_id' => $service->id,
+                ]);
+                sleep(5);
+            }
+        }
+
+        Log::warning('Phase 4H all draft attempts exhausted', [
+            'service_id' => $service->id,
+            'total_days' => $totalDays,
+        ]);
+
+        return null;
+    }
+
+    /**
+     * Phase 4H iter-3: Core chunking with full context accumulation.
+     * Tracks ALL endpoints + ALL titles across chunks.
+     */
+    private function generateAllChunks(
+        Service $service,
+        int $totalDays,
+        string $destination,
+        string $difficulty,
+        int|string $duration,
+        string $description,
+        string $notes,
+        int $chunkSize = 3
+    ): ?array {
+        $totalChunks      = (int) ceil($totalDays / $chunkSize);
+        $allDays          = [];
+        $previousEndpoint = null;
+        $visitedEndpoints = [];
+        $visitedTitles    = [];
+
+        Log::info('Phase 4H chunking start', [
+            'total_days'   => $totalDays,
+            'total_chunks' => $totalChunks,
+            'service_id'   => $service->id,
+        ]);
+
+        for ($i = 0; $i < $totalChunks; $i++) {
+            $startDay  = $i * $chunkSize + 1;
+            $endDay    = min(($i + 1) * $chunkSize, $totalDays);
+            $chunkDays = $endDay - $startDay + 1;
+
+            $progress     = $startDay / $totalDays;
+            $journeyPhase = $progress < 0.4 ? 'ascend'
+                          : ($progress < 0.7 ? 'summit' : 'descend');
+
+            $chunkPrompt = $this->buildPrompt(
+                $service,
+                $chunkDays,
+                $destination,
+                $difficulty,
+                $duration,
+                $description,
+                $notes,
+                $startDay,
+                $endDay,
+                $totalDays,
+                $previousEndpoint,
+                $visitedEndpoints,
+                $journeyPhase,
+                $visitedTitles
+            );
+
+            $chunkResult = $this->generateChunkWithRetry(
+                $chunkPrompt, $chunkDays, $startDay, $endDay
+            );
+
+            if ($chunkResult === null) {
+                Log::warning('Phase 4H chunk failed', [
+                    'chunk'      => $i + 1,
+                    'total'      => $totalChunks,
+                    'start_day'  => $startDay,
+                    'end_day'    => $endDay,
+                    'service_id' => $service->id,
+                ]);
+                return null;
+            }
+
+            // Phase 4H iter-3: track ALL endpoints + titles per day
+            foreach ($chunkResult['days'] as $day) {
+                $title = trim((string) ($day['title'] ?? ''));
+
+                if ($title !== '' && !in_array($title, $visitedTitles, true)) {
+                    $visitedTitles[] = $title;
+                }
+
+                $ep = $this->extractEndpoint($title);
+                if ($ep !== '' && !in_array($ep, $visitedEndpoints, true)) {
+                    $visitedEndpoints[] = $ep;
+                }
+            }
+
+            $lastDay          = end($chunkResult['days']);
+            $previousEndpoint = $this->extractEndpoint($lastDay['title'] ?? '');
+
+            $allDays = array_merge($allDays, $chunkResult['days']);
+
+            if ($i < $totalChunks - 1) {
+                sleep(60);
+            }
+        }
+
+        // Phase 4H: cross-chunk duplicate validation (safety net)
+        $allTitlesLower = array_map(
+            fn($d) => strtolower(trim($d['title'] ?? '')),
+            $allDays
+        );
+        if (count($allTitlesLower) !== count(array_unique($allTitlesLower))) {
+            Log::warning('Phase 4H cross-chunk duplicates detected', [
+                'service_id' => $service->id,
+                'total_days' => count($allDays),
+            ]);
+            return null;
+        }
+
+        Log::info('Phase 4H chunking complete', [
+            'days_generated' => count($allDays),
+            'visited_count'  => count($visitedEndpoints),
+            'titles_count'   => count($visitedTitles),
+            'service_id'     => $service->id,
+        ]);
+
+        return ['days' => $allDays];
+    }
+
+    /**
+     * Phase 4H: Generate single chunk with retry.
+     */
+    private function generateChunkWithRetry(
+        string $prompt,
+        int $chunkDays,
+        int $startDay,
+        int $endDay
+    ): ?array {
+        $maxAttempts       = 2;
+        $adjustedMaxTokens = max($chunkDays * 300, 900);
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                $candidate = $this->llm->generateItinerary(
+                    prompt:      $prompt,
+                    locale:      'en',
+                    model:       'qwen/qwen3.8-27b',
+                    extract:     true,
+                    maxTokens:   $adjustedMaxTokens,
+                    temperature: 0.5,
+                );
+
+                $this->validateChunkStructure($candidate, $startDay, $endDay);
+                return $candidate;
+
+            } catch (\InvalidArgumentException $e) {
+                Log::info('Phase 4H chunk validation fail', [
+                    'attempt'   => $attempt,
+                    'start_day' => $startDay,
+                    'end_day'   => $endDay,
+                    'error'     => $e->getMessage(),
+                ]);
+                if ($attempt < $maxAttempts) sleep(5);
+
+            } catch (\Throwable $e) {
+                $msg = $e->getMessage();
+                Log::error('Phase 4H chunk error', [
+                    'attempt'   => $attempt,
+                    'start_day' => $startDay,
+                    'error'     => $msg,
+                ]);
+
+                if (str_contains($msg, 'rate_limit') ||
+                    str_contains($msg, 'Request too large') ||
+                    str_contains($msg, 'tokens per minute')) {
+                    return null;
+                }
+                if ($attempt < $maxAttempts) sleep(5);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Phase 4H: Extract endpoint location from title.
+     */
+    private function extractEndpoint(string $title): string
+    {
+        $title = trim($title);
+        if (preg_match('/^.+?\s+to\s+(.+)$/i', $title, $m)) {
+            return trim($m[1]);
+        }
+        if (preg_match('/^(.+?):/i', $title, $m)) {
+            return trim($m[1]);
+        }
+        return $title;
+    }
+
+    /**
+     * Phase 4H: Validate single chunk structure.
+     */
+    private function validateChunkStructure(array $chunk, int $startDay, int $endDay): void
+    {
+        if (!isset($chunk['days']) || !is_array($chunk['days']) || empty($chunk['days'])) {
+            throw new \InvalidArgumentException('Missing days array');
+        }
+
+        $expectedCount = $endDay - $startDay + 1;
+        if (count($chunk['days']) !== $expectedCount) {
+            throw new \InvalidArgumentException(
+                "Chunk count mismatch: expected {$expectedCount}, got " . count($chunk['days'])
+            );
+        }
+
+        // Phase 4H: verify absolute day numbers
+        foreach ($chunk['days'] as $idx => $day) {
+            $expectedDayNum = $startDay + $idx;
+            if ((int) ($day['day_number'] ?? 0) !== $expectedDayNum) {
+                throw new \InvalidArgumentException(
+                    "Chunk day_number mismatch at index {$idx}: expected {$expectedDayNum}"
+                );
+            }
+        }
+
+        $titles = array_map(fn($d) => strtolower(trim($d['title'] ?? '')), $chunk['days']);
+        if (count($titles) !== count(array_unique($titles))) {
+            throw new \InvalidArgumentException('Duplicate titles within chunk');
+        }
+
+        foreach ($chunk['days'] as $idx => $day) {
+            if (!is_array($day)) {
+                throw new \InvalidArgumentException("Chunk day {$idx} not array");
+            }
+            if (empty($day['title']) || !is_string($day['title']) || strlen($day['title']) > 255) {
+                throw new \InvalidArgumentException("Chunk day {$idx} invalid title");
+            }
+            if (isset($day['items']) && !is_array($day['items'])) {
+                throw new \InvalidArgumentException("Chunk day {$idx} items invalid");
+            }
+        }
     }
 
         /**
