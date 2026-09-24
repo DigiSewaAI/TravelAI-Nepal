@@ -1,27 +1,14 @@
-══════════════════════════════════════════════════════════
-MASTER FILE v2.0 — DRAFT (Reality-Aligned)
-TO: Owner (Parashar Regmi) / Master Review
-DATE: 2026-09-23
-STATUS: 🟡 DRAFT — Discovery verification pending
-══════════════════════════════════════════════════════════
-
-Bro, file तयार। **DRAFT** भनेर mark गरेको छु — किनभने STAGE 1-8 discovery अझै चलेको छैन। तर Master ले briefing मा दिनुभएको reality summary पर्याप्त छ foundational rewrite को लागि।
-
-नीचे पूरा file — copy गरेर `docs/globe/Globe_Master_File.md` मा save गर्नु। Save गर्दा **v1.0 लाई backup** राख्नु (`Globe_Master_File_v1.0_backup.md`)।
-
----
-
-```markdown
 # 🌍 TravelAI Nepal — Globe Master File
 
 **Version:** 2.0 (Reality-Aligned Rewrite)
 **Created:** 2026-09-22
 **Rewritten:** 2026-09-23
+**Updated:** 2026-09-24 (Phase 4H closure + Phase 4M discovery)
 **Status:** 🟡 DRAFT — Pending discovery verification
 **Owner:** Parashar Regmi
 **Master:** DeepSeek (Master role)
 **Assistant:** DeepSeek (Implementation role)
-**HEAD:** db52544
+**HEAD:** 0415925
 
 > **Single source of truth for TravelAI Nepal — vision, existing systems, phases, and rules.**
 
@@ -235,6 +222,33 @@ Where → What → When → How high → What's next → What I experienced
 - Elevation profile
 - Accommodation + activities
 
+#### Phase 4D — Sunrise/Sunset ✅
+- Sunrise/sunset times
+- Final polish pass
+
+#### Phase 4E — Dashboard Rich Data ✅
+- Dashboard rich data integration
+- Pushed: `9b92e2b` (2026-09-23)
+
+#### Phase 4G — Provider AI Fix ✅
+- Provider AI fixes
+- Pushed: `cdf289e` (2026-09-24)
+
+#### Phase 4H — AI Itinerary Chunking ✅
+- Multi-request chunking (3-day chunks, ~900 tokens each)
+- 60s sleep between chunks (OTPM window)
+- Cross-chunk context: visitedEndpoints + visitedTitles
+- Auto-retry orchestrator (max 2 attempts)
+- Journey phase detection (ascend/summit/descend)
+- Cross-chunk duplicate validation
+- Progress UI (estimated, chunk N/M + days X-Y)
+- Pushed: `04c6e48` (2026-09-24)
+
+#### Phase 4H-Fix — time_of_day Sanitization ✅
+- `apply()` — time_of_day enum sanitization
+- `validateChunkStructure()` — items time_of_day validation
+- Pushed: `0415925` (2026-09-24)
+
 #### ✅ COMPLETED (UNDOCUMENTED — VERIFY IN AUDIT)
 These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
@@ -250,11 +264,53 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
 ### 🟡 IN PROGRESS
 
-#### Phase 4D — Sunrise + Polish
-- Sunrise/sunset times
-- Final polish pass
+#### Phase 4M — Service Foundation (Discovery)
+
+**Goal:** Provider service creation forms complete + category-aware
+
+**Owner Directive:**
+> "Service create 100% fix गरेपछि मात्र AI/Itinerary continue गर्नु।"
+> "Service category अनुसार Provider को dashboard मा Service Create Page open हुनु पर्छ automatically।"
+
+**Scope (Discovered):**
+- Service form missing fields (duration, pax, difficulty, category-specific)
+- Category-aware service creation (trek/tour/hotel/transport/guide)
+- Service detail tables audit (trek_details, tour_details, etc.)
+- Registration → dashboard flow verification
+- Provider business type storage verification
+
+**Sub-phases:**
+- 4M-1: Service form field completion
+- 4M-2: Category-aware service creation
+- 4M-3: Service detail tables alignment
+- 4M-4: Registration flow verification
+
+**Foundation-First Principle (Owner-locked):**
+- Service foundation 100% complete BEFORE AI continuation
+- AI depends on complete service data
+- Provider UX priority
+
+**Ticket:** SERVICE-FORM-INCOMPLETE-01, SERVICE-CATEGORY-ROUTING-01
+
+**Status:** Discovery pending
+
+---
 
 ### 🔒 FUTURE
+
+#### Phase 4I — AI Typo Fixes
+- Model typo corrections (`qwen/qwen3.6-27b` → `qwen/qwen3.8-27b`)
+- LlmService fallback fix
+- QuotationController typo fix
+- AI Quotation form incomplete fix
+
+#### Phase 4J — Multi-Provider
+- Add multiple free AI providers (Groq + OpenRouter free + Cerebras)
+- Load distribution + fallback for rate limits
+
+#### Phase 4K — Content Quality
+- AI itinerary content accuracy improvements (75% → 90%)
+- Prompt + post-validation + UI warnings
 
 #### Phase 5 — Live Journey Enhancements
 - Enhanced GPS tracking
@@ -276,25 +332,26 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
 | Phase | Status | Commit | Date |
 |---|---|---|---|
-| Phase 1 — Foundation | ✅ DONE | (verify) | — |
-| Phase 2A — Discovery | ✅ DONE | (verify) | — |
-| Phase 2B — Discovery+ | ✅ DONE | (verify) | — |
-| Phase 3 — Journey Animation | ✅ DONE | (verify) | — |
-| Phase 4A — Weather | ✅ DONE | (verify) | — |
-| Phase 4B — Photos | ✅ DONE | (verify) | — |
-| Phase 4C — Elevation | ✅ DONE | (verify) | — |
-| Traveler Dashboard | ✅ DONE | (verify) | — |
-| Provider Dashboard | ✅ DONE | (verify) | — |
-| QR Check-in | ✅ DONE | (verify) | — |
-| Safety System | ✅ DONE | (verify) | — |
-| Journey Replay | ✅ DONE | (verify) | — |
-| Photo Memories | ✅ DONE | (verify) | — |
-| AI Planner | ✅ DONE | (verify) | — |
-| Phase 4D — Sunrise + Polish | 🟡 NEXT | — | — |
-| Phase 5 — Live Enhancements | 🔒 FUTURE | — | — |
-| Phase 6 — Memory/Social | 🔒 FUTURE | — | — |
+| Phase 1 — Foundation | ✅ PUSHED | cfa0c7c | 2026-09-22 |
+| Phase 2A — Clean Globe | ✅ PUSHED | d87d50d | 2026-09-22 |
+| Phase 2B — Search Fly-to | ✅ PUSHED | 3b22c0e | 2026-09-23 |
+| Phase 3 — Journey Animation | ✅ PUSHED | 622dbf6 | 2026-09-23 |
+| Phase 4A — Weather Panel | ✅ PUSHED | fe45542 | 2026-09-23 |
+| Phase 4B — Altitude Profile | ✅ PUSHED | 3fbafc7 | 2026-09-23 |
+| Phase 4C — Media Lightbox | ✅ PUSHED | f6026da | 2026-09-23 |
+| Phase 4D — Sunrise/Sunset | ✅ PUSHED | 5da3ce4 | 2026-09-23 |
+| Phase 4E — Dashboard Rich Data | ✅ PUSHED | 9b92e2b | 2026-09-23 |
+| Phase 4G — Provider AI Fix | ✅ PUSHED | cdf289e | 2026-09-24 |
+| Phase 4H — AI Chunking | ✅ PUSHED | 04c6e48 | 2026-09-24 |
+| Phase 4H-Fix — time_of_day | ✅ PUSHED | 0415925 | 2026-09-24 |
+| **Phase 4M — Service Foundation** | 🟢 **DISCOVERY** | — | 2026-09-24 |
+| Phase 4I — AI Typo Fixes | 🔒 After 4M | — | — |
+| Phase 4J — Multi-Provider | 🔒 After 4I | — | — |
+| Phase 4K — Content Quality | 🔒 After 4J | — | — |
+| Phase 5 — Live Journey | 🔒 FUTURE | — | — |
+| Phase 6 — Memory & Social | 🔒 FUTURE | — | — |
 
-> ⚠️ **Commit hashes = STAGE 1-8 audit पछि भरिनेछ।**
+> ⚠️ **Traveler/Provider Dashboard, QR, Safety, Replay, AI Planner — commit hashes = STAGE 1-8 audit पछि भरिनेछ।**
 
 ---
 
@@ -380,7 +437,7 @@ resources/views/admin/                                ← Admin views
 
 | Ticket | Priority | Status |
 |---|---|---|
-| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Phase 4D next |
+| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Phase 4M next |
 | GLOBE-WEATHER-01 | ✅ CLOSED | Phase 4A shipped |
 | GLOBE-JOURNEY-ANIMATION-01 | ✅ CLOSED | Phase 3 shipped |
 | GLOBE-SEARCH-01 | ✅ CLOSED | Phase 2 shipped |
@@ -427,21 +484,22 @@ Plan ≠ Implementation. Executed commits = truth.
 
 ---
 
-## 🚦 11. CURRENT STATE (2026-09-23)
+## 🚦 11. CURRENT STATE (2026-09-24)
 
 ### Git
 ```
 Branch:       main
-HEAD:         db52544
-Status:       ✅ synced (verify)
+HEAD:         0415925
+Status:       ✅ synced (0/0)
 ```
 
 ### Reality Summary
 - **Systems built:** 12+
-- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C
+- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C, 4D, 4E, 4G, 4H, 4H-Fix
 - **Bonus systems (undocumented in v1.0):** Traveler Dashboard, Provider Dashboard, QR Check-in, Safety, Journey Replay, Photo Memories, AI Planner
 - **QR check-ins recorded:** 9
 - **AI planner requests used:** 468
+- **Current phase:** 4M — Service Foundation (Discovery)
 
 ### Sessions Shipped (Historical — from v1.0)
 - Currency fix (`d37890f`)
@@ -449,10 +507,10 @@ Status:       ✅ synced (verify)
 - Toggle UX bundle (`c3f9c94`)
 - Map bounds fix (`a9a885e`)
 - Map polish bundle (`97e3f72`)
-- ...plus all Phase 1-4C work
+- ...plus all Phase 1-4H work
 
 ### Next
-**Master File Rewrite** (this mission) → **Phase 4D** (Sunrise + Polish)
+**Phase 4M — Service Foundation Discovery** → then Phase 4I, 4J, 4K
 
 ---
 
@@ -497,6 +555,7 @@ Status:       ✅ synced (verify)
 | Weather Panel | ✅ Built | Phase 4A |
 | Photo Gallery | ✅ Built | Phase 4B |
 | Elevation Profile | ✅ Built | Phase 4C |
+| Sunrise/Sunset | ✅ Built | Phase 4D |
 | Search + Fly-to | ✅ Built | Phase 2 |
 | District Layer | ✅ Built | Protected |
 | Route Layer | ✅ Built | — |
@@ -516,8 +575,8 @@ Status:       ✅ synced (verify)
 | System | Status | Notes |
 |---|---|---|
 | Provider Dashboard | ✅ Built | Verify via STAGE 4 |
-| Service CRUD | ✅ Built | — |
-| Itinerary Editor | ✅ Built | — |
+| Service CRUD | ✅ Built | Phase 4M next |
+| Itinerary Editor | ✅ Built | Phase 4H shipped |
 | Media Upload | ✅ Built | — |
 | Booking Management | ✅ Built | — |
 
@@ -616,7 +675,5 @@ Status:       ✅ synced (verify)
 ---
 
 **Document End — Globe Master File v2.0 (DRAFT)**
+**Updated:** 2026-09-24 — Phase 4H/4H-Fix closure + Phase 4M discovery
 **Next revision:** After STAGE 1-8 audit completes
-```
-
----

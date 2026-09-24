@@ -3422,3 +3422,177 @@ Three modules, texture fallback, file structure, mobile zoom, rings filter, 3D j
 Effort: Varies (post-MVP).
 
 ---
+
+---
+
+## 🎫 TICKETS — Batch (2026-09-24)
+
+### 🔴 HIGH PRIORITY
+
+**SERVICE-FORM-INCOMPLETE-01**
+Provider service creation forms missing critical fields.
+Gap: duration, pax, difficulty, category-specific fields.
+Discovery pending (Phase 4M).
+Impact: Incomplete service data → poor AI inputs.
+Effort: Discovery + implementation.
+
+**SERVICE-CATEGORY-ROUTING-01** (NEW)
+Category-aware service creation required.
+Owner directive: Provider business type (Trek/Tour/Hotel/etc.)
+determines which service create form opens automatically.
+Current: generic form assumed.
+Desired: Trek provider → trek form; Hotel → hotel form; etc.
+Impact: Provider UX + data quality + AI input consistency.
+Phase: 4M (after service form discovery).
+Effort: Discovery + implementation + testing.
+
+**AI-ITINERARY-CONTENT-QUALITY-01**
+AI-generated itinerary content accuracy ~75% (acceptable draft level).
+Hallucination patterns:
+  • Fake places (Drolapaura, Gorak Shep monastery)
+  • Side-trek confusion (Chukhung Ri on main route)
+  • Wrong village order (Phortse on ascent)
+  • Typos (Pherice vs Pheriche)
+  • Route confusion (Khumbu Icefall = climbing only)
+Fix scope (Phase 4K): prompt + post-validation + UI warnings.
+Expected: 75% → 90%.
+Effort: ~2 hrs.
+Phase: 4K (after 4M).
+
+### 🟡 MEDIUM PRIORITY
+
+**SERVICE-DETAIL-TABLES-AUDIT-01**
+Verify trek_details, tour_details, hotel_details, etc.
+Empty? Populated? Consistent? Category-specific?
+Discovery pending (Phase 4M).
+Effort: Discovery + potential migrations.
+
+**PROVIDER-REGISTRATION-FLOW-01**
+Registration → dashboard transition review.
+Business type storage verify (providers.business_type?).
+Category selection during registration = single or multiple?
+Discovery pending (Phase 4M).
+Effort: Discovery.
+
+**AI-QUOTATION-FORM-INCOMPLETE-01**
+Quotation form missing: days, pax, start_date, accommodation.
+AI cannot generate meaningful quotation without these.
+Fix: Add form fields + update prompt builder.
+Effort: 2 hrs.
+Phase: 4I (after 4M).
+
+**AI-ARCHITECTURE-UNIFY-01**
+4 hardcoded models across codebase.
+`.env GROQ_MODEL` ignored by hardcoded calls.
+Fix: Centralize model selection in config.
+Effort: 1-2 hrs.
+Phase: 4I.
+
+**AI-MULTIPROVIDER-ROTATION-01**
+Add multiple free AI providers (Groq + OpenRouter free + Cerebras).
+Load distribution + fallback for rate limits.
+Effort: 2-3 hrs.
+Phase: 4J.
+
+**AI-PUBLIC-PLANNER-VERIFY-01**
+Public AI Planner = DB-driven (not actual AI).
+Marketing says "AI" — potentially misleading.
+Fix: Verify first, then rename OR upgrade to real AI.
+Effort: Verify + decision.
+Phase: 4I or later.
+
+**ELEVATION-DATA-GAP-01**
+`elevation_gain_m`/`elevation_loss_m` = NULL across all records.
+`altitude_m` populated only.
+Fix: Provider UI to populate gain/loss.
+Effort: 2-4 hrs.
+Phase: Post-4M.
+
+### 🟢 LOW PRIORITY
+
+**AI-QUOTATION-BROKEN-01** (was HIGH, RESOLVED pending 4I)
+Model typo: `qwen/qwen3.6-27b` (non-existent) in QuotationController.
+T6A test (2026-09-24): confirmed 404, quota 461/500.
+Fix: typo → `qwen/qwen3.8-27b`.
+Effort: 5 min.
+Phase: 4I.
+
+**AI-REPLAY-AI-STORY-BROKEN-01** (renamed from AI-REPLAY-BROKEN-01)
+Journey Replay feature = WORKING (data-driven, template + DB data).
+Only AI-narrative enhancement = broken (model typo, fallback in use).
+Priority downgraded: HIGH → MEDIUM.
+Reason: Feature functional; enhancement only.
+Fix: model typo (line 182).
+Effort: 15 min.
+Phase: 4I.
+
+**AI-LLMSERVICE-FALLBACK-FIX-01**
+`LlmService.php:17` default = `qwen/qwen3.6-27b` (non-existent).
+Fix: default → `qwen/qwen3.8-27b`.
+Effort: 1 min.
+Phase: 4I.
+
+**I18N-DUPLICATE-KEY-01**
+`weather_unavailable` × 3 duplicates in 4 locales.
+PHP last-wins → silent override.
+Fix: Audit + deduplicate.
+Effort: 30 min.
+Phase: Post-4M.
+
+**I18N-FALLBACK-PATTERN-01**
+`__('key') ?? 'fallback'` = broken pattern.
+Laravel returns key string, not null.
+Fix: Audit + fix all instances.
+Effort: 1 hr.
+Phase: Post-4M.
+
+**I18N-INDENT-CLEANUP-01** (UPDATED)
+Inconsistent indentation across:
+  • 4 lang files (16sp/4sp mixed)
+  • AiItineraryDraftController.php line 331 (32 spaces, expect 16)
+  • AiItineraryDraftController.php line 784 (16 spaces, expect 8)
+Fix: Standardize.
+Effort: 30 min.
+Phase: Post-4M.
+
+**WEATHER-SERVICE-LEGACY-FIX-01**
+Legacy `WeatherService.php` uses OpenWeatherMap (paid-key pattern).
+Missing config → broken. Safety system dependency (R6).
+Fix: Migrate to Open-Meteo OR remove dead code.
+Effort: 2-3 hrs.
+Phase: Post-deploy.
+
+**SUNSET-INCONSISTENCY-01**
+Public vs dashboard sunset differs by ~19 min.
+Likely cache timing.
+Fix: Investigate (verify only).
+Effort: 30 min.
+
+**DOCS-CONSOLIDATION-01**
+Untracked docs to commit:
+  • docs/globe/TravelAI_Nepal_Master_Handoff_AZ_v4.0.md
+  • docs/provider-itinerary/Master_Plan_v1.0.md
+  • docs/plan_limits/FIX-*.md (7 files)
+Fix: Single bundle commit.
+Effort: 15 min.
+
+**AI-CONTENT-ANALYSIS-DEAD-CODE-01**
+`AiContentAnalysisService.php` — no callers.
+Fix: Delete OR document intent.
+Effort: 15 min.
+
+**X-03-ROUTE-DATA-INJECTION**
+AI route data injection (Tier 2).
+Effort: 1-2 hrs.
+
+**GLOBE-* (6 tickets)**
+Three modules, texture fallback, file structure, mobile zoom, rings filter, 3D journey.
+Effort: Varies (post-MVP).
+
+**MASTER-AI-MD-CREATE-01**
+Create `docs/globe/master_ai.md` — complete AI guide A-Z.
+Sections: features, providers, models, limits, multi-provider, troubleshooting, roadmap.
+Effort: 1-2 hrs.
+Phase: End of day.
+
+---

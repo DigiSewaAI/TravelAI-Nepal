@@ -671,3 +671,68 @@ Protected systems: Zero diff
 **Next:** Phase 4D (Sunrise + Polish) OR Session close
 
 ---
+
+---
+
+### 2026-09-24 — Phase 4H CLOSED + PUSHED (AI Itinerary Chunking)
+
+**Commit:** `04c6e48`
+**Push range:** `fe3bb85` → `04c6e48`
+**Sync:** Local == Remote ✅ (0/0)
+
+**Files (6):**
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php` (chunking logic)
+- `resources/views/provider/services/itinerary/_ai_draft_modal.blade.php` (progress UI)
+- 4 lang files (+3 keys each: ai_draft_progress_chunk, ai_draft_progress_days, ai_draft_progress_wait)
+
+**Stats:** +498/-70
+
+**What Shipped:**
+- Multi-request chunking (3-day chunks, ~900 tokens each)
+- 60s sleep between chunks (OTPM window)
+- Cross-chunk context: visitedEndpoints + visitedTitles
+- Auto-retry orchestrator (max 2 attempts)
+- Journey phase detection (ascend/summit/descend)
+- Cross-chunk duplicate validation
+- Progress UI (estimated, chunk N/M + days X-Y)
+
+**Iterations:**
+- iter-1: basic chunking (T3 failed — duplicates)
+- iter-2: endpoint tracking (partial)
+- iter-3: title list + auto-retry (T3 PASS)
+
+**Tests:**
+- T1 (5-day) — PASS
+- T2 (7-day) — PASS
+- T3 (14-day) — PASS
+- T8 (suite) — 41p/1f (no regression)
+
+**R5/R20:** PlannerService untouched; LlmService default preserved
+**R21-R24:** Free-first (Groq free tier)
+
+**Deferred:** AI-ITINERARY-CONTENT-QUALITY-01 (Phase 4K)
+
+---
+
+### 2026-09-24 — Phase 4H-Fix CLOSED + PUSHED (time_of_day Sanitization)
+
+**Commit:** `0415925`
+**Push range:** `04c6e48` → `0415925`
+**Sync:** Local == Remote ✅ (0/0)
+
+**File (1):**
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php`
+
+**Stats:** +18/-3
+
+**What Shipped:**
+- `apply()` — time_of_day enum sanitization (morning/afternoon/evening, fallback morning)
+- `validateChunkStructure()` — items time_of_day validation added
+
+**Reason:** 14-day Apply test revealed missing time_of_day validation → potential DB constraint failure
+
+**Tests:** 41p/1f (no regression)
+**R5/R20:** कायम
+**R13:** Specific add (1 file)
+
+---
