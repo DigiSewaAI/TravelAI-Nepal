@@ -84,6 +84,21 @@ class LlmService
                     'temperature' => $temperature,
                 ]);
 
+                                // 4I-EXT: Build payload; JSON mode only when extraction requested
+                $payload = [
+                    'model' => $modelToUse,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => $temperature,
+                    'max_tokens' => $maxTokens,
+                ];
+
+                if ($extract) {
+                    $payload['response_format'] = ['type' => 'json_object'];
+                }
+
                 $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $this->apiKey,
                     'Content-Type' => 'application/json',
@@ -92,16 +107,7 @@ class LlmService
                     'verify' => !app()->environment('local', 'testing'),
                     'timeout' => 120,
                 ])
-                ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => $modelToUse,
-                    'messages' => [
-                        ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
-                        ['role' => 'user', 'content' => $prompt],
-                    ],
-                    'temperature' => $temperature,
-                    'max_tokens' => $maxTokens,
-                    'response_format' => ['type' => 'json_object'],
-                ]);
+                ->post('https://api.groq.com/openai/v1/chat/completions', $payload);
 
                 if ($response->successful()) {
                     $data = $response->json();

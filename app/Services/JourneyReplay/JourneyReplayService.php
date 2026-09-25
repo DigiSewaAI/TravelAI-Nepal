@@ -176,14 +176,21 @@ class JourneyReplayService
             $prompt = $this->buildStrictStoryPrompt($input);
             $locale = app()->getLocale();
 
-                        $response = $this->llm->generateItinerary(
+                                                $response = $this->llm->generateItinerary(
                 prompt: $prompt,
                 locale: $locale,
-                extract: false,
+                extract: true,
                 maxTokens: 250
             );
 
-            $raw = $response['content'] ?? null;
+            // 4I-EXT-2: Defensive multi-key read (model may vary key)
+            $raw = $response['story']
+                ?? $response['text']
+                ?? $response['response']
+                ?? $response['content']
+                ?? $response['narrative']
+                ?? $response['output']
+                ?? (is_string($response) ? $response : null);
             $cleaned = $this->cleanStoryResponse($raw);
 
             // If cleaning returns null or empty, use fallback
