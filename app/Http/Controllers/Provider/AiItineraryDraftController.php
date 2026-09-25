@@ -22,10 +22,62 @@ class AiItineraryDraftController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(
+        public function __construct(
         protected LlmService $llm,
         protected AiReservationService $reservations,
-    ) {}
+        protected \App\Services\PlannerService $planner,
+        ) {}
+
+    /** @var array<int, array<int, array{from:string,to:string,distance:?string}>> */
+    protected array $routeWaypointsCache = [];
+
+    /**
+     * Phase 4K: Fetch verified route waypoints for the service.
+     * Returns empty array if no route match (fallback to generic prompt).
+     */
+    protected function fetchRouteWaypoints(Service $service): array
+    {
+        if (isset($this->routeWaypointsCache[$service->id])) {
+            return $this->routeWaypointsCache[$service->id];
+        }
+
+        $waypoints = [];
+        try {
+            $route = $this->planner->resolveRouteForProvider($service->name);
+            if ($route) {
+                $waypoints = $route->segments()
+                    ->with(['fromWaypoint', 'toWaypoint'])
+                    ->orderBy('sequence')
+                    ->get()
+                    ->map(fn($s) => [
+                        'from'     => $s->fromWaypoint->name ?? 'Unknown',
+                        'to'       => $s->toWaypoint->name   ?? 'Unknown',
+                        'distance' => $s->distance_km,
+                    ])
+                    ->toArray();
+
+                Log::info('4K: Route matched for service', [
+                    'service_id'   => $service->id,
+                    'service_name' => $service->name,
+                    'route_id'     => $route->id,
+                    'route_name'   => $route->name,
+                    'waypoints'    => count($waypoints),
+                ]);
+            } else {
+                Log::info('4K: No route match — generic prompt', [
+                    'service_id'   => $service->id,
+                    'service_name' => $service->name,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('4K: Route lookup failed', [
+                'service_id' => $service->id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
+
+        return $this->routeWaypointsCache[$service->id] = $waypoints;
+    }
 
     /**
      * PHASE X-01: Generate AI itinerary draft (preview only).
@@ -362,7 +414,7 @@ class AiItineraryDraftController extends Controller
             /**
      * Build enhanced LLM prompt with strict structural rules (Phase 4G).
      */
-                private function buildPrompt(
+                        private function buildPrompt(
         Service $service,
         int $days,
         string $destination,
@@ -376,7 +428,8 @@ class AiItineraryDraftController extends Controller
         ?string $previousEndpoint = null,
         ?array $visitedEndpoints = null,
         ?string $journeyPhase = null,
-        ?array $visitedTitles = null
+        ?array $visitedTitles = null,
+        array $routeWaypoints = []
     ): string {
         $notesLine  = $notes !== '' ? $notes : 'None';
         $shortDesc  = \Str::limit($description, 500, '');
@@ -443,10 +496,32 @@ TL;
                 $journeyContext .= "\n";
             }
         }
-        // Phase 4H: dynamic day-number rule
+                // Phase 4H: dynamic day-number rule
         $dayNumberRule = ($startDay !== null && $endDay !== null)
             ? "Day numbers MUST be {$startDay} through {$endDay}."
             : "Day numbers MUST be 1 through {$days} sequentially.";
+
+        // Phase 4K: build VERIFIED ROUTE block if route matched
+        $verifiedRouteBlock = '';
+        if (!empty($routeWaypoints)) {
+            $seqLines = '';
+            foreach ($routeWaypoints as $i => $s) {
+                $seqLines .= ($i + 1) . ". {$s['from']} → {$s['to']}\n";
+            }
+            $verifiedRouteBlock = <<<VR
+
+═══════════════════════════════════════
+🔴 VERIFIED ROUTE (NON-NEGOTIABLE)
+═══════════════════════════════════════
+This is the OFFICIAL waypoint sequence for this trek.
+You MUST use ONLY these waypoints, in this exact order.
+Do NOT invent places, do NOT backtrack, do NOT skip any.
+Every day title must be "From → To" using adjacent waypoints below.
+
+{$seqLines}
+VR;
+            $verifiedRouteBlock .= "\n";
+        }
 
         return <<<PROMPT
 You are a Nepal trekking itinerary expert.
@@ -462,7 +537,7 @@ DESCRIPTION CONTEXT:
 {$shortDesc}
 
 Provider notes: {$notesLine}
-{$chunkContext}{$journeyContext}
+{$chunkContext}{$journeyContext}{$verifiedRouteBlock}
 STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 
 1. COUNT: EXACTLY {$days} days. No more. No less.
@@ -620,7 +695,7 @@ PROMPT;
             $journeyPhase = $progress < 0.4 ? 'ascend'
                           : ($progress < 0.7 ? 'summit' : 'descend');
 
-            $chunkPrompt = $this->buildPrompt(
+                        $chunkPrompt = $this->buildPrompt(
                 $service,
                 $chunkDays,
                 $destination,
@@ -634,7 +709,8 @@ PROMPT;
                 $previousEndpoint,
                 $visitedEndpoints,
                 $journeyPhase,
-                $visitedTitles
+                $visitedTitles,
+                $this->fetchRouteWaypoints($service)
             );
 
             $chunkResult = $this->generateChunkWithRetry(
@@ -681,12 +757,26 @@ PROMPT;
             fn($d) => strtolower(trim($d['title'] ?? '')),
             $allDays
         );
-        if (count($allTitlesLower) !== count(array_unique($allTitlesLower))) {
+                if (count($allTitlesLower) !== count(array_unique($allTitlesLower))) {
             Log::warning('Phase 4H cross-chunk duplicates detected', [
                 'service_id' => $service->id,
                 'total_days' => count($allDays),
             ]);
             return null;
+        }
+
+        // Phase 4K: Validate route adherence (if route matched)
+        $routeWaypoints = $this->routeWaypointsCache[$service->id] ?? [];
+        if (!empty($routeWaypoints)) {
+            try {
+                $this->validateRouteWaypoints($allDays, $routeWaypoints);
+            } catch (\InvalidArgumentException $e) {
+                Log::warning('4K: Route validation failed — retrying', [
+                    'service_id' => $service->id,
+                    'error'      => $e->getMessage(),
+                ]);
+                return null;  // triggers chunkAndGenerate retry
+            }
         }
 
         Log::info('Phase 4H chunking complete', [
@@ -825,7 +915,7 @@ PROMPT;
             if (isset($day['items']) && !is_array($day['items'])) {
                 throw new \InvalidArgumentException("Chunk day {$idx} items invalid");
             }
-            foreach ($day['items'] ?? [] as $j => $item) {
+                        foreach ($day['items'] ?? [] as $j => $item) {
                 if (empty($item['title']) || !is_string($item['title'])) {
                     throw new \InvalidArgumentException("Chunk day {$idx} item {$j} title invalid");
                 }
@@ -838,6 +928,64 @@ PROMPT;
             }
         }
         }
+
+    /**
+     * Phase 4K: Post-generation route adherence validation.
+     * Soft: 1 off-route day = warning. 2+ off-route = reject (retry).
+     */
+    private function validateRouteWaypoints(array $allDays, array $routeWaypoints): void
+    {
+        $validEndpoints = [];
+        foreach ($routeWaypoints as $s) {
+            $validEndpoints[] = strtolower(trim($s['from']));
+            $validEndpoints[] = strtolower(trim($s['to']));
+        }
+        $validEndpoints = array_values(array_unique(array_filter($validEndpoints)));
+
+        $offRoute = [];
+        foreach ($allDays as $i => $day) {
+            $title = strtolower(trim($day['title'] ?? ''));
+            if (!preg_match('/^(.+?)\s+to\s+(.+)$/i', $title, $m)) {
+                continue;   // non "A to B" title = skip
+            }
+            $from = strtolower(trim($m[1]));
+            $to   = strtolower(trim($m[2]));
+
+            if ($this->endpointMatches($from, $validEndpoints) ||
+                $this->endpointMatches($to,   $validEndpoints)) {
+                continue;
+            }
+            $offRoute[] = $i + 1;
+        }
+
+        if (count($offRoute) >= 2) {
+            throw new \InvalidArgumentException(
+                'Days off-route: ' . implode(', ', $offRoute)
+            );
+        }
+        if (count($offRoute) === 1) {
+            Log::info('4K: Single off-route day (soft warn)', [
+                'day' => $offRoute[0],
+            ]);
+        }
+    }
+
+    /**
+     * Phase 4K: fuzzy endpoint match (exact / prefix / levenshtein ≤ 2).
+     */
+    private function endpointMatches(string $needle, array $haystack): bool
+    {
+        if ($needle === '') return false;
+        if (in_array($needle, $haystack, true)) return true;
+
+        $prefix = substr($needle, 0, 4);
+        foreach ($haystack as $valid) {
+            if (str_starts_with($valid, $prefix) && levenshtein($needle, $valid) <= 2) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Phase 4K-F2: Layer 3 — Place existence validation.

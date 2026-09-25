@@ -129,7 +129,7 @@ $segments = $segments->sortBy('sequence');
             $dayServicesMap[$i] = collect();
         }
 
-        
+
         // ─── Route data sufficiency check ───
         $routeDataDays = count($overnightSegments);
         $requestedDays = $input['days'];
@@ -1186,7 +1186,19 @@ $serviceName = $service
                         Log::warning('Route not found');
         }
 
-        return $route;
+                return $route;
+    }
+
+    /**
+     * Phase 4K: Public wrapper for Provider AI Draft route resolution.
+     * ADDITIVE — existing resolveRoute() untouched (R5 कायम).
+     */
+    public function resolveRouteForProvider(string $serviceName): ?Route
+    {
+        if (empty(trim($serviceName))) {
+            return null;
+        }
+        return $this->resolveRoute($serviceName);
     }
 
     private function translateName(string $name, string $prefix, string $locale): string
