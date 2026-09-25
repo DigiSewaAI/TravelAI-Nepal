@@ -732,7 +732,7 @@ PROMPT;
                     'end_day'   => $endDay,
                     'error'     => $e->getMessage(),
                 ]);
-                if ($attempt < $maxAttempts) sleep(5);
+                if ($attempt < $maxAttempts) sleep(45);   // 4H-EXT-2: honor OTPM window
 
             } catch (\Throwable $e) {
                 $msg = $e->getMessage();
@@ -742,12 +742,12 @@ PROMPT;
                     'error'     => $msg,
                 ]);
 
-                if (str_contains($msg, 'rate_limit') ||
+                                if (str_contains($msg, 'rate_limit') ||
                     str_contains($msg, 'Request too large') ||
                     str_contains($msg, 'tokens per minute')) {
                     return null;
                 }
-                if ($attempt < $maxAttempts) sleep(5);
+                if ($attempt < $maxAttempts) sleep(45);   // 4H-EXT-2: honor OTPM window
             }
         }
 
@@ -814,10 +814,12 @@ PROMPT;
                 if (empty($item['title']) || !is_string($item['title'])) {
                     throw new \InvalidArgumentException("Chunk day {$idx} item {$j} title invalid");
                 }
-                $tod = $item['time_of_day'] ?? 'morning';
+                                // 4H-EXT-2: Sanitize (trim + lowercase) — do not reject
+                $tod = strtolower(trim((string)($item['time_of_day'] ?? 'morning')));
                 if (!in_array($tod, ['morning', 'afternoon', 'evening'], true)) {
-                    throw new \InvalidArgumentException("Chunk day {$idx} item {$j} time_of_day invalid");
+                    $tod = 'morning';   // fallback (invalid → default)
                 }
+                $chunk['days'][$idx]['items'][$j]['time_of_day'] = $tod;
             }
         }
         }
@@ -964,10 +966,12 @@ PROMPT;
                 if (empty($item['title']) || !is_string($item['title'])) {
                     throw new \InvalidArgumentException("Day {$i} item {$j} title invalid");
                 }
-                $tod = $item['time_of_day'] ?? 'morning';
+                                // 4H-EXT-2: Sanitize (trim + lowercase) — do not reject
+                $tod = strtolower(trim((string)($item['time_of_day'] ?? 'morning')));
                 if (!in_array($tod, ['morning', 'afternoon', 'evening'], true)) {
-                    throw new \InvalidArgumentException("Day {$i} item {$j} time_of_day invalid");
+                    $tod = 'morning';   // fallback (invalid → default)
                 }
+                $draft['days'][$i]['items'][$j]['time_of_day'] = $tod;
             }
                         if (isset($day['meals_included']) && is_array($day['meals_included'])) {
                 foreach ($day['meals_included'] as $m) {
