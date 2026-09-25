@@ -951,3 +951,54 @@ Protected systems: Zero diff
 **Purpose:** Continuity insurance — full plan if Master limit completes
 
 ---
+
+---
+
+### 2026-09-25 — Phase 4I-EXT CLOSED + PUSHED (Journey Replay AI Fix)
+
+**Commit:** `edeb933`
+**Push range:** `1b95e1d` → `edeb933`
+
+**Files (2):**
+- `app/Services/LlmService.php` (conditional response_format)
+- `app/Services/JourneyReplay/JourneyReplayService.php` (extract:true + multi-key)
+
+**Stats:** +26/-13
+
+**Root Cause Discovery:**
+  Journey Replay AI story = fallback (pre-fix)
+  Diagnostic chain:
+    1. Cache clear → still fallback
+    2. Log analysis → `content_length: 0` (empty response)
+    3. gpt-oss-20b (reasoning) consumes 250 tokens internally
+    4. Zero visible text → cleanStoryResponse(null) → fallback
+
+**Two-Layer Fix:**
+
+  **Layer 1 — LlmService (code):**
+    • `response_format: json_object` → conditional on `$extract`
+    • extract:true → JSON mode (for structured)
+    • extract:false → text mode (for raw narrative)
+    • Fixes semantic bug (extract flag was ignored)
+
+  **Layer 2 — JourneyReplay + .env:**
+    • JourneyReplay: `extract: true` (JSON mode)
+    • Multi-key defensive read: story/text/response/content/narrative/output
+    • .env: `GROQ_MODEL=qwen/qwen3.8-27b` (non-reasoning, text-friendly)
+    • .env change NOT committed (Owner domain, R24)
+
+**Result:**
+  ✅ AI story generated (clean text, no JSON wrapper)
+  ✅ Fallback eliminated
+  ✅ AI Quotation still works (T1)
+  ✅ Zero regression (41p/1f)
+
+**Deferred:**
+  🎫 AI-JOURNEY-STORY-GROUNDING-01 (MEDIUM) — Phase 4K
+     • ChatGPT concern: AI merges multiple unrelated trips
+       into single continuous narrative (content quality issue)
+     • 3-layer architecture: Facts (DB) + AI narrative + Validation
+
+**R3/R4/R13/R20/R24 कायम**
+
+---

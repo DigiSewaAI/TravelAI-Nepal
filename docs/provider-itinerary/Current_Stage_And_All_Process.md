@@ -1989,3 +1989,132 @@ Sync:    0/0
 ---
 
 ## 📊 CURRENT STATE (2026-09-25 Evening)
+
+
+---
+
+## 🎫 TICKETS — Session Update (2026-09-25 Final)
+
+### ✅ RESOLVED (This Session)
+
+**AI-REPLAY-AI-STORY-BROKEN-01** — ✅ RESOLVED
+  Commit: `edeb933`
+  Journey Replay AI story working. Root cause = LlmService forced
+  JSON mode (reasoning model fails). Two-layer fix applied.
+
+**JOURNEY-REPLAY-MODEL-DISCOVERY-01** — ✅ CLOSED
+  Architecture confirmed: cache-based (no DB model/table).
+  5-min TTL, on-the-fly generation via LlmService.
+
+### 🟡 MEDIUM PRIORITY (Phase 4K — Next)
+
+**AI-JOURNEY-STORY-GROUNDING-01** (NEW — Phase 4K)
+  ChatGPT concern (valid): AI merges multiple unrelated trips
+  into single continuous narrative.
+  Example: ABC (Aug) + EBC (Sep) + Hotel (Sep)
+  → Output: "journey began in Nayapul... concluded in Pokhara"
+  → Misleading single-journey framing
+
+  3-LAYER FIX ARCHITECTURE (Approved):
+    L1 — Hard Facts (DB only): dates, places, check-ins, coords
+    L2 — AI Interpretation: tone, transitions, narrative
+    L3 — Safety Validation: reject invented/merged facts
+
+  PRINCIPLE:
+    "AI can describe beautifully, but never invent the journey."
+
+  Effort: 2-3 hrs
+  Phase: 4K (merge with AI-ITINERARY-CONTENT-QUALITY-01)
+
+**AI-ITINERARY-CONTENT-QUALITY-01** (Phase 4K — Combined)
+  AI itinerary content ~75% accurate.
+  Hallucinations: fake places, side-trek confusion, route errors.
+  Fix: Prompt enhancement + post-validation.
+  Expected: 75% → 90%.
+  Effort: ~2 hrs.
+
+**Combined Phase 4K scope:**
+  - AI Itinerary accuracy (75% → 90%)
+  - Journey Replay story grounding
+  - Cross-cutting validation (places, dates, categories)
+  Total: ~4-5 hrs
+
+### 🟢 LOW PRIORITY (Deferred)
+
+**AI-QUOTATION-FORM-INCOMPLETE-01**
+  Quotation form missing: days, pax, start_date, accommodation.
+  Effort: 2 hrs.
+  Phase: Post-4K.
+
+**AI-MULTIPROVIDER-ROTATION-01**
+  Currently only Groq. Add OpenRouter + Cerebras (free).
+  Effort: 2-3 hrs.
+  Phase: 4J (after 4K).
+
+**AI-PUBLIC-PLANNER-VERIFY-01**
+  Public AI Planner = DB-driven (working).
+  Owner decision: Keep name, improve in-place (last).
+  No action needed now.
+
+**ELEVATION-DATA-GAP-01**
+  elevation_gain_m/loss_m NULL.
+  Fix: Provider UI to populate.
+  Effort: 2-4 hrs.
+  Phase: Post-4K.
+
+**WEATHER-SERVICE-LEGACY-FIX-01**
+  Legacy WeatherService uses OpenWeatherMap (paid-pattern).
+  Fix: Migrate to Open-Meteo OR remove dead code.
+  Effort: 2-3 hrs.
+  Phase: Post-deploy.
+
+**SERVICE-NULL-PRICE-UX-01**
+  N/A displays in blue styling. Cosmetic.
+  Effort: 15 min.
+
+**TREK-DIFFICULTY-I18N-01**
+  Hardcoded Easy/Moderate/Hard.
+  Effort: 15 min.
+
+**SERVICE-CATEGORY-CHANGE-CLEANUP-01**
+  Orphaned detail records on category change.
+  Effort: 30 min.
+
+**I18N-DUPLICATE-KEY-01**
+  weather_unavailable × 3 duplicates in 4 locales.
+  Effort: 30 min.
+
+**I18N-FALLBACK-PATTERN-01**
+  `__('key') ?? 'fallback'` broken pattern.
+  Effort: 1 hr.
+
+**I18N-INDENT-CLEANUP-01**
+  Inconsistent indentation across lang files + 2 controller sites.
+  Effort: 30 min.
+
+**SUNSET-INCONSISTENCY-01**
+  Public vs dashboard sunset differs ~19 min.
+  Effort: 30 min verify.
+
+**DOCS-CONSOLIDATION-01**
+  Untracked docs (7+ files) to commit.
+  Effort: 15 min.
+
+**AI-CONTENT-ANALYSIS-DEAD-CODE-01**
+  AiContentAnalysisService — no callers.
+  Effort: 15 min.
+
+**MASTER-AI-MD-CREATE-01**
+  Create `docs/globe/master_ai.md` — AI guide A-Z.
+  Effort: 1-2 hrs.
+
+**X-03-ROUTE-DATA-INJECTION**
+  Tier 2.
+  Effort: 1-2 hrs.
+
+**GLOBE-* (6 tickets)**
+  Post-MVP.
+
+---
+
+## 📊 CURRENT STATE (2026-09-25 Final)

@@ -402,6 +402,7 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 | Phase 4M-3-2-REDO — Constraint | ✅ PUSHED | 66eac2b | 2026-09-25 |
 | Master Handover File | ✅ PUSHED | f86de4f | 2026-09-25 |
 | Phase 4I — AI Typo Fixes | ✅ PUSHED | 605dfd3 | 2026-09-25 |
+| | Phase 4I-EXT — Journey Replay AI | ✅ PUSHED | edeb933 | 2026-09-25 |
 | **Phase 4K — AI Content Quality** | 🟢 **NEXT** | — | — |
 | Phase 4J — Multi-Provider | 🔒 After 4K | — | — |
 | Phase 5 — Live Journey | 🔒 FUTURE | — | — |
