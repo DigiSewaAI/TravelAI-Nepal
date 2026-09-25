@@ -9,8 +9,9 @@ class HotelDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+        protected $fillable = [
         'service_id',
+        'property_type',
         'room_count',
         'star_rating',
         'amenities',

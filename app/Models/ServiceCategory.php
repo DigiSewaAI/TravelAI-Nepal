@@ -13,11 +13,24 @@ class ServiceCategory extends Model
 
     // Future: hasMany(Service::class)
 
-    /**
-     * Phase 4M-3-1: Provider types that map to this category.
+        /**
+     * @deprecated (4M-3-REDO) Use providerTypesMany() pivot instead.
      */
     public function providerTypes()
     {
         return $this->hasMany(ProviderType::class);
+    }
+
+    /**
+     * 4M-3-REDO: Many-to-many provider types allowed for this category.
+     */
+    public function providerTypesMany()
+    {
+        return $this->belongsToMany(
+            ProviderType::class,
+            'provider_type_service_category',
+            'service_category_id',
+            'provider_type_id'
+        );
     }
 }
