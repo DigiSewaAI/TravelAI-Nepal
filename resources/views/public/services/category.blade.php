@@ -141,15 +141,15 @@
             <div class="p-5">
                 <div class="flex justify-between items-start">
                     <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
-                    <div class="text-right">
+                                        <div class="text-right">
                         @php
                             $currencyService = app(\App\Services\CurrencyService::class);
                             $displayCurrency = $currencyService->getDisplayCurrency();
                             $baseCurrency = $service->currency ?? 'USD';
-                            $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
-                            $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                            $displayPrice = $service->price !== null ? $currencyService->convert((float) $service->price, $baseCurrency, $displayCurrency) : null;
+                            $formattedPrice = $displayPrice !== null ? $currencyService->format($displayPrice, $displayCurrency) : __('messages.na');
                         @endphp
-                        <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full block">
+                        <span class="text-sm font-semibold {{ $displayPrice !== null ? 'text-blue-600 bg-blue-50' : 'text-gray-400 bg-gray-50 italic' }} px-2 py-1 rounded-full block">
                             {{ $formattedPrice }}
                         </span>
                     </div>

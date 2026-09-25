@@ -543,8 +543,8 @@
                         $currencyService = app(\App\Services\CurrencyService::class);
                         $displayCurrency = $currencyService->getDisplayCurrency();
                         $baseCurrency = $service->currency ?? 'USD';
-                        $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
-                        $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                        $displayPrice = $service->price !== null ? $currencyService->convert((float) $service->price, $baseCurrency, $displayCurrency) : null;
+                        $formattedPrice = $displayPrice !== null ? $currencyService->format($displayPrice, $displayCurrency) : __('messages.na');
 
                         $catSlug = strtolower($service->category->slug ?? '');
                         $catIcon = '📍';

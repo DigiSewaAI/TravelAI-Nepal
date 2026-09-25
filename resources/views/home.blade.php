@@ -254,12 +254,12 @@
           <div class="grid md:grid-cols-2 gap-5">
             <div>
               <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.destination') }} *</label>
-              <input type="text" 
-                     name="destination" 
-                     id="destination" 
-                     list="routeList" 
-                     required 
-                     placeholder="{{ __('messages.destination_placeholder') }}" 
+              <input type="text"
+                     name="destination"
+                     id="destination"
+                     list="routeList"
+                     required
+                     placeholder="{{ __('messages.destination_placeholder') }}"
                      class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
               <datalist id="routeList">
                 @foreach($routes as $route)
@@ -329,41 +329,41 @@
         <input type="hidden" name="planner_result_id" id="plannerResultId">
         <div class="mb-4">
     <label class="block font-medium mb-1">Select Provider *</label>
-    
+
     {{-- Search Box --}}
-    <input type="text" 
-           id="providerSearch" 
-           placeholder="Search provider by name..." 
+    <input type="text"
+           id="providerSearch"
+           placeholder="Search provider by name..."
            class="w-full border rounded-lg px-4 py-2 mb-2"
            autocomplete="off">
-    
+
     {{-- Provider Dropdown --}}
     <select name="provider_id" id="providerSelect" class="w-full border rounded-lg px-4 py-2" required size="1">
         <option value="">Loading providers...</option>
     </select>
-    
+
     {{-- Selected Provider Display --}}
     <p id="selectedProviderName" class="text-xs text-gray-500 mt-1"></p>
 </div>
 
         <div class="mb-4">
     <label class="block font-medium mb-1">Your Full Name *</label>
-    <input type="text" name="traveler_name" id="travelerName" 
-           class="w-full border rounded-lg px-4 py-2" required 
+    <input type="text" name="traveler_name" id="travelerName"
+           class="w-full border rounded-lg px-4 py-2" required
            placeholder="Enter your full name">
 </div>
 
 <div class="mb-4">
     <label class="block font-medium mb-1">Your Email *</label>
-    <input type="email" name="traveler_email" id="travelerEmail" 
-           class="w-full border rounded-lg px-4 py-2" required 
+    <input type="email" name="traveler_email" id="travelerEmail"
+           class="w-full border rounded-lg px-4 py-2" required
            placeholder="your@email.com">
 </div>
 
 <div class="mb-4">
     <label class="block font-medium mb-1">Your Phone (optional)</label>
-    <input type="text" name="traveler_phone" id="travelerPhone" 
-           class="w-full border rounded-lg px-4 py-2" 
+    <input type="text" name="traveler_phone" id="travelerPhone"
+           class="w-full border rounded-lg px-4 py-2"
            placeholder="+977 98XXXXXXXX">
 </div>
 
@@ -434,11 +434,11 @@
               $currencyService = app(\App\Services\CurrencyService::class);
               $displayCurrency = $currencyService->getDisplayCurrency();
               $baseCurrency = $service->currency ?? 'USD';
-              $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
-              $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+              $displayPrice = $service->price !== null ? $currencyService->convert((float) $service->price, $baseCurrency, $displayCurrency) : null;
+              $formattedPrice = $displayPrice !== null ? $currencyService->format($displayPrice, $displayCurrency) : __('messages.na');
             @endphp
             <div class="text-right">
-              <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full block">
+              <span class="text-sm font-semibold {{ $displayPrice !== null ? 'text-blue-600 bg-blue-50' : 'text-gray-400 bg-gray-50 italic' }} px-2 py-1 rounded-full block">
                 {{ $formattedPrice }}
               </span>
             </div>
@@ -451,7 +451,7 @@
             <span><i class="fas fa-tag"></i> {{ $service->category->name ?? __('messages.na') }}</span>
           </div>
           <p class="text-gray-600 text-sm mt-3">{{ $service->provider->name ?? 'TravelAI Partner' }}</p>
-          <a href="{{ route('public.services.show', $service->slug) }}" 
+          <a href="{{ route('public.services.show', $service->slug) }}"
              class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium text-sm">
             {{ __('messages.view_details') }} →
           </a>
@@ -462,7 +462,7 @@
       @endforelse
     </div>
     <div class="text-center mt-12">
-      <a href="{{ route('public.services.index') }}" 
+      <a href="{{ route('public.services.index') }}"
          class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-xl transition shadow-md hover:shadow-lg">
         {{ __('messages.view_all_services') }} →
       </a>
@@ -641,7 +641,7 @@
         const email = form.querySelector('input[type="email"]').value;
         const btn = form.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
-        
+
         btn.innerHTML = 'Submitting...';
         btn.disabled = true;
 
@@ -739,7 +739,7 @@
       days.forEach(day => {
     // ✅ Strip duplicate "Day X:" prefix
     const cleanTitle = (day.title || '').replace(/^(Day|दिन|第)\s*\d+\s*(天)?\s*[:：]\s*/u, '').trim();
-    
+
     html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
     const _locale = '{{ app()->getLocale() }}';
 const _dayPrefix = {np:'दिन', hi:'दिन', zh:'第', en:'Day'}[_locale] || 'Day';
@@ -766,7 +766,7 @@ html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_num
               costDisplay = ` <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${currency || 'NPR'} ${item.cost}</span>`;
             }
             if (!costDisplay && breakdown) {
-              const matchedService = Object.values(breakdown).find(b => 
+              const matchedService = Object.values(breakdown).find(b =>
                 b.name && item.title && b.name.toLowerCase().includes(item.title.toLowerCase())
               );
               if (matchedService && matchedService.amount) {
@@ -785,7 +785,7 @@ html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_num
 
             // ➕ Add "Request Quotation" button after itinerary
       html += `<div class="mt-6 border-t pt-4 text-center">
-                <button onclick="openQuotationModal()" 
+                <button onclick="openQuotationModal()"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto">
                     <i class="fas fa-paper-plane"></i> Request Quotation from Providers
                 </button>
@@ -900,11 +900,11 @@ function loadProviders() {
     const select = document.getElementById('providerSelect');
     const searchInput = document.getElementById('providerSearch');
     const selectedDisplay = document.getElementById('selectedProviderName');
-    
+
     select.innerHTML = '<option value="">Loading...</option>';
     searchInput.value = '';
     selectedDisplay.textContent = '';
-    
+
     fetch('/api/providers/list')
         .then(res => res.json())
         .then(data => {
@@ -919,15 +919,15 @@ function loadProviders() {
 function renderProviderOptions(providers) {
     const select = document.getElementById('providerSelect');
     select.innerHTML = '';
-    
+
     if (providers.length === 0) {
         select.innerHTML = '<option value="">No providers found</option>';
         return;
     }
-    
+
     // Add default option
     select.innerHTML = '<option value="">-- Select a provider --</option>';
-    
+
     providers.forEach(p => {
         select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
     });
@@ -938,22 +938,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('providerSearch');
     const select = document.getElementById('providerSelect');
     const selectedDisplay = document.getElementById('selectedProviderName');
-    
+
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
-            
+
             if (query === '') {
                 renderProviderOptions(allProviders);
             } else {
-                const filtered = allProviders.filter(p => 
+                const filtered = allProviders.filter(p =>
                     p.name.toLowerCase().includes(query)
                 );
                 renderProviderOptions(filtered);
             }
         });
     }
-    
+
     if (select) {
         select.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];

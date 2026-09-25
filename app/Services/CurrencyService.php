@@ -53,8 +53,9 @@ class CurrencyService
     /**
      * Convert amount from one currency to another
      */
-    public function convert(float $amount, string $fromCurrency, string $toCurrency): float
+        public function convert(float|int|null $amount, string $fromCurrency, string $toCurrency): float
     {
+        $amount = (float) ($amount ?? 0);
         if ($fromCurrency === $toCurrency) {
             return $amount;
         }

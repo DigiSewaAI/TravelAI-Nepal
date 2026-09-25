@@ -34,13 +34,17 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="py-3 text-sm font-medium">{{ $service->name }}</td>
                         <td class="py-3 text-sm">{{ $service->category->name ?? 'N/A' }}</td>
-                                                <td class="py-3 text-sm">
-                            @php
-                                $baseCurrency = $service->currency ?? 'USD';
-                                $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
-                                $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
-                            @endphp
-                            {{ $formattedPrice }}
+                                                                        <td class="py-3 text-sm">
+                            @if($service->price !== null)
+                                @php
+                                    $baseCurrency = $service->currency ?? 'USD';
+                                    $displayPrice = $currencyService->convert((float) $service->price, $baseCurrency, $displayCurrency);
+                                    $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
+                                @endphp
+                                {{ $formattedPrice }}
+                            @else
+                                <span class="text-gray-400 italic">N/A</span>
+                            @endif
                         </td>
                         <td class="py-3 text-sm">
     <span class="px-2 py-1 rounded-full text-xs

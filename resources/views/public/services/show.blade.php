@@ -95,13 +95,13 @@
                 @endif
             </div>
 
-            @php
+                        @php
                 $currencyService = app(\App\Services\CurrencyService::class);
                 $displayCurrency = $currencyService->getDisplayCurrency();
                 $baseCurrency = $service->currency ?? 'USD';
-                $displayPrice = $currencyService->convert($service->price, $baseCurrency, $displayCurrency);
-                $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
-                $showBaseNote = ($baseCurrency !== $displayCurrency);
+                $displayPrice = $service->price !== null ? $currencyService->convert((float) $service->price, $baseCurrency, $displayCurrency) : null;
+                $formattedPrice = $displayPrice !== null ? $currencyService->format($displayPrice, $displayCurrency) : __('messages.na');
+                $showBaseNote = ($service->price !== null && $baseCurrency !== $displayCurrency);
             @endphp
 
             <div class="mt-4">
@@ -494,10 +494,10 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach($relatedServices as $related)
-                    @php
+                                        @php
                         $relBaseCurrency = $related->currency ?? 'USD';
-                        $relDisplayPrice = $currencyService->convert($related->price, $relBaseCurrency, $displayCurrency);
-                        $relFormatted = $currencyService->format($relDisplayPrice, $displayCurrency);
+                        $relDisplayPrice = $related->price !== null ? $currencyService->convert((float) $related->price, $relBaseCurrency, $displayCurrency) : null;
+                        $relFormatted = $relDisplayPrice !== null ? $currencyService->format($relDisplayPrice, $displayCurrency) : __('messages.na');
                     @endphp
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition border border-gray-100 group">
                         <div class="h-40 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
