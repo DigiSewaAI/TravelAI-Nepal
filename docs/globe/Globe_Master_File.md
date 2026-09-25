@@ -408,8 +408,13 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 | Phase 4H-EXT — Timing (11m→3m45s) | ✅ PUSHED | 51a33ae | 2026-09-25 |
 | Phase UI-FIX — Cancel + Abort | ✅ PUSHED | e8a586f | 2026-09-25 |
 | Phase 4H-EXT-2 — Chunking Reliability | ✅ PUSHED | 76d5b7d | 2026-09-25 |
-| **Phase 4J — Multi-Provider** | 🟢 **NEXT** | — | — |
-| Phase 4K-F3 — Route Accuracy | 🔒 Deferred | — | — |
+| Phase 4J — Multi-Provider | ✅ PUSHED | 5f9b3e7 | 2026-09-25 |
+| Phase 4J-Fix — Chunker + Guard | ✅ PUSHED | 5f568bf | 2026-09-25 |
+| Phase 4K — Route Accuracy (100%) | ✅ PUSHED | d051257 | 2026-09-25 |
+| **Phase 4K-DATA-FIX — Data cleanup** | 🟢 **NEXT** | — | — |
+| Phase E1 — Home AI Improve | 🔒 LAST | — | — |
+| Phase 4K-F3 — Content tuning | 🔒 Post-deploy | — | — |
+| Deploy | 🔒 FINAL | — | — |
 | Phase 5 — Live Journey | 🔒 FUTURE | — | — |
 | Phase 6 — Memory & Social | 🔒 FUTURE | — | — |
 

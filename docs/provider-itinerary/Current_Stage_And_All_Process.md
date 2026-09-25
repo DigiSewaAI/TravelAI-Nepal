@@ -2306,3 +2306,72 @@ Target:
 ---
 
 ## 📊 CURRENT STATE (2026-09-25 Evening Final)
+
+---
+
+## 🎫 TICKETS — Session Final Update (2026-09-25)
+
+### ✅ RESOLVED (This Session)
+
+**AI-DRAFT-ROUTE-ACCURACY-01** — ✅ RESOLVED
+  Commit: `d051257` (4K)
+  Route accuracy 80% → 100% (via DB waypoint injection)
+
+**AI-DRAFT-CHUNKING-STALL-01** — ✅ RESOLVED
+  Commit: `76d5b7d` (4H-EXT-2)
+
+**AI-DRAFT-MULTIPROVIDER-01** — ✅ RESOLVED
+  Commit: `5f9b3e7` + `5f568bf` (4J)
+
+### 🟡 MEDIUM PRIORITY (Active)
+
+**4K-F3-CONTENT-TUNING** (NEW)
+  Issue:
+    • Day 3: "Birethanti" (ABC waypoint on AC route)
+    • Day 7: "Humla cave" (should be "Milarepa Cave")
+  Fix: Prompt refinement + location context
+  Effort: ~30 min
+  Phase: Post-deploy
+
+**AI-DRAFT-RATE-LIMIT-TUNING-01** (existing)
+  Issue: sleep(40) between chunks = rate limit hit
+  Fix: sleep(40) → sleep(55) at line 674
+  Effort: 5 min
+  Phase: Post-deploy
+
+**AI-DRAFT-CROSS-CHUNK-DUPES-01** (existing)
+  Issue: Cross-chunk duplicate detection occasionally triggers
+  Fix: Prompt tuning
+  Effort: ~30 min
+  Phase: Post-deploy
+
+**AI-ARCHITECTURE-UNIFY-02** (existing)
+  Issue: Hardcoded model in AiItineraryDraftController
+  Effort: 5 min
+  Phase: Post-deploy
+
+**4K-DATA-FIX** (NEW — Owner approved earlier)
+  Issues:
+    • 86 orphan waypoints (location_id null)
+    • Marpha not linked to AC route
+    • Route 5: 2 duplicate loops
+    • Trek services location_id null (optional)
+  Effort: 30-60 min
+  Phase: Next session
+  Benefit: Home planner + Provider AI improve
+
+**E1-HOME-AI-IMPROVE** (Owner directive — last)
+  Goal: Home AI Travel Planner accuracy 85% → 92-95%
+  Pattern: Reuse 4K approach
+  Effort: 1-2 hrs
+  Phase: Last before deploy
+
+### 🟢 LOW PRIORITY
+
+**AI-DRAFT-PROGRESS-SYNC-01** (existing)
+**AI-DRAFT-ASYNC-QUEUE-01** (existing)
+**AI-DRAFT-PROGRESSIVE-SAVE-01** (existing)
+
+---
+
+## 📊 CURRENT STATE (2026-09-25 Final)

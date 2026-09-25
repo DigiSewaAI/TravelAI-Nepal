@@ -1089,3 +1089,64 @@ Protected systems: Zero diff
 **Protected Systems Touched:** ZERO
 
 **Next:** Phase 4J (Multi-Provider Rotation — 500+ travelers)
+
+---
+
+### 2026-09-25 — Phase 4J CLOSED + PUSHED (Multi-Provider Rotation)
+
+**Commit:** `5f9b3e7` (core) + `5f568bf` (fix)
+**Push range:** `50136a0` → `5f568bf`
+
+**Files (5):**
+- `config/services.php` (providers config)
+- `.env.example` (keys documented)
+- `app/Services/LlmService.php` (rotation logic)
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php` (chunker retry)
+- `resources/views/provider/services/itinerary/_ai_draft_modal.blade.php` (double-submit guard)
+
+**What Shipped:**
+- Multi-provider pool (Groq + OpenRouter + Cerebras)
+- Priority rotation with multi-key support
+- Config-driven URLs (no hardcode)
+- Chunker rate-limit retry (honor OTPM window)
+- Double-submit guard (`aiIsFetching` flag)
+
+**Tests:** T1 (7-day) 2m 29s + 14-day 4m 53s + T2 (double-click) 1m 25s — all PASS
+**R5/R20/R21-R24 कायम**
+
+---
+
+### 2026-09-25 — Phase 4K CLOSED + PUSHED (Route Accuracy 80% → 100%)
+
+**Commit:** `d051257`
+**Push range:** `5f568bf` → `d051257`
+
+**Files (2):**
+- `app/Services/PlannerService.php` (additive: resolveRouteForProvider)
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php` (5 sub-changes)
+
+**What Shipped:**
+- Route waypoint injection into AI draft prompt
+- VERIFIED ROUTE block (16 waypoints for AC)
+- Post-generation route validation
+- Fuzzy endpoint matching (levenshtein ≤ 2)
+- Fallback to generic prompt (no route match)
+
+**Discovery (5 stages):**
+- Stage 1: 812 active segments (543 deleted — ignored)
+- Stage 2: 138 routes, 100% with segments
+- Stage 3: Route 5 (AC) actual correct route verified
+- Stage 4: Owner insight proven (name match 85-90%)
+- Stage 5: Home planner pattern reusable (5,131 requests)
+
+**Tests:**
+- T1 (AC 14-day): 14/14 days DB match — 100% route accuracy
+- Zero hallucination (no Chhusang/Chele/Kanga)
+- Thorong La correctly placed (Day 11)
+- Tatopani correctly placed (Day 14)
+- Speed: 3m 21s for 14-day
+
+**R5 कायम:** Existing resolveRoute() untouched — additive wrapper only
+**R3/R4/R20 कायम**
+
+**Achievement:** Owner insight production-proven (5,131 home planner requests validated pattern)
