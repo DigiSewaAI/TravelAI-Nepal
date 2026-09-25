@@ -61,8 +61,8 @@
                 <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.category') }} *</label>
                 <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('service_category_id') border-red-500 @enderror">
                     <option value="">{{ __('messages.select_category') }}</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
+                                        @foreach($categories as $category)
+                        <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
                         </option>
                     @endforeach
@@ -111,9 +111,16 @@
                 <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.status') }}</label>
                 <select name="status" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>{{ __('messages.active') }}</option>
-                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
+                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
                 </select>
             </div>
+
+            {{-- Phase 4M-2-3+4: Category-specific fields --}}
+            @include('provider.services._fields_trek', ['service' => null])
+            @include('provider.services._fields_tour', ['service' => null])
+            @include('provider.services._fields_hotel', ['service' => null])
+            @include('provider.services._fields_activity', ['service' => null])
+            @include('provider.services._fields_experience', ['service' => null])
         </div>
 
         <div class="mt-6 flex gap-3">
@@ -124,6 +131,40 @@
                 {{ __('messages.cancel') }}
             </a>
         </div>
-    </form>
+        </form>
 </div>
+
+{{-- Phase 4M-2-3+4: Category-aware form JS --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var categorySelect = document.querySelector('select[name="service_category_id"]');
+    if (!categorySelect) return;
+
+    var fieldGroups = document.querySelectorAll('.category-fields');
+
+        function updateCategoryFields() {
+        var selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        var slug = selectedOption ? selectedOption.getAttribute('data-slug') : '';
+
+        fieldGroups.forEach(function(group) {
+            var isActive = group.getAttribute('data-slug') === slug;
+
+            // Show/hide
+            group.classList.toggle('hidden', !isActive);
+
+            // Disable/enable inputs (prevents duplicate submission)
+            group.querySelectorAll('input, select, textarea').forEach(function(input) {
+                if (isActive) {
+                    input.removeAttribute('disabled');
+                } else {
+                    input.setAttribute('disabled', 'disabled');
+                }
+            });
+        });
+    }
+
+    categorySelect.addEventListener('change', updateCategoryFields);
+    updateCategoryFields();
+});
+</script>
 @endsection

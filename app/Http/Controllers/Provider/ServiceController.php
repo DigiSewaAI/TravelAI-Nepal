@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Str;
 use App\Models\Provider;
+use App\Models\TrekDetail;
+use App\Models\TourDetail;
+use App\Models\HotelDetail;
+use App\Models\ActivityDetail;
+use App\Models\ExperienceDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -71,6 +76,11 @@ class ServiceController extends Controller
             $validated['cover_image'] = $path;
         }
 
+                // Phase 4M-2-3+4: Category detection + detail validation
+        $category = ServiceCategory::find($validated['service_category_id']);
+        $slug     = $category ? $category->slug : '';
+        $detailData = $this->validateDetailFields($request, $slug);
+
         $validated['provider_id'] = $provider->id;
         $validated['slug']        = Str::slug($validated['name']) . '-' . Str::random(6);
         $validated['status']      = $validated['status'] ?? 'active';
@@ -80,7 +90,7 @@ class ServiceController extends Controller
         $effectiveMax = 0;
 
         try {
-            DB::transaction(function () use ($provider, $validated, &$limitReached, &$effectiveMax) {
+                        DB::transaction(function () use ($provider, $validated, $slug, $detailData, &$limitReached, &$effectiveMax) {
                 // FIX-15 D1: atomic row lock on provider to serialize concurrent creations
                 $lockedProvider = Provider::where('id', $provider->id)
                     ->lockForUpdate()
@@ -105,7 +115,8 @@ class ServiceController extends Controller
                     return;
                 }
 
-                Service::create($validated);
+                                $service = Service::create($validated);
+                $this->upsertDetailRecord($service, $slug, $detailData);
             });
         } catch (\Throwable $e) {
             if ($uploadedFile) {
@@ -133,6 +144,58 @@ class ServiceController extends Controller
         return redirect()
             ->route('provider.services.index')
             ->with('success', 'Service created successfully.');
+    }
+
+    /**
+     * Phase 4M-2-3+4: Validate category-specific detail fields.
+     */
+    private function validateDetailFields(Request $request, string $slug): array
+    {
+        return match ($slug) {
+            'trek' => $request->validate([
+                'duration_days' => 'required|integer|min:1',
+                'difficulty'    => 'required|in:easy,moderate,hard',
+                'max_pax'       => 'nullable|integer|min:1',
+                'max_altitude'  => 'nullable|integer|min:0',
+                'season'        => 'nullable|string|max:100',
+            ]),
+            'tour' => $request->validate([
+                'duration_days' => 'required|integer|min:1',
+                'max_pax'       => 'nullable|integer|min:1',
+            ]),
+            'hotel' => $request->validate([
+                'room_count'     => 'nullable|integer|min:0',
+                'star_rating'    => 'nullable|integer|between:1,5',
+                'amenities'      => 'nullable|string',
+                'check_in_time'  => 'nullable|date_format:H:i',
+                'check_out_time' => 'nullable|date_format:H:i',
+            ]),
+            'activity', 'experience' => $request->validate([
+                'max_pax' => 'nullable|integer|min:1',
+            ]),
+            default => [],
+        };
+    }
+
+    /**
+     * Phase 4M-2-3+4: Upsert category-specific detail record.
+     */
+    private function upsertDetailRecord(Service $service, string $slug, array $data): void
+    {
+        if ($slug === 'hotel' && isset($data['amenities']) && is_string($data['amenities'])) {
+            $data['amenities'] = array_values(array_filter(
+                array_map('trim', explode(',', $data['amenities']))
+            ));
+        }
+
+        match ($slug) {
+            'trek'       => TrekDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'tour'       => TourDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'hotel'      => HotelDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'activity'   => ActivityDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'experience' => ExperienceDetail::updateOrCreate(['service_id' => $service->id], $data),
+            default      => null,
+        };
     }
 
     /**
@@ -166,8 +229,13 @@ class ServiceController extends Controller
         'currency' => 'required|in:USD,NPR',  // ✅ Added
         'description' => 'nullable|string',
         'cover_image' => 'nullable|image|max:2048',
-        'status' => 'nullable|in:active,inactive',
+                'status' => 'nullable|in:active,inactive',
     ]);
+
+    // Phase 4M-2-3+4: Category detection + detail validation
+    $category   = ServiceCategory::find($validated['service_category_id']);
+    $slug       = $category ? $category->slug : '';
+    $detailData = $this->validateDetailFields($request, $slug);
 
     if ($request->hasFile('cover_image')) {
         if ($service->cover_image) {
@@ -177,10 +245,11 @@ class ServiceController extends Controller
         $validated['cover_image'] = $path;
     }
 
-    $service->update($validated);
+                $service->update($validated);
+    $this->upsertDetailRecord($service, $slug, $detailData);
 
     return redirect()->route('provider.services.index')->with('success', 'Service updated successfully.');
-}
+    }
 
     public function destroy(Service $service)
     {
