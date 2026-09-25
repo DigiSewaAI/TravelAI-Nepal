@@ -742,9 +742,24 @@ PROMPT;
                     'error'     => $msg,
                 ]);
 
-                                if (str_contains($msg, 'rate_limit') ||
+                                                if (str_contains($msg, 'rate_limit') ||
                     str_contains($msg, 'Request too large') ||
                     str_contains($msg, 'tokens per minute')) {
+                    // 4J-Fix: honor OTPM window — sleep + retry (not give up)
+                    if ($attempt < $maxAttempts) {
+                        $waitSec = 60;
+                        if (preg_match('/retry_after=(\d+)/i', $msg, $m)) {
+                            $waitSec = max((int)$m[1] + 5, 30);
+                        } elseif (preg_match('/wait (\d+) seconds/i', $msg, $m)) {
+                            $waitSec = max((int)$m[1] + 5, 30);
+                        }
+                        Log::info('4J-Fix: rate_limit retry', [
+                            'attempt' => $attempt,
+                            'wait'    => $waitSec,
+                        ]);
+                        sleep($waitSec);
+                        continue;
+                    }
                     return null;
                 }
                 if ($attempt < $maxAttempts) sleep(45);   // 4H-EXT-2: honor OTPM window

@@ -129,8 +129,9 @@
     var aiDraftUrl      = null;
     var aiDraftApplyUrl = null;
     var csrfToken       = null;
-    var currentDraftId  = null;
+        var currentDraftId  = null;
     var aiAbortController = null;
+    var aiIsFetching    = false;   // 4J-Fix: double-submit guard
 
     function startEstimatedProgress(totalDays) {
         if (!progressEl || !progressChunk || !progressDays || !progressBar) return function(){};
@@ -216,13 +217,18 @@
         }
     });
 
-        generateBtn.addEventListener('click', async function () {
+                generateBtn.addEventListener('click', async function () {
+        // 4J-Fix: prevent double-submit
+        if (aiIsFetching) return;
+        aiIsFetching = true;
+
         var days = parseInt(daysInput.value || '0', 10);
         var notes = notesInput.value || '';
 
         window._aiDraftStopProgress = startEstimatedProgress(days);
 
         if (days < 1 || days > 21) {
+            aiIsFetching = false;
             showError(@json(__('messages.ai_draft_error_generic')));
             return;
         }
@@ -259,7 +265,8 @@
             previewStage.classList.remove('hidden');
         } catch (err) {
             showError(err.message || @json(__('messages.ai_draft_error_generic')));
-                } finally {
+                        } finally {
+            aiIsFetching = false;   // 4J-Fix: release guard
             loadingEl.classList.add('hidden');
             if (typeof window._aiDraftStopProgress === 'function') {
                 window._aiDraftStopProgress();
