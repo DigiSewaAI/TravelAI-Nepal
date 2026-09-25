@@ -467,6 +467,8 @@ STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 
 1. COUNT: EXACTLY {$days} days. No more. No less.
    {$dayNumberRule}
+   🔴 CRITICAL: Count your days array before finalizing.
+   If you have fewer or more than {$days} days, REGENERATE.
 
 2. ANTI-REPETITION (MANDATORY):
    - NEVER repeat a route. "Place A to Place B" may appear ONLY ONCE.
@@ -487,7 +489,19 @@ STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
    - Do NOT introduce places from other Nepal regions.
    - Altitude gain per day must be realistic (< 1000m/day typical).
 
-6. OUTPUT FORMAT — Valid JSON only, no markdown:
+6. NO REASONING OUTPUT (CRITICAL):
+   - Do NOT include reasoning, thinking, planning, or meta-commentary.
+   - Do NOT write "Let me correct...", "However...", "Actually...", "Wait...".
+   - If you realize an error mid-output, STOP and regenerate the full JSON.
+   - Output ONLY the final JSON object. No explanations before/after.
+
+7. SELF-CHECK BEFORE RESPONSE (MANDATORY):
+   - Verify day count = EXACTLY {$days}.
+   - Verify no duplicate titles.
+   - Verify geographic continuity (Day N+1 starts from Day N endpoint).
+   - If any check fails, regenerate internally before responding.
+
+8. OUTPUT FORMAT — Valid JSON only, no markdown:
 {
   "days": [
     {
@@ -553,12 +567,13 @@ PROMPT;
             }
 
             if ($draftAttempt < $maxDraftAttempts) {
-                Log::info('Phase 4H full draft retry', [
+                                Log::info('Phase 4H full draft retry', [
                     'attempt'    => $draftAttempt,
                     'max'        => $maxDraftAttempts,
                     'service_id' => $service->id,
                 ]);
-                sleep(5);
+                // 4H-EXT: Wait 30s before retry (OTPM window reset)
+                sleep(30);
             }
         }
 
@@ -657,7 +672,7 @@ PROMPT;
             $allDays = array_merge($allDays, $chunkResult['days']);
 
             if ($i < $totalChunks - 1) {
-                sleep(60);
+                sleep(40);  // 4H-EXT: OTPM window optimization (60s → 40s)
             }
         }
 
