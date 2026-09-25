@@ -532,6 +532,8 @@ return [
     'amenities' => 'Amenities',
     'check_in_time' => 'Check-in Time',
     'check_out_time' => 'Check-out Time',
+        'category_locked_info' => 'Your provider type (:type) can create :category services only.',
+    'category_not_allowed' => 'This category is not available for your provider type.',
         'altitude_profile_heading' => 'Altitude Profile',
     'altitude_profile_subtitle' => 'Day-by-day altitude trend',
     'altitude_unavailable' => 'Altitude data unavailable',

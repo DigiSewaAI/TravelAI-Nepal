@@ -59,14 +59,26 @@
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.category') }} *</label>
-                <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('service_category_id') border-red-500 @enderror">
-                    <option value="">{{ __('messages.select_category') }}</option>
-                                        @foreach($categories as $category)
-                        <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
+                                @if($allowedCategories->count() === 1)
+                    {{-- 4M-3-2 REDO: Locked (single category) --}}
+                    <select disabled class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed">
+                        <option selected>{{ $allowedCategories->first()->name }}</option>
+                    </select>
+                    <input type="hidden" name="service_category_id" value="{{ $allowedCategories->first()->id }}" data-slug="{{ $allowedCategories->first()->slug }}">
+                    <p class="text-xs text-gray-500 mt-1">
+                        {{ __('messages.category_locked_info', ['type' => $providerType->name, 'category' => $allowedCategories->first()->name]) }}
+                    </p>
+                @else
+                    {{-- 4M-3-2 REDO: Dropdown (multiple allowed OR custom fallback) --}}
+                    <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('service_category_id') border-red-500 @enderror">
+                        <option value="">{{ __('messages.select_category') }}</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                @endif
                 @error('service_category_id')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -137,14 +149,20 @@
 {{-- Phase 4M-2-3+4: Category-aware form JS --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var categorySelect = document.querySelector('select[name="service_category_id"]');
-    if (!categorySelect) return;
+        var categorySelect = document.querySelector('select[name="service_category_id"]');
+    var hiddenCategory = document.querySelector('input[type="hidden"][name="service_category_id"]');
+    if (!categorySelect && !hiddenCategory) return;
 
     var fieldGroups = document.querySelectorAll('.category-fields');
 
         function updateCategoryFields() {
-        var selectedOption = categorySelect.options[categorySelect.selectedIndex];
-        var slug = selectedOption ? selectedOption.getAttribute('data-slug') : '';
+        var slug = '';
+        if (hiddenCategory) {
+            slug = hiddenCategory.getAttribute('data-slug') || '';
+        } else if (categorySelect) {
+            var selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            slug = selectedOption ? selectedOption.getAttribute('data-slug') : '';
+        }
 
         fieldGroups.forEach(function(group) {
             var isActive = group.getAttribute('data-slug') === slug;
@@ -163,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    categorySelect.addEventListener('change', updateCategoryFields);
+    if (categorySelect) categorySelect.addEventListener('change', updateCategoryFields);
     updateCategoryFields();
 });
 </script>

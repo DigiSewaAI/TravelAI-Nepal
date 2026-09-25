@@ -31,10 +31,24 @@ class ServiceController extends Controller
     return view('provider.services.index', compact('services'));
 }
 
-    public function create()
+        public function create()
     {
-        $categories = ServiceCategory::all();
-        return view('provider.services.create', compact('categories'));
+        $provider = Auth::user()->ownProvider();
+        $providerType = $provider?->types()->first();
+
+        // 4M-3-2 REDO: Pivot-based allowed categories
+        $allowedCategories = $providerType
+            ? $providerType->serviceCategories
+            : collect();
+
+        // Custom fallback (Q2): unmapped type = all allowed
+        if ($allowedCategories->isEmpty()) {
+            $allowedCategories = ServiceCategory::all();
+        }
+
+        $categories = $allowedCategories;
+
+        return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType'));
     }
 
         public function store(Request $request)
@@ -48,7 +62,7 @@ class ServiceController extends Controller
             abort(403, 'No provider found.');
         }
 
-        $validated = $request->validate([
+                $validated = $request->validate([
             'name'                => 'required|string|max:255',
             'service_category_id' => 'required|exists:service_categories,id',
             'price'               => 'nullable|numeric|min:0',
@@ -57,6 +71,19 @@ class ServiceController extends Controller
             'cover_image'         => 'nullable|image|max:2048',
             'status'              => 'nullable|in:active,inactive',
         ]);
+
+        // 4M-3-2 REDO (D6): Pivot-based category constraint
+        $providerType = $provider->types()->first();
+        $allowedCategories = $providerType
+            ? $providerType->serviceCategories
+            : collect();
+
+        if ($allowedCategories->isNotEmpty()) {
+            $allowedIds = $allowedCategories->pluck('id')->all();
+            if (!in_array((int) $validated['service_category_id'], $allowedIds, true)) {
+                abort(403, __('messages.category_not_allowed'));
+            }
+        }
 
         // Fast pre-check (non-atomic) — avoid file upload if clearly over limit
         $quickMax = $provider->max_listings; // FIX-15 D5: uses helper
@@ -211,11 +238,33 @@ class ServiceController extends Controller
             ->withInput();
     }
 
-    public function edit(Service $service)
+        public function edit(Service $service)
     {
         $this->authorize('update', $service);
-        $categories = ServiceCategory::all();
-        return view('provider.services.edit', compact('service', 'categories'));
+
+        $provider = Auth::user()->ownProvider();
+        $providerType = $provider?->types()->first();
+
+        // 4M-3-2 REDO: Pivot-based allowed categories
+        $allowedCategories = $providerType
+            ? $providerType->serviceCategories
+            : collect();
+
+        if ($allowedCategories->isEmpty()) {
+            $allowedCategories = ServiceCategory::all();
+        }
+
+        $categories = $allowedCategories;
+
+        // Legacy detection: service in disallowed category
+        $allowedIds = $allowedCategories->pluck('id')->all();
+        $isLegacy = !in_array((int) $service->service_category_id, $allowedIds, true);
+        $currentCategory = ServiceCategory::find($service->service_category_id);
+
+        return view('provider.services.edit', compact(
+            'service', 'categories', 'allowedCategories', 'providerType',
+            'isLegacy', 'currentCategory'
+        ));
     }
 
     public function update(Request $request, Service $service)
@@ -229,8 +278,28 @@ class ServiceController extends Controller
         'currency' => 'required|in:USD,NPR',  // ✅ Added
         'description' => 'nullable|string',
         'cover_image' => 'nullable|image|max:2048',
-                'status' => 'nullable|in:active,inactive',
+                                'status' => 'nullable|in:active,inactive',
     ]);
+
+    // 4M-3-2 REDO (D6 + D4): Pivot constraint with legacy bypass
+    $provider = Auth::user()->ownProvider();
+    $providerType = $provider?->types()->first();
+    $allowedCategories = $providerType
+        ? $providerType->serviceCategories
+        : collect();
+
+    if ($allowedCategories->isNotEmpty()) {
+        $allowedIds = $allowedCategories->pluck('id')->all();
+        $submittedId = (int) $validated['service_category_id'];
+
+        if (!in_array($submittedId, $allowedIds, true)) {
+            // Legacy bypass: unchanged disallowed category = allow
+            $isLegacyUnchanged = (int) $service->service_category_id === $submittedId;
+            if (!$isLegacyUnchanged) {
+                abort(403, __('messages.category_not_allowed'));
+            }
+        }
+    }
 
     // Phase 4M-2-3+4: Category detection + detail validation
     $category   = ServiceCategory::find($validated['service_category_id']);

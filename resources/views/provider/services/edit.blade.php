@@ -18,14 +18,34 @@
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.category') }} *</label>
-                <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">{{ __('messages.select_category') }}</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id', $service->service_category_id) == $category->id ? 'selected' : '' }}>
+                                @if($allowedCategories->count() === 1)
+                    {{-- 4M-3-2 REDO: Locked (single category, with legacy display) --}}
+                    <select disabled class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed">
+                        <option selected>{{ $currentCategory?->name ?? $allowedCategories->first()->name }}</option>
+                    </select>
+                    <input type="hidden" name="service_category_id" value="{{ $service->service_category_id }}" data-slug="{{ $currentCategory?->slug ?? '' }}">
+                    <p class="text-xs text-gray-500 mt-1">
+                        {{ __('messages.category_locked_info', ['type' => $providerType->name, 'category' => $allowedCategories->first()->name]) }}
+                        @if($isLegacy)
+                            <span class="text-orange-600 font-medium">(legacy: {{ $currentCategory?->name }})</span>
+                        @endif
+                    </p>
+                @else
+                    {{-- 4M-3-2 REDO: Dropdown (multiple allowed) --}}
+                    <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">{{ __('messages.select_category') }}</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id', $service->service_category_id) == $category->id ? 'selected' : '' }}>
                                                         {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($isLegacy)
+                        <p class="text-xs text-orange-600 mt-1">
+                            Current category ({{ $currentCategory?->name }}) is legacy. Choose a new allowed category to update.
+                        </p>
+                    @endif
+                @endif
             </div>
 
             {{-- 🔥 यहाँ Price फिल्ड प्रतिस्थापन गरिएको छ --}}
@@ -85,14 +105,20 @@
 {{-- Phase 4M-2-3+4: Category-aware form JS --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var categorySelect = document.querySelector('select[name="service_category_id"]');
-    if (!categorySelect) return;
+        var categorySelect = document.querySelector('select[name="service_category_id"]');
+    var hiddenCategory = document.querySelector('input[type="hidden"][name="service_category_id"]');
+    if (!categorySelect && !hiddenCategory) return;
 
     var fieldGroups = document.querySelectorAll('.category-fields');
 
         function updateCategoryFields() {
-        var selectedOption = categorySelect.options[categorySelect.selectedIndex];
-        var slug = selectedOption ? selectedOption.getAttribute('data-slug') : '';
+        var slug = '';
+        if (hiddenCategory) {
+            slug = hiddenCategory.getAttribute('data-slug') || '';
+        } else if (categorySelect) {
+            var selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            slug = selectedOption ? selectedOption.getAttribute('data-slug') : '';
+        }
 
         fieldGroups.forEach(function(group) {
             var isActive = group.getAttribute('data-slug') === slug;
@@ -111,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    categorySelect.addEventListener('change', updateCategoryFields);
+    if (categorySelect) categorySelect.addEventListener('change', updateCategoryFields);
     updateCategoryFields();
 });
 </script>

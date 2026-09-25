@@ -561,6 +561,8 @@ return [
     'check_out_time' => 'चेक-आउट समय',
         'altitude_profile_heading' => 'ऊँचाई प्रोफाइल',
     'altitude_profile_subtitle' => 'दिन-प्रतिदिन ऊँचाई',
+        'category_locked_info' => 'आपका प्रदाता प्रकार (:type) केवल :category सेवाएँ बना सकता है।',
+    'category_not_allowed' => 'यह श्रेणी आपके प्रदाता प्रकार के लिए उपलब्ध नहीं है।',
     'altitude_unavailable' => 'ऊँचाई डेटा उपलब्ध नहीं',
     'days' => 'दिन',
         'media_close' => 'बंद करें',

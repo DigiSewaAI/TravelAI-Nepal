@@ -530,6 +530,8 @@ return [
     'check_out_time' => '退房时间',
         'altitude_profile_heading' => '海拔剖面',
     'altitude_profile_subtitle' => '逐日海拔趋势',
+        'category_locked_info' => '您的提供者类型（:type）只能创建 :category 服务。',
+    'category_not_allowed' => '此类别不适用于您的提供者类型。',
     'altitude_unavailable' => '海拔数据不可用',
     'days' => '天',
         'media_close' => '关闭',
