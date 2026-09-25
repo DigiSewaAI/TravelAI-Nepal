@@ -1857,3 +1857,135 @@ Sync:    0/0
 
 **Document End — Provider Itinerary Continuity v2.1**
 **Updated:** 2026-09-25 — Phase 4M foundation closure + 4M-3 in progress
+
+
+---
+
+## 🎫 TICKETS — Session Update (2026-09-25 Evening)
+
+### ✅ RESOLVED (This Session)
+
+**PROVIDER-CATEGORY-CONSTRAINT-01** — ✅ RESOLVED
+  Commit: `66eac2b`
+  Adaptive UI + backend 403 + legacy bypass + custom fallback.
+  10 categories + many-to-many pivot.
+
+**SERVICE-CATEGORY-SPLIT-01** — ✅ RESOLVED
+  Commit: `c336559`
+  Resort, Lodge, Homestay added as separate categories.
+
+**AI-QUOTATION-BROKEN-01** — ✅ RESOLVED
+  Commit: `605dfd3`
+  Hardcoded model param removed. AI Quotation working.
+
+**AI-ARCHITECTURE-UNIFY-01** — ✅ RESOLVED (in-scope with 4I)
+  Commit: `605dfd3`
+  Hardcoded models removed. Config-driven (`.env GROQ_MODEL`).
+
+**AI-LLMSERVICE-FALLBACK-FIX-01** — ✅ RESOLVED
+  Commit: `605dfd3`
+  LlmService default → `qwen/qwen3.8-27b`.
+
+### 🔴 HIGH PRIORITY (Active)
+
+**AI-ITINERARY-CONTENT-QUALITY-01** (Phase 4K — Next)
+  AI itinerary content ~75% accurate.
+  Hallucinations: fake places, side-trek confusion, route errors.
+  Fix: Prompt enhancement + post-validation.
+  Expected: 75% → 90%.
+  Effort: ~2 hrs.
+
+### 🟡 MEDIUM PRIORITY
+
+**JOURNEY-REPLAY-MODEL-DISCOVERY-01** (NEW — LOW priority deferred)
+  T2 test revealed: `App\Models\JourneyReplay` not found.
+  Table `journey_replays` doesn't exist.
+  Model assumption incorrect.
+  Discovery needed: actual replay storage model.
+  Effort: 15 min.
+  Phase: Post-4I cleanup.
+
+**AI-MULTIPROVIDER-ROTATION-01** (Phase 4J)
+  Currently only Groq (single point of failure).
+  Add: OpenRouter free + Cerebras free.
+  Load distribution + failover.
+  Effort: 2-3 hrs.
+
+**AI-QUOTATION-FORM-INCOMPLETE-01**
+  Quotation form missing: days, pax, start_date, accommodation.
+  Fix: Add fields + update prompt.
+  Effort: 2 hrs.
+
+**AI-REPLAY-AI-STORY-BROKEN-01**
+  Journey Replay AI story verification pending.
+  Depends on JOURNEY-REPLAY-MODEL-DISCOVERY-01.
+  Effort: 15 min (after discovery).
+
+**AI-PUBLIC-PLANNER-VERIFY-01**
+  Public AI Planner = DB-driven (verified working).
+  Owner decision: Keep name "AI Planner", improve in-place.
+  No action needed now.
+
+**ELEVATION-DATA-GAP-01**
+  elevation_gain_m/loss_m NULL. altitude_m populated.
+  Fix: Provider UI to populate.
+  Effort: 2-4 hrs.
+
+**WEATHER-SERVICE-LEGACY-FIX-01**
+  Legacy WeatherService uses OpenWeatherMap (paid-pattern).
+  Safety dependency (R6).
+  Fix: Migrate to Open-Meteo OR remove dead code.
+  Effort: 2-3 hrs.
+
+### 🟢 LOW PRIORITY
+
+**SERVICE-NULL-PRICE-UX-01**
+  N/A displays in blue styling (sites 2, 5). Cosmetic.
+  Effort: 15 min.
+
+**TREK-DIFFICULTY-I18N-01**
+  Hardcoded Easy/Moderate/Hard.
+  Effort: 15 min.
+
+**SERVICE-CATEGORY-CHANGE-CLEANUP-01**
+  Orphaned detail records on category change. Acceptable behavior.
+  Effort: 30 min.
+
+**I18N-DUPLICATE-KEY-01**
+  weather_unavailable × 3 duplicates in 4 locales.
+  Effort: 30 min.
+
+**I18N-FALLBACK-PATTERN-01**
+  `__('key') ?? 'fallback'` broken pattern.
+  Effort: 1 hr.
+
+**I18N-INDENT-CLEANUP-01** (Updated)
+  Inconsistent indentation across 4 lang files + 2 controller sites.
+  Effort: 30 min.
+
+**SUNSET-INCONSISTENCY-01**
+  Public vs dashboard sunset differs ~19 min.
+  Effort: 30 min verify.
+
+**DOCS-CONSOLIDATION-01**
+  Untracked docs (7+ files) to commit.
+  Effort: 15 min.
+
+**AI-CONTENT-ANALYSIS-DEAD-CODE-01**
+  AiContentAnalysisService — no callers.
+  Effort: 15 min.
+
+**MASTER-AI-MD-CREATE-01**
+  Create `docs/globe/master_ai.md` — AI guide A-Z.
+  Effort: 1-2 hrs.
+
+**X-03-ROUTE-DATA-INJECTION**
+  Tier 2.
+  Effort: 1-2 hrs.
+
+**GLOBE-* (6 tickets)**
+  Post-MVP.
+
+---
+
+## 📊 CURRENT STATE (2026-09-25 Evening)

@@ -1,14 +1,14 @@
 # 🌍 TravelAI Nepal — Globe Master File
 
-**Version:** 2.0 (Reality-Aligned Rewrite)
+**Version:** 2.1 (Reality-Aligned Rewrite)
 **Created:** 2026-09-22
 **Rewritten:** 2026-09-23
-**Updated:** 2026-09-25 (Phase 4M foundation closure)
+**Updated:** 2026-09-25 (Phase 4M-3-REDO + 4I closure)
 **Status:** 🟡 DRAFT — Pending STAGE 1-8 discovery verification
 **Owner:** Parashar Regmi
 **Master:** DeepSeek (Master role)
 **Assistant:** DeepSeek (Implementation role)
-**HEAD:** c0cc382
+**HEAD:** 605dfd3
 
 > **Single source of truth for TravelAI Nepal — vision, existing systems, phases, and rules.**
 
@@ -282,6 +282,43 @@ Where → What → When → How high → What's next → What I experienced
 - 12 files (+355/-13)
 - Pushed: `c0cc382` (2026-09-25)
 
+#### Phase 4M-3-1 — Mapping (1:1) ✅
+- Initial mapping column attempt
+- Superseded by 4M-3-REDO (many-to-many pivot)
+- Pushed: `cd3c110` (2026-09-25)
+
+#### Phase 4M-3-REDO — Pivot (N:N) ✅
+- 3 new categories: Resort, Lodge, Homestay (7 → 10 total)
+- `provider_type_service_category` pivot (many-to-many)
+- 19 seed mappings (trekking-agency → 4 categories, etc.)
+- `hotel_details.property_type` enum (hotel/resort/lodge/homestay)
+- Deprecated `provider_types.service_category_id` (kept for BC)
+- 7 files (+172/-6)
+- Pushed: `c336559` (2026-09-25)
+
+#### Phase 4M-3-2-REDO — Form Constraint ✅
+- Adaptive UI: locked if 1 category, dropdown if 2+
+- Custom fallback: all categories if pivot empty
+- Backend constraint: 403 on disallowed category
+- Legacy bypass: existing disallowed service = OK to keep
+- JS hidden input fallback (for locked case)
+- 7 files (+154/-33)
+- Pushed: `66eac2b` (2026-09-25)
+
+#### Master Handover File ✅
+- `docs/globe/Master_Handover_2026-09-25.md` (NEW, 569 lines, 12 sections)
+- Purpose: Continuity insurance — full plan if Master limit completes
+- Pushed: `f86de4f` (2026-09-25)
+
+#### Phase 4I — AI Typo Fixes + Architecture ✅
+- Removed 2 hardcoded `qwen/qwen3.6-27b` params (non-existent model)
+- LlmService default fallback → `qwen/qwen3.8-27b`
+- Config-driven via `.env GROQ_MODEL` (single source of truth)
+- 2 features unlocked (AI Quotation + Journey Replay)
+- AI-ARCHITECTURE-UNIFY-01 ticket resolved in-scope
+- 3 files (+14/-15)
+- Pushed: `605dfd3` (2026-09-25)
+
 #### ✅ COMPLETED (UNDOCUMENTED — VERIFY IN AUDIT)
 These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
@@ -295,55 +332,33 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
 > ⚠️ **Detailed file references + commits = STAGE 1-8 audit मा verify हुनेछ।**
 
-### 🟢 IN PROGRESS
+### 🟢 IN PROGRESS / NEXT
 
-#### Phase 4M-3 — Provider Type ↔ Category Constraint
+#### Phase 4K — AI Content Quality
 
-**Goal:** Provider business type constrains allowed service categories.
+**Goal:** AI itinerary content accuracy improvements (75% → 90%)
 
-**Decisions Locked (Q1-Q5):**
-- Q1: Mapping column (`provider_types.service_category_id`)
-- Q2: Multi-type DEFERRED
-- Q3: Enforcement = BOTH (form + controller)
-- Q4: Missing types → map to closest category
-- Q5: Custom type → all categories allowed
+**Scope:**
+- Hallucination fix: fake places (Drolapaura, Gorak Shep monastery)
+- Side-trek confusion (Chukhung Ri on main route)
+- Village order errors (Phortse on ascent)
+- Typo fixes (Pherice vs Pheriche)
+- Route confusion (Khumbu Icefall = climbing only)
+- Prompt enhancement + post-validation + UI warnings
 
-**Sub-phases:**
-- 4M-3-1: Migration (approved, implementation pending)
-- 4M-3-2: Model + relation
-- 4M-3-3: Form constraint (create/edit)
-- 4M-3-4: Controller validation
+**Expected:** 75% → 90%
+**Effort:** ~2 hrs
 
-**Foundation Status (4M-1 → 4M-2-3+4):** ✅ 100% COMPLETE
-- Provider creates any category → correct detail record saved
-- Category-aware form working
-- Null-price handling systemic
-- Edit flow with pre-fill
-
-**Owner Directive (validated):**
-> "Service create 100% fix गरेपछि मात्र AI/Itinerary continue"
-
-**Foundation enables AI quality:** AI inputs richer (duration, difficulty, altitude, max_pax) → expected 85-90% in Phase 4K.
-
-**Status:** 4M-3-1 migration approved, implementation pending.
+**Status:** Ready to start (AI foundation 4I complete)
 
 ---
 
 ### 🔒 FUTURE
 
-#### Phase 4I — AI Typo Fixes
-- Model typo corrections (`qwen/qwen3.6-27b` → `qwen/qwen3.8-27b`)
-- LlmService fallback fix
-- QuotationController typo fix
-- AI Quotation form incomplete fix
-
 #### Phase 4J — Multi-Provider
 - Add multiple free AI providers (Groq + OpenRouter free + Cerebras)
 - Load distribution + fallback for rate limits
-
-#### Phase 4K — Content Quality
-- AI itinerary content accuracy improvements (75% → 90%)
-- Prompt + post-validation + UI warnings
+- Single point of failure mitigation
 
 #### Phase 5 — Live Journey Enhancements
 - Enhanced GPS tracking
@@ -382,10 +397,13 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 | Phase 4M-2-2 — Models | ✅ PUSHED | 7392e3b | 2026-09-25 |
 | NULL-FIX — Null Price | ✅ PUSHED | e2cfe7e | 2026-09-25 |
 | Phase 4M-2-3+4 — Category-Aware Form | ✅ PUSHED | c0cc382 | 2026-09-25 |
-| **Phase 4M-3 — Provider Type Constraint** | 🟢 **IN PROGRESS** | — | 2026-09-25 |
-| Phase 4I — AI Typo Fixes | 🔒 After 4M-3 | — | — |
-| Phase 4J — Multi-Provider | 🔒 After 4I | — | — |
-| Phase 4K — Content Quality | 🔒 After 4J | — | — |
+| Phase 4M-3-1 — Mapping (1:1) | ✅ PUSHED | cd3c110 | 2026-09-25 |
+| Phase 4M-3-REDO — Pivot (N:N) | ✅ PUSHED | c336559 | 2026-09-25 |
+| Phase 4M-3-2-REDO — Constraint | ✅ PUSHED | 66eac2b | 2026-09-25 |
+| Master Handover File | ✅ PUSHED | f86de4f | 2026-09-25 |
+| Phase 4I — AI Typo Fixes | ✅ PUSHED | 605dfd3 | 2026-09-25 |
+| **Phase 4K — AI Content Quality** | 🟢 **NEXT** | — | — |
+| Phase 4J — Multi-Provider | 🔒 After 4K | — | — |
 | Phase 5 — Live Journey | 🔒 FUTURE | — | — |
 | Phase 6 — Memory & Social | 🔒 FUTURE | — | — |
 
@@ -475,7 +493,7 @@ resources/views/admin/                                ← Admin views
 
 | Ticket | Priority | Status |
 |---|---|---|
-| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Phase 4M next |
+| GLOBE-ENHANCEMENT-01 | 🔴 HIGH | Post-4K |
 | GLOBE-WEATHER-01 | ✅ CLOSED | Phase 4A shipped |
 | GLOBE-JOURNEY-ANIMATION-01 | ✅ CLOSED | Phase 3 shipped |
 | GLOBE-SEARCH-01 | ✅ CLOSED | Phase 2 shipped |
@@ -522,35 +540,36 @@ Plan ≠ Implementation. Executed commits = truth.
 
 ---
 
-## 🚦 11. CURRENT STATE (2026-09-25)
+## 🚦 11. CURRENT STATE (2026-09-25 Evening)
 
 ### Git
 ```
 Branch:       main
-HEAD:         c0cc382
+HEAD:         605dfd3
 Status:       ✅ synced (0/0)
 Tests:        41 passed / 1 failed (pre-existing Safety)
 ```
 
 ### Reality Summary
 - **Systems built:** 12+
-- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C, 4D, 4E, 4G, 4H, 4H-Fix, 4M-1, 4M-2-1, 4M-2-2, NULL-FIX, 4M-2-3+4
+- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C, 4D, 4E, 4G, 4H, 4H-Fix, 4M-1, 4M-2-1, 4M-2-2, NULL-FIX, 4M-2-3+4, 4M-3-1, 4M-3-REDO, 4M-3-2-REDO, 4I
 - **Bonus systems (undocumented in v1.0):** Traveler Dashboard, Provider Dashboard, QR Check-in, Safety, Journey Replay, Photo Memories, AI Planner
 - **QR check-ins recorded:** 9
 - **AI planner requests used:** 468
-- **Foundation status:** Phase 4M foundation 100% COMPLETE
-- **Current phase:** 4M-3 — Provider Type ↔ Category Constraint (migration approved, implementation pending)
+- **Foundation status:** Phase 4M foundation + 4M-3 REDO 100% COMPLETE
+- **Current phase:** Phase 4K — AI Content Quality (next session)
 
-### Sessions Shipped (Historical — from v1.0)
-- Currency fix (`d37890f`)
-- Provider Editor UX (`45c4ba2`)
-- Toggle UX bundle (`c3f9c94`)
-- Map bounds fix (`a9a885e`)
-- Map polish bundle (`97e3f72`)
-- ...plus all Phase 1-4H + 4M foundation work
+### Today's Session Commits (8 pushed)
+1. 4M-3-1 mapping (superseded)
+2. 4M foundation log
+3. 4M-3-REDO pivot (many-to-many, `c336559`)
+4. Master Handover file (`f86de4f`)
+5. 4M-3-2 REDO constraint (`66eac2b`)
+6. 4I AI typo fixes (`605dfd3`)
+7. Chore docs (this append — pending)
 
 ### Next
-**Phase 4M-3-1** (migration) → 4M-3-2/3/4 → then Phase 4I, 4J, 4K, Deploy
+**Phase 4K** (AI content quality) → Phase 4J (multi-provider) → Deploy
 
 ---
 
@@ -620,6 +639,9 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 | Media Upload | ✅ Built | — |
 | Booking Management | ✅ Built | — |
 | Category-Aware Form | ✅ Built | Phase 4M-2-3+4 |
+| Adaptive Category UI | ✅ Built | Phase 4M-3-2-REDO |
+| Departure Management | ✅ Built | Phase 09B-02 |
+| AI Itinerary Draft | ✅ Built | Phase X-01 |
 
 ### Admin Systems
 | System | Status | Notes |
@@ -636,6 +658,8 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 | Booking Engine | ✅ Built | R6 protected |
 | Notification System | ✅ Built | Verify via STAGE 8 |
 | Auth System | ✅ Built | Verify via STAGE 4 |
+| AI Quotation | ✅ Fixed | Phase 4I |
+| Config-Driven AI Model | ✅ Built | Phase 4I (.env GROQ_MODEL) |
 
 > **Action:** STAGE 1-8 audit ले यो inventory verify + expand गर्नेछ।
 
@@ -677,6 +701,7 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 - [ ] Itinerary editor functional
 - [ ] Media upload works
 - [ ] Booking notifications received
+- [ ] Adaptive category UI works (locked + dropdown)
 
 ### Safety System
 - [ ] Safety map loads
@@ -690,11 +715,17 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 - [ ] Chapters build correctly
 - [ ] Share token generates
 - [ ] Share link works
+- [ ] AI story renders (Phase 4I fix verify)
 
 ### AI Planner (R5 — Inspect Only)
 - [ ] Endpoint responds
 - [ ] Quota tracking works
 - [ ] No touch — verify only
+
+### AI Quotation (Phase 4I Verify)
+- [ ] Real AI response (no 404)
+- [ ] Model config-driven (.env GROQ_MODEL)
+- [ ] Form fields complete
 
 ---
 
@@ -715,6 +746,6 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 
 ---
 
-**Document End — Globe Master File v2.0 (DRAFT)**
-**Updated:** 2026-09-25 — Phase 4M foundation closure + 4M-3 in progress
-**Next revision:** After STAGE 1-8 audit completes
+**Document End — Globe Master File v2.1 (DRAFT)**
+**Updated:** 2026-09-25 — Phase 4M-3-REDO + 4I closure, 4K next
+**Next revision:** After Phase 4K OR STAGE 1-8 audit completes

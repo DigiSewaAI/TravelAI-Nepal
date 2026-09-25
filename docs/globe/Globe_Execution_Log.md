@@ -850,3 +850,104 @@ Protected systems: Zero diff
 ---
 
 **Document End — Globe Execution Log v1.0**
+
+---
+
+### 2026-09-25 — Phase 4M-3-REDO CLOSED + PUSHED (Many-to-Many Pivot)
+
+**Commit:** `c336559`
+**Push range:** `cd3c110` → `c336559`
+
+**Files (7):**
+- 4 migrations (categories, property_type, pivot, seed)
+- 3 models (ProviderType, ServiceCategory, HotelDetail)
+
+**Stats:** +172/-6
+
+**What Shipped:**
+- 3 new categories: Resort, Lodge, Homestay (7 → 10 total)
+- `provider_type_service_category` pivot (many-to-many)
+- 19 seed mappings (trekking-agency → 4 categories, etc.)
+- `hotel_details.property_type` enum (hotel/resort/lodge/homestay)
+- Deprecated `provider_types.service_category_id` (kept for BC)
+
+**कारण:** 1:1 mapping was incorrect। Trekking agency needs multiple categories।
+
+**Tests:** 41p/1f (no regression)
+**R3/R8/R19/R20 कायम**
+
+---
+
+### 2026-09-25 — Phase 4M-3-2-REDO CLOSED + PUSHED (Form Constraint)
+
+**Commit:** `66eac2b`
+**Push range:** `f86de4f` → `66eac2b`
+
+**Files (7):**
+- `app/Http/Controllers/Provider/ServiceController.php` (4 changes)
+- `resources/views/provider/services/create.blade.php` (adaptive UI + JS)
+- `resources/views/provider/services/edit.blade.php` (adaptive + legacy)
+- 4 i18n files (+2 keys each: category_locked_info, category_not_allowed)
+
+**Stats:** +154/-33
+
+**What Shipped:**
+- Adaptive UI: locked if 1 category, dropdown if 2+
+- Custom fallback: all categories if pivot empty
+- Backend constraint: 403 on disallowed category
+- Legacy bypass: existing disallowed service = OK to keep
+- JS hidden input fallback (for locked case)
+
+**Tests:**
+- T2 (Trekking dropdown): PASS
+- T3 (Create Trek): PASS
+- T5 (Edit pre-fill): PASS
+- T7 (Backend bypass): PASS (403 blocked)
+- T8 (Suite): 41p/1f
+- T1/T4 (Hotel locked): Deferred (no hotel account — Option A accepted)
+- F2 (Test Hotel service): Legacy test data — cleaned up
+
+**R3/R4/R13/R20 कायम**
+
+---
+
+### 2026-09-25 — Phase 4I CLOSED + PUSHED (AI Typo Fixes + Architecture)
+
+**Commit:** `605dfd3`
+**Push range:** `66eac2b` → `605dfd3`
+
+**Files (3):**
+- `app/Http/Controllers/Provider/QuotationController.php` (line 76)
+- `app/Services/JourneyReplay/JourneyReplayService.php` (lines 179-184)
+- `app/Services/LlmService.php` (line 17)
+
+**Stats:** +14/-15
+
+**What Shipped:**
+- Removed 2 hardcoded `qwen/qwen3.6-27b` params (non-existent model)
+- LlmService default fallback → `qwen/qwen3.8-27b`
+- Config-driven via `.env GROQ_MODEL` (single source of truth)
+
+**Root Cause:** Hardcoded 3rd param was overriding config — not model name swap
+
+**Strategy B (config-driven) chosen:**
+- 2 features unlocked (AI Quotation + Journey Replay)
+- AI-ARCHITECTURE-UNIFY-01 ticket resolved in-scope
+- Future model change = .env edit only
+
+**Tests:**
+- T1 (AI Quotation): PASS — real AI response, no 404
+- T2 (Journey Replay): DEFERRED (old data + model unknown) — ticket created
+- T4 (Suite): 41p/1f
+
+**R3/R4/R11/R13/R20 कायम**
+
+---
+
+### 2026-09-25 — Master Handover File Pushed
+
+**Commit:** `f86de4f`
+**File:** `docs/globe/Master_Handover_2026-09-25.md` (NEW, 569 lines, 12 sections)
+**Purpose:** Continuity insurance — full plan if Master limit completes
+
+---
