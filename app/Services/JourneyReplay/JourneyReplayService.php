@@ -176,10 +176,9 @@ class JourneyReplayService
             $prompt = $this->buildStrictStoryPrompt($input);
             $locale = app()->getLocale();
 
-            $response = $this->llm->generateItinerary(
+                        $response = $this->llm->generateItinerary(
                 prompt: $prompt,
                 locale: $locale,
-                model: 'qwen/qwen3.6-27b',
                 extract: false,
                 maxTokens: 250
             );

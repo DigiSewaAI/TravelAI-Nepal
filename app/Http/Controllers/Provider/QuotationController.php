@@ -26,7 +26,7 @@ class QuotationController extends Controller
     public function create()
     {
         $provider = Auth::user()->getCurrentProvider();
-        
+
         if (!$provider) {
             abort(403, 'No provider found.');
         }
@@ -73,7 +73,7 @@ class QuotationController extends Controller
             $prompt = $this->buildQuotationPrompt($provider, $validated);
 
             // FIX-12: LLM call OUTSIDE any DB transaction
-            $response = $this->llm->generateItinerary($prompt, 'en', 'qwen/qwen3.6-27b');
+            $response = $this->llm->generateItinerary($prompt, 'en');
 
             $quotation = $this->formatQuotation($response, $provider, $validated);
 
@@ -123,12 +123,12 @@ class QuotationController extends Controller
 
     private function buildQuotationPrompt($provider, $data): string
     {
-        $serviceName = $data['service_id'] 
+        $serviceName = $data['service_id']
             ? Service::find($data['service_id'])->name ?? 'N/A'
             : 'N/A';
 
         return "Generate a professional quotation for a customer named '{$data['customer_name']}'.
-        
+
 Provider: {$provider->name}
 Service: {$serviceName}
 Additional notes: " . ($data['notes'] ?? 'None') . "
@@ -159,19 +159,19 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
             // If the response has a 'quotation' key (structured JSON from model)
             if (isset($aiResponse['quotation'])) {
                 $quotationData = $aiResponse['quotation'];
-                
+
                 // ✅ Build the FULL formatted quotation (header included)
                 $content = "📄 Quotation for {$data['customer_name']}\n\n";
                 $content .= "Provider: {$provider->name}\n";
                 $content .= "Service: {$serviceName}\n"; // ✅ सही Service Name
                 $content .= "Generated: " . now()->toDateTimeString() . "\n";
                 $content .= str_repeat('=', 50) . "\n\n";
-                
+
                 // Greeting
                 if (isset($quotationData['greeting'])) {
                     $content .= $quotationData['greeting'] . "\n\n";
                 }
-                
+
                 // Service Overview
                 if (isset($quotationData['service_overview'])) {
                     $overview = $quotationData['service_overview'];
@@ -181,7 +181,7 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     $content .= "Participants: " . ($overview['participants'] ?? 'N/A') . "\n";
                     $content .= "Description: " . ($overview['description'] ?? 'N/A') . "\n\n";
                 }
-                
+
                 // Pricing Breakdown
                 if (isset($quotationData['pricing_breakdown'])) {
                     $pricing = $quotationData['pricing_breakdown'];
@@ -205,7 +205,7 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     }
                     $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($pricing['grand_total'] ?? 0, 2));
                 }
-                
+
                 // Terms & Conditions
                 if (isset($quotationData['terms_and_conditions']) && is_array($quotationData['terms_and_conditions'])) {
                     $content .= "TERMS & CONDITIONS\n";
@@ -215,7 +215,7 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     }
                     $content .= "\n";
                 }
-                
+
                 // Contact Information
                 if (isset($quotationData['contact_information'])) {
                     $contact = $quotationData['contact_information'];
@@ -226,7 +226,7 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     $content .= "Website: " . ($contact['website'] ?? 'N/A') . "\n";
                     $content .= "Address: " . ($contact['address'] ?? 'N/A') . "\n";
                 }
-                
+
                 return [
                     'provider_name' => $provider->name,
                     'customer_name' => $data['customer_name'],
@@ -237,7 +237,7 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     'generated_at' => now()->toDateTimeString(),
                 ];
             }
-            
+
             // Fallback: if response has a 'content' key, use it
             if (isset($aiResponse['content'])) {
                 $content = $aiResponse['content'];
