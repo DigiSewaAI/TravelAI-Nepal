@@ -9,7 +9,7 @@
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
             <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.ai_draft_modal_title') }}</h3>
             <button type="button"
-                    onclick="closeAiDraftModal()"
+                                        onclick="cancelAiDraft()"
                     class="text-gray-400 hover:text-gray-600 text-2xl leading-none"
                     aria-label="{{ __('messages.ai_draft_cancel_button') }}">
                 &times;
@@ -50,7 +50,7 @@
 
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button"
-                        onclick="closeAiDraftModal()"
+                                                onclick="cancelAiDraft()"
                         class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold">
                     {{ __('messages.ai_draft_cancel_button') }}
                 </button>
@@ -90,8 +90,8 @@
             <div id="ai-draft-preview-list" class="space-y-3"></div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-gray-200">
-                <button type="button"
-                        onclick="closeAiDraftModal()"
+                                <button type="button"
+                        onclick="cancelAiDraft()"
                         class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold">
                     {{ __('messages.ai_draft_cancel_button') }}
                 </button>
@@ -130,6 +130,7 @@
     var aiDraftApplyUrl = null;
     var csrfToken       = null;
     var currentDraftId  = null;
+    var aiAbortController = null;
 
     function startEstimatedProgress(totalDays) {
         if (!progressEl || !progressChunk || !progressDays || !progressBar) return function(){};
@@ -184,6 +185,26 @@
         modal.classList.remove('hidden');
     };
 
+        window.cancelAiDraft = function () {
+        if (aiAbortController) {
+            aiAbortController.abort();
+            aiAbortController = null;
+        }
+        if (typeof window._aiDraftStopProgress === 'function') {
+            window._aiDraftStopProgress();
+            window._aiDraftStopProgress = null;
+        }
+        currentDraftId = null;
+        if (progressEl) progressEl.classList.add('hidden');
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (formStage) formStage.classList.remove('hidden');
+        if (previewStage) previewStage.classList.add('hidden');
+        if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.textContent = @json(__('messages.ai_draft_generate_button'));
+        }
+        closeAiDraftModal();
+    };
     window.closeAiDraftModal = function () {
         modal.classList.add('hidden');
     };
@@ -199,7 +220,7 @@
         var days = parseInt(daysInput.value || '0', 10);
         var notes = notesInput.value || '';
 
-        var stopProgress = startEstimatedProgress(days);
+        window._aiDraftStopProgress = startEstimatedProgress(days);
 
         if (days < 1 || days > 21) {
             showError(@json(__('messages.ai_draft_error_generic')));
@@ -212,8 +233,11 @@
         generateBtn.textContent = @json(__('messages.ai_draft_loading'));
 
         try {
+                        if (aiAbortController) aiAbortController.abort();
+            aiAbortController = new AbortController();
             var res = await fetch(aiDraftUrl, {
                 method: 'POST',
+                signal: aiAbortController.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -237,7 +261,10 @@
             showError(err.message || @json(__('messages.ai_draft_error_generic')));
                 } finally {
             loadingEl.classList.add('hidden');
-            if (typeof stopProgress === 'function') stopProgress();
+            if (typeof window._aiDraftStopProgress === 'function') {
+                window._aiDraftStopProgress();
+                window._aiDraftStopProgress = null;
+            }
             if (progressEl) progressEl.classList.add('hidden');
             generateBtn.disabled = false;
             generateBtn.textContent = @json(__('messages.ai_draft_generate_button'));
