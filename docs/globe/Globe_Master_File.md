@@ -3,12 +3,12 @@
 **Version:** 2.0 (Reality-Aligned Rewrite)
 **Created:** 2026-09-22
 **Rewritten:** 2026-09-23
-**Updated:** 2026-09-24 (Phase 4H closure + Phase 4M discovery)
-**Status:** 🟡 DRAFT — Pending discovery verification
+**Updated:** 2026-09-25 (Phase 4M foundation closure)
+**Status:** 🟡 DRAFT — Pending STAGE 1-8 discovery verification
 **Owner:** Parashar Regmi
 **Master:** DeepSeek (Master role)
 **Assistant:** DeepSeek (Implementation role)
-**HEAD:** 0415925
+**HEAD:** c0cc382
 
 > **Single source of truth for TravelAI Nepal — vision, existing systems, phases, and rules.**
 
@@ -249,6 +249,39 @@ Where → What → When → How high → What's next → What I experienced
 - `validateChunkStructure()` — items time_of_day validation
 - Pushed: `0415925` (2026-09-24)
 
+#### Phase 4M-1 — max_pax Migration ✅
+- `trek_details.max_pax` (int, nullable)
+- `tour_details.max_pax` (int, nullable)
+- Rollback tested + verified
+- Pushed: `362d019` (2026-09-25)
+
+#### Phase 4M-2-1 — Activity + Experience Tables ✅
+- `activity_details` table (service_id FK unique cascade, max_pax nullable)
+- `experience_details` table (same structure)
+- Rollback tested + re-migrated
+- Pushed: `8d1d4e2` (2026-09-25)
+
+#### Phase 4M-2-2 — Models ✅
+- `ActivityDetail`, `ExperienceDetail` models (HasFactory + fillable + casts + relations)
+- Service model: +2 hasOne relations
+- TrekDetail/TourDetail: max_pax fillable + cast
+- Pushed: `7392e3b` (2026-09-25)
+
+#### NULL-FIX — Null Price Systemic ✅
+- 3-layer fix (service signature + display guards + data cleanup)
+- 7 files: CurrencyService + 6 views
+- i18n `messages.na` in 4 locales
+- Pushed: `e2cfe7e` (2026-09-25)
+
+#### Phase 4M-2-3+4 — Category-Aware Form ✅
+- Category-aware form (JS toggle — 5 categories)
+- Detail record creation on service store/update
+- Amenities JSON transform
+- Edit pre-fill support
+- Vanilla JS (no Alpine)
+- 12 files (+355/-13)
+- Pushed: `c0cc382` (2026-09-25)
+
 #### ✅ COMPLETED (UNDOCUMENTED — VERIFY IN AUDIT)
 These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
@@ -262,37 +295,37 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
 > ⚠️ **Detailed file references + commits = STAGE 1-8 audit मा verify हुनेछ।**
 
-### 🟡 IN PROGRESS
+### 🟢 IN PROGRESS
 
-#### Phase 4M — Service Foundation (Discovery)
+#### Phase 4M-3 — Provider Type ↔ Category Constraint
 
-**Goal:** Provider service creation forms complete + category-aware
+**Goal:** Provider business type constrains allowed service categories.
 
-**Owner Directive:**
-> "Service create 100% fix गरेपछि मात्र AI/Itinerary continue गर्नु।"
-> "Service category अनुसार Provider को dashboard मा Service Create Page open हुनु पर्छ automatically।"
-
-**Scope (Discovered):**
-- Service form missing fields (duration, pax, difficulty, category-specific)
-- Category-aware service creation (trek/tour/hotel/transport/guide)
-- Service detail tables audit (trek_details, tour_details, etc.)
-- Registration → dashboard flow verification
-- Provider business type storage verification
+**Decisions Locked (Q1-Q5):**
+- Q1: Mapping column (`provider_types.service_category_id`)
+- Q2: Multi-type DEFERRED
+- Q3: Enforcement = BOTH (form + controller)
+- Q4: Missing types → map to closest category
+- Q5: Custom type → all categories allowed
 
 **Sub-phases:**
-- 4M-1: Service form field completion
-- 4M-2: Category-aware service creation
-- 4M-3: Service detail tables alignment
-- 4M-4: Registration flow verification
+- 4M-3-1: Migration (approved, implementation pending)
+- 4M-3-2: Model + relation
+- 4M-3-3: Form constraint (create/edit)
+- 4M-3-4: Controller validation
 
-**Foundation-First Principle (Owner-locked):**
-- Service foundation 100% complete BEFORE AI continuation
-- AI depends on complete service data
-- Provider UX priority
+**Foundation Status (4M-1 → 4M-2-3+4):** ✅ 100% COMPLETE
+- Provider creates any category → correct detail record saved
+- Category-aware form working
+- Null-price handling systemic
+- Edit flow with pre-fill
 
-**Ticket:** SERVICE-FORM-INCOMPLETE-01, SERVICE-CATEGORY-ROUTING-01
+**Owner Directive (validated):**
+> "Service create 100% fix गरेपछि मात्र AI/Itinerary continue"
 
-**Status:** Discovery pending
+**Foundation enables AI quality:** AI inputs richer (duration, difficulty, altitude, max_pax) → expected 85-90% in Phase 4K.
+
+**Status:** 4M-3-1 migration approved, implementation pending.
 
 ---
 
@@ -344,8 +377,13 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 | Phase 4G — Provider AI Fix | ✅ PUSHED | cdf289e | 2026-09-24 |
 | Phase 4H — AI Chunking | ✅ PUSHED | 04c6e48 | 2026-09-24 |
 | Phase 4H-Fix — time_of_day | ✅ PUSHED | 0415925 | 2026-09-24 |
-| **Phase 4M — Service Foundation** | 🟢 **DISCOVERY** | — | 2026-09-24 |
-| Phase 4I — AI Typo Fixes | 🔒 After 4M | — | — |
+| Phase 4M-1 — max_pax Migration | ✅ PUSHED | 362d019 | 2026-09-25 |
+| Phase 4M-2-1 — Activity/Experience Tables | ✅ PUSHED | 8d1d4e2 | 2026-09-25 |
+| Phase 4M-2-2 — Models | ✅ PUSHED | 7392e3b | 2026-09-25 |
+| NULL-FIX — Null Price | ✅ PUSHED | e2cfe7e | 2026-09-25 |
+| Phase 4M-2-3+4 — Category-Aware Form | ✅ PUSHED | c0cc382 | 2026-09-25 |
+| **Phase 4M-3 — Provider Type Constraint** | 🟢 **IN PROGRESS** | — | 2026-09-25 |
+| Phase 4I — AI Typo Fixes | 🔒 After 4M-3 | — | — |
 | Phase 4J — Multi-Provider | 🔒 After 4I | — | — |
 | Phase 4K — Content Quality | 🔒 After 4J | — | — |
 | Phase 5 — Live Journey | 🔒 FUTURE | — | — |
@@ -484,22 +522,24 @@ Plan ≠ Implementation. Executed commits = truth.
 
 ---
 
-## 🚦 11. CURRENT STATE (2026-09-24)
+## 🚦 11. CURRENT STATE (2026-09-25)
 
 ### Git
 ```
 Branch:       main
-HEAD:         0415925
+HEAD:         c0cc382
 Status:       ✅ synced (0/0)
+Tests:        41 passed / 1 failed (pre-existing Safety)
 ```
 
 ### Reality Summary
 - **Systems built:** 12+
-- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C, 4D, 4E, 4G, 4H, 4H-Fix
+- **Phases shipped:** 1, 2A, 2B, 3, 4A, 4B, 4C, 4D, 4E, 4G, 4H, 4H-Fix, 4M-1, 4M-2-1, 4M-2-2, NULL-FIX, 4M-2-3+4
 - **Bonus systems (undocumented in v1.0):** Traveler Dashboard, Provider Dashboard, QR Check-in, Safety, Journey Replay, Photo Memories, AI Planner
 - **QR check-ins recorded:** 9
 - **AI planner requests used:** 468
-- **Current phase:** 4M — Service Foundation (Discovery)
+- **Foundation status:** Phase 4M foundation 100% COMPLETE
+- **Current phase:** 4M-3 — Provider Type ↔ Category Constraint (migration approved, implementation pending)
 
 ### Sessions Shipped (Historical — from v1.0)
 - Currency fix (`d37890f`)
@@ -507,10 +547,10 @@ Status:       ✅ synced (0/0)
 - Toggle UX bundle (`c3f9c94`)
 - Map bounds fix (`a9a885e`)
 - Map polish bundle (`97e3f72`)
-- ...plus all Phase 1-4H work
+- ...plus all Phase 1-4H + 4M foundation work
 
 ### Next
-**Phase 4M — Service Foundation Discovery** → then Phase 4I, 4J, 4K
+**Phase 4M-3-1** (migration) → 4M-3-2/3/4 → then Phase 4I, 4J, 4K, Deploy
 
 ---
 
@@ -575,10 +615,11 @@ Status:       ✅ synced (0/0)
 | System | Status | Notes |
 |---|---|---|
 | Provider Dashboard | ✅ Built | Verify via STAGE 4 |
-| Service CRUD | ✅ Built | Phase 4M next |
+| Service CRUD | ✅ Built | Phase 4M complete |
 | Itinerary Editor | ✅ Built | Phase 4H shipped |
 | Media Upload | ✅ Built | — |
 | Booking Management | ✅ Built | — |
+| Category-Aware Form | ✅ Built | Phase 4M-2-3+4 |
 
 ### Admin Systems
 | System | Status | Notes |
@@ -675,5 +716,5 @@ Status:       ✅ synced (0/0)
 ---
 
 **Document End — Globe Master File v2.0 (DRAFT)**
-**Updated:** 2026-09-24 — Phase 4H/4H-Fix closure + Phase 4M discovery
+**Updated:** 2026-09-25 — Phase 4M foundation closure + 4M-3 in progress
 **Next revision:** After STAGE 1-8 audit completes

@@ -1,17 +1,10 @@
-# 📄 Globe_Execution_Log.md — Final Complete File
-
-Bro, समस्या बुझें — तिमीले **पुरानै file** paste गरेको छौ (जुन मैले दिएको थिएन)। **यो पूरै file copy गर → पुरानो replace गर:**
-
----
-
-```markdown
 # 🌍 Globe Execution Log
 
 **Purpose:** Chronological record of all Globe work
 **Companion:** `Globe_Master_File.md` (vision + phases + rules)
 **Version:** 1.0
 **Created:** 2026-09-22
-**Updated:** 2026-09-22
+**Updated:** 2026-09-25
 
 ---
 
@@ -104,41 +97,6 @@ Bro, समस्या बुझें — तिमीले **पुरान
 
 ## 📌 PHASE 2 — DISCOVERY MODE
 
-[pending — starts after Phase 1 closure]
-
----
-
-## 📌 PHASE 3 — JOURNEY ANIMATION
-
-[pending — starts after Phase 2]
-
----
-
-## 📌 PHASE 4 — RICH EXPERIENCE
-
-[pending — starts after Phase 3]
-
----
-
-## 📌 PHASE 5 — LIVE JOURNEY
-
-[future]
-
----
-
-## 📌 PHASE 6 — MEMORY & SOCIAL
-
-[future]
-
----
-
-**Document End — Globe Execution Log v1.0**
-```
-
----
-
----
-
 ### 2026-09-22 — Item 2 Complete (Filters → Globe)
 
 **Files:** index.blade.php (3 changes)
@@ -162,8 +120,6 @@ Bro, समस्या बुझें — तिमीले **पुरान
 
 ---
 
----
-
 ### 2026-09-22 — Item 1 Complete (Nepal Highlight)
 
 **Files:** index.blade.php (1 block, ~20 lines)
@@ -179,32 +135,7 @@ Bro, समस्या बुझें — तिमीले **पुरान
 
 **Status:** Implementation done (uncommitted)
 
-### 2026-09-22 — Phase 2A COMPLETE (All 4 Items)
-
-| Item | Status |
-|---|---|
-| Item 4 (Fly to Nepal) | ✅ |
-| Item 3 (Districts toggle) | ✅ |
-| Item 2 (Filters → Globe) | ✅ |
-| Item 1 (Nepal highlight) | ✅ |
-
-**Next:** Bundle commit + push
-
 ---
-
----
-
-### 2026-09-22 — Item 1 Complete (Nepal Highlight)
-
-**Files:** index.blade.php (1 block, ~20 lines)
-**Changes:**
-- Fetch topojson (`/map/nepal-districts.topojson`)
-- `globe.polygonsData(geo.features)`
-- Cap: rgba(37, 99, 235, 0.15) — matches Leaflet
-- Border: #1e40af (dark blue)
-- Altitude: 0.005, Transition: 300ms
-
-**Tests:** T1.1-T1.6 pass
 
 ### 2026-09-22 — Phase 2A COMPLETE (All 4 Items)
 
@@ -222,8 +153,6 @@ Bro, समस्या बुझें — तिमीले **पुरान
 
 ---
 
----
-
 ### 2026-09-22 — Phase 2A Bundle Committed (pending push)
 
 **Commit:** `d87d50d`
@@ -238,8 +167,6 @@ Bro, समस्या बुझें — तिमीले **पुरान
 **Tests:** 41p / 1f (pre-existing Safety)
 
 **Status:** Committed locally, push HOLD
-
----
 
 ---
 
@@ -261,8 +188,6 @@ Bro, समस्या बुझें — तिमीले **पुरान
 **Tests:** 41p/1f (pre-existing)
 
 **Next:** Phase 2B (Search) OR X-02 F1
-
----
 
 ---
 
@@ -292,8 +217,6 @@ stops (Tengboche, Dingboche) skipped — LLM compresses.
 - File: `AiItineraryDraftController.php` (buildPrompt)
 - Effort: ~1-2 hrs
 - Phase: Post-MVP
-
----
 
 ---
 
@@ -341,8 +264,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-23 — Phase 2B Discovery Complete
 
 **Mode:** READ-ONLY
@@ -361,8 +282,6 @@ Protected systems: Zero diff
 - Full (~1-2 days): Multi-entity + autocomplete + full ranking
 
 **Status:** Awaiting Master scope lock
-
----
 
 ---
 
@@ -389,8 +308,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-23 — Phase 2B CLOSED + PUSHED
 
 **Commit:** `3b22c0e`
@@ -414,7 +331,7 @@ Protected systems: Zero diff
 
 ---
 
----
+## 📌 PHASE 3 — JOURNEY ANIMATION
 
 ### 2026-09-23 — Phase 3 Discovery Complete
 
@@ -437,8 +354,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-23 — Phase 3 Re-Inspection Complete
 
 **Mode:** READ-ONLY
@@ -456,8 +371,6 @@ Protected systems: Zero diff
 **Show page size:** 558 → 559 lines (bloat avoided)
 
 **Status:** Awaiting Master exact diff
-
----
 
 ---
 
@@ -490,8 +403,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-23 — Phase 3 2D Map Implementation
 
 **File:** REWRITE `_journey_animation.blade.php`
@@ -509,8 +420,6 @@ Protected systems: Zero diff
 **Explore page 3D globe:** Untouched
 
 **Status:** Implementation complete, testing
-
----
 
 ---
 
@@ -550,7 +459,7 @@ Protected systems: Zero diff
 
 ---
 
----
+## 📌 PHASE 4 — RICH EXPERIENCE
 
 ### 2026-09-23 — Phase 4A CLOSED + PUSHED (Weather Panel)
 
@@ -583,8 +492,6 @@ Protected systems: Zero diff
 **Deploy Platform:** Still deferred
 
 **Next:** Phase 4B (Elevation Chart) OR Break
-
----
 
 ---
 
@@ -631,8 +538,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-23 — Phase 4C CLOSED + PUSHED (Media Lightbox)
 
 **Commit:** `f6026da`
@@ -669,8 +574,6 @@ Protected systems: Zero diff
 **Deploy Platform:** Still deferred
 
 **Next:** Phase 4D (Sunrise + Polish) OR Session close
-
----
 
 ---
 
@@ -737,8 +640,6 @@ Protected systems: Zero diff
 
 ---
 
----
-
 ### 2026-09-24 — NULL PRICE FIX — Session A APPLIED (In Progress)
 
 **Status:** Partial (3 of 6 files) — Session B pending
@@ -779,3 +680,173 @@ Protected systems: Zero diff
 - Resume 4M-2-3+4 testing
 
 ---
+
+### 2026-09-25 — Phase 4M-1 CLOSED + PUSHED (max_pax Migration)
+
+**Commit:** `362d019`
+**Push range:** `1203d98` → `362d019`
+**Sync:** Local == Remote ✅
+
+**File (1):**
+- `database/migrations/2026_09_24_032603_add_max_pax_to_detail_tables.php` (NEW)
+
+**Stats:** +34 insertions
+
+**What Shipped:**
+- `trek_details.max_pax` (int, nullable, after difficulty)
+- `tour_details.max_pax` (int, nullable, after duration_days)
+- Rollback tested + verified
+
+**R19 Authorization:** Granted (additive, nullable, no data loss)
+**R8:** Additive only
+
+---
+
+### 2026-09-25 — Phase 4M-2-1 CLOSED + PUSHED (Activity + Experience Tables)
+
+**Commit:** `8d1d4e2`
+**Push range:** `362d019` → `8d1d4e2`
+
+**Files (2):**
+- `database/migrations/2026_09_24_075412_create_activity_details_table.php` (NEW)
+- `database/migrations/2026_09_24_075413_create_experience_details_table.php` (NEW)
+
+**Stats:** +50 insertions
+
+**What Shipped:**
+- `activity_details` table (id, service_id FK unique cascade, max_pax nullable, timestamps)
+- `experience_details` table (same structure)
+- Rollback tested + re-migrated
+
+**R3 Decision:** Minimal schema (service_id + max_pax only)
+  → Zero invention (discovery confirmed no other evidence)
+  → Additive migrations for future fields when needed
+
+---
+
+### 2026-09-25 — Phase 4M-2-2 CLOSED + PUSHED (Models)
+
+**Commit:** `7392e3b`
+**Push range:** `8d1d4e2` → `7392e3b`
+
+**Files (5):**
+- `app/Models/ActivityDetail.php` (NEW)
+- `app/Models/ExperienceDetail.php` (NEW)
+- `app/Models/Service.php` (+2 relations: activityDetail, experienceDetail)
+- `app/Models/TrekDetail.php` (+max_pax fillable + cast)
+- `app/Models/TourDetail.php` (+max_pax fillable + cast)
+
+**Stats:** +64/-2
+
+**What Shipped:**
+- 2 new models (HasFactory + fillable + casts + service() relation)
+- Service model: 2 new hasOne relations
+- TrekDetail/TourDetail: max_pax fillable + cast (DB-model sync)
+
+---
+
+### 2026-09-25 — NULL-FIX CLOSED + PUSHED (Null Price Systemic)
+
+**Commit:** `e2cfe7e`
+**Push range:** `e577d3e` → `e2cfe7e`
+
+**Files (7):**
+- `app/Services/CurrencyService.php` (Layer 1 — null-safe signature)
+- `resources/views/home.blade.php` (Site 1)
+- `resources/views/public/services/index.blade.php` (Site 2)
+- `resources/views/public/services/category.blade.php` (Site 3)
+- `resources/views/public/services/show.blade.php` (Sites 4+5)
+- `resources/views/public/booking/create.blade.php` (Site 6)
+- `resources/views/provider/services/index.blade.php` (earlier fix)
+
+**Stats:** +65/-60
+
+**Trigger:** Test Tour (id=1233, price=NULL) crashed public pages (500 error)
+
+**Root Cause:** `CurrencyService::convert(float $amount)` = null-unsafe
+→ 7 call sites across 5 files vulnerable
+
+**Fix (3 layers):**
+- Layer 1: Signature `float|int|null` + null coalescing
+- Layer 2: Display guards (`N/A` for null prices)
+- Layer 3: Test data cleanup (deleted id=1233)
+
+**Tests:** T1-T7 PASS (home, explore, service detail, category, related, booking, mobile)
+**R3:** N/A display honest (i18n: `messages.na` = "N/A" / "उपलब्ध छैन" / "उपलब्ध नहीं" / "不可用")
+
+---
+
+### 2026-09-25 — Phase 4M-2-3+4 CLOSED + PUSHED (Category-Aware Form)
+
+**Commit:** `c0cc382`
+**Push range:** `e2cfe7e` → `c0cc382`
+
+**Files (12):**
+- `app/Http/Controllers/Provider/ServiceController.php` (store/update enhancement)
+- `resources/views/provider/services/create.blade.php` (+category-aware fields + JS toggle)
+- `resources/views/provider/services/edit.blade.php` (+same pattern)
+- 5 partials: `_fields_trek / _fields_tour / _fields_hotel / _fields_activity / _fields_experience`
+- 4 i18n files (+7 keys each: duration_days, max_pax, room_count, star_rating, amenities, check_in_time, check_out_time)
+
+**Stats:** +355/-13
+
+**What Shipped:**
+- Category-aware form (JS toggle — 5 categories)
+- Detail record creation on service store/update
+- Amenities JSON transform (comma-separated → array)
+- Edit pre-fill support
+- Vanilla JS (no Alpine, no library)
+
+**Detail Fields per Category:**
+- Trek: duration_days (required), difficulty (required), max_pax, max_altitude, season
+- Tour: duration_days (required), max_pax
+- Hotel: room_count, star_rating, amenities, check_in_time, check_out_time
+- Activity: max_pax
+- Experience: max_pax
+
+**Tests:** 5/5 categories PASS (all detail tables populated correctly)
+
+**R3:** Zero invented fields (discovery-based)
+
+**R5/R20:** PlannerService untouched; existing flow preserved
+
+---
+
+### 2026-09-25 — PHASE 4M FOUNDATION 100% COMPLETE
+
+**Summary:** Provider service creation foundation fully functional.
+
+**Achievement:**
+- Provider creates any category → correct detail record saved
+- Category-aware form (fields show/hide based on selection)
+- Amenities JSON transform working
+- Edit flow with pre-fill
+- Null-price handling systemic
+
+**Foundation-First Principle (Owner directive) — Validated:**
+> "Service create 100% fix गरेपछि मात्र AI/Itinerary continue"
+
+**Foundation enables AI quality:**
+- Before: AI = 75% (name + description only)
+- After: AI = richer inputs (duration, difficulty, altitude, max_pax)
+- Expected: 85-90% (Phase 4K)
+
+**Next:** Phase 4M-3 (Provider Type ↔ Category Constraint)
+
+**Open Tickets:** ~15 (see Current_Stage_And_All_Process.md)
+
+---
+
+## 📌 PHASE 5 — LIVE JOURNEY
+
+[future]
+
+---
+
+## 📌 PHASE 6 — MEMORY & SOCIAL
+
+[future]
+
+---
+
+**Document End — Globe Execution Log v1.0**
