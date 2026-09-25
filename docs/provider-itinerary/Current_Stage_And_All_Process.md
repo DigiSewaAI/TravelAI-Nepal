@@ -2118,3 +2118,115 @@ Sync:    0/0
 ---
 
 ## 📊 CURRENT STATE (2026-09-25 Final)
+
+---
+
+### 🎫 AI-MULTIPROVIDER-ROTATION-01 — ENRICHED (Phase 4J)
+
+**Priority:** 🟡 MEDIUM → 🟢 HIGH (before scale)
+**Phase:** 4J (after Phase 4K)
+**Effort:** 2-3 hrs
+**Owner Directive:** "500 travelers ले use गर्न मिल्ने बनाउनु"
+**Free-First Rule:** R21-R24 कायम (कोई paid provider कहिल्यै)
+
+#### PROBLEM STATEMENT
+
+Current state:
+  • Only Groq free tier (single point of failure)
+  • Groq free tier rate limit: ~14,400 requests/day
+  • 500 travelers × ~10 requests/day = 5,000 (OK baseline)
+  • BUT spike scenario (all users same time) = rate limit hit
+  • No failover if Groq down
+
+Target:
+  • Support 500+ concurrent travelers
+  • Zero downtime on provider failure
+  • Stay 100% free-tier
+
+#### FREE PROVIDERS (CANDIDATES)
+
+  ✅ Groq (current) — free tier, no card, working
+  🟡 OpenRouter — free models (Llama, Mistral, Qwen)
+  🟡 Cerebras — free tier (verify availability 2026)
+  🟡 Together AI — free tier (verify)
+  🟡 Any new free tier provider
+
+**RULES:**
+  ❌ No paid plan
+  ❌ No credit card
+  ❌ No free-trial-then-paid
+  ✅ Free forever only
+
+#### SOLUTION ARCHITECTURE
+
+  1. Provider Pool
+     • Multiple LlmService-like clients
+     • Each = separate API key + endpoint
+     • Config-driven (.env: provider list)
+
+  2. Load Distribution
+     • Round-robin OR
+     • Hash by user_id (sticky per user) OR
+     • Least-recently-used
+     • Balancer class: MultiProviderLlmService
+
+  3. Failover Logic
+     • Try provider A → rate limit → provider B
+     • Try B → failure → provider C
+     • All fail → friendly error + retry delay
+
+  4. Rate Limit Tracking
+     • Per-provider counter (Redis/file cache)
+     • Respect free-tier limits
+     • Auto-rotate when threshold hit
+
+  5. Config (.env)
+     • AI_PROVIDERS=groq,openrouter,cerebras
+     • GROQ_API_KEY=...
+     • OPENROUTER_API_KEY=...
+     • CEREBRAS_API_KEY=...
+     • All free-tier keys (Owner provides)
+
+#### AFFECTED FILES (Provisional)
+
+  NEW:
+    • app/Services/AI/MultiProviderLlmService.php
+    • app/Services/AI/Providers/GroqProvider.php
+    • app/Services/AI/Providers/OpenRouterProvider.php
+    • app/Services/AI/Providers/CerebrasProvider.php
+    • app/Services/AI/ProviderBalancer.php
+
+  MODIFY:
+    • app/Services/LlmService.php (delegate to balancer)
+    • config/services.php (provider pool)
+    • .env.example (new provider keys)
+
+  UNTOUCHED:
+    • All callers (transparent — same interface)
+    • Provider-side features
+    • Public site
+
+#### SUCCESS CRITERIA
+
+  ✅ 500+ concurrent users = no rate limit errors
+  ✅ Provider failure = auto failover (no user-visible error)
+  ✅ All providers = free tier
+  ✅ Zero cost added
+  ✅ No regression (41p/1f baseline maintained)
+
+#### TEST PLAN (Post-Implementation)
+
+  T1: Single provider (Groq) → works (baseline)
+  T2: Simulate Groq rate limit → OpenRouter auto-used
+  T3: Simulate all providers → friendly error
+  T4: Load test (mock 500 users) → no crash
+  T5: Zero cost verification → no paid keys used
+  T6: Suite 41p/1f
+
+#### PRIORITY ORDER
+
+  After Phase 4K (content quality)
+  Before final Deploy
+  Before 500-user launch
+
+---
