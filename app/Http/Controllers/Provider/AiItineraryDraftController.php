@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -804,10 +805,85 @@ PROMPT;
                 }
             }
         }
+        }
+
+    /**
+     * Phase 4K-F2: Layer 3 — Place existence validation.
+     * Hard reject if 2+ unknown places in single day.
+     * Soft warn if 1 unknown place (new place may be legit).
+     */
+    private function validatePlaceExistence(array $draft): void
+    {
+        $validPlaces = Cache::remember('waypoint_names_lc', 3600, function () {
+            return \App\Models\Waypoint::pluck('name')
+                ->map(fn($n) => strtolower(trim($n)))
+                ->filter()
+                ->values()
+                ->toArray();
+        });
+
+        $placeMap = array_flip($validPlaces);
+
+        $whitelist = [
+            'nepal', 'himalaya', 'himalayas', 'everest region',
+            'annapurna region', 'khumbu', 'pokhara valley',
+            'kathmandu valley', 'nepal himalaya',
+        ];
+
+        foreach ($draft['days'] as $i => $day) {
+            $title = strtolower(trim($day['title'] ?? ''));
+            if (!preg_match('/^(.+?)\s+to\s+(.+)$/i', $title, $m)) {
+                continue;
+            }
+
+            $unknownCount = 0;
+            $unknownPlaces = [];
+
+            foreach ([$m[1], $m[2]] as $place) {
+                $place = strtolower(trim($place));
+
+                if (in_array($place, $whitelist, true)) continue;
+
+                if (isset($placeMap[$place])) continue;
+
+                $prefix = substr($place, 0, 4);
+                $found = false;
+                foreach ($placeMap as $valid => $idx) {
+                    if (str_starts_with($valid, $prefix)) {
+                        if (levenshtein($place, $valid) <= 2) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+                if ($found) continue;
+
+                $unknownCount++;
+                $unknownPlaces[] = $place;
+            }
+
+            if ($unknownCount >= 2) {
+                Log::warning('4K-F2: Multiple unknown places — likely hallucination', [
+                    'day'      => $i + 1,
+                    'title'    => $day['title'],
+                    'unknowns' => $unknownPlaces,
+                ]);
+                throw new \InvalidArgumentException(
+                    "Day " . ($i + 1) . ": multiple unknown places (" . implode(', ', $unknownPlaces) . ")"
+                );
+            }
+
+            if ($unknownCount === 1) {
+                Log::info('4K-F2: Single unknown place — soft warn (may be legit new place)', [
+                    'day'     => $i + 1,
+                    'title'   => $day['title'],
+                    'unknown' => $unknownPlaces[0],
+                ]);
+            }
+        }
     }
 
-        /**
-     * Validate LLM draft structure + Phase 4G quality checks.
+    /**
      * Throws InvalidArgumentException on failure.
      */
     private function validateDraftStructure(array $draft, int $expectedCount = 0): void
@@ -878,7 +954,7 @@ PROMPT;
                     throw new \InvalidArgumentException("Day {$i} item {$j} time_of_day invalid");
                 }
             }
-            if (isset($day['meals_included']) && is_array($day['meals_included'])) {
+                        if (isset($day['meals_included']) && is_array($day['meals_included'])) {
                 foreach ($day['meals_included'] as $m) {
                     if (!in_array($m, ['B', 'L', 'D'], true)) {
                         throw new \InvalidArgumentException("Day {$i} meal invalid");
@@ -886,5 +962,8 @@ PROMPT;
                 }
             }
         }
+
+        // Phase 4K-F2: Layer 3 — place existence check
+        $this->validatePlaceExistence($draft);
     }
 }
