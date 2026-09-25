@@ -1002,3 +1002,90 @@ Protected systems: Zero diff
 **R3/R4/R13/R20/R24 कायम**
 
 ---
+
+---
+
+### 2026-09-25 — Phase 4K-F2 CLOSED + PUSHED (AI Draft Layer 3 Validation)
+
+**Commit:** `2cacc06`
+**Files (1):** `app/Http/Controllers/Provider/AiItineraryDraftController.php`
+**Stats:** +82/-3
+
+**What Shipped:**
+- `validatePlaceExistence()` — Layer 3 place validation
+- Cache-based waypoint lookup (716 names, 1hr TTL)
+- Hash map O(1) lookup
+- Whitelist (9 generic terms)
+- Fuzzy match (prefix + levenshtein ≤2)
+- 2+ unknown → reject / 1 unknown → warn
+
+**Tests:** T1 PASS (no false reject)
+**R3/R4/R20 कायम**
+
+---
+
+### 2026-09-25 — Phase 4H-EXT CLOSED + PUSHED (Draft Timing Optimization)
+
+**Commit:** `51a33ae`
+**Files (1):** `AiItineraryDraftController.php`
+**Stats:** +19/-4
+
+**What Shipped:**
+- Sleep 60s → 40s between chunks (line 675)
+- Prompt rules 6+7 added (NO REASONING + SELF-CHECK)
+- Rule 1 strengthened (day count verification)
+- Retry delay 5s → 30s (line 576)
+
+**Tests:** T1 PASS — 11.5 min → 3m 45s (**67% faster**)
+**R3/R4/R20 कायम**
+
+---
+
+### 2026-09-25 — Phase UI-FIX CLOSED + PUSHED (Cancel + Abort + Wait Text)
+
+**Commit:** `e8a586f`
+**Files (5):** Blade modal + 4 lang files
+**Stats:** +39/-18
+
+**What Shipped:**
+- AbortController for fetch cancellation
+- `cancelAiDraft()` — full cleanup (abort + interval + state + UI)
+- X button + Cancel buttons → same handler
+- Global `window._aiDraftStopProgress`
+- Fetch signal param
+- Wait text revert (4 locales): `:minutes` placeholder → "a few minutes"
+
+**Tests:** T1 (Cancel) PASS + T4 (Wait text) PASS
+**R3/R4/R20 कायम**
+
+---
+
+### 2026-09-25 — Phase 4H-EXT-2 CLOSED + PUSHED (Chunking Reliability)
+
+**Commit:** `76d5b7d`
+**Files (1):** `AiItineraryDraftController.php`
+**Stats:** +11/-7
+
+**Root Cause (from log):**
+- `time_of_day invalid` — 4H-Fix incomplete (chunk validation missing sanitize)
+- Chunk retry had no backoff (5s only)
+- 16-day generation = 15 min stall (2 full retry cycles)
+
+**What Shipped:**
+- `validateChunkStructure()` — sanitize time_of_day (trim + lowercase + fallback)
+- `generateChunkWithRetry()` — sleep 5s → 45s (honor OTPM window)
+
+**Tests:** 14-day generation successful (0 time_of_day errors, 0 validation fails)
+**R3/R4/R20 कायम**
+
+---
+
+### 2026-09-25 — SERVICE SECTION 100% CLOSED 🎉
+
+**Session Total:** 14+ commits
+**Phases Closed:** 4M, 4K-F1, 4K-F2, 4H-EXT, UI-FIX, 4H-EXT-2
+**Tests:** 41p/1f (baseline maintained)
+**Regressions:** ZERO
+**Protected Systems Touched:** ZERO
+
+**Next:** Phase 4J (Multi-Provider Rotation — 500+ travelers)

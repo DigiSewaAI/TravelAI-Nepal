@@ -399,12 +399,17 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 | Phase 4M-2-3+4 — Category-Aware Form | ✅ PUSHED | c0cc382 | 2026-09-25 |
 | Phase 4M-3-1 — Mapping (1:1) | ✅ PUSHED | cd3c110 | 2026-09-25 |
 | Phase 4M-3-REDO — Pivot (N:N) | ✅ PUSHED | c336559 | 2026-09-25 |
-| Phase 4M-3-2-REDO — Constraint | ✅ PUSHED | 66eac2b | 2026-09-25 |
+| | Phase 4M-3-2-REDO — Constraint | ✅ PUSHED | 66eac2b | 2026-09-25 |
 | Master Handover File | ✅ PUSHED | f86de4f | 2026-09-25 |
 | Phase 4I — AI Typo Fixes | ✅ PUSHED | 605dfd3 | 2026-09-25 |
-| | Phase 4I-EXT — Journey Replay AI | ✅ PUSHED | edeb933 | 2026-09-25 |
-| **Phase 4K — AI Content Quality** | 🟢 **NEXT** | — | — |
-| Phase 4J — Multi-Provider | 🔒 After 4K | — | — |
+| Phase 4I-EXT — Journey Replay AI | ✅ PUSHED | edeb933 | 2026-09-25 |
+| Phase 4K-F1 — Journey Replay Grounding | ✅ PUSHED | 52ff921 | 2026-09-25 |
+| Phase 4K-F2 — AI Draft Layer 3 | ✅ PUSHED | 2cacc06 | 2026-09-25 |
+| Phase 4H-EXT — Timing (11m→3m45s) | ✅ PUSHED | 51a33ae | 2026-09-25 |
+| Phase UI-FIX — Cancel + Abort | ✅ PUSHED | e8a586f | 2026-09-25 |
+| Phase 4H-EXT-2 — Chunking Reliability | ✅ PUSHED | 76d5b7d | 2026-09-25 |
+| **Phase 4J — Multi-Provider** | 🟢 **NEXT** | — | — |
+| Phase 4K-F3 — Route Accuracy | 🔒 Deferred | — | — |
 | Phase 5 — Live Journey | 🔒 FUTURE | — | — |
 | Phase 6 — Memory & Social | 🔒 FUTURE | — | — |
 

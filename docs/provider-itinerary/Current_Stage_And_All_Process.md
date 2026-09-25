@@ -2230,3 +2230,79 @@ Target:
   Before 500-user launch
 
 ---
+
+---
+
+## 🎫 TICKETS — Session Update (2026-09-25 Evening Final)
+
+### ✅ RESOLVED (This Session)
+
+**AI-DRAFT-CHUNKING-STALL-01** — ✅ RESOLVED
+  Commit: `76d5b7d` (4H-EXT-2)
+  time_of_day sanitize + OTPM backoff (5s → 45s).
+
+**AI-DRAFT-CHUNKING-TIMING-01** — ✅ RESOLVED
+  Commit: `51a33ae` (4H-EXT)
+  11.5 min → 3m 45s (67% faster).
+
+**CANCEL-BUTTON-NONFUNCTIONAL-01** — ✅ RESOLVED
+  Commit: `e8a586f` (UI-FIX)
+  AbortController + cancelAiDraft() cleanup.
+
+### 🟡 MEDIUM PRIORITY (Active)
+
+**AI-DRAFT-RATE-LIMIT-TUNING-01** (NEW)
+  Concern: sleep(40) between chunks insufficient (every chunk hits rate limit)
+  Fix: sleep(40) → sleep(55) at line 674 (generateAllChunks)
+  Effort: 5 min
+  Phase: Post-service-close
+
+**AI-DRAFT-ROUTE-ACCURACY-01** (Phase 4K)
+  Days 11-13 hallucinations:
+    • Chhusang (Upper Mustang restricted — off AC route)
+    • Kaski (district name, not town)
+    • Tatopani missing (classic AC stop)
+  Fix: Route-specific validation + prompt enhancement
+  Effort: ~2-3 hrs
+  Phase: 4K (deferred)
+
+**AI-DRAFT-CROSS-CHUNK-DUPES-01** (Phase 4K)
+  Duplicate titles/endpoints detected across chunks
+  Fix: Prompt tuning
+  Effort: ~30 min
+  Phase: 4K
+
+**AI-ARCHITECTURE-UNIFY-02** (hardcoded model line 717)
+  Hardcoded model remaining in AiItineraryDraftController
+  Fix: config-driven
+  Effort: 5 min
+  Phase: Post-service-close
+
+**AI-MULTIPROVIDER-ROTATION-01** (Phase 4J — NEXT)
+  Multi-provider rotation (Groq + OpenRouter + Cerebras)
+  500+ travelers scale target
+  Fix: Provider pool + balancer + failover
+  Effort: 2-3 hrs
+  Phase: 4J
+
+### 🟢 LOW PRIORITY
+
+**AI-DRAFT-PROGRESS-SYNC-01** (NEW)
+  Client progress timer vs server actual timing mismatch
+  Fix: Sync with server chunk events
+  Effort: ~1 hr
+  Phase: Post-MVP
+
+**AI-DRAFT-ASYNC-QUEUE-01**
+  Async queue + notification (best UX)
+  Effort: Large (queue setup)
+  Phase: Post-deploy
+
+**AI-DRAFT-PROGRESSIVE-SAVE-01**
+  Progressive save (Day 1-3 available while 4-6 generating)
+  Effort: Frontend + backend
+  Phase: Post-MVP
+
+---
+
+## 📊 CURRENT STATE (2026-09-25 Evening Final)
