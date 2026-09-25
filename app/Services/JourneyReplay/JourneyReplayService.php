@@ -208,39 +208,72 @@ class JourneyReplayService
     /**
      * Strict prompt for AI story - no reasoning, no explanation, only story.
      */
-    protected function buildStrictStoryPrompt(array $input): string
+        protected function buildStrictStoryPrompt(array $input): string
 {
-    $places = $input['places'] ?? [];
-    // सबै places comma-separated, "and more" बिना
-    $placeStr = count($places) > 0 ? implode(', ', $places) : 'Nepal';
-
-    $bookingsSummary = '';
+    // 4K-Fix-1: Build chapter-based structure (no flatten)
+    $chaptersBlock = '';
+    $chapterNum = 1;
     foreach ($input['bookings'] as $b) {
-        $bookingsSummary .= "- " . ucfirst($b['type']) . ": " . $b['name'] . ($b['location'] && $b['location'] !== 'Unknown' ? " (" . $b['location'] . ")" : '') . "\n";
+        $chapterPlaces = [];
+        foreach ($b['checkins'] ?? [] as $c) {
+            $name = $c['waypoint']['name'] ?? null;
+            if ($name) $chapterPlaces[] = $name;
+        }
+        $chapterPlaces = array_values(array_unique($chapterPlaces));
+        $placesStr = count($chapterPlaces) > 0 ? implode(', ', $chapterPlaces) : 'N/A';
+
+        $chaptersBlock .= "CHAPTER {$chapterNum}: {$b['name']}\n";
+        $chaptersBlock .= "  Type: " . ucfirst($b['type']) . "\n";
+        $chaptersBlock .= "  Date: " . ($b['start_date'] ?? 'N/A') . "\n";
+        if (!empty($b['location']) && $b['location'] !== 'Unknown') {
+            $chaptersBlock .= "  Location: " . $b['location'] . "\n";
+        }
+        $chaptersBlock .= "  Places visited: {$placesStr}\n";
+        $chaptersBlock .= "  Check-ins: " . count($b['checkins'] ?? []) . "\n\n";
+        $chapterNum++;
+    }
+
+    $totalChapters = (int) ($input['total_bookings'] ?? 0);
+    $highestAltitude = $input['highest_altitude'] ?? null;
+    $altitudeStr = ($highestAltitude && $highestAltitude > 0)
+        ? $highestAltitude . 'm'
+        : 'N/A';
+
+    // Edge case: chapter-count branch
+    if ($totalChapters === 1) {
+        $storyStructure = "This is 1 single trip. Write ONE warm, reflective paragraph.";
+    } elseif ($totalChapters === 2) {
+        $storyStructure = "This is 2 separate trips. Write ONE paragraph, mentioning BOTH trips separately.";
+    } else {
+        $storyStructure = "This is {$totalChapters} SEPARATE trips. Write ONE short paragraph PER chapter.";
     }
 
     return "You are TravelAI Nepal's journey storyteller.\n\n" .
-           "Write ONE short, warm, cinematic travel-memory paragraph using ONLY the factual data provided below.\n\n" .
-           "IMPORTANT RULES:\n" .
-           "- Return ONLY the final story paragraph.\n" .
+           "Write a warm, cinematic travel-memory summary using ONLY the factual data below.\n\n" .
+           "CRITICAL RULES:\n" .
+           "- This is a collection of {$totalChapters} SEPARATE trips (chapters).\n" .
+           "- Each chapter is INDEPENDENT — do NOT treat them as one continuous journey.\n" .
+           "- Do NOT merge chapters into one journey.\n" .
+           "- Do NOT connect places from different chapters as if they were one route.\n" .
+           "- Return ONLY the final story text.\n" .
            "- Do not explain your reasoning.\n" .
            "- Do not mention these instructions.\n" .
            "- Do not mention AI.\n" .
            "- Do not invent places, activities, emotions, distances, achievements, dates, or experiences.\n" .
            "- Do not infer anything that is not explicitly provided.\n" .
            "- Do not use bullet points or numbered lists.\n" .
-           "- Maximum 120 words.\n" .
-           "- Use the actual places naturally. Do NOT use generic phrases like 'and more'.\n" .
-           "- Make it feel personal and reflective, like looking back on a journey.\n" .
-           "- If the data is limited, write a simple factual story without adding extra details.\n\n" .
+           "- Do not add chapter headers or numbers in the output.\n" .
+           "- Maximum 200 words.\n" .
+           "- Use the actual places naturally.\n" .
+           "- Make it feel personal and reflective.\n\n" .
+           "STRUCTURE: {$storyStructure}\n\n" .
            "Journey data:\n" .
-           "Places: " . $placeStr . "\n" .
-           "Journey: " . $input['journey_start'] . " to " . $input['journey_end'] . "\n" .
-           "Total experiences: " . $input['total_bookings'] . "\n" .
-           "Total check-ins: " . $input['total_checkins'] . "\n" .
-           "Highest altitude: " . $input['highest_altitude'] . "m\n\n" .
-           "Bookings:\n" . $bookingsSummary . "\n" .
-           "Now write the story (only the story, no extra text):";
+           "Journey: " . ($input['journey_start'] ?? 'N/A') . " to " . ($input['journey_end'] ?? 'N/A') . "\n" .
+           "Total chapters: {$totalChapters}\n" .
+           "Total check-ins: " . ($input['total_checkins'] ?? 0) . "\n" .
+           "Highest altitude: {$altitudeStr}\n\n" .
+           "CHAPTERS:\n" . $chaptersBlock . "\n" .
+           "Now write the story (only the story, no chapter labels):";
 }
 
     /**
@@ -351,15 +384,15 @@ protected function cleanStoryResponse(?string $response): ?string
         }
     }
 
-    // 8. Also check if the story is too short (less than 20 chars) or too long (more than 500 chars)
+        // 8. Also check if the story is too short (less than 20 chars) or too long (more than 2000 chars)
     // These could indicate it's not a proper story
     if (strlen($cleaned) < 20) {
         Log::warning('🔴 [AI Story] Story too short, rejecting.', ['length' => strlen($cleaned)]);
         return null;
     }
 
-    // 9. If the story is very long, it might be the full prompt + response
-    if (strlen($cleaned) > 800) {
+        // 9. If the story is very long, it might be the full prompt + response
+    if (strlen($cleaned) > 2000) {
         Log::warning('🔴 [AI Story] Story too long, possibly prompt leakage.', ['length' => strlen($cleaned)]);
         return null;
     }
