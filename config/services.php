@@ -42,10 +42,34 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
-    // 🔥 Groq AI Configuration (for Itinerary Planner)
+        // 🔥 Groq AI Configuration (Phase 4J: multi-key support)
     'groq' => [
-        'api_key' => env('GROQ_API_KEY'),
-        'model' => env('GROQ_MODEL', 'llama-3.1-70b-versatile'),
+        'api_key'  => env('GROQ_API_KEY'),
+        'api_keys' => env('GROQ_API_KEYS', env('GROQ_API_KEY')),
+        'model'    => env('GROQ_MODEL', 'qwen/qwen3.8-27b'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+    ],
+
+    // 🆕 4J: OpenRouter (free models)
+    'openrouter' => [
+        'api_key'  => env('OPENROUTER_API_KEY'),
+        'api_keys' => env('OPENROUTER_API_KEYS', env('OPENROUTER_API_KEY')),
+        'model'    => env('OPENROUTER_MODEL', 'meta-llama/llama-3.1-8b-instruct:free'),
+        'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
+    ],
+
+    // 🆕 4J: Cerebras (free tier)
+    'cerebras' => [
+        'api_key'  => env('CEREBRAS_API_KEY'),
+        'api_keys' => env('CEREBRAS_API_KEYS', env('CEREBRAS_API_KEY')),
+        'model'    => env('CEREBRAS_MODEL', 'llama3.1-8b'),
+        'base_url' => env('CEREBRAS_BASE_URL', 'https://api.cerebras.ai/v1'),
+    ],
+
+    // 🆕 4J: Provider fallback control
+    'ai' => [
+        'fallback_enabled' => env('AI_FALLBACK_ENABLED', true),
+        'preferred'        => env('AI_PROVIDER'),
     ],
 
     // 🔥 Google Places API (for geocoding & location search)

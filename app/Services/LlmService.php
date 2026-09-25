@@ -7,19 +7,95 @@ use Illuminate\Support\Facades\Log;
 
 class LlmService
 {
-    protected string $apiKey;
+        protected string $apiKey;
     protected string $model;
     protected int $maxRetries = 3;
 
-    public function __construct()
+    /** @var array<int, array{name:string,api_keys:array,model:string,base_url:string}> */
+    protected array $providers = [];
+
+        public function __construct()
     {
         $this->apiKey = config('services.groq.api_key');
-        $this->model = config('services.groq.model', 'qwen/qwen3.8-27b');
+        $this->model  = config('services.groq.model', 'qwen/qwen3.8-27b');
 
-                Log::info('LlmService initialized', [
+        $this->providers = $this->buildProviderPool();
+
+        $preferred = config('services.ai.preferred');
+        if ($preferred) {
+            $this->providers = array_values(array_filter(
+                $this->providers,
+                fn($p) => $p['name'] === $preferred
+            ));
+        }
+
+        Log::info('LlmService initialized', [
             'model' => $this->model,
             'api_key_configured' => !empty($this->apiKey),
+            'providers_available' => array_values(array_filter(
+                array_map(fn($p) => empty($p['api_keys']) ? null : $p['name'], $this->providers)
+            )),
         ]);
+    }
+
+    protected function buildProviderPool(): array
+    {
+        return [
+            [
+                'name'     => 'groq',
+                'api_keys' => $this->parseKeys(config('services.groq.api_keys')),
+                'model'    => config('services.groq.model', 'qwen/qwen3.8-27b'),
+                'base_url' => config('services.groq.base_url', 'https://api.groq.com/openai/v1'),
+            ],
+            [
+                'name'     => 'openrouter',
+                'api_keys' => $this->parseKeys(config('services.openrouter.api_keys')),
+                'model'    => config('services.openrouter.model', 'meta-llama/llama-3.1-8b-instruct:free'),
+                'base_url' => config('services.openrouter.base_url', 'https://openrouter.ai/api/v1'),
+            ],
+            [
+                'name'     => 'cerebras',
+                'api_keys' => $this->parseKeys(config('services.cerebras.api_keys')),
+                'model'    => config('services.cerebras.model', 'llama3.1-8b'),
+                'base_url' => config('services.cerebras.base_url', 'https://api.cerebras.ai/v1'),
+            ],
+        ];
+    }
+
+    protected function parseKeys(?string $raw): array
+    {
+        if (empty($raw)) return [];
+        return array_values(array_filter(array_map('trim', explode(',', $raw))));
+    }
+
+    protected function callProvider(string $baseUrl, string $apiKey, array $payload, int $timeout = 120): array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type'  => 'application/json',
+        ])
+        ->withOptions([
+            'verify'  => !app()->environment('local', 'testing'),
+            'timeout' => $timeout,
+        ])
+        ->post(rtrim($baseUrl, '/') . '/chat/completions', $payload);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return [
+                'status'      => 200,
+                'content'     => (string) ($data['choices'][0]['message']['content'] ?? ''),
+                'retry_after' => 0,
+                'body'        => '',
+            ];
+        }
+
+        return [
+            'status'      => $response->status(),
+            'content'     => null,
+            'retry_after' => (int) ($response->header('Retry-After') ?: 0),
+            'body'        => (string) $response->body(),
+        ];
     }
 
     public function listModels(): array
@@ -30,7 +106,7 @@ class LlmService
                 ->withOptions([
             'verify' => !app()->environment('local', 'testing'),
         ])
-        ->get('https://api.groq.com/openai/v1/models');
+        ->get(rtrim(config('services.groq.base_url', 'https://api.groq.com/openai/v1'), '/') . '/models');
 
         if (!$response->successful()) {
             throw new \Exception('Failed to fetch models: ' . $response->body());
@@ -52,122 +128,107 @@ class LlmService
      * @param int $maxTokens Max tokens for the response.
      * @return array
      */
-        public function generateItinerary(
+            public function generateItinerary(
         string $prompt,
         string $locale = 'en',
         ?string $model = null,
         bool $extract = true,
         int $maxTokens = 3000,
         float $temperature = 0.2
-    ): array
-    {
-                Log::info('LlmService generateItinerary called', [
+    ): array {
+        Log::info('LlmService generateItinerary called', [
             'locale' => $locale,
             'prompt_length' => strlen($prompt),
         ]);
 
-        $attempt = 0;
-        $baseDelay = 2;
+        $errors = [];
+        $sawRateLimit = false;
+        $fallbackEnabled = (bool) config('services.ai.fallback_enabled', true);
 
-        while ($attempt < $this->maxRetries) {
-            try {
-                $modelToUse = $model ?? $this->model;
+        foreach ($this->providers as $provider) {
+            if (empty($provider['api_keys'])) {
+                continue;
+            }
+            $modelToUse = $model ?? $provider['model'];
 
-                Log::info('Groq API call initiated', [
-                    'model' => $modelToUse,
-                    'attempt' => $attempt + 1,
-                    'prompt_length' => strlen($prompt),
-                ]);
+            foreach ($provider['api_keys'] as $keyIdx => $apiKey) {
+                $keyLabel = $provider['name'] . '#' . ($keyIdx + 1);
 
-                Log::info('LlmService sending to Groq', [
-                    'model' => $modelToUse,
-                    'temperature' => $temperature,
-                ]);
-
-                                // 4I-EXT: Build payload; JSON mode only when extraction requested
                 $payload = [
                     'model' => $modelToUse,
                     'messages' => [
                         ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
-                        ['role' => 'user', 'content' => $prompt],
+                        ['role' => 'user',   'content' => $prompt],
                     ],
                     'temperature' => $temperature,
-                    'max_tokens' => $maxTokens,
+                    'max_tokens'  => $maxTokens,
                 ];
-
                 if ($extract) {
                     $payload['response_format'] = ['type' => 'json_object'];
                 }
 
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type' => 'application/json',
-                ])
-                                ->withOptions([
-                    'verify' => !app()->environment('local', 'testing'),
-                    'timeout' => 120,
-                ])
-                ->post('https://api.groq.com/openai/v1/chat/completions', $payload);
-
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $content = $data['choices'][0]['message']['content'] ?? '';
-
-                                        Log::info('LlmService raw Groq response received', [
-                        'content_length' => strlen($content),
-                    ]);
-
-                    // ✅ If extraction is disabled, return raw content as array
-                    if (!$extract) {
-                        return ['content' => $content, 'raw' => true];
-                    }
-
-                    // ✅ Default: extract JSON
-                    return $this->extractJson($content);
-                }
-
-                if ($response->status() === 429) {
-                    $retryAfter = $response->header('Retry-After') ?? ($baseDelay * pow(2, $attempt));
-                    Log::warning('Groq rate limit hit', [
-                        'attempt' => $attempt + 1,
-                        'retry_after' => $retryAfter,
-                        'body' => $response->body(),
-                    ]);
-                    if ((int) $retryAfter > 30) {
-                        throw new \Exception('Rate limit: Please wait ' . $retryAfter . ' seconds.');
-                    }
-                    sleep((int) $retryAfter + 1);
-                    $attempt++;
-                    continue;
-                }
-
-                                Log::error('Groq API failed', [
-                    'status' => $response->status(),
-                ]);
-                throw new \Exception("Groq API error: " . $response->body());
-
-            } catch (\Exception $e) {
-                Log::error('LlmService exception', [
-                    'attempt' => $attempt + 1,
-                    'message' => $e->getMessage(),
+                Log::info('4J: LLM provider call', [
+                    'provider' => $provider['name'],
+                    'key'      => $keyLabel,
+                    'model'    => $modelToUse,
                 ]);
 
-                if (str_contains($e->getMessage(), 'Rate limit')) {
-                    throw $e;
+                try {
+                    $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
+
+                    if ($result['status'] === 200) {
+                        $content = $result['content'];
+                        Log::info('4J: LLM response received', [
+                            'provider'       => $provider['name'],
+                            'key'            => $keyLabel,
+                            'content_length' => strlen($content),
+                        ]);
+
+                        if (!$extract) {
+                            return ['content' => $content, 'raw' => true];
+                        }
+                        return $this->extractJson($content);
+                    }
+
+                    if ($result['status'] === 429) {
+                        $sawRateLimit = true;
+                        $retryAfter   = $result['retry_after'] ?: 5;
+                        Log::warning('4J: Rate limit hit', [
+                            'provider'    => $provider['name'],
+                            'key'         => $keyLabel,
+                            'retry_after' => $retryAfter,
+                        ]);
+                        $errors[] = "{$keyLabel}: 429 (retry_after={$retryAfter})";
+                        continue;
+                    }
+
+                    Log::error('4J: Provider HTTP error', [
+                        'provider' => $provider['name'],
+                        'key'      => $keyLabel,
+                        'status'   => $result['status'],
+                    ]);
+                    $errors[] = "{$keyLabel}: HTTP {$result['status']}";
+                } catch (\Throwable $e) {
+                    Log::error('4J: Provider exception', [
+                        'provider' => $provider['name'],
+                        'key'      => $keyLabel,
+                        'message'  => $e->getMessage(),
+                    ]);
+                    $errors[] = "{$keyLabel}: " . $e->getMessage();
                 }
 
-                if ($attempt >= $this->maxRetries - 1) {
-                    throw $e;
+                if (!$fallbackEnabled) {
+                    break 2;
                 }
-
-                $delay = $baseDelay * pow(2, $attempt);
-                Log::info("Retrying after {$delay} seconds...");
-                sleep($delay);
-                $attempt++;
             }
         }
 
-        throw new \Exception('Max retries exceeded for Groq API.');
+        $joined = implode(' | ', $errors);
+        if ($sawRateLimit) {
+            // 4J: lowercase 'rate_limit' for downstream str_contains match
+            throw new \Exception('rate_limit: All providers exhausted. ' . $joined);
+        }
+        throw new \Exception('All providers failed: ' . $joined);
     }
 
         /**
@@ -188,19 +249,23 @@ class LlmService
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
         ])
-                ->withOptions([
+                                ->withOptions([
             'verify' => !app()->environment('local', 'testing'),
             'timeout' => $timeout,
         ])
-        ->post('https://api.groq.com/openai/v1/chat/completions', [
-            'model' => $modelToUse,
-            'messages' => [
-                ['role' => 'system', 'content' => $systemPrompt],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'temperature' => 0.7,
-            'max_tokens' => $maxTokens,
-        ]);
+        ->post(
+            rtrim(config('services.groq.base_url', 'https://api.groq.com/openai/v1'), '/')
+                . '/chat/completions',
+            [
+                'model' => $modelToUse,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => $maxTokens,
+            ]
+        );
 
         if (!$response->successful()) {
             Log::error('LlmService::generateRawText failed', [
