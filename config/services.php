@@ -72,9 +72,15 @@ return [
     ],
 
     // 🆕 4J: Provider fallback control
-    'ai' => [
+        'ai' => [
         'fallback_enabled' => env('AI_FALLBACK_ENABLED', true),
         'preferred'        => env('AI_PROVIDER'),
+    ],
+
+    // Phase CACHE-01: AI draft response caching
+    'ai_draft_cache' => [
+        'enabled'   => env('AI_DRAFT_CACHE_ENABLED', true),
+        'ttl_hours' => env('AI_DRAFT_CACHE_TTL_HOURS', 24),
     ],
 
     // 🔥 Google Places API (for geocoding & location search)

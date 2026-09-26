@@ -83,6 +83,35 @@ class AiItineraryDraftController extends Controller
     }
 
     /**
+     * Phase CACHE-01: Build deterministic cache key for AI draft.
+     */
+    protected function buildDraftCacheKey(Service $service, int $days, string $notes): string
+    {
+        return sprintf(
+            'ai_draft:v1:%d:%d:%s',
+            $service->id,
+            $days,
+            substr(md5($notes), 0, 12)
+        );
+    }
+
+    /**
+     * Phase CACHE-01: Check if response caching enabled.
+     */
+    protected function isDraftCacheEnabled(): bool
+    {
+        return (bool) config('services.ai_draft_cache.enabled', true);
+    }
+
+    /**
+     * Phase CACHE-01: Get cache TTL in seconds.
+     */
+    protected function getDraftCacheTtl(): int
+    {
+        $hours = (int) config('services.ai_draft_cache.ttl_hours', 24);
+        return max($hours, 1) * 3600;
+    }
+    /**
      * PHASE X-01: Generate AI itinerary draft (preview only).
      *
      * - Quota-gated via AiReservationService::reserveForProvider()
@@ -100,8 +129,43 @@ class AiItineraryDraftController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $days = (int) $validated['days'];
+                $days = (int) $validated['days'];
         $notes = trim((string) ($validated['notes'] ?? ''));
+
+        // Phase CACHE-01: Check cache (same service + days + notes)
+        $cacheKey = $this->buildDraftCacheKey($service, $days, $notes);
+        if ($this->isDraftCacheEnabled()) {
+            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
+            if ($cached !== null && is_array($cached) && !empty($cached['preview'])) {
+                $draftId = (string) Str::uuid();
+                session()->put("ai_draft:{$draftId}", [
+                    'service_id'  => $service->id,
+                    'provider_id' => $service->provider_id,
+                    'days'        => $cached['preview'],
+                    'created_at'  => now()->timestamp,
+                ]);
+
+                $durationMs = (int) ((microtime(true) - $start) * 1000);
+                Log::info('CACHE-01: AI draft cache HIT', [
+                    'service_id'  => $service->id,
+                    'days'        => $days,
+                    'cache_key'   => $cacheKey,
+                    'duration_ms' => $durationMs,
+                ]);
+
+                return response()->json([
+                    'draft_id'   => $draftId,
+                    'preview'    => $cached['preview'],
+                    'days_count' => $cached['days_count'],
+                    'cached'     => true,
+                ]);
+            }
+            Log::info('CACHE-01: AI draft cache MISS', [
+                'service_id' => $service->id,
+                'days'       => $days,
+                'cache_key'  => $cacheKey,
+            ]);
+        }
 
         $provider = $service->provider;
         if (!$provider) {
@@ -286,12 +350,30 @@ class AiItineraryDraftController extends Controller
 
             $durationMs = (int) ((microtime(true) - $start) * 1000);
 
-            Log::info('AI draft generated', [
+                        Log::info('AI draft generated', [
                 'service_id'  => $service->id,
                 'provider_id' => $provider->id,
                 'days_count'  => count($draft['days']),
                 'duration_ms' => $durationMs,
             ]);
+
+            // Phase CACHE-01: Store preview in cache (NO draft_id — fresh UUID on HIT)
+            if ($this->isDraftCacheEnabled()) {
+                \Illuminate\Support\Facades\Cache::put(
+                    $cacheKey,
+                    [
+                        'preview'    => $draft['days'],
+                        'days_count' => count($draft['days']),
+                    ],
+                    $this->getDraftCacheTtl()
+                );
+                Log::info('CACHE-01: AI draft cache STORE', [
+                    'service_id' => $service->id,
+                    'days'       => $days,
+                    'cache_key'  => $cacheKey,
+                    'ttl_hours'  => $this->getDraftCacheTtl() / 3600,
+                ]);
+            }
 
             return response()->json([
                 'draft_id'   => $draftId,
