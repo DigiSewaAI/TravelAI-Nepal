@@ -320,8 +320,9 @@ class AiItineraryDraftController extends Controller
     {
         $this->authorize('update', $service);
 
-        $validated = $request->validate([
+                $validated = $request->validate([
             'draft_id' => 'required|string|uuid',
+            'update_service_duration' => 'nullable|boolean',
         ]);
 
         $draftKey = 'ai_draft:' . $validated['draft_id'];
@@ -400,7 +401,16 @@ class AiItineraryDraftController extends Controller
                     ]);
                 }
 
-                $insertedDays++;
+                                $insertedDays++;
+            }
+
+            // 4K-F4: Update detail table duration if requested (category-aware)
+            if ($request->boolean('update_service_duration', false) && $insertedDays > 0) {
+                if ($service->trekDetail) {
+                    $service->trekDetail->update(['duration_days' => $insertedDays]);
+                } elseif ($service->tourDetail) {
+                    $service->tourDetail->update(['duration_days' => $insertedDays]);
+                }
             }
 
             session()->forget('ai_draft:' . request()->input('draft_id'));
@@ -847,17 +857,29 @@ PROMPT;
                     'error'     => $msg,
                 ]);
 
-                                                if (str_contains($msg, 'rate_limit') ||
+                                                                if (str_contains($msg, 'rate_limit') ||
                     str_contains($msg, 'Request too large') ||
                     str_contains($msg, 'tokens per minute')) {
-                    // 4J-Fix: honor OTPM window — sleep + retry (not give up)
+                    // 4J-Fix + 4K-F4b: honor OTPM window — sleep + retry
+                    // BUT cap at 60s — longer waits = bad UX + PHP timeout risk
                     if ($attempt < $maxAttempts) {
-                        $waitSec = 60;
+                        $retryAfter = null;
                         if (preg_match('/retry_after=(\d+)/i', $msg, $m)) {
-                            $waitSec = max((int)$m[1] + 5, 30);
+                            $retryAfter = (int) $m[1];
                         } elseif (preg_match('/wait (\d+) seconds/i', $msg, $m)) {
-                            $waitSec = max((int)$m[1] + 5, 30);
+                            $retryAfter = (int) $m[1];
                         }
+
+                        // 4K-F4b: Fail fast if wait > 60s (quota exhausted, not burst)
+                        if ($retryAfter !== null && $retryAfter > 60) {
+                            Log::warning('4K-F4b: rate_limit wait too long — failing fast', [
+                                'attempt'     => $attempt,
+                                'retry_after' => $retryAfter,
+                            ]);
+                            return null;
+                        }
+
+                        $waitSec = $retryAfter !== null ? max($retryAfter + 5, 30) : 60;
                         Log::info('4J-Fix: rate_limit retry', [
                             'attempt' => $attempt,
                             'wait'    => $waitSec,

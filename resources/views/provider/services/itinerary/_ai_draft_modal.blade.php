@@ -22,11 +22,17 @@
                 <label for="ai-draft-days" class="block text-sm font-semibold text-gray-700 mb-1">
                     {{ __('messages.ai_draft_days_label') }}
                 </label>
+                                                @php
+                    $parsedDuration = preg_match('/(\d+)\s*days?/i', $service->name, $m) ? (int) $m[1] : 7;
+                    $defaultDays = $service->trekDetail?->duration_days
+                                ?? $service->tourDetail?->duration_days
+                                ?? $parsedDuration;
+                @endphp
                 <input type="number"
                        id="ai-draft-days"
                        min="1"
                        max="21"
-                       value="7"
+                       value="{{ $defaultDays }}"
                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <p class="text-xs text-gray-500 mt-1">{{ __('messages.ai_draft_days_hint') }}</p>
             </div>
@@ -105,6 +111,32 @@
 
     </div>
 </div>
+    {{-- 4K-F4: Duration mismatch warning modal --}}
+    <div id="ai-draft-duration-warning" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-3">
+                {{ __('messages.ai_draft_duration_warning_title') }}
+            </h3>
+            <p class="text-sm text-gray-700 mb-4" id="ai-draft-duration-warning-msg"></p>
+            <div class="flex flex-col gap-2">
+                <button type="button"
+                        id="ai-draft-duration-update-btn"
+                        class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold">
+                    {{ __('messages.ai_draft_duration_update_button') }}
+                </button>
+                <button type="button"
+                        id="ai-draft-duration-keep-btn"
+                        class="w-full px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold">
+                    {{ __('messages.ai_draft_duration_keep_button') }}
+                </button>
+                <button type="button"
+                        id="ai-draft-duration-cancel-btn"
+                        class="w-full px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">
+                    {{ __('messages.ai_draft_duration_cancel_button') }}
+                </button>
+            </div>
+        </div>
+    </div>
 
 <script>
 (function () {
@@ -276,15 +308,14 @@
             generateBtn.disabled = false;
             generateBtn.textContent = @json(__('messages.ai_draft_generate_button'));
         }
-    });
+        });
 
-    applyBtn.addEventListener('click', function () {
-        if (!currentDraftId) return;
+        var serviceDuration = @json($service->trekDetail?->duration_days ?? $service->tourDetail?->duration_days ?? null);
 
+    function submitApplyForm(updateServiceDuration) {
         applyBtn.disabled = true;
         applyBtn.textContent = @json(__('messages.ai_draft_apply_button')) + '...';
 
-        // Submit via form (redirect endpoint)
         var form = document.createElement('form');
         form.method = 'POST';
         form.action = aiDraftApplyUrl;
@@ -301,8 +332,46 @@
         draftId.value = currentDraftId;
         form.appendChild(draftId);
 
+        if (updateServiceDuration) {
+            var upd = document.createElement('input');
+            upd.type = 'hidden';
+            upd.name = 'update_service_duration';
+            upd.value = '1';
+            form.appendChild(upd);
+        }
+
         document.body.appendChild(form);
         form.submit();
+    }
+
+    applyBtn.addEventListener('click', function () {
+        if (!currentDraftId) return;
+
+        var draftDays = parseInt(daysInput.value || '0', 10);
+
+        if (serviceDuration && draftDays && draftDays !== serviceDuration) {
+            var msgTpl = @json(__('messages.ai_draft_duration_warning_msg'));
+            document.getElementById('ai-draft-duration-warning-msg').textContent =
+                msgTpl.replace(':service', serviceDuration).replace(':draft', draftDays);
+            document.getElementById('ai-draft-duration-warning').classList.remove('hidden');
+            return;
+        }
+
+        submitApplyForm(false);
+    });
+
+    document.getElementById('ai-draft-duration-update-btn').addEventListener('click', function () {
+        document.getElementById('ai-draft-duration-warning').classList.add('hidden');
+        submitApplyForm(true);
+    });
+
+    document.getElementById('ai-draft-duration-keep-btn').addEventListener('click', function () {
+        document.getElementById('ai-draft-duration-warning').classList.add('hidden');
+        submitApplyForm(false);
+    });
+
+    document.getElementById('ai-draft-duration-cancel-btn').addEventListener('click', function () {
+        document.getElementById('ai-draft-duration-warning').classList.add('hidden');
     });
 
     function showError(msg) {
