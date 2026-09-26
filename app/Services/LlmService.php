@@ -40,23 +40,26 @@ class LlmService
 
     protected function buildProviderPool(): array
     {
-        return [
+                return [
             [
                 'name'     => 'groq',
                 'api_keys' => $this->parseKeys(config('services.groq.api_keys')),
                 'model'    => config('services.groq.model', 'qwen/qwen3.8-27b'),
+                'models'   => config('services.groq.models', []),
                 'base_url' => config('services.groq.base_url', 'https://api.groq.com/openai/v1'),
             ],
             [
                 'name'     => 'openrouter',
                 'api_keys' => $this->parseKeys(config('services.openrouter.api_keys')),
                 'model'    => config('services.openrouter.model', 'meta-llama/llama-3.1-8b-instruct:free'),
+                'models'   => config('services.openrouter.models', []),
                 'base_url' => config('services.openrouter.base_url', 'https://openrouter.ai/api/v1'),
             ],
             [
                 'name'     => 'cerebras',
                 'api_keys' => $this->parseKeys(config('services.cerebras.api_keys')),
                 'model'    => config('services.cerebras.model', 'llama3.1-8b'),
+                'models'   => config('services.cerebras.models', []),
                 'base_url' => config('services.cerebras.base_url', 'https://api.cerebras.ai/v1'),
             ],
         ];
@@ -145,80 +148,103 @@ class LlmService
         $sawRateLimit = false;
         $fallbackEnabled = (bool) config('services.ai.fallback_enabled', true);
 
-        foreach ($this->providers as $provider) {
+                foreach ($this->providers as $provider) {
             if (empty($provider['api_keys'])) {
                 continue;
             }
-            $modelToUse = $model ?? $provider['model'];
+
+            // 4K-F4d: Build models to try (explicit $model > provider models array > single model)
+            if ($model !== null) {
+                $modelsToTry = [$model];
+            } elseif (!empty($provider['models'])) {
+                $modelsToTry = $provider['models'];
+            } else {
+                $modelsToTry = [$provider['model']];
+            }
 
             foreach ($provider['api_keys'] as $keyIdx => $apiKey) {
-                $keyLabel = $provider['name'] . '#' . ($keyIdx + 1);
+                foreach ($modelsToTry as $modelIdx => $modelToUse) {
+                    $keyLabel = $provider['name'] . '#' . ($keyIdx + 1)
+                              . (count($modelsToTry) > 1 ? '/m' . ($modelIdx + 1) : '');
 
-                $payload = [
-                    'model' => $modelToUse,
-                    'messages' => [
-                        ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
-                        ['role' => 'user',   'content' => $prompt],
-                    ],
-                    'temperature' => $temperature,
-                    'max_tokens'  => $maxTokens,
-                ];
-                if ($extract) {
-                    $payload['response_format'] = ['type' => 'json_object'];
-                }
+                    $payload = [
+                        'model' => $modelToUse,
+                        'messages' => [
+                            ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
+                            ['role' => 'user',   'content' => $prompt],
+                        ],
+                        'temperature' => $temperature,
+                        'max_tokens'  => $maxTokens,
+                    ];
+                    if ($extract) {
+                        $payload['response_format'] = ['type' => 'json_object'];
+                    }
 
-                Log::info('4J: LLM provider call', [
-                    'provider' => $provider['name'],
-                    'key'      => $keyLabel,
-                    'model'    => $modelToUse,
-                ]);
+                    Log::info('4J: LLM provider call', [
+                        'provider' => $provider['name'],
+                        'key'      => $keyLabel,
+                        'model'    => $modelToUse,
+                    ]);
 
-                try {
-                    $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
+                    try {
+                        $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
 
-                    if ($result['status'] === 200) {
-                        $content = $result['content'];
-                        Log::info('4J: LLM response received', [
-                            'provider'       => $provider['name'],
-                            'key'            => $keyLabel,
-                            'content_length' => strlen($content),
-                        ]);
+                        if ($result['status'] === 200) {
+                            $content = $result['content'];
+                            Log::info('4J: LLM response received', [
+                                'provider'       => $provider['name'],
+                                'key'            => $keyLabel,
+                                'content_length' => strlen($content),
+                            ]);
 
-                        if (!$extract) {
-                            return ['content' => $content, 'raw' => true];
+                            if (!$extract) {
+                                return ['content' => $content, 'raw' => true];
+                            }
+
+                            // 4K-F4d: Empty response → try next model (same key)
+                            if (strlen(trim((string) $content)) === 0) {
+                                Log::warning('4J: Empty response — trying next model', [
+                                    'provider' => $provider['name'],
+                                    'key'      => $keyLabel,
+                                    'model'    => $modelToUse,
+                                ]);
+                                $errors[] = "{$keyLabel}: empty response";
+                                continue;
+                            }
+
+                            return $this->extractJson($content);
                         }
-                        return $this->extractJson($content);
-                    }
 
-                    if ($result['status'] === 429) {
-                        $sawRateLimit = true;
-                        $retryAfter   = $result['retry_after'] ?: 5;
-                        Log::warning('4J: Rate limit hit', [
-                            'provider'    => $provider['name'],
-                            'key'         => $keyLabel,
-                            'retry_after' => $retryAfter,
+                        if ($result['status'] === 429) {
+                            $sawRateLimit = true;
+                            $retryAfter   = $result['retry_after'] ?: 5;
+                            Log::warning('4J: Rate limit hit', [
+                                'provider'    => $provider['name'],
+                                'key'         => $keyLabel,
+                                'retry_after' => $retryAfter,
+                            ]);
+                            $errors[] = "{$keyLabel}: 429 (retry_after={$retryAfter})";
+                            continue;
+                        }
+
+                        Log::error('4J: Provider HTTP error', [
+                            'provider' => $provider['name'],
+                            'key'      => $keyLabel,
+                            'status'   => $result['status'],
                         ]);
-                        $errors[] = "{$keyLabel}: 429 (retry_after={$retryAfter})";
-                        continue;
+                        $errors[] = "{$keyLabel}: HTTP {$result['status']}";
+                    } catch (\Throwable $e) {
+                        Log::error('4J: Provider exception', [
+                            'provider' => $provider['name'],
+                            'key'      => $keyLabel,
+                            'message'  => $e->getMessage(),
+                        ]);
+                        $errors[] = "{$keyLabel}: " . $e->getMessage();
                     }
 
-                    Log::error('4J: Provider HTTP error', [
-                        'provider' => $provider['name'],
-                        'key'      => $keyLabel,
-                        'status'   => $result['status'],
-                    ]);
-                    $errors[] = "{$keyLabel}: HTTP {$result['status']}";
-                } catch (\Throwable $e) {
-                    Log::error('4J: Provider exception', [
-                        'provider' => $provider['name'],
-                        'key'      => $keyLabel,
-                        'message'  => $e->getMessage(),
-                    ]);
-                    $errors[] = "{$keyLabel}: " . $e->getMessage();
-                }
-
-                if (!$fallbackEnabled) {
-                    break 2;
+                    if (!$fallbackEnabled) {
+                        break 3;   // 4K-F4d: 3-level loop
+                    }
                 }
             }
         }

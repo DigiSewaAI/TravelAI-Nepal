@@ -45,14 +45,17 @@ class AiItineraryDraftController extends Controller
         try {
             $route = $this->planner->resolveRouteForProvider($service->name);
             if ($route) {
-                $waypoints = $route->segments()
+                                $waypoints = $route->segments()
                     ->with(['fromWaypoint', 'toWaypoint'])
                     ->orderBy('sequence')
                     ->get()
                     ->map(fn($s) => [
-                        'from'     => $s->fromWaypoint->name ?? 'Unknown',
-                        'to'       => $s->toWaypoint->name   ?? 'Unknown',
-                        'distance' => $s->distance_km,
+                        'from'          => $s->fromWaypoint->name ?? 'Unknown',
+                        'to'            => $s->toWaypoint->name   ?? 'Unknown',
+                        'distance'      => $s->distance_km,
+                        'time'          => $s->estimated_time_hours,
+                        'altitude_from' => $s->fromWaypoint->altitude ?? null,
+                        'altitude_to'   => $s->toWaypoint->altitude ?? null,
                     ])
                     ->toArray();
 
@@ -199,10 +202,10 @@ class AiItineraryDraftController extends Controller
                 while ($attempt < $maxAttempts) {
                     $attempt++;
                     try {
-                        $candidate = $this->llm->generateItinerary(
+                                                $candidate = $this->llm->generateItinerary(
                             prompt:      $prompt,
                             locale:      'en',
-                            model:       'qwen/qwen3.8-27b',
+                            model:       null,   // 4K-F4d-fix: use provider pool models
                             extract:     true,
                             maxTokens:   $adjustedMaxTokens,
                             temperature: 0.5,
@@ -237,6 +240,18 @@ class AiItineraryDraftController extends Controller
                         ]);
                         if ($attempt < $maxAttempts) sleep(5);
                     }
+                }
+            }
+
+                        if ($validDraft === null) {
+                // 4K-F4c: Template fallback from route_segments (guaranteed output)
+                $templateDays = $this->buildTemplateFromRoute($service, $days);
+                if ($templateDays !== null) {
+                    Log::info('4K-F4c: LLM failed, using template fallback', [
+                        'service_id' => $service->id,
+                        'days'       => count($templateDays),
+                    ]);
+                    $validDraft = ['days' => $templateDays];
                 }
             }
 
@@ -419,6 +434,88 @@ class AiItineraryDraftController extends Controller
         return redirect()
             ->route('provider.services.itinerary.index', $service)
             ->with('success', __('messages.ai_draft_applied', ['count' => $insertedDays]));
+    }
+
+        /**
+     * 4K-F4c: Template fallback from route_segments DB.
+     * Triggered when ALL LLM providers fail.
+     * Ensures user ALWAYS gets a valid itinerary.
+     */
+    private function buildTemplateFromRoute(Service $service, int $days): ?array
+    {
+        $routeWaypoints = $this->fetchRouteWaypoints($service);
+        if (empty($routeWaypoints)) {
+            return null;   // No route = can't template
+        }
+
+        $segments = $routeWaypoints;
+        $segmentsCount = count($segments);
+        $result = [];
+        $segmentIndex = 0;
+
+        for ($dayNum = 1; $dayNum <= $days; $dayNum++) {
+            if ($segmentIndex >= $segmentsCount) {
+                $seg = $segments[$segmentsCount - 1];
+                $title = $seg['to'] . ' — Rest / Exploration';
+                $desc = 'A rest and exploration day at ' . $seg['to'] . '.';
+                $distKm = 0.0;
+                $timeHrs = 0.0;
+                $alt = $seg['altitude_to'] ?? null;
+                $fromName = $seg['from'] ?? '';
+                $toName = $seg['to'] ?? '';
+            } else {
+                $seg = $segments[$segmentIndex];
+                $from = $seg['from'] ?? '';
+                $to = $seg['to'] ?? '';
+
+                if ($from === $to) {
+                    $title = $to . ' — Acclimatization';
+                    $desc = 'Acclimatization day at ' . $to . '. Rest and explore the village.';
+                } else {
+                    $title = $from . ' to ' . $to;
+                    $desc = 'Trek from ' . $from . ' to ' . $to . '.';
+                }
+                $distKm = (float) ($seg['distance'] ?? 0.0);
+                $timeHrs = (float) ($seg['time'] ?? 0.0);
+                $alt = $seg['altitude_to'] ?? null;
+                $fromName = $from;
+                $toName = $to;
+                $segmentIndex++;
+            }
+
+            $result[] = [
+                'day_number'           => $dayNum,
+                'title'                => $title,
+                'description'          => $desc,
+                'distance_km'          => $distKm,
+                'estimated_time_hours' => $timeHrs,
+                'altitude_m'           => $alt,
+                'accommodation'        => 'Teahouse',
+                'meals_included'       => ['B', 'L', 'D'],
+                'items'                => [
+                    [
+                        'title'        => (!empty($fromName) ? $fromName . ' Departure' : 'Morning Departure'),
+                        'description'  => 'Start the day from ' . ($fromName !== '' ? $fromName : 'your location') . '.',
+                        'time_of_day'  => 'morning',
+                        'is_optional'  => false,
+                    ],
+                    [
+                        'title'        => 'Arrival at ' . ($toName !== '' ? $toName : 'destination'),
+                        'description'  => 'Reach ' . ($toName !== '' ? $toName : 'destination') . ' and rest for the night.',
+                        'time_of_day'  => 'afternoon',
+                        'is_optional'  => false,
+                    ],
+                ],
+            ];
+        }
+
+        Log::warning('4K-F4c: Template fallback generated', [
+            'service_id' => $service->id,
+            'days'       => $days,
+            'source'     => 'route_segments',
+        ]);
+
+        return $result;
     }
 
             /**
@@ -828,10 +925,10 @@ PROMPT;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
-                $candidate = $this->llm->generateItinerary(
+                                $candidate = $this->llm->generateItinerary(
                     prompt:      $prompt,
                     locale:      'en',
-                    model:       'qwen/qwen3.8-27b',
+                    model:       null,   // 4K-F4d-fix: use provider pool models
                     extract:     true,
                     maxTokens:   $adjustedMaxTokens,
                     temperature: 0.5,
