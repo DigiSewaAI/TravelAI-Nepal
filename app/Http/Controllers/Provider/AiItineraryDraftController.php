@@ -435,7 +435,7 @@ class AiItineraryDraftController extends Controller
         $shortDesc  = \Str::limit($description, 500, '');
 
         // Phase 4H: chunk context
-        $chunkContext = '';
+                $chunkContext = '';
         if ($startDay !== null && $endDay !== null && $totalDays !== null) {
             $chunkContext = <<<CTX
 
@@ -445,6 +445,13 @@ CHUNK CONTEXT (CRITICAL)
 This is days {$startDay} to {$endDay} of a {$totalDays}-day itinerary.
 Generate ONLY these {$days} days.
 Day numbers MUST be {$startDay} through {$endDay} (absolute).
+
+🔴 DESCENT SECTIONS (NON-NEGOTIABLE):
+- If this chunk is during DESCENT (after summit), DO NOT compress days.
+- Descent sections ALSO require EXACTLY {$days} day objects.
+- Each day = one distinct From→To waypoint pair.
+- Do NOT merge descent days, even if narrative feels repetitive.
+- Every day from {$startDay} through {$endDay} MUST appear in the array.
 CTX;
             if ($previousEndpoint !== null) {
                 $chunkContext .= "\nPrevious day ended at: {$previousEndpoint}\n";
@@ -563,6 +570,14 @@ STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
    - Use ONLY places mentioned in description or region context.
    - Do NOT introduce places from other Nepal regions.
    - Altitude gain per day must be realistic (< 1000m/day typical).
+
+5b. DESCRIPTION ACCURACY (MANDATORY):
+   - Day description MUST reference ONLY the From/To waypoints in that day's title.
+   - Do NOT mention ANY other place name in the description — even real Nepal locations.
+   - Landmarks, cultural notes, and terrain features must be tied to the specific
+     From/To villages. Use "the trail", "river valley", "ridge", or "forest" if unsure.
+   - Do NOT introduce side-trek villages (e.g., Koto, Birethanti) that are NOT in
+     the VERIFIED ROUTE sequence above. Doing so will cause rejection.
 
 6. NO REASONING OUTPUT (CRITICAL):
    - Do NOT include reasoning, thinking, planning, or meta-commentary.
@@ -748,7 +763,7 @@ PROMPT;
             $allDays = array_merge($allDays, $chunkResult['days']);
 
             if ($i < $totalChunks - 1) {
-                sleep(40);  // 4H-EXT: OTPM window optimization (60s → 40s)
+                sleep(55);  // 4K-F3b: increase 40s→55s (reduce rate limit cascade)
             }
         }
 
@@ -933,7 +948,7 @@ PROMPT;
      * Phase 4K: Post-generation route adherence validation.
      * Soft: 1 off-route day = warning. 2+ off-route = reject (retry).
      */
-    private function validateRouteWaypoints(array $allDays, array $routeWaypoints): void
+            private function validateRouteWaypoints(array $allDays, array $routeWaypoints): void
     {
         $validEndpoints = [];
         foreach ($routeWaypoints as $s) {
@@ -942,7 +957,24 @@ PROMPT;
         }
         $validEndpoints = array_values(array_unique(array_filter($validEndpoints)));
 
+        // 4K-F3: Load ALL active waypoint names once (for off-route detection)
+        $allWaypoints = \Illuminate\Support\Facades\Cache::remember(
+            'waypoint_names_lc_v2',
+            3600,
+            function () {
+                return \App\Models\Waypoint::whereNull('deleted_at')
+                    ->pluck('name')
+                    ->map(fn($n) => strtolower(trim((string) $n)))
+                    ->filter(fn($n) => strlen($n) >= 4)
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            }
+        );
+
         $offRoute = [];
+        $routeContextMentions = [];   // 4K-F3c: route-endpoint context (soft only)
+        $externalPlaces = [];          // 4K-F3c: real off-route (hard reject)
         foreach ($allDays as $i => $day) {
             $title = strtolower(trim($day['title'] ?? ''));
             if (!preg_match('/^(.+?)\s+to\s+(.+)$/i', $title, $m)) {
@@ -951,11 +983,55 @@ PROMPT;
             $from = strtolower(trim($m[1]));
             $to   = strtolower(trim($m[2]));
 
-            if ($this->endpointMatches($from, $validEndpoints) ||
-                $this->endpointMatches($to,   $validEndpoints)) {
+            $onRoute = $this->endpointMatches($from, $validEndpoints)
+                    || $this->endpointMatches($to,   $validEndpoints);
+
+            if (!$onRoute) {
+                $offRoute[] = $i + 1;
                 continue;
             }
-            $offRoute[] = $i + 1;
+
+            // 4K-F3: description check (only when title is on route)
+            $desc = strtolower(trim($day['description'] ?? ''));
+            if ($desc === '') {
+                continue;
+            }
+
+            $dayEndpoints = [$from, $to];
+            $dayRouteContext = [];
+            $dayExternal = [];
+
+            // A) 4K-F3c: Route endpoints mentioned in other days → SOFT WARN only
+            foreach ($validEndpoints as $vp) {
+                if (in_array($vp, $dayEndpoints, true)) continue;
+                if (preg_match('/\b' . preg_quote($vp, '/') . '\b/u', $desc)) {
+                    $dayRouteContext[] = $vp;
+                }
+            }
+
+            // B) 4K-F3: External places NOT on route → HARD REJECT at 2+
+            foreach ($allWaypoints as $wp) {
+                if (in_array($wp, $validEndpoints, true)) continue;   // on route = OK
+                if (preg_match('/\b' . preg_quote($wp, '/') . '\b/u', $desc)) {
+                    $dayExternal[] = $wp . '(off-route)';
+                }
+            }
+
+            // HARD REJECT only on external places (not route endpoints)
+            if (count($dayExternal) >= 2) {
+                throw new \InvalidArgumentException(
+                    "Day " . ($i + 1) . ": description mentions external off-route places: "
+                    . implode(', ', $dayExternal)
+                );
+            }
+            if (count($dayExternal) === 1) {
+                $externalPlaces[] = ($i + 1) . ':' . $dayExternal[0];
+            }
+
+            // SOFT WARN for route-endpoint context mentions (never reject)
+            if (!empty($dayRouteContext)) {
+                $routeContextMentions[] = ($i + 1) . ':' . implode(',', $dayRouteContext);
+            }
         }
 
         if (count($offRoute) >= 2) {
@@ -966,6 +1042,16 @@ PROMPT;
         if (count($offRoute) === 1) {
             Log::info('4K: Single off-route day (soft warn)', [
                 'day' => $offRoute[0],
+            ]);
+        }
+        if (!empty($externalPlaces)) {
+            Log::info('4K-F3c: External off-route place in description (soft warn)', [
+                'days' => $externalPlaces,
+            ]);
+        }
+        if (!empty($routeContextMentions)) {
+            Log::info('4K-F3c: Route-endpoint context mention (soft warn, no reject)', [
+                'days' => $routeContextMentions,
             ]);
         }
     }

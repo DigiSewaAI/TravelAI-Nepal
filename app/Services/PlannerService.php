@@ -1189,16 +1189,50 @@ $serviceName = $service
                 return $route;
     }
 
-    /**
+        /**
      * Phase 4K: Public wrapper for Provider AI Draft route resolution.
      * ADDITIVE — existing resolveRoute() untouched (R5 कायम).
+     *
+     * 4K-F3b: Enhanced to handle real-world service name suffixes:
+     *   - Strategy 1: exact via existing 3-tier resolveRoute()
+     *   - Strategy 2: strip "— N Days" / "- N days" / " with ..." suffix → retry
+     *   - Strategy 3: reverse-LIKE (service contains route name, longest wins)
      */
     public function resolveRouteForProvider(string $serviceName): ?Route
     {
-        if (empty(trim($serviceName))) {
+        $serviceName = trim($serviceName);
+        if ($serviceName === '') {
             return null;
         }
-        return $this->resolveRoute($serviceName);
+
+        // Strategy 1 — exact via existing 3-tier
+        $route = $this->resolveRoute($serviceName);
+        if ($route) {
+            return $route;
+        }
+
+        // Strategy 2 — strip common suffixes and retry
+        $normalized = preg_replace(
+            '/\s*[—–-]\s*\d+\s*(days?|day|nights?|night).*$|\s+with\s+.*$/iu',
+            '',
+            $serviceName
+        );
+        $normalized = trim((string) $normalized);
+        if ($normalized !== '' && $normalized !== $serviceName) {
+            $route = $this->resolveRoute($normalized);
+            if ($route) {
+                return $route;
+            }
+        }
+
+        // Strategy 3 — reverse-LIKE (service name contains route name)
+        $haystack = $normalized !== '' ? $normalized : $serviceName;
+        $route = Route::where('is_active', true)
+            ->whereRaw('? LIKE CONCAT("%", name, "%")', [$haystack])
+            ->orderByRaw('LENGTH(name) DESC')
+            ->first();
+
+        return $route;
     }
 
     private function translateName(string $name, string $prefix, string $locale): string
