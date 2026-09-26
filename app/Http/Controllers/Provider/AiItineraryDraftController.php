@@ -1045,9 +1045,7 @@ PROMPT;
 
             $allDays = array_merge($allDays, $chunkResult['days']);
 
-            if ($i < $totalChunks - 1) {
-                sleep(55);  // 4K-F3b: increase 40s→55s (reduce rate limit cascade)
-            }
+                        // Phase 2: sleep removed (parallel provider dispatch)
         }
 
         // Phase 4H: cross-chunk duplicate validation (safety net)
@@ -1101,10 +1099,10 @@ PROMPT;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
-                                $candidate = $this->llm->generateItinerary(
+                                                $candidate = $this->llm->generateItineraryParallel(
                     prompt:      $prompt,
                     locale:      'en',
-                    model:       null,   // 4K-F4d-fix: use provider pool models
+                    model:       null,
                     extract:     true,
                     maxTokens:   $adjustedMaxTokens,
                     temperature: 0.5,
@@ -1114,13 +1112,13 @@ PROMPT;
                 return $candidate;
 
             } catch (\InvalidArgumentException $e) {
-                Log::info('Phase 4H chunk validation fail', [
+                                Log::info('Phase 4H chunk validation fail', [
                     'attempt'   => $attempt,
                     'start_day' => $startDay,
                     'end_day'   => $endDay,
                     'error'     => $e->getMessage(),
                 ]);
-                if ($attempt < $maxAttempts) sleep(45);   // 4H-EXT-2: honor OTPM window
+                // Phase 2: sleep removed (parallel dispatch)
 
             } catch (\Throwable $e) {
                 $msg = $e->getMessage();
@@ -1160,9 +1158,9 @@ PROMPT;
                         sleep($waitSec);
                         continue;
                     }
-                    return null;
+                                        return null;
                 }
-                if ($attempt < $maxAttempts) sleep(45);   // 4H-EXT-2: honor OTPM window
+                // Phase 2: sleep removed (parallel dispatch)
             }
         }
 

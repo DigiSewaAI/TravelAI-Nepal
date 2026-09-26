@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -391,6 +392,155 @@ class LlmService
             default => ' Generate all content in English.',
         };
 
-        return $basePrompt . $languageInstruction;
+                return $basePrompt . $languageInstruction;
+    }
+
+    /**
+     * 4J-EXT Phase 2: Parallel provider race.
+     * Dispatches all available providers via Http::pool().
+     * First successful JSON response wins.
+     * Rate-limited providers -> CircuitBreaker (60s skip).
+     * Timeout: 20s per request (worst-case pool wait).
+     */
+    public function generateItineraryParallel(
+        string $prompt,
+        string $locale = 'en',
+        ?string $model = null,
+        bool $extract = true,
+        int $maxTokens = 3000,
+        float $temperature = 0.2
+    ): array {
+        Log::info('LlmService generateItineraryParallel called', [
+            'locale'        => $locale,
+            'prompt_length' => strlen($prompt),
+        ]);
+
+        $breaker = app(\App\Services\AI\CircuitBreakerService::class);
+
+        $payloadBase = [
+            'messages' => [
+                ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
+                ['role' => 'user',   'content' => $prompt],
+            ],
+            'temperature' => $temperature,
+            'max_tokens'  => $maxTokens,
+        ];
+        if ($extract) {
+            $payloadBase['response_format'] = ['type' => 'json_object'];
+        }
+
+        $candidates = [];
+        foreach ($this->providers as $provider) {
+            if (empty($provider['api_keys'])) {
+                continue;
+            }
+
+            if ($model !== null) {
+                $modelsToTry = [$model];
+            } elseif (!empty($provider['models'])) {
+                $modelsToTry = $provider['models'];
+            } else {
+                $modelsToTry = [$provider['model']];
+            }
+
+            foreach ($provider['api_keys'] as $keyIdx => $apiKey) {
+                foreach ($modelsToTry as $modelIdx => $modelToUse) {
+                    $keyLabel = $provider['name'] . '#' . ($keyIdx + 1)
+                              . (count($modelsToTry) > 1 ? '/m' . ($modelIdx + 1) : '');
+
+                    if (!$breaker->isAvailable($keyLabel)) {
+                        Log::info('4J-Parallel: circuit-broken skip', ['key' => $keyLabel]);
+                        continue;
+                    }
+
+                    $candidates[] = [
+                        'label'    => $keyLabel,
+                        'provider' => $provider,
+                        'apiKey'   => $apiKey,
+                        'model'    => $modelToUse,
+                    ];
+                }
+            }
+        }
+
+        if (empty($candidates)) {
+            throw new \RuntimeException('All LLM providers circuit-broken or unconfigured');
+        }
+
+        Log::info('4J-Parallel: dispatching', [
+            'count'     => count($candidates),
+            'providers' => array_column($candidates, 'label'),
+        ]);
+
+        try {
+            $responses = Http::timeout(20)->pool(function (Pool $pool) use ($candidates, $payloadBase) {
+                $requests = [];
+                foreach ($candidates as $idx => $cand) {
+                    $payload = array_merge($payloadBase, ['model' => $cand['model']]);
+                    $requests[] = $pool->as((string) $idx)
+                        ->withHeaders([
+                            'Authorization' => 'Bearer ' . $cand['apiKey'],
+                            'Content-Type'  => 'application/json',
+                        ])
+                        ->withOptions([
+                            'verify' => !app()->environment('local', 'testing'),
+                        ])
+                        ->post(
+                            rtrim($cand['provider']['base_url'], '/') . '/chat/completions',
+                            $payload
+                        );
+                }
+                return $requests;
+            });
+        } catch (\Throwable $e) {
+            Log::error('4J-Parallel: pool exception', ['message' => $e->getMessage()]);
+            throw new \RuntimeException('Parallel LLM pool failed: ' . $e->getMessage(), 0, $e);
+        }
+
+        $errors = [];
+        foreach ($responses as $idx => $response) {
+            $cand   = $candidates[(int) $idx];
+            $status = $response->status();
+
+            if ($status === 200) {
+                $data    = $response->json();
+                $content = (string) ($data['choices'][0]['message']['content'] ?? '');
+
+                if (strlen(trim($content)) === 0) {
+                    Log::warning('4J-Parallel: empty response', ['key' => $cand['label']]);
+                    $errors[] = $cand['label'] . ': empty';
+                    continue;
+                }
+
+                Log::info('4J-Parallel: success', [
+                    'provider'       => $cand['label'],
+                    'content_length' => strlen($content),
+                ]);
+
+                if (!$extract) {
+                    return ['content' => $content, 'raw' => true];
+                }
+                return $this->extractJson($content);
+            }
+
+            if ($status === 429) {
+                $retryAfter = (int) ($response->header('Retry-After') ?: 60);
+                $breaker->markRateLimited($cand['label'], max($retryAfter, 60));
+                Log::warning('4J-Parallel: rate limit', [
+                    'key'         => $cand['label'],
+                    'retry_after' => $retryAfter,
+                ]);
+                $errors[] = $cand['label'] . ': 429 (retry_after=' . $retryAfter . ')';
+                continue;
+            }
+
+            Log::error('4J-Parallel: HTTP error', [
+                'key'    => $cand['label'],
+                'status' => $status,
+            ]);
+            $errors[] = $cand['label'] . ': HTTP ' . $status;
+        }
+
+        throw new \RuntimeException('All parallel LLM calls failed: ' . implode(' | ', $errors));
     }
 }
