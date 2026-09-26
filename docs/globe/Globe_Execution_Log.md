@@ -1250,3 +1250,117 @@ Protected systems: Zero diff
 - Docs append (this commit)
 - E1 (Home AI improve)
 - Deploy prep
+
+
+---
+
+## 📌 SESSION 2026-09-26 — CACHE + 4J-EXT PHASES
+
+### Phase CACHE-01 — CLOSED + PUSHED
+
+**Commit:** `6c9e781`
+**What shipped:** Response caching for AI draft (24h TTL, config-driven)
+**Test:** T1 MISS 4:10 min + T2 HIT 95ms = 2,600× speedup
+**Files:** `config/services.php` + `AiItineraryDraftController.php`
+
+---
+
+### 4K-DATA-FIX-02 — DB-ONLY COMPLETE
+
+**No commit** (data-only)
+**What shipped:**
+- Kala Patthar waypoint added (id=1021, alt=5545m)
+- Route 2 EBC: Namche accl + Kala Patthar segments
+- Route 2: 15 → 18 segments
+
+**Verify:** waypoints 716→717, route_2 15→18
+
+---
+
+### 4J-EXT Phase 1A — CLOSED + PUSHED
+
+**Commit:** `16f5fca`
+**What shipped:** Gemini free-tier provider (3rd provider added)
+**Test:** EBC 14-day real LLM, **Gemini 5/5 success** (critical failover)
+**Files:** `config/services.php` + `LlmService.php` (+18/-0)
+
+**API tests:** 5 iterations → 2 winners (`gemini-3.5-flash-lite` + `gemini-flash-lite-latest`)
+
+---
+
+### 4J-EXT Phase 1B — CLOSED (No Candidate)
+
+**Reason:** HF (paid router), Together AI ($5 min), Mistral (Pro required), Cerebras (paid)
+**2026 reality:** 3 free providers only (Groq, OpenRouter, Gemini)
+**Decision:** Strategy shift → Phase 2 (parallelization)
+
+---
+
+### 4J-EXT Phase 2 — CLOSED + PUSHED
+
+**Commit:** `c906cd1`
+**What shipped:**
+- **Parallel provider dispatch** (`Http::timeout(20)->pool()`)
+- **Circuit breaker service** (60s skip on 429, file-cache based)
+- **Removed** `sleep(55)` between chunks
+- **Removed** `sleep(45)` retry waits
+
+**Test:** EBC 14-day = **9:30 min → 19.4 sec (29× speedup)**
+
+**Files (3):**
+- `app/Services/AI/CircuitBreakerService.php` (NEW, ~55 lines)
+- `app/Services/LlmService.php` (MOD, +import +method `generateItineraryParallel()`)
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php` (MOD, 4 changes)
+
+**Runtime log (verified):**
+- 6 candidates dispatched parallel (chunk 1)
+- Circuit breaker: `groq#2`, `OR/m1`, `OR/m2` → OPEN 60s (chunk 1)
+- Smart skip: circuit-broken providers skipped (chunks 2-5)
+- Gemini carried chunks 2-5 flawlessly
+
+**Suite:** 41p/1f (baseline intact)
+
+---
+
+### Session Summary
+
+| Metric | Value |
+|---|---|
+| **Phases shipped** | 4 (CACHE-01, DATA-FIX-02, 1A, 2) |
+| **Commits pushed** | 2 (`16f5fca`, `c906cd1`) |
+| **Speed record** | 29× (project best) |
+| **Providers** | 3 working (Groq + OpenRouter + Gemini) |
+| **Tests** | 41p/1f (baseline) |
+
+---
+
+### Quality Flag — Next Session Priority
+
+🔴 **Route 2 waypoints dropped 18→15** (log evidence)
+- Symptom: Namche acclimatization missing, Kala Patthar missing
+- Ticket: `ROUTE-DATA-AUDIT-EBC-01`
+- Root cause hypothesis: `4K-DATA-FIX-02` segments filtered or `fetchRouteWaypoints()` logic
+
+---
+
+### New Tickets
+
+| Ticket | Priority |
+|---|---|
+| `ROUTE-DATA-AUDIT-EBC-01` | 🔴 HIGH |
+| `AI-ACCLIMATIZATION-ENFORCEMENT-01` | 🔴 HIGH |
+| `AI-ROUTE-COMPLETENESS-01` | 🔴 HIGH |
+| `4J-EXT-PHASE-2B-GROQ-DEDUP` | 🟡 LOW |
+| `TEST-FLOW-CONFIG-CACHE-01` | 🔴 HIGH (learned today) |
+
+---
+
+### Critical Lesson — Config Cache + Test
+
+**Incident:** During session, `config:cache + php artisan test` = **wiped main DB**।
+**Recovery:** `backup_4K_data_fix.sql` (66 MB) restore = 100% success।
+**Prevention:** NEVER `config:cache` before `test`। ALWAYS `config:clear` first।
+
+---
+
+**Session End — 2026-09-26**

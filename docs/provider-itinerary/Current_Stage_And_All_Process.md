@@ -2451,3 +2451,92 @@ Target:
 ---
 
 ## 📊 CURRENT STATE (2026-09-26 Evening)
+
+
+
+### Session 2026-09-26 — Achievement Summary
+
+| Item | Value |
+|---|---|
+| **Phases shipped** | 4 (CACHE-01, 4K-DATA-FIX-02, 4J-EXT 1A, 4J-EXT 2) |
+| **Commits** | 2 pushed (`16f5fca`, `c906cd1`) |
+| **Speed record** | 29× (9:30 min → 19.4 sec) |
+| **Tests** | 41p/1f (baseline) |
+| **HEAD** | c906cd1 (synced 0/0) |
+
+---
+
+### 🎫 TICKETS — Session Update (2026-09-26)
+
+#### ✅ RESOLVED (This Session)
+
+| Ticket | Commit / Notes |
+|---|---|
+| CACHE-01 — Response caching | `6c9e781` |
+| 4K-DATA-FIX-02 — Route 2 EBC extension | DB-only |
+| 4J-EXT Phase 1A — Gemini provider | `16f5fca` |
+| 4J-EXT Phase 2 — Parallel + circuit breaker | `c906cd1` |
+| 4J-EXT Phase 1B — No viable candidate | 4 providers rejected |
+| AI-LLMSERVICE-FALLBACK-FIX-01 | Resolved (prior) |
+
+#### 🔴 NEW TICKETS (High Priority)
+
+| Ticket | Description |
+|---|---|
+| `ROUTE-DATA-AUDIT-EBC-01` | Route 2 waypoints 18→15 drop investigate |
+| `AI-ACCLIMATIZATION-ENFORCEMENT-01` | Force Namche/Dingboche accl days in output |
+| `AI-ROUTE-COMPLETENESS-01` | Critical waypoint presence validation |
+| `TEST-FLOW-CONFIG-CACHE-01` | Doc: config:clear before test (DB-wipe prevention) |
+
+#### 🟡 MEDIUM PRIORITY
+
+| Ticket | Description |
+|---|---|
+| `CACHE-CONTENT-VERSION-01` | Cache source-aware (template vs LLM) |
+| `4K-P1-VALIDATION-SOFTEN-01` | Warn vs retry on minor off-route mentions |
+| `AI-DRAFT-CROSS-CHUNK-DUPES-01` | Duplicate detection tuning |
+
+#### 🟢 LOW PRIORITY
+
+| Ticket | Description |
+|---|---|
+| `4J-EXT-PHASE-2B-GROQ-DEDUP` | Remove Groq#2 (same org as Groq#1) |
+| `AI-CONTENT-ANALYSIS-DEAD-CODE-01` | AiContentAnalysisService (no callers) |
+| `MASTER-AI-MD-CREATE-01` | Create `docs/globe/master_ai.md` |
+| Various i18n cleanup tickets | (unchanged) |
+
+---
+
+### 🚨 Incident Log — 2026-09-26
+
+**Incident:** DB wipe during test execution
+**Root cause:** `config:cache` + `php artisan test` = tests hit main DB (not test DB)
+**Recovery:** `backup_4K_data_fix.sql` (66 MB, same day) → 100% restore
+**Verify:** users=39, services=1170, bookings=31, waypoints=752, route_segments=1355
+
+**Prevention Rule (locked):**
+1. `config:clear` MANDATORY before test
+2. `config:cache` = production only
+3. Consider `.env.testing` with separate DB
+4. Assistant MUST warn explicitly before test
+
+---
+
+### 🎯 Next Session Priority
+
+1. **ROUTE-DATA-AUDIT-EBC-01** (discovery first)
+   - READ-ONLY: route_segments state for route_id=2
+   - Verify `fetchRouteWaypoints()` logic
+   - Report → Master scope lock
+
+2. **AI-ACCLIMATIZATION-ENFORCEMENT-01**
+   - After root cause identified
+   - May be data fix (not code)
+
+3. **Phase 2B** (Groq#2 removal — quick)
+4. **CACHE-CONTENT-VERSION-01**
+5. **Deploy prep** (after quality verified)
+
+---
+
+### 📊 Current State (2026-09-26 Close)
