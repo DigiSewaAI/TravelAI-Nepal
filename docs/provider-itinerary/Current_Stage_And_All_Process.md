@@ -2375,3 +2375,79 @@ Target:
 ---
 
 ## 📊 CURRENT STATE (2026-09-25 Final)
+
+---
+
+## 🎫 TICKETS — Session Update (2026-09-26)
+
+### ✅ RESOLVED
+
+**4K-F4 — Duration Sync** — ✅ Pushed (`257b1e2`)
+  Duration mismatch warning modal (Update/Keep/Cancel)।
+  Cap fix (retry_after > 60s → fail fast)।
+
+**4K-F4c — Template Fallback** — ✅ Pushed (`7902aff`)
+  Route_segments based guaranteed output।
+  User never sees error।
+
+**4K-F4d — Multi-Model** — ✅ Pushed (`7902aff`)
+  Multi-model rotation (m1 → m2 → m3 → m4)।
+  Hardcoded model removed (`model: null`)।
+
+**4K-DATA-FIX Fix 1** — ✅ Complete (DB)
+  Route 5 = 17 segments (Marpha added)।
+  Jomsom → Marpha → Tatopani।
+
+**4K-DATA-FIX Fix 2b** — ✅ Complete (DB)
+  86 orphans → location_id assigned।
+  0 remaining।
+
+**4K-DATA-FIX Fix 3** — ✅ Complete (READ-ONLY)
+  Marpha 212 (generic) + 404 (tour-specific) = both valid।
+
+**P0-A — Multi-Route Validation** — ✅ 100% PASS
+  10 representative routes = all have segments।
+  138/138 active routes = zero missing।
+  716/716 waypoints mapped।
+
+**P1 — Rich Template** — ✅ Pushed (`4b2aadd`)
+  Distance + time + altitude + elevation gain/loss।
+  Acclimatization + rest day context।
+  Non-overnight detection।
+
+**MODEL-OPT** — ✅ Pushed (`4b2aadd`)
+  Short 429 retry (≤10s)।
+  2 Gemma models (verified JSON-capable)।
+
+### 🟡 MEDIUM PRIORITY (Active/Next)
+
+**P0-B — Real LLM Test**
+  Wait: Groq quota reset (1+ hour rolling)।
+  Test: EBC 14-day with real LLM output।
+  Verify: LLM quality vs template।
+
+**AI-TEMPLATE-RICHNESS-01** — ✅ RESOLVED (P1)
+
+**AI-ROUTE-ACCURACY-VERIFY-01** — ✅ RESOLVED (P0-A)
+
+**AI-LLM-QUALITY-VERIFY-01** — 🟡 PENDING (P0-B)
+
+### 🟢 LOW PRIORITY (Deferred)
+
+**CEREBRAS-PROVIDER-01** — ❌ SKIPPED (paid-only, R21 कायम)
+
+**Alternative Free Providers** — Research (Gemini, Together, Mistral, HuggingFace)
+
+**WAYPOINT-SEEDER-DEDUP-01** — Deferred (post-deploy)
+  Systemic duplicates (Kathmandu × 31 = actually distinct tour stops)।
+  False alarm — no action needed।
+
+**4K-F3c-content** — Day 2/8/10 polish (deferred)
+
+**E1** — Home AI improve (last)
+
+**Deploy** — Production (final)
+
+---
+
+## 📊 CURRENT STATE (2026-09-26 Evening)

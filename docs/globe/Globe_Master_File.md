@@ -332,10 +332,6 @@ These were listed as "future" in v1.0 but Master confirms **BUILT**:
 
 > ⚠️ **Detailed file references + commits = STAGE 1-8 audit मा verify हुनेछ।**
 
-### 🟢 IN PROGRESS / NEXT
-
-#### Phase 4K — AI Content Quality
-
 **Goal:** AI itinerary content accuracy improvements (75% → 90%)
 
 **Scope:**
@@ -568,8 +564,14 @@ Tests:        41 passed / 1 failed (pre-existing Safety)
 - **QR check-ins recorded:** 9
 - **AI planner requests used:** 468
 - **Foundation status:** Phase 4M foundation + 4M-3 REDO 100% COMPLETE
-- **Current phase:** Phase 4K — AI Content Quality (next session)
-
+| Phase 4K-F4 — Duration + Cap | ✅ PUSHED | 257b1e2 | 2026-09-26 |
+| Phase 4K-F4c/F4d — Template + Multi-Model | ✅ PUSHED | 7902aff | 2026-09-26 |
+| 4K-DATA-FIX — Data Cleanup | ✅ DB-ONLY | — | 2026-09-26 |
+| Phase 4K-P1 — Rich Template | ✅ PUSHED | 4b2aadd | 2026-09-26 |
+| MODEL-OPT — Short 429 + Gemma Models | ✅ PUSHED | 4b2aadd | 2026-09-26 |
+| **P0-B — Real LLM Test** | 🟡 **NEXT SESSION** | — | — |
+| **E1 — Home AI Improve** | 🔒 Last | — | — |
+| Deploy | 🔒 FINAL | — | — |
 ### Today's Session Commits (8 pushed)
 1. 4M-3-1 mapping (superseded)
 2. 4M foundation log

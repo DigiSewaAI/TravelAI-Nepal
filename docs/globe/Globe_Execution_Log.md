@@ -1150,3 +1150,103 @@ Protected systems: Zero diff
 **R3/R4/R20 कायम**
 
 **Achievement:** Owner insight production-proven (5,131 home planner requests validated pattern)
+
+---
+
+### 2026-09-26 — Phase 4K-F4 CLOSED + PUSHED (Duration Sync + Cap Fix)
+
+**Commit:** `257b1e2`
+**Push range:** `718254d` → `257b1e2`
+
+**Files (6):** Controller, blade modal, 4 lang files, LlmService, config/services.php
+
+**Stats:** +123/-12
+
+**What Shipped:**
+- Duration mismatch warning modal (Update/Keep/Cancel)
+- Cap fix (retry_after > 60s → fail fast)
+- OpenRouter fallback (multi-provider)
+
+---
+
+### 2026-09-26 — Phase 4K-F4c/F4d CLOSED + PUSHED (Template + Multi-Model)
+
+**Commit:** `7902aff`
+**Push range:** `257b1e2` → `7902aff`
+
+**Files (3):** Controller, LlmService, config/services.php
+
+**Stats:** +200/-72
+
+**What Shipped:**
+- Template fallback from route_segments (guaranteed output)
+- Multi-model rotation (m1 → m2 → m3 → m4)
+- Hardcoded model removal (`model: null`)
+- OpenRouter multi-model config
+
+---
+
+### 2026-09-26 — 4K-DATA-FIX CLOSED (Data Cleanup)
+
+**No commit (DB-only)**
+**Backup:** `database/backups/backup_4K_data_fix.sql` (66 MB)
+
+**What Fixed:**
+- **Fix 1:** Route 5 (AC) = 16 → 17 segments (Marpha added)
+  - Jomsom → Marpha (5 km, 2 hrs)
+  - Marpha → Tatopani (11 km, 4 hrs)
+- **Fix 2b:** 86 orphan waypoints → location_id assigned (0 remaining)
+- **Fix 3:** Marpha waypoint verified (212 = generic, 404 = tour-specific)
+
+**Result:**
+- Route 5 = correct AC descent
+- 716/716 waypoints mapped (100%)
+- 138/138 active routes have segments
+
+---
+
+### 2026-09-26 — Phase 4K-P1 CLOSED + PUSHED (Rich Template)
+
+**Commit:** `4b2aadd`
+**Push range:** `7902aff` → `4b2aadd`
+
+**Files (3):** Controller, LlmService, config/services.php
+
+**Stats:** +146/-31
+
+**What Shipped:**
+- Rich template descriptions (DB-driven)
+- Distance + time + altitude + elevation gain/loss
+- Acclimatization day context (altitude + hydration + optional hike)
+- Rest day context (type + altitude)
+- Non-overnight detection ("Continue onward")
+
+**Test:** 14-day template fallback = rich descriptions verified
+
+---
+
+### 2026-09-26 — MODEL OPTIMIZATION APPLIED
+
+**Part of Phase 4K-P1 commit**
+**Files:** LlmService.php, config/services.php
+
+**What Shipped:**
+- Short 429 retry (retry_after ≤ 10s → sleep + retry same model)
+- Model list: 2 Gemma models (verified JSON-capable)
+- Removed: qwen3.8:free (redundant), nemotron-120b (non-JSON), ling-flash (400)
+
+---
+
+### 2026-09-26 — SESSION SUMMARY (3 days total)
+
+**Phases Closed:** 4K-F4, 4K-F4c/F4d, 4K-DATA-FIX, P1, MODEL-OPT
+**Total Commits:** ~25 across 3 days
+**Data Integrity:** 100% (Route 5, orphans, waypoints)
+**Template Quality:** 4x richer descriptions
+**Test:** Multi-route validation PASS (138/138)
+
+**Pending (Next Session):**
+- P0-B (real LLM test — Groq quota reset)
+- Docs append (this commit)
+- E1 (Home AI improve)
+- Deploy prep
