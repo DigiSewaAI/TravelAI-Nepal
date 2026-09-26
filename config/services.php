@@ -70,6 +70,17 @@ return [
         'model'    => env('CEREBRAS_MODEL', 'llama3.1-8b'),
         'base_url' => env('CEREBRAS_BASE_URL', 'https://api.cerebras.ai/v1'),
     ],
+        // 🆕 4J-EXT: Gemini (free tier — Phase 1A)
+    'gemini' => [
+        'api_key'  => env('GEMINI_API_KEY'),
+        'api_keys' => env('GEMINI_API_KEYS', env('GEMINI_API_KEY')),
+        'model'    => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
+        'models'   => array_filter(array_map('trim', explode(',', env(
+            'GEMINI_MODELS',
+            'gemini-3.5-flash-lite,gemini-flash-lite-latest'
+        )))),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai'),
+    ],
 
     // 🆕 4J: Provider fallback control
         'ai' => [

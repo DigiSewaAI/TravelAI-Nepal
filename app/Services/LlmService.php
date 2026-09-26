@@ -62,6 +62,13 @@ class LlmService
                 'models'   => config('services.cerebras.models', []),
                 'base_url' => config('services.cerebras.base_url', 'https://api.cerebras.ai/v1'),
             ],
+                        [
+                'name'     => 'gemini',
+                'api_keys' => $this->parseKeys(config('services.gemini.api_keys')),
+                'model'    => config('services.gemini.model', 'gemini-3.5-flash-lite'),
+                'models'   => config('services.gemini.models', []),
+                'base_url' => config('services.gemini.base_url', 'https://generativelanguage.googleapis.com/v1beta/openai'),
+            ],
         ];
     }
 
