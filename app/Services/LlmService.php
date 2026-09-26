@@ -186,8 +186,29 @@ class LlmService
                         'model'    => $modelToUse,
                     ]);
 
-                    try {
-                        $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
+                                        try {
+                        // 4K-F4e: Retry short 429s (burst-limit recovery)
+                        $callAttempts = 0;
+                        $maxCallAttempts = 2;
+                        do {
+                            $callAttempts++;
+                            $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
+
+                            if ($result['status'] === 429) {
+                                $shortRetry = $result['retry_after'] ?: 5;
+                                if ($shortRetry <= 10 && $callAttempts < $maxCallAttempts) {
+                                    Log::info('4J: Short 429 — retrying same model', [
+                                        'provider'    => $provider['name'],
+                                        'key'         => $keyLabel,
+                                        'model'       => $modelToUse,
+                                        'retry_after' => $shortRetry,
+                                    ]);
+                                    sleep($shortRetry + 1);
+                                    continue;
+                                }
+                            }
+                            break;
+                        } while (true);
 
                         if ($result['status'] === 200) {
                             $content = $result['content'];

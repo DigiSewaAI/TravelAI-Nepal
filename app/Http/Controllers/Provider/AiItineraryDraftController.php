@@ -441,45 +441,71 @@ class AiItineraryDraftController extends Controller
      * Triggered when ALL LLM providers fail.
      * Ensures user ALWAYS gets a valid itinerary.
      */
-    private function buildTemplateFromRoute(Service $service, int $days): ?array
+        private function buildTemplateFromRoute(Service $service, int $days): ?array
     {
-        $routeWaypoints = $this->fetchRouteWaypoints($service);
-        if (empty($routeWaypoints)) {
-            return null;   // No route = can't template
+        // P1: Fetch segments with full metadata (waypoint type, altitude, elevation change)
+        $route = $this->planner->resolveRouteForProvider($service->name);
+        if (!$route) {
+            return null;
         }
 
-        $segments = $routeWaypoints;
-        $segmentsCount = count($segments);
+        $segments = $route->segments()
+            ->with(['fromWaypoint', 'toWaypoint'])
+            ->orderBy('sequence')
+            ->get();
+
+        if ($segments->isEmpty()) {
+            return null;
+        }
+
+        $segmentsCount = $segments->count();
         $result = [];
         $segmentIndex = 0;
 
         for ($dayNum = 1; $dayNum <= $days; $dayNum++) {
             if ($segmentIndex >= $segmentsCount) {
-                $seg = $segments[$segmentsCount - 1];
-                $title = $seg['to'] . ' — Rest / Exploration';
-                $desc = 'A rest and exploration day at ' . $seg['to'] . '.';
+                // Rest day at end (out of segments)
+                $lastSeg = $segments->last();
+                $toWp = $lastSeg->toWaypoint;
+                $toName = $toWp->name ?? 'Destination';
+                $toAlt = $toWp->altitude ?? null;
+                $toType = $toWp->type ?? 'place';
+                $fromName = $toName;
                 $distKm = 0.0;
                 $timeHrs = 0.0;
-                $alt = $seg['altitude_to'] ?? null;
-                $fromName = $seg['from'] ?? '';
-                $toName = $seg['to'] ?? '';
+                $alt = $toAlt;
+
+                $title = $toName . ' — Rest / Exploration';
+                $desc = $this->buildRestDescription($toName, $toType, $toAlt);
             } else {
                 $seg = $segments[$segmentIndex];
-                $from = $seg['from'] ?? '';
-                $to = $seg['to'] ?? '';
+                $fromWp = $seg->fromWaypoint;
+                $toWp = $seg->toWaypoint;
 
-                if ($from === $to) {
-                    $title = $to . ' — Acclimatization';
-                    $desc = 'Acclimatization day at ' . $to . '. Rest and explore the village.';
+                $fromName = $fromWp->name ?? '';
+                $toName = $toWp->name ?? '';
+                $distKm = (float) ($seg->distance_km ?? 0.0);
+                $timeHrs = (float) ($seg->estimated_time_hours ?? 0.0);
+                $gainM = (int) ($seg->elevation_gain_m ?? 0);
+                $lossM = (int) ($seg->elevation_loss_m ?? 0);
+                $toAlt = $toWp->altitude ?? null;
+                $toType = $toWp->type ?? 'place';
+                $fromAlt = $fromWp->altitude ?? null;
+                $toOvernight = (bool) ($toWp->is_overnight_stop ?? false);
+
+                if ($fromName === $toName) {
+                    // Acclimatization day
+                    $title = $toName . ' — Acclimatization';
+                    $desc = $this->buildAcclimatizationDescription($toName, $toAlt);
                 } else {
-                    $title = $from . ' to ' . $to;
-                    $desc = 'Trek from ' . $from . ' to ' . $to . '.';
+                    $title = $fromName . ' to ' . $toName;
+                    $desc = $this->buildTrekDescription(
+                        $fromName, $toName, $fromAlt, $toAlt, $toType,
+                        $distKm, $timeHrs, $gainM, $lossM, $toOvernight
+                    );
                 }
-                $distKm = (float) ($seg['distance'] ?? 0.0);
-                $timeHrs = (float) ($seg['time'] ?? 0.0);
-                $alt = $seg['altitude_to'] ?? null;
-                $fromName = $from;
-                $toName = $to;
+
+                $alt = $toAlt;
                 $segmentIndex++;
             }
 
@@ -509,13 +535,81 @@ class AiItineraryDraftController extends Controller
             ];
         }
 
-        Log::warning('4K-F4c: Template fallback generated', [
+        Log::warning('P1: Rich template fallback generated', [
             'service_id' => $service->id,
             'days'       => $days,
-            'source'     => 'route_segments',
+            'source'     => 'route_segments_rich',
         ]);
 
         return $result;
+    }
+
+    /**
+     * P1: Build rich trek description from DB metadata.
+     */
+    private function buildTrekDescription(
+        string $fromName, string $toName,
+        ?int $fromAlt, ?int $toAlt, string $toType,
+        float $distKm, float $timeHrs,
+        int $gainM, int $lossM, bool $isOvernight
+    ): string {
+        $parts = [];
+        $parts[] = "Trek from {$fromName} to {$toName}";
+
+        if ($distKm > 0 && $timeHrs > 0) {
+            $parts[] = sprintf('covering %.1f km in %.1f hours', $distKm, $timeHrs);
+        } elseif ($distKm > 0) {
+            $parts[] = sprintf('covering %.1f km', $distKm);
+        }
+
+        if ($toAlt !== null) {
+            $parts[] = "arriving at {$toAlt}m";
+        }
+
+        $desc = implode(', ', $parts) . '.';
+
+        if ($gainM > 0 && $lossM === 0) {
+            $desc .= " Ascending {$gainM}m.";
+        } elseif ($lossM > 0 && $gainM === 0) {
+            $desc .= " Descending {$lossM}m.";
+        } elseif ($gainM > 0 && $lossM > 0) {
+            $desc .= " With {$gainM}m gain and {$lossM}m loss.";
+        }
+
+        if ($isOvernight) {
+            $desc .= ' Overnight at ' . $toType . ' teahouse.';
+        } else {
+            $desc .= ' Continue onward.';
+        }
+
+        return $desc;
+    }
+
+    /**
+     * P1: Build acclimatization day description.
+     */
+    private function buildAcclimatizationDescription(string $placeName, ?int $altM): string
+    {
+        $desc = "Acclimatization day at {$placeName}";
+        if ($altM !== null) {
+            $desc .= " ({$altM}m)";
+        }
+        $desc .= '. Rest, hydrate, and explore the village.';
+        $desc .= ' Optional short hike to aid altitude adjustment.';
+        return $desc;
+    }
+
+    /**
+     * P1: Build rest / exploration day description.
+     */
+    private function buildRestDescription(string $placeName, string $type, ?int $altM): string
+    {
+        $desc = "A rest and exploration day at {$placeName}";
+        if ($altM !== null) {
+            $desc .= " ({$altM}m)";
+        }
+        $desc .= '. Take time to recover and experience the local ' . $type . ' surroundings.';
+        return $desc;
     }
 
             /**

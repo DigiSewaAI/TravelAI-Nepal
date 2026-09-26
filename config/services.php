@@ -56,9 +56,9 @@ return [
         'api_keys' => env('OPENROUTER_API_KEYS', env('OPENROUTER_API_KEY')),
         'model'    => env('OPENROUTER_MODEL', 'meta-llama/llama-3.1-8b-instruct:free'),
         // 4K-F4d: Multi-model fallback (empty response → next model)
-        'models'   => array_filter(array_map('trim', explode(',', env(
+                'models'   => array_filter(array_map('trim', explode(',', env(
             'OPENROUTER_MODELS',
-            'meta-llama/llama-3.1-8b-instruct:free,google/gemma-2-9b-it:free,mistralai/mistral-7b-instruct:free,qwen/qwen-2-7b-instruct:free'
+            'google/gemma-4-31b-it:free,google/gemma-4-26b-a4b-it:free'
         )))),
         'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
     ],
