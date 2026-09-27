@@ -20,7 +20,7 @@ class JourneyReplayController extends Controller
         // ✅ FIXED: qrScans() instead of checkins()
         $qrScans = $booking->qrScans()->with('waypoint')->get();
         $waypoints = $qrScans->pluck('waypoint')->filter()->unique('id');
-        
+
         // ✅ FIXED: traveler_id instead of user_id
         $media = UserMedia::whereIn('waypoint_id', $waypoints->pluck('id'))
                           ->where('user_id', $booking->traveler_id)
@@ -69,13 +69,56 @@ class JourneyReplayController extends Controller
         return response()->file($path);
     }
 
-    public function cinematic($token)
+        public function cinematic($token)
     {
         $booking = Booking::findByShareToken($token);
         if (!$booking || $booking->visibility === 'private') {
             abort(404);
         }
 
-        return view('public.cinematic-replay', compact('booking', 'token'));
+        // PHASE-5D-FIX: build booking-scoped scenes for public cinematic
+        // (mirrors show() logic — reuse traveler/cinematic-replay blade)
+        $scans = $booking->qrScans()
+            ->with('waypoint')
+            ->orderBy('scanned_at', 'asc')
+            ->get();
+
+        $grouped = $scans->groupBy('waypoint_id');
+        $scenes = [];
+        $index = 0;
+
+        foreach ($grouped as $waypointId => $group) {
+            $firstScan = $group->first();
+            $waypoint = $firstScan->waypoint;
+            if (!$waypoint) continue;
+
+            $mediaItems = UserMedia::where('user_id', $booking->traveler_id)
+                ->where('waypoint_id', $waypointId)
+                ->orderBy('is_primary', 'desc')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'type'      => $item->media_type,
+                        'url'       => asset('storage/' . $item->optimized_path),
+                        'thumbnail' => $item->thumbnail_path ? asset('storage/' . $item->thumbnail_path) : null,
+                        'source'    => 'user',
+                    ];
+                })
+                ->toArray();
+
+            $scenes[] = [
+                'checkpoint' => $waypoint->name,
+                'altitude'   => $waypoint->altitude,
+                'latitude'   => $waypoint->latitude,
+                'longitude'  => $waypoint->longitude,
+                'scanned_at' => $firstScan->scanned_at,
+                'media'      => $mediaItems,
+                'index'      => ++$index,
+            ];
+        }
+
+        $data = ['scenes' => $scenes];
+
+        return view('traveler.cinematic-replay', compact('data', 'booking', 'token'));
     }
 }

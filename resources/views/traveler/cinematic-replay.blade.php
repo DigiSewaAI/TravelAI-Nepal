@@ -119,7 +119,7 @@
         document.getElementById('prev-btn').addEventListener('click', prevScene);
         document.getElementById('play-btn').addEventListener('click', togglePlay);
         document.getElementById('exit-btn').addEventListener('click', function() {
-            window.location.href = "{{ route('traveler.journey-replay') }}";
+        window.location.href = "{{ isset($token) ? route('public.journey.replay', $token) : route('traveler.journey-replay') }}";
         });
 
         // Keyboard controls
