@@ -21,7 +21,7 @@ class PlannerController extends Controller
     {
         // ✅ Session बाट सिधै locale लिने (middleware ले सही नगरे पनि काम गर्छ)
         $locale = session('locale', 'en');
-        
+
         Log::info('🔍 [PlannerController] Locale from session', [
             'locale' => $locale,
             'session_locale' => session('locale'),
@@ -40,7 +40,11 @@ class PlannerController extends Controller
             ]);
 
             // ✅ session बाट लिइएको locale पास गर्ने
-            $result = $this->planner->generate($request->all(), $locale);
+           $result = $this->planner->generate($request->all(), $locale);
+
+// PHASE 5B: LLM narrative enrichment (R5 SAFE — PlannerService untouched)
+$result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
+    ->enrichCollection($result['days'], $locale);
 
             return response()->json([
                 'success' => true,

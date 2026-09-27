@@ -83,9 +83,10 @@ return [
     ],
 
     // 🆕 4J: Provider fallback control
-        'ai' => [
-        'fallback_enabled' => env('AI_FALLBACK_ENABLED', true),
-        'preferred'        => env('AI_PROVIDER'),
+            'ai' => [
+        'fallback_enabled'          => env('AI_FALLBACK_ENABLED', true),
+        'preferred'                 => env('AI_PROVIDER'),
+        'planner_narrative_enabled' => env('AI_PLANNER_NARRATIVE_ENABLED', true),
     ],
 
     // Phase CACHE-01: AI draft response caching
