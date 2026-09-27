@@ -231,8 +231,9 @@ class AiItineraryDraftController extends Controller
 
                 // Step 2 — LLM call (OUTSIDE transaction)
         try {
-            $validDraft = null;
+                        $validDraft = null;
             $lastError  = null;
+            $usedTemplateFallback = false;  // CACHE-CONTENT-VERSION-01
 
             // Phase 4H: chunking for days > 5 (OTPM workaround)
             if ($days > 5) {
@@ -310,12 +311,13 @@ class AiItineraryDraftController extends Controller
                         if ($validDraft === null) {
                 // 4K-F4c: Template fallback from route_segments (guaranteed output)
                 $templateDays = $this->buildTemplateFromRoute($service, $days);
-                if ($templateDays !== null) {
+                                if ($templateDays !== null) {
                     Log::info('4K-F4c: LLM failed, using template fallback', [
                         'service_id' => $service->id,
                         'days'       => count($templateDays),
                     ]);
                     $validDraft = ['days' => $templateDays];
+                    $usedTemplateFallback = true;  // CACHE-CONTENT-VERSION-01
                 }
             }
 
@@ -357,8 +359,9 @@ class AiItineraryDraftController extends Controller
                 'duration_ms' => $durationMs,
             ]);
 
-            // Phase CACHE-01: Store preview in cache (NO draft_id — fresh UUID on HIT)
-            if ($this->isDraftCacheEnabled()) {
+                        // Phase CACHE-01: Store preview in cache (NO draft_id — fresh UUID on HIT)
+            // CACHE-CONTENT-VERSION-01: Skip cache store for template fallback (allow LLM retry)
+            if ($this->isDraftCacheEnabled() && !$usedTemplateFallback) {
                 \Illuminate\Support\Facades\Cache::put(
                     $cacheKey,
                     [
