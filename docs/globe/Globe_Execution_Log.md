@@ -1457,3 +1457,110 @@ Protected systems: Zero diff
 ---
 
 **Session End — 2026-09-27**
+
+
+---
+
+## 📌 SESSION 2026-09-27 (CONT.) — ROUTE AUDIT + PHASE 3D/3E
+
+### ROUTE-DATA-QUALITY-AUDIT-01 — CLOSED + PUSHED
+
+**Commit:** `f693858` — `fix(data): re-apply Route 5 Marpha + 86 orphan location_ids (Route Audit)`
+
+**Files (3):**
+- `fix_route5_marpha.php` (NEW)
+- `fix_orphans_dryrun.php` (NEW)
+- `fix_orphans_apply.php` (NEW)
+
+**What shipped:**
+- Route 5 (AC) — 16 → 17 segments (Marpha added)
+  - Jomsom → Marpha (5 km, 2 hrs)
+  - Marpha → Tatopani (11 km, 4 hrs)
+- 86 orphans → location_id assigned (0 remaining)
+- 3 stray files cleaned (echo, php, put)
+
+**Root cause:** Backup restore reverted 4K-DATA-FIX Fix 1 + Fix 2b
+
+**Result:** 4/4 fixes verified (Route 5, orphans, Kala Patthar, EBC)
+
+---
+
+### PHASE 3D — Descent Compression (Partial)
+
+**File:** `AiItineraryDraftController.php`
+**Change:** LOCKED / FLEXIBLE split in VERIFIED ROUTE block
+**Test:** EBC 14-day
+**Result:** ⚠️ Partial
+- ✅ Lukla reached (Day 12)
+- ✅ Round-trip EBC preserved
+- 🔴 Kala Patthar missing (chunk 4 overlap)
+- 🔴 Days 13-14 duplicates
+
+**Root cause:** Chunk boundary overlap (locked day 10 + flexible 11-12)
+
+---
+
+### PHASE 3E — Chunk Boundary Alignment — CLOSED + PUSHED
+
+**Commit:** `6503ca8` — `fix(ai): chunk boundary alignment for locked/flexible split (Phase 3E)`
+
+**File (1):** `app/Http/Controllers/Provider/AiItineraryDraftController.php` (+165/-59)
+
+**What shipped:**
+- `computeDayGroupAnalysis()` — single source of truth (day-groups + peak)
+- `computeLockedCount()` — wrapper
+- `computeChunkBoundaries()` — locked (size 5) + flexible (single chunk)
+- `buildPrompt()` refactored (uses helper)
+- `generateAllChunks()` — boundary-aware loop
+
+**Test:** EBC 14-day
+- **Chunks: 3 (vs 5) — 40% faster**
+- **Duration: 14.2 sec (best yet)**
+- **Day 9 = GSh ↔ EBC** ✅
+- **Day 10 = GSh ↔ Kala Patthar** ✅ (restored)
+- **Day 14 = Namche → Phakding → Lukla** ✅ (reached!)
+- **No duplicates** ✅
+- **14/14 days** ✅
+
+**Result:** 🎉 MAJOR WIN — EBC 14-day complete + correct
+
+**Minor tickets (post-deploy):**
+- 🟢 `AI-ROUNDTRIP-CONTINUITY-01` — Day 11 starts from peak (cosmetic)
+- 🟢 `AI-DESCENT-DISTRIBUTION-01` — Merge optimization (cosmetic)
+
+---
+
+### Session Summary — 2026-09-27
+
+| Metric | Value |
+|---|---|
+| Commits pushed | 3 (`f693858`, `6503ca8` + docs) |
+| **EBC 14-day** | ✅ **Complete + correct** |
+| Speed | 14.2 sec (best) |
+| Chunks | 3 (optimized) |
+| Route Audit | ✅ CLOSED |
+| Suite | 41p/1f (baseline) |
+
+### Phase 3 — Full Progression (3 Days)
+
+| Phase | Result | Speed |
+|---|---|---|
+| 3A | Data fix (18 segments) | 24 sec |
+| 3B | Prompt tuning (failed) | 24 sec |
+| 3C | Round-trip grouping | 19.5 sec |
+| 3D | Descent split (partial) | 24 sec |
+| **3E** | **Boundary alignment** | **14.2 sec** ✅ |
+
+### New Tickets — Session
+
+| Ticket | Priority |
+|---|---|
+| `AI-ROUNDTRIP-CONTINUITY-01` | 🟢 LOW |
+| `AI-DESCENT-DISTRIBUTION-01` | 🟢 LOW |
+| `SEEDER-SYNC-01` | 🔴 HIGH (pre-deploy) |
+| `SEEDER-SAFETY-AUDIT-01` | 🔴 HIGH (pre-deploy) |
+| `PRODUCTION-DEPLOY-CHECKLIST-01` | 🔴 HIGH (pre-deploy) |
+
+---
+
+**Session End — 2026-09-27 (continued)**
