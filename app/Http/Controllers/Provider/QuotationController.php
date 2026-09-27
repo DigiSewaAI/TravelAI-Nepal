@@ -153,7 +153,25 @@ Please provide:
       - duration: EXACTLY {$days} days
    - participants: EXACTLY {$pax}
    - description: 2-3 sentences describing the trek
-3. Pricing breakdown (currency, items with unit price, quantity, total, subtotal, tax, grand total)
+3. Pricing breakdown — MUST have MULTIPLE meaningful items (NEVER one generic line):
+   - Provide 4-6 separate items minimum
+   - Suggested categories (use the ones that fit this service):
+     * Trek package / Base price
+     * Accommodation ({$accommodation} level)
+     * Meals (3 meals/day × {$days} days)
+     * Guide & Porter services
+     * Permits & National Park fees
+     * Transport / Flights
+   - Each item MUST have:
+          * description: specific + human-readable (e.g., ABC Trek Package, 14 days)
+       NEVER use generic labels like Item, Package, or Service
+     * unit_price: USD value (number)
+     * quantity: {$pax} for per-person items, 1 for group items
+     * total: unit_price × quantity
+   - currency: USD
+   - subtotal = sum of all item totals
+   - tax = 13% VAT of subtotal (Nepal standard)
+   - grand_total = subtotal + tax
 4. Terms and conditions (at least 3 items)
 5. Contact information (email, phone, website, address)
 
@@ -205,13 +223,18 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     $content .= "PRICING BREAKDOWN\n";
                     $content .= "-----------------\n";
                     $currency = $pricing['currency'] ?? 'USD';
-                    foreach (($pricing['items'] ?? []) as $item) {
+                                        foreach (($pricing['items'] ?? []) as $idx => $item) {
+                        $desc = trim((string) ($item['description'] ?? ''));
+                        if ($desc === '' || strcasecmp($desc, 'Item') === 0 || strcasecmp($desc, 'Package') === 0) {
+                            // Phase 5C-EXT: fallback — meaningful description (never bare "Item")
+                            $desc = $serviceName . ' (Component ' . ($idx + 1) . ')';
+                        }
                         $content .= sprintf(
                             "%s: %s %s (x%d) = %s %s\n",
-                            $item['description'] ?? 'Item',
+                            $desc,
                             $currency,
                             number_format($item['unit_price'] ?? 0, 2),
-                            $item['quantity'] ?? 1,
+                            (int) ($item['quantity'] ?? 1),
                             $currency,
                             number_format($item['total'] ?? 0, 2)
                         );
