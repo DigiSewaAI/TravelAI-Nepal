@@ -791,22 +791,68 @@ TL;
             ? "Day numbers MUST be {$startDay} through {$endDay}."
             : "Day numbers MUST be 1 through {$days} sequentially.";
 
-        // Phase 4K: build VERIFIED ROUTE block if route matched
+                // Phase 4K: build VERIFIED ROUTE block if route matched
+        // Phase 3C: group round-trips + zero-distance segments into day-groups
         $verifiedRouteBlock = '';
         if (!empty($routeWaypoints)) {
-            $seqLines = '';
-            foreach ($routeWaypoints as $i => $s) {
-                $seqLines .= ($i + 1) . ". {$s['from']} → {$s['to']}\n";
+            $dayGroups = [];
+            $segCount  = count($routeWaypoints);
+            $i = 0;
+
+            while ($i < $segCount) {
+                $cur  = $routeWaypoints[$i];
+                $next = ($i + 1 < $segCount) ? $routeWaypoints[$i + 1] : null;
+
+                $curFrom = trim((string) ($cur['from'] ?? ''));
+                $curTo   = trim((string) ($cur['to']   ?? ''));
+
+                // Round-trip detection: A→B followed by B→A
+                if ($next !== null) {
+                    $nxFrom = trim((string) ($next['from'] ?? ''));
+                    $nxTo   = trim((string) ($next['to']   ?? ''));
+                    if ($curFrom !== $curTo
+                        && $curFrom !== ''
+                        && strcasecmp($curFrom, $nxTo) === 0
+                        && strcasecmp($curTo, $nxFrom) === 0) {
+                        $dayGroups[] = "{$curFrom} ↔ {$curTo} (round-trip, 1 day)";
+                        $i += 2;
+                        continue;
+                    }
+                }
+
+                // Zero-distance segment (acclimatization day)
+                if ($curFrom !== '' && strcasecmp($curFrom, $curTo) === 0) {
+                    $dayGroups[] = "{$curFrom} (acclimatization day, 0 km)";
+                    $i++;
+                    continue;
+                }
+
+                // Regular segment
+                $dayGroups[] = "{$curFrom} → {$curTo}";
+                $i++;
             }
+
+            $seqLines = '';
+            foreach ($dayGroups as $idx => $g) {
+                $seqLines .= 'Day ' . ($idx + 1) . ': ' . $g . "\n";
+            }
+            $groupCount = count($dayGroups);
+
             $verifiedRouteBlock = <<<VR
 
-═══════════════════════════════════════
-🔴 VERIFIED ROUTE (NON-NEGOTIABLE)
-═══════════════════════════════════════
-This is the OFFICIAL waypoint sequence for this trek.
-You MUST use ONLY these waypoints, in this exact order.
-Do NOT invent places, do NOT backtrack, do NOT skip any.
-Every day title must be "From → To" using adjacent waypoints below.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔴 VERIFIED ROUTE (NON-NEGOTIABLE) — DAY-GROUPED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This is the OFFICIAL day-by-day structure for this trek.
+Each "Day N" line below = ONE day in your output. Do NOT split.
+Round-trips (↔) count as ONE day. Acclimatization days count as ONE day.
+
+Official day-group count: {$groupCount}
+
+If the requested total days is LESS than {$groupCount}:
+  Merge adjacent DESCENT segments into a single day.
+  Example: "A → B" + "B → C" (both descending) = "A → B → C" (1 day).
+  NEVER merge ascent or round-trip days.
 
 {$seqLines}
 VR;
@@ -848,6 +894,18 @@ STRICT STRUCTURAL RULES (VIOLATION = REJECTED):
 4. PROGRESSION:
    - Progressive trek — no loops back to start.
    - Natural arc: approach → high point → return (if applicable).
+
+4b. ROUND-TRIP COMPRESSION (MANDATORY):
+   - Two consecutive segments "A → B" and "B → A" = ONE round-trip day. Do NOT split into two days.
+   - Example: "Gorak Shep → Everest Base Camp" + "Everest Base Camp → Gorak Shep" = 1 day total.
+   - Example: "Gorak Shep → Kala Patthar" + "Kala Patthar → Gorak Shep" = 1 day total.
+   - Round-trips DO NOT violate Rule 4 (they are intentional out-and-back journeys).
+   - Purpose: preserve days budget for complete descent to trek starting point.
+
+4c. TREK COMPLETION (MANDATORY):
+   - Final day MUST reach the trek starting point (e.g., Lukla) if days budget allows.
+   - Do NOT end mid-descent (e.g., Dingboche/Namche) unless days budget is truly insufficient.
+   - If early days use round-trips, use the saved days for complete descent.
 
 5. GEOGRAPHIC ACCURACY:
    - Use ONLY places mentioned in description or region context.
