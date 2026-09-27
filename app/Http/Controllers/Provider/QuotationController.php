@@ -31,8 +31,9 @@ class QuotationController extends Controller
             abort(403, 'No provider found.');
         }
 
-        $services = Service::where('provider_id', $provider->id)
+                $services = Service::where('provider_id', $provider->id)
                            ->where('status', 'active')
+                           ->with(['trekDetail', 'tourDetail'])
                            ->get();
 
         $usage = $this->aiLimit->getUsage($provider);

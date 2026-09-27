@@ -62,7 +62,10 @@
                 <select name="service_id" id="service_id" required class="w-full border rounded-lg px-4 py-2">
                     <option value="">Select a service...</option>
                     @foreach($services as $service)
-                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        <option value="{{ $service->id }}"
+                                data-days="{{ $service->trekDetail?->duration_days ?? $service->tourDetail?->duration_days ?? '' }}">
+                            {{ $service->name }}
+                        </option>
                     @endforeach
                 </select>
                         </div>
@@ -132,6 +135,13 @@
 </div>
 
 <script>
+    // AI-QUOTATION-AUTO-FILL-01: auto-fill days from selected service duration
+    document.getElementById('service_id').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const daysData = selectedOption.dataset.days || '';
+        document.getElementById('days').value = daysData;
+    });
+
     document.getElementById('quotationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('generateBtn');
