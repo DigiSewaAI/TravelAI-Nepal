@@ -195,11 +195,13 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
     private function formatQuotation($aiResponse, $provider, $data): array
     {
         // ✅ सही Service Name लिने
-        $serviceName = 'N/A';
+               $serviceName  = 'N/A';
+        $servicePrice = 0.0;
         if (!empty($data['service_id'])) {
             $service = Service::find($data['service_id']);
             if ($service) {
-                $serviceName = $service->name;
+                $serviceName  = $service->name;
+                $servicePrice = (float) ($service->price ?? 0);
             }
         }
 
@@ -245,9 +247,16 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     $pricing = $quotationData['pricing_breakdown'];
                     $currency = $pricing['currency'] ?? 'USD';
 
-                    // Tier 1-EXT-2 + EXT-3: compute canonical values FIRST
+                                        // Tier 1-EXT-2 + EXT-3: compute canonical values FIRST
                     $subtotal   = (float) ($pricing['subtotal'] ?? 0);
                     $grandTotal = (float) ($pricing['grand_total'] ?? 0);
+
+                    // Tier 1-EXT-4: parser-enforced subtotal (R25 #5 — override LLM)
+                    $pax = (int) ($data['pax'] ?? 0);
+                    $canonicalSubtotal = round($servicePrice * $pax, 2);
+                    if ($canonicalSubtotal > 0) {
+                        $subtotal = $canonicalSubtotal;
+                    }
 
                     $taxAmount = (float) ($pricing['tax'] ?? 0);
                     if ($taxAmount <= 0 && $grandTotal > $subtotal) {
@@ -264,8 +273,22 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                         $grandTotal = $expectedGrand;
                     }
 
-                    // Tier 1-EXT-3: R25 — scale items so sum = subtotal
+                                        // Tier 1-EXT-3: R25 — scale items so sum = subtotal
                     $items = $pricing['items'] ?? [];
+
+                    // Tier 1-EXT-5: items fallback (R25 #6 — LLM sometimes omits items)
+                    if (empty($items) && $subtotal > 0) {
+                        $accomLabel = ucfirst((string) ($data['accommodation'] ?? 'standard'));
+                        $items = [
+                            ['description' => $serviceName . ' Package (Base Price)', 'quantity' => $pax, 'total' => round($subtotal * 0.60, 2)],
+                            ['description' => 'Accommodation (' . $accomLabel . ' level)', 'quantity' => $pax, 'total' => round($subtotal * 0.15, 2)],
+                            ['description' => 'Meals (3 meals/day)', 'quantity' => $pax, 'total' => round($subtotal * 0.10, 2)],
+                            ['description' => 'Guide & Porter Services', 'quantity' => $pax, 'total' => round($subtotal * 0.10, 2)],
+                            ['description' => 'Permits & National Park Fees', 'quantity' => $pax, 'total' => round($subtotal * 0.03, 2)],
+                            ['description' => 'Transport / Flights', 'quantity' => $pax, 'total' => round($subtotal * 0.02, 2)],
+                        ];
+                    }
+
                     $itemsSum = 0;
                     foreach ($items as $it) {
                         $itemsSum += (float) ($it['total'] ?? 0);
