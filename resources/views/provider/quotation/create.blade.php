@@ -41,19 +41,19 @@
 
             <div>
                 <label class="block font-medium mb-1">Customer Name *</label>
-                <input type="text" name="customer_name" id="customer_name" 
+                <input type="text" name="customer_name" id="customer_name"
                        class="w-full border rounded-lg px-4 py-2" required>
             </div>
 
             <div>
                 <label class="block font-medium mb-1">Customer Email</label>
-                <input type="email" name="customer_email" id="customer_email" 
+                <input type="email" name="customer_email" id="customer_email"
                        class="w-full border rounded-lg px-4 py-2">
             </div>
 
             <div>
                 <label class="block font-medium mb-1">Customer Phone</label>
-                <input type="text" name="customer_phone" id="customer_phone" 
+                <input type="text" name="customer_phone" id="customer_phone"
                        class="w-full border rounded-lg px-4 py-2">
             </div>
 
@@ -65,16 +65,49 @@
                         <option value="{{ $service->id }}">{{ $service->name }}</option>
                     @endforeach
                 </select>
+                        </div>
+
+            {{-- Phase 5C: Trip details --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-medium mb-1">{{ __('messages.quotation_days') }} *</label>
+                    <input type="number" name="days" id="days" min="1" max="30" value="7" required
+                           class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1">{{ __('messages.quotation_pax') }} *</label>
+                    <input type="number" name="pax" id="pax" min="1" max="20" value="2" required
+                           class="w-full border rounded-lg px-4 py-2">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-medium mb-1">{{ __('messages.quotation_start_date') }} *</label>
+                    <input type="date" name="start_date" id="start_date" required
+                           min="{{ now()->format('Y-m-d') }}"
+                           value="{{ now()->addDays(7)->format('Y-m-d') }}"
+                           class="w-full border rounded-lg px-4 py-2">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1">{{ __('messages.quotation_accommodation') }} *</label>
+                    <select name="accommodation" id="accommodation" required
+                            class="w-full border rounded-lg px-4 py-2">
+                        <option value="budget">{{ __('messages.quotation_accommodation_budget') }}</option>
+                        <option value="standard" selected>{{ __('messages.quotation_accommodation_standard') }}</option>
+                        <option value="luxury">{{ __('messages.quotation_accommodation_luxury') }}</option>
+                    </select>
+                </div>
             </div>
 
             <div>
                 <label class="block font-medium mb-1">Additional Notes</label>
-                <textarea name="notes" id="notes" rows="3" 
-                          class="w-full border rounded-lg px-4 py-2" 
+                <textarea name="notes" id="notes" rows="3"
+                          class="w-full border rounded-lg px-4 py-2"
                           placeholder="e.g., Special requests, travel dates, group size..."></textarea>
             </div>
 
-            <button type="submit" id="generateBtn" 
+            <button type="submit" id="generateBtn"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
                 <i class="fas fa-magic"></i> Generate Quotation
             </button>
@@ -107,12 +140,16 @@
         btn.disabled = true;
 
         try {
-            const payload = {
+                        const payload = {
                 customer_name: document.getElementById('customer_name').value,
                 customer_email: document.getElementById('customer_email').value,
                 customer_phone: document.getElementById('customer_phone').value,
                 service_id: document.getElementById('service_id').value,
                 notes: document.getElementById('notes').value,
+                days: parseInt(document.getElementById('days').value, 10),
+                pax: parseInt(document.getElementById('pax').value, 10),
+                start_date: document.getElementById('start_date').value,
+                accommodation: document.getElementById('accommodation').value,
             };
 
             const response = await fetch('{{ route("provider.quotation.generate") }}', {
@@ -129,11 +166,11 @@
             if (data.success) {
                 const resultDiv = document.getElementById('result');
                 const contentDiv = document.getElementById('quotationResult');
-                
+
                 const q = data.quotation;
                 // ✅ Controller बाट आएको पूरा Content Display गर्ने (Duplicate Header हटाइयो)
 contentDiv.innerHTML = q.content;
-                
+
                 resultDiv.classList.remove('hidden');
             } else {
                 alert(data.message || 'Failed to generate quotation.');

@@ -48,12 +48,17 @@ class QuotationController extends Controller
             abort(403, 'No provider found.');
         }
 
-        $validated = $request->validate([
+                $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'nullable|email|max:255',
             'customer_phone' => 'nullable|string|max:20',
             'service_id' => 'nullable|exists:services,id',
             'notes' => 'nullable|string',
+            // Phase 5C: Trip details (required for better AI quote)
+            'days' => 'required|integer|min:1|max:30',
+            'pax' => 'required|integer|min:1|max:20',
+            'start_date' => 'required|date|after_or_equal:today',
+            'accommodation' => 'required|in:budget,standard,luxury',
         ]);
 
         $reservation = null;
@@ -127,10 +132,19 @@ class QuotationController extends Controller
             ? Service::find($data['service_id'])->name ?? 'N/A'
             : 'N/A';
 
+                $days = (int) ($data['days'] ?? 0);
+        $pax = (int) ($data['pax'] ?? 0);
+        $startDate = $data['start_date'] ?? 'Not specified';
+        $accommodation = $data['accommodation'] ?? 'standard';
+
         return "Generate a professional quotation for a customer named '{$data['customer_name']}'.
 
 Provider: {$provider->name}
 Service: {$serviceName}
+Trip duration: {$days} days
+Group size: {$pax} pax
+Start date: {$startDate}
+Accommodation preference: {$accommodation}
 Additional notes: " . ($data['notes'] ?? 'None') . "
 
 Please provide:
