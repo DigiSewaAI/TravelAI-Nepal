@@ -253,7 +253,7 @@ if ($segments->isNotEmpty()) {
 
         $filteredDays = array_filter($aiOutput['days'] ?? [], function ($day) {
             $title = $day['title'] ?? '';
-            
+
             if (stripos($title, 'no itinerary') !== false ||
                 stripos($title, 'no data') !== false ||
                 stripos($title, 'कोई यात्रा') !== false ||
@@ -262,7 +262,7 @@ if ($segments->isNotEmpty()) {
                 preg_match('/no\s*itinerary/i', $title)) {
                 return true;
             }
-            
+
             if (!empty($day['items'])) return true;
             if (!empty($day['description']) && strlen($day['description']) > 10) return true;
             if (preg_match('/^Day\s*\d+$/i', trim($title))) return false;
@@ -273,10 +273,40 @@ if ($segments->isNotEmpty()) {
             $filteredDays = $this->generateFallbackItinerary($route, $input, $locale);
         }
 // ✅ Trim days if more than requested (applies to ALL routes)
-if (count($filteredDays) > $requestedDays) {
-    $filteredDays = array_slice($filteredDays, 0, $requestedDays);
-}
-        
+        // PHASE-5G-FIX: Smart compression — drop flexible rest days before endpoint
+        // (Phase 4K pattern: locked ascent + endpoint, flexible middle rest days)
+        if (count($filteredDays) > $requestedDays) {
+            $excess = count($filteredDays) - $requestedDays;
+            $total  = count($filteredDays);
+
+            // Identify flexible rest days (distance_km == 0)
+            // Protect first 2 (early ascent) + last 2 (descent endpoint)
+            $restCandidates = [];
+            foreach ($filteredDays as $idx => $day) {
+                if ($idx < 2 || $idx >= $total - 2) {
+                    continue;
+                }
+                if ((float) ($day['distance_km'] ?? -1) == 0) {
+                    $restCandidates[] = $idx;
+                }
+            }
+
+            if (count($restCandidates) >= $excess) {
+                // Drop highest-index rest days first (later acclimatization less critical)
+                $toRemove = array_slice($restCandidates, -$excess);
+                $filteredDays = array_values(array_filter(
+                    $filteredDays,
+                    fn($idx) => !in_array($idx, $toRemove),
+                    ARRAY_FILTER_USE_KEY
+                ));
+            } else {
+                // Safety net: not enough rest days — preserve endpoint (last 2) + truncate middle
+                $head = array_slice($filteredDays, 0, $requestedDays - 2, true);
+                $tail = array_slice($filteredDays, -2, 2, true);
+                $filteredDays = array_values($head + $tail);
+            }
+        }
+
         foreach ($filteredDays as $day) {
             $isRestDay = isset($day['distance_km']) && (float) $day['distance_km'] == 0;
             $altitude = null;
