@@ -1364,3 +1364,96 @@ Protected systems: Zero diff
 ---
 
 **Session End — 2026-09-26**
+
+
+---
+
+## 📌 SESSION 2026-09-27 — PHASE 3 (EBC FIX + ROUND-TRIP GROUPING)
+
+### Phase 3A — EBC Data Fix (DB-ONLY)
+
+**No commit** (DB fix via scripts — later committed with Phase 3 code)
+**Root cause:** Backup restore reverted Route 2 (18 → 15 segments) + Kala Patthar waypoint lost
+**Fix applied:**
+- `fix_kala_patthar.php` — Kala Patthar waypoint (id=1021, alt=5545m)
+- `fix_route2_ebc.php` — Route 2 = 15 → 18 segments:
+  - Namche → Namche (acclimatization, seq 3)
+  - Gorak Shep → Kala Patthar (seq 11)
+  - Kala Patthar → Gorak Shep (seq 12)
+- Route 2 verified = 18 segments
+- Waypoints: 752 → 753
+
+**Result:** 3/4 critical fixes present (Namche acclim, Kala Patthar up/down)
+
+---
+
+### Phase 3B — Prompt Tuning (Partial)
+
+**Files:** `AiItineraryDraftController.php` (+2 rules)
+**Added:** Rule 4b (round-trip compression) + Rule 4c (trek completion)
+**Result:** ❌ Ignored by LLM (VERIFIED ROUTE block dominance)
+**Learning:** Prompt rules ineffective when structural block conflicts
+
+---
+
+### Phase 3C — Structural Fix (WIN)
+
+**Commit:** `c8a6a22` — `feat(ai): round-trip grouping in route prompt (Phase 3)`
+**Files (3):**
+- `app/Http/Controllers/Provider/AiItineraryDraftController.php` (+68/-10)
+- `fix_kala_patthar.php` (NEW, 62 lines)
+- `fix_route2_ebc.php` (NEW, 105 lines)
+
+**Change:** VERIFIED ROUTE block reformatted
+- Detect round-trips (A→B + B→A) → merge as "A ↔ B (round-trip, 1 day)"
+- Detect zero-distance segments → mark as acclimatization day
+- Present "Day N" groups instead of segment list
+- Prompt note: "If days < groupCount, compress descent"
+
+**Result:** Round-trip grouping 100% effective
+- Day 9: "Gorak Shep → EBC → back to Gorak Shep" ✅
+- Day 10: "Gorak Shep → Kala Patthar → back to Gorak Shep" ✅
+- Progress: 3A/3B = 2 days short → 3C = 1 day short (Day 14 = Namche)
+- Speed: 19.5 sec (parallel preserved)
+
+**Test:** EBC 14-day browser test
+- Duration: 19,567 ms (19.5 sec)
+- Route matched: `waypoints: 18`
+- Cache: MISS → STORE
+
+---
+
+### Session Summary
+
+| Metric | Value |
+|---|---|
+| **Speed** | 19.5 sec (best) |
+| **Route** | 18 segments ✅ |
+| **Fixes present** | 3/4 |
+| **Remaining** | Descent compression (6→4 segments) |
+
+---
+
+### Tickets
+
+| Ticket | Status |
+|---|---|
+| `AI-ACCLIMATIZATION-ENFORCEMENT-01` | ✅ RESOLVED (Phase 3A) |
+| `AI-TREK-COMPRESSION-LOGIC-01` | 🟡 Partial (round-trips done, descent pending) |
+| `AI-DESCENT-COMPRESSION-01` | 🔴 NEW — next session |
+| `SEEDER-SYNC-01` | 🔴 NEW — before production |
+| `SEEDER-SAFETY-AUDIT-01` | 🔴 NEW — before production |
+| `PRODUCTION-DEPLOY-CHECKLIST-01` | 🔴 NEW — before production |
+
+---
+
+### Owner Concerns (Production Safety)
+
+- Seeders production मा risky (duplicate/wipe) — verify needed
+- Fix scripts production IDs mismatch possible
+- Routes fixes DB मा छन्, seeders मा छैनन् → sync needed
+- New Assistant handoff = documentation strong बनाउनुपर्छ
+
+---
+
+**Session End — 2026-09-27**

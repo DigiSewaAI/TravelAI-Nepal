@@ -840,3 +840,88 @@ Cache:        AI_DRAFT_CACHE_ENABLED=true
 
 **Master File — Session 2026-09-26 End**
 **Next revision:** After ROUTE-DATA-AUDIT-EBC-01
+
+
+---
+
+## 📌 SESSION 2026-09-27 — PHASE LEDGER UPDATE
+
+### Phase Ledger — New Entries
+
+| Phase | Status | Commit | Date |
+|---|---|---|---|
+| Phase 3A | ✅ DB-ONLY | — | 2026-09-27 |
+| Phase 3B | ⚠️ Partial | — | 2026-09-27 |
+| Phase 3C | ✅ PUSHED | c8a6a22 | 2026-09-27 |
+| **AI-DESCENT-COMPRESSION-01** | 🔴 **NEXT SESSION** | — | — |
+| **SEEDER-SYNC-01** | 🔴 Before deploy | — | — |
+| **SEEDER-SAFETY-AUDIT-01** | 🔴 Before deploy | — | — |
+| **PRODUCTION-DEPLOY-CHECKLIST-01** | 🔴 Before deploy | — | — |
+
+---
+
+### Current State (2026-09-27)
+Branch: main
+HEAD: c8a6a22 (synced with origin/main)
+Tests: 41 passed / 1 failed (pre-existing Safety)
+Config: cleared (dev-mode)
+Cache: AI_DRAFT_CACHE_ENABLED=true
+
+text
+
+**Latest phase shipped:** Phase 3C — Structural round-trip grouping (19.5 sec, 1 day short)
+
+---
+
+### Session 2026-09-27 — Achievements
+
+| Achievement | Value |
+|---|---|
+| Speed | 19.5 sec (best) |
+| Route | 18 segments proven |
+| Round-trip grouping | Structural fix proven |
+| Fix scripts | Committed as documentation |
+
+---
+
+### Session Incidents — Handled
+
+1. **Backup restore reverted DB** — Kala Patthar + 3 Route 2 segments lost
+   → Re-applied via scripts (verified)
+2. **Prompt tuning failed** — LLM ignored rules
+   → Structural fix (Option C) succeeded
+
+---
+
+### Next Session Priority
+
+1. 🔴 **AI-DESCENT-COMPRESSION-01** (structural, ~30 min)
+2. 🟡 **CACHE-CONTENT-VERSION-01** (30 min)
+3. 🟡 **Phase 2B (Groq#2 removal)** (5 min)
+4. 🔒 **Provider Itinerary CLOSE** (after quality)
+5. 🔒 **Quotation + Home AI improve** (future)
+6. 🔒 **Production deploy prep** (with seeder audit)
+
+---
+
+### Production Concerns (Owner Raised)
+
+**🚨 Seeders production-unsafe risk:**
+- Seeders = designed for fresh install
+- Production = already data → duplicate/wipe risk
+- Routes fixes = DB-only, seeders unchanged
+- **Action:** SEEDER-SAFETY-AUDIT-01 + SEEDER-SYNC-01 before deploy
+
+**🚨 Fix scripts production-safe?**
+- `fix_kala_patthar.php` = idempotent ✅
+- `fix_route2_ebc.php` = hardcoded IDs ⚠️ verify
+
+**🚨 New Assistant handoff:**
+- 5 files must read (Master File + Execution Log + Current Stage + 2 new)
+- Strong documentation = safe continuity
+
+---
+
+**Master File — Session 2026-09-27 End**
+**Next revision:** After AI-DESCENT-COMPRESSION-01
+
