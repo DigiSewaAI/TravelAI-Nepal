@@ -128,14 +128,19 @@ class QuotationController extends Controller
 
     private function buildQuotationPrompt($provider, $data): string
     {
-        $serviceName = $data['service_id']
-            ? Service::find($data['service_id'])->name ?? 'N/A'
-            : 'N/A';
+                $serviceModel  = $data['service_id'] ? Service::find($data['service_id']) : null;
+        $serviceName   = $serviceModel->name ?? 'N/A';
+        $servicePrice  = (float) ($serviceModel->price ?? 0);
+        $serviceCurrency = strtoupper((string) ($serviceModel->currency ?? 'USD'));
 
-                $days = (int) ($data['days'] ?? 0);
+                        $days = (int) ($data['days'] ?? 0);
         $pax = (int) ($data['pax'] ?? 0);
         $startDate = $data['start_date'] ?? 'Not specified';
         $accommodation = $data['accommodation'] ?? 'standard';
+
+        $baseTotal = $servicePrice * $pax;
+        $taxAmount = $baseTotal * 0.13;
+        $grandTotal = $baseTotal + $taxAmount;
 
         return "Generate a professional quotation for a customer named '{$data['customer_name']}'.
 
@@ -147,31 +152,39 @@ Start date: {$startDate}
 Accommodation preference: {$accommodation}
 Additional notes: " . ($data['notes'] ?? 'None') . "
 
+🔴 CRITICAL — SERVICE BASE PRICE (FROM PROVIDER DB — DO NOT DEVIATE):
+   Per-person price: USD {$servicePrice}
+   Group size: {$pax} pax
+   BASE TOTAL = USD {$baseTotal} (this is the EXACT subtotal to use)
+   Tax (13% VAT) = USD {$taxAmount}
+   Grand Total = USD {$grandTotal}
+   Currency: {$serviceCurrency}
+
 Please provide:
 1. A warm greeting
 2. Service overview (USE EXACT VALUES from input above, NEVER write N/A):
       - duration: EXACTLY {$days} days
    - participants: EXACTLY {$pax}
    - description: 2-3 sentences describing the trek
-3. Pricing breakdown — MUST have MULTIPLE meaningful items (NEVER one generic line):
-   - Provide 4-6 separate items minimum
-   - Suggested categories (use the ones that fit this service):
-     * Trek package / Base price
-     * Accommodation ({$accommodation} level)
-     * Meals (3 meals/day × {$days} days)
-     * Guide & Porter services
-     * Permits & National Park fees
-     * Transport / Flights
-   - Each item MUST have:
-          * description: specific + human-readable (e.g., ABC Trek Package, 14 days)
-       NEVER use generic labels like Item, Package, or Service
-     * unit_price: USD value (number)
-     * quantity: {$pax} for per-person items, 1 for group items
-     * total: unit_price × quantity
-   - currency: USD
-   - subtotal = sum of all item totals
-   - tax = 13% VAT of subtotal (Nepal standard)
-   - grand_total = subtotal + tax
+3. Pricing breakdown — MUST anchor to BASE TOTAL = USD {$baseTotal}:
+   - Split the base total into these EXACT items (fixed percentages):
+     * {serviceName} Package (Base Price): 60% of base
+     * Accommodation ({$accommodation} level): 15%
+     * Meals (3 meals/day × {$days} days): 10%
+     * Guide & Porter Services: 10%
+     * Permits & National Park Fees: 3%
+     * Transport / Flights: 2%
+   - Sum of all items MUST equal USD {$baseTotal} (subtotal)
+   - For each item:
+     * description: specific + meaningful (no generic Item/Package labels)
+     * unit_price = item total ÷ {$pax}
+     * quantity = {$pax}
+     * total = unit_price × {$pax}
+   - currency = USD
+   - subtotal = USD {$baseTotal}
+   - tax = USD {$taxAmount} (13% VAT — pre-computed)
+   - grand_total = USD {$grandTotal}
+   - DO NOT invent different prices. Use the base total above EXACTLY.
 4. Terms and conditions (at least 3 items)
 5. Contact information (email, phone, website, address)
 
@@ -212,21 +225,67 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                     $overview = $quotationData['service_overview'];
                     $content .= "SERVICE OVERVIEW\n";
                     $content .= "----------------\n";
-                    $content .= "Duration: " . ($overview['duration'] ?? 'N/A') . "\n";
-                    $content .= "Participants: " . ($overview['participants'] ?? 'N/A') . "\n";
+                                        // Tier 1-EXT: parser-level fallback (LLM non-determinism safety net)
+                    $durationValue = $overview['duration'] ?? 'N/A';
+                    if ($durationValue === 'N/A' || trim((string) $durationValue) === '') {
+                        $durationValue = ((int) ($data['days'] ?? 0)) . ' days';
+                    }
+                    $participantsValue = $overview['participants'] ?? 'N/A';
+                    if ($participantsValue === 'N/A' || trim((string) $participantsValue) === '') {
+                        $participantsValue = (string) ((int) ($data['pax'] ?? 0));
+                    }
+                    $content .= "Duration: " . $durationValue . "\n";
+                    $content .= "Participants: " . $participantsValue . "\n";
                     $content .= "Description: " . ($overview['description'] ?? 'N/A') . "\n\n";
                 }
 
-                // Pricing Breakdown
+                                // Pricing Breakdown
                 if (isset($quotationData['pricing_breakdown'])) {
                     $pricing = $quotationData['pricing_breakdown'];
+                    $currency = $pricing['currency'] ?? 'USD';
+
+                    // Tier 1-EXT-2 + EXT-3: compute canonical values FIRST
+                    $subtotal   = (float) ($pricing['subtotal'] ?? 0);
+                    $grandTotal = (float) ($pricing['grand_total'] ?? 0);
+
+                    $taxAmount = (float) ($pricing['tax'] ?? 0);
+                    if ($taxAmount <= 0 && $grandTotal > $subtotal) {
+                        $taxAmount = round($grandTotal - $subtotal, 2);
+                    }
+
+                    // Tier 1-EXT-2: parser-level numeric sanitize (LLM non-determinism)
+                    $expectedTax = round($subtotal * 0.13, 2);
+                    if ($expectedTax > 0 && ($taxAmount < $expectedTax * 0.9 || $taxAmount > $expectedTax * 1.1)) {
+                        $taxAmount = $expectedTax;
+                    }
+                    $expectedGrand = round($subtotal + $taxAmount, 2);
+                    if (abs($grandTotal - $expectedGrand) > 1.0) {
+                        $grandTotal = $expectedGrand;
+                    }
+
+                    // Tier 1-EXT-3: R25 — scale items so sum = subtotal
+                    $items = $pricing['items'] ?? [];
+                    $itemsSum = 0;
+                    foreach ($items as $it) {
+                        $itemsSum += (float) ($it['total'] ?? 0);
+                    }
+                    if ($itemsSum > 0 && abs($itemsSum - $subtotal) > 1.0) {
+                        $scale = $subtotal / $itemsSum;
+                        foreach ($items as &$it) {
+                            $it['total'] = round((float) ($it['total'] ?? 0) * $scale, 2);
+                            $qty = max((int) ($it['quantity'] ?? 1), 1);
+                            $it['unit_price'] = round($it['total'] / $qty, 2);
+                        }
+                        unset($it);
+                    }
+
+                    // Display
                     $content .= "PRICING BREAKDOWN\n";
                     $content .= "-----------------\n";
-                    $currency = $pricing['currency'] ?? 'USD';
-                                        foreach (($pricing['items'] ?? []) as $idx => $item) {
+
+                    foreach ($items as $idx => $item) {
                         $desc = trim((string) ($item['description'] ?? ''));
                         if ($desc === '' || strcasecmp($desc, 'Item') === 0 || strcasecmp($desc, 'Package') === 0) {
-                            // Phase 5C-EXT: fallback — meaningful description (never bare "Item")
                             $desc = $serviceName . ' (Component ' . ($idx + 1) . ')';
                         }
                         $content .= sprintf(
@@ -239,11 +298,12 @@ Return as a JSON object with key 'quotation' containing all these details. Do no
                             number_format($item['total'] ?? 0, 2)
                         );
                     }
-                    $content .= sprintf("Subtotal: %s %s\n", $currency, number_format($pricing['subtotal'] ?? 0, 2));
-                    if (($pricing['tax'] ?? 0) > 0) {
-                        $content .= sprintf("Tax: %s %s\n", $currency, number_format($pricing['tax'], 2));
+
+                    $content .= sprintf("Subtotal: %s %s\n", $currency, number_format($subtotal, 2));
+                    if ($taxAmount > 0) {
+                        $content .= sprintf("Tax (13%% VAT): %s %s\n", $currency, number_format($taxAmount, 2));
                     }
-                    $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($pricing['grand_total'] ?? 0, 2));
+                    $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($grandTotal, 2));
                 }
 
                 // Terms & Conditions
