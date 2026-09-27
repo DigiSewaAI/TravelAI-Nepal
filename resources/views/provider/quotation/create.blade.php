@@ -58,8 +58,8 @@
             </div>
 
             <div>
-                <label class="block font-medium mb-1">Service (optional)</label>
-                <select name="service_id" id="service_id" class="w-full border rounded-lg px-4 py-2">
+                <label class="block font-medium mb-1">Service *</label>
+                <select name="service_id" id="service_id" required class="w-full border rounded-lg px-4 py-2">
                     <option value="">Select a service...</option>
                     @foreach($services as $service)
                         <option value="{{ $service->id }}">{{ $service->name }}</option>

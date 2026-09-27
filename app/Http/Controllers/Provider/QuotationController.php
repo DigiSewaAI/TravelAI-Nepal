@@ -52,7 +52,7 @@ class QuotationController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'nullable|email|max:255',
             'customer_phone' => 'nullable|string|max:20',
-            'service_id' => 'nullable|exists:services,id',
+            'service_id' => 'required|exists:services,id',
             'notes' => 'nullable|string',
             // Phase 5C: Trip details (required for better AI quote)
             'days' => 'required|integer|min:1|max:30',
@@ -149,7 +149,10 @@ Additional notes: " . ($data['notes'] ?? 'None') . "
 
 Please provide:
 1. A warm greeting
-2. Service overview (duration, participants, description)
+2. Service overview (USE EXACT VALUES from input above, NEVER write N/A):
+      - duration: EXACTLY {$days} days
+   - participants: EXACTLY {$pax}
+   - description: 2-3 sentences describing the trek
 3. Pricing breakdown (currency, items with unit price, quantity, total, subtotal, tax, grand total)
 4. Terms and conditions (at least 3 items)
 5. Contact information (email, phone, website, address)
