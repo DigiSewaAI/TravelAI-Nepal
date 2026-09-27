@@ -791,72 +791,63 @@ TL;
             ? "Day numbers MUST be {$startDay} through {$endDay}."
             : "Day numbers MUST be 1 through {$days} sequentially.";
 
-                // Phase 4K: build VERIFIED ROUTE block if route matched
+                                // Phase 4K: build VERIFIED ROUTE block if route matched
         // Phase 3C: group round-trips + zero-distance segments into day-groups
+        // Phase 3D: split into LOCKED (ascent + round-trips) + FLEXIBLE (descent)
+        // Phase 3E: use computeDayGroupAnalysis() helper (single source of truth)
         $verifiedRouteBlock = '';
         if (!empty($routeWaypoints)) {
-            $dayGroups = [];
-            $segCount  = count($routeWaypoints);
-            $i = 0;
+            $analysis      = $this->computeDayGroupAnalysis($routeWaypoints);
+            $dayGroups     = $analysis['groups'];
+            $lockedCount   = $analysis['lockedCount'];
+            $flexibleCount = $analysis['flexibleCount'];
+            $groupCount    = count($dayGroups);
 
-            while ($i < $segCount) {
-                $cur  = $routeWaypoints[$i];
-                $next = ($i + 1 < $segCount) ? $routeWaypoints[$i + 1] : null;
+            if ($groupCount > 0) {
+                $lockedGroups   = array_slice($dayGroups, 0, $lockedCount);
+                $flexibleGroups = array_slice($dayGroups, $lockedCount);
 
-                $curFrom = trim((string) ($cur['from'] ?? ''));
-                $curTo   = trim((string) ($cur['to']   ?? ''));
-
-                // Round-trip detection: A→B followed by B→A
-                if ($next !== null) {
-                    $nxFrom = trim((string) ($next['from'] ?? ''));
-                    $nxTo   = trim((string) ($next['to']   ?? ''));
-                    if ($curFrom !== $curTo
-                        && $curFrom !== ''
-                        && strcasecmp($curFrom, $nxTo) === 0
-                        && strcasecmp($curTo, $nxFrom) === 0) {
-                        $dayGroups[] = "{$curFrom} ↔ {$curTo} (round-trip, 1 day)";
-                        $i += 2;
-                        continue;
-                    }
+                $lockedLines = '';
+                foreach ($lockedGroups as $idx => $g) {
+                    $lockedLines .= 'Day ' . ($idx + 1) . ': ' . $g['text'] . "\n";
                 }
 
-                // Zero-distance segment (acclimatization day)
-                if ($curFrom !== '' && strcasecmp($curFrom, $curTo) === 0) {
-                    $dayGroups[] = "{$curFrom} (acclimatization day, 0 km)";
-                    $i++;
-                    continue;
+                $flexibleLines = '';
+                foreach ($flexibleGroups as $idx => $g) {
+                    $flexibleLines .= '  ' . chr(65 + $idx) . ': ' . $g['text'] . "\n";
                 }
 
-                // Regular segment
-                $dayGroups[] = "{$curFrom} → {$curTo}";
-                $i++;
-            }
+                $totalDaysEff     = $totalDays ?? $days;
+                $descentDaysAvail = max(0, $totalDaysEff - $lockedCount);
+                $isFinalChunk     = ($endDay !== null && $totalDays !== null && $endDay === $totalDays);
+                $finalNote = $isFinalChunk
+                    ? "\n🔴 THIS IS THE FINAL CHUNK — the FINAL day MUST reach the trek endpoint (last flexible segment). DO NOT stop mid-descent.\n"
+                    : '';
 
-            $seqLines = '';
-            foreach ($dayGroups as $idx => $g) {
-                $seqLines .= 'Day ' . ($idx + 1) . ': ' . $g . "\n";
-            }
-            $groupCount = count($dayGroups);
-
-            $verifiedRouteBlock = <<<VR
+                $verifiedRouteBlock = <<<VR
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔴 VERIFIED ROUTE (NON-NEGOTIABLE) — DAY-GROUPED
+🔴 VERIFIED ROUTE — LOCKED + FLEXIBLE SPLIT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-This is the OFFICIAL day-by-day structure for this trek.
-Each "Day N" line below = ONE day in your output. Do NOT split.
-Round-trips (↔) count as ONE day. Acclimatization days count as ONE day.
-
-Official day-group count: {$groupCount}
-
-If the requested total days is LESS than {$groupCount}:
-  Merge adjacent DESCENT segments into a single day.
-  Example: "A → B" + "B → C" (both descending) = "A → B → C" (1 day).
-  NEVER merge ascent or round-trip days.
-
-{$seqLines}
+Total route: {$groupCount} day-groups = {$lockedCount} LOCKED + {$flexibleCount} FLEXIBLE descent
+Requested total days: {$totalDaysEff}
+Descent days available: {$totalDaysEff} - {$lockedCount} = {$descentDaysAvail}
+Your chunk covers: {$days} days{$finalNote}
+━━━ 🔒 LOCKED DAYS (Days 1-{$lockedCount}) — EXACT, 1:1, NO CHANGES ━━━
+{$lockedLines}
+━━━ 🔄 FLEXIBLE DESCENT ({$flexibleCount} segments — MUST all appear) ━━━
+{$flexibleLines}
+━━━ COMPRESSION RULES ━━━
+1. Days 1-{$lockedCount} = LOCKED (must match EXACTLY, one per day).
+2. Days {$lockedCount}+1 through {$totalDaysEff} = FLEXIBLE descent.
+3. Merge {$flexibleCount} descent segments into {$descentDaysAvail} days.
+   Each merged day = 2-3 adjacent segments as ONE day ("A → B → C").
+4. Every segment (A-{$flexibleCount}) MUST appear EXACTLY ONCE in output.
+5. NEVER merge ascent, acclimatization, or round-trip days.
+6. Final flexible segment = trek endpoint — the LAST day must reach it.
 VR;
-            $verifiedRouteBlock .= "\n";
+                $verifiedRouteBlock .= "\n";
+            }
         }
 
         return <<<PROMPT
@@ -969,6 +960,114 @@ PROMPT;
      * Phase 4H iter-3: Orchestrator with auto-retry on duplicate detection.
      * Tries full draft up to 2 times before giving up.
      */
+        /**
+     * Phase 3E: Extract day-groups + peak analysis (single source of truth).
+     * Used by buildPrompt() and generateAllChunks().
+     */
+    private function computeDayGroupAnalysis(array $routeWaypoints): array
+    {
+        $dayGroups = [];
+        $segCount  = count($routeWaypoints);
+        $i = 0;
+
+        while ($i < $segCount) {
+            $cur  = $routeWaypoints[$i];
+            $next = ($i + 1 < $segCount) ? $routeWaypoints[$i + 1] : null;
+
+            $curFrom = trim((string) ($cur['from'] ?? ''));
+            $curTo   = trim((string) ($cur['to']   ?? ''));
+            $curAlt  = max((int) ($cur['altitude_from'] ?? 0), (int) ($cur['altitude_to'] ?? 0));
+
+            // Round-trip detection: A→B followed by B→A
+            if ($next !== null) {
+                $nxFrom = trim((string) ($next['from'] ?? ''));
+                $nxTo   = trim((string) ($next['to']   ?? ''));
+                if ($curFrom !== $curTo
+                    && $curFrom !== ''
+                    && strcasecmp($curFrom, $nxTo) === 0
+                    && strcasecmp($curTo, $nxFrom) === 0) {
+                    $dayGroups[] = ['text' => "{$curFrom} ↔ {$curTo} (round-trip, 1 day)", 'altitude' => $curAlt];
+                    $i += 2;
+                    continue;
+                }
+            }
+
+            // Zero-distance segment (acclimatization day)
+            if ($curFrom !== '' && strcasecmp($curFrom, $curTo) === 0) {
+                $dayGroups[] = ['text' => "{$curFrom} (acclimatization day, 0 km)", 'altitude' => $curAlt];
+                $i++;
+                continue;
+            }
+
+            // Regular segment
+            $dayGroups[] = ['text' => "{$curFrom} → {$curTo}", 'altitude' => $curAlt];
+            $i++;
+        }
+
+        if (empty($dayGroups)) {
+            return ['groups' => [], 'lockedCount' => 0, 'flexibleCount' => 0];
+        }
+
+        // Peak = last occurrence of highest altitude
+        $peakIndex = 0;
+        $peakAlt   = -1;
+        foreach ($dayGroups as $idx => $g) {
+            if ($g['altitude'] >= $peakAlt) {
+                $peakAlt   = $g['altitude'];
+                $peakIndex = $idx;
+            }
+        }
+
+        $lockedCount   = $peakIndex + 1;
+        $flexibleCount = count($dayGroups) - $lockedCount;
+
+        return [
+            'groups'        => $dayGroups,
+            'lockedCount'   => $lockedCount,
+            'flexibleCount' => $flexibleCount,
+        ];
+    }
+
+    /**
+     * Phase 3E: Convenience wrapper — returns only locked count.
+     */
+    private function computeLockedCount(array $routeWaypoints): int
+    {
+        return $this->computeDayGroupAnalysis($routeWaypoints)['lockedCount'];
+    }
+
+    /**
+     * Phase 3E: Build chunk boundaries (locked + flexible, no mixing).
+     */
+    private function computeChunkBoundaries(int $totalDays, int $lockedCount, int $defaultChunkSize = 3): array
+    {
+        // Fallback: no locked info → uniform chunking (old behavior)
+        if ($lockedCount <= 0 || $lockedCount >= $totalDays) {
+            $size = max(1, $defaultChunkSize);
+            $out  = [];
+            for ($start = 1; $start <= $totalDays; $start += $size) {
+                $out[] = [$start, min($start + $size - 1, $totalDays)];
+            }
+            return $out;
+        }
+
+        $out = [];
+
+        // Locked chunks (size 5 for parallel-safe dispatch)
+        $lockedChunkSize = 5;
+        for ($start = 1; $start <= $lockedCount; $start += $lockedChunkSize) {
+            $out[] = [$start, min($start + $lockedChunkSize - 1, $lockedCount)];
+        }
+
+        // Flexible descent: single chunk (LLM needs full list to merge correctly)
+        $flexStart = $lockedCount + 1;
+        if ($flexStart <= $totalDays) {
+            $out[] = [$flexStart, $totalDays];
+        }
+
+        return $out;
+    }
+
     private function chunkAndGenerate(
         Service $service,
         int $totalDays,
@@ -998,7 +1097,7 @@ PROMPT;
             }
 
             if ($draftAttempt < $maxDraftAttempts) {
-                                Log::info('Phase 4H full draft retry', [
+                Log::info('Phase 4H full draft retry', [
                     'attempt'    => $draftAttempt,
                     'max'        => $maxDraftAttempts,
                     'service_id' => $service->id,
@@ -1030,21 +1129,28 @@ PROMPT;
         string $notes,
         int $chunkSize = 3
     ): ?array {
-        $totalChunks      = (int) ceil($totalDays / $chunkSize);
+                // Phase 3E: compute locked count for boundary-aware chunking
+        $routeWaypoints = $this->fetchRouteWaypoints($service);
+        $lockedCount    = $this->computeLockedCount($routeWaypoints);
+
         $allDays          = [];
         $previousEndpoint = null;
         $visitedEndpoints = [];
         $visitedTitles    = [];
 
+        // Phase 3E: build chunk boundaries (locked + flexible, no mixing)
+        $boundaries  = $this->computeChunkBoundaries($totalDays, $lockedCount, $chunkSize);
+        $totalChunks = count($boundaries);
+
         Log::info('Phase 4H chunking start', [
             'total_days'   => $totalDays,
             'total_chunks' => $totalChunks,
+            'locked_count' => $lockedCount,
+            'boundaries'   => $boundaries,
             'service_id'   => $service->id,
         ]);
 
-        for ($i = 0; $i < $totalChunks; $i++) {
-            $startDay  = $i * $chunkSize + 1;
-            $endDay    = min(($i + 1) * $chunkSize, $totalDays);
+        foreach ($boundaries as $i => [$startDay, $endDay]) {
             $chunkDays = $endDay - $startDay + 1;
 
             $progress     = $startDay / $totalDays;
