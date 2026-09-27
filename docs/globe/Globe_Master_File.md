@@ -1027,3 +1027,37 @@ text
 
 **Master File — Session 2026-09-27 (Flow 2 + 5D + 5E) End**
 **Next revision:** After Phase 6 (Deploy prep)
+
+---
+
+### Phase 5G — AI Planner Fix (2026-09-27)
+
+**HEAD:** `d276b4c` (synced 0/0)
+
+**Phase Ledger Update:**
+
+| Phase | Status | Commit |
+|---|---|---|
+| Phase 5G (AI Planner smart compression) | ✅ CLOSED | d276b4c |
+
+**Session Milestone:**
+- Flow 2 — SHIPPED
+- Phase 5D — CLOSED
+- Phase 5E — CLOSED
+- Phase 5G — CLOSED
+
+= Deploy-ready + AI Planner fixed
+
+**Active Tickets:**
+- AI-PLANNER-DAYS-PADDING-01 (post-deploy)
+- SAFETY-TEST-TYPE-ERROR-01 (next session)
+- CLEANUP-AUDIT-ARTIFACTS-01 (post-deploy)
+
+**Next phase:** TRANSPORT P2 (discovery) OR Phase 6 (Deploy prep)
+
+**New Rule:** R16-EXT (regression before commit — enforce)
+
+---
+
+**Master File — Session 2026-09-27 (Phase 5G CLOSED) End**
+**Next revision:** After Phase 6 (Deploy prep)

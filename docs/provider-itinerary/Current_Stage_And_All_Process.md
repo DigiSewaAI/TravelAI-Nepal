@@ -2713,3 +2713,37 @@ Target:
 
 **Session 2026-09-27 (Flow 2 + 5D + 5E) — CLOSED**
 **Next session:** AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01 + Phase 6
+
+---
+
+### Phase 5G — AI Planner Smart Compression (CLOSED)
+
+**Commit:** `d276b4c`
+**File:** `app/Services/ItineraryValidator.php` (lines 275-278 → 22-line block)
+
+**Problem:**
+- Naive `array_slice($filteredDays, 0, $requestedDays)` truncated tail
+- EBC 16-day route → 14-day request = endpoint (Lukla) dropped
+
+**Solution (Phase 4K pattern):**
+- Drop flexible rest days (distance_km = 0), highest-index first
+- Protect first 2 (early ascent) + last 2 (descent endpoint)
+- Fallback preserves endpoint in edge cases
+
+**Tests PASS:**
+- EBC 14/15/16, AC 15 (endpoint preserved)
+- Regression = 41p/1f (baseline)
+
+**Tickets Logged:**
+- AI-PLANNER-DAYS-PADDING-01 (post-deploy)
+- SAFETY-TEST-TYPE-ERROR-01 (pre-existing)
+
+**Next Tasks:**
+1. TRANSPORT P2 (discovery)
+2. PHASE 6 (Deploy prep)
+3. SAFETY-TEST-TYPE-ERROR-01
+
+---
+
+**Session 2026-09-27 — Phase 5G CLOSED**
+**Next session:** TRANSPORT P2 OR Phase 6

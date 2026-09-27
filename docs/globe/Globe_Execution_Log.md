@@ -1612,3 +1612,39 @@ Protected systems: Zero diff
 
 **Session End — 2026-09-27 (Flow 2 + 5D + 5E CLOSED)**
 **Next session:** AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01 + Phase 6 (Deploy prep)
+
+---
+
+### 2026-09-27 — PHASE 5G (AI Planner Smart Compression Fix)
+
+**Commit:** `d276b4c` — fix(planner): smart compression for day truncation
+
+**Root Cause (Phase 5F audit):**
+- Route 2 (EBC) = 18 segments / 16 overnight days (correct)
+- `ItineraryValidator.php` line 277: `array_slice($filteredDays, 0, $requestedDays)` truncated tail
+- EBC 14-day output = Day 14 at Namche (endpoint Lukla lost)
+
+**Fix (Phase 5G-3):**
+- Replaced naive truncation with smart compression
+- Priority: drop rest days (distance_km = 0) — highest-index first
+- Protect: first 2 (ascent) + last 2 (descent endpoint)
+- Fallback: safety net preserves endpoint if insufficient rest days
+
+**Verification:**
+- EBC 14 → Day 14 = Phakding → Lukla ✅
+- EBC 15 → 1 rest dropped (Dingboche) ✅
+- EBC 16 → No change ✅
+- AC 15 → Nayapul endpoint ✅
+- Regression = 41p/1f (baseline maintained) ✅
+
+**Tickets Logged:**
+- 🟡 `AI-PLANNER-DAYS-PADDING-01` (request > route = no padding)
+- 🟡 `SAFETY-TEST-TYPE-ERROR-01` (pre-existing)
+- 🟢 `CLEANUP-AUDIT-ARTIFACTS-01` (untracked files)
+
+**R16-EXT (new rule):** Regression before commit (process deviation noted, accepted with lesson)
+
+---
+
+**Session End — 2026-09-27 (Phase 5G CLOSED)**
+**Next session:** TRANSPORT P2 (discovery) OR Phase 6 (Deploy prep)
