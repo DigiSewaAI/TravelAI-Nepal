@@ -1564,3 +1564,51 @@ Protected systems: Zero diff
 ---
 
 **Session End — 2026-09-27 (continued)**
+
+---
+
+### 2026-09-27 — SESSION (Flow 2 + Phase 5D + Phase 5E)
+
+**Commits:**
+- `58c6b72` — fix(flow2): display narrative + email structure + R25 bundle (Flow 2)
+- `8aa36db` — fix(public): cinematic view + close button routing (Phase 5D)
+
+**Completed:**
+
+1. **Flow 2** (traveler → provider quote) — SHIPPED
+   - 9 fixes: crash (`$grandTotal` init), narrative prompt (`day_by_day_breakdown`), pax multi-source, remove budget-match, provider contact injection, R25 LLM (Parallel + extract:true + config model), `$rawContent` cleanup, display narrative, email structure
+   - Email verified = dashboard (identical)
+   - Math verified: 450+350+280+60+120+50 = 1,310
+
+2. **Phase 5D** (Journey Replay verify) — CLOSED
+   - 7/7 tests PASS
+   - 2 bugs fixed: cinematic view (booking-scoped scenes), close button (conditional route)
+   - Root cause catch: shared token resolves to #33 (not #27) — by design per-booking
+
+3. **Phase 5E** (Payment verify) — CLOSED
+   - 5/5 tests PASS
+   - Security: `.env` safe (not tracked, keys masked)
+   - Stripe = deep-integrated (Phase 7 removal ticket)
+   - Layer 1 (bank+QR) = MISSING (Phase 7 ticket)
+
+**New Tickets (10):**
+
+| Ticket | Priority | Phase |
+|---|---|---|
+| `AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01` | 🔴 HIGH | Next session |
+| `ROUTE-EBC-DESCENT-01` | 🟡 MED | Next session |
+| `AI-QUOTATION-NARRATIVE-QUALITY-01` | 🟡 MED | Post-deploy |
+| `AI-QUOTATION-PAX-FORM-01` | 🟡 MED | Post-deploy |
+| `JOURNEY-REPLAY-SHARE-LABEL-01` | 🟢 LOW | Post-deploy |
+| `CLEANUP-AUDIT-ARTIFACTS-01` | 🟢 LOW | Post-deploy |
+| `PAYMENT-STRIPE-REMOVAL-01` | 🔴 HIGH | Phase 7 |
+| `PAYMENT-SUBSCRIPTION-LAYER1-01` | 🔴 HIGH | Phase 7 |
+| `PAYMENT-PROVIDER-DIRECT-01` | 🟡 MED | Phase 7 |
+| `PAYMENT-DATA-PROVIDER-MAPPING-01` | 🟡 MED | Phase 7 |
+
+**Deploy-ready Status:** ✅ Achieved (Flow 2 + 5D + 5E CLOSED)
+
+---
+
+**Session End — 2026-09-27 (Flow 2 + 5D + 5E CLOSED)**
+**Next session:** AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01 + Phase 6 (Deploy prep)

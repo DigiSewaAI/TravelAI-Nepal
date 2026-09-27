@@ -2680,3 +2680,36 @@ Target:
 
 **Session 2026-09-27 (cont.) — CLOSED**
 **Next session:** CACHE-CONTENT-VERSION-01
+
+---
+
+### Session 2026-09-27 — Flow 2 + Phase 5D + Phase 5E (CLOSED)
+
+**Completed:**
+
+1. **Flow 2 — Traveler → Provider Quote (SHIPPED)** — Commit `58c6b72`
+   - 9 fixes: crash, narrative, pax, budget, contact, R25, structure, display, email
+   - Email = dashboard (identical) — production-ready
+
+2. **Phase 5D — Journey Replay Verify (CLOSED)** — Commit `8aa36db`
+   - 7/7 tests PASS
+   - 2 bugs fixed: cinematic view + close button
+   - Discrepancy = by design (per-booking token)
+
+3. **Phase 5E — Payment Verify (CLOSED)**
+   - 5/5 tests PASS
+   - Stripe = deep-integrated (Phase 7 removal)
+   - Layer 1 (bank+QR) = MISSING (Phase 7)
+
+**New Tickets:** 10 (see Globe_Execution_Log.md for detail)
+
+**Next Tasks:**
+
+1. `AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01` (~1 hr)
+2. Phase 6 — Seeder sync + production checklist
+3. Phase 7 — Payment architecture (post-deploy)
+
+---
+
+**Session 2026-09-27 (Flow 2 + 5D + 5E) — CLOSED**
+**Next session:** AI-TRAVEL-PLANNER-ITINERARY-AUDIT-01 + Phase 6
