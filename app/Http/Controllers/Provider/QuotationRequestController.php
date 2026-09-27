@@ -88,13 +88,17 @@ class QuotationRequestController extends Controller
         $prompt = $this->buildQuotationPrompt($quotationRequest, $provider);
 
         // FIX-12: LLM call OUTSIDE any DB transaction
-        $response = $this->llm->generateItinerary($prompt, 'en', 'openai/gpt-oss-20b', false, 8000);
+        // FLOW2-FIX (R25): config-driven model, extract=true, parallel
+        $response = $this->llm->generateItineraryParallel(
+            prompt:    $prompt,
+            locale:    'en',
+            model:     null,
+            extract:   true,
+            maxTokens: 8000,
+        );
 
-        $rawContent = is_array($response) && isset($response['content'])
-            ? $response['content']
-            : (string) $response;
-
-        $quotationData = $this->extractQuotationJson($rawContent);
+                // FLOW2-FIX-7: extract=true returns parsed array — pass directly
+        $quotationData = $this->extractQuotationJson($response);
 
         // Rebuild day_by_day_breakdown from ORIGINAL itinerary (not AI)
         $itineraryDays = $quotationRequest->itinerary_data['days'] ?? [];
@@ -189,16 +193,36 @@ class QuotationRequestController extends Controller
     $itinerary = $request->itinerary_data;
     $input = $request->traveler_input;
 
-    // Extract group size from message
+        // FLOW2-FIX: Multi-source pax extraction (R25: never trust defaults)
     $groupSize = 1;
-    if ($request->message) {
-        preg_match('/(\d+)\s*pax/i', $request->message, $matches);
-        if (!empty($matches[1])) {
-            $groupSize = (int) $matches[1];
+
+    // Source 1: traveler_input explicit fields (future-proof)
+    foreach (['pax', 'group_size', 'travelers'] as $paxKey) {
+        if (!empty($input[$paxKey]) && is_numeric($input[$paxKey])) {
+            $groupSize = (int) $input[$paxKey];
+            break;
         }
     }
+
+    // Source 2: itinerary_data.days[].items[].quantity (max = group size)
+    if ($groupSize === 1) {
+        $maxQty = 0;
+        foreach (($itinerary['days'] ?? []) as $day) {
+            foreach (($day['items'] ?? []) as $item) {
+                $q = (int) ($item['quantity'] ?? 0);
+                if ($q > $maxQty) {
+                    $maxQty = $q;
+                }
+            }
+        }
+        if ($maxQty > 1) {
+            $groupSize = $maxQty;
+        }
+    }
+
+    // Source 3: message regex (existing behavior preserved)
     if ($groupSize === 1 && $request->message) {
-        preg_match('/(\d+)\s*people/i', $request->message, $matches);
+        preg_match('/(\d+)\s*(?:pax|people|persons?|travelers?)/i', $request->message, $matches);
         if (!empty($matches[1])) {
             $groupSize = (int) $matches[1];
         }
@@ -222,6 +246,12 @@ class QuotationRequestController extends Controller
 
     $services = $provider->services()->where('status', 'active')->pluck('name')->join(', ') ?: 'Various services available';
 
+    // FLOW2-FIX: inject real provider contact (never placeholders)
+    $providerContactEmail = $provider->contact_email ?? '';
+    $providerContactPhone = $provider->contact_phone ?? '';
+    $providerWebsite      = $provider->website ?? '';
+    $providerAddress      = $provider->address ?? '';
+
     // ✅ Use HEREDOC to avoid escaping issues
     return <<<PROMPT
 Generate a professional quotation for a traveler based on the following itinerary.
@@ -242,20 +272,29 @@ ITINERARY:
 Provide:
 1. A warm greeting (1-2 sentences)
 2. Service overview for {$groupSize} pax (2-3 sentences)
-3. Cost breakdown with items (per person, quantity, total) in USD
-4. Terms and conditions (3-5 items)
-5. Contact information
+3. Day-by-day narrative breakdown (2-3 sentences per day, vivid, atmospheric)
+4. Cost breakdown with items (per person, quantity, total) in USD
+5. Terms and conditions (3-5 items)
+6. Contact information
 
 CRITICAL INSTRUCTIONS:
 - Output ONLY a valid JSON object. No markdown, no thinking, no extra text.
 - All numbers must be numeric.
-- Grand total must equal the sum of all item totals and should be close to the budget.
+- Grand total must equal the sum of all item totals. Calculate honestly based on realistic Nepal trekking costs — do NOT match the budget.
 
 Return ONLY this JSON structure:
 {
   "quotation": {
     "greeting": "A warm greeting to the traveler",
     "overview": "Service overview for {$groupSize} pax",
+    "day_by_day_breakdown": [
+      {
+        "day": 1,
+        "route": "Starting point → Ending point",
+        "description": "2-3 vivid, atmospheric sentences about today's experience. Reference ONLY real places from the itinerary.",
+        "services_included": ["Service A", "Service B"]
+      }
+    ],
     "cost_breakdown": {
       "currency": "USD",
       "items": [
@@ -269,11 +308,11 @@ Return ONLY this JSON structure:
       "grand_total": 800
     },
     "terms_and_conditions": ["Term 1", "Term 2", "Term 3"],
-    "contact_information": {
-      "email": "provider email",
-      "phone": "provider phone",
-      "website": "provider website",
-      "address": "provider address"
+        "contact_information": {
+      "email": "{$providerContactEmail}",
+      "phone": "{$providerContactPhone}",
+      "website": "{$providerWebsite}",
+      "address": "{$providerAddress}"
     }
   }
 }
@@ -285,36 +324,42 @@ PROMPT;
     public function formatQuotationText(array $quotationData, $provider, $quotationRequest): string
     {
         $travelerName = $quotationRequest->traveler_name ?? $quotationRequest->traveler->name ?? 'Traveler';
-        
-        $q = $quotationData['quotation'] ?? $quotationData;
-        
+
+                $q = $quotationData['quotation'] ?? $quotationData;
+        $grandTotal = 0; // FLOW2-FIX: init (prevents undefined var crash at line 374)
+
         $content = "📄 Quotation for {$travelerName}\n\n";
         $content .= "Provider: {$provider->name}\n";
         $content .= "Generated: " . now()->toDateTimeString() . "\n";
         $content .= str_repeat('=', 50) . "\n\n";
-        
+
         if (isset($q['greeting'])) {
             $content .= $q['greeting'] . "\n\n";
         }
-        
+
         if (isset($q['overview']) || isset($q['service_overview'])) {
             $ov = $q['overview'] ?? $q['service_overview'];
             $content .= "SERVICE OVERVIEW\n----------------\n";
             $content .= (is_string($ov) ? $ov : ($ov['description'] ?? 'N/A')) . "\n\n";
         }
-        
+
         if (isset($q['day_by_day_breakdown']) && is_array($q['day_by_day_breakdown'])) {
     $content .= "DAY-BY-DAY BREAKDOWN\n--------------------\n";
     foreach ($q['day_by_day_breakdown'] as $day) {
         $dayNum = $day['day'] ?? '?';
         $route = $day['route'] ?? '';
-        
+
         // ✅ Strip duplicate "Day X:" prefix
         $route = preg_replace('/^Day\s*\d+\s*[:：]\s*/i', '', $route);
         $route = trim($route);
-        
-        $content .= "Day {$dayNum}: {$route}\n";
-        
+
+                $content .= "Day {$dayNum}: {$route}\n";
+
+        // FLOW2-FIX-8: display narrative description (Layer B — display fix)
+        if (!empty($day['description']) && is_string($day['description'])) {
+            $content .= "  " . trim($day['description']) . "\n";
+        }
+
         // Handle both 'services_included' (array) and 'services' (key-value)
         if (!empty($day['services_included']) && is_array($day['services_included'])) {
             foreach ($day['services_included'] as $service) {
@@ -328,29 +373,29 @@ PROMPT;
         $content .= "\n";
     }
 }
-        
+
         if (isset($q['cost_breakdown'])) {
             $p = $q['cost_breakdown'];
             $currency = $p['currency'] ?? 'USD';
             $content .= "COST BREAKDOWN\n--------------\n";
-            
+
             $total = 0;
             $items = $p['items'] ?? [];
-            
+
             foreach ($items as $item) {
                 $amount = $item['total'] ?? 0;
                 if ($amount == 0 && isset($item['per_person'])) {
                     $amount = $item['per_person'];
                 }
                 $total += $amount;
-                
+
                 $description = $item['description'] ?? 'Item';
                 if (isset($item['per_person']) && isset($item['quantity'])) {
                     $description .= " ({$item['per_person']} x {$item['quantity']} pax)";
                 } elseif (isset($item['per_person'])) {
                     $description .= " (Per Person: {$currency} " . number_format($item['per_person'], 2) . ")";
                 }
-                
+
                 $content .= sprintf(
                     "%s: %s %s\n",
                     $description,
@@ -358,14 +403,14 @@ PROMPT;
                     number_format($amount, 2)
                 );
             }
-            
+
             $grandTotal = $p['grand_total'] ?? $p['total'] ?? 0;
             if ($grandTotal == 0 && $total > 0) {
                 $grandTotal = $total;
             }
-            
+
             $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($grandTotal, 2));
-            }  
+            }
 
 // ✅ NEW: Budget Comparison Section
 $travelerBudget = $quotationRequest->traveler_input['budget'] ?? null;
@@ -374,24 +419,24 @@ if ($travelerBudget && is_numeric($travelerBudget) && $travelerBudget > 0) {
     $finalTotal = (float) $grandTotal;
     $difference = $finalTotal - $budget;
     $percentDiff = round(($difference / $budget) * 100, 1);
-    
+
     $content .= "BUDGET COMPARISON\n";
     $content .= "-----------------\n";
     $content .= "Traveler's Budget: USD " . number_format($budget, 2) . "\n";
     $content .= "Our Quotation:     USD " . number_format($finalTotal, 2) . "\n";
-    
+
     if ($finalTotal > $budget) {
-        $content .= sprintf("Difference:        +USD %s (%s%% over budget)\n\n", 
+        $content .= sprintf("Difference:        +USD %s (%s%% over budget)\n\n",
             number_format($difference, 2), $percentDiff);
     } else {
         $savings = abs($difference);
-        $content .= sprintf("Difference:        -USD %s (%s%% under budget)\n\n", 
+        $content .= sprintf("Difference:        -USD %s (%s%% under budget)\n\n",
             number_format($savings, 2), abs($percentDiff));
     }
-    
+
     // ✅ Check if provider wrote custom note
     $providerNote = trim($q['provider_budget_note'] ?? '');
-    
+
     if (!empty($providerNote)) {
         // Provider को custom message
         $content .= "📝 " . $providerNote . "\n\n";
@@ -442,7 +487,7 @@ if (isset($q['terms_and_conditions']) && is_array($q['terms_and_conditions'])) {
     }
     $content .= "\n";
 }
-        
+
         // ✅ Contact Information – provider fallback if N/A
 $c = $q['contact_information'] ?? [];
 $email = ($c['email'] ?? 'N/A') !== 'N/A' ? $c['email'] : ($provider->contact_email ?? 'N/A');
@@ -455,7 +500,7 @@ $content .= "Email: {$email}\n";
 $content .= "Phone: {$phone}\n";
 $content .= "Website: {$website}\n";
 $content .= "Address: {$address}\n";
-        
+
         return $content;
     }
 
@@ -490,25 +535,25 @@ $content .= "Address: {$address}\n";
     // Find JSON object from first { to last }
     if (preg_match('/\{[\s\S]*\}/', $cleaned, $matches)) {
         $json = $matches[0];
-        
+
         // Fix unclosed braces
         $open = substr_count($json, '{');
         $close = substr_count($json, '}');
         if ($open > $close) {
             $json .= str_repeat('}', $open - $close);
         }
-        
+
         // Fix unclosed brackets
         $openB = substr_count($json, '[');
         $closeB = substr_count($json, ']');
         if ($openB > $closeB) {
             $json .= str_repeat(']', $openB - $closeB);
         }
-        
+
         // Remove trailing commas
         $json = preg_replace('/,\s*}/', '}', $json);
         $json = preg_replace('/,\s*]/', ']', $json);
-        
+
         $decoded = json_decode($json, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             return isset($decoded['quotation']) ? $decoded : ['quotation' => $decoded];
@@ -599,19 +644,19 @@ private function authorizeProvider(QuotationRequest $request): void
 public function edit(QuotationRequest $quotationRequest)
 {
     $this->authorizeProvider($quotationRequest);
-    
+
     if ($quotationRequest->isQuotationSent()) {
         abort(403, 'Quotation already sent. Cannot edit.');
     }
-    
+
     // AI draft
     $draft = $quotationRequest->quotation_data['quotation'] ?? [];
-    
+
     // Final quotation – handle both structures
     if ($quotationRequest->quotation_final) {
         $finalWrapper = $quotationRequest->quotation_final;
         $final = $finalWrapper['quotation'] ?? [];
-        
+
         // If cost_breakdown wrapper exists, use it; otherwise use root
         if (isset($final['cost_breakdown']) && is_array($final['cost_breakdown'])) {
             $final = $final;
@@ -620,7 +665,7 @@ public function edit(QuotationRequest $quotationRequest)
     } else {
         $final = $draft;
     }
-    
+
     // Ensure items exist
     if (!isset($final['cost_breakdown']) && isset($final['items'])) {
         // Items are at root – wrap them
@@ -631,7 +676,7 @@ public function edit(QuotationRequest $quotationRequest)
         ];
         unset($final['items']);
     }
-    
+
     return view('provider.quotation-requests.edit', compact(
         'quotationRequest', 'draft', 'final'
     ));
@@ -642,11 +687,11 @@ public function edit(QuotationRequest $quotationRequest)
 public function update(Request $request, QuotationRequest $quotationRequest)
 {
     $this->authorizeProvider($quotationRequest);
-    
+
     if ($quotationRequest->isQuotationSent()) {
         return response()->json(['error' => 'Quotation already sent.'], 403);
     }
-    
+
     $validated = $request->validate([
     'items' => 'required|array|min:1',
     'items.*.description' => 'required|string|max:255',
@@ -658,13 +703,13 @@ public function update(Request $request, QuotationRequest $quotationRequest)
     'special_notes' => 'nullable|string|max:1000',
     'provider_budget_note' => 'nullable|string|max:2000', // ✅ NEW
 ]);
-    
+
     // Recalculate
     $recalculated = $this->recalculateQuotation(
         $validated['items'],
         $validated['discount'] ?? 0
     );
-    
+
     // Build final data with cost_breakdown structure
     $draft = $quotationRequest->quotation_data['quotation'] ?? [];
     $finalData = [
@@ -682,9 +727,9 @@ public function update(Request $request, QuotationRequest $quotationRequest)
         'address' => $quotationRequest->provider->address ?? 'N/A',
     ],
 ];
-    
+
     $quotationWrapper = ['quotation' => $finalData];
-    
+
     $quotationRequest->quotation_final = $quotationWrapper;
     $quotationRequest->quotation_status = 'edited';
     $quotationRequest->edited_at = now();
@@ -695,7 +740,7 @@ public function update(Request $request, QuotationRequest $quotationRequest)
         $quotationRequest
     );
     $quotationRequest->save();
-    
+
     return response()->json([
         'success' => true,
         'message' => 'Quotation updated successfully.',
@@ -708,9 +753,9 @@ public function update(Request $request, QuotationRequest $quotationRequest)
 public function preview(QuotationRequest $quotationRequest)
 {
     $this->authorizeProvider($quotationRequest);
-    
+
     $provider = Auth::user()->getCurrentProvider();
-    
+
     // Use final if exists, otherwise draft
     if ($quotationRequest->quotation_final) {
         $finalData = $quotationRequest->quotation_final;
@@ -724,7 +769,7 @@ public function preview(QuotationRequest $quotationRequest)
             $quotationRequest
         );
     }
-    
+
     return view('emails.quotation', [
         'quotationRequest' => $quotationRequest,
         'quotationText' => $quotationText,
@@ -739,21 +784,21 @@ public function preview(QuotationRequest $quotationRequest)
 public function send(Request $request, QuotationRequest $quotationRequest)
 {
     $this->authorizeProvider($quotationRequest);
-    
+
     if ($quotationRequest->isQuotationSent()) {
         return back()->with('error', 'Quotation already sent.');
     }
-    
+
     $provider = Auth::user()->getCurrentProvider();
-    
+
     // If no final exists, use draft
     if (!$quotationRequest->quotation_final) {
         $draft = $quotationRequest->quotation_data['quotation'] ?? [];
-        
+
         if (empty($draft['cost_breakdown']['items'])) {
             return back()->with('error', 'No quotation data found. Please generate AI quotation first.');
         }
-        
+
         $finalData = $this->recalculateQuotation(
             $draft['cost_breakdown']['items'] ?? [],
             0
@@ -763,7 +808,7 @@ public function send(Request $request, QuotationRequest $quotationRequest)
         $finalData['day_by_day_breakdown'] = $draft['day_by_day_breakdown'] ?? [];
         $finalData['terms_and_conditions'] = $draft['terms_and_conditions'] ?? [];
         $finalData['contact_information'] = $draft['contact_information'] ?? [];
-        
+
         $quotationRequest->quotation_final = ['quotation' => $finalData];
         $quotationRequest->quotation_status = 'reviewed';
         $quotationRequest->quotation_text = $this->formatQuotationText(
@@ -773,19 +818,25 @@ public function send(Request $request, QuotationRequest $quotationRequest)
         );
         $quotationRequest->save();
     }
-    
+
     // Recalculate server-side
     $finalWrapper = $quotationRequest->quotation_final;
     $finalData = $finalWrapper['quotation'] ?? [];
-    
+
+        // FLOW2-FIX-9: items live at ROOT level (from recalculateQuotation) —
+    // not inside cost_breakdown. Rebuild cost_breakdown fully.
     $recalculated = $this->recalculateQuotation(
-        $finalData['cost_breakdown']['items'] ?? [],
+        $finalData['items'] ?? $finalData['cost_breakdown']['items'] ?? [],
         $finalData['discount'] ?? 0
     );
-    $finalData['cost_breakdown']['items'] = $recalculated['items'];
-    $finalData['cost_breakdown']['grand_total'] = $recalculated['grand_total'];
+    $finalData['cost_breakdown'] = [
+        'currency'    => $finalData['cost_breakdown']['currency'] ?? 'USD',
+        'items'       => $recalculated['items'],
+        'subtotal'    => $recalculated['subtotal'] ?? 0,
+        'grand_total' => $recalculated['grand_total'],
+    ];
     $finalData['discount'] = $recalculated['discount'];
-    
+
     $quotationRequest->quotation_final = ['quotation' => $finalData];
     $quotationRequest->quotation_text = $this->formatQuotationText(
         ['quotation' => $finalData],
@@ -793,25 +844,25 @@ public function send(Request $request, QuotationRequest $quotationRequest)
         $quotationRequest
     );
     $quotationRequest->save();
-    
+
     // Send email
     $email = $quotationRequest->traveler_email ?? $quotationRequest->traveler->email ?? null;
     if (!$email) {
         return back()->with('error', 'No traveler email address found.');
     }
-    
+
     try {
         Mail::to($email)->send(new \App\Mail\QuotationMail($quotationRequest));
     } catch (\Exception $e) {
         Log::error('Quotation email failed: ' . $e->getMessage());
         return back()->with('error', 'Email sending failed. Please try again.');
     }
-    
+
     // Mark sent only after email success
     $quotationRequest->quotation_status = 'sent';
     $quotationRequest->sent_at = now();
     $quotationRequest->save();
-    
+
     return back()->with('success', 'Quotation sent successfully to traveler.');
 }
 /**
@@ -822,21 +873,21 @@ private function recalculateQuotation(array $items, float $discount = 0): array
 {
     $total = 0;
     $currency = 'USD';
-    
+
     foreach ($items as &$item) {
         $quantity = $item['quantity'] ?? 1;
         $perPerson = (float) $item['per_person'];
         $total = (float) ($perPerson * $quantity);
-        
+
         $item['total'] = round($total, 2);
         $item['quantity'] = (int) $quantity;
         $item['per_person'] = round($perPerson, 2);
     }
-    
+
     $subtotal = array_sum(array_column($items, 'total'));
     $grandTotal = round($subtotal - $discount, 2);
     if ($grandTotal < 0) $grandTotal = 0;
-    
+
     return [
         'items' => $items,
         'currency' => $currency,
