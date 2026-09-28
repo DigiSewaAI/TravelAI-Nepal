@@ -620,8 +620,17 @@
                             <div class="flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
                                 <span class="flex items-center gap-1.5">
                                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
-                                    <strong class="text-gray-700">{{ $service->trekDetail->duration_days ?? '—' }}</strong>
-                                    {{ __('messages.days') }}
+                                    @if($service->trekDetail && $service->trekDetail->duration_days)
+                                        <strong class="text-gray-700">{{ $service->trekDetail->duration_days }}</strong> {{ __('messages.days') }}
+                                    @elseif($service->tourDetail && $service->tourDetail->duration_days)
+                                        <strong class="text-gray-700">{{ $service->tourDetail->duration_days }}</strong> {{ __('messages.days') }}
+                                    @elseif($service->transportDetail && $service->transportDetail->duration_minutes)
+                                        <strong class="text-gray-700">{{ round($service->transportDetail->duration_minutes / 60, 1) }}</strong> hours
+                                    @elseif($service->hotelDetail)
+                                        <strong class="text-gray-700">Stay</strong>
+                                    @else
+                                        <strong class="text-gray-700">—</strong> {{ __('messages.days') }}
+                                    @endif
                                 </span>
                                 @if($service->trekDetail && $service->trekDetail->max_altitude)
                                     <span class="flex items-center gap-1.5">
@@ -641,7 +650,15 @@
                                 <div class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">{{ __('messages.from') }}</div>
                                 <div class="text-base font-bold text-gray-900">
                                     {{ $formattedPrice }}
-                                    <span class="text-xs text-gray-500 font-medium">{{ __('messages.per_person') }}</span>
+                                    <span class="text-xs text-gray-500 font-medium">
+                                        @if($service->hotelDetail)
+                                            / night
+                                        @elseif($service->transportDetail && $service->transportDetail->price_per_vehicle)
+                                            / vehicle
+                                        @else
+                                            {{ __('messages.per_person') }}
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                             <div class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition">
