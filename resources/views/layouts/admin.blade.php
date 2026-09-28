@@ -69,25 +69,25 @@
 @if(Route::has('admin.safety.dashboard'))
 <div class="border-t border-gray-200 my-2 pt-2">
     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Safety</p>
-    
+
     <a href="{{ route('admin.safety.dashboard') }}"
        class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.*') ? 'active' : '' }}">
         <i class="fas fa-shield-alt w-5"></i>
         <span>Safety Dashboard</span>
     </a>
-    
+
     <a href="{{ route('admin.safety.incidents') }}"
        class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.incidents') ? 'active' : '' }}">
         <i class="fas fa-exclamation-triangle w-5"></i>
         <span>Incidents</span>
     </a>
-    
+
     <a href="{{ route('admin.safety.sources') }}"
        class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.sources') ? 'active' : '' }}">
         <i class="fas fa-rss w-5"></i>
         <span>Sources</span>
     </a>
-    
+
     <a href="{{ route('admin.safety.audit') }}"
        class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.safety.audit') ? 'active' : '' }}">
         <i class="fas fa-history w-5"></i>
@@ -120,11 +120,23 @@
                 </a>
                 @endif
 
-                @if(Route::has('admin.payments.index'))
+                                @if(Route::has('admin.payments.index'))
                 <a href="{{ route('admin.payments.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.payments.index') || request()->routeIs('admin.payments.show') ? 'active' : '' }}">
                     <i class="fas fa-credit-card w-5"></i>
                     <span>Payments</span>
+                </a>
+                @endif
+
+                @if(Route::has('admin.payments.verify'))
+                <a href="{{ route('admin.payments.verify') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.payments.verify') ? 'active' : '' }}">
+                    <i class="fas fa-shield-alt w-5"></i>
+                    <span>Verify Payments</span>
+                    @php $pendingCount = \App\Models\Payment::where('status', 'pending_verification')->count(); @endphp
+                    @if($pendingCount > 0)
+                        <span class="ml-auto text-xs bg-orange-500 text-white rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
+                    @endif
                 </a>
                 @endif
 

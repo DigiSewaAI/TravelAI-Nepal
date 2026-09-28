@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
 {
@@ -57,5 +62,146 @@ class PaymentController extends Controller
 
         return redirect()->route('admin.payments.index')
             ->with('success', 'Payment deleted successfully.');
+    }
+        /**
+     * PHASE 7D — Admin verify queue (pending payments list).
+     */
+    public function verifyQueue()
+    {
+        $pending = Payment::with(['provider', 'payable'])
+            ->where('status', 'pending_verification')
+            ->latest()
+            ->paginate(20);
+
+        $stats = [
+            'pending'  => Payment::where('status', 'pending_verification')->count(),
+            'verified' => Payment::where('status', 'verified')
+                ->whereDate('verified_at', today())->count(),
+            'rejected' => Payment::where('status', 'rejected')
+                ->where('updated_at', '>=', now()->subWeek())->count(),
+            'revenue'  => Payment::where('status', 'verified')
+                ->whereMonth('verified_at', now()->month)
+                ->sum('amount'),
+        ];
+
+        $recentActivity = Payment::with('provider')
+            ->whereIn('status', ['verified', 'rejected'])
+            ->latest('updated_at')
+            ->take(10)
+            ->get();
+
+        return view('admin.payments.verify', compact('pending', 'stats', 'recentActivity'));
+    }
+
+    /**
+     * PHASE 7D — Approve payment (atomic: Payment + Subscription).
+     */
+    public function approve(Payment $payment)
+    {
+        if ($payment->status !== 'pending_verification') {
+            return back()->with('error', 'This payment is not pending verification.');
+        }
+
+        DB::transaction(function () use ($payment) {
+            $locked = Payment::where('id', $payment->id)->lockForUpdate()->first();
+
+            if ($locked->status !== 'pending_verification') {
+                throw new \RuntimeException('Payment status changed — refresh and retry.');
+            }
+
+            $locked->update([
+                'status'      => 'verified',
+                'verified_by' => Auth::id(),
+                'verified_at' => now(),
+                'paid_at'     => $locked->paid_at ?? now(),
+            ]);
+
+            if ($locked->payable_type === Subscription::class) {
+                $subscription = Subscription::find($locked->payable_id);
+                if ($subscription) {
+                    $subscription->update([
+                        'status'     => 'active',
+                        'start_date' => $subscription->start_date ?? now(),
+                    ]);
+
+                    // Cancel other active subscriptions for same provider
+                    Subscription::where('provider_id', $subscription->provider_id)
+                        ->where('id', '!=', $subscription->id)
+                        ->where('status', 'active')
+                        ->update(['status' => 'cancelled', 'end_date' => now()]);
+                }
+            }
+        });
+
+        Log::info('Payment approved', [
+            'payment_id'  => $payment->id,
+            'verified_by' => Auth::id(),
+        ]);
+
+        return back()->with('success', 'Payment approved. Subscription activated.');
+    }
+
+    /**
+     * PHASE 7D — Reject payment (reason required).
+     */
+    public function reject(Request $request, Payment $payment)
+    {
+        $validated = $request->validate([
+            'admin_note' => 'required|string|min:10|max:500',
+        ]);
+
+        if ($payment->status !== 'pending_verification') {
+            return back()->with('error', 'This payment is not pending verification.');
+        }
+
+        DB::transaction(function () use ($payment, $validated) {
+            $locked = Payment::where('id', $payment->id)->lockForUpdate()->first();
+
+            if ($locked->status !== 'pending_verification') {
+                throw new \RuntimeException('Payment status changed — refresh and retry.');
+            }
+
+            $locked->update([
+                'status'      => 'rejected',
+                'admin_note'  => trim($validated['admin_note']),
+                'verified_by' => Auth::id(),
+                'verified_at' => now(),
+            ]);
+
+            if ($locked->payable_type === Subscription::class) {
+                $subscription = Subscription::find($locked->payable_id);
+                if ($subscription) {
+                    $subscription->update([
+                        'status'   => 'cancelled',
+                        'end_date' => now(),
+                    ]);
+                }
+            }
+        });
+
+        Log::info('Payment rejected', [
+            'payment_id'  => $payment->id,
+            'verified_by' => Auth::id(),
+            'reason'      => $validated['admin_note'],
+        ]);
+
+        return back()->with('success', 'Payment rejected. Provider notified via dashboard.');
+    }
+
+    /**
+     * PHASE 7D — Serve receipt file (admin-only, private storage).
+     */
+    public function serveReceipt(Payment $payment)
+    {
+        if (!$payment->receipt_image_path) {
+            abort(404, 'No receipt for this payment.');
+        }
+
+        if (!Storage::disk('local')->exists($payment->receipt_image_path)) {
+            abort(404, 'Receipt file not found.');
+        }
+
+        $path = Storage::disk('local')->path($payment->receipt_image_path);
+        return response()->file($path);
     }
 }

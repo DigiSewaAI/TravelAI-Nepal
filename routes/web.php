@@ -388,6 +388,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/subscriptions/{subscription}', [App\Http\Controllers\Admin\SubscriptionController::class, 'destroy'])->name('subscriptions.destroy');
 
     // Payments
+        // PHASE 7D — Admin verify queue (must come BEFORE {payment} wildcard)
+    Route::get('/payments/verify', [App\Http\Controllers\Admin\PaymentController::class, 'verifyQueue'])->name('payments.verify');
+    Route::post('/payments/{payment}/approve', [App\Http\Controllers\Admin\PaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('/payments/{payment}/reject', [App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('payments.reject');
+    Route::get('/payments/{payment}/receipt', [App\Http\Controllers\Admin\PaymentController::class, 'serveReceipt'])->name('payments.receipt');
+
     Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
     Route::post('/payments/{payment}/refund', [App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('payments.refund');
