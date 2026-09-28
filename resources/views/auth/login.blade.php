@@ -63,12 +63,6 @@
                 {{ __('messages.no_account') }}
                 <a href="{{ route('register') }}" class="text-blue-600 hover:underline">{{ __('messages.register_here') }}</a>
             </p>
-
-            {{-- Link to old agency login --}}
-            <div class="mt-4 text-center text-sm">
-                <span class="text-gray-400">{{ __('messages.or') }}</span>
-                {{-- <a href="{{ route('agency.login') }}" class="text-blue-600 hover:underline ml-1">Agency Login (Legacy)</a> --}}
-            </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
