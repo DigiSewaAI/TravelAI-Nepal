@@ -35,12 +35,7 @@ return [
         ],
     ],
 
-    // ✅ Stripe Configuration for Payments (Phase 9)
-    'stripe' => [
-        'key' => env('STRIPE_KEY'),
-        'secret_key' => env('STRIPE_SECRET'),
-        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
-    ],
+    // Stripe configuration removed (Phase 7A — Stripe decommission)
 
         // 🔥 Groq AI Configuration (Phase 4J: multi-key support)
     'groq' => [

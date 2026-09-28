@@ -27,7 +27,7 @@ class PaymentController extends Controller
     public function history()
     {
         $provider = Auth::user()->ownProvider();
-        
+
         if (!$provider) {
             abort(403, 'No provider found.');
         }
@@ -94,7 +94,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Confirm payment after Stripe callback.
+     * Confirm payment (legacy — Phase 7C will replace).
      */
     public function confirm(Request $request)
     {

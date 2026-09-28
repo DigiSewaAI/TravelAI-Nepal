@@ -431,7 +431,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // =======================================
 // 8. WEBHOOK ROUTES
 // =======================================
-Route::post('/webhook/stripe', [WebhookController::class, 'stripe'])->name('webhook.stripe');
+// Stripe webhook route removed (Phase 7A — Stripe decommission)
 
 // Redirect old agencies URL to new providers page
 Route::get('/agencies', function () {
