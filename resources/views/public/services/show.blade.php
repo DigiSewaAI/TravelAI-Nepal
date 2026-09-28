@@ -114,6 +114,8 @@
                         <span class="text-sm font-normal text-gray-500">/ {{ __('messages.night') }}</span>
                     @elseif($service->tourDetail)
                         <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
+                    @elseif($service->transportDetail && $service->transportDetail->price_per_vehicle)
+                        <span class="text-sm font-normal text-gray-500">/ vehicle</span>
                     @else
                         <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
                     @endif
@@ -147,6 +149,41 @@
                     <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
                         <div><span class="text-gray-500">{{ __('messages.duration') }}:</span> {{ $service->tourDetail->duration_days }} {{ __('messages.days') }}</div>
                     </div>
+                </div>
+            @endif
+
+            <!-- Transport Details -->
+            @if($service->transportDetail)
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-700">Transport Details</h3>
+                    <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
+                        <div><span class="text-gray-500">Type:</span> {{ ucfirst($service->transportDetail->transport_type) }}</div>
+                        <div><span class="text-gray-500">From:</span> {{ $service->transportDetail->fromLocation->city ?? '—' }}</div>
+                        <div><span class="text-gray-500">To:</span> {{ $service->transportDetail->toLocation->city ?? '—' }}</div>
+                        @if($service->transportDetail->departure_time)
+                            <div><span class="text-gray-500">Departure:</span> {{ \Carbon\Carbon::parse($service->transportDetail->departure_time)->format('g:i A') }}</div>
+                        @endif
+                        @if($service->transportDetail->duration_minutes)
+                            <div><span class="text-gray-500">Duration:</span> {{ $service->transportDetail->duration_minutes }} min</div>
+                        @endif
+                        <div><span class="text-gray-500">Seats:</span> {{ $service->transportDetail->total_seats }}</div>
+                        <div><span class="text-gray-500">Type:</span> {{ ucfirst($service->transportDetail->private_shared) }}</div>
+                        @if($service->transportDetail->ac_available)
+                            <div><span class="text-gray-500">AC:</span> Yes</div>
+                        @endif
+                        @if($service->transportDetail->driver_included)
+                            <div><span class="text-gray-500">Driver:</span> Included</div>
+                        @endif
+                        @if($service->transportDetail->fuel_included)
+                            <div><span class="text-gray-500">Fuel:</span> Included</div>
+                        @endif
+                    </div>
+                    @if($service->transportDetail->cancellation_policy)
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Cancellation Policy</p>
+                            <p class="text-sm text-gray-600">{{ $service->transportDetail->cancellation_policy }}</p>
+                        </div>
+                    @endif
                 </div>
             @endif
 
