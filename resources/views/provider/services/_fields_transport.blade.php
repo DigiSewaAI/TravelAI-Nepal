@@ -17,17 +17,23 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <label class="block text-gray-700 font-semibold mb-1">From Location *</label>
-            <input type="number" name="from_location_id" value="{{ old('from_location_id', $detail?->from_location_id ?? '') }}" placeholder="Location ID"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('from_location_id') border-red-500 @enderror">
-            <p class="text-xs text-gray-400 mt-1">Location ID (dropdown V2)</p>
+            <select name="from_location_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('from_location_id') border-red-500 @enderror">
+                <option value="">Select location</option>
+                @foreach(($locations ?? collect()) as $loc)
+                    <option value="{{ $loc->id }}" {{ old('from_location_id', $detail?->from_location_id) == $loc->id ? 'selected' : '' }}>{{ $loc->city }}</option>
+                @endforeach
+            </select>
             @error('from_location_id')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div>
             <label class="block text-gray-700 font-semibold mb-1">To Location *</label>
-            <input type="number" name="to_location_id" value="{{ old('to_location_id', $detail?->to_location_id ?? '') }}" placeholder="Location ID"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('to_location_id') border-red-500 @enderror">
-            <p class="text-xs text-gray-400 mt-1">Location ID (dropdown V2)</p>
+            <select name="to_location_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('to_location_id') border-red-500 @enderror">
+                <option value="">Select location</option>
+                @foreach(($locations ?? collect()) as $loc)
+                    <option value="{{ $loc->id }}" {{ old('to_location_id', $detail?->to_location_id) == $loc->id ? 'selected' : '' }}>{{ $loc->city }}</option>
+                @endforeach
+            </select>
             @error('to_location_id')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
         </div>
     </div>
@@ -35,7 +41,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <label class="block text-gray-700 font-semibold mb-1">Departure Time</label>
-            <input type="time" name="departure_time" value="{{ old('departure_time', $detail?->departure_time ?? '') }}"
+            <input type="time" name="departure_time" value="{{ old('departure_time', $detail?->departure_time ? \Carbon\Carbon::parse($detail->departure_time)->format('H:i') : '') }}"
                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('departure_time') border-red-500 @enderror">
             @error('departure_time')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
         </div>

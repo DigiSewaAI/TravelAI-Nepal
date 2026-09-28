@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -49,7 +50,8 @@ class ServiceController extends Controller
 
         $categories = $allowedCategories;
 
-        return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType'));
+        $locations = Location::whereNotNull('city')->where('city', '!=', '')->orderBy('city')->get(['id', 'city']);
+        return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType', 'locations'));
     }
 
         public function store(Request $request)
@@ -205,7 +207,7 @@ class ServiceController extends Controller
                 'transport_type'    => 'required|in:bus,jeep,car,van,flight,heli',
                 'from_location_id'  => 'required|exists:locations,id',
                 'to_location_id'    => 'required|exists:locations,id',
-                'departure_time'    => 'nullable|date_format:H:i',
+                'departure_time'    => 'nullable|date_format:H:i,H:i:s',
                 'duration_minutes'  => 'required|integer|min:1',
                 'price_per_person'  => 'required|numeric|min:0',
                 'price_per_vehicle' => 'nullable|numeric|min:0',
@@ -287,9 +289,11 @@ class ServiceController extends Controller
         $isLegacy = !in_array((int) $service->service_category_id, $allowedIds, true);
         $currentCategory = ServiceCategory::find($service->service_category_id);
 
+        $locations = Location::whereNotNull('city')->where('city', '!=', '')->orderBy('city')->get(['id', 'city']);
+
         return view('provider.services.edit', compact(
             'service', 'categories', 'allowedCategories', 'providerType',
-            'isLegacy', 'currentCategory'
+            'isLegacy', 'currentCategory', 'locations'
         ));
     }
 
