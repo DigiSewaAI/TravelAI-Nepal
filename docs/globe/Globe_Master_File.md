@@ -1061,3 +1061,50 @@ text
 
 **Master File — Session 2026-09-27 (Phase 5G CLOSED) End**
 **Next revision:** After Phase 6 (Deploy prep)
+---
+
+## Phase Ledger Update — 2026-09-28
+
+### Current HEAD
+8dee6b0 — feat(payment): traveler booking payment display + notify (Phase 7E.2)
+
+text
+
+### Payment Phase 7 Progress
+
+| Sub-Phase | Status | Commit |
+|-----------|--------|--------|
+| 7A — Stripe removal | ✅ CLOSED | 943093f |
+| 7B — Migrations + models | ✅ CLOSED | 21fcd48 |
+| 7C — Provider subscription UI | ✅ CLOSED | af9617e |
+| 7D — Admin verify queue | ✅ CLOSED | 9272936 |
+| 7E.1 — Provider settings UI | ✅ CLOSED | 54d2530 |
+| 7E.1b — Sidebar link | ✅ CLOSED | 54d2530 |
+| 7E.2 — Traveler display | ✅ CLOSED | 8dee6b0 |
+| 7E.2b — PayPal side-by-side | 🟡 PENDING | — |
+| 7E.3 — Cancel confirmation | 🟡 PENDING | — |
+| 7F — Full regression | 🟡 PENDING | — |
+| 7G — Notifications + Invoice | 🟡 PENDING | — |
+| 7H — Legacy Stripe data | 🟡 PENDING | — |
+
+### New Tickets (2026-09-28)
+🟢 PM-PAYPAL-SIDEBYSIDE-01 LOW — 7E.2b (UI polish)
+🟢 PM-MODAL-DYNAMIC-FIELDS-01 LOW — post-deploy (dynamic field visibility)
+🟢 PM-MODAL-FIELD-HINTS-01 LOW — post-deploy (field hints in modal)
+🟢 PM-PAYPAL-NEPAL-GUIDANCE-01 LOW — post-deploy (provider tooltip)
+🟢 SIDEBAR-EMOJI-MOJIBAKE-01 LOW — i18n cleanup batch
+🟡 ADMIN-REJECT-TEST-01 MED — before deploy
+🟡 PROVIDER-BOOKING-NOTIFICATION-01 MED — 7G scope
+🟢 7E.1-RUNTIME-JSON-01 CLOSED (base64 fix)
+🟡 PROVIDER-SIDEBAR-LINK-01 CLOSED (7E.1b)
+
+text
+
+### Protected Systems — Verified Intact
+
+- ✅ PlannerService (R5)
+- ✅ Booking status transitions
+- ✅ QR / Safety / SOS / JourneyReplay
+- ✅ All Seeders (locks preserved)
+- ✅ Backups intact
+

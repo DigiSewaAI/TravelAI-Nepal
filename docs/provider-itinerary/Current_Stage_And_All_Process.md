@@ -2747,3 +2747,67 @@ Target:
 
 **Session 2026-09-27 — Phase 5G CLOSED**
 **Next session:** TRANSPORT P2 OR Phase 6
+---
+
+## 2026-09-28 — Payment Workstream Update
+
+### What Was Built (Provider Side)
+
+- Provider Settings → Payment Methods page (`/provider/settings/payment-methods`)
+  - Domestic methods: bank, eSewa, Khalti, cash
+  - International methods: PayPal, Wise, international bank
+  - QR image upload (2MB, PNG/JPG)
+  - Toggle active/inactive per method
+  - Edit / Delete per method
+  - Sort order field
+  - Sidebar link (wallet icon) added
+
+### What Was Built (Traveler Side)
+
+- Traveler booking show page (`/traveler/bookings/{id}`)
+  - Payment Options section
+  - Region-aware display: 🇳🇵 Domestic + 🌍 International badges
+  - Copy buttons for account/identifier/SWIFT
+  - QR image display (if uploaded)
+  - Disclaimer: "TravelAI does not process this payment"
+  - "I've Paid — Notify Provider" button
+  - After notify: "Already notified" state (with timestamp)
+  - No payment record created (ChatGPT principle)
+
+### Architecture (Locked)
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer, eSewa, Khalti, manual admin verify
+
+**Layer 2 (Provider ↔ Traveler):**
+- Domestic: bank, eSewa, Khalti, cash
+- International: PayPal, Wise, international bank
+- Provider self-config, display-only
+- "I've Paid" = notification only
+
+### Tickets Logged Today
+
+- 🟢 PM-PAYPAL-SIDEBYSIDE-01 (LOW, 7E.2b)
+- 🟢 PM-MODAL-DYNAMIC-FIELDS-01 (LOW)
+- 🟢 PM-MODAL-FIELD-HINTS-01 (LOW)
+- 🟢 PM-PAYPAL-NEPAL-GUIDANCE-01 (LOW)
+- 🟢 SIDEBAR-EMOJI-MOJIBAKE-01 (LOW)
+- 🟡 ADMIN-REJECT-TEST-01 (MED)
+- 🟡 PROVIDER-BOOKING-NOTIFICATION-01 (MED, 7G)
+
+### Next Session Priority (2026-09-29)
+
+**Morning Block (4 hrs):**
+1. 7E.2b — PayPal side-by-side layout (~5 min)
+2. 7E.3 — Cancel confirmation fix (~10 min)
+3. 7F — Full regression (~1 hr)
+4. 7G — Notifications + Invoice (~1.5 hrs)
+5. 7H — Legacy Stripe data migration (~30 min)
+
+**Afternoon Block (4 hrs):**
+6. Transport P2 — Discovery (READ-ONLY, ~30 min)
+7. Transport P3 — V1 Build (~3-4 hrs)
+
+**Evening Block (2 hrs):**
+8. Remaining tickets (ADMIN-REJECT-TEST-01, etc.)
+9. Session log append

@@ -1648,3 +1648,46 @@ Protected systems: Zero diff
 
 **Session End — 2026-09-27 (Phase 5G CLOSED)**
 **Next session:** TRANSPORT P2 (discovery) OR Phase 6 (Deploy prep)
+---
+
+## 2026-09-28 — Payment Phase 7 (Session 3)
+
+### Commits (chronological)
+
+| Hash | Phase | Message |
+|------|-------|---------|
+| 943093f | 7A | refactor(payment): decommission Stripe |
+| 21fcd48 | 7B | feat(payment): add payment methods tables + verify fields |
+| af9617e | 7C | feat(payment): provider subscription payment page |
+| 9272936 | 7D | feat(payment): admin verify queue |
+| 54d2530 | 7E.1 + 7E.1b | feat(payment): provider payment methods settings + sidebar |
+| 8dee6b0 | 7E.2 | feat(payment): traveler booking payment display + notify |
+
+### Phases Closed
+
+- ✅ Phase 7A — Stripe decommission
+- ✅ Phase 7B — Migrations + models (payment methods tables)
+- ✅ Phase 7C — Provider subscription payment page
+- ✅ Phase 7D — Admin verify queue (approve/reject/receipt)
+- ✅ Phase 7E.1 — Provider payment methods settings (CRUD + QR + toggle)
+- ✅ Phase 7E.1b — Provider sidebar link
+- ✅ Phase 7E.2 — Traveler booking payment display + "I've Paid" notify
+
+### Runtime Bugs Fixed
+
+- 🔴 7E.1-RUNTIME-JSON-01 → Blade `@json()` directive with complex array → ParseError
+  - Fix: `base64_encode` + `data-pm-edit` attribute + `atob()` JS decode
+  - Lesson: Blade directive + complex arrays = avoid (use `@php` pre-compute)
+
+### Tests
+
+- Suite: 42 passed / 0 failed (108 assertions)
+- 7E.1 CRUD: T4-T9 all PASS (create/render/toggle/edit/delete/international)
+- 7E.2 flow: render + copy + notify + DB write verified
+
+### Session End
+
+- HEAD: 8dee6b0
+- Working tree: clean (untracked artifacts only)
+- Session: closed
+- Next: Phase 7E.2b + 7E.3 + 7F-7H (2026-09-29)
