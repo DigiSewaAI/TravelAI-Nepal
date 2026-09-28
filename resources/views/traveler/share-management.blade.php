@@ -1,6 +1,6 @@
 <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-        <i class="fas fa-share-alt text-blue-600"></i> Share My Journey
+        <i class="fas fa-share-alt text-blue-600"></i> Share This Trip
     </h3>
 
     <div class="mt-4 flex flex-wrap gap-3 items-center">
