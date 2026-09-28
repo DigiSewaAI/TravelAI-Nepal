@@ -28,8 +28,8 @@
         <!-- Sidebar -->
         <div class="w-64 bg-white border-r shadow-sm p-4 flex flex-col">
             <a href="{{ route('provider.dashboard') }}" class="flex items-center space-x-2 mb-6">
-                <img src="{{ asset('images/logo.png') }}" 
-                     alt="TravelAI Nepal" 
+                <img src="{{ asset('images/logo.png') }}"
+                     alt="TravelAI Nepal"
                      class="h-10 w-auto">
                 <span class="font-bold text-gray-800 text-lg">TravelAI Nepal</span>
             </a>
@@ -40,7 +40,7 @@
                     <div class="flex items-center space-x-3">
                         <!-- 🔥 Provider Logo -->
                         @if($provider->logo_url)
-                            <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                            <img src="{{ asset('storage/' . $provider->logo_url) }}"
                                  alt="{{ $provider->name }} logo"
                                  class="w-10 h-10 rounded-full object-cover border border-gray-200"
                                  onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">
@@ -64,27 +64,27 @@
             <!-- Navigation -->
             <nav class="flex-1 space-y-1">
                 <!-- Dashboard -->
-                <a href="{{ route('provider.dashboard') }}" 
+                <a href="{{ route('provider.dashboard') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-chart-line w-5"></i>
                     <span>{{ __('messages.dashboard') }}</span>
                 </a>
 
                 <!-- Services -->
-                <a href="{{ route('provider.services.index') }}" 
+                <a href="{{ route('provider.services.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
                     <i class="fas fa-list w-5"></i>
                     <span>{{ __('messages.services') }}</span>
                 </a>
 
-                <a href="{{ route('provider.quotation.create') }}" 
+                <a href="{{ route('provider.quotation.create') }}"
    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
     <i class="fas fa-file-invoice-dollar w-5"></i>
     <span>AI Quotation</span>
 </a>
 
 <!-- Quotation Requests -->
-<a href="{{ route('provider.quotation-requests.index') }}" 
+<a href="{{ route('provider.quotation-requests.index') }}"
    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation-requests.*') ? 'active' : '' }}">
     <i class="fas fa-inbox w-5"></i>
     <span>Quotation Requests</span>
@@ -99,32 +99,41 @@
         <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
     @endif
 </a>                <!-- Bookings -->
-                <a href="{{ route('provider.bookings.index') }}" 
+                <a href="{{ route('provider.bookings.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>{{ __('messages.bookings') }}</span>
                 </a>
 
                 <!-- Subscriptions (Phase 8) -->
-                <a href="{{ route('provider.subscriptions.index') }}" 
+                <a href="{{ route('provider.subscriptions.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}">
                     <i class="fas fa-crown w-5"></i>
                     <span>{{ __('messages.subscriptions') }}</span>
                 </a>
 
                 <!-- Verification (Phase 8) -->
-                <a href="{{ route('provider.verification.index') }}" 
+                <a href="{{ route('provider.verification.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}">
                     <i class="fas fa-shield-alt w-5"></i>
                     <span>{{ __('messages.verification') }}</span>
                 </a>
 
-                <!-- Payments (Phase 9) -->
-                <a href="{{ route('provider.payments.index') }}" 
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.payments.*') ? 'active' : '' }}">
+                                <!-- Payments (Phase 9) -->
+                <a href="{{ route('provider.payments.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.payments.index') || request()->routeIs('provider.payments.detail') || request()->routeIs('provider.payments.show') ? 'active' : '' }}">
                     <i class="fas fa-credit-card w-5"></i>
                     <span>{{ __('messages.payments') }}</span>
                 </a>
+
+                <!-- PHASE 7E.1b — Payment Methods Settings -->
+                @if(Route::has('provider.settings.payment-methods.index'))
+                <a href="{{ route('provider.settings.payment-methods.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.settings.payment-methods.*') ? 'active' : '' }}">
+                    <i class="fas fa-wallet w-5"></i>
+                    <span>{{ __('messages.pm_page_title') }}</span>
+                </a>
+                @endif
 
                 <!-- Invoices (Phase 13) -->
                 @if(Route::has('provider.invoices.index'))
@@ -136,14 +145,14 @@
                 @endif
 
                 <!-- Profile -->
-                <a href="{{ route('provider.profile') }}" 
+                <a href="{{ route('provider.profile') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
                     <i class="fas fa-user w-5"></i>
                     <span>{{ __('messages.profile') }}</span>
                 </a>
 
                 <!-- Team (Staff Management) -->
-                <a href="{{ route('provider.staff.index') }}" 
+                <a href="{{ route('provider.staff.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
                     <i class="fas fa-users w-5"></i>
                     <span>Team</span>
@@ -159,14 +168,14 @@
 @endif
 
                 <!-- Check-ins (Phase 12) -->
-                <a href="{{ route('provider.checkins.index') }}" 
+                <a href="{{ route('provider.checkins.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
                     <i class="fas fa-qrcode w-5"></i>
                     <span>{{ __('messages.checkins') }}</span>
                 </a>
 
                 <!-- Safety (Phase 6) -->
-<a href="{{ route('safety.index') }}" 
+<a href="{{ route('safety.index') }}"
    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
     <i class="fas fa-shield-alt w-5"></i>
     <span>🛡️ Safety</span>

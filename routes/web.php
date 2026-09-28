@@ -253,6 +253,17 @@ Route::prefix('services/{service}/itinerary/departures')
     Route::post('/payments/subscription/{subscription}', [PaymentController::class, 'createPayment'])->name('payments.create');
     Route::get('/payments/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
 
+    // PHASE 7E.1 — Provider Payment Methods Settings
+    Route::prefix('settings/payment-methods')
+        ->name('settings.payment-methods.')
+        ->group(function () {
+            Route::get('/', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'store'])->name('store');
+            Route::put('/{id}', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'update'])->name('update');
+            Route::delete('/{id}', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'toggle'])->name('toggle');
+        });
+
     // Analytics (Phase 11)
     Route::middleware('feature:full_analytics')->group(function () {
     Route::get('/analytics', [App\Http\Controllers\Provider\AnalyticsController::class, 'index'])->name('analytics.index');
