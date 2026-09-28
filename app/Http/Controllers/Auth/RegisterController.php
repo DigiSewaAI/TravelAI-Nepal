@@ -45,7 +45,7 @@ class RegisterController extends Controller
     if ($request->filled('provider_type')) {
         $rules['business_name'] = 'required|string|max:255';
         $rules['address'] = 'nullable|string|max:500';
-        
+
         // If "Other" selected, custom_provider_type is required
         if ($request->provider_type == 'other') {
             $rules['custom_provider_type'] = 'required|string|max:255';
@@ -92,12 +92,12 @@ if ($plan->isContactOnly()) {
             if ($request->provider_type == 'other') {
                 $customTypeName = trim($request->custom_provider_type);
                 $customTypeSlug = Str::slug($customTypeName);
-                
+
                 $providerType = ProviderType::firstOrCreate(
                     ['slug' => $customTypeSlug],
                     ['name' => $customTypeName]
                 );
-                
+
                 $providerTypeId = $providerType->id;
                 \Log::info("New provider type created: {$customTypeName} (ID: {$providerTypeId})");
             } else {
@@ -141,6 +141,11 @@ if ($plan->isContactOnly()) {
                 $subscriptionData['end_date'] = now()->addYear(); // Free plan: 1 year
             } else {
                 $subscriptionData['status'] = 'pending'; // Payment required
+                $subscriptionData['start_date'] = now();
+                // Tentative end_date based on billing interval (activates after payment)
+                $subscriptionData['end_date'] = $billingInterval === 'yearly'
+                    ? now()->addYear()
+                    : now()->addMonth();
             }
 
             $subscription = Subscription::create($subscriptionData);

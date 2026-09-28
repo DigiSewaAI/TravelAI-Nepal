@@ -16,8 +16,12 @@
                 </div>
                 <div class="text-right">
                     <p class="text-sm text-gray-500">{{ __('messages.amount') }}</p>
-                    <p class="font-bold text-2xl text-blue-600">
-                        Rs. {{ number_format($subscription->plan->price_yearly ?? $subscription->plan->price_monthly ?? 0, 2) }}
+                    <p class="text-xl font-bold text-blue-600">
+                        @if($subscription->billing_interval === 'yearly')
+                            Rs. {{ number_format($subscription->plan->price_yearly ?? 0, 2) }} / year
+                        @else
+                            Rs. {{ number_format($subscription->plan->price_monthly ?? 0, 2) }} / month
+                        @endif
                     </p>
                 </div>
             </div>
