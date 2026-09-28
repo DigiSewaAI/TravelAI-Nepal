@@ -320,6 +320,7 @@ Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(functi
     // Bookings
     Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+    Route::post('/bookings/{booking}/payment-notice', [App\Http\Controllers\Traveler\BookingController::class, 'notifyPayment'])->name('bookings.notifyPayment');
 
     // Cinematic Replay
     Route::get('/cinematic-replay', [App\Http\Controllers\Traveler\CinematicReplayController::class, 'index'])->name('cinematic-replay');
