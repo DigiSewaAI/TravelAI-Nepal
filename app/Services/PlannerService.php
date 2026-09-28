@@ -878,67 +878,81 @@ $serviceName = $service
         $dayNumber++;
     }
 
-    $requestedDays = $input['days'];
-    $maxRestDays = min(3, $requestedDays - count($days));
-    $restDaysAdded = 0;
+            $requestedDays = $input['days'];
+        $paddingNeeded = max(0, $requestedDays - count($days));
 
-    while (count($days) < $requestedDays && $restDaysAdded < $maxRestDays) {
-        $last = end($days);
-        $waypointId = $last['overnight_waypoint_id'] ?? null;
-        $waypoint = $waypointId ? Waypoint::find($waypointId) : null;
-        $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+        if ($paddingNeeded > 0) {
+            // PHASE-5G-SMARTPAD: Collect unique high-altitude overnight waypoints
+            $candidates = [];
+            $seen = [];
+            foreach ($days as $d) {
+                $wpId = $d['overnight_waypoint_id'] ?? null;
+                $alt  = (float) ($d['altitude_m'] ?? 0);
+                if ($wpId && $alt >= 3000 && !isset($seen[$wpId])) {
+                    $candidates[] = ['id' => $wpId, 'alt' => $alt];
+                    $seen[$wpId] = true;
+                }
+            }
+            usort($candidates, fn($a, $b) => $b['alt'] <=> $a['alt']);
+            $candidateCount = count($candidates);
 
-        $altitude = $last['altitude_m'] ?? 0;
-        if ($altitude < 3000) {
-            break;
+            if ($candidateCount > 0) {
+                $waypointMap = Waypoint::whereIn('id', array_column($candidates, 'id'))
+                    ->get()
+                    ->keyBy('id');
+
+                for ($p = 0; $p < $paddingNeeded; $p++) {
+                    $candidate = $candidates[$p % $candidateCount];
+                    $waypoint  = $waypointMap[$candidate['id']] ?? null;
+                    $waypointName = $waypoint ? $waypoint->name : 'Unknown';
+                    $isRepeat = $p >= $candidateCount;
+
+                    $restTitle = match($locale) {
+                        'hi' => $isRepeat ? "{$waypointName} में विस्तारित अनुकूलन" : "{$waypointName} में अनुकूलन दिवस",
+                        'zh' => $isRepeat ? "{$waypointName} 扩展适应" : "{$waypointName} 适应日",
+                        'np' => $isRepeat ? "{$waypointName} मा विस्तारित अनुकूलन" : "{$waypointName} मा अनुकूलन दिन",
+                        default => $isRepeat ? "Extended Acclimatization at {$waypointName}" : "Acclimatization Day at {$waypointName}",
+                    };
+
+                    $days[] = [
+                        'day_number' => count($days) + 1,
+                        'title' => $restTitle,
+                        'description' => match($locale) {
+                            'np' => "आज ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
+                            'hi' => "आज ट्रेकिङ नहीं। {$waypointName} में आराम और अनुकूलन।",
+                            'zh' => "今天不徒步。在{$waypointName}休息和适应。",
+                            default => "No trekking today. Rest and acclimatize at {$waypointName}.",
+                        },
+                        'overnight_waypoint_id' => $candidate['id'],
+                        'distance_km' => 0,
+                        'estimated_time_hours' => 0,
+                        'altitude_m' => $candidate['alt'],
+                        'items' => [[
+                            'title' => match($locale) {
+                                'np' => "{$waypointName} मा आराम दिन",
+                                'hi' => "{$waypointName} में आराम दिवस",
+                                'zh' => "在 {$waypointName} 休息日",
+                                default => "Rest Day at {$waypointName}",
+                            },
+                            'description' => match($locale) {
+                                'np' => "{$waypointName} मा आराम र अनुकूलन।",
+                                'hi' => "{$waypointName} में आराम और अनुकूलन।",
+                                'zh' => "在 {$waypointName} 休息和适应。",
+                                default => "Rest and relax at {$waypointName}.",
+                            },
+                            'time_of_day' => 'morning',
+                            'cost' => 0,
+                            'pricing_source' => 'system_estimate',
+                            'pricing_snapshot' => null,
+                            'service_id' => null,
+                            'is_optional' => false,
+                            'metadata' => null,
+                        ]]
+                    ];
+                }
+            }
+            // else: no high-alt candidates → skip padding (better than blind duplicates)
         }
-
-        $restTitle = match($locale) {
-            'hi' => "{$waypointName} में अनुकूलन दिवस",
-            'zh' => "{$waypointName} 适应日",
-            'np' => "{$waypointName} मा अनुकूलन दिन",
-            default => "Acclimatization Day at {$waypointName}",
-        };
-
-        $days[] = [
-            'day_number' => count($days) + 1,
-            'title' => $restTitle,
-            'description' => match($locale) {
-    'np' => "आज ट्रेकिङ छैन। {$waypointName} मा आराम र अनुकूलन।",
-    'hi' => "आज ट्रेकिंग नहीं। {$waypointName} में आराम और अनुकूलन।",
-    'zh' => "今天不徒步。在{$waypointName}休息和适应。",
-    default => "No trekking today. Rest and acclimatize at {$waypointName}.",
-},
-            'overnight_waypoint_id' => $waypointId,
-            'distance_km' => 0,
-            'estimated_time_hours' => 0,
-            'altitude_m' => $altitude,
-                        'items' => [
-                [
-                                                            'title' => match($locale) {
-                        'np' => "{$waypointName} मा आराम दिन",
-                        'hi' => "{$waypointName} में आराम दिवस",
-                        'zh' => "在 {$waypointName} 休息日",
-                        default => "Rest Day at {$waypointName}",
-                    },
-                    'description' => match($locale) {
-                        'np' => "{$waypointName} मा आराम र अनुकूलन।",
-                        'hi' => "{$waypointName} में आराम और अनुकूलन।",
-                        'zh' => "在 {$waypointName} 休息和适应。",
-                        default => "Rest and relax at {$waypointName}.",
-                    },
-                    'time_of_day' => 'morning',
-                    'cost' => 0,
-                    'pricing_source' => 'system_estimate',
-                    'pricing_snapshot' => null,
-                    'service_id' => null,
-                    'is_optional' => false,
-                    'metadata' => null,
-                ]
-            ]
-        ];
-        $restDaysAdded++;
-    }
 
     while (count($days) < $requestedDays) {
         $dayNumber = count($days) + 1;
