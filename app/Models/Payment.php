@@ -21,12 +21,20 @@ class Payment extends Model
         'status',
         'metadata',
         'paid_at',
+        // PHASE 7B — Manual verification fields
+        'reference_number',
+        'receipt_image_path',
+        'admin_note',
+        'verified_by',
+        'verified_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'metadata' => 'array',
         'paid_at' => 'datetime',
+        // PHASE 7B
+        'verified_at' => 'datetime',
     ];
 
     // Relationships

@@ -214,6 +214,14 @@ class Provider extends Model
 {
     return $this->hasMany(ProviderStyle::class, 'provider_id');
 }
+
+    /**
+     * PHASE 7B — Provider's own payment methods (Layer 2 display for travelers).
+     */
+    public function paymentMethods()
+    {
+        return $this->hasMany(\App\Models\ProviderPaymentMethod::class, 'provider_id');
+    }
 public function supportsStyle(string $styleSlug): bool
 {
     return $this->styles()->where('style_slug', $styleSlug)->exists();

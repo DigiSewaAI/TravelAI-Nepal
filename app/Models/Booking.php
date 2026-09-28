@@ -30,6 +30,8 @@ class Booking extends Model
         'share_token',
         'share_enabled_at',
         'share_revoked_at',
+        // PHASE 7B — "I've Paid" notification (not a payment record)
+        'payment_notice_sent_at',
     ];
 
     protected $casts = [
@@ -39,6 +41,8 @@ class Booking extends Model
         // NEW casts for share timestamps
         'share_enabled_at' => 'datetime',
         'share_revoked_at' => 'datetime',
+        // PHASE 7B
+        'payment_notice_sent_at' => 'datetime',
     ];
 
     // =============================================
