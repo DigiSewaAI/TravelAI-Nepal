@@ -34,7 +34,7 @@ class SubscriptionController extends Controller
 
     /**
      * Store a new subscription (plan selection).
-     * 
+     *
      * 🧪 LOCAL: Activates immediately (payment bypassed)
      * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
@@ -94,8 +94,8 @@ class SubscriptionController extends Controller
                 'plan_id' => $plan->id,
                 'status' => 'pending',
                 'billing_interval' => $billingInterval,
-                'start_date' => null,
-                'end_date' => null,
+                'start_date' => now(),  // PHASE 7C-FIX: NOT NULL constraint — set tentative start
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
             ]);
 
             // For free plans, activate immediately even in production
@@ -119,7 +119,7 @@ class SubscriptionController extends Controller
     /**
      * Upgrade to a different plan.
      * Cancels current subscription and creates a new one.
-     * 
+     *
      * 🧪 LOCAL: Activates immediately (payment bypassed)
      * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
@@ -187,8 +187,8 @@ class SubscriptionController extends Controller
                 'plan_id' => $plan->id,
                 'status' => 'pending',
                 'billing_interval' => $billingInterval,
-                'start_date' => null,
-                'end_date' => null,
+                'start_date' => now(),  // PHASE 7C-FIX: NOT NULL constraint — set tentative start
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
             ]);
 
             // For free plans, activate immediately even in production
@@ -238,7 +238,7 @@ class SubscriptionController extends Controller
 
     /**
      * Resume a cancelled subscription (reactivate).
-     * 
+     *
      * 🧪 LOCAL: Activates immediately (payment bypassed)
      * 🔒 PRODUCTION: Creates pending subscription & redirects to payment
      */
@@ -305,8 +305,8 @@ class SubscriptionController extends Controller
                 'plan_id' => $plan->id,
                 'status' => 'pending',
                 'billing_interval' => $billingInterval,
-                'start_date' => null,
-                'end_date' => null,
+                'start_date' => now(),  // PHASE 7C-FIX: NOT NULL constraint
+                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
             ]);
 
             return redirect()->route('provider.payments.show', $newSubscription->id)
