@@ -130,7 +130,8 @@ class Phase1Test extends TestCase
             'longitude' => 84.001,
         ]);
 
-        $score = $service->calculateScore($incident, $waypoint);
+        $result = $service->calculateScore($incident, $waypoint);
+        $score = $result['score'] ?? 0;
         $status = $service->scoreToStatus($score);
 
         $this->assertIsFloat($score);
