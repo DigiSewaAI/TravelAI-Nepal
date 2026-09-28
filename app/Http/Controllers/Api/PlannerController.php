@@ -53,8 +53,21 @@ $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
             $paddingAdded  = max(0, $requestedDays - $routeDataDays);
             $notice        = null;
             if ($paddingAdded > 0) {
-                $notice = "This route has {$routeDataDays} verified trekking days. " .
-                          "You requested {$requestedDays} — {$paddingAdded} rest day(s) were added to fill the itinerary.";
+                // Category-aware unit from destination (safe — no relation dependency)
+                $destination = strtolower((string) $request->input('destination', ''));
+                $unit = match (true) {
+                    str_contains($destination, 'trek')                                          => 'trekking days',
+                    str_contains($destination, 'tour')                                          => 'tour days',
+                    str_contains($destination, 'hotel') || str_contains($destination, 'stay')   => 'hotel nights',
+                    str_contains($destination, 'transport') || str_contains($destination, 'transfer')
+                                                                                                 => 'transport legs',
+                    str_contains($destination, 'activity')                                       => 'activity days',
+                    str_contains($destination, 'experience')                                     => 'experience days',
+                    default                                                                       => 'route days',
+                };
+
+                $notice = "This route has {$routeDataDays} verified {$unit}. " .
+                          "{$paddingAdded} rest day(s) added to match your {$requestedDays}-day trip length.";
             }
 
             return response()->json([
