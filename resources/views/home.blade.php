@@ -826,7 +826,10 @@ html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_num
         const data = await response.json();
 
         if (data.success && data.data && data.data.days) {
-          document.getElementById('itineraryResult').innerHTML = renderItinerary(
+          const noticeHtml = data.data.notice
+            ? '<div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-3 mb-3 rounded text-sm"><i class="fas fa-info-circle mr-1"></i> ' + data.data.notice + '</div>'
+            : '';
+          document.getElementById('itineraryResult').innerHTML = noticeHtml + renderItinerary(
             data.data.days,
             data.data.total_cost,
             data.data.breakdown,

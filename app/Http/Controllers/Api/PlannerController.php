@@ -46,10 +46,22 @@ class PlannerController extends Controller
 $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
     ->enrichCollection($result['days'], $locale);
 
+            // PHASE-5G-PADDING: honest banner for auto-added rest days
+            $meta          = $result['metadata'] ?? [];
+            $routeDataDays = (int) ($meta['route_data_days'] ?? 0);
+            $requestedDays = (int) ($meta['requested_days'] ?? $request->input('days'));
+            $paddingAdded  = max(0, $requestedDays - $routeDataDays);
+            $notice        = null;
+            if ($paddingAdded > 0) {
+                $notice = "This route has {$routeDataDays} verified trekking days. " .
+                          "You requested {$requestedDays} — {$paddingAdded} rest day(s) were added to fill the itinerary.";
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'days' => $result['days'],
+                    'notice' => $notice,
                     'total_cost' => $result['total_cost'],
                     'breakdown' => $result['breakdown'] ?? [],
                     'currency' => 'NPR',
