@@ -89,6 +89,7 @@
             @include('provider.services._fields_hotel', ['service' => $service])
             @include('provider.services._fields_activity', ['service' => $service])
             @include('provider.services._fields_experience', ['service' => $service])
+            @include('provider.services._fields_transport', ['service' => $service])
         </div>
 
         <div class="mt-6 flex gap-3">

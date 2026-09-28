@@ -15,6 +15,7 @@ use App\Models\TourDetail;
 use App\Models\HotelDetail;
 use App\Models\ActivityDetail;
 use App\Models\ExperienceDetail;
+use App\Models\TransportDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -200,6 +201,23 @@ class ServiceController extends Controller
             'activity', 'experience' => $request->validate([
                 'max_pax' => 'nullable|integer|min:1',
             ]),
+            'transport' => $request->validate([
+                'transport_type'    => 'required|in:bus,jeep,car,van,flight,heli',
+                'from_location_id'  => 'required|exists:locations,id',
+                'to_location_id'    => 'required|exists:locations,id',
+                'departure_time'    => 'nullable|date_format:H:i',
+                'duration_minutes'  => 'required|integer|min:1',
+                'price_per_person'  => 'required|numeric|min:0',
+                'price_per_vehicle' => 'nullable|numeric|min:0',
+                'total_seats'       => 'required|integer|min:1',
+                'private_shared'    => 'required|in:private,shared',
+                'booking_type'      => 'nullable|in:instant,on-request',
+                'ac_available'      => 'nullable|boolean',
+                'driver_included'   => 'nullable|boolean',
+                'fuel_included'     => 'nullable|boolean',
+                'cancellation_policy' => 'nullable|string',
+                'description'       => 'nullable|string',
+            ]),
             default => [],
         };
     }
@@ -215,12 +233,20 @@ class ServiceController extends Controller
             ));
         }
 
+        // Normalize transport booleans (checkbox unchecked = not sent)
+        if ($slug === 'transport') {
+            $data['ac_available']    = !empty($data['ac_available']);
+            $data['driver_included'] = !empty($data['driver_included']);
+            $data['fuel_included']   = !empty($data['fuel_included']);
+        }
+
         match ($slug) {
             'trek'       => TrekDetail::updateOrCreate(['service_id' => $service->id], $data),
             'tour'       => TourDetail::updateOrCreate(['service_id' => $service->id], $data),
             'hotel'      => HotelDetail::updateOrCreate(['service_id' => $service->id], $data),
             'activity'   => ActivityDetail::updateOrCreate(['service_id' => $service->id], $data),
             'experience' => ExperienceDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'transport'  => TransportDetail::updateOrCreate(['service_id' => $service->id], $data),
             default      => null,
         };
     }
