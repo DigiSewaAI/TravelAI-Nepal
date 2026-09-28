@@ -209,7 +209,7 @@ class ServiceController extends Controller
                 'to_location_id'    => 'required|exists:locations,id',
                 'departure_time'    => 'nullable|date_format:H:i,H:i:s',
                 'duration_hours'    => 'required|numeric|min:0.25',
-                'price_per_person'  => 'required|numeric|min:0',
+                'price_per_person'  => 'nullable|numeric|min:0',
                 'price_per_vehicle' => 'nullable|numeric|min:0',
                 'total_seats'       => 'required|integer|min:1',
                 'private_shared'    => 'required|in:private,shared',
