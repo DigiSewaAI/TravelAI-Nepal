@@ -208,7 +208,7 @@ class ServiceController extends Controller
                 'from_location_id'  => 'required|exists:locations,id',
                 'to_location_id'    => 'required|exists:locations,id',
                 'departure_time'    => 'nullable|date_format:H:i,H:i:s',
-                'duration_minutes'  => 'required|integer|min:1',
+                'duration_hours'    => 'required|numeric|min:0.25',
                 'price_per_person'  => 'required|numeric|min:0',
                 'price_per_vehicle' => 'nullable|numeric|min:0',
                 'total_seats'       => 'required|integer|min:1',
@@ -235,11 +235,16 @@ class ServiceController extends Controller
             ));
         }
 
-        // Normalize transport booleans (checkbox unchecked = not sent)
+        // Normalize transport: booleans + hours→minutes
         if ($slug === 'transport') {
             $data['ac_available']    = !empty($data['ac_available']);
             $data['driver_included'] = !empty($data['driver_included']);
             $data['fuel_included']   = !empty($data['fuel_included']);
+            // Convert form hours to storage minutes
+            if (isset($data['duration_hours'])) {
+                $data['duration_minutes'] = (int) round($data['duration_hours'] * 60);
+                unset($data['duration_hours']);
+            }
         }
 
         match ($slug) {

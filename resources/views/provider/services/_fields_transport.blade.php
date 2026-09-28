@@ -47,10 +47,12 @@
         </div>
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-1">Duration (minutes) *</label>
-            <input type="number" name="duration_minutes" value="{{ old('duration_minutes', $detail?->duration_minutes ?? '') }}" min="0"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('duration_minutes') border-red-500 @enderror">
-            @error('duration_minutes')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+            <label class="block text-gray-700 font-semibold mb-1">Duration (hours) *</label>
+            <input type="number" name="duration_hours" step="0.5" min="0.5"
+                   value="{{ old('duration_hours', $detail?->duration_minutes ? $detail->duration_minutes / 60 : '') }}"
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('duration_hours') border-red-500 @enderror">
+            <p class="text-xs text-gray-400 mt-1">e.g., 6 for 6 hours</p>
+            @error('duration_hours')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
         </div>
     </div>
 

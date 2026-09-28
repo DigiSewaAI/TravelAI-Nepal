@@ -164,7 +164,7 @@
                             <div><span class="text-gray-500">Departure:</span> {{ \Carbon\Carbon::parse($service->transportDetail->departure_time)->format('g:i A') }}</div>
                         @endif
                         @if($service->transportDetail->duration_minutes)
-                            <div><span class="text-gray-500">Duration:</span> {{ $service->transportDetail->duration_minutes }} min</div>
+                            <div><span class="text-gray-500">Duration:</span> {{ rtrim(rtrim(number_format($service->transportDetail->duration_minutes / 60, 1), '0'), '.') }} hours</div>
                         @endif
                         <div><span class="text-gray-500">Seats:</span> {{ $service->transportDetail->total_seats }}</div>
                         <div><span class="text-gray-500">Type:</span> {{ ucfirst($service->transportDetail->private_shared) }}</div>
