@@ -7,6 +7,7 @@ use App\Models\Plan;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
@@ -157,19 +158,22 @@ class SubscriptionController extends Controller
             return back()->with('error', 'You are already on the ' . $plan->name . ' plan.');
         }
 
-        // Cancel current active subscription
-        if ($current) {
-            $current->status = 'cancelled';
-            $current->end_date = now();
-            $current->save();
-        }
+        // RACE FIX (2026-09-29): Cleanup old pending subs to prevent duplicates
+        $provider->subscriptions()
+            ->where('status', 'pending')
+            ->update(['status' => 'cancelled', 'end_date' => now()]);
 
-        // 🌍 Environment check
         $isLocal = app()->environment('local');
 
         if ($isLocal) {
-            // 🧪 LOCAL: Activate immediately without payment
-            $subscription = Subscription::create([
+            // LOCAL: Cancel current + activate new (dev convenience)
+            if ($current) {
+                $current->status = 'cancelled';
+                $current->end_date = now();
+                $current->save();
+            }
+
+            Subscription::create([
                 'provider_id' => $provider->id,
                 'plan_id' => $plan->id,
                 'status' => 'active',
@@ -180,33 +184,47 @@ class SubscriptionController extends Controller
 
             return redirect()->route('provider.subscriptions.index')
                 ->with('success', 'Plan upgraded to ' . $plan->name . ' successfully!');
-        } else {
-            // 🔒 PRODUCTION: Create pending, redirect to payment
-            $subscription = Subscription::create([
-                'provider_id' => $provider->id,
-                'plan_id' => $plan->id,
-                'status' => 'pending',
-                'billing_interval' => $billingInterval,
-                'start_date' => now(),  // PHASE 7C-FIX: NOT NULL constraint — set tentative start
-                'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
-            ]);
-
-            // For free plans, activate immediately even in production
-            $isFree = $plan->isFree();
-
-            if ($isFree) {
-                $subscription->status = 'active';
-                $subscription->start_date = now();
-                $subscription->end_date = now()->addYear();
-                $subscription->save();
-
-                return redirect()->route('provider.subscriptions.index')
-                    ->with('success', 'Plan upgraded to ' . $plan->name . ' (Free) successfully!');
-            }
-
-            return redirect()->route('provider.payments.show', $subscription->id)
-                ->with('info', 'Please complete the payment to activate your new plan.');
         }
+
+        // PRODUCTION
+        $isFree = $plan->isFree();
+
+        if ($isFree) {
+            // FREE plan: Cancel current + activate new (atomic transaction)
+            DB::transaction(function () use ($current, $provider, $plan, $billingInterval) {
+                if ($current) {
+                    $current->status = 'cancelled';
+                    $current->end_date = now();
+                    $current->save();
+                }
+
+                Subscription::create([
+                    'provider_id' => $provider->id,
+                    'plan_id' => $plan->id,
+                    'status' => 'active',
+                    'billing_interval' => $billingInterval,
+                    'start_date' => now(),
+                    'end_date' => now()->addYear(),
+                ]);
+            });
+
+            return redirect()->route('provider.subscriptions.index')
+                ->with('success', 'Plan upgraded to ' . $plan->name . ' (Free) successfully!');
+        }
+
+        // PAID plan: Do NOT cancel current — approve() will handle after payment verified
+        // RACE FIX: Provider keeps current plan if payment fails/abandoned
+        $subscription = Subscription::create([
+            'provider_id' => $provider->id,
+            'plan_id' => $plan->id,
+            'status' => 'pending',
+            'billing_interval' => $billingInterval,
+            'start_date' => now(),
+            'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
+        ]);
+
+        return redirect()->route('provider.payments.show', $subscription->id)
+            ->with('info', 'Please complete the payment to activate your new plan.');
     }
 
     /**
