@@ -2984,3 +2984,117 @@ All 14 sub-phases (7A → 7H) closed. Payment ecosystem production-ready.
 - 11+ commits
 - 2 major milestones
 = Production-ready payment + transport ecosystem
+---
+
+## 2026-09-29 Final — Payment + Transport + E1 Complete
+
+### Payment System — 100% Complete
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer / eSewa / Khalti
+- Manual admin verify queue (7D)
+- Auto-invoice + 4 email notifications (7G)
+- Refund reminder + mark-refunded (E1-Refund)
+
+**Layer 2 (Provider ↔ Traveler):**
+- Provider self-config (7 methods)
+- Traveler display (region-aware + i18n)
+- "I've Paid" notification (no payment record)
+
+### Transport — 100% Complete
+
+- Model (TransportDetail) + migration
+- Provider form (_fields_transport.blade.php)
+- Public display (i18n)
+- AI Planner integration
+- Booking flow (proven — Booking #69)
+
+### E1 — Public Planner Accuracy
+
+**New:**
+- `app/Services/AI/AiValidationService.php`
+- Narrative prompt injection (VERIFIED PLACES)
+- Post-narrative validation (log only)
+
+**Impact:**
+- Zero hallucination (EBC test)
+- Real places only
+- 4 locales (EN/NP/HI/ZH)
+
+### Budget Fix — Session-Aware
+
+**Changed:**
+- Controller: session-currency → NPR
+- PlannerService: removed × 133 (R5 exception)
+- Blade: session-aware label
+- i18n: budget_npr key
+
+### Admin Reject — Verified
+
+**Flow:**
+- Queue → Reject button → Modal (with reminder)
+- Reason required (min 10 chars)
+- Subscription auto-cancelled
+- Refund reminder (metadata flag)
+
+### Provider Access Discovery
+
+**After reject:**
+- Login/dashboard = OK
+- Old services = OK
+- New services = free-tier limits
+- Premium features = blocked
+- Refund = manual
+
+### Files Changed (Extended Session)
+
+**E1 (3):**
+- app/Services/AI/AiValidationService.php (NEW)
+- app/Services/AI/PlannerNarrativeService.php
+- app/Http/Controllers/Api/PlannerController.php
+
+**Budget (7):**
+- app/Http/Controllers/Api/PlannerController.php
+- app/Services/PlannerService.php (R5 exception)
+- resources/views/home.blade.php
+- resources/lang/{en,np,hi,zh}/messages.php
+
+**Reject + Refund (7):**
+- app/Http/Controllers/Admin/PaymentController.php
+- routes/web.php
+- resources/views/admin/payments/verify.blade.php
+- resources/views/layouts/admin.blade.php (@stack fix)
+- resources/lang/{en,np,hi,zh}/messages.php
+
+### Suite Status
+
+- 44 passed / 0 failed (115 assertions)
+
+### New Tickets (LOW, Deferred)
+
+- PAYMENT-REFUND-WORKFLOW-DOC-01
+- ADMIN-REJECT-REASON-PRESETS-01
+- PAYMENT-REFUND-TRACKING-01
+- REVENUE-STAT-CLARITY-01
+- PAYMENT-ID-MANUAL-GEN-01
+
+### Next Session Priority
+
+**Morning (~4 hrs):**
+1. SECURITY-GMAIL-ROTATE-01 verify
+2. i18n batch
+3. Phase 6 (Deploy prep)
+
+**Afternoon:**
+4. Remaining tickets
+5. Deploy checklist
+
+**Day After:**
+6. Deploy
+
+### Historic Session
+
+- 15+ commits
+- 12+ tickets closed
+- 6+ major milestones (Phase 7 + Transport + E1 + Budget + Reject + Refund)
+- 1 real bug caught by testing

@@ -1273,4 +1273,127 @@ text
 - ✅ QR / Safety / SOS / JourneyReplay
 - ✅ All Seeders (locks preserved)
 - ✅ Backups intact
+---
+
+## Phase Ledger Update — 2026-09-29 (Final)
+
+### Current HEAD
+7e25949 — feat(admin): refund reminder + mark-refunded action (Phase E1-Refund)
+
+text
+
+### Session Timeline (2026-09-29)
+
+| Time | Phase | Commit | Status |
+|------|-------|--------|--------|
+| Morning | 7E.2b | 62203ee | ✅ |
+| Morning | 7E.3 | 92d7d61 | ✅ |
+| Morning | Race fix | 2b81696 | ✅ |
+| Morning | Pricing fix | a9c4bfe | ✅ |
+| Morning | 7F docs | 9213ccc | ✅ |
+| Afternoon | 7G | d7c5bc5 | ✅ |
+| Afternoon | Transport P3-C | bc33288 | ✅ |
+| Afternoon | i18n public footer | 77a3125 | ✅ |
+| Afternoon | i18n blade cleanup | 3e6812f | ✅ |
+| Afternoon | Session docs | 48b1c51 | ✅ |
+| Evening | E1 | cecec95 | ✅ |
+| Evening | Budget fix | 60ab504 | ✅ |
+| Evening | @stack fix | 5fa218d | ✅ |
+| Evening | Refund reminder | 7e25949 | ✅ |
+
+### Milestones Closed
+✅ Phase 7 (Payment) — 14 sub-phases
+✅ Transport — full feature (95% pre-built)
+✅ E1 — public planner accuracy
+✅ Budget fix — session-aware NPR
+✅ Admin reject — runtime verified
+✅ Refund reminder — metadata-based
+
+text
+
+### Tickets — Status
+
+**Closed today:**
+✅ 7E.1-RUNTIME-JSON-01
+✅ PROVIDER-SIDEBAR-LINK-01
+✅ PM-COPY-TOOLTIP-01
+✅ CANCEL-CONFIRMATION-01
+✅ PLAN-CHANGE-RACE-CONDITION-01
+✅ JUNK-FILES-CLEANUP-01
+✅ PRICING-STRIPE-MENTION-01
+✅ ADMIN-REJECT-TEST-01
+✅ ADMIN-REJECT-JS-NOT-LOADED-01 (real bug)
+✅ ADMIN-REFUND-REMINDER-01
+✅ E1 (narrative validation)
+✅ PLANNER-BUDGET-CURRENCY-01
+
+text
+
+**Open — deferred:**
+🚨 SECURITY-GMAIL-ROTATE-01 (verify tomorrow — FIRST)
+🟡 TRANSPORT-DATA-BACKFILL-01 (185 services, post-deploy)
+🟢 PAYMENT-REFUND-WORKFLOW-DOC-01
+🟢 ADMIN-REJECT-REASON-PRESETS-01
+🟢 PAYMENT-REFUND-TRACKING-01
+🟢 REVENUE-STAT-CLARITY-01
+🟢 PAYMENT-ID-MANUAL-GEN-01
+🟢 PM-MODAL-DYNAMIC-FIELDS-01
+🟢 PM-MODAL-FIELD-HINTS-01
+🟢 PM-PAYPAL-NEPAL-GUIDANCE-01
+🟢 PLAN-CHANGE-PRO-RATED-REFUND-01
+
+text
+
+### Tomorrow's Priority
+Morning Block (~4 hrs):
+
+SECURITY-GMAIL-ROTATE-01 verify (FIRST!)
+
+i18n batch (~30 min — LOW tickets)
+
+Phase 6 (Deploy prep, ~3 hrs)
+
+Afternoon:
+
+Remaining tickets
+
+Deploy checklist review
+
+Day After:
+
+Deploy (Phase 8)
+
+text
+
+### Payment Architecture — FINAL
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer + eSewa + Khalti
+- Manual admin verify (7D)
+- Auto-invoice + email (7G)
+- Refund reminder (E1-Refund)
+
+**Layer 2 (Provider ↔ Traveler):**
+- 7 methods (self-config)
+- Traveler display + notify
+- "I've Paid" notification only
+
+### Transport — COMPLETE
+
+- Model + Form + Controller
+- Public display + i18n
+- AI Planner integration
+- Booking flow proven
+
+### Protected Systems — Verified Intact
+
+- ✅ PlannerService (R5 exception: 5 lines bug fix)
+- ✅ Booking status transitions
+- ✅ QR / Safety / SOS / JourneyReplay
+- ✅ All Seeders (locks preserved)
+- ✅ Backups intact
+
+### ETA to Deploy
+~3 दिन (unchanged — realistic)
+
 

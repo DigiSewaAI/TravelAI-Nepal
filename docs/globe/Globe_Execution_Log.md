@@ -1816,3 +1816,103 @@ Protected systems: Zero diff
 - Working tree: clean
 - Session: CLOSED
 - Next: E1 (Home AI) + Phase 6 (Deploy prep)
+---
+
+## 2026-09-29 — Extended Session (E1 + Budget + Reject + Refund)
+
+### Commits (Extended Session)
+
+| Hash | Phase | Message |
+|------|-------|---------|
+| cecec95 | E1 | feat(ai): public planner narrative validation + prompt injection |
+| 60ab504 | E1-Budget | fix(planner): session-aware currency budget + NPR-native warnings |
+| 5fa218d | 7D-fix | fix(admin): add @stack('scripts') to admin layout (reject modal) |
+| 7e25949 | E1-Refund | feat(admin): refund reminder + mark-refunded action |
+
+### Items Closed
+
+| Item | Status | Notes |
+|------|--------|-------|
+| E1 — narrative validation | ✅ | AiValidationService + prompt injection |
+| PLANNER-BUDGET-CURRENCY-01 | ✅ | Session-aware currency + NPR-native |
+| ADMIN-REJECT-TEST-01 | ✅ | Full flow verified (browser + DB) |
+| ADMIN-REFUND-REMINDER-01 | ✅ | Metadata-based (no migration) |
+
+### Real Bugs Caught + Fixed
+
+**🔴 ADMIN-REJECT-JS-NOT-LOADED-01**
+- Issue: `@stack('scripts')` missing in `layouts/admin.blade.php`
+- Impact: Reject modal JS never loaded → `openReject()` undefined
+- Root cause: 7D shipped `@push('scripts')` but layout lacked stack
+- Fix: Added `@stack('scripts')` before `</body>` (5fa218d)
+- Caught by: Runtime test (R18) — would have shipped broken otherwise
+
+### E1 — Public Planner Accuracy
+
+**New:**
+- `app/Services/AI/AiValidationService.php`
+  - 717 verified places (waypoint cache)
+  - Place candidate extraction (capitalized words)
+  - Levenshtein ≤ 2 fuzzy match
+
+**Modified:**
+- `app/Services/AI/PlannerNarrativeService.php`
+  - Prompt injection: VERIFIED PLACES section
+  - Post-narrative validation (log only, non-blocking)
+- `app/Http/Controllers/Api/PlannerController.php`
+  - Pass routeName to narrative service
+
+**Impact:**
+- Zero hallucination (EBC 14-day verified)
+- Real places only (Lukla → Kala Patthar)
+- Multi-language (EN/NP/HI/ZH)
+
+### Budget Fix — Session-Aware Currency
+
+**Fixed:**
+- `Api\PlannerController`: session-currency → NPR conversion (CurrencyService)
+- `PlannerService`: removed × 133 hardcoded (R5 exception, 5 lines)
+- `PlannerService`: NPR-native warnings (4 locales)
+- `home.blade.php`: session-aware label
+- i18n: budget_npr key (4 locales)
+
+**R5 Exception:** 5 lines (bug fix nature, not feature)
+
+**Verified:**
+- EN: "149% over your budget of NPR 20000"
+- NP: "NPR 50000 बजेट भन्दा 74% बढी छ"
+- ZH: (no warning — under budget, correct)
+
+### Refund Reminder — Metadata-Based
+
+**Design:**
+- No migration (metadata JSON field)
+- Modal reminder: "Rejection does NOT refund automatically"
+- Recent Activity: "Refund pending" + [Mark Refunded] button
+- Metadata: refund_reminder, refund_reminded_at, refund_marked_at
+
+**Verified:**
+- Modal reminder visible (yellow box)
+- Activity shows pending + button
+- Mark refunded → green checkmark
+- Metadata: 3 fields set correctly
+
+### Tests
+
+- Suite: 44 passed / 0 failed (115 assertions)
+- Browser tests: EBC/API/Gosaikunda planner, refund flow
+- DB verify: 5 audit fields + subscription cancel
+
+### Session Summary
+
+- Total session: ~12 hrs
+- Commits today: 15+ (across all sessions)
+- Items closed: 4 (extended) + 6 (earlier Phase 7 + Transport)
+- Real bugs caught: 1 (@stack)
+
+### Session End
+
+- HEAD: 7e25949
+- Working tree: clean
+- Session: CLOSED
+- Next: Gmail rotation verify + i18n batch + Phase 6 (Deploy prep)
