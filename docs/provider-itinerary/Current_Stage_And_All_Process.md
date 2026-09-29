@@ -2811,3 +2811,93 @@ Target:
 **Evening Block (2 hrs):**
 8. Remaining tickets (ADMIN-REJECT-TEST-01, etc.)
 9. Session log append
+---
+
+## 2026-09-29 — Phase 7 COMPLETE (Payment System Live)
+
+### What Was Completed Today
+
+**7E.2b — Traveler Payment Display Polish:**
+- Desktop (lg+): 🇳🇵 Domestic + 🌍 International side-by-side
+- Mobile: vertical stack
+- Copy tooltip added (title + aria-label)
+- i18n key: traveler_payment_copy_btn (4 locales)
+
+**7E.3 — Cancel Confirmation:**
+- onsubmit="return confirm(...)" on cancel form
+- i18n key: cancel_subscription_confirm (4 locales)
+- Prevents accidental subscription cancel
+
+**Race Fix (PLAN-CHANGE-RACE-CONDITION-01):**
+- Problem: upgrade() cancelled current sub BEFORE payment verified
+- Fix: Production path no longer cancels; approve() handles after payment
+- DB transaction for Free plan path
+- Pending cleanup (prevents duplicates)
+- Regression test: PlanChangeRaceConditionTest (2 tests)
+
+**Pricing Stripe Fix (PRICING-STRIPE-MENTION-01):**
+- Removed Stripe from 3 i18n keys × 4 locales:
+  - secure_payment_text
+  - gdpr_section6_text
+  - faq_a2
+- Blade file was clean (translations-only fix)
+
+### Architecture — FINAL
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer, eSewa, Khalti
+- Manual admin verify (7D queue)
+
+**Layer 2 (Provider ↔ Traveler):**
+- Domestic: bank, eSewa, Khalti, cash
+- International: PayPal, Wise, international bank
+- Provider self-config
+- "I've Paid" = notify only (no payment record)
+
+### Critical Files Changed Today
+app/Http/Controllers/Provider/SubscriptionController.php (race fix)
+app/Http/Controllers/Admin/PaymentController.php (unchanged - already correct)
+app/Http/Controllers/Traveler/BookingController.php (7E.2 - was earlier)
+tests/Feature/Subscription/PlanChangeRaceConditionTest.php (NEW)
+resources/lang/{en,np,hi,zh}/messages.php (pricing + 7E.2b + 7E.3)
+resources/views/traveler/bookings/show.blade.php (7E.2b)
+resources/views/provider/subscriptions/index.blade.php (7E.3)
+
+text
+
+### Next Session Priority
+
+**Morning Block (~3 hrs):**
+1. 7G — Notifications + Invoice PDF (dompdf)
+   - Payment verified → provider email
+   - Subscription expiring (7 days) → email
+   - Subscription expired → email
+   - Invoice auto-generate + download
+   - PROVIDER-BOOKING-NOTIFICATION-01 (booking → provider)
+
+**Mid-day Block (~30 min):**
+2. 7H — Legacy Stripe data migration
+   - 7 payments (keep historical)
+   - 5 subscriptions (migrate status)
+   - Stripe webhook events (archive)
+
+**Afternoon Block (~4 hrs):**
+3. Transport P2 — Discovery (READ-ONLY)
+4. Transport P3 — V1 Build (migration + model + form + public display)
+
+**Evening:**
+5. Session append
+6. Deploy prep
+
+### Phase 7 Ticket Summary
+
+**Closed today (7):**
+- 7E.1-RUNTIME-JSON-01
+- PROVIDER-SIDEBAR-LINK-01
+- PM-COPY-TOOLTIP-01
+- CANCEL-CONFIRMATION-01
+- PLAN-CHANGE-RACE-CONDITION-01
+- JUNK-FILES-CLEANUP-01
+- PRICING-STRIPE-MENTION-01
+
+**Open (7):** see Globe_Master_File.md

@@ -1107,4 +1107,83 @@ text
 - ✅ QR / Safety / SOS / JourneyReplay
 - ✅ All Seeders (locks preserved)
 - ✅ Backups intact
+---
+
+## Phase Ledger Update — 2026-09-29 (Phase 7 COMPLETE)
+
+### Current HEAD
+a9c4bfe — fix(i18n): remove Stripe mentions from pricing (Phase 7A cleanup)
+
+text
+
+### Phase 7 — COMPLETE ✅
+
+| Sub-Phase | Status | Commit |
+|-----------|--------|--------|
+| 7A — Stripe removal | ✅ | 943093f |
+| 7B — Migrations + models | ✅ | 21fcd48 |
+| 7C — Provider subscription UI | ✅ | af9617e |
+| 7D — Admin verify queue | ✅ | 9272936 |
+| 7E.1 — Provider settings | ✅ | 54d2530 |
+| 7E.1b — Sidebar link | ✅ | 54d2530 |
+| 7E.2 — Traveler display | ✅ | 8dee6b0 |
+| 7E.2b — Side-by-side + tooltip | ✅ | 62203ee |
+| 7E.3 — Cancel confirmation | ✅ | 92d7d61 |
+| Race fix | ✅ | 2b81696 |
+| Pricing Stripe fix | ✅ | a9c4bfe |
+| **7F — Regression** | ✅ **PASS (44p/0f)** | — |
+
+### Payment Architecture — LOCKED
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer (NIC Asia)
+- eSewa
+- Khalti
+- Manual admin verify (7D queue)
+
+**Layer 2 (Provider ↔ Traveler):**
+- Domestic: bank, eSewa, Khalti, cash
+- International: PayPal, Wise, international bank
+- Provider self-config
+- Display-only (no platform processing)
+- "I've Paid" = notification only (no payment record)
+
+### Tickets Closed Today (7)
+✅ 7E.1-RUNTIME-JSON-01
+✅ PROVIDER-SIDEBAR-LINK-01
+✅ PM-COPY-TOOLTIP-01
+✅ CANCEL-CONFIRMATION-01
+✅ PLAN-CHANGE-RACE-CONDITION-01
+✅ JUNK-FILES-CLEANUP-01
+✅ PRICING-STRIPE-MENTION-01
+
+text
+
+### Tickets Open (deferred)
+🟢 PM-MODAL-DYNAMIC-FIELDS-01 LOW post-deploy
+🟢 PM-MODAL-FIELD-HINTS-01 LOW post-deploy
+🟢 PM-PAYPAL-NEPAL-GUIDANCE-01 LOW post-deploy
+🟢 SIDEBAR-EMOJI-MOJIBAKE-01 LOW i18n batch
+🟢 PLAN-CHANGE-PRO-RATED-REFUND-01 LOW post-MVP
+🟡 ADMIN-REJECT-TEST-01 MED before deploy
+🟡 PROVIDER-BOOKING-NOTIFICATION-01 MED 7G scope
+
+text
+
+### Next Phases
+7G — Notifications + Invoice (email + dompdf + hooks) ~3 hrs
+7H — Legacy Stripe data migration ~30 min
+Transport P2 — Discovery (READ-ONLY) ~30 min
+Transport P3 — V1 Build ~3-4 hrs
+Deploy prep + final regression
+
+text
+
+### Protected Systems — Verified Intact
+
+- ✅ PlannerService (R5)
+- ✅ Booking status transitions
+- ✅ QR / Safety / SOS / JourneyReplay
+- ✅ All Seeders (locks preserved)
+- ✅ Backups intact
 
