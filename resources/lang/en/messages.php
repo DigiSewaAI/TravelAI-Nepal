@@ -1083,6 +1083,7 @@ return [
     'explore_more_adventures' => 'Explore more adventures & services',
     'safety'                  => 'Safety',
     'travel_safety'           => 'Travel Safety',
+    'budget_npr' => 'Budget (NPR)',
 // ======================
 // TREKS
 // ======================

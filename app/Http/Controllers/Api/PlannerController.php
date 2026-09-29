@@ -40,7 +40,23 @@ class PlannerController extends Controller
             ]);
 
             // ✅ session बाट लिइएको locale पास गर्ने
-           $result = $this->planner->generate($request->all(), $locale);
+           // PHASE E1-BUDGET: Convert session-currency budget → NPR
+           $input = $request->all();
+           $sessionCurrency = session('display_currency', 'USD');
+
+           if ($sessionCurrency === 'USD') {
+               $currencyService = app(\App\Services\CurrencyService::class);
+               $input['budget'] = (int) round(
+                   $currencyService->convert(
+                       (float) $request->input('budget'),
+                       'USD',
+                       'NPR'
+                   )
+               );
+           }
+           // Else: budget already NPR — pass as-is
+
+           $result = $this->planner->generate($input, $locale);
 
 // PHASE 5B: LLM narrative enrichment (R5 SAFE — PlannerService untouched)
 $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)

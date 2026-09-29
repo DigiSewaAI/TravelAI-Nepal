@@ -273,7 +273,9 @@
               <input type="number" name="days" id="days" min="1" max="30" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
             <div>
-              <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.budget_usd') }} *</label>
+                            <label class="block text-gray-700 font-semibold mb-1">
+                {{ session('display_currency', 'USD') === 'USD' ? __('messages.budget_usd') : __('messages.budget_npr') }} *
+              </label>
               <input type="number" name="budget" id="budget" min="100" required placeholder="{{ __('messages.budget_placeholder') }}" class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
             <div>

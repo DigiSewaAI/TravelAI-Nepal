@@ -412,7 +412,8 @@ $perDayServiceCosts[$key] = [
             $finalBreakdown = array_merge($breakdown, $perDayServiceCosts);
 
             // BUDGET WARNING
-            $budgetNpr = $input['budget'] * 133;
+            // PHASE E1-BUDGET: input is NPR-native (converted by controller)
+            $budgetNpr = (float) $input['budget'];
             if ($input['budget'] > 0 && $totalCost > $budgetNpr) {
                 $overPercent = (($totalCost - $budgetNpr) / $budgetNpr) * 100;
                 if ($overPercent > 10) {
@@ -430,10 +431,10 @@ $perDayServiceCosts[$key] = [
                         'is_mandatory' => false,
                         'provider_name' => 'System',
                         'message' => match($locale) {
-                            'np' => "अनुमानित लागत तपाईंको \${$input['budget']} USD बजेट भन्दा {$overPctRounded}% बढी छ। कृपया बजेट बढाउनुहोस् वा किफायती शैली छान्नुहोस्।",
-                            'hi' => "अनुमानित लागत आपके \${$input['budget']} USD बजट से {$overPctRounded}% अधिक है। कृपया बजट बढ़ाएँ या अधिक किफायती शैली चुनें।",
-                            'zh' => "预计费用超出您 \${$input['budget']} USD 预算 {$overPctRounded}%。请考虑增加预算或选择更经济的旅行方式。",
-                            default => "Estimated cost is {$overPctRounded}% over your budget of \${$input['budget']} USD. Consider increasing your budget or choosing a more affordable style.",
+                            'np' => "अनुमानित लागत तपाईंको NPR {$input['budget']} बजेट भन्दा {$overPctRounded}% बढी छ। कृपया बजेट बढाउनुहोस् वा किफायती शैली छान्नुहोस्।",
+                            'hi' => "अनुमानित लागत आपके NPR {$input['budget']} बजट से {$overPctRounded}% अधिक है। कृपया बजट बढ़ाएँ या अधिक किफायती शैली चुनें।",
+                            'zh' => "预计费用超出您 NPR {$input['budget']} 预算 {$overPctRounded}%。请考虑增加预算或选择更经济的旅行方式。",
+                            default => "Estimated cost is {$overPctRounded}% over your budget of NPR {$input['budget']}. Consider increasing your budget or choosing a more affordable style.",
                         },
                     ];
                     Log::info("⚠️ Budget warning added: {$overPercent}% over budget");

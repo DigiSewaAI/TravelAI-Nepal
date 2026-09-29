@@ -1073,6 +1073,7 @@ return [
     'explore_more_adventures' => '探索更多精彩服务',
     'safety'                  => '安全',
     'travel_safety'           => '旅行安全',
+        'budget_npr' => '预算（NPR）',
 // ======================
 // TREKS
 // ======================
