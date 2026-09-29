@@ -17,19 +17,23 @@ use Illuminate\Support\Facades\Log;
  */
 class PlannerNarrativeService
 {
-    public function __construct(protected LlmService $llm) {}
+    public function __construct(
+        protected LlmService $llm,
+        protected AiValidationService $validator,
+    ) {}
 
     /**
      * Enrich a Collection of ItineraryDay models with LLM narratives.
      */
-    public function enrichCollection(Collection $days, string $locale = 'en'): Collection
+    public function enrichCollection(Collection $days, string $locale = 'en', ?string $routeName = null): Collection
     {
         if ($days->isEmpty() || !$this->isEnabled()) {
             return $days;
         }
 
         try {
-            $prompt = $this->buildPrompt($days, $locale);
+            $routePlaces = $this->validator->extractPlacesFromTitles($days);
+            $prompt      = $this->buildPrompt($days, $locale, $routePlaces);
             $result = $this->llm->generateItineraryParallel(
                 prompt:      $prompt,
                 locale:      $locale,
@@ -45,6 +49,15 @@ class PlannerNarrativeService
             }
 
             $this->applyNarratives($days, $narratives);
+
+            // E1: post-narrative place validation (log only, non-blocking)
+            try {
+                $this->validateNarratives($days, $routeName);
+            } catch (\Throwable $e) {
+                Log::warning('E1: Narrative validation failed (non-blocking)', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             Log::info('PlannerNarrativeService: enrichment applied', [
                 'days_count' => $days->count(),
@@ -72,7 +85,7 @@ class PlannerNarrativeService
         return (int) min(max($dayCount * 130, 800), 6000);
     }
 
-    protected function buildPrompt(Collection $days, string $locale): string
+    protected function buildPrompt(Collection $days, string $locale, array $routePlaces = []): string
     {
         $dayLines = '';
         foreach ($days as $day) {
@@ -97,12 +110,25 @@ class PlannerNarrativeService
             default => 'Write ALL descriptions in English.',
         };
 
+        $verifiedPlacesBlock = '';
+        if (!empty($routePlaces)) {
+            $list = implode(', ', $routePlaces);
+            $verifiedPlacesBlock = <<<BLOCK
+
+VERIFIED PLACES (you may ONLY mention these in descriptions):
+{$list}
+
+If unsure about a place name, use generic terms like "the trail", "the region", "the village" instead of inventing names.
+BLOCK;
+        }
+
         return <<<PROMPT
 You are a Nepal trekking narrative expert. Rewrite the day-by-day
 descriptions for the itinerary below.
 
 ITINERARY (Day | From→To | altitude | distance | time):
 {$dayLines}
+{$verifiedPlacesBlock}
 
 RULES (STRICT):
 1. Return ONE JSON object: {"days": [{ "day_number": N, "description": "..." }, ...]}
@@ -116,6 +142,33 @@ RULES (STRICT):
 
 Now generate the JSON.
 PROMPT;
+    }
+
+    /**
+     * E1: Validate narratives for hallucinated place names (log only).
+     */
+    protected function validateNarratives(Collection $days, ?string $routeName): void
+    {
+        $allText = $days->pluck('description')->filter()->implode(' ');
+        if (trim($allText) === '') {
+            return;
+        }
+
+        $candidates = $this->validator->extractPlaceCandidates($allText);
+        if (empty($candidates)) {
+            return;
+        }
+
+        $unknowns = $this->validator->findUnknownPlaces($candidates);
+
+        if (!empty($unknowns)) {
+            Log::info('E1: Narrative place validation', [
+                'route'          => $routeName ?? 'unknown',
+                'days_count'     => $days->count(),
+                'unknown_count'  => count($unknowns),
+                'unknown_sample' => array_slice($unknowns, 0, 3),
+            ]);
+        }
     }
 
     /**

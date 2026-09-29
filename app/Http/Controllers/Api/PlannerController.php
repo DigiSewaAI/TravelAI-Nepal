@@ -44,7 +44,7 @@ class PlannerController extends Controller
 
 // PHASE 5B: LLM narrative enrichment (R5 SAFE — PlannerService untouched)
 $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
-    ->enrichCollection($result['days'], $locale);
+    ->enrichCollection($result['days'], $locale, $request->input('destination'));
 
             // PHASE-5G-PADDING: honest banner for auto-added rest days
             $meta          = $result['metadata'] ?? [];
