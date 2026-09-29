@@ -115,7 +115,7 @@
                     @elseif($service->tourDetail)
                         <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
                     @elseif($service->transportDetail && $service->transportDetail->price_per_vehicle)
-                        <span class="text-sm font-normal text-gray-500">/ vehicle</span>
+                        <span class="text-sm font-normal text-gray-500">/ {{ __('messages.vehicle') }}</span>
                     @else
                         <span class="text-sm font-normal text-gray-500">/ {{ __('messages.person') }}</span>
                     @endif
@@ -158,7 +158,7 @@
                     <h3 class="font-semibold text-gray-700">{{ __('messages.transport_details') }}</h3>
                     <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
                         <div><span class="text-gray-500">{{ __('messages.transport_type') }}:</span> {{ __('messages.transport_' . $service->transportDetail->transport_type) }}</div>
-                        <div><span class="text-gray-500">{{ __('messages.from') }}:</span> {{ $service->transportDetail->fromLocation->city ?? '—' }}</div>
+                        <div><span class="text-gray-500">{{ __('messages.transport_from') }}:</span> {{ $service->transportDetail->fromLocation->city ?? '—' }}</div>
                         <div><span class="text-gray-500">{{ __('messages.transport_to') }}:</span> {{ $service->transportDetail->toLocation->city ?? '—' }}</div>
                         @if($service->transportDetail->departure_time)
                             <div><span class="text-gray-500">{{ __('messages.departure') }}:</span> {{ \Carbon\Carbon::parse($service->transportDetail->departure_time)->format('g:i A') }}</div>
@@ -519,13 +519,13 @@
             <div class="text-center mb-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-[11px] font-bold uppercase tracking-wider mb-3">
                     <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                    You May Also Like
+                    {{ __('messages.you_may_also_like') }}
                 </div>
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
                     {{ __('messages.related_services') }}
                 </h2>
                 <p class="text-sm text-gray-500 mt-2">
-                    Explore more adventures & services
+                    {{ __('messages.explore_more_adventures') }}
                 </p>
             </div>
 
