@@ -1103,6 +1103,13 @@ return [
     'transport_heli'         => 'हेलिकप्टर',
     'transport_private'      => 'निजी',
     'transport_shared'       => 'साझा',
+        // PHASE P3-C-FIX — i18n cleanup bundle
+    'transport_from'          => 'बाट',
+    'vehicle'                 => 'सवारी',
+    'you_may_also_like'       => 'तपाईंलाई यो पनि मन पर्न सक्छ',
+    'explore_more_adventures' => 'थप रोमाञ्चक सेवाहरू अन्वेषण गर्नुहोस्',
+    'safety'                  => 'सुरक्षा',
+    'travel_safety'           => 'यात्रा सुरक्षा',
     // Safety Page - Search & Weather
 'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, र नेपाल भर यात्रीहरूको लागि लाइव घटना ट्र्याकिङ।',
 'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',

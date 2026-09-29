@@ -1076,6 +1076,13 @@ return [
     'transport_heli'         => 'Helicopter',
     'transport_private'      => 'Private',
     'transport_shared'       => 'Shared',
+        // PHASE P3-C-FIX — i18n cleanup bundle
+    'transport_from'          => 'From',
+    'vehicle'                 => 'vehicle',
+    'you_may_also_like'       => 'You May Also Like',
+    'explore_more_adventures' => 'Explore more adventures & services',
+    'safety'                  => 'Safety',
+    'travel_safety'           => 'Travel Safety',
 // ======================
 // TREKS
 // ======================

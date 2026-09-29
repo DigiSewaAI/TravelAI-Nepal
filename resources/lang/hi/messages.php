@@ -1067,6 +1067,13 @@ return [
     'transport_heli'         => 'हेलिकॉप्टर',
     'transport_private'      => 'निजी',
     'transport_shared'       => 'साझा',
+        // PHASE P3-C-FIX — i18n cleanup bundle
+    'transport_from'          => 'से',
+    'vehicle'                 => 'वाहन',
+    'you_may_also_like'       => 'आपको यह भी पसंद आ सकता है',
+    'explore_more_adventures' => 'और रोमांचक सेवाएं खोजें',
+    'safety'                  => 'सुरक्षा',
+    'travel_safety'           => 'यात्रा सुरक्षा',
 // ======================
 // TREKS
 // ======================

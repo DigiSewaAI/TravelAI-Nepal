@@ -1066,6 +1066,13 @@ return [
     'transport_heli'         => '直升机',
     'transport_private'      => '私人',
     'transport_shared'       => '共享',
+        // PHASE P3-C-FIX — i18n cleanup bundle
+    'transport_from'          => '起点',
+    'vehicle'                 => '车',
+    'you_may_also_like'       => '您可能还喜欢',
+    'explore_more_adventures' => '探索更多精彩服务',
+    'safety'                  => '安全',
+    'travel_safety'           => '旅行安全',
 // ======================
 // TREKS
 // ======================
