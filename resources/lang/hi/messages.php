@@ -623,6 +623,7 @@ return [
     'traveler_payment_identifier'         => 'पहचानकर्ता',
     'traveler_payment_bank_name'          => 'बैंक',
     'traveler_payment_swift'              => 'SWIFT / BIC',
+        'traveler_payment_copy_btn'           => 'कॉपी करें',
         'duration_days' => 'अवधि (दिन)',
     'max_pax' => 'अधिकतम व्यक्ति',
     'room_count' => 'कमरों की संख्या',

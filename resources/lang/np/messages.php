@@ -656,6 +656,7 @@ return [
     'traveler_payment_identifier'         => 'पहिचान',
     'traveler_payment_bank_name'          => 'बैंक',
     'traveler_payment_swift'              => 'SWIFT / BIC',
+        'traveler_payment_copy_btn'           => 'प्रतिलिपि गर्नुहोस्',
         'duration_days' => 'अवधि (दिन)',
     'max_pax' => 'अधिकतम व्यक्ति',
     'room_count' => 'कोठा संख्या',

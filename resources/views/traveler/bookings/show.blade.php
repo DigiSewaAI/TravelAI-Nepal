@@ -76,16 +76,17 @@
                     </p>
                 </div>
 
+                <div class="grid lg:grid-cols-2 gap-4 lg:gap-6">
                 @foreach([
                     ['methods' => $domesticMethods, 'flag' => '🇳🇵', 'label' => __('messages.traveler_payment_domestic_badge')],
                     ['methods' => $internationalMethods, 'flag' => '🌍', 'label' => __('messages.traveler_payment_international_badge')],
                 ] as $group)
                     @if($group['methods']->isNotEmpty())
-                        <div class="mb-4">
-                            <h4 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                                 <span>{{ $group['flag'] }}</span> {{ $group['label'] }}
                             </h4>
-                            <div class="grid md:grid-cols-2 gap-3">
+                            <div class="grid gap-3">
                                 @foreach($group['methods'] as $method)
                                     @php
                                         $icon = $typeIcons[$method->type] ?? ['fas', 'credit-card'];
@@ -125,6 +126,8 @@
                                                 <button type="button"
                                                         data-copy-value="{{ $cv['value'] }}"
                                                         onclick="pmCopy(this)"
+                                                        title="{{ __('messages.traveler_payment_copy_btn') }}"
+                                                        aria-label="{{ __('messages.traveler_payment_copy_btn') }}"
                                                         class="ml-2 p-1.5 text-blue-600 hover:bg-blue-100 rounded text-xs shrink-0">
                                                     <i class="fas fa-copy"></i>
                                                 </button>
@@ -153,7 +156,7 @@
                         </div>
                     @endif
                 @endforeach
-
+                </div>
                 <div class="mt-4 pt-4 border-t">
                     @if($booking->payment_notice_sent_at === null)
                         <form method="POST" action="{{ route('traveler.bookings.notifyPayment', $booking) }}">

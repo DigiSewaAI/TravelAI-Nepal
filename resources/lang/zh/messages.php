@@ -592,6 +592,7 @@ return [
     'traveler_payment_identifier'         => '标识符',
     'traveler_payment_bank_name'          => '银行',
     'traveler_payment_swift'              => 'SWIFT / BIC',
+        'traveler_payment_copy_btn'           => '复制',
         'duration_days' => '时长（天）',
     'max_pax' => '最多人数',
     'room_count' => '房间数量',

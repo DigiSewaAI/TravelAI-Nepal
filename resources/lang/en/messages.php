@@ -596,6 +596,7 @@ return [
     'traveler_payment_identifier'         => 'Identifier',
     'traveler_payment_bank_name'          => 'Bank',
     'traveler_payment_swift'              => 'SWIFT / BIC',
+        'traveler_payment_copy_btn'           => 'Copy',
         'duration_days' => 'Duration (days)',
     'max_pax' => 'Max Pax',
     'room_count' => 'Room Count',
