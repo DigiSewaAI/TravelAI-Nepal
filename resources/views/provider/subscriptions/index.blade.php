@@ -8,7 +8,7 @@
     <!-- Current Plan -->
     <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ __('messages.current_plan') }}</h2>
-        
+
         @if($currentSubscription)
             <div class="flex justify-between items-center">
                 <div>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold 
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
                         @if($currentSubscription->status === 'active') bg-green-100 text-green-800
                         @elseif($currentSubscription->status === 'cancelled') bg-red-100 text-red-800
                         @else bg-gray-100 text-gray-800 @endif">
@@ -40,7 +40,8 @@
             </div>
             @if($currentSubscription->status === 'active')
                 <div class="mt-4">
-                    <form method="POST" action="{{ route('provider.subscriptions.cancel') }}">
+                    <form method="POST" action="{{ route('provider.subscriptions.cancel') }}"
+                          onsubmit="return confirm('{{ __('messages.cancel_subscription_confirm') }}')">
                         @csrf
                         <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
                             <i class="fas fa-times-circle mr-1"></i> {{ __('messages.cancel_subscription_btn') }}
@@ -73,7 +74,7 @@
                             <span class="text-lg font-bold text-gray-800">{{ __('messages.custom') }}</span>
                         @endif
                     </div>
-                    
+
                     <!-- Features -->
                     <ul class="mt-3 space-y-1 text-sm text-gray-600">
                         @php $features = $plan->features ?? []; @endphp

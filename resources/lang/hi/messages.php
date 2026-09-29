@@ -624,6 +624,7 @@ return [
     'traveler_payment_bank_name'          => 'बैंक',
     'traveler_payment_swift'              => 'SWIFT / BIC',
         'traveler_payment_copy_btn'           => 'कॉपी करें',
+            'cancel_subscription_confirm' => 'क्या आप वाकई अपनी सदस्यता रद्द करना चाहते हैं? इसे पूर्ववत नहीं किया जा सकता।',
         'duration_days' => 'अवधि (दिन)',
     'max_pax' => 'अधिकतम व्यक्ति',
     'room_count' => 'कमरों की संख्या',

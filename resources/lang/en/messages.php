@@ -597,6 +597,7 @@ return [
     'traveler_payment_bank_name'          => 'Bank',
     'traveler_payment_swift'              => 'SWIFT / BIC',
         'traveler_payment_copy_btn'           => 'Copy',
+            'cancel_subscription_confirm' => 'Are you sure you want to cancel your subscription? This cannot be undone.',
         'duration_days' => 'Duration (days)',
     'max_pax' => 'Max Pax',
     'room_count' => 'Room Count',

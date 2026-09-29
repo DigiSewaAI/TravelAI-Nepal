@@ -593,6 +593,7 @@ return [
     'traveler_payment_bank_name'          => '银行',
     'traveler_payment_swift'              => 'SWIFT / BIC',
         'traveler_payment_copy_btn'           => '复制',
+            'cancel_subscription_confirm' => '您确定要取消订阅吗？此操作无法撤销。',
         'duration_days' => '时长（天）',
     'max_pax' => '最多人数',
     'room_count' => '房间数量',
