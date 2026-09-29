@@ -1747,3 +1747,72 @@ Protected systems: Zero diff
 - Working tree: clean (untracked artifacts only)
 - Session: CLOSED
 - Next: Phase 7G (notifications + invoice) + 7H (legacy Stripe) + Transport P2/P3
+---
+
+## 2026-09-29 — Phase 7 + Transport COMPLETE (Session 5)
+
+### Commits (Today)
+
+| Hash | Phase | Message |
+|------|-------|---------|
+| 62203ee | 7E.2b | feat(payment): side-by-side payment layout + copy tooltip |
+| 92d7d61 | 7E.3 | feat(provider): add cancel subscription confirmation |
+| 2b81696 | Race | fix(subscription): defer cancellation until payment verified + regression test |
+| a9c4bfe | Pricing | fix(i18n): remove Stripe mentions from pricing (Phase 7A cleanup) |
+| 9213ccc | Docs | chore(docs): session log 2026-09-29 (Phase 7 COMPLETE) |
+| d7c5bc5 | 7G | feat(payment): notifications + invoice automation (Phase 7G) |
+| bc33288 | P3-C | feat(public): transport display i18n + eager load (Transport P3-C) |
+| 77a3125 | i18n | fix(i18n): public footer travel safety translation |
+| 3e6812f | i18n | fix(i18n): blade wrap cleanup — provider sidebar + service show |
+
+### Phase 7 — FULLY CLOSED
+
+| Sub-Phase | Status |
+|-----------|--------|
+| 7A — Stripe removal | ✅ |
+| 7B — Migrations + models | ✅ |
+| 7C — Provider subscription UI | ✅ |
+| 7D — Admin verify queue | ✅ |
+| 7E.1 — Provider settings | ✅ |
+| 7E.1b — Sidebar link | ✅ |
+| 7E.2 — Traveler display | ✅ |
+| 7E.2b — Side-by-side + tooltip | ✅ |
+| 7E.3 — Cancel confirmation | ✅ |
+| Race fix | ✅ |
+| Pricing Stripe fix | ✅ |
+| 7F — Full regression | ✅ |
+| 7G — Notifications + invoice | ✅ |
+| 7H — Legacy data cleanup | ✅ |
+
+### Transport — COMPLETE
+
+- Model + Controller + Form (pre-existing)
+- Public display (pre-existing) + i18n (added P3-C)
+- AI Planner integration (verified)
+- Booking flow (proven — Booking #69)
+
+### i18n Cleanup Bundle
+
+- Transport labels (21 keys × 4 locales)
+- Public footer "Travel Safety" (1 key × 4)
+- Service show wraps (vehicle/from/you_may/explore) (4 keys × 4)
+- Provider sidebar Safety emoji fix
+
+### Bug Fixes
+
+- @json directive → base64 (earlier session)
+- Race condition in upgrade() → defer cancellation (2b81696)
+- 3 orphaned pending stripe payments → failed (data-only)
+
+### Tests
+
+- Suite: 44 passed / 0 failed (115 assertions)
+- Baseline: 42 → 44 (+2 race fix tests)
+- All phase-7 runtime tests PASS
+
+### Session End
+
+- HEAD: 3e6812f
+- Working tree: clean
+- Session: CLOSED
+- Next: E1 (Home AI) + Phase 6 (Deploy prep)

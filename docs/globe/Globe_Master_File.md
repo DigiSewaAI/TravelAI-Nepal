@@ -1186,4 +1186,91 @@ text
 - ✅ QR / Safety / SOS / JourneyReplay
 - ✅ All Seeders (locks preserved)
 - ✅ Backups intact
+---
+
+## Phase Ledger Update — 2026-09-29 (Phase 7 + Transport COMPLETE)
+
+### Current HEAD
+3e6812f — fix(i18n): blade wrap cleanup — provider sidebar + service show (i18n cleanup)
+
+text
+
+### Phase Status
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| 7A — Stripe removal | ✅ | 943093f |
+| 7B — Migrations | ✅ | 21fcd48 |
+| 7C — Provider UI | ✅ | af9617e |
+| 7D — Admin verify | ✅ | 9272936 |
+| 7E.1 — Provider settings | ✅ | 54d2530 |
+| 7E.1b — Sidebar link | ✅ | 54d2530 |
+| 7E.2 — Traveler display | ✅ | 8dee6b0 |
+| 7E.2b — Side-by-side + tooltip | ✅ | 62203ee |
+| 7E.3 — Cancel confirmation | ✅ | 92d7d61 |
+| Race fix | ✅ | 2b81696 |
+| Pricing Stripe cleanup | ✅ | a9c4bfe |
+| 7F — Full regression | ✅ | PASS (44p/0f) |
+| 7G — Notifications + invoice | ✅ | d7c5bc5 |
+| 7H — Legacy data | ✅ | 3 orphaned payments resolved |
+| Transport (P3-C) | ✅ | bc33288 + i18n cleanup 3e6812f |
+| **i18n cleanup bundle** | ✅ | 77a3125 + 3e6812f |
+
+### Payment Architecture — LOCKED
+
+**Layer 1 (TravelAI ↔ Provider):**
+- Bank transfer (NIC Asia)
+- eSewa
+- Khalti
+- Manual admin verify (7D queue)
+- Auto-invoice + email (7G)
+
+**Layer 2 (Provider ↔ Traveler):**
+- Domestic: bank, eSewa, Khalti, cash
+- International: PayPal, Wise, international bank
+- Provider self-config
+- Display-only (no platform processing)
+- "I've Paid" = notification only
+
+### Transport — COMPLETE
+
+- Category: transport (id 5)
+- Provider type: transport-provider (id 9)
+- Services: 186 (existing)
+- transport_details table (19 cols) — 1 filled (185 pending backfill)
+- Public display + i18n + AI Planner integration
+
+### Tickets — OPEN
+🟢 FROM-TRANSLATION-ZH-01 (CLOSED — fixed 3e6812f)
+🟢 TRANSPORT-BLADE-HARDCODED-EN-01 (CLOSED — 77a3125 + 3e6812f)
+🟢 SIDEBAR-EMOJI-MOJIBAKE-01 (CLOSED — 3e6812f)
+🟡 TRANSPORT-DATA-BACKFILL-01 (deferred — post-deploy, 185 services)
+🟢 PM-MODAL-DYNAMIC-FIELDS-01 (post-deploy)
+🟢 PM-MODAL-FIELD-HINTS-01 (post-deploy)
+🟢 PM-PAYPAL-NEPAL-GUIDANCE-01 (post-deploy)
+🟡 ADMIN-REJECT-TEST-01 (MED — before deploy)
+🟢 PLAN-CHANGE-PRO-RATED-REFUND-01 (post-MVP)
+🚨 SECURITY-GMAIL-ROTATE-01 (deferred — SIM pending)
+
+text
+
+### Next Priority
+E1 (Home AI improve) — ~1-2 hrs
+
+Phase 6 (Deploy prep) — ~2-3 hrs
+
+Remaining tickets (ADMIN-REJECT-TEST-01 etc.)
+
+Deploy (Phase 8)
+= ~3-4 days to deploy
+
+text
+
+### Protected Systems — Verified Intact
+
+- ✅ PlannerService (R5)
+- ✅ Booking status transitions
+- ✅ QR / Safety / SOS / JourneyReplay
+- ✅ All Seeders (locks preserved)
+- ✅ Backups intact
 

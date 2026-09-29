@@ -2901,3 +2901,86 @@ text
 - PRICING-STRIPE-MENTION-01
 
 **Open (7):** see Globe_Master_File.md
+---
+
+## 2026-09-29 — Payment + Transport Complete (Session 5)
+
+### Phase 7 (Payment) — 100% COMPLETE
+
+All 14 sub-phases (7A → 7H) closed. Payment ecosystem production-ready.
+
+**Delivered:**
+- Provider subscription UI + cancellation confirm
+- Admin verify queue (approve/reject/receipt)
+- Provider payment methods (CRUD + QR + toggle)
+- Traveler "I've Paid" notify + display
+- Auto invoice + 4 email notifications
+- Race fix (defer cancellation)
+- Legacy Stripe data cleanup
+
+### Transport — 100% COMPLETE
+
+- TransportDetail model + Controller + Form (pre-existing)
+- Public display i18n (P3-C)
+- AI Planner integration (verified)
+- 21 transport i18n keys × 4 locales
+
+### i18n Cleanup Bundle
+
+- Public footer "Travel Safety" → translated (4 locales)
+- Provider sidebar Safety emoji fix (mojibake)
+- Service show blade wraps (vehicle, from, you_may_also_like, explore_more)
+- Chinese 'from' context fix (dedicated transport_from key)
+
+### Files Changed Today
+
+**Payment (14 files):**
+- app/Mail/PaymentNoticeReceivedMail.php
+- app/Mail/PaymentVerifiedMail.php
+- app/Mail/SubscriptionExpiredMail.php
+- app/Mail/SubscriptionExpiringMail.php
+- app/Services/InvoiceService.php
+- app/Http/Controllers/Admin/PaymentController.php
+- app/Http/Controllers/Traveler/BookingController.php
+- app/Jobs/ExpireSubscriptionsJob.php
+- app/Models/Subscription.php
+- database/migrations/2026_09_29_125950_add_expiry_reminder_sent_at_to_subscriptions_table.php
+- resources/views/emails/{4 templates}
+- (7E.3 + 7E.2b additional)
+
+**Transport (6 files):**
+- app/Http/Controllers/Public/ServiceController.php
+- resources/views/public/services/show.blade.php
+- resources/lang/{en,np,hi,zh}/messages.php
+
+**i18n (5 files):**
+- resources/views/layouts/public.blade.php
+- resources/views/layouts/provider.blade.php
+- resources/lang/{en,np,hi,zh}/messages.php
+
+### Suite Status
+
+- 44 passed / 0 failed (115 assertions)
+- Baseline: 42 → 44 (+2 race fix tests)
+
+### Next Session Priority
+
+**Morning Block (~4 hrs):**
+1. E1 — Home AI improve (~1-2 hrs)
+2. ADMIN-REJECT-TEST-01 (15 min)
+3. i18n batch — remaining LOW tickets (~1 hr)
+
+**Afternoon Block (~4 hrs):**
+4. Phase 6 — Deploy prep (~2-3 hrs)
+
+**Day After:**
+5. Remaining tickets
+6. Deploy (Phase 8)
+
+### Historic Day
+
+- Phase 7 (Payment) = 100%
+- Transport = 100%
+- 11+ commits
+- 2 major milestones
+= Production-ready payment + transport ecosystem
