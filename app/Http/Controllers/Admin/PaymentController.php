@@ -214,6 +214,10 @@ class PaymentController extends Controller
                 'admin_note'  => trim($validated['admin_note']),
                 'verified_by' => Auth::id(),
                 'verified_at' => now(),
+                'metadata'    => array_merge($locked->metadata ?? [], [
+                    'refund_reminder'    => true,
+                    'refund_reminded_at' => now()->toIso8601String(),
+                ]),
             ]);
 
             if ($locked->payable_type === Subscription::class) {
@@ -234,6 +238,32 @@ class PaymentController extends Controller
         ]);
 
         return back()->with('success', 'Payment rejected. Provider notified via dashboard.');
+    }
+
+    /**
+     * PHASE E1-REFUND — Mark a rejected payment's refund as completed.
+     * Manual refund (bank) — this is bookkeeping only.
+     */
+    public function markRefunded(Payment $payment)
+    {
+        if ($payment->status !== 'rejected') {
+            return back()->with('error', 'Only rejected payments can be marked as refunded.');
+        }
+
+        $metadata = $payment->metadata ?? [];
+        if (!empty($metadata['refund_marked_at'])) {
+            return back()->with('info', 'Refund already marked as completed.');
+        }
+
+        $metadata['refund_marked_at'] = now()->toIso8601String();
+        $payment->update(['metadata' => $metadata]);
+
+        Log::info('Payment refund marked', [
+            'payment_id' => $payment->id,
+            'marked_by'  => Auth::id(),
+        ]);
+
+        return back()->with('success', 'Refund marked as completed.');
     }
 
     /**

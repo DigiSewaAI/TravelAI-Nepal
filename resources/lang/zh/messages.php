@@ -1074,6 +1074,10 @@ return [
     'safety'                  => '安全',
     'travel_safety'           => '旅行安全',
         'budget_npr' => '预算（NPR）',
+            'admin_refund_reminder_modal'  => '注意：拒绝不会自动退款。如已收到款项，请通过银行手动退款。',
+    'admin_refund_reminder_short'  => '退款待处理',
+    'admin_mark_refunded'          => '标记为已退款',
+    'admin_refund_marked'          => '已标记为退款完成。',
 // ======================
 // TREKS
 // ======================

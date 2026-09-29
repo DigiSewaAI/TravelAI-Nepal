@@ -1075,6 +1075,10 @@ return [
     'safety'                  => 'सुरक्षा',
     'travel_safety'           => 'यात्रा सुरक्षा',
         'budget_npr' => 'बजट (NPR)',
+            'admin_refund_reminder_modal'  => 'नोट: Reject करने पर पैसा स्वतः वापस नहीं होता। यदि पैसा प्राप्त हुआ है तो बैंक से स्वयं वापस भेजें।',
+    'admin_refund_reminder_short'  => 'वापसी बाकी',
+    'admin_mark_refunded'          => 'वापसी चिह्नित करें',
+    'admin_refund_marked'          => 'वापसी चिह्नित की गई।',
 // ======================
 // TREKS
 // ======================

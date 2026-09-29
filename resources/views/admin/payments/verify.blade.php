@@ -206,6 +206,27 @@
                                 @if($a->status === 'rejected' && $a->admin_note)
                                     <p class="text-xs text-red-500 mt-1 truncate">{{ $a->admin_note }}</p>
                                 @endif
+                                @if($a->status === 'rejected')
+                                    @if(!empty($a->metadata['refund_marked_at']))
+                                        <p class="text-xs text-green-600 mt-1">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            {{ __('messages.admin_refund_marked') }}
+                                        </p>
+                                    @elseif(!empty($a->metadata['refund_reminder']))
+                                        <div class="mt-2 flex items-center gap-2 flex-wrap">
+                                            <span class="text-xs text-yellow-700">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                {{ __('messages.admin_refund_reminder_short') }}
+                                            </span>
+                                            <form method="POST" action="{{ route('admin.payments.mark-refunded', $a->id) }}" class="inline">
+                                                @csrf
+                                                <button type="submit" class="text-xs bg-green-600 hover:bg-green-700 text-white rounded px-2 py-0.5">
+                                                    {{ __('messages.admin_mark_refunded') }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                @endif
                             </div>
                         </li>
                     @endforeach
@@ -219,6 +240,12 @@
 <div id="rejectModal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-3">Reject Payment</h3>
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded mb-3">
+            <p class="text-xs text-yellow-800">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                {{ __('messages.admin_refund_reminder_modal') }}
+            </p>
+        </div>
         <form id="rejectForm" method="POST">
             @csrf
             <label class="block text-sm font-semibold text-gray-700 mb-1">

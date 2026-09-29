@@ -1084,6 +1084,10 @@ return [
     'safety'                  => 'Safety',
     'travel_safety'           => 'Travel Safety',
     'budget_npr' => 'Budget (NPR)',
+        'admin_refund_reminder_modal'  => 'Note: Rejection does NOT refund automatically. If funds were received, refund via bank manually.',
+    'admin_refund_reminder_short'  => 'Refund pending',
+    'admin_mark_refunded'          => 'Mark Refunded',
+    'admin_refund_marked'          => 'Refund marked as completed.',
 // ======================
 // TREKS
 // ======================

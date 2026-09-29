@@ -1111,6 +1111,10 @@ return [
     'safety'                  => 'सुरक्षा',
     'travel_safety'           => 'यात्रा सुरक्षा',
         'budget_npr' => 'बजेट (NPR)',
+            'admin_refund_reminder_modal'  => 'नोट: Reject गर्दा पैसा automatic फिर्ता हुँदैन। यदि पैसा आएको छ भने बैंकबाट आफैं फिर्ता पठाउनुहोस्।',
+    'admin_refund_reminder_short'  => 'फिर्ता बाँकी',
+    'admin_mark_refunded'          => 'फिर्ता गरिएको चिन्ह लगाउने',
+    'admin_refund_marked'          => 'फिर्ता गरिएको चिन्ह लगाइयो।',
     // Safety Page - Search & Weather
 'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, र नेपाल भर यात्रीहरूको लागि लाइव घटना ट्र्याकिङ।',
 'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',
