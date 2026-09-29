@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Traveler;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentNoticeReceivedMail;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;  // ✅ PDF Facade
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
@@ -41,6 +44,28 @@ class BookingController extends Controller
         }
 
         $booking->update(['payment_notice_sent_at' => now()]);
+
+        // PHASE 7G — Notify provider (non-blocking)
+        $booking->load('service.provider', 'traveler');
+        $provider = $booking->service?->provider;
+        $recipient = $provider?->contact_email;
+
+        if ($recipient) {
+            try {
+                Mail::to($recipient)->send(new PaymentNoticeReceivedMail($booking));
+            } catch (\Throwable $e) {
+                Log::error('Booking notice email failed', [
+                    'booking_id'  => $booking->id,
+                    'provider_id' => $provider->id,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        } else {
+            Log::warning('Booking notice — no provider email', [
+                'booking_id'  => $booking->id,
+                'provider_id' => $provider?->id,
+            ]);
+        }
 
         return back()->with('success', __('messages.traveler_payment_notified_success'));
     }

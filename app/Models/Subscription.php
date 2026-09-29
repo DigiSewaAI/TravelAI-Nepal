@@ -15,12 +15,14 @@ class Subscription extends Model
         'start_date',
         'end_date',
         'status',
-        'billing_interval', // ✅ New
+        'billing_interval',
+        'expiry_reminder_sent_at',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'datetime',
+        'expiry_reminder_sent_at' => 'datetime',
     ];
 
     // Relationships

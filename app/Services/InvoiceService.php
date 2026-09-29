@@ -7,6 +7,8 @@ use App\Models\Subscription;
 use App\Models\Payment;
 use App\Models\Provider;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoiceMail;
 use Illuminate\Support\Str;
@@ -79,7 +81,7 @@ class InvoiceService
     public function sendInvoiceEmail(Invoice $invoice): void
     {
         $provider = $invoice->provider;
-        $email = $provider->user->email ?? $provider->email;
+        $email = $provider->contact_email ?? ($provider->user->email ?? null);
 
         if ($email) {
             $pdf = $this->generatePdf($invoice);
@@ -95,5 +97,75 @@ class InvoiceService
         $invoice = $this->createFromPayment($payment, $payable);
         $this->sendInvoiceEmail($invoice);
         return $invoice;
+    }
+
+    /**
+     * PHASE 7G — Generate race-safe invoice for a verified subscription.
+     * Used by Admin\PaymentController@approve after payment verification.
+     *
+     * Transaction + lock + retry prevents duplicate invoice numbers
+     * under concurrent verification.
+     */
+    public function generateForSubscription(Subscription $subscription): ?Invoice
+    {
+        $maxAttempts = 3;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                return DB::transaction(function () use ($subscription) {
+                    $year = now()->year;
+
+                    $lastInvoice = Invoice::whereYear('created_at', $year)
+                        ->lockForUpdate()
+                        ->orderBy('invoice_number', 'desc')
+                        ->first();
+
+                    $next = 1;
+                    if ($lastInvoice && preg_match('/INV-\d{4}-(\d+)$/', $lastInvoice->invoice_number, $m)) {
+                        $next = ((int) $m[1]) + 1;
+                    }
+
+                    $invoiceNumber = sprintf('INV-%d-%06d', $year, $next);
+                    $receiptNumber = sprintf('REC-%d-%06d', $year, $next);
+
+                    $amount = (float) ($subscription->plan->price_monthly ?? 0);
+                    $tax = round($amount * 0.13, 2);       // Nepal VAT 13%
+                    $total = round($amount + $tax, 2);
+
+                    return Invoice::create([
+                        'provider_id'     => $subscription->provider_id,
+                        'subscription_id' => $subscription->id,
+                        'booking_id'      => null,
+                        'invoice_number'  => $invoiceNumber,
+                        'receipt_number'  => $receiptNumber,
+                        'amount'          => $amount,
+                        'currency'        => 'NPR',
+                        'tax'             => $tax,
+                        'total'           => $total,
+                        'status'          => 'paid',
+                        'payment_method'  => 'manual_verify',
+                        'paid_at'         => now(),
+                        'due_date'        => null,
+                        'metadata'        => [
+                            'source'    => 'payment_verified',
+                            'plan_slug' => $subscription->plan->slug ?? null,
+                            'plan_name' => $subscription->plan->name ?? null,
+                        ],
+                    ]);
+                });
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($attempt >= $maxAttempts || !str_contains($e->getMessage(), 'invoice_number')) {
+                    Log::error('InvoiceService: generateForSubscription failed', [
+                        'subscription_id' => $subscription->id,
+                        'attempt'         => $attempt,
+                        'error'           => $e->getMessage(),
+                    ]);
+                    return null;
+                }
+                usleep(50000);
+            }
+        }
+
+        return null;
     }
 }

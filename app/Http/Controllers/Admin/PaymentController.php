@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentVerifiedMail;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
@@ -137,6 +140,51 @@ class PaymentController extends Controller
             'payment_id'  => $payment->id,
             'verified_by' => Auth::id(),
         ]);
+
+        // PHASE 7G: Generate invoice + send email (non-blocking)
+        $payment->refresh();
+        if ($payment->payable_type === Subscription::class) {
+            $subscription = Subscription::with(['provider', 'plan'])->find($payment->payable_id);
+
+            if ($subscription && $subscription->provider && $subscription->provider->contact_email) {
+                $invoice = null;
+                $pdf = null;
+
+                // Generate invoice
+                try {
+                    $invoice = app(InvoiceService::class)->generateForSubscription($subscription);
+                } catch (\Throwable $e) {
+                    Log::error('Invoice generation failed', [
+                        'subscription_id' => $subscription->id,
+                        'error'           => $e->getMessage(),
+                    ]);
+                }
+
+                // Generate PDF (if invoice created)
+                if ($invoice) {
+                    try {
+                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.invoices.pdf', ['invoice' => $invoice]);
+                    } catch (\Throwable $e) {
+                        Log::error('Invoice PDF generation failed', [
+                            'invoice_id' => $invoice->id,
+                            'error'      => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                // Send email (fail-safe)
+                try {
+                    Mail::to($subscription->provider->contact_email)
+                        ->send(new PaymentVerifiedMail($payment, $subscription, $invoice, $pdf));
+                } catch (\Throwable $e) {
+                    Log::error('Payment verified email failed', [
+                        'payment_id'      => $payment->id,
+                        'subscription_id' => $subscription->id,
+                        'error'           => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
 
         return back()->with('success', 'Payment approved. Subscription activated.');
     }
