@@ -258,17 +258,19 @@ class ServiceController extends Controller
         public function show($slug)
     {
         $service = Service::with([
-    'provider',
-    'category',
-    'trekDetail',
-    'tourDetail',
-    'hotelDetail',
-    'location',
-    'itineraryDays.items',
-    'itineraryDays.media',
-    'itineraryDays.startWaypoint:id,name,altitude,latitude,longitude',
-    'itineraryDays.endWaypoint:id,name,altitude,latitude,longitude',
-    'itineraryDays.overnightWaypoint:id,name,altitude,latitude,longitude',
+            'provider',
+            'category',
+            'trekDetail',
+            'tourDetail',
+            'hotelDetail',
+            'transportDetail.fromLocation:id,city',
+            'transportDetail.toLocation:id,city',
+            'location',
+            'itineraryDays.items',
+            'itineraryDays.media',
+            'itineraryDays.startWaypoint:id,name,altitude,latitude,longitude',
+            'itineraryDays.endWaypoint:id,name,altitude,latitude,longitude',
+            'itineraryDays.overnightWaypoint:id,name,altitude,latitude,longitude',
     // PROVIDER-ITINERARY-09B-03: Public future scheduled departures
     // - scheduled only, end_date >= today (P2)
     // - reserved seats = SUM(guest_count) for consuming statuses (P3)

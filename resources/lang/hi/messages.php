@@ -1045,7 +1045,28 @@ return [
 'faq_a3' => 'हाँ, मुफ्त योजना हमेशा बुनियादी सुविधाओं के साथ उपलब्ध है। कभी भी अपग्रेड करें।',
 'faq_q4' => 'यदि मैं अपनी योजना की सीमा से अधिक हो जाऊँ तो क्या होगा?',
 'faq_a4' => 'आपको सूचित किया जाएगा और सेवा का उपयोग जारी रखने के लिए उच्च योजना में अपग्रेड कर सकते हैं।',
-
+    // PHASE P3-C — Transport Display
+    'transport_details'      => 'परिवहन विवरण',
+    'transport_type'         => 'प्रकार',
+    'transport_to'           => 'गंतव्य',
+    'transport_duration'     => 'अवधि',
+    'transport_hours'        => 'घंटे',
+    'transport_seats'        => 'सीट',
+    'transport_booking_type' => 'बुकिंग',
+    'transport_ac'           => 'AC',
+    'transport_driver'       => 'चालक',
+    'transport_fuel'         => 'ईंधन',
+    'transport_yes'          => 'हाँ',
+    'transport_included'     => 'शामिल',
+    'transport_cancellation' => 'रद्दीकरण नीति',
+    'transport_bus'          => 'बस',
+    'transport_jeep'         => 'जीप',
+    'transport_car'          => 'कार',
+    'transport_van'          => 'वैन',
+    'transport_flight'       => 'उड़ान',
+    'transport_heli'         => 'हेलिकॉप्टर',
+    'transport_private'      => 'निजी',
+    'transport_shared'       => 'साझा',
 // ======================
 // TREKS
 // ======================

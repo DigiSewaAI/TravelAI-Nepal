@@ -1054,7 +1054,28 @@ return [
 'faq_a3' => 'Yes, the Free plan is always available with basic features. Upgrade anytime.',
 'faq_q4' => 'What happens if I exceed my plan limits?',
 'faq_a4' => "You'll be notified and can upgrade to a higher plan to continue using the service.",
-
+    // PHASE P3-C — Transport Display
+    'transport_details'      => 'Transport Details',
+    'transport_type'         => 'Type',
+    'transport_to'           => 'To',
+    'transport_duration'     => 'Duration',
+    'transport_hours'        => 'hours',
+    'transport_seats'        => 'Seats',
+    'transport_booking_type' => 'Booking',
+    'transport_ac'           => 'AC',
+    'transport_driver'       => 'Driver',
+    'transport_fuel'         => 'Fuel',
+    'transport_yes'          => 'Yes',
+    'transport_included'     => 'Included',
+    'transport_cancellation' => 'Cancellation Policy',
+    'transport_bus'          => 'Bus',
+    'transport_jeep'         => 'Jeep',
+    'transport_car'          => 'Car',
+    'transport_van'          => 'Van',
+    'transport_flight'       => 'Flight',
+    'transport_heli'         => 'Helicopter',
+    'transport_private'      => 'Private',
+    'transport_shared'       => 'Shared',
 // ======================
 // TREKS
 // ======================

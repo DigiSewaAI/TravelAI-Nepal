@@ -1044,7 +1044,28 @@ return [
 'faq_a3' => '是的，免费计划始终可用，提供基本功能。随时升级。',
 'faq_q4' => '如果我超出计划限制会怎样？',
 'faq_a4' => '您将收到通知，并可以升级到更高的计划以继续使用服务。',
-
+    // PHASE P3-C — Transport Display
+    'transport_details'      => '交通详情',
+    'transport_type'         => '类型',
+    'transport_to'           => '终点',
+    'transport_duration'     => '时长',
+    'transport_hours'        => '小时',
+    'transport_seats'        => '座位',
+    'transport_booking_type' => '预订',
+    'transport_ac'           => '空调',
+    'transport_driver'       => '司机',
+    'transport_fuel'         => '燃油',
+    'transport_yes'          => '是',
+    'transport_included'     => '已包含',
+    'transport_cancellation' => '取消政策',
+    'transport_bus'          => '巴士',
+    'transport_jeep'         => '吉普车',
+    'transport_car'          => '汽车',
+    'transport_van'          => '面包车',
+    'transport_flight'       => '航班',
+    'transport_heli'         => '直升机',
+    'transport_private'      => '私人',
+    'transport_shared'       => '共享',
 // ======================
 // TREKS
 // ======================
