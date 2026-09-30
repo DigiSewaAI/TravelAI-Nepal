@@ -1088,6 +1088,22 @@ return [
     'admin_refund_reminder_short'  => 'Refund pending',
     'admin_mark_refunded'          => 'Mark Refunded',
     'admin_refund_marked'          => 'Refund marked as completed.',
+        // Traveler Dashboard (Phase 6)
+    'traveler_memories_title'         => 'My Travel Memories',
+    'traveler_memories_subtitle'      => 'Upload photos & videos from your journey checkpoints.',
+    'traveler_checkpoint_select'      => 'Select a checkpoint...',
+    'traveler_upload_btn'             => 'Upload',
+    'traveler_no_memories'            => 'No memories uploaded yet.',
+    'traveler_delete_memory_confirm'  => 'Delete this memory?',
+    'traveler_replay_title'           => 'My Journey Replay',
+    'traveler_replay_subtitle'        => 'Turn your TravelAI Nepal experiences into a beautiful travel memory.',
+    'traveler_replay_cta'             => 'Relive Your Journey',
+    'traveler_mark_read_btn'          => 'Mark as Read',
+    'traveler_no_safety_alerts'       => 'No safety alerts at this time.',
+    'traveler_view_safety_map'        => 'View Safety Map',
+        'greeting_morning'   => 'Morning',
+    'greeting_afternoon' => 'Afternoon',
+    'greeting_evening'   => 'Evening',
 // ======================
 // TREKS
 // ======================

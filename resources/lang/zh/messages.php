@@ -1078,6 +1078,22 @@ return [
     'admin_refund_reminder_short'  => '退款待处理',
     'admin_mark_refunded'          => '标记为已退款',
     'admin_refund_marked'          => '已标记为退款完成。',
+        // Traveler Dashboard (Phase 6)
+    'traveler_memories_title'         => '我的旅行回忆',
+    'traveler_memories_subtitle'      => '从您的旅程检查点上传照片和视频。',
+    'traveler_checkpoint_select'      => '选择检查点...',
+    'traveler_upload_btn'             => '上传',
+    'traveler_no_memories'            => '尚未上传任何回忆。',
+    'traveler_delete_memory_confirm'  => '删除这条回忆？',
+    'traveler_replay_title'           => '我的旅程回放',
+    'traveler_replay_subtitle'        => '将您的 TravelAI Nepal 体验变成美丽的旅行记忆。',
+    'traveler_replay_cta'             => '重温您的旅程',
+    'traveler_mark_read_btn'          => '标记为已读',
+    'traveler_no_safety_alerts'       => '目前没有安全警报。',
+    'traveler_view_safety_map'        => '查看安全地图',
+        'greeting_morning'   => '早上好',
+    'greeting_afternoon' => '下午好',
+    'greeting_evening'   => '晚上好',
 // ======================
 // TREKS
 // ======================
@@ -1168,7 +1184,7 @@ return [
 // TRAVELER DASHBOARD
 // ======================
 'traveler_dashboard_title' => '我的仪表板 | TravelAI 尼泊尔',
-'traveler_greeting' => '好 :greeting, :name 👋',
+'traveler_greeting' => ':greeting, :name 👋',
 'traveler_ready_for_adventure' => '准备好您的下一次尼泊尔冒险了吗？',
 'plan_with_ai' => '用AI规划',
 'explore_nepal_btn' => '探索尼泊尔',

@@ -1079,6 +1079,22 @@ return [
     'admin_refund_reminder_short'  => 'वापसी बाकी',
     'admin_mark_refunded'          => 'वापसी चिह्नित करें',
     'admin_refund_marked'          => 'वापसी चिह्नित की गई।',
+        // Traveler Dashboard (Phase 6)
+    'traveler_memories_title'         => 'मेरी यात्रा यादें',
+    'traveler_memories_subtitle'      => 'अपनी यात्रा के चेकपॉइंट से फ़ोटो और वीडियो अपलोड करें।',
+    'traveler_checkpoint_select'      => 'एक चेकपॉइंट चुनें...',
+    'traveler_upload_btn'             => 'अपलोड करें',
+    'traveler_no_memories'            => 'अभी तक कोई याद अपलोड नहीं की गई।',
+    'traveler_delete_memory_confirm'  => 'इस याद को हटाएँ?',
+    'traveler_replay_title'           => 'मेरा यात्रा रीप्ले',
+    'traveler_replay_subtitle'        => 'अपने TravelAI Nepal अनुभवों को एक सुंदर यात्रा याद में बदलें।',
+    'traveler_replay_cta'             => 'अपनी यात्रा फिर से देखें',
+    'traveler_mark_read_btn'          => 'पढ़ा हुआ चिह्नित करें',
+    'traveler_no_safety_alerts'       => 'इस समय कोई सुरक्षा चेतावनी नहीं है।',
+    'traveler_view_safety_map'        => 'सुरक्षा मानचित्र देखें',
+        'greeting_morning'   => 'सुप्रभात',
+    'greeting_afternoon' => 'नमस्कार',
+    'greeting_evening'   => 'शुभ संध्या',
 // ======================
 // TREKS
 // ======================
@@ -1168,7 +1184,7 @@ return [
 // TRAVELER DASHBOARD
 // ======================
 'traveler_dashboard_title' => 'मेरा डैशबोर्ड | TravelAI नेपाल',
-'traveler_greeting' => 'गुड :greeting, :name 👋',
+'traveler_greeting' => ':greeting, :name 👋',
 'traveler_ready_for_adventure' => 'अपनी अगली नेपाल यात्रा के लिए तैयार हैं?',
 'plan_with_ai' => 'AI के साथ योजना बनाएं',
 'explore_nepal_btn' => 'नेपाल खोजें',

@@ -10,8 +10,8 @@
         <div class="flex flex-wrap justify-between items-center">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold">
-                    {{ __('messages.traveler_greeting', ['greeting' => $greeting ?? 'Morning', 'name' => Auth::user()->name ?? 'Traveler']) }}
-                </h1>
+    {{ __('messages.traveler_greeting', ['greeting' => __('messages.greeting_' . strtolower($greeting ?? 'morning')), 'name' => Auth::user()->name ?? 'Traveler']) }}
+</h1>
                 <p class="text-blue-100 text-lg mt-1">{{ __('messages.traveler_ready_for_adventure') }}</p>
             </div>
             <div class="flex flex-wrap gap-3 mt-4 md:mt-0">
@@ -48,12 +48,12 @@
         </div>
     </div>
 
-    {{-- ✅ PASSPORT QUICK ACCESS CARD WITH SHARE TOGGLE --}}
+    {{-- &#9989; PASSPORT QUICK ACCESS CARD WITH SHARE TOGGLE --}}
 <div class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-2xl p-6 mb-6 text-white shadow-xl relative overflow-hidden group">
     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div class="flex items-center gap-4">
-            <div class="text-4xl">🎒</div>
+            <div class="text-4xl">&#127890;</div>
             <div>
                 <h3 class="text-xl font-bold">{{ __('messages.passport_card_title') }}</h3>
                 <p class="text-blue-100 text-sm">
@@ -105,7 +105,7 @@
                     <div class="mt-3">
                         <h4 class="text-xl font-semibold text-gray-900">{{ $activeTrip->service->name ?? __('messages.na') }}</h4>
                         <p class="text-sm text-gray-500 mt-1">
-                            <i class="far fa-calendar-alt mr-1"></i> 
+                            <i class="far fa-calendar-alt mr-1"></i>
                             {{ $activeTrip->start_date ? $activeTrip->start_date->format('M d, Y') : __('messages.tbd') }}
                         </p>
                         <div class="flex flex-wrap items-center gap-3 mt-3">
@@ -115,7 +115,7 @@
                             <span class="text-sm text-gray-500">
                                 {{ __('messages.traveler_status_label') }}: <span class="font-medium text-gray-700">{{ ucfirst($activeTrip->status) }}</span>
                             </span>
-                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-auto">
+                            <a href="{{ route('traveler.passport') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-auto">
                                 {{ __('messages.traveler_view_trek_passport') }} <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -126,7 +126,7 @@
                     <i class="fas fa-hiking text-4xl text-gray-300 mb-3"></i>
                     <h3 class="text-lg font-semibold text-gray-700">{{ __('messages.traveler_no_active_trip') }}</h3>
                     <p class="text-sm text-gray-400">{{ __('messages.traveler_no_active_trip_sub') }}</p>
-                    <a href="{{ route('home') }}#ai-planner" class="inline-block mt-3 text-blue-600 hover:underline text-sm">{{ __('messages.traveler_start_planning') }} →</a>
+                    <a href="{{ route('home') }}#ai-planner" class="inline-block mt-3 text-blue-600 hover:underline text-sm">{{ __('messages.traveler_start_planning') }} &rarr;</a>
                 </div>
             @endif
 
@@ -146,7 +146,7 @@
                                 <div>
                                     <p class="font-medium text-gray-800">{{ $booking->service->name ?? __('messages.na') }}</p>
                                     <p class="text-xs text-gray-400">
-                                        <i class="far fa-calendar-alt mr-1"></i> 
+                                        <i class="far fa-calendar-alt mr-1"></i>
                                         {{ $booking->start_date ? $booking->start_date->format('M d, Y') : __('messages.tbd') }}
                                     </p>
                                 </div>
@@ -167,7 +167,7 @@
                                         </a>
                                     @endif
                                     @if($booking->review)
-                                        <span class="text-sm text-green-600">✅ {{ __('messages.traveler_reviewed') }}</span>
+                                        <span class="text-sm text-green-600">&#9989; {{ __('messages.traveler_reviewed') }}</span>
                                     @endif
                                     <a href="{{ route('traveler.bookings.show', $booking->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                         {{ __('messages.view') }} <i class="fas fa-arrow-right ml-1"></i>
@@ -178,13 +178,13 @@
                     </div>
                     @if($bookings->count() > 5)
                         <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_bookings') }} →</a>
+                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_bookings') }} &rarr;</a>
                         </div>
                     @endif
                 @else
                     <p class="text-gray-500 text-center py-6">{{ __('messages.traveler_no_bookings_yet') }}</p>
                     <div class="text-center">
-                        <a href="{{ route('public.services.index') }}" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_explore_services') }} →</a>
+                        <a href="{{ route('public.services.index') }}" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_explore_services') }} &rarr;</a>
                     </div>
                 @endif
             </div>
@@ -204,7 +204,7 @@
                             <div class="border-b pb-2 last:border-0">
                                 <div class="flex justify-between items-start">
                                     <span class="font-medium text-sm text-gray-800">{{ $review->service->name ?? __('messages.na') }}</span>
-                                    <span class="text-yellow-500 text-sm">{{ str_repeat('⭐', $review->rating) }}</span>
+                                    <span class="text-yellow-500 text-sm">{!! str_repeat('&#11088;', $review->rating) !!}</span>
                                 </div>
                                 <p class="text-xs text-gray-500 line-clamp-1">{{ $review->comment ?: __('messages.traveler_no_comment') }}</p>
                             </div>
@@ -212,7 +212,7 @@
                     </div>
                     @if($reviews->count() > 3)
                         <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_reviews') }} →</a>
+                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_reviews') }} &rarr;</a>
                         </div>
                     @endif
                 @else
@@ -232,7 +232,7 @@
                                 <div>
                                     <p class="font-medium text-sm text-gray-800">{{ $scan->booking->service->name ?? __('messages.na') }}</p>
                                     <p class="text-xs text-gray-400">
-                                        <i class="fas fa-map-pin mr-1 text-blue-500"></i> 
+                                        <i class="fas fa-map-pin mr-1 text-blue-500"></i>
                                         {{ $scan->checkpoint_name ?? __('messages.traveler_checkin_default') }}
                                     </p>
                                 </div>
@@ -247,7 +247,7 @@
                     </div>
                     @if($qrScans->count() > 10)
                         <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_history') }} →</a>
+                            <a href="{{ route('traveler.journey-replay') }}" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_history') }} &rarr;</a>
                         </div>
                     @endif
                 @else
@@ -259,7 +259,7 @@
                 @endif
             </div>
 
-            {{-- 🔥 AI Travel Planner (Prominent Card) --}}
+            {{-- &#128293; AI Travel Planner (Prominent Card) --}}
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
@@ -277,30 +277,30 @@
                 </div>
             </div>
 
-            {{-- 📸 My Travel Memories --}}
+            {{-- &#128248; My Travel Memories --}}
 <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
     <div class="flex items-start gap-3">
         <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-images text-green-500 text-xl"></i>
         </div>
         <div class="flex-1">
-            <h4 class="font-semibold text-gray-800">📸 My Travel Memories</h4>
-            <p class="text-xs text-gray-500 mt-0.5">Upload photos & videos from your journey checkpoints.</p>
-            
-            {{-- ✅ Upload Form --}}
+            <h4 class="font-semibold text-gray-800">&#128248; {{ __('messages.traveler_memories_title') }}</h4>
+            <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_memories_subtitle') }}</p>
+
+            {{-- &#9989; Upload Form --}}
             <form id="uploadForm" class="mt-3" enctype="multipart/form-data">
                 @csrf
                 <div class="flex flex-wrap gap-2">
                     <select name="checkpoint" id="checkpointSelect" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2" required>
-                        <option value="">Select a checkpoint...</option>
+                        <option value="">{{ __('messages.traveler_checkpoint_select') }}</option>
                         @foreach($userWaypoints as $wp)
                             <option value="{{ $wp->name }}">{{ $wp->name }}</option>
                         @endforeach
                     </select>
                     <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700" required>
                     <button type="submit" id="uploadBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">
-                        <i class="fas fa-upload"></i> Upload
-                    </button>
+    <i class="fas fa-upload"></i> {{ __('messages.traveler_upload_btn') }}
+</button>
                 </div>
                 <div id="uploadMessage" class="mt-2 text-sm hidden"></div>
             </form>
@@ -325,7 +325,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="id" value="{{ $media->id }}">
-                                <button type="submit" onclick="return confirm('Delete this memory?')" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">×</button>
+                                <button type="submit" onclick="return confirm('{{ __('messages.traveler_delete_memory_confirm') }}')" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
                             </form>
                         </div>
                     @endforeach
@@ -334,30 +334,30 @@
                     <p class="text-xs text-gray-400 mt-2">+{{ $userMedia->count() - 6 }} more</p>
                 @endif
             @else
-                <p class="text-xs text-gray-400 mt-3">No memories uploaded yet.</p>
+                <p class="text-xs text-gray-400 mt-3">{{ __('messages.traveler_no_memories') }}</p>
             @endif
         </div>
     </div>
 </div>
 
-            {{-- 🎬 My Journey Replay (Always Visible) --}}
+            {{-- &#127916; My Journey Replay (Always Visible) --}}
 <div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition group">
     <div class="flex items-start gap-3">
         <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
             <i class="fas fa-film text-2xl"></i>
         </div>
         <div class="flex-1">
-            <h4 class="font-bold text-lg">🎬 My Journey Replay</h4>
-            <p class="text-sm text-purple-100 mt-0.5">Turn your TravelAI Nepal experiences into a beautiful travel memory.</p>
-            <a href="{{ route('traveler.journey-replay') }}" 
+            <h4 class="font-bold text-lg">&#127916; {{ __('messages.traveler_replay_title') }}</h4>
+            <p class="text-sm text-purple-100 mt-0.5">{{ __('messages.traveler_replay_subtitle') }}</p>
+            <a href="{{ route('traveler.journey-replay') }}"
                class="inline-block mt-2 bg-white text-purple-600 hover:bg-gray-100 px-4 py-1.5 rounded-lg text-sm font-semibold transition shadow group-hover:scale-105 transform duration-200">
-                Relive Your Journey →
+                {{ __('messages.traveler_replay_cta') }} &rarr;
             </a>
         </div>
     </div>
 </div>
 
-            {{-- 🔥 Safety Center --}}
+            {{-- &#128293; Safety Center --}}
 <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
     <div class="flex items-start gap-3">
         <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
@@ -378,7 +378,7 @@
             @if(isset($unreadAlerts) && count($unreadAlerts) > 0)
                 <div class="mt-3 space-y-2 max-h-60 overflow-y-auto">
                     @foreach($unreadAlerts as $alert)
-                        <div class="border-l-4 
+                        <div class="border-l-4
                             @if($alert['severity'] === 'critical') border-red-600
                             @elseif($alert['severity'] === 'high') border-orange-500
                             @elseif($alert['severity'] === 'moderate') border-yellow-500
@@ -387,10 +387,10 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="font-medium text-sm">
-                                        @if($alert['severity'] === 'critical') 🔴
-                                        @elseif($alert['severity'] === 'high') 🟠
-                                        @elseif($alert['severity'] === 'moderate') 🟡
-                                        @else 🟢 @endif
+                                        @if($alert['severity'] === 'critical') &#128308;
+                                        @elseif($alert['severity'] === 'high') &#128992;
+                                        @elseif($alert['severity'] === 'moderate') &#128993;
+                                        @else &#128994; @endif
                                         {{ $alert['incident']['title'] ?? $alert['message'] ?? 'Safety Alert' }}
                                     </p>
                                     <p class="text-xs text-gray-600">{{ $alert['message'] }}</p>
@@ -400,7 +400,7 @@
                                 </div>
                                 <form method="POST" action="{{ route('traveler.alert.read', $alert['id']) }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800">Mark as Read</button>
+                                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800">{{ __('messages.traveler_mark_read_btn') }}</button>
                                 </form>
                             </div>
                         </div>
@@ -408,14 +408,14 @@
                 </div>
             @else
                 <div class="text-center py-3">
-                    <p class="text-gray-500 text-sm">✅ No safety alerts at this time.</p>
+                    <p class="text-gray-500 text-sm">&#9989; {{ __('messages.traveler_no_safety_alerts') }}</p>
                 </div>
             @endif
 
             <div class="mt-3">
                 <a href="{{ route('safety.index') }}" class="text-sm text-blue-600 hover:underline">
-                    View Safety Map →
-                </a>
+    {{ __('messages.traveler_view_safety_map') }} &rarr;
+</a>
             </div>
         </div>
     </div>
@@ -444,16 +444,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showMessage('✅ ' + data.message, 'green');
+                showMessage('&#9989; ' + data.message, 'green');
                 setTimeout(() => location.reload(), 1000);
             } else {
-                showMessage('❌ ' + data.message, 'red');
+                showMessage('&#10060; ' + data.message, 'red');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
             }
         })
         .catch(error => {
-            showMessage('❌ Network error', 'red');
+            showMessage('&#10060; Network error', 'red');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-upload"></i> Upload';
         });
