@@ -88,8 +88,19 @@
 @endpush
 
 @section('content')
+@php
+    $safetyI18n = [
+        'mapError' => __('messages.safety_js_map_error'),
+        'noDestinations' => __('messages.safety_js_no_destinations'),
+        'weatherUnavailable' => __('messages.safety_js_weather_unavailable'),
+        'viewArrow' => __('messages.safety_js_view_arrow'),
+        'noResults' => __('messages.safety_js_no_results'),
+        'searchError' => __('messages.safety_js_search_error'),
+        'viewDetails' => __('messages.safety_js_view_details'),
+    ];
+@endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-    
+
     <!-- Page Header with Last Updated -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
@@ -103,10 +114,10 @@
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
             <i class="fas fa-sync-alt text-blue-500 animate-spin-slow"></i>
-            <span>Last updated: {{ now()->format('M d, Y h:i A') }}</span>
+            <span>{{ __('messages.safety_last_updated') }}: {{ now()->translatedFormat('M d, Y h:i A') }}</span>
         </div>
     </div>
-    
+
     <!-- Advanced Summary Cards -->
     @php
         $computedStats = [
@@ -159,7 +170,7 @@
                 <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
                 <div id="searchResults" class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 hidden z-50 max-h-96 overflow-y-auto"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-1.5">Search from 138+ destinations across Nepal</p>
+            <p class="text-xs text-gray-400 mt-1.5">{{ __('messages.safety_search_hint') }}</p>
         </div>
 
         <!-- Weather Snapshot Strip (compact) -->
@@ -193,7 +204,7 @@
     <!-- ========== END NEW SECTION ========== -->
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         <!-- Map Section (Takes 2/3 width) -->
         <div class="lg:col-span-2">
             <div class="glass-card rounded-2xl p-1 shadow-lg border border-gray-200 overflow-hidden relative">
@@ -202,28 +213,29 @@
                         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
                             <i class="fas fa-map-marked-alt text-blue-600"></i> {{ __('messages.safety_map') }}
                         </h2>
-                        <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Live Interactive Map</span>
+                        <span class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ __('messages.safety_map_live') }}</span>
                     </div>
-                    
+
                     <!-- Map Container -->
-                    <div id="safetyMap" class="w-full h-[500px] rounded-xl z-0 border border-gray-200 relative">
+                    <div id="safetyMap" class="w-full h-[500px] rounded-xl z-0 border border-gray-200 relative"
+                         data-i18n='@json($safetyI18n)'>
                         <!-- Loading State -->
                         <div id="mapLoader" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-[1000] flex items-center justify-center rounded-xl">
                             <div class="flex flex-col items-center gap-3">
                                 <i class="fas fa-circle-notch fa-spin text-3xl text-blue-600"></i>
-                                <span class="text-sm font-medium text-gray-600">Loading map data...</span>
+                                <span class="text-sm font-medium text-gray-600">{{ __('messages.safety_map_loading') }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Custom Map Legend -->
                     <div class="absolute bottom-8 right-8 z-[500] bg-white/95 backdrop-blur-md p-3 rounded-xl shadow-lg border border-gray-200 text-xs hidden md:block">
-                        <p class="font-bold text-gray-700 mb-2">Map Legend</p>
+                        <p class="font-bold text-gray-700 mb-2">{{ __('messages.safety_map_legend') }}</p>
                         <div class="space-y-1.5">
-                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> Critical / Avoid</div>
-                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span> High Risk</div>
-                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-400"></span> Caution</div>
-                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Normal</div>
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> {{ __('messages.safety_legend_critical') }}</div>
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span> {{ __('messages.safety_legend_high') }}</div>
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-400"></span> {{ __('messages.safety_legend_caution') }}</div>
+                            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> {{ __('messages.safety_legend_normal') }}</div>
                         </div>
                     </div>
                 </div>
@@ -239,47 +251,59 @@
 
                 <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     @php $hasAreas = false; @endphp
-                    
+
                     @foreach(($affectedWaypoints ?? []) as $wp)
                         @php $hasAreas = true; @endphp
-                        @php 
-                            $status = strtolower($wp->safety_status ?? 'normal');
-                            $badgeColor = match($status) {
-                                'caution' => 'bg-amber-100 text-amber-800 border-amber-200',
-                                'high_risk', 'high' => 'bg-orange-100 text-orange-800 border-orange-200',
-                                'avoid', 'critical' => 'bg-red-100 text-red-800 border-red-200',
+                        @php
+                            $rawStatus = strtolower($wp->safety_status ?? 'normal');
+                            $statusKey = match($rawStatus) {
+                                'high', 'high_risk', 'high risk' => 'status_high_risk',
+                                'critical', 'avoid' => 'status_avoid',
+                                'caution', 'moderate' => 'status_caution',
+                                default => 'status_normal',
+                            };
+                            $badgeColor = match($statusKey) {
+                                'status_caution' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                'status_high_risk' => 'bg-orange-100 text-orange-800 border-orange-200',
+                                'status_avoid' => 'bg-red-100 text-red-800 border-red-200',
                                 default => 'bg-emerald-100 text-emerald-800 border-emerald-200'
                             };
                         @endphp
                         <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-map-pin text-gray-400"></i>
-                                <span class="font-medium text-gray-800 text-sm">{{ $wp->name ?? 'Unknown Location' }}</span>
+                                <span class="font-medium text-gray-800 text-sm">{{ $wp->name ?? __('messages.safety_unknown_location') }}</span>
                             </div>
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border {{ $badgeColor }}">
-                                {{ str_replace('_', ' ', $status) }}
+                                {{ __('messages.' . $statusKey) }}
                             </span>
                         </div>
                     @endforeach
 
                     @foreach(($affectedTreks ?? []) as $trek)
                         @php $hasAreas = true; @endphp
-                        @php 
-                            $status = strtolower($trek->safety_status ?? 'normal');
-                            $badgeColor = match($status) {
-                                'caution' => 'bg-amber-100 text-amber-800 border-amber-200',
-                                'high_risk', 'high' => 'bg-orange-100 text-orange-800 border-orange-200',
-                                'avoid', 'critical' => 'bg-red-100 text-red-800 border-red-200',
+                        @php
+                            $rawStatus = strtolower($trek->safety_status ?? 'normal');
+                            $statusKey = match($rawStatus) {
+                                'high', 'high_risk', 'high risk' => 'status_high_risk',
+                                'critical', 'avoid' => 'status_avoid',
+                                'caution', 'moderate' => 'status_caution',
+                                default => 'status_normal',
+                            };
+                            $badgeColor = match($statusKey) {
+                                'status_caution' => 'bg-amber-100 text-amber-800 border-amber-200',
+                                'status_high_risk' => 'bg-orange-100 text-orange-800 border-orange-200',
+                                'status_avoid' => 'bg-red-100 text-red-800 border-red-200',
                                 default => 'bg-emerald-100 text-emerald-800 border-emerald-200'
                             };
                         @endphp
                         <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                             <div class="flex items-center gap-3">
                                 <i class="fas fa-mountain text-gray-400"></i>
-                                <span class="font-medium text-gray-800 text-sm">{{ $trek->name ?? 'Unknown Trek' }}</span>
+                                <span class="font-medium text-gray-800 text-sm">{{ $trek->name ?? __('messages.safety_unknown_trek') }}</span>
                             </div>
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border {{ $badgeColor }}">
-                                {{ str_replace('_', ' ', $status) }}
+                                {{ __('messages.' . $statusKey) }}
                             </span>
                         </div>
                     @endforeach
@@ -287,7 +311,7 @@
                     @if(!$hasAreas)
                         <div class="text-center py-8 text-gray-500">
                             <i class="fas fa-shield-alt text-3xl text-emerald-400 mb-2"></i>
-                            <p class="text-sm">No areas currently under safety alerts.</p>
+                            <p class="text-sm">{{ __('messages.safety_no_areas') }}</p>
                         </div>
                     @endif
                 </div>
@@ -322,16 +346,16 @@
                     <div class="flex items-start justify-between mb-3">
                         <span class="text-2xl" title="{{ $incident->severity }}">{{ $icon }}</span>
                         <span class="text-xs font-semibold text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200">
-                            {{ $incident->reported_at?->diffForHumans() ?? 'Recently' }}
+                            {{ $incident->reported_at?->diffForHumans() ?? __('messages.safety_recently') }}
                         </span>
                     </div>
-                    
+
                     <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
                         <a href="{{ route('safety.incident', $incident->id) }}" class="hover:text-blue-600 transition-colors">
                             {{ $incident->title }}
                         </a>
                     </h3>
-                    
+
                     <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
                         <i class="fas fa-map-marker-alt text-gray-400"></i>
                         <span class="truncate">{{ $incident->location_name ?? 'Unknown Location' }}</span>
@@ -350,7 +374,7 @@
             @empty
                 <div class="col-span-full glass-card rounded-2xl p-12 text-center border border-dashed border-gray-300">
                     <i class="fas fa-check-circle text-5xl text-emerald-400 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">All Clear!</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('messages.safety_all_clear') }}</h3>
                     <p class="text-gray-500">{{ __('messages.no_active_incidents_reported') ?? 'No active safety incidents reported at this time.' }}</p>
                 </div>
             @endforelse
@@ -364,6 +388,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ---------- i18n strings from data attribute ----------
+        const i18n = JSON.parse(document.getElementById('safetyMap').dataset.i18n);
+
         // ---------- Map ----------
         fetch('{{ route("api.safety.markers") }}')
             .then(response => response.json())
@@ -392,7 +419,7 @@
                             </span>
                             <p class="text-sm text-gray-600 mb-2">${incident.location || ''}</p>
                             <a href="${incident.url}" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800">
-                                View Details &rarr;
+                                ${i18n.viewDetails}
                             </a>
                         </div>
                     `;
@@ -412,7 +439,7 @@
             })
             .catch(error => {
                 console.error('Error loading safety markers:', error);
-                document.getElementById('mapLoader').innerHTML = '<span class="text-red-500 text-sm">Failed to load map data</span>';
+                document.getElementById('mapLoader').innerHTML = '<span class="text-red-500 text-sm">' + i18n.mapError + '</span>';
             });
 
         // ---------- Search: Weather & Safety ----------
@@ -441,7 +468,7 @@
                 })
                 .then(data => {
                     if (!data.found) {
-                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">No destinations found</div>`;
+                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">${i18n.noDestinations}</div>`;
                         resultsContainer.classList.remove('hidden');
                         return;
                     }
@@ -450,7 +477,7 @@
                     if (data.results && data.results.length > 0) {
                         let html = '';
                         data.results.forEach(item => {
-                            const statusBadge = item.safety_status === 'avoid' ? 'bg-red-100 text-red-700' : 
+                            const statusBadge = item.safety_status === 'avoid' ? 'bg-red-100 text-red-700' :
                                                 (item.safety_status === 'high_risk' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700');
                             const statusLabel = item.safety_status ? item.safety_status.toUpperCase() : 'NORMAL';
                             const incidentInfo = item.incident ? `<div class="text-xs text-red-600 mt-1">⚠️ ${item.incident.title}</div>` : '';
@@ -466,13 +493,13 @@
                                                     <span class="text-gray-600 capitalize"><i class="fas fa-cloud"></i> ${item.weather.condition}</span>
                                                     <span class="text-gray-600"><i class="fas fa-tint"></i> ${item.weather.humidity}%</span>
                                                 </div>
-                                            ` : `<div class="text-xs text-gray-400 mt-1">Weather data unavailable</div>`}
+                                            ` : `<div class="text-xs text-gray-400 mt-1">${i18n.weatherUnavailable}</div>`}
                                             <div class="flex items-center gap-2 mt-2">
                                                 <span class="text-xs font-bold px-2 py-0.5 rounded-full ${statusBadge}">${statusLabel}</span>
                                                 ${incidentInfo}
                                             </div>
                                         </div>
-                                        <span class="text-blue-600 text-sm font-medium">View →</span>
+                                        <span class="text-blue-600 text-sm font-medium">${i18n.viewArrow}</span>
                                     </div>
                                 </div>
                             `;
@@ -480,13 +507,13 @@
                         resultsContainer.innerHTML = html;
                         resultsContainer.classList.remove('hidden');
                     } else {
-                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">No results found</div>`;
+                        resultsContainer.innerHTML = `<div class="p-4 text-gray-500 text-sm">${i18n.noResults}</div>`;
                         resultsContainer.classList.remove('hidden');
                     }
                 })
                 .catch(error => {
                     console.error('Search error:', error);
-                    resultsContainer.innerHTML = `<div class="p-4 text-red-500 text-sm">Error searching. Please try again.</div>`;
+                    resultsContainer.innerHTML = `<div class="p-4 text-red-500 text-sm">${i18n.searchError}</div>`;
                     resultsContainer.classList.remove('hidden');
                 });
         }

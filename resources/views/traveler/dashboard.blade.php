@@ -159,7 +159,7 @@
                                 <i class="fas fa-circle text-[6px] mr-1 align-middle"></i> {{ __('messages.traveler_active') }}
                             </span>
                             <span class="text-sm text-gray-500">
-                                {{ __('messages.traveler_status_label') }}: <span class="font-medium text-gray-700">{{ ucfirst($activeTrip->status) }}</span>
+                                {{ __('messages.traveler_status_label') }}: <span class="font-medium text-gray-700">{{ __('messages.' . $activeTrip->status) }}</span>
                             </span>
                             <a href="{{ route('traveler.passport') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium ml-auto">
                                 {{ __('messages.traveler_view_trek_passport') }} <i class="fas fa-arrow-right ml-1"></i>

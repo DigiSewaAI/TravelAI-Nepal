@@ -17,7 +17,7 @@ class Localization
         // 2. यदि Provider Guard ले Login गरेको छ भने Default Nepali राख्ने
         if (auth()->guard('provider')->check()) {
             Log::info('🔍 [Localization Middleware] Provider guard is active');
-            
+
             // यदि Session मा locale छैन भने 'np' सेट गर्ने
             if (!session()->has('locale')) {
                 $locale = 'np';
@@ -29,10 +29,18 @@ class Localization
         } else {
             Log::info('🔍 [Localization Middleware] Provider guard not active, using session locale');
         }
-
         // 3. Laravel को App Locale सेट गर्ने
         app()->setLocale($locale);
-        Log::info('🔍 [Localization Middleware] Step 3: App locale set', ['locale' => $locale]);
+
+        // 3b. Carbon locale mapping (Laravel 'np' → Carbon 'ne')
+        $carbonLocale = match($locale) {
+            'np' => 'ne',      // Nepali
+            'hi' => 'hi',      // Hindi
+            'zh' => 'zh_CN',   // Chinese Simplified
+            default => 'en',
+        };
+        \Carbon\Carbon::setLocale($carbonLocale);
+        Log::info('🔍 [Localization Middleware] Step 3: App+Carbon locale set', ['app' => $locale, 'carbon' => $carbonLocale]);
 
         return $next($request);
     }

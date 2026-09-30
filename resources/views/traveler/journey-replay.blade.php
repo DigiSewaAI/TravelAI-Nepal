@@ -1,12 +1,18 @@
 @extends('layouts.public')
 
-@section('title', 'My Journey Replay - TravelAI Nepal')
+@section('title', __('messages.journey_replay_page_title'))
 
 @push('head')
 <meta name="robots" content="noindex, nofollow">
 @endpush
 
 @section('content')
+@php
+    $trackHero     = app()->getLocale() === 'en' ? 'uppercase tracking-[0.3em]'  : 'tracking-normal';
+    $trackScroll   = app()->getLocale() === 'en' ? 'tracking-[0.2em]'             : 'tracking-normal';
+    $trackLabel    = app()->getLocale() === 'en' ? 'uppercase tracking-[0.2em]'  : 'tracking-normal';
+    $trackChapter  = app()->getLocale() === 'en' ? 'uppercase tracking-[0.15em]' : 'tracking-normal';
+@endphp
 <div class="container mx-auto px-4 py-8 max-w-7xl">
 
     {{-- ===============================================
@@ -17,34 +23,34 @@
         <div class="absolute inset-0 bg-black/10"></div>
 
         <div class="relative z-10 p-8 md:p-12 lg:p-16 text-center">
-            <p class="text-sm uppercase tracking-[0.3em] text-purple-300 mb-3 font-light">✨ My Journey Replay</p>
+            <p class="text-sm {{ $trackHero }} text-purple-100 mb-3 font-medium">✨ {{ __('messages.journey_replay_eyebrow') }}</p>
 
             <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-[1.1] tracking-tight">
                 @if($replayData['has_data'])
-                    {{ $replayData['story'] ? '"A Journey to Remember"' : 'Your Journey. Your Story.' }}
+                    {{ $replayData['story'] ? __('messages.journey_replay_hero_title_story') : __('messages.journey_replay_hero_title_default') }}
                 @else
-                    Your journey is waiting to be written.
+                    {{ __('messages.journey_replay_hero_title_empty') }}
                 @endif
             </h1>
 
             @if($replayData['has_data'])
                 <p class="text-lg md:text-xl lg:text-2xl text-blue-100/80 max-w-2xl mx-auto font-light leading-relaxed">
-                    A collection of places, moments and experiences from your journey.
+                    {{ __('messages.journey_replay_hero_subtitle') }}
                 </p>
 
                 <div class="mt-6 flex flex-wrap justify-center gap-3 md:gap-4 text-sm">
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['total_bookings'] }} <span class="text-blue-200/70">Experiences</span>
+                        {{ $replayData['stats']['total_bookings'] }} <span class="text-blue-200/70">{{ __('messages.journey_replay_stat_experiences') }}</span>
                     </span>
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['total_checkins'] }} <span class="text-blue-200/70">Moments</span>
+                        {{ $replayData['stats']['total_checkins'] }} <span class="text-blue-200/70">{{ __('messages.journey_replay_stat_moments') }}</span>
                     </span>
                     <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                        {{ $replayData['stats']['unique_places'] }} <span class="text-blue-200/70">Places</span>
+                        {{ $replayData['stats']['unique_places'] }} <span class="text-blue-200/70">{{ __('messages.journey_replay_stat_places') }}</span>
                     </span>
                     @if($replayData['stats']['highest_altitude'] > 0)
                         <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-blue-200/70">Highest</span>
+                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-blue-200/70">{{ __('messages.journey_replay_stat_highest') }}</span>
                         </span>
                     @endif
                     @if($replayData['stats']['journey_start'] && $replayData['stats']['journey_end'])
@@ -57,11 +63,13 @@
                 <div class="mt-8">
                     <a href="#journey-timeline"
                        class="inline-block bg-white text-indigo-900 px-8 py-3.5 rounded-full font-semibold hover:bg-gray-100 transition shadow-lg hover:shadow-xl hover:scale-[1.02] transform duration-300 group">
-                        ↓ <span class="ml-2">Begin Replay</span>
+                                                ▶ <span class="ml-2">{{ __('messages.journey_replay_begin') }}</span>
                     </a>
                 </div>
 
-                <div class="mt-6 text-blue-200/30 text-xs tracking-[0.2em] animate-pulse">S C R O L L</div>
+                                <div class="mt-6 text-blue-100/80 text-xs {{ $trackScroll }} animate-bounce">{{ __('messages.journey_replay_scroll') }}</div>
+                    <i class="fas fa-chevron-down text-lg animate-bounce"></i>
+                </div>
             @endif
         </div>
     </div>
@@ -72,10 +80,10 @@
     @if(!$replayData['has_data'])
         <div class="text-center py-20">
             <div class="text-7xl mb-6">🗺️</div>
-            <h2 class="text-3xl font-bold text-gray-700">No journey yet</h2>
-            <p class="text-gray-400 mt-3 max-w-md mx-auto">Book your first TravelAI Nepal experience and your memories will appear here.</p>
+            <h2 class="text-3xl font-bold text-gray-700">{{ __('messages.journey_replay_empty_title') }}</h2>
+            <p class="text-gray-400 mt-3 max-w-md mx-auto">{{ __('messages.journey_replay_empty_desc') }}</p>
             <a href="{{ route('public.services.index') }}" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg">
-                Explore Experiences →
+                {{ __('messages.journey_replay_explore_btn') }} →
             </a>
         </div>
     @else
@@ -86,19 +94,19 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10" id="stats-container">
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="text-3xl md:text-4xl font-bold text-blue-600 stat-number" data-target="{{ $replayData['stats']['total_bookings'] }}">0</div>
-                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Experiences</div>
+                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">{{ __('messages.journey_replay_stat_experiences') }}</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="text-3xl md:text-4xl font-bold text-green-600 stat-number" data-target="{{ $replayData['stats']['total_checkins'] }}">0</div>
-                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Moments</div>
+                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">{{ __('messages.journey_replay_stat_moments') }}</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="text-3xl md:text-4xl font-bold text-purple-600 stat-number" data-target="{{ $replayData['stats']['unique_places'] }}">0</div>
-                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Places</div>
+                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">{{ __('messages.journey_replay_stat_places') }}</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-5 text-center border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="text-3xl md:text-4xl font-bold text-orange-600 stat-number" data-target="{{ $replayData['stats']['highest_altitude'] }}">0</div>
-                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">Highest Altitude</div>
+                <div class="text-xs md:text-sm text-gray-500 mt-1 font-medium tracking-wide">{{ __('messages.journey_replay_stat_highest_alt') }}</div>
             </div>
         </div>
 
@@ -110,7 +118,7 @@
         @else
             {{-- If $booking is not passed, show a warning (optional) --}}
             <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 text-sm">
-                ⚠️ Share management is not available because booking data is missing. Please ensure your controller passes <code>$booking</code>.
+                ⚠️ {!! __('messages.journey_replay_share_warning', ['booking' => '<code>$booking</code>']) !!}
             </div>
         @endif
 
@@ -126,17 +134,17 @@
                 <div class="relative z-10 max-w-3xl mx-auto text-center">
                     <div class="text-5xl text-purple-300/40 font-serif leading-none mb-1">"</div>
                     <div class="flex items-center justify-center gap-2 mb-2">
-                        <span class="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium">Your Journey Story</span>
+                        <span class="text-xs {{ $trackLabel }} text-indigo-600 font-semibold">{{ __('messages.journey_replay_story_label') }}</span>
                     </div>
                     <div class="text-lg md:text-xl lg:text-2xl text-gray-800 leading-relaxed font-light italic max-w-2xl mx-auto">
                         {{ $replayData['story'] }}
                     </div>
-                    <div class="mt-6 text-xs text-gray-400 tracking-wide">— TravelAI Nepal</div>
+                    <div class="mt-6 text-xs text-gray-600 font-medium tracking-wide">— TravelAI Nepal</div>
                 </div>
             </div>
         @else
             <div class="bg-gray-50/80 rounded-3xl p-8 mb-10 border border-gray-100 text-center">
-                <p class="text-gray-400">✨ A story from your journey will appear here.</p>
+                <p class="text-gray-400">✨ {{ __('messages.journey_replay_story_empty') }}</p>
             </div>
         @endif
 
@@ -147,16 +155,16 @@
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100/80 p-4 md:p-6 mb-10">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="text-2xl">🗺️</span>
-                    <h2 class="text-xl font-semibold text-gray-800">Your Journey Path</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">{{ __('messages.journey_replay_path_title') }}</h2>
                 </div>
-                <p class="text-sm text-gray-400 mb-4">Follow the places your journey took you.</p>
+                <p class="text-sm text-gray-400 mb-4">{{ __('messages.journey_replay_path_desc') }}</p>
                 <div id="journey-map" class="rounded-xl overflow-hidden shadow-inner" style="height: 400px; width: 100%;"></div>
                 <div class="flex flex-wrap gap-6 mt-3 text-xs text-gray-400/70">
                     <span class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span> Checkpoint
+                        <span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span> {{ __('messages.journey_replay_path_checkpoint') }}
                     </span>
                     <span class="flex items-center gap-1.5">
-                        <span class="w-6 h-0.5 bg-blue-400 inline-block"></span> Journey path
+                        <span class="w-6 h-0.5 bg-blue-400 inline-block"></span> {{ __('messages.journey_replay_path_line') }}
                     </span>
                 </div>
             </div>
@@ -167,17 +175,17 @@
         =============================================== --}}
         <div id="journey-timeline" class="mt-12">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center tracking-tight">
-                📖 Your Journey Chapters
+                📖 {{ __('messages.journey_replay_chapters_title') }}
             </h2>
 
             <div class="relative space-y-10">
                 @php
                     $chapterLabels = [
-                        'tour' => 'Exploring Nepal',
-                        'trek' => 'Into the Mountains',
-                        'hotel' => 'A Place to Rest',
-                        'other' => 'Experience',
-                        'transport' => 'On the Road',
+                        'tour' => __('messages.journey_replay_chapter_exploring'),
+                        'trek' => __('messages.journey_replay_chapter_mountains'),
+                        'hotel' => __('messages.journey_replay_chapter_rest'),
+                        'other' => __('messages.journey_replay_chapter_experience'),
+                        'transport' => __('messages.journey_replay_chapter_road'),
                     ];
                     $chapterCounter = 1;
                     $totalChapters = count($replayData['timeline']);
@@ -186,9 +194,9 @@
                 @foreach($replayData['timeline'] as $index => $event)
                     @php
                         $type = $event['type'];
-                        $label = $chapterLabels[$type] ?? 'The Journey Continues';
-                        if ($chapterCounter === 1) $label = 'The Journey Begins';
-                        if ($chapterCounter === $totalChapters) $label = 'Until Next Time';
+                        $label = $chapterLabels[$type] ?? __('messages.journey_replay_chapter_continues');
+                        if ($chapterCounter === 1) $label = __('messages.journey_replay_chapter_begins');
+                        if ($chapterCounter === $totalChapters) $label = __('messages.journey_replay_chapter_until_next');
 
                         $icon = match($type) {
                             'trek' => '🥾',
@@ -197,10 +205,10 @@
                             default => '🧳'
                         };
                         $displayType = match($type) {
-                            'trek' => 'TREK',
-                            'tour' => 'TOUR',
-                            'hotel' => 'HOTEL',
-                            default => 'EXPERIENCE'
+                            'trek' => __('messages.journey_replay_type_trek'),
+                            'tour' => __('messages.journey_replay_type_tour'),
+                            'hotel' => __('messages.journey_replay_type_hotel'),
+                            default => __('messages.journey_replay_type_experience')
                         };
 
                         $uniqueCheckpoints = $event['checkins']->pluck('checkpoint')->unique()->values();
@@ -210,7 +218,7 @@
 
                     <div class="flex flex-col md:flex-row gap-4 items-start animate-fade-up chapter-card">
                         <div class="md:w-24 flex-shrink-0 text-right">
-                            <span class="text-xs font-bold text-blue-600/60 uppercase tracking-[0.15em]">Chapter {{ str_pad($chapterCounter, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="text-xs font-bold text-blue-600/60 {{ $trackChapter }}">{{ __('messages.journey_replay_chapter_prefix') }} {{ str_pad($chapterCounter, 2, '0', STR_PAD_LEFT) }}</span>
                         </div>
 
                         <div class="flex-1 bg-white rounded-3xl shadow-sm border border-gray-100/80 overflow-hidden hover:shadow-lg transition-all duration-300 group">
@@ -236,7 +244,7 @@
                                             <div class="flex flex-wrap items-center gap-2 mb-1">
                                                 <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">{{ $displayType }}</span>
                                                 @if($event['status'] === 'completed')
-                                                    <span class="text-xs text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">Completed</span>
+                                                    <span class="text-xs text-green-700 bg-green-50 px-2.5 py-0.5 rounded-full">{{ __('messages.journey_replay_status_completed') }}</span>
                                                 @endif
                                             </div>
                                             <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
@@ -250,7 +258,7 @@
                                         <div class="text-right text-sm text-gray-500 flex-shrink-0">
                                             <div>{{ $event['start_date'] ? $event['start_date']->format('M d, Y') : 'N/A' }}</div>
                                             @if($event['duration'])
-                                                <div class="text-xs text-gray-400">{{ $event['duration'] }} days</div>
+                                                <div class="text-xs text-gray-400">{{ $event['duration'] }} {{ __('messages.journey_replay_days') }}</div>
                                             @endif
                                         </div>
                                     </div>
@@ -260,12 +268,12 @@
                                             <span class="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">📍 {{ $event['location'] }}</span>
                                         @endif
                                         @if($event['type'] === 'trek' && isset($event['difficulty']))
-                                            <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">⛰️ {{ ucfirst($event['difficulty']) }}</span>
+                                            <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">⛰️ {{ __('messages.difficulty_' . $event['difficulty']) }}</span>
                                         @endif
                                         @if($event['type'] === 'hotel' && isset($event['star_rating']))
                                             <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">⭐ {{ $event['star_rating'] }}</span>
                                         @endif
-                                        <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">📸 {{ $event['checkins']->count() }} check-ins</span>
+                                        <span class="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full">📸 {{ $event['checkins']->count() }} {{ __('messages.journey_replay_checkins') }}</span>
                                         @if($event['rating'])
                                             <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-full">★ {{ number_format($event['rating'], 1) }}</span>
                                         @endif
@@ -273,12 +281,12 @@
 
                                     @if($uniqueCheckpoints->isNotEmpty())
                                         <div class="mt-2 text-xs text-gray-400">
-                                            <span class="font-medium text-gray-500">Checkpoints:</span>
+                                            <span class="font-medium text-gray-500">{{ __('messages.journey_replay_checkpoints_label') }}</span>
                                             @foreach($visibleCheckpoints as $name)
                                                 <span class="inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full mr-1">{{ $name }}</span>
                                             @endforeach
                                             @if($extraCheckpoints > 0)
-                                                <span class="text-gray-400">+{{ $extraCheckpoints }} more</span>
+                                                <span class="text-gray-400">+{{ $extraCheckpoints }} {{ __('messages.journey_replay_more') }}</span>
                                             @endif
                                         </div>
                                     @endif
@@ -297,39 +305,39 @@
         =============================================== --}}
         <div class="mt-16 text-center border-t border-gray-200/60 pt-12 ending-section">
             <div class="max-w-2xl mx-auto">
-                <p class="text-base text-gray-400/80 italic font-light">And just like that...</p>
+                <p class="text-base text-gray-600 italic font-medium">{{ __('messages.journey_replay_ending_line') }}</p>
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mt-2 tracking-tight leading-[1.1]">
-                    your journey became a memory.
+                    {{ __('messages.journey_replay_ending_title') }}
                 </h2>
 
                 <div class="flex flex-wrap justify-center gap-4 mt-6">
                     <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                        {{ $replayData['stats']['total_bookings'] }} <span class="text-gray-400">experiences</span>
+                        {{ $replayData['stats']['total_bookings'] }} <span class="text-gray-400">{{ __('messages.journey_replay_stat_experiences') }}</span>
                     </span>
                     <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                        {{ $replayData['stats']['total_checkins'] }} <span class="text-gray-400">moments</span>
+                        {{ $replayData['stats']['total_checkins'] }} <span class="text-gray-400">{{ __('messages.journey_replay_stat_moments') }}</span>
                     </span>
                     @if($replayData['stats']['highest_altitude'] > 0)
                         <span class="text-sm text-gray-500 bg-gray-50/80 px-3 py-1.5 rounded-full">
-                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-gray-400">reached</span>
+                            {{ number_format($replayData['stats']['highest_altitude']) }}m <span class="text-gray-400">{{ __('messages.journey_replay_ending_reached') }}</span>
                         </span>
                     @endif
                 </div>
 
-                <p class="text-gray-400 mt-6 text-base font-light tracking-wide">Until the next adventure. ❤️</p>
+                <p class="text-gray-700 mt-6 text-base font-medium tracking-wide">{{ __('messages.journey_replay_ending_until_next') }} ❤️</p>
             </div>
         </div>
 <div class="text-center mt-8">
     <a href="{{ route('traveler.cinematic-replay') }}"
        class="inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition hover:scale-105">
-        🎬 Watch Cinematic Replay
+        🎬 {{ __('messages.journey_replay_watch_cinematic') }}
     </a>
 </div>
         {{-- Back to Dashboard --}}
         <div class="mt-10 text-center">
             <a href="{{ route('traveler.dashboard') }}"
-               class="inline-block text-sm text-gray-400 hover:text-gray-600 transition-colors duration-300">
-                ← Back to Dashboard
+               class="inline-block text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors duration-300">
+                ← {{ __('messages.journey_replay_back_dashboard') }}
             </a>
         </div>
 
@@ -363,7 +371,7 @@
         points.forEach(p => {
             const marker = L.marker([p.lat, p.lng]).addTo(map);
             let popupContent = `<strong>${p.name}</strong>`;
-            if (p.altitude) popupContent += `<br>Altitude: ${p.altitude}m`;
+            if (p.altitude) popupContent += `<br>{{ __('messages.journey_replay_js_altitude') }} ${p.altitude}m`;
             if (p.scanned_at) popupContent += `<br>${new Date(p.scanned_at).toLocaleDateString()}`;
             marker.bindPopup(popupContent);
         });
