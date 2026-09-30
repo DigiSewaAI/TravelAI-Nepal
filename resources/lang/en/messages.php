@@ -1213,6 +1213,14 @@ return [
     'difficulty_strenuous'    => 'Strenuous',
     'difficulty_difficult'    => 'Difficult',
     'difficulty_challenging'  => 'Challenging',
+        // ============================================
+    // Booking Page Polish (Phase B)
+    // ============================================
+    'traveler_booking_download_invoice'      => 'Download Invoice',
+    'traveler_booking_copy_failed'           => 'Copy failed — please copy manually',
+    'traveler_booking_copy_not_supported'    => 'Copy not supported — please copy manually',
+    'traveler_booking_quick_actions'         => 'Quick Actions',
+    'traveler_booking_payment_domestic'      => 'Domestic Methods',
 // ======================
 // TREKS
 // ======================

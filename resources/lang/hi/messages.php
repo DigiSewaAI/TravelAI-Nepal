@@ -1294,6 +1294,14 @@ return [
     'difficulty_strenuous'    => 'कठोर',
     'difficulty_difficult'    => 'जटिल',
     'difficulty_challenging'  => 'चुनौतीपूर्ण',
+        // ============================================
+    // Booking Page Polish (Phase B)
+    // ============================================
+    'traveler_booking_download_invoice'      => 'इनवॉइस डाउनलोड करें',
+    'traveler_booking_copy_failed'           => 'कॉपी विफल — कृपया मैन्युअल कॉपी करें',
+    'traveler_booking_copy_not_supported'    => 'कॉपी समर्थित नहीं — कृपया मैन्युअल कॉपी करें',
+    'traveler_booking_quick_actions'         => 'त्वरित कार्य',
+    'traveler_booking_payment_domestic'      => 'घरेलू तरीके',
 'traveler_ready_for_adventure' => 'अपनी अगली नेपाल यात्रा के लिए तैयार हैं?',
 'plan_with_ai' => 'AI के साथ योजना बनाएं',
 'explore_nepal_btn' => 'नेपाल खोजें',

@@ -78,8 +78,8 @@
 
                 <div class="grid lg:grid-cols-2 gap-4 lg:gap-6">
                 @foreach([
-                    ['methods' => $domesticMethods, 'flag' => '🇳🇵', 'label' => __('messages.traveler_payment_domestic_badge')],
-                    ['methods' => $internationalMethods, 'flag' => '🌍', 'label' => __('messages.traveler_payment_international_badge')],
+                    ['methods' => $domesticMethods, 'flag' => '🇳🇵', 'label' => __('messages.traveler_payment_domestic_badge'), 'border' => 'border-l-blue-500'],
+                    ['methods' => $internationalMethods, 'flag' => '🌍', 'label' => __('messages.traveler_payment_international_badge'), 'border' => 'border-l-purple-500'],
                 ] as $group)
                     @if($group['methods']->isNotEmpty())
                         <div>
@@ -96,7 +96,7 @@
                                         if ($method->identifier)     $copyValues[] = ['label' => __('messages.traveler_payment_identifier'),     'value' => $method->identifier];
                                         if ($method->swift_code)     $copyValues[] = ['label' => __('messages.traveler_payment_swift'),           'value' => $method->swift_code];
                                     @endphp
-                                    <div class="border rounded-lg p-4 bg-white">
+                                    <div class="border border-l-4 {{ $group['border'] }} rounded-lg p-4 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
                                         <div class="flex items-start gap-3 mb-2">
                                             <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                                                 <i class="{{ $icon[0] }} fa-{{ $icon[1] }}"></i>
@@ -125,10 +125,12 @@
                                                 </div>
                                                 <button type="button"
                                                         data-copy-value="{{ $cv['value'] }}"
+                                                        data-copy-failed="{{ __('messages.traveler_booking_copy_failed') }}"
+                                                        data-copy-not-supported="{{ __('messages.traveler_booking_copy_not_supported') }}"
                                                         onclick="pmCopy(this)"
                                                         title="{{ __('messages.traveler_payment_copy_btn') }}"
                                                         aria-label="{{ __('messages.traveler_payment_copy_btn') }}"
-                                                        class="ml-2 p-1.5 text-blue-600 hover:bg-blue-100 rounded text-xs shrink-0">
+                                                        class="ml-2 p-1.5 text-blue-600 hover:bg-blue-100 rounded text-xs shrink-0 transition-colors duration-200">
                                                     <i class="fas fa-copy"></i>
                                                 </button>
                                             </div>
@@ -162,7 +164,7 @@
                         <form method="POST" action="{{ route('traveler.bookings.notifyPayment', $booking) }}">
                             @csrf
                             <button type="submit"
-                                    class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                                    class="w-full md:w-auto bg-green-600 hover:bg-green-700 hover:brightness-110 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md">
                                 <i class="fas fa-check-circle"></i>
                                 {{ __('messages.traveler_payment_ive_paid_btn') }}
                             </button>
@@ -182,24 +184,31 @@
             @endif
         </div>
 
-        {{-- 🔥 QR Code Section --}}
-        <div class="mt-6 border-t pt-4">
-            <h3 class="font-semibold text-gray-700">📱 {{ __('messages.traveler_booking_qr_heading') }}</h3>
-            <div class="mt-2">
+        {{-- 🎯 QR Code + Quick Actions (COMPACT) --}}
+        <div class="mt-6 border-t pt-6">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-4 md:p-5 flex flex-col md:flex-row gap-4 md:gap-6 items-center">
+                {{-- QR Code --}}
                 <img src="{{ route('booking.qr', $booking->id) }}"
                      alt="{{ __('messages.traveler_booking_qr_alt') }}"
-                     class="w-32 h-32 border rounded-lg">
-                <p class="text-xs text-gray-400 mt-1">{{ __('messages.traveler_booking_qr_instruction') }}</p>
+                     class="w-28 h-28 border-4 border-white rounded-lg shadow-sm bg-white shrink-0">
+
+                {{-- Info --}}
+                <div class="flex-1 min-w-0 text-center md:text-left">
+                    <h3 class="font-semibold text-gray-800 flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-qrcode text-blue-600"></i>
+                        {{ __('messages.traveler_booking_qr_heading') }}
+                    </h3>
+                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">{{ __('messages.traveler_booking_qr_instruction') }}</p>
+                </div>
+
+                {{-- Invoice Button --}}
+                <a href="{{ route('traveler.bookings.invoice', $booking) }}"
+                   target="_blank"
+                   class="bg-blue-600 hover:bg-blue-700 hover:brightness-110 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <i class="fas fa-file-pdf"></i> {{ __('messages.traveler_booking_download_invoice') }}
+                </a>
             </div>
         </div>
-
-        {{-- 🔥 DOWNLOAD INVOICE BUTTON --}}
-<div class="mt-6 border-t pt-4 flex justify-end">
-    <a href="{{ route('traveler.bookings.invoice', $booking) }}"
-       class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2" target="_blank">
-        <i class="fas fa-file-pdf"></i> {{ __('Download Invoice') }}
-    </a>
-</div>
 
         {{-- PHASE 4E: Dashboard Rich Data --}}
         @include('traveler.bookings._weather_panel', ['booking' => $booking])
@@ -237,6 +246,8 @@
 <script>
 function pmCopy(btn) {
     var value = btn.getAttribute('data-copy-value') || '';
+    var failedMsg = btn.getAttribute('data-copy-failed') || 'Copy failed';
+    var unsupportedMsg = btn.getAttribute('data-copy-not-supported') || 'Copy not supported';
     if (!value) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(value).then(function() {
@@ -245,9 +256,9 @@ function pmCopy(btn) {
             var old = icon.className;
             icon.className = 'fas fa-check text-green-600';
             setTimeout(function() { icon.className = old; }, 1500);
-        }).catch(function() { alert('Copy failed — please copy manually: ' + value); });
+        }).catch(function() { alert(failedMsg + ': ' + value); });
     } else {
-        alert('Copy not supported — please copy manually: ' + value);
+        alert(unsupportedMsg + ': ' + value);
     }
 }
 </script>

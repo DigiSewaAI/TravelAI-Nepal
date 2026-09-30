@@ -1293,6 +1293,14 @@ return [
     'difficulty_strenuous'    => '艰苦',
     'difficulty_difficult'    => '艰难',
     'difficulty_challenging'  => '挑战性',
+        // ============================================
+    // Booking Page Polish (Phase B)
+    // ============================================
+    'traveler_booking_download_invoice'      => '下载发票',
+    'traveler_booking_copy_failed'           => '复制失败 — 请手动复制',
+    'traveler_booking_copy_not_supported'    => '不支持复制 — 请手动复制',
+    'traveler_booking_quick_actions'         => '快捷操作',
+    'traveler_booking_payment_domestic'      => '国内方式',
 'traveler_ready_for_adventure' => '准备好您的下一次尼泊尔冒险了吗？',
 'plan_with_ai' => '用AI规划',
 'explore_nepal_btn' => '探索尼泊尔',

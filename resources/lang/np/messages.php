@@ -1240,6 +1240,14 @@ return [
     'difficulty_strenuous'    => 'कठोर',
     'difficulty_difficult'    => 'जटिल',
     'difficulty_challenging'  => 'चुनौतीपूर्ण',
+        // ============================================
+    // Booking Page Polish (Phase B)
+    // ============================================
+    'traveler_booking_download_invoice'      => 'इनभ्वाइस डाउनलोड गर्नु',
+    'traveler_booking_copy_failed'           => 'कपी असफल भयो — कृपया म्यानुअल कपी गर्नु',
+    'traveler_booking_copy_not_supported'    => 'कपी समर्थित छैन — कृपया म्यानुअल कपी गर्नु',
+    'traveler_booking_quick_actions'         => 'छिटो कार्यहरू',
+    'traveler_booking_payment_domestic'      => 'देशीय माध्यमहरू',
     // Safety Page - Search & Weather
 'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, र नेपाल भर यात्रीहरूको लागि लाइव घटना ट्र्याकिङ।',
 'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',
