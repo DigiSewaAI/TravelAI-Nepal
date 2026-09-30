@@ -27,11 +27,35 @@
                     </span>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('home') }}#ai-planner" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+            <div class="flex flex-wrap gap-3 items-center">
+                {{-- Weather Widget --}}
+                @if(!empty($weatherData) && isset($weatherData['temperature']))
+                    @php
+                        $wmo = \App\Services\OpenMeteoService::describeWmoCode($weatherData['weather_code'] ?? null);
+                        $iconMap = [
+                            'clear' => 'fa-sun',
+                            'cloud' => 'fa-cloud',
+                            'rain'  => 'fa-cloud-rain',
+                            'snow'  => 'fa-snowflake',
+                            'fog'   => 'fa-smog',
+                            'storm' => 'fa-bolt',
+                            'unknown' => 'fa-cloud-sun',
+                        ];
+                        $wIcon = $iconMap[$wmo['icon']] ?? 'fa-cloud-sun';
+                    @endphp
+                    <div class="bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/20 transition-all duration-200">
+                        <i class="fas {{ $wIcon }} text-2xl text-yellow-300"></i>
+                        <div class="leading-tight">
+                            <p class="text-[10px] uppercase tracking-wider text-blue-100/80">{{ $weatherCity }}</p>
+                            <p class="text-lg font-bold">{{ round($weatherData['temperature']) }}°C</p>
+                        </div>
+                    </div>
+                @endif
+
+                <a href="{{ route('home') }}#ai-planner" class="bg-white/20 hover:bg-white/30 hover:brightness-110 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2">
                     <i class="fas fa-robot"></i> {{ __('messages.plan_with_ai') }}
                 </a>
-                <a href="{{ route('public.services.index') }}" class="bg-white text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                <a href="{{ route('public.services.index') }}" class="bg-white text-blue-600 hover:bg-gray-100 hover:brightness-110 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2">
                     <i class="fas fa-compass"></i> {{ __('messages.explore_nepal_btn') }}
                 </a>
             </div>
@@ -43,7 +67,7 @@
 
     {{-- ========== STATS CARDS ========== --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
                     <i class="fas fa-hourglass-half"></i>
@@ -144,7 +168,7 @@
 
             {{-- Active Trip --}}
             @if($activeTrip)
-                <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition">
+                <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-blue-500 p-6 hover:shadow-lg transition-all duration-300">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                         <i class="fas fa-hiking text-blue-600"></i> {{ __('messages.traveler_active_trip_title') }}
                     </h3>
@@ -177,7 +201,7 @@
             @endif
 
             {{-- My Bookings --}}
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-blue-500 p-6 hover:shadow-lg transition-all duration-300">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                         <i class="fas fa-calendar-check text-blue-600"></i> {{ __('messages.traveler_my_bookings') }}
@@ -188,7 +212,7 @@
                 @if($bookings->count() > 0)
                     <div class="divide-y divide-gray-100">
                         @foreach($bookings->take(5) as $booking)
-                            <div class="py-3 flex flex-wrap justify-between items-center gap-2">
+                            <div class="py-3 flex flex-wrap justify-between items-center gap-2 hover:bg-gray-50/60 -mx-2 px-2 rounded-lg transition-colors duration-200">
                                 <div>
                                     <p class="font-medium text-gray-800">{{ $booking->service->name ?? __('messages.na') }}</p>
                                     <p class="text-xs text-gray-400">
@@ -239,8 +263,7 @@
         {{-- ========== RIGHT COLUMN: Reviews + Quick Actions ========== --}}
         <div class="space-y-6">
 
-            {{-- My Reviews --}}
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-amber-500 p-6 hover:shadow-lg transition-all duration-300">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
                     <i class="fas fa-star text-yellow-500"></i> {{ __('messages.traveler_my_reviews') }}
                 </h3>
@@ -267,7 +290,7 @@
             </div>
 
             {{-- My Trek History (QR Check-ins) --}}
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-emerald-500 p-6 hover:shadow-lg transition-all duration-300">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
                     <i class="fas fa-route text-green-600"></i> {{ __('messages.traveler_trek_history') }}
                 </h3>
@@ -409,7 +432,7 @@
 </div>
 
             {{-- &#128293; Safety Center --}}
-<div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+<div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-red-500 p-5 hover:shadow-lg transition-all duration-300">
     <div class="flex items-start gap-3">
         <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-shield-alt text-red-500 text-xl"></i>

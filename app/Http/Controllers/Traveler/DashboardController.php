@@ -8,6 +8,7 @@ use App\Models\QrScan;
 use App\Models\UserMedia;
 use App\Models\Waypoint;
 use App\Services\Safety\AlertService;
+use App\Services\OpenMeteoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -15,13 +16,17 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     protected $alertService;
+    protected $weatherService;
 
     /**
-     * Constructor with AlertService injection
+     * Constructor with service injection
      */
-    public function __construct(AlertService $alertService)
-    {
+    public function __construct(
+        AlertService $alertService,
+        OpenMeteoService $weatherService
+    ) {
         $this->alertService = $alertService;
+        $this->weatherService = $weatherService;
     }
 
     public function index()
@@ -93,6 +98,10 @@ class DashboardController extends Controller
             $greeting = 'Evening';
         }
 
+        // Weather widget — Kathmandu default (active trip destination future enhancement)
+        $weatherCity = 'Kathmandu';
+        $weatherData = $this->weatherService->getWeatherForCoords(27.7172, 85.3240);
+
         return view('traveler.dashboard', compact(
             'user',
             'bookings',
@@ -107,7 +116,9 @@ class DashboardController extends Controller
             'userMedia',
             'mediaByCheckpoint',
             'userWaypoints',
-            'unreadAlerts'   // ✅ NEW: Pass to view
+            'unreadAlerts',   // ✅ NEW: Pass to view
+            'weatherData',    // ✅ NEW: Weather widget
+            'weatherCity'     // ✅ NEW: Weather city name
         ));
     }
 
