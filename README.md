@@ -66,3 +66,36 @@ npm run build
 
 # Or for development with hot reload
 npm run dev
+```
+
+---
+
+### Documentation
+
+| Guide | Audience | Location |
+|-------|----------|----------|
+| **User Guide** | Travelers + Providers | `docs/USER_GUIDE.md` |
+| **Admin Guide** | Platform Admin | `docs/ADMIN-GUIDE.md` |
+| **Deployment Guide** | Owner / DevOps | `docs/DEPLOYMENT.md` |
+| **Production Env** | DevOps | `docs/deployment/PRODUCTION_ENV.md` |
+| **Queue & Scheduler** | DevOps | `docs/deployment/QUEUE_SCHEDULER.md` |
+| **Master Blueprint** | Developers | `docs/master_planning_and_all.md` |
+| **Production Seeders** | DevOps | `docs/PRODUCTION_SEEDERS_SUMMARY.md` |
+
+---
+
+## Tech Stack
+
+- **Backend:** Laravel 13, PHP 8.4
+- **Frontend:** Tailwind CSS 4.0, Blade
+- **Database:** MySQL 8.0
+- **AI Providers:** Groq, OpenRouter, Cerebras (free tier)
+- **Maps:** Leaflet + OpenStreetMap
+- **PDF:** DomPDF (invoices)
+
+---
+
+## Contributing
+
+See `docs/DEPLOYMENT.md` for setup instructions. All PRs require passing test suite (44 tests).
+END
