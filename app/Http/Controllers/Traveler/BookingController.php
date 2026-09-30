@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traveler;
 use App\Http\Controllers\Controller;
 use App\Mail\PaymentNoticeReceivedMail;
 use App\Models\Booking;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -12,7 +13,48 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
-        public function show(Booking $booking)
+    /**
+     * TRAVELER-ROUTES-MISSING-01 — All bookings index
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $filter = $request->query('filter', 'all');
+
+        $baseQuery = Booking::where('traveler_id', $user->id);
+
+        // Filter
+        $query = clone $baseQuery;
+        switch ($filter) {
+            case 'upcoming':
+                $query->where('status', 'pending');
+                break;
+            case 'active':
+                $query->where('status', 'confirmed');
+                break;
+            case 'completed':
+                $query->where('status', 'completed');
+                break;
+            // 'all' → no filter
+        }
+
+        $bookings = $query->with(['service', 'review'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        // Counts for filter tabs
+        $counts = [
+            'all'       => (clone $baseQuery)->count(),
+            'upcoming'  => (clone $baseQuery)->where('status', 'pending')->count(),
+            'active'    => (clone $baseQuery)->where('status', 'confirmed')->count(),
+            'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
+        ];
+
+        return view('traveler.bookings.index', compact('bookings', 'filter', 'counts'));
+    }
+
+    public function show(Booking $booking)
     {
         if ($booking->traveler_id !== Auth::id()) {
             abort(403, 'Unauthorized access.');

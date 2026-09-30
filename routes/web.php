@@ -305,20 +305,24 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
 // =======================================
 // 4. TRAVELER ROUTES (Phase 10 + Passport)
 // =======================================
-Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
+    Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
 
-    // Digital Trek Passport
-    Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
-    Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
+        // Digital Trek Passport
+        Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
+        Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
 
-    // Reviews
-    Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+        // Bookings — Index (MUST be before /bookings/{booking})
+        Route::get('/bookings', [App\Http\Controllers\Traveler\BookingController::class, 'index'])->name('bookings.index');
 
-    // Bookings
-    Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
+        // Reviews — Index + Create + Store
+        Route::get('/reviews', [App\Http\Controllers\Traveler\ReviewController::class, 'index'])->name('reviews.index');
+        Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+
+        // Bookings — Show + Invoice + Notify
+        Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
     Route::get('/bookings/{booking}/invoice', [App\Http\Controllers\Traveler\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
     Route::post('/bookings/{booking}/payment-notice', [App\Http\Controllers\Traveler\BookingController::class, 'notifyPayment'])->name('bookings.notifyPayment');
 

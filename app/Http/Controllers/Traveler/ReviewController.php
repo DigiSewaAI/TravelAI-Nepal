@@ -13,6 +13,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
+    /**
+     * TRAVELER-ROUTES-MISSING-01 — All reviews index
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        $reviews = Review::where('user_id', $user->id)
+            ->with(['service', 'booking'])
+            ->latest()
+            ->paginate(10);
+
+        return view('traveler.reviews.index', compact('reviews'));
+    }
+
     public function create(Booking $booking)
     {
         // Ensure booking belongs to logged-in user and is completed
