@@ -1104,6 +1104,12 @@ return [
         'greeting_morning'   => 'Morning',
     'greeting_afternoon' => 'Afternoon',
     'greeting_evening'   => 'Evening',
+        // Traveler Dashboard — Design Pass 1 (Phase 7I)
+    'traveler_quick_treks'      => 'Treks',
+    'traveler_quick_bookings'   => 'Bookings',
+    'traveler_quick_reviews'    => 'Reviews',
+    'traveler_group_travels'    => 'My Travels',
+    'traveler_group_tools'      => 'Tools & Shortcuts',
 // ======================
 // TREKS
 // ======================

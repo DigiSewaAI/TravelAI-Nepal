@@ -1185,6 +1185,11 @@ return [
 // ======================
 'traveler_dashboard_title' => '我的仪表板 | TravelAI 尼泊尔',
 'traveler_greeting' => ':greeting, :name 👋',
+    // Traveler Dashboard — Design Pass 1 (Phase 7I)
+    'traveler_quick_treks'      => '徒步',
+    'traveler_quick_bookings'   => '预订',
+    'traveler_quick_reviews'    => '评论',
+    'traveler_group_travels'    => '我的旅行',
 'traveler_ready_for_adventure' => '准备好您的下一次尼泊尔冒险了吗？',
 'plan_with_ai' => '用AI规划',
 'explore_nepal_btn' => '探索尼泊尔',

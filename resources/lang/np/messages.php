@@ -1131,6 +1131,12 @@ return [
         'greeting_morning'   => 'बिहान',
     'greeting_afternoon' => 'दिउँसो',
     'greeting_evening'   => 'साँझ',
+        // Traveler Dashboard — Design Pass 1 (Phase 7I)
+    'traveler_quick_treks'      => 'ट्रेक',
+    'traveler_quick_bookings'   => 'बुकिङ',
+    'traveler_quick_reviews'    => 'समीक्षा',
+    'traveler_group_travels'    => 'मेरा यात्राहरू',
+        'traveler_group_tools'      => 'उपकरण र सर्टकटहरू',
     // Safety Page - Search & Weather
 'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, र नेपाल भर यात्रीहरूको लागि लाइव घटना ट्र्याकिङ।',
 'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',

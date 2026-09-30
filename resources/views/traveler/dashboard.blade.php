@@ -5,20 +5,33 @@
 @section('content')
 
 {{-- ========== HERO / WELCOME SECTION ========== --}}
-<div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-10 px-4">
+<div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-6 px-4">
     <div class="max-w-7xl mx-auto">
-        <div class="flex flex-wrap justify-between items-center">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold">
-    {{ __('messages.traveler_greeting', ['greeting' => __('messages.greeting_' . strtolower($greeting ?? 'morning')), 'name' => Auth::user()->name ?? 'Traveler']) }}
-</h1>
-                <p class="text-blue-100 text-lg mt-1">{{ __('messages.traveler_ready_for_adventure') }}</p>
+        <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl md:text-3xl font-bold">
+                    {{ __('messages.traveler_greeting', ['greeting' => __('messages.greeting_' . strtolower($greeting ?? 'morning')), 'name' => Auth::user()->name ?? 'Traveler']) }}
+                </h1>
+                <p class="text-blue-100 text-sm mt-1">{{ __('messages.traveler_ready_for_adventure') }}</p>
+
+                {{-- Quick stats chips --}}
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="text-xs bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <i class="fas fa-hiking mr-1"></i>{{ $bookingStats['completed'] ?? 0 }} {{ __('messages.traveler_quick_treks') }}
+                    </span>
+                    <span class="text-xs bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <i class="fas fa-calendar-check mr-1"></i>{{ $bookings->count() }} {{ __('messages.traveler_quick_bookings') }}
+                    </span>
+                    <span class="text-xs bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <i class="fas fa-star mr-1"></i>{{ $reviews->count() }} {{ __('messages.traveler_quick_reviews') }}
+                    </span>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-3 mt-4 md:mt-0">
-                <a href="{{ route('home') }}#ai-planner" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('home') }}#ai-planner" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
                     <i class="fas fa-robot"></i> {{ __('messages.plan_with_ai') }}
                 </a>
-                <a href="{{ route('public.services.index') }}" class="bg-white text-blue-600 hover:bg-gray-100 px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                <a href="{{ route('public.services.index') }}" class="bg-white text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
                     <i class="fas fa-compass"></i> {{ __('messages.explore_nepal_btn') }}
                 </a>
             </div>
@@ -30,21 +43,49 @@
 
     {{-- ========== STATS CARDS ========== --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
-            <p class="text-2xl font-bold text-blue-600">{{ $bookingStats['upcoming'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_upcoming') }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-3xl font-bold text-gray-900">{{ $bookingStats['upcoming'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">{{ __('messages.traveler_stat_upcoming') }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
-            <p class="text-2xl font-bold text-green-600">{{ $bookingStats['active'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_active') }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                    <i class="fas fa-hiking"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-3xl font-bold text-gray-900">{{ $bookingStats['active'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">{{ __('messages.traveler_stat_active') }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
-            <p class="text-2xl font-bold text-gray-800">{{ $bookingStats['completed'] ?? 0 }}</p>
-            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_completed') }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-gray-100 text-gray-700 flex items-center justify-center text-xl shrink-0">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-3xl font-bold text-gray-900">{{ $bookingStats['completed'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">{{ __('messages.traveler_stat_completed') }}</p>
+                </div>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border p-4 text-center hover:shadow-md transition">
-            <p class="text-2xl font-bold text-purple-600">{{ $reviews->count() }}</p>
-            <p class="text-xs text-gray-500">{{ __('messages.traveler_stat_reviews') }}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-3xl font-bold text-gray-900">{{ $reviews->count() }}</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">{{ __('messages.traveler_stat_reviews') }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -95,6 +136,11 @@
 
         {{-- ========== LEFT COLUMN: Active Trip + Bookings ========== --}}
         <div class="lg:col-span-2 space-y-6">
+
+            {{-- Group: My Travels --}}
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                <i class="fas fa-suitcase-rolling mr-1"></i> {{ __('messages.traveler_group_travels') }}
+            </h2>
 
             {{-- Active Trip --}}
             @if($activeTrip)
@@ -258,6 +304,11 @@
                     </div>
                 @endif
             </div>
+
+            {{-- Group: Tools & Shortcuts --}}
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider pt-2">
+                <i class="fas fa-toolbox mr-1"></i> {{ __('messages.traveler_group_tools') }}
+            </h2>
 
             {{-- &#128293; AI Travel Planner (Prominent Card) --}}
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition">

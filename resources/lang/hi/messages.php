@@ -1185,6 +1185,12 @@ return [
 // ======================
 'traveler_dashboard_title' => 'मेरा डैशबोर्ड | TravelAI नेपाल',
 'traveler_greeting' => ':greeting, :name 👋',
+    // Traveler Dashboard — Design Pass 1 (Phase 7I)
+    'traveler_quick_treks'      => 'ट्रेक',
+    'traveler_quick_bookings'   => 'बुकिंग',
+    'traveler_quick_reviews'    => 'समीक्षाएँ',
+    'traveler_group_travels'    => 'मेरी यात्राएँ',
+    'traveler_group_tools'      => 'उपकरण और शॉर्टकट',
 'traveler_ready_for_adventure' => 'अपनी अगली नेपाल यात्रा के लिए तैयार हैं?',
 'plan_with_ai' => 'AI के साथ योजना बनाएं',
 'explore_nepal_btn' => 'नेपाल खोजें',
