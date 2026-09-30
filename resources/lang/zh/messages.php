@@ -1301,6 +1301,29 @@ return [
     'traveler_booking_copy_not_supported'    => '不支持复制 — 请手动复制',
     'traveler_booking_quick_actions'         => '快捷操作',
     'traveler_booking_payment_domestic'      => '国内方式',
+        // ============================================
+    // Traveler Routes Missing (TRAVELER-ROUTES-MISSING-01)
+    // ============================================
+    'traveler_bookings_filter_all'        => '全部',
+    'traveler_bookings_filter_upcoming'   => '即将到来',
+    'traveler_bookings_filter_active'     => '进行中',
+    'traveler_bookings_filter_completed'  => '已完成',
+    'traveler_bookings_empty_desc'        => '开始探索尼泊尔并预订您的第一次体验。',
+    'traveler_bookings_showing'           => '显示 :count 条预订',
+    'traveler_reviews_status_pending'     => '等待审核',
+    'traveler_reviews_status_approved'    => '已批准',
+    'traveler_reviews_status_rejected'    => '已拒绝',
+    'traveler_reviews_empty_desc'         => '完成一次预订以留下您的第一条评价。',
+    'traveler_reviews_reviewed_on'        => '评价日期',
+    'traveler_back_dashboard'             => '返回仪表板',
+        // ============================================
+    // Traveler Routes Fix (visibility + missing keys)
+    // ============================================
+    'traveler_view_all_bookings_short'  => '查看全部',
+    'traveler_view_all_reviews_short'   => '查看全部',
+    'traveler_reviews_showing'          => '显示 :count 条评价',
+    'traveler_reviews_view_booking'     => '查看预订',
+    'traveler_reviews_view_booking_arrow' => '查看预订 →',
 'traveler_ready_for_adventure' => '准备好您的下一次尼泊尔冒险了吗？',
 'plan_with_ai' => '用AI规划',
 'explore_nepal_btn' => '探索尼泊尔',

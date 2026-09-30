@@ -1248,6 +1248,29 @@ return [
     'traveler_booking_copy_not_supported'    => 'कपी समर्थित छैन — कृपया म्यानुअल कपी गर्नु',
     'traveler_booking_quick_actions'         => 'छिटो कार्यहरू',
     'traveler_booking_payment_domestic'      => 'देशीय माध्यमहरू',
+        // ============================================
+    // Traveler Routes Missing (TRAVELER-ROUTES-MISSING-01)
+    // ============================================
+    'traveler_bookings_filter_all'        => 'सबै',
+    'traveler_bookings_filter_upcoming'   => 'आउँदैछ',
+    'traveler_bookings_filter_active'     => 'सक्रिय',
+    'traveler_bookings_filter_completed'  => 'सम्पन्न',
+    'traveler_bookings_empty_desc'        => 'नेपाल अन्वेषण सुरु गर्नु र आफ्नो पहिलो अनुभव बुक गर्नु।',
+    'traveler_bookings_showing'           => ':count बुकिङ देखाउँदै',
+    'traveler_reviews_status_pending'     => 'स्वीकृति बाँकी',
+    'traveler_reviews_status_approved'    => 'स्वीकृत',
+    'traveler_reviews_status_rejected'    => 'अस्वीकृत',
+    'traveler_reviews_empty_desc'         => 'पहिलो समीक्षा दिन बुकिङ पूरा गर्नु।',
+    'traveler_reviews_reviewed_on'        => 'समीक्षा मिति',
+    'traveler_back_dashboard'             => 'ड्यासबोर्डमा फर्कनु',
+        // ============================================
+    // Traveler Routes Fix (visibility + missing keys)
+    // ============================================
+    'traveler_view_all_bookings_short'  => 'सबै हेर्नु',
+    'traveler_view_all_reviews_short'   => 'सबै हेर्नु',
+    'traveler_reviews_showing'          => ':count समीक्षा देखाउँदै',
+    'traveler_reviews_view_booking'     => 'बुकिङ हेर्नु',
+    'traveler_reviews_view_booking_arrow' => 'बुकिङ हेर्नु →',
     // Safety Page - Search & Weather
 'safety_subtitle' => 'वास्तविक-समय सुरक्षा अपडेट, AI-संचालित जोखिम मूल्यांकन, र नेपाल भर यात्रीहरूको लागि लाइव घटना ट्र्याकिङ।',
 'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',

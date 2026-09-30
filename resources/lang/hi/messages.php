@@ -1302,6 +1302,14 @@ return [
     'traveler_booking_copy_not_supported'    => 'कॉपी समर्थित नहीं — कृपया मैन्युअल कॉपी करें',
     'traveler_booking_quick_actions'         => 'त्वरित कार्य',
     'traveler_booking_payment_domestic'      => 'घरेलू तरीके',
+        // ============================================
+    // Traveler Routes Fix (visibility + missing keys)
+    // ============================================
+    'traveler_view_all_bookings_short'  => 'सभी देखें',
+    'traveler_view_all_reviews_short'   => 'सभी देखें',
+    'traveler_reviews_showing'          => ':count समीक्षाएँ दिखा रहे हैं',
+    'traveler_reviews_view_booking'     => 'बुकिंग देखें',
+    'traveler_reviews_view_booking_arrow' => 'बुकिंग देखें →',
 'traveler_ready_for_adventure' => 'अपनी अगली नेपाल यात्रा के लिए तैयार हैं?',
 'plan_with_ai' => 'AI के साथ योजना बनाएं',
 'explore_nepal_btn' => 'नेपाल खोजें',

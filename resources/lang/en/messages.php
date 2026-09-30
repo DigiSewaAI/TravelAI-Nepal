@@ -1221,6 +1221,29 @@ return [
     'traveler_booking_copy_not_supported'    => 'Copy not supported — please copy manually',
     'traveler_booking_quick_actions'         => 'Quick Actions',
     'traveler_booking_payment_domestic'      => 'Domestic Methods',
+        // ============================================
+    // Traveler Routes Missing (TRAVELER-ROUTES-MISSING-01)
+    // ============================================
+    'traveler_bookings_filter_all'        => 'All',
+    'traveler_bookings_filter_upcoming'   => 'Upcoming',
+    'traveler_bookings_filter_active'     => 'Active',
+    'traveler_bookings_filter_completed'  => 'Completed',
+    'traveler_bookings_empty_desc'        => 'Start exploring Nepal and book your first experience.',
+    'traveler_bookings_showing'           => 'Showing :count bookings',
+    'traveler_reviews_status_pending'     => 'Pending Approval',
+    'traveler_reviews_status_approved'    => 'Approved',
+    'traveler_reviews_status_rejected'    => 'Rejected',
+    'traveler_reviews_empty_desc'         => 'Complete a booking to leave your first review.',
+    'traveler_reviews_reviewed_on'        => 'Reviewed on',
+    'traveler_back_dashboard'             => 'Back to Dashboard',
+    // ============================================
+    // Traveler Routes Fix (visibility + missing keys)
+    // ============================================
+    'traveler_view_all_bookings_short'  => 'See All',
+    'traveler_view_all_reviews_short'   => 'See All',
+    'traveler_reviews_showing'          => 'Showing :count reviews',
+    'traveler_reviews_view_booking'     => 'View Booking',
+    'traveler_reviews_view_booking_arrow' => 'View Booking →',
 // ======================
 // TREKS
 // ======================

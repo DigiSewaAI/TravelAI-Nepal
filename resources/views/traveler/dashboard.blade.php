@@ -206,7 +206,14 @@
                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                         <i class="fas fa-calendar-check text-blue-600"></i> {{ __('messages.traveler_my_bookings') }}
                     </h3>
-                    <span class="text-sm text-gray-400">{{ $bookings->count() }} {{ __('messages.traveler_total') }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400">{{ $bookings->count() }} {{ __('messages.traveler_total') }}</span>
+                        @if($bookings->count() > 0)
+                            <a href="{{ route('traveler.bookings.index') }}" class="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center gap-1">
+                                {{ __('messages.traveler_view_all_bookings_short') }} <i class="fas fa-arrow-right text-[10px]"></i>
+                            </a>
+                        @endif
+                    </div>
                 </div>
 
                 @if($bookings->count() > 0)
@@ -246,11 +253,7 @@
                             </div>
                         @endforeach
                     </div>
-                    @if($bookings->count() > 5)
-                        <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_bookings') }} &rarr;</a>
-                        </div>
-                    @endif
+
                 @else
                     <p class="text-gray-500 text-center py-6">{{ __('messages.traveler_no_bookings_yet') }}</p>
                     <div class="text-center">
@@ -264,9 +267,16 @@
         <div class="space-y-6">
 
                         <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-amber-500 p-6 hover:shadow-lg transition-all duration-300">
-                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-                    <i class="fas fa-star text-yellow-500"></i> {{ __('messages.traveler_my_reviews') }}
-                </h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-star text-yellow-500"></i> {{ __('messages.traveler_my_reviews') }}
+                    </h3>
+                    @if($reviews->count() > 0)
+                        <a href="{{ route('traveler.reviews.index') }}" class="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-colors flex items-center gap-1">
+                            {{ __('messages.traveler_view_all_reviews_short') }} <i class="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    @endif
+                </div>
                 @if($reviews->count() > 0)
                     <div class="space-y-3">
                         @foreach($reviews->take(3) as $review)
@@ -279,11 +289,7 @@
                             </div>
                         @endforeach
                     </div>
-                    @if($reviews->count() > 3)
-                        <div class="mt-3 text-center">
-                            <a href="#" class="text-blue-600 hover:underline text-sm">{{ __('messages.traveler_view_all_reviews') }} &rarr;</a>
-                        </div>
-                    @endif
+
                 @else
                     <p class="text-gray-400 text-sm text-center py-4">{{ __('messages.traveler_no_reviews_yet') }}</p>
                 @endif
