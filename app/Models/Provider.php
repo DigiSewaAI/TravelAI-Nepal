@@ -7,11 +7,68 @@ use Illuminate\Database\Eloquent\Model;
 
 class Provider extends Model
 {
+    /**
+     * BOOKING-REFERENCE-SYSTEM-01: Auto-generate code on create
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($provider) {
+            if (empty($provider->code)) {
+                $provider->code = self::generateUniqueCode($provider->name);
+            }
+        });
+    }
+
+    /**
+     * Extract 3-letter code from provider name (skip stop words).
+     * Collision → append digit (THT → THT2 → THT3).
+     */
+    public static function generateUniqueCode(string $name): string
+    {
+        $words = preg_split('/\s+/', trim($name)) ?: [];
+        $stopWords = ['the', 'a', 'an', 'and', 'of', 'for', 'pvt', 'ltd', 'p', 'l', 'inc', 'llc', 'co'];
+        $words = array_values(array_filter(
+            $words,
+            fn($w) => $w !== '' && !in_array(strtolower($w), $stopWords)
+        ));
+
+        if (count($words) >= 3) {
+            $code = strtoupper($words[0][0] . $words[1][0] . $words[2][0]);
+        } elseif (count($words) === 2) {
+            $code = strtoupper($words[0][0] . $words[1][0] . ($words[1][1] ?? 'X'));
+        } elseif (count($words) === 1) {
+            $code = strtoupper(substr($words[0], 0, 3));
+        } else {
+            $code = 'PRV';
+        }
+
+        // Ensure 3 letters
+        $code = str_pad(substr($code, 0, 3), 3, 'X');
+
+        // Handle collision: THT → THT2 → THT3 ...
+        if (!self::where('code', $code)->exists()) {
+            return $code;
+        }
+
+        $base = substr($code, 0, 3);
+        for ($i = 2; $i <= 99; $i++) {
+            $candidate = $base . $i;
+            if (!self::where('code', $candidate)->exists()) {
+                return $candidate;
+            }
+        }
+
+        // Extremely unlikely fallback
+        return $base . substr(uniqid(), -2);
+    }
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'name',
+        'code',
         'slug',
         'description',
         'logo_url',

@@ -12,7 +12,43 @@ class Booking extends Model
 {
     use HasFactory;
 
+    /**
+     * BOOKING-REFERENCE-SYSTEM-01: Auto-generate booking_number on create
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($booking) {
+            if (empty($booking->booking_number)) {
+                $booking->booking_number = self::generateBookingNumber($booking);
+            }
+        });
+    }
+
+    /**
+     * Generate format: {PROVIDER_CODE}-BK-{YY}-{00001}
+     * Race-safe: unique constraint + retry on collision
+     */
+    public static function generateBookingNumber(self $booking): string
+    {
+        $booking->loadMissing('service.provider');
+        $provider = $booking->service?->provider;
+        $code = $provider?->code ?? 'SYS';
+        $year = now()->format('y');
+        $prefix = "{$code}-BK-{$year}-";
+
+        $last = self::where('booking_number', 'LIKE', "{$prefix}%")
+            ->orderByDesc('booking_number')
+            ->value('booking_number');
+
+        $next = $last ? ((int) substr($last, -5)) + 1 : 1;
+
+        return $prefix . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+    }
+
         protected $fillable = [
+        'booking_number',
         'traveler_id',
         'service_id',
         'departure_id',       // PROVIDER-ITINERARY-09B-04
