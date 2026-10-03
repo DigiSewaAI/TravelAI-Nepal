@@ -118,7 +118,7 @@
 
     <!-- ======================= HEADER ======================= -->
     <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/70 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 md:px-10 py-2 flex flex-wrap justify-between items-center">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 py-2 flex justify-between items-center">
             <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center space-x-0 group">
                 <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-2xl text-blue-600\'></i>'">
@@ -126,16 +126,16 @@
             </a>
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
-            <div class="flex flex-wrap gap-3 md:gap-4 text-gray-700 font-medium mt-3 md:mt-0 items-center">
+            <div class="flex gap-2 lg:gap-3 text-gray-700 font-medium items-center">
                 <!-- Navigation Links (पहिले जस्तै) -->
-                <a href="{{ url('/') }}" class="nav-link text-sm md:text-base">{{ __('messages.home') }}</a>
-                <a href="{{ url('/features') }}" class="nav-link text-sm md:text-base">{{ __('messages.features') }}</a>
-                <a href="{{ route('public.services.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.explore') }}</a>
-                <a href="{{ route('public.shop.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.nav_shop') }}</a>
-                <a href="{{ route('public.rental.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.nav_rental') }}</a>
-                <a href="{{ route('pages.pricing') }}" class="nav-link text-sm md:text-base">{{ __('messages.pricing') }}</a>
-                <a href="{{ url('/how-it-works') }}" class="nav-link text-sm md:text-base">{{ __('messages.how_it_works') }}</a>
-                <a href="{{ route('public.providers.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.providers') }}</a>
+                <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.home') }}</a>
+                <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.features') }}</a>
+                <a href="{{ route('public.services.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.explore') }}</a>
+                <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.nav_shop') }}</a>
+                <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.nav_rental') }}</a>
+                <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.pricing') }}</a>
+                <a href="{{ url('/how-it-works') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.how_it_works') }}</a>
+                <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.providers') }}</a>
 
                 <!-- ✅ Language Switcher (Get Early Access को ठाउँमा) -->
                 <div class="relative">
