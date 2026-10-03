@@ -429,7 +429,7 @@
         </div>
 
         {{-- Category chips --}}
-        <div class="chips-scroll flex gap-2 overflow-x-auto pb-4 mb-6 border-b border-gray-100" role="tablist">
+        <div class="chips-scroll flex flex-wrap gap-2 pb-4 mb-6 border-b border-gray-100" role="tablist">
             <a href="{{ route('public.services.index', ['category' => 'all']) }}"
                data-category="all"
                role="tab"
