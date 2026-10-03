@@ -24,7 +24,7 @@
                 <tbody>
                     @foreach($bookings as $booking)
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="py-3 text-sm">#{{ $booking->id }}</td>
+                        <td class="py-3 text-sm font-mono text-xs">{{ $booking->booking_number ?? '#' . $booking->id }}</td>
                         <td class="py-3 text-sm">{{ $booking->traveler->name ?? 'Guest' }}</td>
                         <td class="py-3 text-sm">{{ $booking->service->name ?? 'N/A' }}</td>
                         <td class="py-3 text-sm">{{ $booking->service->provider->name ?? 'N/A' }}</td>

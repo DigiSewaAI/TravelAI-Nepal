@@ -23,7 +23,7 @@ class PaymentNoticeReceivedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Traveler marked payment as sent — Booking #' . $this->booking->id,
+            subject: 'Traveler marked payment as sent — ' . ($this->booking->booking_number ?? 'Booking #' . $this->booking->id),
         );
     }
 

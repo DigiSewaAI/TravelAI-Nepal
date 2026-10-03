@@ -37,7 +37,7 @@
                 <h1>BOOKING INVOICE</h1>
             </div>
             <div class="invoice-number">
-                <strong>#{{ $booking->id }}</strong>
+                <strong>{{ $booking->booking_number ?? '#' . $booking->id }}</strong>
                 Date: {{ $booking->created_at->format('M d, Y') }}
             </div>
         </div>

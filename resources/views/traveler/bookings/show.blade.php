@@ -1,19 +1,19 @@
 @extends('layouts.public')
 
-@section('title', __('messages.traveler_booking_detail_title', ['id' => $booking->id]))
+@section('title', __('messages.traveler_booking_detail_title', ['id' => $booking->booking_number ?? $booking->id]))
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
     <nav class="text-sm text-gray-500 mb-4">
         <a href="{{ route('traveler.dashboard') }}" class="hover:text-blue-600">{{ __('messages.traveler_dashboard') }}</a>
         <span class="mx-2">/</span>
-        <span>{{ __('messages.traveler_booking_hash', ['id' => $booking->id]) }}</span>
+        <span>{{ __('messages.traveler_booking_hash', ['id' => $booking->booking_number ?? $booking->id]) }}</span>
     </nav>
 
     <div class="bg-white rounded-xl shadow-md border p-6">
         <div class="flex justify-between items-start">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.traveler_booking_hash', ['id' => $booking->id]) }}</h1>
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('messages.traveler_booking_hash', ['id' => $booking->booking_number ?? $booking->id]) }}</h1>
                 <p class="text-gray-500 text-sm mt-1">{{ $booking->service->name ?? __('messages.na') }}</p>
             </div>
             <span class="px-3 py-1 rounded-full text-sm font-semibold

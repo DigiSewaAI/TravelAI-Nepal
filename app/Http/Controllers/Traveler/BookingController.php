@@ -128,6 +128,7 @@ class BookingController extends Controller
         ];
 
         $pdf = Pdf::loadView('invoices.booking-pdf', $data);
-        return $pdf->download('booking-invoice-' . $booking->id . '.pdf');
+        $filename = 'booking-invoice-' . ($booking->booking_number ?? $booking->id) . '.pdf';
+        return $pdf->download($filename);
     }
 }
