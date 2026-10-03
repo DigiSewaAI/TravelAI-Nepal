@@ -260,6 +260,20 @@ php artisan key:generate
 bash
 php artisan migrate --force
 Expected: All migrations run successfully.
+### 4.6b Path 3A Migrations (Products)
+
+Path 3A adds:
+- `products` table (base — polymorphic: shop/rental/wholesale)
+- `shop_details`, `rental_details`, `wholesale_details`
+- 3 categories (shop, rental, wholesale)
+- 3 provider types (shop-owner, rental-provider, wholesale-provider)
+- 3 pivot mappings
+
+These run automatically via:
+```bash
+php artisan migrate --force
+No separate command needed. Existing 10-category system is unaffected (additive only — R8).
+
 
 ### 4.7 Run Production Seeders
 
