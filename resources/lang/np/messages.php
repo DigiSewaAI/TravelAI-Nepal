@@ -1379,7 +1379,7 @@ return [
     // ======================
     'traveler_booking_detail_title' => 'बुकिङ #:id | TravelAI नेपाल',
     'traveler_dashboard' => 'ड्यासबोर्ड',
-    'traveler_booking_hash' => 'बुकिङ #:id',
+     'traveler_booking_hash' => 'बुकिङ :id',
     'traveler_booking_start_date' => 'सुरु मिति',
     'traveler_booking_date' => 'बुकिङ मिति',
     'traveler_booking_provider' => 'सेवा प्रदायक',

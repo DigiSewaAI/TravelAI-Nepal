@@ -52,6 +52,24 @@ class ProviderController extends Controller
         return back()->with('success', 'Provider status updated.');
     }
 
+    /**
+     * BOOKING-REFERENCE-SYSTEM-01: Update provider code
+     */
+    public function updateCode(Request $request, Provider $provider)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|min:2|max:5|regex:/^[A-Z0-9]+$/|unique:providers,code,' . $provider->id,
+        ], [
+            'code.regex'  => 'Code must be uppercase letters or digits only.',
+            'code.unique' => 'This code is already taken by another provider.',
+        ]);
+
+        $provider->code = strtoupper($validated['code']);
+        $provider->save();
+
+        return back()->with('success', 'Provider code updated successfully.');
+    }
+
     public function destroy(Provider $provider)
     {
         // Delete associated documents

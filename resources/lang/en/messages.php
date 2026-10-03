@@ -1352,7 +1352,7 @@ return [
 // ======================
 'traveler_booking_detail_title' => 'Booking #:id | TravelAI Nepal',
 'traveler_dashboard' => 'Dashboard',
-'traveler_booking_hash' => 'Booking #:id',
+'traveler_booking_hash' => 'Booking :id',
 'traveler_booking_start_date' => 'Start Date',
 'traveler_booking_date' => 'Booking Date',
 'traveler_booking_provider' => 'Service Provider',

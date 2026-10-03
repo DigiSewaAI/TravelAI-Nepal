@@ -379,6 +379,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/providers/{provider}', [AdminProviderController::class, 'show'])->name('providers.show');
     Route::patch('/providers/{provider}/verify', [AdminProviderController::class, 'verify'])->name('providers.verify');
     Route::patch('/providers/{provider}/toggle', [AdminProviderController::class, 'toggleActive'])->name('providers.toggle');
+    Route::patch('/providers/{provider}/code', [AdminProviderController::class, 'updateCode'])->name('providers.update-code');
     Route::delete('/providers/{provider}', [AdminProviderController::class, 'destroy'])->name('providers.destroy');
 
     // Users

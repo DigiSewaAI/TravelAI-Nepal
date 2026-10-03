@@ -1370,7 +1370,7 @@ return [
 // ======================
 'traveler_booking_detail_title' => '预订 #:id | TravelAI 尼泊尔',
 'traveler_dashboard' => '仪表板',
-'traveler_booking_hash' => '预订 #:id',
+'traveler_booking_hash' => '预订 :id',
 'traveler_booking_start_date' => '开始日期',
 'traveler_booking_date' => '预订日期',
 'traveler_booking_provider' => '服务供应商',

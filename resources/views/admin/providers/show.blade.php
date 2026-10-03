@@ -73,6 +73,35 @@
         <div class="bg-white rounded-xl shadow-sm border p-6 h-fit">
             <h3 class="font-semibold text-gray-700 mb-4">Actions</h3>
 
+            <!-- Provider Code (BOOKING-REFERENCE-SYSTEM-01) -->
+            <form method="POST" action="{{ route('admin.providers.update-code', $provider) }}" class="mb-4">
+                @csrf
+                @method('PATCH')
+                <div class="space-y-2">
+                    <label class="block text-sm text-gray-600">
+                        {{ __('messages.provider_code_label') }}
+                    </label>
+                    <input type="text"
+                           name="code"
+                           value="{{ old('code', $provider->code) }}"
+                           maxlength="5"
+                           pattern="[A-Za-z0-9]{2,5}"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg text-sm uppercase font-mono"
+                           placeholder="THT">
+                    <p class="text-xs text-gray-500">{{ __('messages.provider_code_hint') }}</p>
+                    @error('code')
+                        <p class="text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-save mr-1"></i>
+                        {{ __('messages.provider_code_save') }}
+                    </button>
+                </div>
+            </form>
+
+            <hr class="mb-4">
+
             <!-- Verification Status Update -->
             <form method="POST" action="{{ route('admin.providers.verify', $provider) }}" class="mb-4">
                 @csrf
