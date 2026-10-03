@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Provider extends Model
 {
+    use HasFactory;
+
     /**
      * BOOKING-REFERENCE-SYSTEM-01: Auto-generate code on create
      */
@@ -63,7 +65,6 @@ class Provider extends Model
         // Extremely unlikely fallback
         return $base . substr(uniqid(), -2);
     }
-    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -99,7 +100,7 @@ class Provider extends Model
         return $this->belongsToMany(ProviderType::class, 'provider_provider_type');
     }
 
-        /**
+    /**
      * FIX-14: Canonical staff relationship.
      * Returns ProviderStaff memberships (join table).
      * Do NOT use User->provider_id — that column does not exist.
@@ -127,6 +128,14 @@ class Provider extends Model
     public function services()
     {
         return $this->hasMany(Service::class);
+    }
+
+    /**
+     * PATH-3A: Products (shop / rental / wholesale) owned by this provider.
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 
     public function bookings()
@@ -199,6 +208,19 @@ class Provider extends Model
         return $this->hasMany(Payment::class);
     }
 
+    /**
+     * PHASE 7B — Provider's own payment methods (Layer 2 display for travelers).
+     */
+    public function paymentMethods()
+    {
+        return $this->hasMany(\App\Models\ProviderPaymentMethod::class, 'provider_id');
+    }
+
+    public function styles()
+    {
+        return $this->hasMany(ProviderStyle::class, 'provider_id');
+    }
+
     // =====================================================
     // HELPERS
     // =====================================================
@@ -238,7 +260,8 @@ class Provider extends Model
             default => 1,
         };
     }
-        /**
+
+    /**
      * FIX-15: Get the maximum number of active service listings allowed
      * for the provider's current plan.
      * Returns -1 for unlimited (Enterprise).
@@ -267,20 +290,37 @@ class Provider extends Model
             default => 3,
         };
     }
-    public function styles()
-{
-    return $this->hasMany(ProviderStyle::class, 'provider_id');
-}
 
     /**
-     * PHASE 7B — Provider's own payment methods (Layer 2 display for travelers).
+     * PATH-3A: Max products (shop/rental/wholesale) from plan.
+     * Unified limit — all product types share this quota.
      */
-    public function paymentMethods()
+    public function getMaxProductsAttribute(): int
     {
-        return $this->hasMany(\App\Models\ProviderPaymentMethod::class, 'provider_id');
+        $plan = $this->getActivePlanAttribute();
+        if (!$plan) {
+            return 5;
+        }
+
+        $limits = is_array($plan->limits)
+            ? $plan->limits
+            : (json_decode($plan->limits, true) ?? []);
+
+        if (isset($limits['max_products'])) {
+            return (int) $limits['max_products'];
+        }
+
+        return match ($plan->slug) {
+            'free'         => 5,
+            'professional' => 30,
+            'business'     => 200,
+            'enterprise'   => -1,
+            default        => 5,
+        };
     }
-public function supportsStyle(string $styleSlug): bool
-{
-    return $this->styles()->where('style_slug', $styleSlug)->exists();
-}
+
+    public function supportsStyle(string $styleSlug): bool
+    {
+        return $this->styles()->where('style_slug', $styleSlug)->exists();
+    }
 }
