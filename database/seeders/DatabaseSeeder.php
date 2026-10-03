@@ -62,38 +62,46 @@ class DatabaseSeeder extends Seeder
             AssignRouteCategoriesSeeder::class,
         ]);
 
-        // ─── 6. Provider seeders per region ───
-        //         (need locations + service_categories + users)
-        $this->call([
-            AnnapurnaProviderSeeder::class,
-            EverestProviderSeeder::class,
-            LangtangProviderSeeder::class,
-            ManasluProviderSeeder::class,
-            KanchenjungaMakaluProviderSeeder::class,
-            MustangDolpoProviderSeeder::class,
-            NationalParksProviderSeeder::class,
-            ReligiousSitesProviderSeeder::class,
-            HiddenGemsProviderSeeder::class,
-            CityCulturalProviderSeeder::class,
-            AdventureActivitiesProviderSeeder::class,
-            RemoteTreksProviderSeeder::class,
-        ]);
+        // ─── 6-9. DEV-ONLY (test providers + services + tourism + assignments) ───
+        // Production = fresh DB + curated demo (Hybrid strategy)
+        if (!app()->environment('production')) {
+            $this->call([
+                // §6 — Provider Seeders (12)
+                AnnapurnaProviderSeeder::class,
+                EverestProviderSeeder::class,
+                LangtangProviderSeeder::class,
+                ManasluProviderSeeder::class,
+                KanchenjungaMakaluProviderSeeder::class,
+                MustangDolpoProviderSeeder::class,
+                NationalParksProviderSeeder::class,
+                ReligiousSitesProviderSeeder::class,
+                HiddenGemsProviderSeeder::class,
+                CityCulturalProviderSeeder::class,
+                AdventureActivitiesProviderSeeder::class,
+                RemoteTreksProviderSeeder::class,
 
-        // ─── 7. Base services + location assignment ───
-        $this->call([
-            ServiceSeeder::class,
-            ServiceLocationSeeder::class,
-        ]);
+                // §7 — Service Seeders
+                ServiceSeeder::class,
+                ServiceLocationSeeder::class,
 
-        // ─── 8. Tourism providers (with services, reviews) ───
-        $this->call([
-            TourismProvidersSeeder::class,
-        ]);
+                // §8 — Tourism Providers
+                TourismProvidersSeeder::class,
 
-        // ─── 9. Final assignments (need all above) ───
-        $this->call([
-            AssignProviderTypesSeeder::class,
-        ]);
+                // §9 — Assign Provider Types (depends on §6)
+                AssignProviderTypesSeeder::class,
+            ]);
+        }
+
+        // ─── Always: production admin (idempotent, env-driven) ───
+        $this->call(ProductionAdminSeeder::class);
+                // ─── Always: production admin (idempotent, env-driven) ───
+        $this->call(ProductionAdminSeeder::class);
+
+        // ─── Real entities (migrated from local — idempotent) ───
+        $this->call(RealEntitiesSeeder::class);
+
+        // ─── Demo providers (1 per remaining category — idempotent) ───
+        $this->call(DemoProvidersSeeder::class);
 
         // ─── 10. Testing data (dev only) ───
         // $this->call([TestingDataSeeder::class]); // ← uncomment if needed

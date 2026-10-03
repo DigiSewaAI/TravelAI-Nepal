@@ -261,10 +261,37 @@ bash
 php artisan migrate --force
 Expected: All migrations run successfully.
 
-4.7 Run Production Seeders
-bash
+### 4.7 Run Production Seeders
+
+**Env setup (production `.env`) — add these:**
+```
+ADMIN_EMAIL=parasharregmi@gmail.com
+ADMIN_NAME=Parashar Regmi
+ADMIN_PASSWORD=Himalayan@1980
+ADMIN_PHONE=9761762036
+```
+
+**Run:**
+```bash
 php artisan db:seed --force
-⚠️ Note: Only production-safe seeders (see docs/PRODUCTION_SEEDERS_SUMMARY.md). Do not run dev-only seeders.
+```
+
+**Behavior (env-aware):**
+
+- ✅ Runs: Core data (categories, plans, locations)
+- ✅ Runs: Route data (routes, waypoints, segments)
+- ✅ Runs: ProductionAdminSeeder (Parashar Regmi — super_admin)
+- ✅ Runs: RealEntitiesSeeder (Anju + Pareen + John — providers/services/bookings)
+- ✅ Runs: DemoProvidersSeeder (5 demo providers — Hotel, Activity, Experience, Resort, Homestay)
+- ❌ Skips: 12 provider seeders (env guard)
+- ❌ Skips: Service + Tourism seeders (env guard)
+- ❌ Skips: AssignProviderTypes (env guard)
+
+**Result:** Fresh DB + 4 users + 7 providers + ~15 services + 3 bookings.
+
+**Post-seed:** Verify admin login with ADMIN_EMAIL + ADMIN_PASSWORD.
+
+**Full strategy:** `docs/PRODUCTION_SEEDERS_SUMMARY.md`
 
 4.8 Create Storage Link
 bash
