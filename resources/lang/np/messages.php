@@ -1390,6 +1390,47 @@ return [
     'traveler_booking_write_review' => 'समीक्षा लेख्नुहोस्',
     'traveler_booking_back_to_dashboard' => 'ड्यासबोर्डमा फर्कनुहोस्',
 
+        // ============================================
+    // PATH-3A — Products (Shop / Rental / Wholesale)
+    // ============================================
+    'products_title'                        => 'मेरा उत्पादनहरू',
+    'products_create_btn'                   => 'नयाँ उत्पादन',
+    'products_filter_all'                   => 'सबै',
+    'products_filter_shop'                  => 'पसल',
+    'products_filter_rental'                => 'भाडा',
+    'products_filter_wholesale'             => 'थोक',
+    'products_limit_label'                  => ':used / :max उत्पादनहरू',
+    'products_limit_unlimited'              => 'असीमित उत्पादनहरू',
+    'products_no_items'                     => 'अहिलेसम्म कुनै उत्पादन छैन। नयाँ बनाएर सुरु गर्नुहोस्।',
+    'products_edit_btn'                     => 'सम्पादन',
+    'products_delete_btn'                   => 'हटाउनु',
+    'products_delete_confirm'               => 'यो उत्पादन हटाउने?',
+    'product_type'                          => 'उत्पादनको प्रकार',
+    'product_type_shop'                     => 'पसल',
+    'product_type_rental'                   => 'भाडा',
+    'product_type_wholesale'                => 'थोक',
+    'product_name'                          => 'उत्पादनको नाम',
+    'product_description'                   => 'विवरण',
+    'product_price'                         => 'मूल्य',
+    'product_currency'                      => 'मुद्रा',
+    'product_cover_image'                   => 'मुख्य तस्बिर',
+    'product_status'                        => 'स्थिति',
+    'product_status_active'                 => 'सक्रिय',
+    'product_status_inactive'               => 'निष्क्रिय',
+    'product_shop_stock_count'              => 'स्टक संख्या',
+    'product_shop_sku'                      => 'SKU',
+    'product_rental_price_per_day'          => 'दैनिक भाडा मूल्य',
+    'product_rental_deposit'                => 'धरौटी',
+    'product_rental_condition'              => 'अवस्था',
+    'product_rental_min_days'               => 'न्यूनतम दिन',
+    'product_rental_max_days'               => 'अधिकतम दिन',
+    'product_wholesale_min_order_qty'       => 'न्यूनतम अर्डर संख्या',
+    'product_wholesale_bulk_pricing_hint'   => 'थोक मूल्य तह Phase 3B मा व्यवस्थापन गरिनेछ।',
+    'product_created'                       => 'उत्पादन सफलतापूर्वक सिर्जना भयो।',
+    'product_updated'                       => 'उत्पादन सफलतापूर्वक अद्यावधिक भयो।',
+    'product_deleted'                       => 'उत्पादन सफलतापूर्वक हटाइयो।',
+    'product_limit_reached'                 => 'उत्पादन सीमा पुग्यो (:max)। आफ्नो योजना अपग्रेड गर्नुहोस्।',
+
     // ======================
     // TRAVELER REVIEW CREATE
     // ======================

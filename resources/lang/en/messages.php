@@ -1363,6 +1363,47 @@ return [
 'traveler_booking_write_review' => 'Write a Review',
 'traveler_booking_back_to_dashboard' => 'Back to Dashboard',
 
+    // ============================================
+    // PATH-3A — Products (Shop / Rental / Wholesale)
+    // ============================================
+    'products_title'                        => 'My Products',
+    'products_create_btn'                   => 'Create Product',
+    'products_filter_all'                   => 'All',
+    'products_filter_shop'                  => 'Shop',
+    'products_filter_rental'                => 'Rental',
+    'products_filter_wholesale'             => 'Wholesale',
+    'products_limit_label'                  => ':used / :max products',
+    'products_limit_unlimited'              => 'Unlimited products',
+    'products_no_items'                     => 'No products yet. Start by creating one.',
+    'products_edit_btn'                     => 'Edit',
+    'products_delete_btn'                   => 'Delete',
+    'products_delete_confirm'               => 'Delete this product?',
+    'product_type'                          => 'Product Type',
+    'product_type_shop'                     => 'Shop',
+    'product_type_rental'                   => 'Rental',
+    'product_type_wholesale'                => 'Wholesale',
+    'product_name'                          => 'Product Name',
+    'product_description'                   => 'Description',
+    'product_price'                         => 'Price',
+    'product_currency'                      => 'Currency',
+    'product_cover_image'                   => 'Cover Image',
+    'product_status'                        => 'Status',
+    'product_status_active'                 => 'Active',
+    'product_status_inactive'               => 'Inactive',
+    'product_shop_stock_count'              => 'Stock Count',
+    'product_shop_sku'                      => 'SKU',
+    'product_rental_price_per_day'          => 'Rental Price (per day)',
+    'product_rental_deposit'                => 'Deposit',
+    'product_rental_condition'              => 'Condition',
+    'product_rental_min_days'               => 'Minimum Days',
+    'product_rental_max_days'               => 'Maximum Days',
+    'product_wholesale_min_order_qty'       => 'Minimum Order Quantity',
+    'product_wholesale_bulk_pricing_hint'   => 'Bulk pricing tiers managed in Phase 3B.',
+    'product_created'                       => 'Product created successfully.',
+    'product_updated'                       => 'Product updated successfully.',
+    'product_deleted'                       => 'Product deleted successfully.',
+    'product_limit_reached'                 => 'Product limit reached (:max). Upgrade your plan.',
+
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

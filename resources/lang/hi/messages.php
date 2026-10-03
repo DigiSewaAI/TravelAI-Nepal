@@ -1367,6 +1367,47 @@ return [
 'traveler_booking_write_review' => 'समीक्षा लिखें',
 'traveler_booking_back_to_dashboard' => 'डैशबोर्ड पर वापस जाएँ',
 
+    // ============================================
+    // PATH-3A — Products (Shop / Rental / Wholesale)
+    // ============================================
+    'products_title'                        => 'मेरे उत्पाद',
+    'products_create_btn'                   => 'नया उत्पाद',
+    'products_filter_all'                   => 'सभी',
+    'products_filter_shop'                  => 'दुकान',
+    'products_filter_rental'                => 'किराया',
+    'products_filter_wholesale'             => 'थोक',
+    'products_limit_label'                  => ':used / :max उत्पाद',
+    'products_limit_unlimited'              => 'असीमित उत्पाद',
+    'products_no_items'                     => 'अभी कोई उत्पाद नहीं। एक बनाकर शुरू करें।',
+    'products_edit_btn'                     => 'संपादित करें',
+    'products_delete_btn'                   => 'हटाएं',
+    'products_delete_confirm'               => 'यह उत्पाद हटाएं?',
+    'product_type'                          => 'उत्पाद प्रकार',
+    'product_type_shop'                     => 'दुकान',
+    'product_type_rental'                   => 'किराया',
+    'product_type_wholesale'                => 'थोक',
+    'product_name'                          => 'उत्पाद का नाम',
+    'product_description'                   => 'विवरण',
+    'product_price'                         => 'मूल्य',
+    'product_currency'                      => 'मुद्रा',
+    'product_cover_image'                   => 'कवर छवि',
+    'product_status'                        => 'स्थिति',
+    'product_status_active'                 => 'सक्रिय',
+    'product_status_inactive'               => 'निष्क्रिय',
+    'product_shop_stock_count'              => 'स्टॉक संख्या',
+    'product_shop_sku'                      => 'SKU',
+    'product_rental_price_per_day'          => 'प्रति दिन किराया मूल्य',
+    'product_rental_deposit'                => 'जमा राशि',
+    'product_rental_condition'              => 'स्थिति',
+    'product_rental_min_days'               => 'न्यूनतम दिन',
+    'product_rental_max_days'               => 'अधिकतम दिन',
+    'product_wholesale_min_order_qty'       => 'न्यूनतम ऑर्डर मात्रा',
+    'product_wholesale_bulk_pricing_hint'   => 'थोक मूल्य स्तर Phase 3B में प्रबंधित किए जाएंगे।',
+    'product_created'                       => 'उत्पाद सफलतापूर्वक बनाया गया।',
+    'product_updated'                       => 'उत्पाद सफलतापूर्वक अपडेट किया गया।',
+    'product_deleted'                       => 'उत्पाद सफलतापूर्वक हटाया गया।',
+    'product_limit_reached'                 => 'उत्पाद सीमा पूरी हुई (:max)। अपनी योजना अपग्रेड करें।',
+
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================
