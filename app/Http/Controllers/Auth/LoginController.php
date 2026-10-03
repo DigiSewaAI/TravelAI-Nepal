@@ -39,6 +39,9 @@ class LoginController extends Controller
                 'role'    => $user->role,
             ]);
 
+            // PATH-3B B2: merge guest cart into user cart
+            app(\App\Services\CartService::class)->mergeGuestCart($user->id);
+
             // Redirect based on role
             if ($user->isSuperAdmin()) {
     return redirect()->intended(route('admin.dashboard'));

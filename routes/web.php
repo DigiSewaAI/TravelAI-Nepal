@@ -153,6 +153,15 @@ Route::get('/shop',      [App\Http\Controllers\Public\ProductController::class, 
 Route::get('/rental',    [App\Http\Controllers\Public\ProductController::class, 'rental'])->name('public.rental.index');
 Route::get('/wholesale', [App\Http\Controllers\Public\ProductController::class, 'wholesale'])->name('public.wholesale.index');
 Route::get('/product/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('public.products.show');
+
+
+// =============================================
+// CART (Path 3B — B2)
+// =============================================
+Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{product}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/{cart}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{cart}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');

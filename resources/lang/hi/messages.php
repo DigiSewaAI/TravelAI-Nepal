@@ -1439,6 +1439,22 @@ return [
     'products_add_cart_coming'     => 'कार्ट जल्द आ रहा है',
     'products_detail_about'        => 'इस उत्पाद के बारे में',
     'products_detail_provider'     => 'प्रदानकर्ता',
+        // ============================================
+    // PATH-3B B2 — Cart
+    // ============================================
+    'cart_title'                   => 'शॉपिंग कार्ट',
+    'cart_empty'                   => 'आपका कार्ट खाली है।',
+    'cart_added'                   => 'कार्ट में जोड़ा गया।',
+    'cart_updated'                 => 'कार्ट अपडेट किया गया।',
+    'cart_removed'                 => 'आइटम हटाया गया।',
+    'cart_subtotal'                => 'उप-योग',
+    'cart_checkout_btn'            => 'चेकआउट पर जाएं',
+    'cart_continue_shopping'       => 'खरीदारी जारी रखें',
+    'cart_rental_dates_required'   => 'कृपया किराया तिथियाँ चुनें।',
+    'cart_min_days_error'          => 'न्यूनतम किराया: :min दिन।',
+    'cart_max_days_error'          => 'अधिकतम किराया: :max दिन।',
+    'cart_add_btn'                 => 'कार्ट में जोड़ें',
+    'cart_remove_btn'              => 'हटाएं',
 
 // ======================
 // TRAVELER REVIEW CREATE

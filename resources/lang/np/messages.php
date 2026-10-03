@@ -1462,6 +1462,22 @@ return [
     'products_add_cart_coming'     => 'कार्ट चाँडै आउँदैछ',
     'products_detail_about'        => 'यो उत्पादनको बारेमा',
     'products_detail_provider'     => 'प्रदानकर्ता',
+        // ============================================
+    // PATH-3B B2 — Cart
+    // ============================================
+    'cart_title'                   => 'किन्ने झोला',
+    'cart_empty'                   => 'तपाईंको झोला खाली छ।',
+    'cart_added'                   => 'झोलामा थपियो।',
+    'cart_updated'                 => 'झोला अद्यावधिक भयो।',
+    'cart_removed'                 => 'वस्तु हटाइयो।',
+    'cart_subtotal'                => 'उप-योग',
+    'cart_checkout_btn'            => 'भुक्तानीमा जानुहोस्',
+    'cart_continue_shopping'       => 'किनमेल जारी राख्नुहोस्',
+    'cart_rental_dates_required'   => 'कृपया भाडाको मिति छान्नुहोस्।',
+    'cart_min_days_error'          => 'न्यूनतम भाडा: :min दिन।',
+    'cart_max_days_error'          => 'अधिकतम भाडा: :max दिन।',
+    'cart_add_btn'                 => 'झोलामा थप्नुहोस्',
+    'cart_remove_btn'              => 'हटाउनुहोस्',
 
     // ======================
     // TRAVELER REVIEW CREATE

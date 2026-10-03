@@ -1453,6 +1453,22 @@ return [
     'products_add_cart_coming'     => '购物车即将推出',
     'products_detail_about'        => '关于此产品',
     'products_detail_provider'     => '提供者',
+        // ============================================
+    // PATH-3B B2 — Cart
+    // ============================================
+    'cart_title'                   => '购物车',
+    'cart_empty'                   => '您的购物车是空的。',
+    'cart_added'                   => '已添加到购物车。',
+    'cart_updated'                 => '购物车已更新。',
+    'cart_removed'                 => '商品已移除。',
+    'cart_subtotal'                => '小计',
+    'cart_checkout_btn'            => '前往结账',
+    'cart_continue_shopping'       => '继续购物',
+    'cart_rental_dates_required'   => '请选择租赁日期。',
+    'cart_min_days_error'          => '最短租赁：:min 天。',
+    'cart_max_days_error'          => '最长租赁：:max 天。',
+    'cart_add_btn'                 => '加入购物车',
+    'cart_remove_btn'              => '移除',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

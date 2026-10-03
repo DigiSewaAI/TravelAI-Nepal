@@ -75,9 +75,41 @@
                 </div>
             @endif
 
-            <div class="mt-6 bg-gray-50 rounded-xl p-4">
-                <p class="text-sm text-gray-500">{{ __('messages.products_add_cart_coming') }}</p>
-            </div>
+            <form method="POST" action="{{ route('cart.add', $product) }}" class="mt-6">
+                @csrf
+
+                @if($product->product_type === 'rental')
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" name="rental_start_date" required
+                                   min="{{ date('Y-m-d') }}"
+                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" name="rental_end_date" required
+                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                @endif
+
+                <div class="flex gap-3 items-center">
+                    <input type="number" name="quantity" value="1" min="1" max="100"
+                           class="w-20 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
+                        <i class="fas fa-cart-plus mr-2"></i> {{ __('messages.cart_add_btn') }}
+                    </button>
+                </div>
+
+                @if(session('error'))
+                    <p class="mt-2 text-sm text-red-600">{{ session('error') }}</p>
+                @endif
+                @if(session('success'))
+                    <p class="mt-2 text-sm text-green-600">{{ session('success') }}</p>
+                @endif
+            </form>
 
         </div>
     </div>

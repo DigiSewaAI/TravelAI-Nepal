@@ -1435,6 +1435,22 @@ return [
     'products_add_cart_coming'     => 'Cart coming soon',
     'products_detail_about'        => 'About this product',
     'products_detail_provider'     => 'Provided by',
+        // ============================================
+    // PATH-3B B2 — Cart
+    // ============================================
+    'cart_title'                   => 'Shopping Cart',
+    'cart_empty'                   => 'Your cart is empty.',
+    'cart_added'                   => 'Added to cart.',
+    'cart_updated'                 => 'Cart updated.',
+    'cart_removed'                 => 'Item removed.',
+    'cart_subtotal'                => 'Subtotal',
+    'cart_checkout_btn'            => 'Proceed to Checkout',
+    'cart_continue_shopping'       => 'Continue Shopping',
+    'cart_rental_dates_required'   => 'Please select rental dates.',
+    'cart_min_days_error'          => 'Minimum rental: :min days.',
+    'cart_max_days_error'          => 'Maximum rental: :max days.',
+    'cart_add_btn'                 => 'Add to Cart',
+    'cart_remove_btn'              => 'Remove',
 
 // ======================
 // TRAVELER REVIEW CREATE
