@@ -1421,6 +1421,38 @@ return [
     'product_updated'                       => '产品更新成功。',
     'product_deleted'                       => '产品删除成功。',
     'product_limit_reached'                 => '产品上限已达 (:max)。请升级您的计划。',
+        // ============================================
+    // PATH-3B B1 — Public Product Catalog
+    // ============================================
+    'nav_shop'                     => '商店',
+    'nav_rental'                   => '租赁',
+    'nav_wholesale'                => '批发',
+    'shop_index_title'             => '尼泊尔手工艺品和纪念品',
+    'shop_index_subtitle'          => '来自当地工匠的正宗商品',
+    'rental_index_title'           => '徒步装备租赁',
+    'rental_index_subtitle'        => '为您的冒险租赁优质装备',
+    'wholesale_index_title'        => '批发产品',
+    'wholesale_index_subtitle'     => '面向零售商的批量订单',
+    'products_filter_search'       => '搜索产品',
+    'products_filter_location'     => '地点',
+    'products_filter_all_locations' => '所有地点',
+    'products_filter_price_min'    => '最低价格',
+    'products_filter_price_max'    => '最高价格',
+    'products_filter_apply'        => '应用筛选',
+    'products_filter_reset'        => '重置',
+    'products_sort_label'          => '排序方式',
+    'products_sort_newest'         => '最新',
+    'products_sort_price_asc'      => '价格：从低到高',
+    'products_sort_price_desc'     => '价格：从高到低',
+    'products_sort_name'           => '名称',
+    'products_no_items'            => '未找到产品。',
+    'products_per_day'             => '每天',
+    'products_deposit_label'       => '押金',
+    'products_min_order'           => '最小订单量',
+    'products_bulk_available'      => '提供批量定价',
+    'products_add_cart_coming'     => '购物车即将推出',
+    'products_detail_about'        => '关于此产品',
+    'products_detail_provider'     => '提供者',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

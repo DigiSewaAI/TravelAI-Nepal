@@ -1430,6 +1430,38 @@ return [
     'product_updated'                       => 'उत्पादन सफलतापूर्वक अद्यावधिक भयो।',
     'product_deleted'                       => 'उत्पादन सफलतापूर्वक हटाइयो।',
     'product_limit_reached'                 => 'उत्पादन सीमा पुग्यो (:max)। आफ्नो योजना अपग्रेड गर्नुहोस्।',
+        // ============================================
+    // PATH-3B B1 — Public Product Catalog
+    // ============================================
+    'nav_shop'                     => 'पसल',
+    'nav_rental'                   => 'भाडा',
+    'nav_wholesale'                => 'थोक',
+    'shop_index_title'             => 'नेपाली हस्तकला र सम्झनाहरू',
+    'shop_index_subtitle'          => 'स्थानीय कलाकारहरूका प्रामाणिक सामानहरू',
+    'rental_index_title'           => 'ट्रेकिङ सामान भाडा',
+    'rental_index_subtitle'        => 'तपाईंको यात्राको लागि गुणस्तरीय सामान भाडामा',
+    'wholesale_index_title'        => 'थोक उत्पादनहरू',
+    'wholesale_index_subtitle'     => 'खुद्रा व्यापारीहरूका लागि थोक अर्डर',
+    'products_filter_search'       => 'उत्पादनहरू खोज्नुहोस्',
+    'products_filter_location'     => 'स्थान',
+    'products_filter_all_locations' => 'सबै स्थानहरू',
+    'products_filter_price_min'    => 'न्यूनतम मूल्य',
+    'products_filter_price_max'    => 'अधिकतम मूल्य',
+    'products_filter_apply'        => 'फिल्टर लागू गर्नुहोस्',
+    'products_filter_reset'        => 'रिसेट',
+    'products_sort_label'          => 'क्रमबद्ध गर्नुहोस्',
+    'products_sort_newest'         => 'नयाँ',
+    'products_sort_price_asc'      => 'मूल्य: कमदेखि उच्च',
+    'products_sort_price_desc'     => 'मूल्य: उच्चदेखि कम',
+    'products_sort_name'           => 'नाम',
+    'products_no_items'            => 'कुनै उत्पादन भेटिएन।',
+    'products_per_day'             => 'प्रति दिन',
+    'products_deposit_label'       => 'धरौटी',
+    'products_min_order'           => 'न्यूनतम अर्डर',
+    'products_bulk_available'      => 'थोक मूल्य उपलब्ध',
+    'products_add_cart_coming'     => 'कार्ट चाँडै आउँदैछ',
+    'products_detail_about'        => 'यो उत्पादनको बारेमा',
+    'products_detail_provider'     => 'प्रदानकर्ता',
 
     // ======================
     // TRAVELER REVIEW CREATE

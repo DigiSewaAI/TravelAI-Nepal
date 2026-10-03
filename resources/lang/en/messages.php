@@ -1403,6 +1403,38 @@ return [
     'product_updated'                       => 'Product updated successfully.',
     'product_deleted'                       => 'Product deleted successfully.',
     'product_limit_reached'                 => 'Product limit reached (:max). Upgrade your plan.',
+        // ============================================
+    // PATH-3B B1 — Public Product Catalog
+    // ============================================
+    'nav_shop'                     => 'Shop',
+    'nav_rental'                   => 'Rental',
+    'nav_wholesale'                => 'Wholesale',
+    'shop_index_title'             => 'Nepali Handicrafts & Souvenirs',
+    'shop_index_subtitle'          => 'Authentic items from local artisans',
+    'rental_index_title'           => 'Trekking Gear Rental',
+    'rental_index_subtitle'        => 'Rent quality gear for your adventure',
+    'wholesale_index_title'        => 'Wholesale Products',
+    'wholesale_index_subtitle'     => 'Bulk orders for retailers',
+    'products_filter_search'       => 'Search products',
+    'products_filter_location'     => 'Location',
+    'products_filter_all_locations' => 'All Locations',
+    'products_filter_price_min'    => 'Min Price',
+    'products_filter_price_max'    => 'Max Price',
+    'products_filter_apply'        => 'Apply Filters',
+    'products_filter_reset'        => 'Reset',
+    'products_sort_label'          => 'Sort By',
+    'products_sort_newest'         => 'Newest',
+    'products_sort_price_asc'      => 'Price: Low to High',
+    'products_sort_price_desc'     => 'Price: High to Low',
+    'products_sort_name'           => 'Name',
+    'products_no_items'            => 'No products found.',
+    'products_per_day'             => 'per day',
+    'products_deposit_label'       => 'Deposit',
+    'products_min_order'           => 'Min Order',
+    'products_bulk_available'      => 'Bulk pricing available',
+    'products_add_cart_coming'     => 'Cart coming soon',
+    'products_detail_about'        => 'About this product',
+    'products_detail_provider'     => 'Provided by',
 
 // ======================
 // TRAVELER REVIEW CREATE

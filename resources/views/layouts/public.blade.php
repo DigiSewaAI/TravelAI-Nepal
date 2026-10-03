@@ -131,6 +131,8 @@
                 <a href="{{ url('/') }}" class="nav-link text-sm md:text-base">{{ __('messages.home') }}</a>
                 <a href="{{ url('/features') }}" class="nav-link text-sm md:text-base">{{ __('messages.features') }}</a>
                 <a href="{{ route('public.services.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.explore') }}</a>
+                <a href="{{ route('public.shop.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.nav_shop') }}</a>
+                <a href="{{ route('public.rental.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.nav_rental') }}</a>
                 <a href="{{ route('pages.pricing') }}" class="nav-link text-sm md:text-base">{{ __('messages.pricing') }}</a>
                 <a href="{{ url('/how-it-works') }}" class="nav-link text-sm md:text-base">{{ __('messages.how_it_works') }}</a>
                 <a href="{{ route('public.providers.index') }}" class="nav-link text-sm md:text-base">{{ __('messages.providers') }}</a>
@@ -237,6 +239,7 @@
                     <li><a href="{{ route('pages.features') }}" class="hover:text-blue-600">{{ __('messages.features') }}</a></li>
                     <li><a href="{{ route('pages.pricing') }}" class="hover:text-blue-600">{{ __('messages.pricing') }}</a></li>
                     <li><a href="{{ route('public.providers.index') }}" class="hover:text-blue-600">{{ __('messages.providers') }}</a></li>
+                    <li><a href="{{ route('public.wholesale.index') }}" class="hover:text-blue-600">{{ __('messages.nav_wholesale') }}</a></li>
                     <li><a href="{{ route('safety.index') }}" class="hover:text-blue-600">🛡️ {{ __('messages.travel_safety') }}</a></li>
                     <li><a href="{{ route('register') }}" class="hover:text-blue-600">{{ __('messages.become_partner') }}</a></li>
                 </ul>

@@ -1407,6 +1407,38 @@ return [
     'product_updated'                       => 'उत्पाद सफलतापूर्वक अपडेट किया गया।',
     'product_deleted'                       => 'उत्पाद सफलतापूर्वक हटाया गया।',
     'product_limit_reached'                 => 'उत्पाद सीमा पूरी हुई (:max)। अपनी योजना अपग्रेड करें।',
+        // ============================================
+    // PATH-3B B1 — Public Product Catalog
+    // ============================================
+    'nav_shop'                     => 'दुकान',
+    'nav_rental'                   => 'किराया',
+    'nav_wholesale'                => 'थोक',
+    'shop_index_title'             => 'नेपाली हस्तशिल्प और स्मृति चिन्ह',
+    'shop_index_subtitle'          => 'स्थानीय कारीगरों की प्रामाणिक वस्तुएं',
+    'rental_index_title'           => 'ट्रेकिंग गियर किराया',
+    'rental_index_subtitle'        => 'अपनी यात्रा के लिए गुणवत्तापूर्ण गियर किराए पर',
+    'wholesale_index_title'        => 'थोक उत्पाद',
+    'wholesale_index_subtitle'     => 'खुदरा विक्रेताओं के लिए थोक ऑर्डर',
+    'products_filter_search'       => 'उत्पाद खोजें',
+    'products_filter_location'     => 'स्थान',
+    'products_filter_all_locations' => 'सभी स्थान',
+    'products_filter_price_min'    => 'न्यूनतम मूल्य',
+    'products_filter_price_max'    => 'अधिकतम मूल्य',
+    'products_filter_apply'        => 'फ़िल्टर लागू करें',
+    'products_filter_reset'        => 'रीसेट',
+    'products_sort_label'          => 'क्रमबद्ध करें',
+    'products_sort_newest'         => 'नवीनतम',
+    'products_sort_price_asc'      => 'मूल्य: कम से उच्च',
+    'products_sort_price_desc'     => 'मूल्य: उच्च से कम',
+    'products_sort_name'           => 'नाम',
+    'products_no_items'            => 'कोई उत्पाद नहीं मिला।',
+    'products_per_day'             => 'प्रति दिन',
+    'products_deposit_label'       => 'जमा राशि',
+    'products_min_order'           => 'न्यूनतम ऑर्डर',
+    'products_bulk_available'      => 'थोक मूल्य उपलब्ध',
+    'products_add_cart_coming'     => 'कार्ट जल्द आ रहा है',
+    'products_detail_about'        => 'इस उत्पाद के बारे में',
+    'products_detail_provider'     => 'प्रदानकर्ता',
 
 // ======================
 // TRAVELER REVIEW CREATE

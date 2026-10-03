@@ -146,6 +146,13 @@ Route::prefix('explore')->name('public.')->group(function () {
         ->middleware('throttle:booking-public');
 });
 
+// =============================================
+// PRODUCT CATALOG (Path 3B — B1)
+// =============================================
+Route::get('/shop',      [App\Http\Controllers\Public\ProductController::class, 'shop'])->name('public.shop.index');
+Route::get('/rental',    [App\Http\Controllers\Public\ProductController::class, 'rental'])->name('public.rental.index');
+Route::get('/wholesale', [App\Http\Controllers\Public\ProductController::class, 'wholesale'])->name('public.wholesale.index');
+Route::get('/product/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('public.products.show');
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
     ->name('public.booking.confirmation');
