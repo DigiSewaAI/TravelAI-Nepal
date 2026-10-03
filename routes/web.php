@@ -179,6 +179,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
 
     Route::resource('services', ProviderServiceController::class);
 
+    // PATH-3A: Products (shop, rental, wholesale)
+    Route::resource('products', \App\Http\Controllers\Provider\ProductController::class)
+        ->except(['show']);
+
     // ─── PROVIDER-ITINERARY-05: Service Itinerary Editor ───
     // SL2: explicit routes only (no Route::resource)
     // SL7: day + item reorder separate endpoints
