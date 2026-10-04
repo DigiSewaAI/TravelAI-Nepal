@@ -1615,6 +1615,21 @@ return [
     'provider_return_preview'         => 'वापसी पूर्वावलोकन (पुष्टि से पहले)',
     'email_return_confirmed_heading'  => 'वापसी पुष्ट',
     'email_return_confirmed_body'     => 'ऑर्डर :number की वापसी पुष्ट हुई।',
+        // ============================================
+    // PATH-3C C5 — Rental UI Polish
+    // ============================================
+    'rental_select_dates'           => 'किराया तिथियाँ चुनें',
+    'rental_start_label'            => 'प्रारंभ तिथि',
+    'rental_end_label'              => 'समाप्ति तिथि',
+    'rental_duration_hint'          => 'किराया अवधि: :min से :max दिन।',
+    'rental_terms_heading'          => 'किराया शर्तें',
+    'rental_terms_deposit'          => 'वापसी योग्य जमा: NPR :amount',
+    'rental_terms_late_fee'         => 'विलंब वापसी शुल्क: NPR :amount प्रति दिन',
+    'rental_terms_damage'           => 'क्षति कटौती: जमा का :pct% तक',
+    'rental_return_instructions'    => 'किराया कैसे वापस करें',
+    'rental_return_step_1'          => 'किराया अवधि समाप्त होने पर आइटम प्रदाता को वापस करें।',
+    'rental_return_step_2'          => 'इस ऑर्डर पृष्ठ पर "वापस के रूप में चिह्नित करें" पर क्लिक करें।',
+    'rental_return_step_3'          => 'प्रदाता स्थिति की पुष्टि करता है → जमा वापसी संसाधित।',
 
 // ======================
 // TRAVELER REVIEW CREATE

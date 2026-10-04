@@ -1611,6 +1611,21 @@ return [
     'provider_return_preview'         => 'Refund preview (before confirm)',
     'email_return_confirmed_heading'  => 'Return Confirmed',
     'email_return_confirmed_body'     => 'Your return for order :number has been confirmed.',
+        // ============================================
+    // PATH-3C C5 — Rental UI Polish
+    // ============================================
+    'rental_select_dates'           => 'Select Rental Dates',
+    'rental_start_label'            => 'Start date',
+    'rental_end_label'              => 'End date',
+    'rental_duration_hint'          => 'Rental period: :min to :max days.',
+    'rental_terms_heading'          => 'Rental Terms',
+    'rental_terms_deposit'          => 'Refundable deposit: NPR :amount',
+    'rental_terms_late_fee'         => 'Late return fee: NPR :amount per day',
+    'rental_terms_damage'           => 'Damage deduction: up to :pct% of deposit',
+    'rental_return_instructions'    => 'How to return your rental',
+    'rental_return_step_1'          => 'When your rental period ends, return the item to the provider.',
+    'rental_return_step_2'          => 'Click "Mark as Returned" on this order page.',
+    'rental_return_step_3'          => 'Provider confirms condition → deposit refund processed.',
 
 // ======================
 // TRAVELER REVIEW CREATE

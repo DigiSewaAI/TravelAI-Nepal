@@ -186,6 +186,26 @@
             </div>
         @endif
 
+        {{-- PATH-3C C5: Return instructions (for active rentals) --}}
+        @if($order->hasRentalItems() && !$order->isDepositFullyRefunded())
+            @php
+                $activeRentals = $order->items->filter(fn($i) => $i->isRental() && !$i->isReturnConfirmed());
+            @endphp
+            @if($activeRentals->isNotEmpty())
+                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                    <h3 class="font-semibold text-blue-900 mb-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {{ __('messages.rental_return_instructions') }}
+                    </h3>
+                    <ul class="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                        <li>{{ __('messages.rental_return_step_1') }}</li>
+                        <li>{{ __('messages.rental_return_step_2') }}</li>
+                        <li>{{ __('messages.rental_return_step_3') }}</li>
+                    </ul>
+                </div>
+            @endif
+        @endif
+
         {{-- PATH-3C C1: Deposit tracking --}}
         @if($order->deposit_total > 0)
             <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">

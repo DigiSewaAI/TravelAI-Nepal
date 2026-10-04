@@ -1638,6 +1638,21 @@ return [
     'provider_return_preview'         => 'फिर्ता पूर्वावलोकन (पुष्टि अघि)',
     'email_return_confirmed_heading'  => 'फिर्ता पुष्टि',
     'email_return_confirmed_body'     => 'अर्डर :number को फिर्ता पुष्टि भयो।',
+        // ============================================
+    // PATH-3C C5 — Rental UI Polish
+    // ============================================
+    'rental_select_dates'           => 'भाडाको मिति छान्नुहोस्',
+    'rental_start_label'            => 'सुरु मिति',
+    'rental_end_label'              => 'अन्त्य मिति',
+    'rental_duration_hint'          => 'भाडा अवधि: :min देखि :max दिन।',
+    'rental_terms_heading'          => 'भाडा सर्तहरू',
+    'rental_terms_deposit'          => 'फिर्ता योग्य धरौटी: NPR :amount',
+    'rental_terms_late_fee'         => 'ढिलो फिर्ता शुल्क: NPR :amount प्रति दिन',
+    'rental_terms_damage'           => 'क्षति कटौती: धरौटीको :pct% सम्म',
+    'rental_return_instructions'    => 'भाडा कसरी फिर्ता गर्ने',
+    'rental_return_step_1'          => 'भाडा अवधि सकिएपछि वस्तु प्रदायकलाई फिर्ता गर्नुहोस्।',
+    'rental_return_step_2'          => 'यो अर्डर पृष्ठमा "फिर्ता भएको चिन्ह लगाउनुहोस्" क्लिक गर्नुहोस्।',
+    'rental_return_step_3'          => 'प्रदायकले अवस्था पुष्टि गर्छन् → धरौटी फिर्ता प्रक्रिया।',
 
     // ======================
     // TRAVELER REVIEW CREATE

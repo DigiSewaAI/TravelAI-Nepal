@@ -1629,6 +1629,21 @@ return [
     'provider_return_preview'         => '退款预览（确认前）',
     'email_return_confirmed_heading'  => '归还已确认',
     'email_return_confirmed_body'     => '您的订单 :number 归还已确认。',
+        // ============================================
+    // PATH-3C C5 — Rental UI Polish
+    // ============================================
+    'rental_select_dates'           => '选择租赁日期',
+    'rental_start_label'            => '开始日期',
+    'rental_end_label'              => '结束日期',
+    'rental_duration_hint'          => '租赁期限：:min 至 :max 天。',
+    'rental_terms_heading'          => '租赁条款',
+    'rental_terms_deposit'          => '可退还押金：NPR :amount',
+    'rental_terms_late_fee'         => '逾期归还费：每天 NPR :amount',
+    'rental_terms_damage'           => '损坏扣款：押金的 :pct%',
+    'rental_return_instructions'    => '如何归还租赁物品',
+    'rental_return_step_1'          => '租赁期结束时，将物品归还给供应商。',
+    'rental_return_step_2'          => '在此订单页面点击"标记为已归还"。',
+    'rental_return_step_3'          => '供应商确认状态 → 押金退款处理。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

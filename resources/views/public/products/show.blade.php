@@ -104,19 +104,58 @@
                 @csrf
 
                 @if($product->product_type === 'rental')
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                            <input type="date" name="rental_start_date" required
-                                   min="{{ date('Y-m-d') }}"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    @php
+                        $rentalDetail = $product->rentalDetail;
+                    @endphp
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ __('messages.rental_select_dates') }}
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <input type="date" name="rental_start_date" required
+                                       min="{{ date('Y-m-d') }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">{{ __('messages.rental_start_label') }}</p>
+                            </div>
+                            <div>
+                                <input type="date" name="rental_end_date" required
+                                       min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">{{ __('messages.rental_end_label') }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                            <input type="date" name="rental_end_date" required
-                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
+                        @if($rentalDetail && ($rentalDetail->rental_min_days || $rentalDetail->rental_max_days))
+                            <p class="text-xs text-gray-600 mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                {{ __('messages.rental_duration_hint', [
+                                    'min' => $rentalDetail->rental_min_days ?? 1,
+                                    'max' => $rentalDetail->rental_max_days ?? '∞',
+                                ]) }}
+                            </p>
+                        @endif
+                        @if($rentalDetail && ($rentalDetail->late_fee_per_day > 0 || $rentalDetail->damage_deposit_pct < 100))
+                            <div class="mt-3 p-3 bg-amber-50 border-l-4 border-amber-400 rounded text-xs space-y-1">
+                                <div class="font-semibold text-amber-900">
+                                    {{ __('messages.rental_terms_heading') }}
+                                </div>
+                                @if($rentalDetail->rental_deposit > 0)
+                                    <div class="text-amber-800">
+                                        {{ __('messages.rental_terms_deposit', ['amount' => number_format($rentalDetail->rental_deposit, 2)]) }}
+                                    </div>
+                                @endif
+                                @if($rentalDetail->late_fee_per_day > 0)
+                                    <div class="text-amber-800">
+                                        {{ __('messages.rental_terms_late_fee', ['amount' => number_format($rentalDetail->late_fee_per_day, 2)]) }}
+                                    </div>
+                                @endif
+                                @if($rentalDetail->damage_deposit_pct < 100)
+                                    <div class="text-amber-800">
+                                        {{ __('messages.rental_terms_damage', ['pct' => $rentalDetail->damage_deposit_pct]) }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @endif
 
