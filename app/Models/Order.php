@@ -10,6 +10,7 @@ class Order extends Model
         'order_number', 'user_id', 'status', 'contact_name', 'contact_email',
         'contact_phone', 'shipping_address', 'shipping_city', 'shipping_country',
         'subtotal', 'shipping_fee', 'total', 'currency',
+        'deposit_total', 'deposit_refunded_amount', 'deposit_refunded_at',
         'payment_method', 'payment_methods_snapshot', 'payment_status', 'paid_at',
         'payment_reference', 'payment_note', 'payment_notice_sent_at',
         'payment_verified_at', 'payment_verified_by',
@@ -21,6 +22,9 @@ class Order extends Model
         'total'                    => 'decimal:2',
         'subtotal'                 => 'decimal:2',
         'shipping_fee'             => 'decimal:2',
+        'deposit_total'            => 'decimal:2',
+        'deposit_refunded_amount'  => 'decimal:2',
+        'deposit_refunded_at'      => 'datetime',
         'payment_methods_snapshot' => 'array',
         'payment_notice_sent_at'   => 'datetime',
         'payment_verified_at'      => 'datetime',
@@ -108,5 +112,30 @@ class Order extends Model
     public function statusHistory()
     {
         return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at', 'asc')->orderBy('id', 'asc');
+    }
+
+    /**
+     * PATH-3C C1: current deposit held by provider (total - refunded).
+     */
+    public function getDepositHeldAttribute(): float
+    {
+        return max(0, (float) $this->deposit_total - (float) $this->deposit_refunded_amount);
+    }
+
+    /**
+     * PATH-3C C1: whether deposit is fully refunded.
+     */
+    public function isDepositFullyRefunded(): bool
+    {
+        return $this->deposit_refunded_at !== null
+            && (float) $this->deposit_refunded_amount >= (float) $this->deposit_total;
+    }
+
+    /**
+     * PATH-3C C1: whether order contains rental items.
+     */
+    public function hasRentalItems(): bool
+    {
+        return $this->items()->where('product_type', 'rental')->exists();
     }
 }

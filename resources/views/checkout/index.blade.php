@@ -105,11 +105,28 @@
                         @endforeach
                     </div>
 
+                    @php
+                        $depositTotal = $items->filter(fn($i) => $i->product && $i->product->isRental())
+                            ->sum(fn($i) => ($i->product->rentalDetail->rental_deposit ?? 0) * $i->quantity);
+                    @endphp
+
+                    @if($depositTotal > 0)
+                        <div class="flex justify-between text-sm mt-2 pt-2 border-t text-gray-600">
+                            <span>{{ __('messages.checkout_deposit_refundable') }}</span>
+                            <span class="font-medium">
+                                {{ $currencyService->format(
+                                    $currencyService->convert($depositTotal, 'NPR', $displayCurrency),
+                                    $displayCurrency
+                                ) }}
+                            </span>
+                        </div>
+                    @endif
+
                     <div class="border-t pt-3 flex justify-between text-lg font-bold">
                         <span>{{ __('messages.cart_subtotal') }}</span>
                         <span class="text-blue-600">
                             {{ $currencyService->format(
-                                $currencyService->convert($subtotal, 'NPR', $displayCurrency),
+                                $currencyService->convert($subtotal + $depositTotal, 'NPR', $displayCurrency),
                                 $displayCurrency
                             ) }}
                         </span>

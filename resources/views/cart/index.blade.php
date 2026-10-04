@@ -99,8 +99,29 @@
             <aside class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-sm border p-5 sticky top-4">
                     <h2 class="font-semibold text-gray-900 mb-4">{{ __('messages.cart_subtotal') }}</h2>
-                    <p class="text-2xl font-bold text-blue-600 mb-4">
-                        {{ $currencyService->format($currencyService->convert($subtotal, 'NPR', $displayCurrency), $displayCurrency) }}
+
+                    {{-- PATH-3C C1: Deposit calculation --}}
+                    @php
+                        $rentalDeposit = $items->filter(fn($i) => $i->product && $i->product->isRental())
+                            ->sum(fn($i) => ($i->product->rentalDetail->rental_deposit ?? 0) * $i->quantity);
+                    @endphp
+
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">{{ __('messages.cart_subtotal') }}</span>
+                        <span>{{ $currencyService->format($currencyService->convert($subtotal, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                    </div>
+
+                    @if($rentalDeposit > 0)
+                        <div class="flex justify-between text-sm mb-2 text-gray-600">
+                            <span>{{ __('messages.cart_deposit_refundable') }}</span>
+                            <span class="font-medium">
+                                {{ $currencyService->format($currencyService->convert($rentalDeposit, 'NPR', $displayCurrency), $displayCurrency) }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <p class="text-2xl font-bold text-blue-600 mb-4 pt-2 border-t">
+                        {{ $currencyService->format($currencyService->convert($subtotal + ($rentalDeposit ?? 0), 'NPR', $displayCurrency), $displayCurrency) }}
                     </p>
                     <a href="{{ route('checkout.index') }}"
                        class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">

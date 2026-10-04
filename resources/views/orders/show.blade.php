@@ -103,6 +103,12 @@
                     <span>{{ $currencyService->format($currencyService->convert((float)$order->shipping_fee, $order->currency, $displayCurrency), $displayCurrency) }}</span>
                 </div>
             @endif
+            @if($order->deposit_total > 0)
+                <div class="flex justify-between text-sm mt-1 text-blue-700">
+                    <span>{{ __('messages.order_deposit_total') }}</span>
+                    <span>{{ $currencyService->format($currencyService->convert((float)$order->deposit_total, $order->currency, $displayCurrency), $displayCurrency) }}</span>
+                </div>
+            @endif
             <div class="flex justify-between text-lg font-bold mt-3 pt-3 border-t">
                 <span>Total</span>
                 <span class="text-blue-600">
@@ -115,6 +121,34 @@
             <div class="border-t mt-6 pt-4">
                 <h3 class="font-semibold text-gray-900 mb-2">Notes</h3>
                 <p class="text-sm text-gray-700 whitespace-pre-line">{{ $order->notes }}</p>
+            </div>
+        @endif
+
+        {{-- PATH-3C C1: Deposit tracking --}}
+        @if($order->deposit_total > 0)
+            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <h3 class="font-semibold text-blue-900 mb-2">{{ __('messages.order_deposit_held') }}</h3>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-700">{{ __('messages.order_deposit_total') }}</span>
+                    <span class="font-mono font-medium">
+                        {{ $currencyService->format($currencyService->convert((float)$order->deposit_total, $order->currency, $displayCurrency), $displayCurrency) }}
+                    </span>
+                </div>
+                @if($order->deposit_refunded_amount > 0)
+                    <div class="flex justify-between text-sm mt-1 text-green-700">
+                        <span>{{ __('messages.order_deposit_refunded') }}</span>
+                        <span class="font-mono font-medium">
+                            {{ $currencyService->format($currencyService->convert((float)$order->deposit_refunded_amount, $order->currency, $displayCurrency), $displayCurrency) }}
+                        </span>
+                    </div>
+                @endif
+                <div class="flex justify-between text-sm mt-2 pt-2 border-t border-blue-200 font-semibold">
+                    <span>{{ __('messages.order_deposit_held') }}</span>
+                    <span class="font-mono text-blue-700">
+                        {{ $currencyService->format($currencyService->convert($order->deposit_held, $order->currency, $displayCurrency), $displayCurrency) }}
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">{{ __('messages.order_deposit_hint') }}</p>
             </div>
         @endif
 

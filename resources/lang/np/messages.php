@@ -1580,6 +1580,17 @@ return [
     'order_mail_payment_verified_heading'      => 'भुक्तानी प्रमाणित',
     'order_mail_payment_verified_body'         => 'अर्डर :number को तपाईंको भुक्तानी प्रमाणित भएको छ।',
     'order_mail_view_order'                    => 'अर्डर हेर्नुहोस्',
+        // ============================================
+    // PATH-3C C1 — Deposit Handling
+    // ============================================
+    'cart_deposit_refundable'        => 'फिर्ता योग्य धरौटी',
+    'cart_total_with_deposit'        => 'कुल (धरौटी सहित)',
+    'checkout_deposit_refundable'    => 'फिर्ता योग्य धरौटी',
+    'order_deposit_total'            => 'लिइएको धरौटी',
+    'order_deposit_held'             => 'हाल राखिएको धरौटी',
+    'order_deposit_refunded'         => 'फिर्ता गरिएको धरौटी',
+    'order_deposit_hint'             => 'वस्तु सुरक्षित रूपमा फिर्ता भएपछि धरौटी फिर्ता गरिन्छ।',
+    'provider_order_deposit'         => 'ग्राहक धरौटी',
 
     // ======================
     // TRAVELER REVIEW CREATE

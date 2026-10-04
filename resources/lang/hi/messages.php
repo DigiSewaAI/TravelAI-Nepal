@@ -1557,6 +1557,17 @@ return [
     'order_mail_payment_verified_heading'      => 'भुगतान सत्यापित',
     'order_mail_payment_verified_body'         => 'ऑर्डर :number के लिए आपका भुगतान सत्यापित किया गया है।',
     'order_mail_view_order'                    => 'ऑर्डर देखें',
+        // ============================================
+    // PATH-3C C1 — Deposit Handling
+    // ============================================
+    'cart_deposit_refundable'        => 'वापसी योग्य जमा',
+    'cart_total_with_deposit'        => 'कुल (जमा सहित)',
+    'checkout_deposit_refundable'    => 'वापसी योग्य जमा',
+    'order_deposit_total'            => 'लिया गया जमा',
+    'order_deposit_held'             => 'वर्तमान में रखा जमा',
+    'order_deposit_refunded'         => 'वापस किया गया जमा',
+    'order_deposit_hint'             => 'वस्तु सुरक्षित रूप से वापस होने पर जमा वापस किया जाएगा।',
+    'provider_order_deposit'         => 'ग्राहक जमा',
 
 // ======================
 // TRAVELER REVIEW CREATE

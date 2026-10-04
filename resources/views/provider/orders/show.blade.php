@@ -79,6 +79,35 @@
         @include('partials.order-timeline', ['order' => $order])
     </div>
 
+    {{-- PATH-3C C1: Deposit tracking --}}
+    @if($order->deposit_total > 0)
+        <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
+            <h3 class="font-semibold text-blue-900 mb-2 text-sm">{{ __('messages.provider_order_deposit') }}</h3>
+            <div class="text-sm space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-gray-700">{{ __('messages.order_deposit_total') }}</span>
+                    <span class="font-mono">
+                        {{ $currencyService->format($currencyService->convert((float)$order->deposit_total, $order->currency, $displayCurrency), $displayCurrency) }}
+                    </span>
+                </div>
+                @if($order->deposit_refunded_amount > 0)
+                    <div class="flex justify-between text-green-700">
+                        <span>{{ __('messages.order_deposit_refunded') }}</span>
+                        <span class="font-mono">
+                            {{ $currencyService->format($currencyService->convert((float)$order->deposit_refunded_amount, $order->currency, $displayCurrency), $displayCurrency) }}
+                        </span>
+                    </div>
+                @endif
+                <div class="flex justify-between pt-2 border-t border-blue-200 font-semibold">
+                    <span>{{ __('messages.order_deposit_held') }}</span>
+                    <span class="font-mono text-blue-700">
+                        {{ $currencyService->format($currencyService->convert($order->deposit_held, $order->currency, $displayCurrency), $displayCurrency) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- PATH-3B B5: Payment Verification --}}
     @if($order->isPaymentNotified() && !$order->isPaymentVerified())
         <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-4">

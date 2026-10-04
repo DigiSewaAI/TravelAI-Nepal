@@ -1553,6 +1553,17 @@ return [
     'order_mail_payment_verified_heading'      => 'Payment Verified',
     'order_mail_payment_verified_body'         => 'Your payment for order :number has been verified.',
     'order_mail_view_order'                    => 'View Order',
+        // ============================================
+    // PATH-3C C1 — Deposit Handling
+    // ============================================
+    'cart_deposit_refundable'        => 'Refundable deposit',
+    'cart_total_with_deposit'        => 'Total (incl. deposit)',
+    'checkout_deposit_refundable'    => 'Refundable deposit',
+    'order_deposit_total'            => 'Deposit charged',
+    'order_deposit_held'             => 'Deposit currently held',
+    'order_deposit_refunded'         => 'Deposit refunded',
+    'order_deposit_hint'             => 'Deposit is refunded upon safe return of the item.',
+    'provider_order_deposit'         => 'Customer Deposit',
 
 // ======================
 // TRAVELER REVIEW CREATE

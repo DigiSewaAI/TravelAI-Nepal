@@ -51,8 +51,16 @@ class CheckoutService
                 ];
             }
 
+            // PATH-3C C1: compute deposit total (sum of rental item deposits × qty)
+            $depositTotal = 0;
+            foreach ($itemsData as $item) {
+                if ($item['product_type'] === 'rental' && !empty($item['rental_deposit'])) {
+                    $depositTotal += ((float) $item['rental_deposit']) * ((int) $item['quantity']);
+                }
+            }
+
             $shippingFee = 0;
-            $total = $subtotal + $shippingFee;
+            $total = $subtotal + $shippingFee + $depositTotal;
 
             // PATH-3B B5: capture payment methods snapshot per provider
             $providerIds = collect($itemsData)->pluck('provider_id')->unique();
@@ -81,6 +89,7 @@ class CheckoutService
                 'shipping_country' => $data['shipping_country'] ?? null,
                 'subtotal'         => $subtotal,
                 'shipping_fee'     => $shippingFee,
+                'deposit_total'    => $depositTotal,
                 'total'            => $total,
                 'currency'                 => 'NPR',
                 'payment_status'           => 'pending',

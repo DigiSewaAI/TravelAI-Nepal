@@ -1571,6 +1571,17 @@ return [
     'order_mail_payment_verified_heading'      => '付款已验证',
     'order_mail_payment_verified_body'         => '订单 :number 的付款已验证。',
     'order_mail_view_order'                    => '查看订单',
+        // ============================================
+    // PATH-3C C1 — Deposit Handling
+    // ============================================
+    'cart_deposit_refundable'        => '可退还押金',
+    'cart_total_with_deposit'        => '总计（含押金）',
+    'checkout_deposit_refundable'    => '可退还押金',
+    'order_deposit_total'            => '已收押金',
+    'order_deposit_held'             => '当前持有押金',
+    'order_deposit_refunded'         => '已退押金',
+    'order_deposit_hint'             => '物品安全归还后退还押金。',
+    'provider_order_deposit'         => '客户押金',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================
