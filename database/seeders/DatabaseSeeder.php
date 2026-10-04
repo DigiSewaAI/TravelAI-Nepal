@@ -103,6 +103,9 @@ class DatabaseSeeder extends Seeder
         // ─── Demo providers (1 per remaining category — idempotent) ───
         $this->call(DemoProvidersSeeder::class);
 
+        // ─── Demo products (shop + rental + wholesale — idempotent) ───
+        $this->call(DemoProductsSeeder::class);
+
         // ─── 10. Testing data (dev only) ───
         // $this->call([TestingDataSeeder::class]); // ← uncomment if needed
     }
