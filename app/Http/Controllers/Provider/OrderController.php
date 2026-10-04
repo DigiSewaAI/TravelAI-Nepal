@@ -99,6 +99,11 @@ class OrderController extends Controller
             return $count;
         });
 
+        // PATH-3C C3: restore stock on cancel
+        if ($validated['status'] === 'cancelled' && $oldStatus !== 'cancelled') {
+            app(\App\Services\InventoryService::class)->restoreForOrder($order);
+        }
+
         // PATH-3B B7: record history + email
         \App\Models\OrderStatusHistory::record(
             $order, $validated['status'], $oldStatus, null, auth()->id(), 'provider', 'Provider updated status'

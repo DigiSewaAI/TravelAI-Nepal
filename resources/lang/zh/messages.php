@@ -1603,6 +1603,13 @@ return [
     'return_email_requested_body'       => '买家已请求从订单 :number 归还物品。',
     'return_email_confirmed_heading'    => '归还已确认',
     'return_email_confirmed_body'       => '您的订单 :number 归还已确认。押金退款已处理。',
+        // ============================================
+    // PATH-3C C3 — Inventory
+    // ============================================
+    'product_in_stock'                  => '有货（:count 件可用）',
+    'product_out_of_stock'              => '缺货',
+    'checkout_insufficient_stock'       => ':name 库存不足。',
+    'checkout_rental_unavailable'       => ':name 在所选日期不可用。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

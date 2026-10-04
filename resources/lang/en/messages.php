@@ -1585,6 +1585,13 @@ return [
     'return_email_requested_body'       => 'Buyer has requested to return an item from order :number.',
     'return_email_confirmed_heading'    => 'Return Confirmed',
     'return_email_confirmed_body'       => 'Your return for order :number has been confirmed. Deposit refund processed.',
+        // ============================================
+    // PATH-3C C3 — Inventory
+    // ============================================
+    'product_in_stock'                  => 'In stock (:count available)',
+    'product_out_of_stock'              => 'Out of stock',
+    'checkout_insufficient_stock'       => 'Insufficient stock for :name.',
+    'checkout_rental_unavailable'       => ':name is not available for the selected dates.',
 
 // ======================
 // TRAVELER REVIEW CREATE

@@ -1612,6 +1612,13 @@ return [
     'return_email_requested_body'       => 'क्रेताले अर्डर :number बाट वस्तु फिर्ता गर्न अनुरोध गरेका छन्।',
     'return_email_confirmed_heading'    => 'फिर्ता पुष्टि',
     'return_email_confirmed_body'       => 'तपाईंको अर्डर :number को फिर्ता पुष्टि भयो। धरौटी फिर्ता प्रक्रिया सम्पन्न।',
+        // ============================================
+    // PATH-3C C3 — Inventory
+    // ============================================
+    'product_in_stock'                  => 'स्टकमा छ (:count उपलब्ध)',
+    'product_out_of_stock'              => 'स्टक सकियो',
+    'checkout_insufficient_stock'       => ':name को लागि अपर्याप्त स्टक।',
+    'checkout_rental_unavailable'       => 'चयन गरिएको मितिमा :name उपलब्ध छैन।',
 
     // ======================
     // TRAVELER REVIEW CREATE

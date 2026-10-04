@@ -75,6 +75,31 @@
                 </div>
             @endif
 
+            {{-- PATH-3C C3: stock display for shop products --}}
+            @if($product->isShop() && $product->shopDetail?->stock_count !== null)
+                <div class="mt-4">
+                    @if($product->shopDetail->stock_count > 0)
+                        <span class="text-green-600 font-medium text-sm">
+                            <i class="fas fa-check-circle"></i>
+                            {{ __('messages.product_in_stock', ['count' => $product->shopDetail->stock_count]) }}
+                        </span>
+                    @else
+                        <span class="text-red-600 font-medium text-sm">
+                            <i class="fas fa-times-circle"></i>
+                            {{ __('messages.product_out_of_stock') }}
+                        </span>
+                    @endif
+                </div>
+            @endif
+
+            @if($product->isShop() && $product->shopDetail?->stock_count === 0)
+                <div class="mt-6">
+                    <button type="button" disabled
+                            class="w-full bg-gray-300 text-gray-600 py-3 rounded-lg font-semibold cursor-not-allowed">
+                        {{ __('messages.product_out_of_stock') }}
+                    </button>
+                </div>
+            @else
             <form method="POST" action="{{ route('cart.add', $product) }}" class="mt-6">
                 @csrf
 
@@ -110,6 +135,7 @@
                     <p class="mt-2 text-sm text-green-600">{{ session('success') }}</p>
                 @endif
             </form>
+            @endif
 
             @if($product->product_type === 'wholesale' && auth()->check())
                 <a href="{{ route('wholesale.rfq.create', $product) }}"

@@ -22,6 +22,31 @@ class CheckoutService
                 ]);
             }
 
+            // PATH-3C C3: pre-flight inventory / availability checks
+            $inventory = app(\App\Services\InventoryService::class);
+            foreach ($cartItems as $cart) {
+                $p = $cart->product;
+                if (!$p) continue;
+
+                if ($p->isShop() && !$inventory->hasStock($p, $cart->quantity)) {
+                    throw ValidationException::withMessages([
+                        'cart' => __('messages.checkout_insufficient_stock', ['name' => $p->name]),
+                    ]);
+                }
+
+                if ($p->isRental() && $cart->rental_start_date && $cart->rental_end_date) {
+                    if (!$inventory->isRentalAvailable(
+                        $p,
+                        $cart->rental_start_date->toDateString(),
+                        $cart->rental_end_date->toDateString()
+                    )) {
+                        throw ValidationException::withMessages([
+                            'cart' => __('messages.checkout_rental_unavailable', ['name' => $p->name]),
+                        ]);
+                    }
+                }
+            }
+
             $subtotal = 0;
             $itemsData = [];
 
@@ -100,6 +125,9 @@ class CheckoutService
             foreach ($itemsData as $item) {
                 $order->items()->create($item);
             }
+
+            // PATH-3C C3: decrement shop stock
+            app(\App\Services\InventoryService::class)->decrementForOrder($order);
 
             // PATH-3B B7: record initial history
             \App\Models\OrderStatusHistory::record(

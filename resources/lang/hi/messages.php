@@ -1589,6 +1589,13 @@ return [
     'return_email_requested_body'       => 'क्रेता ने ऑर्डर :number से आइटम वापस करने का अनुरोध किया।',
     'return_email_confirmed_heading'    => 'वापसी पुष्ट',
     'return_email_confirmed_body'       => 'आपके ऑर्डर :number की वापसी पुष्ट हुई। जमा वापसी संसाधित।',
+        // ============================================
+    // PATH-3C C3 — Inventory
+    // ============================================
+    'product_in_stock'                  => 'स्टॉक में है (:count उपलब्ध)',
+    'product_out_of_stock'              => 'स्टॉक खत्म',
+    'checkout_insufficient_stock'       => ':name के लिए अपर्याप्त स्टॉक।',
+    'checkout_rental_unavailable'       => 'चयनित तिथियों में :name उपलब्ध नहीं है।',
 
 // ======================
 // TRAVELER REVIEW CREATE
