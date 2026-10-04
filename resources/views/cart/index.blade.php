@@ -102,10 +102,10 @@
                     <p class="text-2xl font-bold text-blue-600 mb-4">
                         {{ $currencyService->format($currencyService->convert($subtotal, 'NPR', $displayCurrency), $displayCurrency) }}
                     </p>
-                    <button type="button" disabled
-                            class="w-full bg-gray-300 text-gray-600 py-3 rounded-lg font-semibold cursor-not-allowed">
-                        {{ __('messages.cart_checkout_btn') }} (B3)
-                    </button>
+                    <a href="{{ route('checkout.index') }}"
+                       class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
+                        {{ __('messages.cart_checkout_btn') }}
+                    </a>
                     <a href="{{ route('public.shop.index') }}" class="block text-center mt-3 text-sm text-gray-500 hover:text-blue-600">
                         {{ __('messages.cart_continue_shopping') }}
                     </a>
