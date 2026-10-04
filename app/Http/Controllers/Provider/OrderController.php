@@ -149,4 +149,59 @@ class OrderController extends Controller
 
         return back()->with('success', __('messages.order_payment_verified_success'));
     }
+
+    // ═══════════════════════════════════════════
+    // PATH-3C C2: Provider confirms return + condition
+    // ═══════════════════════════════════════════
+    public function confirmReturn(Request $request, Order $order, \App\Models\OrderItem $item)
+    {
+        $provider = $this->getProvider();
+        if ($order->items()->where('provider_id', $provider->id)->doesntExist()) abort(403);
+        if ($item->provider_id !== $provider->id) abort(403);
+        if (!$item->isRental()) abort(403);
+        if ($item->isReturnConfirmed()) {
+            return back()->with('info', __('messages.return_already_confirmed'));
+        }
+
+        $validated = $request->validate([
+            'return_condition' => 'required|in:good,damaged,lost',
+            'return_notes'     => 'nullable|string|max:1000',
+        ]);
+
+        $item->return_condition = $validated['return_condition'];
+        $refundAmount = $item->calculateDepositRefund();
+        $lateFee = $item->calculateLateFee();
+        $finalRefund = max(0, $refundAmount - $lateFee);
+
+        $item->update([
+            'return_confirmed_at'   => now(),
+            'return_condition'      => $validated['return_condition'],
+            'return_notes'          => $validated['return_notes'] ?? null,
+            'deposit_refund_amount' => $finalRefund,
+            'deposit_refunded_at'   => now(),
+        ]);
+
+        // Update order-level deposit_refunded_amount
+        $order->deposit_refunded_amount = $order->items()
+            ->whereNotNull('deposit_refunded_at')
+            ->sum('deposit_refund_amount');
+        $order->deposit_refunded_at = now();
+        $order->save();
+
+        // Notify buyer
+        try {
+            \Mail::to($order->user->email)
+                ->queue(new \App\Mail\ReturnConfirmedMail($order, $item, $finalRefund));
+        } catch (\Throwable $e) {
+            \Log::warning('ReturnConfirmedMail failed', ['order' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        // Record history
+        \App\Models\OrderStatusHistory::record(
+            $order, 'returned', $order->status, null, auth()->id(), 'provider',
+            'Return confirmed: ' . $validated['return_condition']
+        );
+
+        return back()->with('success', __('messages.return_confirmed'));
+    }
 }

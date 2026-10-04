@@ -1591,6 +1591,27 @@ return [
     'order_deposit_refunded'         => 'फिर्ता गरिएको धरौटी',
     'order_deposit_hint'             => 'वस्तु सुरक्षित रूपमा फिर्ता भएपछि धरौटी फिर्ता गरिन्छ।',
     'provider_order_deposit'         => 'ग्राहक धरौटी',
+        // ============================================
+    // PATH-3C C2 — Return Flow
+    // ============================================
+    'return_request_btn'                => 'फिर्ता भएको चिन्ह लगाउनुहोस्',
+    'return_requested'                  => 'फिर्ता अनुरोध गरियो',
+    'return_already_requested'          => 'फिर्ता अनुरोध पहिले नै गरिएको छ।',
+    'return_confirmed'                  => 'फिर्ता पुष्टि भयो',
+    'return_already_confirmed'          => 'फिर्ता पहिले नै पुष्टि भयो।',
+    'return_pending_provider'           => 'प्रदायकले प्रमाणित गर्न प्रतीक्षा।',
+    'return_refund_amount'              => 'फिर्ता रकम',
+    'return_condition_label'            => 'फिर्ताको अवस्था',
+    'return_condition_good'             => 'राम्रो अवस्था — पूरा फिर्ता',
+    'return_condition_damaged'          => 'क्षति — आंशिक फिर्ता',
+    'return_condition_lost'             => 'हरायो — फिर्ता छैन',
+    'return_notes_label'                => 'फिर्ता नोट (वैकल्पिक)',
+    'provider_return_confirm_btn'       => 'फिर्ता पुष्टि गर्नुहोस्',
+    'provider_return_confirm_title'     => 'भाडा फिर्ता पुष्टि गर्नुहोस्:',
+    'return_email_requested_heading'    => 'फिर्ता अनुरोध',
+    'return_email_requested_body'       => 'क्रेताले अर्डर :number बाट वस्तु फिर्ता गर्न अनुरोध गरेका छन्।',
+    'return_email_confirmed_heading'    => 'फिर्ता पुष्टि',
+    'return_email_confirmed_body'       => 'तपाईंको अर्डर :number को फिर्ता पुष्टि भयो। धरौटी फिर्ता प्रक्रिया सम्पन्न।',
 
     // ======================
     // TRAVELER REVIEW CREATE

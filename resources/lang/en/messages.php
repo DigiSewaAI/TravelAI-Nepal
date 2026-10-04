@@ -1564,6 +1564,27 @@ return [
     'order_deposit_refunded'         => 'Deposit refunded',
     'order_deposit_hint'             => 'Deposit is refunded upon safe return of the item.',
     'provider_order_deposit'         => 'Customer Deposit',
+        // ============================================
+    // PATH-3C C2 — Return Flow
+    // ============================================
+    'return_request_btn'                => 'Mark as Returned',
+    'return_requested'                  => 'Return requested',
+    'return_already_requested'          => 'Return already requested.',
+    'return_confirmed'                  => 'Return confirmed',
+    'return_already_confirmed'          => 'Return already confirmed.',
+    'return_pending_provider'           => 'Waiting for provider to verify.',
+    'return_refund_amount'              => 'Refund amount',
+    'return_condition_label'            => 'Return condition',
+    'return_condition_good'             => 'Good condition — full refund',
+    'return_condition_damaged'          => 'Damaged — partial refund',
+    'return_condition_lost'             => 'Lost — no refund',
+    'return_notes_label'                => 'Return notes (optional)',
+    'provider_return_confirm_btn'       => 'Confirm Return',
+    'provider_return_confirm_title'     => 'Confirm rental return:',
+    'return_email_requested_heading'    => 'Return Requested',
+    'return_email_requested_body'       => 'Buyer has requested to return an item from order :number.',
+    'return_email_confirmed_heading'    => 'Return Confirmed',
+    'return_email_confirmed_body'       => 'Your return for order :number has been confirmed. Deposit refund processed.',
 
 // ======================
 // TRAVELER REVIEW CREATE

@@ -63,6 +63,43 @@
                     <p class="text-xs text-gray-500 mt-1">
                         Status: <span class="font-semibold">{{ ucfirst($item->provider_status) }}</span>
                     </p>
+
+                    {{-- PATH-3C C2: Return confirmation for rental items --}}
+                    @if($item->product_type === 'rental')
+                        @if($item->isReturnConfirmed())
+                            <div class="mt-2 p-2 bg-green-50 rounded text-xs">
+                                <p class="text-green-800 font-medium">
+                                    {{ __('messages.return_confirmed') }} — {{ ucfirst($item->return_condition) }}
+                                </p>
+                                @if($item->deposit_refund_amount !== null)
+                                    <p class="text-green-700">
+                                        {{ __('messages.return_refund_amount') }}: NPR {{ number_format($item->deposit_refund_amount, 2) }}
+                                    </p>
+                                @endif
+                            </div>
+                        @elseif($item->hasReturnRequest())
+                            <div class="mt-3 p-3 bg-yellow-50 rounded border border-yellow-200">
+                                <p class="text-xs font-semibold text-yellow-800 mb-2">
+                                    {{ __('messages.provider_return_confirm_title') }}
+                                </p>
+                                <form method="POST" action="{{ route('provider.orders.items.confirm-return', [$order, $item]) }}" class="space-y-2">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="return_condition" required class="w-full border rounded px-2 py-1 text-xs">
+                                        <option value="good">{{ __('messages.return_condition_good') }}</option>
+                                        <option value="damaged">{{ __('messages.return_condition_damaged') }}</option>
+                                        <option value="lost">{{ __('messages.return_condition_lost') }}</option>
+                                    </select>
+                                    <textarea name="return_notes" rows="2" maxlength="1000"
+                                              placeholder="{{ __('messages.return_notes_label') }}"
+                                              class="w-full border rounded px-2 py-1 text-xs"></textarea>
+                                    <button type="submit" class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded">
+                                        {{ __('messages.provider_return_confirm_btn') }}
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                    @endif
                 </div>
                 <span class="font-bold text-blue-600">
                     {{ $currencyService->format(

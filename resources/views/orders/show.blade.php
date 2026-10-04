@@ -56,6 +56,34 @@
                             <p class="text-xs text-gray-500 mt-1">
                                 Status: <span class="font-semibold">{{ ucfirst($item->provider_status ?? 'pending') }}</span>
                             </p>
+
+                            {{-- PATH-3C C2: Rental return status + button --}}
+                            @if($item->product_type === 'rental')
+                                @if($item->isReturnConfirmed())
+                                    <div class="mt-2 p-2 bg-green-50 border-l-2 border-green-500 rounded text-xs">
+                                        <p class="text-green-800 font-medium">
+                                            {{ __('messages.return_confirmed') }} — {{ ucfirst($item->return_condition) }}
+                                        </p>
+                                        @if($item->deposit_refund_amount !== null)
+                                            <p class="text-green-700 mt-0.5">
+                                                {{ __('messages.return_refund_amount') }}: NPR {{ number_format($item->deposit_refund_amount, 2) }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                @elseif($item->hasReturnRequest())
+                                    <div class="mt-2 p-2 bg-yellow-50 border-l-2 border-yellow-500 rounded text-xs">
+                                        <p class="text-yellow-800 font-medium">{{ __('messages.return_requested') }}</p>
+                                        <p class="text-yellow-700">{{ __('messages.return_pending_provider') }}</p>
+                                    </div>
+                                @else
+                                    <form method="POST" action="{{ route('orders.items.return', [$order, $item]) }}" class="mt-2">
+                                        @csrf
+                                        <button type="submit" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded">
+                                            <i class="fas fa-undo mr-1"></i> {{ __('messages.return_request_btn') }}
+                                        </button>
+                                    </form>
+                                @endif
+                            @endif
                         </div>
                         <span class="font-bold text-blue-600">
                             {{ $currencyService->format(

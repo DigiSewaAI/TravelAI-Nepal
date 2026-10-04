@@ -1582,6 +1582,27 @@ return [
     'order_deposit_refunded'         => '已退押金',
     'order_deposit_hint'             => '物品安全归还后退还押金。',
     'provider_order_deposit'         => '客户押金',
+        // ============================================
+    // PATH-3C C2 — Return Flow
+    // ============================================
+    'return_request_btn'                => '标记为已归还',
+    'return_requested'                  => '已请求归还',
+    'return_already_requested'          => '已请求归还。',
+    'return_confirmed'                  => '归还已确认',
+    'return_already_confirmed'          => '归还已确认。',
+    'return_pending_provider'           => '等待供应商验证。',
+    'return_refund_amount'              => '退款金额',
+    'return_condition_label'            => '归还状态',
+    'return_condition_good'             => '良好 — 全额退款',
+    'return_condition_damaged'          => '损坏 — 部分退款',
+    'return_condition_lost'             => '丢失 — 不退款',
+    'return_notes_label'                => '归还备注（可选）',
+    'provider_return_confirm_btn'       => '确认归还',
+    'provider_return_confirm_title'     => '确认租赁归还：',
+    'return_email_requested_heading'    => '已请求归还',
+    'return_email_requested_body'       => '买家已请求从订单 :number 归还物品。',
+    'return_email_confirmed_heading'    => '归还已确认',
+    'return_email_confirmed_body'       => '您的订单 :number 归还已确认。押金退款已处理。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

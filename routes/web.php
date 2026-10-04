@@ -185,6 +185,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [App\Http\Controllers\OrdersController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [App\Http\Controllers\OrdersController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/notify-payment', [App\Http\Controllers\OrdersController::class, 'notifyPayment'])->name('orders.notifyPayment');
+    // PATH-3C C2: Buyer requests rental return
+    Route::post('/orders/{order}/items/{item}/return', [App\Http\Controllers\OrdersController::class, 'requestReturn'])->name('orders.items.return');
 });
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
@@ -229,6 +231,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::get('/{order}', [App\Http\Controllers\Provider\OrderController::class, 'show'])->name('show');
         Route::patch('/{order}/status', [App\Http\Controllers\Provider\OrderController::class, 'updateStatus'])->name('updateStatus');
         Route::patch('/{order}/verify-payment', [App\Http\Controllers\Provider\OrderController::class, 'verifyPayment'])->name('verifyPayment');
+        // PATH-3C C2: Provider confirms rental return
+        Route::patch('/{order}/items/{item}/confirm-return', [App\Http\Controllers\Provider\OrderController::class, 'confirmReturn'])->name('items.confirm-return');
     });
 
     // PATH-3B B6: Provider wholesale RFQ

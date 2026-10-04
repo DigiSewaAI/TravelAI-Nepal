@@ -1568,6 +1568,27 @@ return [
     'order_deposit_refunded'         => 'वापस किया गया जमा',
     'order_deposit_hint'             => 'वस्तु सुरक्षित रूप से वापस होने पर जमा वापस किया जाएगा।',
     'provider_order_deposit'         => 'ग्राहक जमा',
+        // ============================================
+    // PATH-3C C2 — Return Flow
+    // ============================================
+    'return_request_btn'                => 'वापस के रूप में चिह्नित करें',
+    'return_requested'                  => 'वापसी अनुरोध किया गया',
+    'return_already_requested'          => 'वापसी पहले ही अनुरोधित।',
+    'return_confirmed'                  => 'वापसी पुष्ट',
+    'return_already_confirmed'          => 'वापसी पहले ही पुष्ट।',
+    'return_pending_provider'           => 'प्रदाता सत्यापन की प्रतीक्षा।',
+    'return_refund_amount'              => 'वापसी राशि',
+    'return_condition_label'            => 'वापसी की स्थिति',
+    'return_condition_good'             => 'अच्छी स्थिति — पूरी वापसी',
+    'return_condition_damaged'          => 'क्षतिग्रस्त — आंशिक वापसी',
+    'return_condition_lost'             => 'खो गया — वापसी नहीं',
+    'return_notes_label'                => 'वापसी नोट्स (वैकल्पिक)',
+    'provider_return_confirm_btn'       => 'वापसी की पुष्टि करें',
+    'provider_return_confirm_title'     => 'किराया वापसी की पुष्टि:',
+    'return_email_requested_heading'    => 'वापसी अनुरोध',
+    'return_email_requested_body'       => 'क्रेता ने ऑर्डर :number से आइटम वापस करने का अनुरोध किया।',
+    'return_email_confirmed_heading'    => 'वापसी पुष्ट',
+    'return_email_confirmed_body'       => 'आपके ऑर्डर :number की वापसी पुष्ट हुई। जमा वापसी संसाधित।',
 
 // ======================
 // TRAVELER REVIEW CREATE
