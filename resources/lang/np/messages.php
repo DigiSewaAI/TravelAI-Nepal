@@ -1510,6 +1510,23 @@ return [
     'provider_order_update_status'   => 'स्थिति अद्यावधिक',
     'provider_order_status_label'    => 'स्थिति',
     'provider_order_status_updated'  => ':count वस्तु अद्यावधिक भयो।',
+        // ============================================
+    // PATH-3B B5 — Payment Display
+    // ============================================
+    'order_payment_section'                 => 'भुक्तानी',
+    'order_payment_verified'                => 'भुक्तानी प्रमाणित भयो',
+    'order_payment_pending_verification'    => 'भुक्तानी प्रमाणीकरणको प्रतीक्षामा',
+    'order_payment_for_provider'            => 'भुक्तानी गर्नुहोस्',
+    'order_payment_reference'               => 'भुक्तानी सन्दर्भ / लेनदेन ID',
+    'order_payment_note'                    => 'भुक्तानी नोट (वैकल्पिक)',
+    'order_payment_ive_paid'                => 'मैले भुक्तानी गरें',
+    'order_payment_notified'                => 'भुक्तानी सूचना पठाइयो। प्रमाणीकरणको प्रतीक्षामा।',
+    'order_payment_already_notified'        => 'भुक्तानी सूचना पहिले नै पठाइसकियो।',
+    'order_payment_already_verified'        => 'भुक्तानी पहिले नै प्रमाणित भयो।',
+    'order_payment_verified_success'        => 'भुक्तानी सफलतापूर्वक प्रमाणित भयो।',
+    'order_payment_no_methods'              => 'विक्रेताले भुक्तानी विधिहरू प्रदान गर्नेछ।',
+    'provider_order_payment_notified'       => 'यात्रीले भुक्तानी गरें भनेको छ — प्रमाणित गर्नुहोस्:',
+    'provider_order_verify_payment'         => 'भुक्तानी प्रमाणित गर्नुहोस्',
 
     // ======================
     // TRAVELER REVIEW CREATE

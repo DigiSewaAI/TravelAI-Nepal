@@ -1487,6 +1487,23 @@ return [
     'provider_order_update_status'   => 'स्थिति अपडेट',
     'provider_order_status_label'    => 'स्थिति',
     'provider_order_status_updated'  => ':count आइटम अपडेट किए।',
+        // ============================================
+    // PATH-3B B5 — Payment Display
+    // ============================================
+    'order_payment_section'                 => 'भुगतान',
+    'order_payment_verified'                => 'भुगतान सत्यापित',
+    'order_payment_pending_verification'    => 'भुगतान सत्यापन लंबित',
+    'order_payment_for_provider'            => 'भुगतान करें',
+    'order_payment_reference'               => 'भुगतान संदर्भ / लेनदेन ID',
+    'order_payment_note'                    => 'भुगतान नोट (वैकल्पिक)',
+    'order_payment_ive_paid'                => 'मैंने भुगतान कर दिया',
+    'order_payment_notified'                => 'भुगतान सूचना भेजी गई। सत्यापन की प्रतीक्षा।',
+    'order_payment_already_notified'        => 'भुगतान सूचना पहले ही भेजी गई।',
+    'order_payment_already_verified'        => 'भुगतान पहले ही सत्यापित।',
+    'order_payment_verified_success'        => 'भुगतान सफलतापूर्वक सत्यापित।',
+    'order_payment_no_methods'              => 'विक्रेता भुगतान विधियाँ प्रदान करेगा।',
+    'provider_order_payment_notified'       => 'यात्री कहते हैं भुगतान किया — सत्यापित करें:',
+    'provider_order_verify_payment'         => 'भुगतान सत्यापित करें',
 
 // ======================
 // TRAVELER REVIEW CREATE

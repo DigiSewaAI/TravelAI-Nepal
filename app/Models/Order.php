@@ -10,14 +10,20 @@ class Order extends Model
         'order_number', 'user_id', 'status', 'contact_name', 'contact_email',
         'contact_phone', 'shipping_address', 'shipping_city', 'shipping_country',
         'subtotal', 'shipping_fee', 'total', 'currency',
-        'payment_method', 'payment_status', 'paid_at', 'notes',
+        'payment_method', 'payment_methods_snapshot', 'payment_status', 'paid_at',
+        'payment_reference', 'payment_note', 'payment_notice_sent_at',
+        'payment_verified_at', 'payment_verified_by',
+        'notes',
     ];
 
     protected $casts = [
-        'paid_at'      => 'datetime',
-        'total'        => 'decimal:2',
-        'subtotal'     => 'decimal:2',
-        'shipping_fee' => 'decimal:2',
+        'paid_at'                  => 'datetime',
+        'total'                    => 'decimal:2',
+        'subtotal'                 => 'decimal:2',
+        'shipping_fee'             => 'decimal:2',
+        'payment_methods_snapshot' => 'array',
+        'payment_notice_sent_at'   => 'datetime',
+        'payment_verified_at'      => 'datetime',
     ];
 
     protected static function boot()
@@ -76,5 +82,26 @@ class Order extends Model
         }
 
         return 'partial';
+    }
+
+    public function isPaymentPending(): bool
+    {
+        return $this->payment_status === 'pending';
+    }
+
+    public function isPaymentNotified(): bool
+    {
+        return $this->payment_notice_sent_at !== null
+            && $this->payment_verified_at === null;
+    }
+
+    public function isPaymentVerified(): bool
+    {
+        return $this->payment_verified_at !== null;
+    }
+
+    public function paymentVerifier()
+    {
+        return $this->belongsTo(User::class, 'payment_verified_by');
     }
 }

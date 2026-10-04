@@ -99,4 +99,27 @@ class OrderController extends Controller
 
         return back()->with('success', __('messages.provider_order_status_updated', ['count' => $updated]));
     }
+
+    public function verifyPayment(Order $order)
+    {
+        $provider = $this->getProvider();
+
+        if ($order->items()->where('provider_id', $provider->id)->doesntExist()) {
+            abort(403);
+        }
+
+        if ($order->payment_verified_at !== null) {
+            return back()->with('info', __('messages.order_payment_already_verified'));
+        }
+
+        $order->update([
+            'payment_verified_at' => now(),
+            'payment_verified_by' => auth()->id(),
+            'payment_status'      => 'paid',
+            'paid_at'             => now(),
+            'status'              => 'confirmed',
+        ]);
+
+        return back()->with('success', __('messages.order_payment_verified_success'));
+    }
 }

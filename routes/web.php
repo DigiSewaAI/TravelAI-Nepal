@@ -171,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [App\Http\Controllers\OrdersController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [App\Http\Controllers\OrdersController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/notify-payment', [App\Http\Controllers\OrdersController::class, 'notifyPayment'])->name('orders.notifyPayment');
 });
 // Service booking confirmation
 Route::get('/service/confirmation/{booking}', [PublicBookingController::class, 'confirmation'])
@@ -214,6 +215,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::get('/', [App\Http\Controllers\Provider\OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [App\Http\Controllers\Provider\OrderController::class, 'show'])->name('show');
         Route::patch('/{order}/status', [App\Http\Controllers\Provider\OrderController::class, 'updateStatus'])->name('updateStatus');
+        Route::patch('/{order}/verify-payment', [App\Http\Controllers\Provider\OrderController::class, 'verifyPayment'])->name('verifyPayment');
     });
 
     // ─── PROVIDER-ITINERARY-05: Service Itinerary Editor ───

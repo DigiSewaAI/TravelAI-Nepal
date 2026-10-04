@@ -1501,6 +1501,23 @@ return [
     'provider_order_update_status'   => '更新状态',
     'provider_order_status_label'    => '状态',
     'provider_order_status_updated'  => '已更新 :count 个商品。',
+        // ============================================
+    // PATH-3B B5 — Payment Display
+    // ============================================
+    'order_payment_section'                 => '付款',
+    'order_payment_verified'                => '付款已验证',
+    'order_payment_pending_verification'    => '付款待验证',
+    'order_payment_for_provider'            => '支付给',
+    'order_payment_reference'               => '付款参考号 / 交易 ID',
+    'order_payment_note'                    => '付款备注（可选）',
+    'order_payment_ive_paid'                => '我已付款',
+    'order_payment_notified'                => '付款通知已发送。等待验证。',
+    'order_payment_already_notified'        => '付款通知已发送。',
+    'order_payment_already_verified'        => '付款已验证。',
+    'order_payment_verified_success'        => '付款验证成功。',
+    'order_payment_no_methods'              => '卖家将提供付款方式。',
+    'provider_order_payment_notified'       => '旅行者已付款 — 请验证：',
+    'provider_order_verify_payment'         => '验证付款',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

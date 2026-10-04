@@ -74,6 +74,42 @@
         @endforeach
     </div>
 
+    {{-- PATH-3B B5: Payment Verification --}}
+    @if($order->isPaymentNotified() && !$order->isPaymentVerified())
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-4">
+            <p class="font-medium text-yellow-800 mb-2">
+                {{ __('messages.provider_order_payment_notified') }}
+            </p>
+            <div class="text-sm text-gray-700 mb-2">
+                <div><strong>{{ __('messages.order_payment_reference') }}:</strong>
+                    {{ $order->payment_reference }}</div>
+                @if($order->payment_note)
+                    <div><strong>{{ __('messages.order_payment_note') }}:</strong>
+                        {{ $order->payment_note }}</div>
+                @endif
+                <div class="text-xs text-gray-500">
+                    {{ $order->payment_notice_sent_at->diffForHumans() }}
+                </div>
+            </div>
+            <form method="POST" action="{{ route('provider.orders.verifyPayment', $order) }}">
+                @csrf
+                @method('PATCH')
+                <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    {{ __('messages.provider_order_verify_payment') }}
+                </button>
+            </form>
+        </div>
+    @elseif($order->isPaymentVerified())
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
+            <p class="text-green-800">
+                <i class="fas fa-check-circle"></i>
+                {{ __('messages.order_payment_verified') }}
+            </p>
+        </div>
+    @endif
+
     {{-- Status Update Form --}}
     @php
         $currentStatus = $order->getProviderStatusForProvider($provider->id);

@@ -1483,6 +1483,23 @@ return [
     'provider_order_update_status'   => 'Update Status',
     'provider_order_status_label'    => 'Status',
     'provider_order_status_updated'  => 'Updated :count item(s).',
+        // ============================================
+    // PATH-3B B5 — Payment Display
+    // ============================================
+    'order_payment_section'                 => 'Payment',
+    'order_payment_verified'                => 'Payment verified',
+    'order_payment_pending_verification'    => 'Payment pending verification',
+    'order_payment_for_provider'            => 'Pay to',
+    'order_payment_reference'               => 'Payment Reference / Transaction ID',
+    'order_payment_note'                    => 'Payment Note (optional)',
+    'order_payment_ive_paid'                => 'I have paid',
+    'order_payment_notified'                => 'Payment notice sent. Awaiting verification.',
+    'order_payment_already_notified'        => 'Payment notice already sent.',
+    'order_payment_already_verified'        => 'Payment already verified.',
+    'order_payment_verified_success'        => 'Payment verified successfully.',
+    'order_payment_no_methods'              => 'Payment methods will be provided by the seller.',
+    'provider_order_payment_notified'       => 'Traveler says paid — verify:',
+    'provider_order_verify_payment'         => 'Verify Payment',
 
 // ======================
 // TRAVELER REVIEW CREATE

@@ -54,6 +54,22 @@ class CheckoutService
             $shippingFee = 0;
             $total = $subtotal + $shippingFee;
 
+            // PATH-3B B5: capture payment methods snapshot per provider
+            $providerIds = collect($itemsData)->pluck('provider_id')->unique();
+            $paymentMethodsSnapshot = [];
+            foreach ($providerIds as $pid) {
+                $provider = \App\Models\Provider::find($pid);
+                if ($provider) {
+                    $methods = $provider->paymentMethods()
+                        ->where('is_active', true)
+                        ->get(['type', 'label', 'account_name', 'account_number', 'identifier', 'swift_code', 'bank_name', 'instructions', 'qr_image_path']);
+                    $paymentMethodsSnapshot[$pid] = [
+                        'provider_name' => $provider->name,
+                        'methods'       => $methods->toArray(),
+                    ];
+                }
+            }
+
             $order = Order::create([
                 'user_id'          => $user->id,
                 'status'           => 'pending',
@@ -66,9 +82,10 @@ class CheckoutService
                 'subtotal'         => $subtotal,
                 'shipping_fee'     => $shippingFee,
                 'total'            => $total,
-                'currency'         => 'NPR',
-                'payment_status'   => 'pending',
-                'notes'            => $data['notes'] ?? null,
+                'currency'                 => 'NPR',
+                'payment_status'           => 'pending',
+                'payment_methods_snapshot' => $paymentMethodsSnapshot,
+                'notes'                    => $data['notes'] ?? null,
             ]);
 
             foreach ($itemsData as $item) {

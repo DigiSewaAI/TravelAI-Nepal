@@ -118,6 +118,94 @@
             </div>
         @endif
 
+        {{-- PATH-3B B5: Payment Section --}}
+        <div class="mt-6 border-t pt-6">
+            <h3 class="text-lg font-semibold mb-3">
+                {{ __('messages.order_payment_section') }}
+            </h3>
+
+            @if(session('info'))
+                <div class="mb-3 p-3 bg-blue-100 text-blue-800 rounded-lg text-sm">{{ session('info') }}</div>
+            @endif
+            @if(session('success'))
+                <div class="mb-3 p-3 bg-green-100 text-green-800 rounded-lg text-sm">{{ session('success') }}</div>
+            @endif
+
+            @if($order->isPaymentVerified())
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                    <p class="text-green-800">
+                        <i class="fas fa-check-circle"></i>
+                        {{ __('messages.order_payment_verified') }}
+                        ({{ $order->payment_verified_at->diffForHumans() }})
+                    </p>
+                </div>
+            @elseif($order->isPaymentNotified())
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                    <p class="text-yellow-800">
+                        <i class="fas fa-clock"></i>
+                        {{ __('messages.order_payment_pending_verification') }}
+                        ({{ $order->payment_notice_sent_at->diffForHumans() }})
+                    </p>
+                </div>
+            @else
+                @if($order->payment_methods_snapshot)
+                    <div class="space-y-4 mb-4">
+                        @foreach($order->payment_methods_snapshot as $pid => $data)
+                            <div class="border rounded-lg p-4 bg-gray-50">
+                                <h4 class="font-semibold text-sm mb-2">
+                                    {{ __('messages.order_payment_for_provider') }}: {{ $data['provider_name'] }}
+                                </h4>
+                                @foreach($data['methods'] as $method)
+                                    <div class="text-sm mb-2 p-2 bg-white rounded">
+                                        <div class="font-medium">{{ $method['label'] ?? ucfirst($method['type']) }}</div>
+                                        @if(!empty($method['account_name']))
+                                            <div class="text-gray-600">{{ $method['account_name'] }}</div>
+                                        @endif
+                                        @if(!empty($method['account_number']))
+                                            <div class="text-gray-600 font-mono">{{ $method['account_number'] }}</div>
+                                        @endif
+                                        @if(!empty($method['identifier']))
+                                            <div class="text-gray-600">{{ $method['identifier'] }}</div>
+                                        @endif
+                                        @if(!empty($method['instructions']))
+                                            <div class="text-xs text-gray-500 mt-1">{{ $method['instructions'] }}</div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-sm text-gray-500 mb-4">{{ __('messages.order_payment_no_methods') }}</p>
+                @endif
+
+                <form method="POST" action="{{ route('orders.notifyPayment', $order) }}" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {{ __('messages.order_payment_reference') }}
+                        </label>
+                        <input type="text" name="payment_reference" maxlength="100" required
+                               value="{{ old('payment_reference') }}"
+                               class="w-full border rounded-lg px-3 py-2">
+                        @error('payment_reference') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {{ __('messages.order_payment_note') }}
+                        </label>
+                        <textarea name="payment_note" maxlength="500" rows="2"
+                                  class="w-full border rounded-lg px-3 py-2">{{ old('payment_note') }}</textarea>
+                    </div>
+                    <button type="submit"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        {{ __('messages.order_payment_ive_paid') }}
+                    </button>
+                </form>
+            @endif
+        </div>
+
     </div>
 
     <div class="mt-4 text-center">
