@@ -152,6 +152,19 @@ Route::prefix('explore')->name('public.')->group(function () {
 Route::get('/shop',      [App\Http\Controllers\Public\ProductController::class, 'shop'])->name('public.shop.index');
 Route::get('/rental',    [App\Http\Controllers\Public\ProductController::class, 'rental'])->name('public.rental.index');
 Route::get('/wholesale', [App\Http\Controllers\Public\ProductController::class, 'wholesale'])->name('public.wholesale.index');
+
+// =============================================
+// WHOLESALE RFQ (Path 3B — B6, auth required)
+// =============================================
+Route::middleware(['auth'])->prefix('wholesale')->name('wholesale.')->group(function () {
+    Route::get('/rfqs', [App\Http\Controllers\WholesaleRfqController::class, 'index'])->name('rfq.index');
+    Route::get('/rfq/create/{product}', [App\Http\Controllers\WholesaleRfqController::class, 'create'])->name('rfq.create');
+    Route::post('/rfq/create/{product}', [App\Http\Controllers\WholesaleRfqController::class, 'store'])->name('rfq.store');
+    Route::get('/rfq/{rfq}', [App\Http\Controllers\WholesaleRfqController::class, 'show'])->name('rfq.show');
+    Route::post('/rfq/{rfq}/message', [App\Http\Controllers\WholesaleRfqController::class, 'sendMessage'])->name('rfq.message');
+    Route::post('/rfq/{rfq}/accept', [App\Http\Controllers\WholesaleRfqController::class, 'accept'])->name('rfq.accept');
+    Route::post('/rfq/{rfq}/reject', [App\Http\Controllers\WholesaleRfqController::class, 'reject'])->name('rfq.reject');
+});
 Route::get('/product/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('public.products.show');
 
 
@@ -218,6 +231,13 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::patch('/{order}/verify-payment', [App\Http\Controllers\Provider\OrderController::class, 'verifyPayment'])->name('verifyPayment');
     });
 
+    // PATH-3B B6: Provider wholesale RFQ
+    Route::prefix('wholesale-rfq')->name('wholesale-rfq.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Provider\WholesaleRfqController::class, 'index'])->name('index');
+        Route::get('/{rfq}', [App\Http\Controllers\Provider\WholesaleRfqController::class, 'show'])->name('show');
+        Route::patch('/{rfq}/quote', [App\Http\Controllers\Provider\WholesaleRfqController::class, 'quote'])->name('quote');
+        Route::post('/{rfq}/message', [App\Http\Controllers\Provider\WholesaleRfqController::class, 'sendMessage'])->name('message');
+    });
     // ─── PROVIDER-ITINERARY-05: Service Itinerary Editor ───
     // SL2: explicit routes only (no Route::resource)
     // SL7: day + item reorder separate endpoints

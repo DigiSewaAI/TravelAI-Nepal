@@ -111,6 +111,13 @@
                 @endif
             </form>
 
+            @if($product->product_type === 'wholesale' && auth()->check())
+                <a href="{{ route('wholesale.rfq.create', $product) }}"
+                   class="block mt-3 text-center bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-semibold transition">
+                    <i class="fas fa-file-invoice mr-2"></i> {{ __('messages.rfq_request_quote_btn') }}
+                </a>
+            @endif
+
         </div>
     </div>
 
