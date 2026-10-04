@@ -1596,6 +1596,25 @@ return [
     'product_out_of_stock'              => 'स्टॉक खत्म',
     'checkout_insufficient_stock'       => ':name के लिए अपर्याप्त स्टॉक।',
     'checkout_rental_unavailable'       => 'चयनित तिथियों में :name उपलब्ध नहीं है।',
+        // ============================================
+    // PATH-3C C4 — Rental Fee UI
+    // ============================================
+    'product_rental_policy_section'   => 'वापसी और जमा नीति',
+    'product_rental_late_fee'         => 'विलंब शुल्क (प्रति दिन)',
+    'product_rental_late_fee_hint'    => 'किराया समाप्ति के बाद वापस करने पर प्रति दिन लगेगा।',
+    'product_rental_damage_pct'       => 'क्षति कटौती (%)',
+    'product_rental_damage_pct_hint'  => 'आइटम क्षतिग्रस्त होने पर जमा का प्रतिशत कटौती।',
+    'product_rental_lost_pct'         => 'खोए आइटम कटौती (%)',
+    'product_rental_lost_pct_hint'    => 'आइटम खो जाने पर जमा का प्रतिशत कटौती।',
+    'return_refund_breakdown'         => 'वापसी विवरण',
+    'return_deposit_paid'             => 'भुगतान किया जमा',
+    'return_damage_deduction'         => 'क्षति कटौती',
+    'return_lost_deduction'           => 'खोए आइटम कटौती',
+    'return_late_fee'                 => 'विलंब शुल्क',
+    'return_net_refund'               => 'शुद्ध वापसी',
+    'provider_return_preview'         => 'वापसी पूर्वावलोकन (पुष्टि से पहले)',
+    'email_return_confirmed_heading'  => 'वापसी पुष्ट',
+    'email_return_confirmed_body'     => 'ऑर्डर :number की वापसी पुष्ट हुई।',
 
 // ======================
 // TRAVELER REVIEW CREATE

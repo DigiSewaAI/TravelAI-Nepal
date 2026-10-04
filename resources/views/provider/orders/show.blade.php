@@ -78,6 +78,31 @@
                                 @endif
                             </div>
                         @elseif($item->hasReturnRequest())
+                            {{-- PATH-3C C4: refund preview --}}
+                            @php
+                                $deposit = $item->rental_deposit * $item->quantity;
+                                $lateFee = $item->calculateLateFee();
+                                $overdue = $lateFee > 0;
+                            @endphp
+
+                            <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 text-xs">
+                                <div class="font-semibold mb-2">
+                                    {{ __('messages.provider_return_preview') }}
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between">
+                                        <span>{{ __('messages.return_deposit_paid') }}</span>
+                                        <span>{{ $currencyService->format($currencyService->convert($deposit, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                    </div>
+                                    @if($overdue)
+                                        <div class="flex justify-between text-orange-600">
+                                            <span>{{ __('messages.return_late_fee') }} ({{ (int) $item->rental_end_date->startOfDay()->diffInDays(now()->startOfDay()) }} days)</span>
+                                            <span>- {{ $currencyService->format($currencyService->convert($lateFee, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="mt-3 p-3 bg-yellow-50 rounded border border-yellow-200">
                                 <p class="text-xs font-semibold text-yellow-800 mb-2">
                                     {{ __('messages.provider_return_confirm_title') }}

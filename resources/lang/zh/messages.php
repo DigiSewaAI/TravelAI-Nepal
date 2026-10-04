@@ -1610,6 +1610,25 @@ return [
     'product_out_of_stock'              => '缺货',
     'checkout_insufficient_stock'       => ':name 库存不足。',
     'checkout_rental_unavailable'       => ':name 在所选日期不可用。',
+        // ============================================
+    // PATH-3C C4 — Rental Fee UI
+    // ============================================
+    'product_rental_policy_section'   => '归还与押金政策',
+    'product_rental_late_fee'         => '滞纳金（每天）',
+    'product_rental_late_fee_hint'    => '租赁结束日期后归还，每天收取。',
+    'product_rental_damage_pct'       => '损坏扣款 (%)',
+    'product_rental_damage_pct_hint'  => '物品损坏时从押金中扣除的百分比。',
+    'product_rental_lost_pct'         => '遗失扣款 (%)',
+    'product_rental_lost_pct_hint'    => '物品遗失时从押金中扣除的百分比。',
+    'return_refund_breakdown'         => '退款明细',
+    'return_deposit_paid'             => '已付押金',
+    'return_damage_deduction'         => '损坏扣款',
+    'return_lost_deduction'           => '遗失扣款',
+    'return_late_fee'                 => '滞纳金',
+    'return_net_refund'               => '净退款',
+    'provider_return_preview'         => '退款预览（确认前）',
+    'email_return_confirmed_heading'  => '归还已确认',
+    'email_return_confirmed_body'     => '您的订单 :number 归还已确认。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

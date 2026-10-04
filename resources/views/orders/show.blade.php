@@ -70,6 +70,40 @@
                                             </p>
                                         @endif
                                     </div>
+
+                                    {{-- PATH-3C C4: refund breakdown --}}
+                                    <div class="mt-2 p-3 bg-gray-50 rounded text-xs space-y-1">
+                                        <div class="font-semibold text-gray-700 mb-1">
+                                            {{ __('messages.return_refund_breakdown') }}
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>{{ __('messages.return_deposit_paid') }}</span>
+                                            <span>{{ $currencyService->format($currencyService->convert($item->rental_deposit * $item->quantity, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                        </div>
+                                        @if($item->return_condition === 'damaged')
+                                            <div class="flex justify-between text-orange-600">
+                                                <span>{{ __('messages.return_damage_deduction') }}
+                                                    ({{ $item->product->rentalDetail->damage_deposit_pct ?? 100 }}%)
+                                                </span>
+                                                <span>- {{ $currencyService->format($currencyService->convert($item->rental_deposit * $item->quantity * (($item->product->rentalDetail->damage_deposit_pct ?? 100) / 100), 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                            </div>
+                                        @elseif($item->return_condition === 'lost')
+                                            <div class="flex justify-between text-red-600">
+                                                <span>{{ __('messages.return_lost_deduction') }}</span>
+                                                <span>- {{ $currencyService->format($currencyService->convert($item->rental_deposit * $item->quantity, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                            </div>
+                                        @endif
+                                        @if($item->calculateLateFee() > 0)
+                                            <div class="flex justify-between text-orange-600">
+                                                <span>{{ __('messages.return_late_fee') }}</span>
+                                                <span>- {{ $currencyService->format($currencyService->convert($item->calculateLateFee(), 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="flex justify-between font-bold text-green-700 pt-1 border-t">
+                                            <span>{{ __('messages.return_net_refund') }}</span>
+                                            <span>{{ $currencyService->format($currencyService->convert($item->deposit_refund_amount ?? 0, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                                        </div>
+                                    </div>
                                 @elseif($item->hasReturnRequest())
                                     <div class="mt-2 p-2 bg-yellow-50 border-l-2 border-yellow-500 rounded text-xs">
                                         <p class="text-yellow-800 font-medium">{{ __('messages.return_requested') }}</p>

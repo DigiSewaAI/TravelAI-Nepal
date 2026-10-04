@@ -1592,6 +1592,25 @@ return [
     'product_out_of_stock'              => 'Out of stock',
     'checkout_insufficient_stock'       => 'Insufficient stock for :name.',
     'checkout_rental_unavailable'       => ':name is not available for the selected dates.',
+        // ============================================
+    // PATH-3C C4 — Rental Fee UI
+    // ============================================
+    'product_rental_policy_section'   => 'Return & Deposit Policy',
+    'product_rental_late_fee'         => 'Late Fee (per day)',
+    'product_rental_late_fee_hint'    => 'Charged per day if returned after rental_end_date.',
+    'product_rental_damage_pct'       => 'Damage Deduction (%)',
+    'product_rental_damage_pct_hint'  => 'Percentage of deposit deducted if item is damaged.',
+    'product_rental_lost_pct'         => 'Lost Item Deduction (%)',
+    'product_rental_lost_pct_hint'    => 'Percentage of deposit deducted if item is lost.',
+    'return_refund_breakdown'         => 'Refund Breakdown',
+    'return_deposit_paid'             => 'Deposit paid',
+    'return_damage_deduction'         => 'Damage deduction',
+    'return_lost_deduction'           => 'Lost item deduction',
+    'return_late_fee'                 => 'Late fee',
+    'return_net_refund'               => 'Net refund',
+    'provider_return_preview'         => 'Refund preview (before confirm)',
+    'email_return_confirmed_heading'  => 'Return Confirmed',
+    'email_return_confirmed_body'     => 'Your return for order :number has been confirmed.',
 
 // ======================
 // TRAVELER REVIEW CREATE

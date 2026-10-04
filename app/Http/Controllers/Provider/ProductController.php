@@ -107,6 +107,9 @@ class ProductController extends Controller
                 'rental_condition'     => 'nullable|string|max:50',
                 'rental_min_days'      => 'nullable|integer|min:1',
                 'rental_max_days'      => 'nullable|integer|min:1|gte:rental_min_days',
+                'late_fee_per_day'     => 'nullable|numeric|min:0',
+                'damage_deposit_pct'   => 'nullable|integer|min:0|max:100',
+                'lost_deposit_pct'     => 'nullable|integer|min:0|max:100',
             ],
             'wholesale' => [
                 'min_order_qty' => 'required|integer|min:1',
@@ -154,6 +157,9 @@ class ProductController extends Controller
                     'rental_condition'     => $validated['rental_condition'] ?? null,
                     'rental_min_days'      => $validated['rental_min_days'] ?? null,
                     'rental_max_days'      => $validated['rental_max_days'] ?? null,
+                    'late_fee_per_day'     => $validated['late_fee_per_day'] ?? 0,
+                    'damage_deposit_pct'   => $validated['damage_deposit_pct'] ?? 100,
+                    'lost_deposit_pct'     => $validated['lost_deposit_pct'] ?? 100,
                 ]),
                 'wholesale' => WholesaleDetail::create([
                     'product_id'    => $product->id,
@@ -211,6 +217,9 @@ class ProductController extends Controller
                 'rental_condition'     => 'nullable|string|max:50',
                 'rental_min_days'      => 'nullable|integer|min:1',
                 'rental_max_days'      => 'nullable|integer|min:1|gte:rental_min_days',
+                'late_fee_per_day'     => 'nullable|numeric|min:0',
+                'damage_deposit_pct'   => 'nullable|integer|min:0|max:100',
+                'lost_deposit_pct'     => 'nullable|integer|min:0|max:100',
             ],
             'wholesale' => [
                 'min_order_qty' => 'required|integer|min:1',
@@ -247,6 +256,9 @@ class ProductController extends Controller
                         'rental_condition'     => $validated['rental_condition'] ?? null,
                         'rental_min_days'      => $validated['rental_min_days'] ?? null,
                         'rental_max_days'      => $validated['rental_max_days'] ?? null,
+                        'late_fee_per_day'     => $validated['late_fee_per_day'] ?? 0,
+                        'damage_deposit_pct'   => $validated['damage_deposit_pct'] ?? 100,
+                        'lost_deposit_pct'     => $validated['lost_deposit_pct'] ?? 100,
                     ]
                 ),
                 'wholesale' => WholesaleDetail::updateOrCreate(
