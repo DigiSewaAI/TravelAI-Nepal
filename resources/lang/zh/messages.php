@@ -1644,6 +1644,7 @@ return [
     'rental_return_step_1'          => '租赁期结束时，将物品归还给供应商。',
     'rental_return_step_2'          => '在此订单页面点击"标记为已归还"。',
     'rental_return_step_3'          => '供应商确认状态 → 押金退款处理。',
+        'products' => '产品',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

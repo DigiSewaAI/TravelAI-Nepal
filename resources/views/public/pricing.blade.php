@@ -120,7 +120,7 @@
                     {{ $plan->slug === 'professional' ? 'border-blue-500 shadow-blue-100 relative' : '' }}
                     {{ $plan->slug === 'business' ? 'border-purple-500 shadow-purple-100' : '' }}
                     {{ $plan->slug === 'enterprise' ? 'border-amber-500 shadow-amber-100' : '' }}">
-            
+
             @if($plan->slug === 'professional')
                 <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">{{ __('messages.most_popular') }}</span>
             @endif
@@ -189,6 +189,12 @@
                     @endif
                     @if(isset($limits['max_staff']))
                         <div>👥 {{ $limits['max_staff'] == -1 ? __('messages.unlimited') : $limits['max_staff'] }} {{ __('messages.staff') }}</div>
+                    @endif
+                    @if(isset($limits['max_products']))
+                        <div>📦 {{ $limits['max_products'] == -1 ? __('messages.unlimited') : $limits['max_products'] }} {{ __('messages.products') }}</div>
+                    @endif
+                    @if(isset($limits['max_bookings']))
+                        <div>📅 {{ $limits['max_bookings'] == -1 ? __('messages.unlimited') : $limits['max_bookings'] }} {{ __('messages.bookings') }}</div>
                     @endif
                     @if(isset($limits['max_ai_requests']))
                         <div>🤖 {{ $limits['max_ai_requests'] == -1 ? __('messages.unlimited') : $limits['max_ai_requests'] }} {{ __('messages.ai_requests_mo') }}</div>
@@ -280,16 +286,42 @@
                         @endforeach
                     </tr>
 
+                    {{-- PRODUCTS row --}}
+                    <tr class="border-b">
+                        <td class="py-3 text-gray-600">{{ __('messages.products') }}</td>
+                        @foreach($plans as $plan)
+                            @php $value = $plan->limits['max_products'] ?? null; @endphp
+                            <td class="text-center py-3">
+                                {{ $value == -1 ? __('messages.unlimited') : ($value ?? '∞') }}
+                            </td>
+                        @endforeach
+                    </tr>
+
+                    {{-- BOOKINGS row --}}
+                    <tr class="border-b">
+                        <td class="py-3 text-gray-600">{{ __('messages.bookings') }}</td>
+                        @foreach($plans as $plan)
+                            @php $value = $plan->limits['max_bookings'] ?? null; @endphp
+                            <td class="text-center py-3">
+                                {{ $value == -1 ? __('messages.unlimited') : ($value ?? '∞') }}
+                            </td>
+                        @endforeach
+                    </tr>
+
                     {{-- CUSTOM LOGO row --}}
                     <tr>
                         <td class="py-3 text-gray-600">{{ __('messages.custom_logo') }}</td>
                         @foreach($plans as $plan)
                             <td class="text-center py-3">
-                                @if(in_array('Custom Logo', $plan->features ?? []))
-                                    <i class="fas fa-check-circle text-green-500"></i>
-                                @else
-                                    <i class="fas fa-times-circle text-gray-300"></i>
-                                @endif
+                                                        @php
+                            $features = $plan->features ?? [];
+                            $hasLogo = in_array('Custom Logo', $features) || in_array('White-label', $features);
+                        @endphp
+                        @if($hasLogo)
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        @else
+                            <i class="fas fa-times-circle text-gray-300"></i>
+                        @endif
                             </td>
                         @endforeach
                     </tr>

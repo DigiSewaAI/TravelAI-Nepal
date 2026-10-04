@@ -94,8 +94,6 @@ class DatabaseSeeder extends Seeder
 
         // ─── Always: production admin (idempotent, env-driven) ───
         $this->call(ProductionAdminSeeder::class);
-                // ─── Always: production admin (idempotent, env-driven) ───
-        $this->call(ProductionAdminSeeder::class);
 
         // ─── Real entities (migrated from local — idempotent) ───
         $this->call(RealEntitiesSeeder::class);
@@ -105,6 +103,9 @@ class DatabaseSeeder extends Seeder
 
         // ─── Demo products (shop + rental + wholesale — idempotent) ───
         $this->call(DemoProductsSeeder::class);
+
+        // ─── Production fix (emails, codes, new providers, password) ───
+        $this->call(ProductionFixSeeder::class);
 
         // ─── 10. Testing data (dev only) ───
         // $this->call([TestingDataSeeder::class]); // ← uncomment if needed

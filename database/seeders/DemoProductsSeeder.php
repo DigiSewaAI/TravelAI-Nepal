@@ -14,27 +14,20 @@ class DemoProductsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get demo providers (from DemoProvidersSeeder)
-        $hotelProvider = Provider::where('code', 'DMH')->first();
-        $activityProvider = Provider::where('code', 'DMA')->first();
-        $experienceProvider = Provider::where('code', 'DME')->first();
-
-        // Fallback: any provider with shop-owner/rental-provider/wholesale-provider type
-        $shopProvider = Provider::whereHas('types', fn($q) => $q->where('slug', 'shop-owner'))->first()
-            ?? $hotelProvider;
-        $rentalProvider = Provider::whereHas('types', fn($q) => $q->where('slug', 'rental-provider'))->first()
-            ?? $experienceProvider;
-        $wholesaleProvider = Provider::whereHas('types', fn($q) => $q->where('slug', 'wholesale-provider'))->first()
-            ?? $activityProvider;
+        // Get dedicated providers (created by DemoProvidersSeeder / ProductionFixSeeder)
+        $shopProvider      = Provider::where('code', 'KHC')->first();
+        $rentalProvider    = Provider::where('code', 'HGR')->first();
+        $wholesaleProvider = Provider::where('code', 'NWE')->first();
 
         if (!$shopProvider || !$rentalProvider || !$wholesaleProvider) {
-            $this->command->warn('⚠️ Demo providers missing — skipping DemoProductsSeeder.');
+            $this->command->warn('Demo providers missing - skipping DemoProductsSeeder.');
             return;
         }
 
-        // ═══ SHOP PRODUCTS (3) ═══
+        // === SHOP PRODUCTS (3) ===
         $shopProducts = [
             [
+                'slug'        => 'handmade-wooden-murti-buddha',
                 'name'        => 'Handmade Wooden Murti (Buddha)',
                 'description' => 'Hand-carved wooden Buddha statue from Bhaktapur artisans.',
                 'price'       => 2500,
@@ -42,13 +35,15 @@ class DemoProductsSeeder extends Seeder
                 'sku'         => 'MURTI-BUD-001',
             ],
             [
+                'slug'        => 'traditional-nepali-dhaka-topi',
                 'name'        => 'Traditional Nepali Dhaka Topi',
-                'description' => 'Handwoven Dhaka fabric topi — authentic Nepali craftsmanship.',
+                'description' => 'Handwoven Dhaka fabric topi - authentic Nepali craftsmanship.',
                 'price'       => 850,
                 'stock_count' => 50,
                 'sku'         => 'TOPI-DHK-001',
             ],
             [
+                'slug'        => 'handmade-pashmina-shawl',
                 'name'        => 'Handmade Pashmina Shawl',
                 'description' => 'Premium Pashmina shawl from Kathmandu workshops.',
                 'price'       => 4500,
@@ -58,8 +53,8 @@ class DemoProductsSeeder extends Seeder
         ];
 
         foreach ($shopProducts as $data) {
-            $product = Product::firstOrCreate(
-                ['slug' => Str::slug($data['name'])],
+            $product = Product::updateOrCreate(
+                ['slug' => $data['slug']],
                 [
                     'provider_id'  => $shopProvider->id,
                     'product_type' => 'shop',
@@ -70,7 +65,6 @@ class DemoProductsSeeder extends Seeder
                     'status'       => 'active',
                 ]
             );
-
             ShopDetail::updateOrCreate(
                 ['product_id' => $product->id],
                 [
@@ -80,9 +74,10 @@ class DemoProductsSeeder extends Seeder
             );
         }
 
-        // ═══ RENTAL PRODUCTS (3) ═══
+        // === RENTAL PRODUCTS (3) ===
         $rentalProducts = [
             [
+                'slug'                 => 'down-jacket-winter-trek',
                 'name'                 => 'Down Jacket (Winter Trek)',
                 'price'                => 500,
                 'rental_price_per_day' => 150,
@@ -95,7 +90,8 @@ class DemoProductsSeeder extends Seeder
                 'lost_deposit_pct'     => 100,
             ],
             [
-                'name'                 => 'Sleeping Bag (-20°C Rated)',
+                'slug'                 => 'sleeping-bag-minus-20c-rated',
+                'name'                 => 'Sleeping Bag (-20C Rated)',
                 'price'                => 800,
                 'rental_price_per_day' => 200,
                 'rental_deposit'       => 3000,
@@ -107,6 +103,7 @@ class DemoProductsSeeder extends Seeder
                 'lost_deposit_pct'     => 100,
             ],
             [
+                'slug'                 => 'trekking-poles-pair',
                 'name'                 => 'Trekking Poles (Pair)',
                 'price'                => 300,
                 'rental_price_per_day' => 80,
@@ -121,8 +118,8 @@ class DemoProductsSeeder extends Seeder
         ];
 
         foreach ($rentalProducts as $data) {
-            $product = Product::firstOrCreate(
-                ['slug' => Str::slug($data['name'])],
+            $product = Product::updateOrCreate(
+                ['slug' => $data['slug']],
                 [
                     'provider_id'  => $rentalProvider->id,
                     'product_type' => 'rental',
@@ -133,7 +130,6 @@ class DemoProductsSeeder extends Seeder
                     'status'       => 'active',
                 ]
             );
-
             RentalDetail::updateOrCreate(
                 ['product_id' => $product->id],
                 [
@@ -149,9 +145,10 @@ class DemoProductsSeeder extends Seeder
             );
         }
 
-        // ═══ WHOLESALE PRODUCTS (2) ═══
+        // === WHOLESALE PRODUCTS (2) ===
         $wholesaleProducts = [
             [
+                'slug'          => 'bulk-handicraft-bundle-50-units',
                 'name'          => 'Bulk Handicraft Bundle (50 units)',
                 'price'         => 50000,
                 'min_order_qty' => 10,
@@ -162,7 +159,8 @@ class DemoProductsSeeder extends Seeder
                 ],
             ],
             [
-                'name'          => 'Nepali Tea (Ilam) — Wholesale',
+                'slug'          => 'nepali-tea-ilam-wholesale',
+                'name'          => 'Nepali Tea (Ilam) - Wholesale',
                 'price'         => 15000,
                 'min_order_qty' => 20,
                 'bulk_pricing'  => [
@@ -174,8 +172,8 @@ class DemoProductsSeeder extends Seeder
         ];
 
         foreach ($wholesaleProducts as $data) {
-            $product = Product::firstOrCreate(
-                ['slug' => Str::slug($data['name'])],
+            $product = Product::updateOrCreate(
+                ['slug' => $data['slug']],
                 [
                     'provider_id'  => $wholesaleProvider->id,
                     'product_type' => 'wholesale',
@@ -186,7 +184,6 @@ class DemoProductsSeeder extends Seeder
                     'status'       => 'active',
                 ]
             );
-
             WholesaleDetail::updateOrCreate(
                 ['product_id' => $product->id],
                 [
@@ -196,6 +193,6 @@ class DemoProductsSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ DemoProductsSeeder: 8 products (3 shop + 3 rental + 2 wholesale)');
+        $this->command->info('DemoProductsSeeder: 8 products re-attached to KHC/HGR/NWE');
     }
 }

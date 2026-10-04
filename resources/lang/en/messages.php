@@ -1626,6 +1626,7 @@ return [
     'rental_return_step_1'          => 'When your rental period ends, return the item to the provider.',
     'rental_return_step_2'          => 'Click "Mark as Returned" on this order page.',
     'rental_return_step_3'          => 'Provider confirms condition → deposit refund processed.',
+        'products' => 'Products',
 
 // ======================
 // TRAVELER REVIEW CREATE

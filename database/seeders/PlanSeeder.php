@@ -17,7 +17,7 @@ class PlanSeeder extends Seeder
                 'price_monthly' => 0,
                 'price_yearly' => 0,
                 'features' => ['Basic Dashboard', '3 Listings', '5 AI Requests/mo', '10 Bookings/mo'],
-                'limits' => ['max_listings' => 3, 'max_staff' => 1, 'max_ai_requests' => 5, 'max_bookings' => 10],
+                'limits' => ['max_listings' => 3, 'max_staff' => 1, 'max_ai_requests' => 5, 'max_bookings' => 10, 'max_products' => 5],
             ],
             [
                 'name' => 'Professional',
@@ -26,7 +26,7 @@ class PlanSeeder extends Seeder
                 'price_monthly' => 4499,        // NPR
                 'price_yearly' => 44999,        // NPR
                 'features' => ['Advanced Dashboard', '20 Listings', '50 AI Requests/mo', '100 Bookings/mo', 'Custom Logo'],
-                'limits' => ['max_listings' => 20, 'max_staff' => 5, 'max_ai_requests' => 50, 'max_bookings' => 100],
+                'limits' => ['max_listings' => 20, 'max_staff' => 5, 'max_ai_requests' => 50, 'max_bookings' => 100, 'max_products' => 30],
             ],
             [
                 'name' => 'Business',
@@ -35,7 +35,7 @@ class PlanSeeder extends Seeder
                 'price_monthly' => 11999,       // NPR
                 'price_yearly' => 119999,       // NPR
                 'features' => ['Full Analytics', '100 Listings', '500 AI Requests/mo', '1000 Bookings/mo', 'White-label'],
-                'limits' => ['max_listings' => 100, 'max_staff' => 20, 'max_ai_requests' => 500, 'max_bookings' => 1000],
+                'limits' => ['max_listings' => 100, 'max_staff' => 20, 'max_ai_requests' => 500, 'max_bookings' => 1000, 'max_products' => 200],
             ],
             [
                 'name' => 'Enterprise',
@@ -43,8 +43,8 @@ class PlanSeeder extends Seeder
                 'description' => 'Custom solutions for large enterprises',
                 'price_monthly' => null,
                 'price_yearly' => null,
-                'features' => ['Unlimited Listings', 'Unlimited Staff', 'Unlimited AI', 'Unlimited Bookings', 'Priority Support'],
-                'limits' => ['max_listings' => -1, 'max_staff' => -1, 'max_ai_requests' => -1, 'max_bookings' => -1],
+                'features' => ['Unlimited Listings', 'Unlimited Staff', 'Unlimited AI', 'Unlimited Bookings', 'Custom Logo', 'Priority Support'],
+                'limits' => ['max_listings' => -1, 'max_staff' => -1, 'max_ai_requests' => -1, 'max_bookings' => -1, 'max_products' => -1],
             ],
         ];
 
