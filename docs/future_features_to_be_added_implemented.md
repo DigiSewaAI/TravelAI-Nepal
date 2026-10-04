@@ -18,15 +18,43 @@
 
 ---
 
-## 📊 Current State (as of 2026-10-03)
+## 📊 Current State (as of 2026-10-04)
 
-- **HEAD:** 0ca5c88 (Path 3A complete, pushed)
+- **HEAD:** [B9-hash] (Path 3B complete, pushed)
 - **Categories:** 13 (10 original + shop, rental, wholesale)
 - **Provider types:** 15 (12 original + shop-owner, rental-provider, wholesale-provider)
 - **Seeder strategy:** Hybrid (production-safe)
-- **Production users:** 4 (Parashar admin + Anju + Pareen + John)
-- **Production providers:** 7 (2 migrated + 5 demo)
-- **Tests:** 56/56 pass
+- **Tests:** 122/122 pass
+
+### Path 3A — COMPLETE ✅
+- Products table (polymorphic: shop/rental/wholesale)
+- Provider CRUD + views + i18n
+- Plan limits: max_products (5/30/200/-1)
+- 56 tests baseline
+
+### Path 3B — COMPLETE ✅
+- Public product pages (/shop, /rental, /wholesale, /product/{slug})
+- Cart system (guest + user, rental dates, auto-merge on login)
+- Checkout + Orders (ORD-YY-NNNNN format, immutable snapshots)
+- Provider order management (multi-vendor aware)
+- Payment display + manual verification flow
+- Wholesale RFQ system (RFQ-YY-NNNNN + threaded messages)
+- Order tracking (status history + timeline UI)
+- Email notifications (3 types, queued, non-blocking)
+- i18n: 4 locales (156 Path 3B keys, 100% clean)
+- Tests: 122/122 (12 E2E integration)
+
+### Next: Path 3C (Rental Lifecycle)
+- Rental deposit handling
+- Return flow + condition check
+- Inventory tracking
+- Late fee + damage claims
+
+### Phase 4 (Post-Deploy)
+- Forex system (traveler dashboard)
+- Provider ads system (traveler dashboard)
+- Payment gateway integration (Stripe/PayPal)
+- Multi-vendor payment splitting
 
 ### Path 3A — COMPLETE ✅
 
@@ -52,7 +80,7 @@
 
 ## 🚀 Stage 1 — Path 3 (~4 weeks)
 
-**Status:** 3A COMPLETE (2026-10-03) | 3B + 3C pending
+**Status:** 3A + 3B COMPLETE (2026-10-04) | 3C pending
 
 ### 3A — Basic Marketplace (Week 1-2)
 
@@ -191,6 +219,7 @@
 
 - 2026-10-03: Document created (Path 3 decision + future roadmap)
 - 2026-10-03: Path 3A COMPLETE (migrations, models, controller, views, i18n, tests)
+- 2026-10-04: Path 3B COMPLETE (commerce: cart + checkout + orders + RFQ + tracking + emails)
 
 ---
 

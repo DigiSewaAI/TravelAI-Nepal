@@ -274,8 +274,35 @@ These run automatically via:
 php artisan migrate --force
 No separate command needed. Existing 10-category system is unaffected (additive only — R8).
 
+### 4.6c Path 3B Migrations (Commerce)
 
-### 4.7 Run Production Seeders
+Path 3B adds:
+- `carts` (guest + user cart)
+- `orders`, `order_items` (immutable snapshots)
+- `order_status_histories` (tracking)
+- `wholesale_rfqs`, `wholesale_rfq_messages` (B2B RFQ)
+- Payment fields on `orders` (display + manual verify)
+
+Auto-run via:
+```bash
+php artisan migrate --force
+No manual steps required. Existing systems unaffected (R8 additive).
+
+Post-deploy smoke test:
+
+/shop, /rental, /wholesale load
+
+/cart (guest + auth)
+
+/checkout (auth required)
+
+/orders (history)
+
+/provider/orders (provider dashboard)
+
+/provider/wholesale-rfq (RFQ inbox)
+
+4.7 Run Production Seeders
 
 **Env setup (production `.env`) — add these:**
 ```
