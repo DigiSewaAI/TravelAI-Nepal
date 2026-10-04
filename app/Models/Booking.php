@@ -23,6 +23,12 @@ class Booking extends Model
             if (empty($booking->booking_number)) {
                 $booking->booking_number = self::generateBookingNumber($booking);
             }
+
+            // SEEDER-QR-CODE-DEFAULT-01: auto-generate qr_code (was NOT NULL, no default)
+            // qr_token = null intentionally (generated at check-in via regenerateQrToken)
+            if (empty($booking->qr_code)) {
+                $booking->qr_code = 'QR-' . strtoupper(\Illuminate\Support\Str::random(12));
+            }
         });
     }
 

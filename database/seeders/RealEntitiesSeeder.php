@@ -125,17 +125,33 @@ class RealEntitiesSeeder extends Seeder
         );
 
         // Bookings (preserving FK chains)
+        // SEEDER-QR-CODE-DEFAULT-01: qr_code explicitly set (WithoutModelEvents disables model hooks)
         Booking::updateOrCreate(
             ['booking_number' => 'HJO-BK-26-00001'],
-            ['traveler_id' => $john->id, 'service_id' => $s27->id, 'guest_count' => 1, 'booking_date' => '2026-08-12', 'start_date' => '2026-08-17', 'status' => 'completed', 'quota_month' => '2026-09', 'visibility' => 'public']
+            [
+                'traveler_id' => $john->id, 'service_id' => $s27->id,
+                'guest_count' => 1, 'booking_date' => '2026-08-12', 'start_date' => '2026-08-17',
+                'status' => 'completed', 'quota_month' => '2026-09', 'visibility' => 'public',
+                'qr_code' => 'QR-' . strtoupper(\Illuminate\Support\Str::random(12)),
+            ]
         );
         Booking::updateOrCreate(
             ['booking_number' => 'HJO-BK-26-00002'],
-            ['traveler_id' => $john->id, 'service_id' => $s28->id, 'guest_count' => 1, 'booking_date' => '2026-09-02', 'start_date' => '2026-09-12', 'status' => 'confirmed', 'quota_month' => '2026-09', 'visibility' => 'private']
+            [
+                'traveler_id' => $john->id, 'service_id' => $s28->id,
+                'guest_count' => 1, 'booking_date' => '2026-09-02', 'start_date' => '2026-09-12',
+                'status' => 'confirmed', 'quota_month' => '2026-09', 'visibility' => 'private',
+                'qr_code' => 'QR-' . strtoupper(\Illuminate\Support\Str::random(12)),
+            ]
         );
         Booking::updateOrCreate(
             ['booking_number' => 'HTP-BK-26-00001'],
-            ['traveler_id' => $john->id, 'service_id' => $s1242->id, 'guest_count' => 1, 'booking_date' => '2026-09-28', 'start_date' => '2026-09-29', 'status' => 'confirmed', 'quota_month' => '2026-09', 'visibility' => 'public']
+            [
+                'traveler_id' => $john->id, 'service_id' => $s1242->id,
+                'guest_count' => 1, 'booking_date' => '2026-09-28', 'start_date' => '2026-09-29',
+                'status' => 'confirmed', 'quota_month' => '2026-09', 'visibility' => 'public',
+                'qr_code' => 'QR-' . strtoupper(\Illuminate\Support\Str::random(12)),
+            ]
         );
 
         $this->command->info('✅ RealEntitiesSeeder: 3 users, 2 providers, 5 services, 3 bookings');
