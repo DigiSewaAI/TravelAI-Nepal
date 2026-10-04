@@ -58,4 +58,6 @@ app/Services/*.bak_before_*
 database/seeders/*.bak_before_*
 .env.testing
 # Ngrok binary (temporary, for local tunneling)
-ngrok
+ngrok 
+# Laravel Cloud env reference (scratch - do not commit) 
+docs/LARAVEL_CLOUD_ENV.md 
