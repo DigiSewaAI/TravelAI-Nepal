@@ -1491,6 +1491,16 @@ return [
     'order_status'                  => '状态',
     'order_total'                   => '总计',
     'order_detail_title'            => '订单详情',
+        // ============================================
+    // PATH-3B B4 — Provider Order Management
+    // ============================================
+    'provider_orders_title'          => '订单',
+    'provider_orders_empty'          => '暂无订单。',
+    'provider_order_customer'        => '客户',
+    'provider_order_your_items'      => '您的商品',
+    'provider_order_update_status'   => '更新状态',
+    'provider_order_status_label'    => '状态',
+    'provider_order_status_updated'  => '已更新 :count 个商品。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

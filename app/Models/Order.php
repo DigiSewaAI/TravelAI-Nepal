@@ -62,4 +62,19 @@ class Order extends Model
     {
         return in_array($this->status, ['pending', 'confirmed'], true);
     }
+
+    public function getProviderStatusForProvider(int $providerId): ?string
+    {
+        $items = $this->items->where('provider_id', $providerId);
+        if ($items->isEmpty()) {
+            return null;
+        }
+
+        $statuses = $items->pluck('provider_status')->unique();
+        if ($statuses->count() === 1) {
+            return $statuses->first();
+        }
+
+        return 'partial';
+    }
 }

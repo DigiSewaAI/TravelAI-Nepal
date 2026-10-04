@@ -53,6 +53,9 @@
                             @if($item->provider)
                                 <p class="text-xs text-gray-500">by {{ $item->provider->name }}</p>
                             @endif
+                            <p class="text-xs text-gray-500 mt-1">
+                                Status: <span class="font-semibold">{{ ucfirst($item->provider_status ?? 'pending') }}</span>
+                            </p>
                         </div>
                         <span class="font-bold text-blue-600">
                             {{ $currencyService->format(

@@ -1477,6 +1477,16 @@ return [
     'order_status'                  => 'स्थिति',
     'order_total'                   => 'कुल',
     'order_detail_title'            => 'ऑर्डर विवरण',
+        // ============================================
+    // PATH-3B B4 — Provider Order Management
+    // ============================================
+    'provider_orders_title'          => 'ऑर्डर',
+    'provider_orders_empty'          => 'अभी कोई ऑर्डर नहीं।',
+    'provider_order_customer'        => 'ग्राहक',
+    'provider_order_your_items'      => 'आपके आइटम',
+    'provider_order_update_status'   => 'स्थिति अपडेट',
+    'provider_order_status_label'    => 'स्थिति',
+    'provider_order_status_updated'  => ':count आइटम अपडेट किए।',
 
 // ======================
 // TRAVELER REVIEW CREATE

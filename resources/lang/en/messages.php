@@ -1473,6 +1473,16 @@ return [
     'order_status'                  => 'Status',
     'order_total'                   => 'Total',
     'order_detail_title'            => 'Order Details',
+        // ============================================
+    // PATH-3B B4 — Provider Order Management
+    // ============================================
+    'provider_orders_title'          => 'Orders',
+    'provider_orders_empty'          => 'No orders yet.',
+    'provider_order_customer'        => 'Customer',
+    'provider_order_your_items'      => 'Your Items',
+    'provider_order_update_status'   => 'Update Status',
+    'provider_order_status_label'    => 'Status',
+    'provider_order_status_updated'  => 'Updated :count item(s).',
 
 // ======================
 // TRAVELER REVIEW CREATE

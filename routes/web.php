@@ -209,6 +209,13 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::resource('products', \App\Http\Controllers\Provider\ProductController::class)
         ->except(['show']);
 
+    // PATH-3B B4: Provider order management
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Provider\OrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [App\Http\Controllers\Provider\OrderController::class, 'show'])->name('show');
+        Route::patch('/{order}/status', [App\Http\Controllers\Provider\OrderController::class, 'updateStatus'])->name('updateStatus');
+    });
+
     // ─── PROVIDER-ITINERARY-05: Service Itinerary Editor ───
     // SL2: explicit routes only (no Route::resource)
     // SL7: day + item reorder separate endpoints
