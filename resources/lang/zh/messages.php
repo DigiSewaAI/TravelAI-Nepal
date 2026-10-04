@@ -1552,6 +1552,25 @@ return [
     'provider_rfq_respond'     => '回复 RFQ',
     'provider_rfq_send_quote'  => '发送报价',
     'provider_rfq_message'     => '留言',
+        // ============================================
+    // PATH-3B B7 — Order Tracking + Emails
+    // ============================================
+    'order_tracking_timeline'                  => '订单时间线',
+    'order_tracking_empty'                     => '暂无状态变更记录。',
+    'order_status_pending'                     => '待处理',
+    'order_status_confirmed'                   => '已确认',
+    'order_status_processing'                  => '处理中',
+    'order_status_shipped'                     => '已发货',
+    'order_status_delivered'                   => '已送达',
+    'order_status_cancelled'                   => '已取消',
+    'order_status_refunded'                    => '已退款',
+    'order_mail_placed_heading'                => '收到新订单',
+    'order_mail_placed_body'                   => '新订单 :number 已下达，需要您的关注。',
+    'order_mail_status_heading'                => '订单状态已更新',
+    'order_mail_status_body'                   => '您的订单 :number 状态现为：:status',
+    'order_mail_payment_verified_heading'      => '付款已验证',
+    'order_mail_payment_verified_body'         => '订单 :number 的付款已验证。',
+    'order_mail_view_order'                    => '查看订单',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

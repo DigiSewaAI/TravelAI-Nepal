@@ -104,4 +104,9 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'payment_verified_by');
     }
+
+    public function statusHistory()
+    {
+        return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at', 'asc')->orderBy('id', 'asc');
+    }
 }

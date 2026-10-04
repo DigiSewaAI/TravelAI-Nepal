@@ -74,6 +74,11 @@
         @endforeach
     </div>
 
+    {{-- PATH-3B B7: Timeline --}}
+    <div class="border-t pt-4 mb-4">
+        @include('partials.order-timeline', ['order' => $order])
+    </div>
+
     {{-- PATH-3B B5: Payment Verification --}}
     @if($order->isPaymentNotified() && !$order->isPaymentVerified())
         <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-4">

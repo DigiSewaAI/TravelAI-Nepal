@@ -118,6 +118,11 @@
             </div>
         @endif
 
+        {{-- PATH-3B B7: Timeline --}}
+        <div class="mt-6 border-t pt-6">
+            @include('partials.order-timeline', ['order' => $order])
+        </div>
+
         {{-- PATH-3B B5: Payment Section --}}
         <div class="mt-6 border-t pt-6">
             <h3 class="text-lg font-semibold mb-3">

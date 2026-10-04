@@ -49,6 +49,11 @@ class OrdersController extends Controller
             'payment_notice_sent_at' => now(),
         ]);
 
+        // PATH-3B B7: record history (payment notice = same status but notable event)
+        \App\Models\OrderStatusHistory::record(
+            $order, $order->status, $order->status, null, auth()->id(), 'buyer', 'Payment notice sent'
+        );
+
         return back()->with('success', __('messages.order_payment_notified'));
     }
 }

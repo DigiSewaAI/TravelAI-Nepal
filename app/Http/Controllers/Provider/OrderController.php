@@ -77,6 +77,8 @@ class OrderController extends Controller
             'status' => 'required|in:confirmed,shipped,delivered,cancelled',
         ]);
 
+        $oldStatus = $order->status;
+
         $updated = DB::transaction(function () use ($order, $provider, $validated) {
             $count = OrderItem::where('order_id', $order->id)
                 ->where('provider_id', $provider->id)
@@ -97,6 +99,18 @@ class OrderController extends Controller
             return $count;
         });
 
+        // PATH-3B B7: record history + email
+        \App\Models\OrderStatusHistory::record(
+            $order, $validated['status'], $oldStatus, null, auth()->id(), 'provider', 'Provider updated status'
+        );
+
+        try {
+            \Mail::to($order->user->email)
+                ->queue(new \App\Mail\OrderStatusChangedMail($order, $oldStatus, $validated['status']));
+        } catch (\Throwable $e) {
+            \Log::warning('OrderStatusChangedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
         return back()->with('success', __('messages.provider_order_status_updated', ['count' => $updated]));
     }
 
@@ -112,6 +126,8 @@ class OrderController extends Controller
             return back()->with('info', __('messages.order_payment_already_verified'));
         }
 
+        $oldStatus = $order->status;
+
         $order->update([
             'payment_verified_at' => now(),
             'payment_verified_by' => auth()->id(),
@@ -119,6 +135,17 @@ class OrderController extends Controller
             'paid_at'             => now(),
             'status'              => 'confirmed',
         ]);
+
+        // PATH-3B B7: record history + email
+        \App\Models\OrderStatusHistory::record(
+            $order, 'confirmed', $oldStatus, null, auth()->id(), 'provider', 'Payment verified'
+        );
+
+        try {
+            \Mail::to($order->user->email)->queue(new \App\Mail\OrderPaymentVerifiedMail($order));
+        } catch (\Throwable $e) {
+            \Log::warning('OrderPaymentVerifiedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
 
         return back()->with('success', __('messages.order_payment_verified_success'));
     }

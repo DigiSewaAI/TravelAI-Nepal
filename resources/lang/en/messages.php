@@ -1534,6 +1534,25 @@ return [
     'provider_rfq_respond'     => 'Respond to RFQ',
     'provider_rfq_send_quote'  => 'Send Quote',
     'provider_rfq_message'     => 'Message',
+        // ============================================
+    // PATH-3B B7 — Order Tracking + Emails
+    // ============================================
+    'order_tracking_timeline'                  => 'Order Timeline',
+    'order_tracking_empty'                     => 'No status changes recorded yet.',
+    'order_status_pending'                     => 'Pending',
+    'order_status_confirmed'                   => 'Confirmed',
+    'order_status_processing'                  => 'Processing',
+    'order_status_shipped'                     => 'Shipped',
+    'order_status_delivered'                   => 'Delivered',
+    'order_status_cancelled'                   => 'Cancelled',
+    'order_status_refunded'                    => 'Refunded',
+    'order_mail_placed_heading'                => 'New Order Received',
+    'order_mail_placed_body'                   => 'A new order :number has been placed and requires your attention.',
+    'order_mail_status_heading'                => 'Order Status Updated',
+    'order_mail_status_body'                   => 'Your order :number status is now: :status',
+    'order_mail_payment_verified_heading'      => 'Payment Verified',
+    'order_mail_payment_verified_body'         => 'Your payment for order :number has been verified.',
+    'order_mail_view_order'                    => 'View Order',
 
 // ======================
 // TRAVELER REVIEW CREATE

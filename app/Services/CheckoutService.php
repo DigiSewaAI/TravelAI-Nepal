@@ -92,6 +92,26 @@ class CheckoutService
                 $order->items()->create($item);
             }
 
+            // PATH-3B B7: record initial history
+            \App\Models\OrderStatusHistory::record(
+                $order, 'pending', null, null, $user->id, 'buyer', 'Order placed'
+            );
+
+            // PATH-3B B7: notify each provider (queued)
+            foreach ($providerIds as $pid) {
+                $p = \App\Models\Provider::find($pid);
+                if ($p && $p->contact_email) {
+                    try {
+                        \Mail::to($p->contact_email)
+                            ->queue(new \App\Mail\OrderPlacedMail($order, $p));
+                    } catch (\Throwable $e) {
+                        \Log::warning('OrderPlacedMail failed', [
+                            'order_id' => $order->id, 'provider_id' => $pid, 'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+
             $this->cart->clear();
 
             return $order;

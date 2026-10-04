@@ -1561,6 +1561,25 @@ return [
     'provider_rfq_respond'     => 'RFQ लाई जवाफ दिनुहोस्',
     'provider_rfq_send_quote'  => 'मूल्य पठाउनुहोस्',
     'provider_rfq_message'     => 'सन्देश',
+        // ============================================
+    // PATH-3B B7 — Order Tracking + Emails
+    // ============================================
+    'order_tracking_timeline'                  => 'अर्डर टाइमलाइन',
+    'order_tracking_empty'                     => 'अझै कुनै स्थिति परिवर्तन रेकर्ड गरिएको छैन।',
+    'order_status_pending'                     => 'विचाराधीन',
+    'order_status_confirmed'                   => 'पुष्टि भयो',
+    'order_status_processing'                  => 'प्रक्रियामा',
+    'order_status_shipped'                     => 'पठाइयो',
+    'order_status_delivered'                   => 'डेलिभर भयो',
+    'order_status_cancelled'                   => 'रद्द',
+    'order_status_refunded'                    => 'फिर्ता',
+    'order_mail_placed_heading'                => 'नयाँ अर्डर प्राप्त',
+    'order_mail_placed_body'                   => 'नयाँ अर्डर :number राखिएको छ र तपाईंको ध्यान आवश्यक छ।',
+    'order_mail_status_heading'                => 'अर्डर स्थिति अद्यावधिक',
+    'order_mail_status_body'                   => 'तपाईंको अर्डर :number को स्थिति अब: :status',
+    'order_mail_payment_verified_heading'      => 'भुक्तानी प्रमाणित',
+    'order_mail_payment_verified_body'         => 'अर्डर :number को तपाईंको भुक्तानी प्रमाणित भएको छ।',
+    'order_mail_view_order'                    => 'अर्डर हेर्नुहोस्',
 
     // ======================
     // TRAVELER REVIEW CREATE
