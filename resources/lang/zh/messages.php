@@ -1469,6 +1469,28 @@ return [
     'cart_max_days_error'          => '最长租赁：:max 天。',
     'cart_add_btn'                 => '加入购物车',
     'cart_remove_btn'              => '移除',
+        // ============================================
+    // PATH-3B B3 — Checkout + Orders
+    // ============================================
+    'checkout_title'                => '结账',
+    'checkout_contact_section'      => '联系信息',
+    'checkout_shipping_section'     => '送货详情',
+    'checkout_contact_name'         => '全名',
+    'checkout_contact_email'        => '邮箱',
+    'checkout_contact_phone'        => '电话',
+    'checkout_shipping_address'     => '地址',
+    'checkout_shipping_city'        => '城市',
+    'checkout_shipping_country'     => '国家',
+    'checkout_notes'                => '订单备注（可选）',
+    'checkout_place_order'          => '提交订单',
+    'checkout_cart_summary'         => '购物车摘要',
+    'order_created'                 => '订单提交成功！',
+    'orders_title'                  => '我的订单',
+    'orders_empty'                  => '您还没有订单。',
+    'order_number'                  => '订单号',
+    'order_status'                  => '状态',
+    'order_total'                   => '总计',
+    'order_detail_title'            => '订单详情',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

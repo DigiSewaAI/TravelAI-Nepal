@@ -1455,6 +1455,28 @@ return [
     'cart_max_days_error'          => 'अधिकतम किराया: :max दिन।',
     'cart_add_btn'                 => 'कार्ट में जोड़ें',
     'cart_remove_btn'              => 'हटाएं',
+        // ============================================
+    // PATH-3B B3 — Checkout + Orders
+    // ============================================
+    'checkout_title'                => 'चेकआउट',
+    'checkout_contact_section'      => 'संपर्क जानकारी',
+    'checkout_shipping_section'     => 'शिपिंग विवरण',
+    'checkout_contact_name'         => 'पूरा नाम',
+    'checkout_contact_email'        => 'ईमेल',
+    'checkout_contact_phone'        => 'फ़ोन',
+    'checkout_shipping_address'     => 'पता',
+    'checkout_shipping_city'        => 'शहर',
+    'checkout_shipping_country'     => 'देश',
+    'checkout_notes'                => 'ऑर्डर नोट्स (वैकल्पिक)',
+    'checkout_place_order'          => 'ऑर्डर करें',
+    'checkout_cart_summary'         => 'कार्ट सारांश',
+    'order_created'                 => 'ऑर्डर सफलतापूर्वक दिया गया!',
+    'orders_title'                  => 'मेरे ऑर्डर',
+    'orders_empty'                  => 'आपके पास अभी कोई ऑर्डर नहीं है।',
+    'order_number'                  => 'ऑर्डर नंबर',
+    'order_status'                  => 'स्थिति',
+    'order_total'                   => 'कुल',
+    'order_detail_title'            => 'ऑर्डर विवरण',
 
 // ======================
 // TRAVELER REVIEW CREATE

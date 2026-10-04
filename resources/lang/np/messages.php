@@ -1478,6 +1478,28 @@ return [
     'cart_max_days_error'          => 'अधिकतम भाडा: :max दिन।',
     'cart_add_btn'                 => 'झोलामा थप्नुहोस्',
     'cart_remove_btn'              => 'हटाउनुहोस्',
+        // ============================================
+    // PATH-3B B3 — Checkout + Orders
+    // ============================================
+    'checkout_title'                => 'भुक्तानी',
+    'checkout_contact_section'      => 'सम्पर्क जानकारी',
+    'checkout_shipping_section'     => 'ढुवानी विवरण',
+    'checkout_contact_name'         => 'पूरा नाम',
+    'checkout_contact_email'        => 'इमेल',
+    'checkout_contact_phone'        => 'फोन',
+    'checkout_shipping_address'     => 'ठेगाना',
+    'checkout_shipping_city'        => 'शहर',
+    'checkout_shipping_country'     => 'देश',
+    'checkout_notes'                => 'अर्डर नोट (वैकल्पिक)',
+    'checkout_place_order'          => 'अर्डर गर्नुहोस्',
+    'checkout_cart_summary'         => 'झोला सारांश',
+    'order_created'                 => 'अर्डर सफलतापूर्वक राखियो!',
+    'orders_title'                  => 'मेरा अर्डरहरू',
+    'orders_empty'                  => 'तपाईंको अझै कुनै अर्डर छैन।',
+    'order_number'                  => 'अर्डर नम्बर',
+    'order_status'                  => 'स्थिति',
+    'order_total'                   => 'कुल',
+    'order_detail_title'            => 'अर्डर विवरण',
 
     // ======================
     // TRAVELER REVIEW CREATE

@@ -1451,6 +1451,28 @@ return [
     'cart_max_days_error'          => 'Maximum rental: :max days.',
     'cart_add_btn'                 => 'Add to Cart',
     'cart_remove_btn'              => 'Remove',
+        // ============================================
+    // PATH-3B B3 — Checkout + Orders
+    // ============================================
+    'checkout_title'                => 'Checkout',
+    'checkout_contact_section'      => 'Contact Information',
+    'checkout_shipping_section'     => 'Shipping Details',
+    'checkout_contact_name'         => 'Full Name',
+    'checkout_contact_email'        => 'Email',
+    'checkout_contact_phone'        => 'Phone',
+    'checkout_shipping_address'     => 'Address',
+    'checkout_shipping_city'        => 'City',
+    'checkout_shipping_country'     => 'Country',
+    'checkout_notes'                => 'Order Notes (optional)',
+    'checkout_place_order'          => 'Place Order',
+    'checkout_cart_summary'         => 'Cart Summary',
+    'order_created'                 => 'Order placed successfully!',
+    'orders_title'                  => 'My Orders',
+    'orders_empty'                  => 'You have no orders yet.',
+    'order_number'                  => 'Order Number',
+    'order_status'                  => 'Status',
+    'order_total'                   => 'Total',
+    'order_detail_title'            => 'Order Details',
 
 // ======================
 // TRAVELER REVIEW CREATE
