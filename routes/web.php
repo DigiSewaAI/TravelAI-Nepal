@@ -474,6 +474,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/payments/{payment}/reject', [App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('payments.reject');
     Route::get('/payments/{payment}/receipt', [App\Http\Controllers\Admin\PaymentController::class, 'serveReceipt'])->name('payments.receipt');
     Route::post('/payments/{payment}/mark-refunded', [App\Http\Controllers\Admin\PaymentController::class, 'markRefunded'])->name('payments.mark-refunded');
+    // Platform payment methods (subscription payments)
+    Route::resource('platform-payment-methods', App\Http\Controllers\Admin\PlatformPaymentMethodController::class)
+        ->except(['show']);
+    Route::post('/platform-payment-methods/{platformPaymentMethod}/toggle',
+        [App\Http\Controllers\Admin\PlatformPaymentMethodController::class, 'toggle'])
+        ->name('platform-payment-methods.toggle');
 
     Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');

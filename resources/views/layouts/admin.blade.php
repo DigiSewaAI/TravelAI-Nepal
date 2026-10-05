@@ -140,6 +140,14 @@
                 </a>
                 @endif
 
+                @if(Route::has('admin.platform-payment-methods.index'))
+                <a href="{{ route('admin.platform-payment-methods.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.platform-payment-methods.*') ? 'active' : '' }}">
+                    <i class="fas fa-university w-5"></i>
+                    <span>Platform Payment Methods</span>
+                </a>
+                @endif
+
     @if(Route::has('admin.invoices.index'))
     <a href="{{ route('admin.invoices.index') }}"
        class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}">
