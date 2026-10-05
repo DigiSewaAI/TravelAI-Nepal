@@ -29,7 +29,7 @@ class ProductController extends Controller
         $query = Product::query()
             ->with([
                 'provider:id,name,slug',
-                'location:id,city,district',
+                'location:id,city',
                 'shopDetail',
                 'rentalDetail',
                 'wholesaleDetail',
@@ -70,7 +70,7 @@ class ProductController extends Controller
         $locations = Location::whereNotNull('city')
             ->where('city', '!=', '')
             ->orderBy('city')
-            ->get(['id', 'city', 'district']);
+            ->get(['id', 'city']);
 
         return view('public.products.index', compact('products', 'type', 'locations', 'sort'));
     }
@@ -81,7 +81,7 @@ class ProductController extends Controller
             ->where('status', 'active')
             ->with([
                 'provider:id,name,slug,contact_email,contact_phone,address,logo_url',
-                'location:id,city,district',
+                'location:id,city',
                 'shopDetail',
                 'rentalDetail',
                 'wholesaleDetail',
