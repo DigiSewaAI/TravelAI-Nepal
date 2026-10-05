@@ -60,8 +60,8 @@ class HomeController extends Controller
         $agencyName = $provider?->name ?? 'Local Trek Partner';
         $travelerName = 'Anonymous';
         $timeAgo = $scan->scanned_at ? $scan->scanned_at->diffForHumans() : 'Just now';
-        
-        $coverImage = $service?->cover_image ? asset('storage/' . $service->cover_image) : null;
+
+        $coverImage = $service?->cover_image ? \Storage::url($service->cover_image) : null;
 
         return [
             'checkpoint'    => $checkpoint,

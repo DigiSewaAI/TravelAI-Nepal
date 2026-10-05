@@ -62,8 +62,8 @@ class CinematicReplayService
                 foreach ($media as $item) {
                     $mediaItems[] = [
                         'type' => $item->media_type,
-                        'url' => asset('storage/' . $item->optimized_path),
-                        'thumbnail' => $item->thumbnail_path ? asset('storage/' . $item->thumbnail_path) : null,
+                        'url' => \Storage::url($item->optimized_path),
+                        'thumbnail' => $item->thumbnail_path ? \Storage::url($item->thumbnail_path) : null,
                         'source' => 'user',
                     ];
                 }
@@ -86,7 +86,7 @@ class CinematicReplayService
     public function getCinematicData(User $user): array
     {
         $scenes = $this->getScenes($user);
-        
+
         // Use passport service for reliable stats (keys: total_treks, total_checkins, unique_waypoints, highest_altitude, etc.)
         $stats = $this->passportService->getStatistics($user);
 

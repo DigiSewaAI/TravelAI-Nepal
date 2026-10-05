@@ -99,8 +99,8 @@ class JourneyReplayController extends Controller
                 ->map(function ($item) {
                     return [
                         'type'      => $item->media_type,
-                        'url'       => asset('storage/' . $item->optimized_path),
-                        'thumbnail' => $item->thumbnail_path ? asset('storage/' . $item->thumbnail_path) : null,
+                        'url'       => \Storage::url($item->optimized_path),
+                        'thumbnail' => $item->thumbnail_path ? \Storage::url($item->thumbnail_path) : null,
                         'source'    => 'user',
                     ];
                 })
