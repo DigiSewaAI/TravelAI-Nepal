@@ -12,6 +12,7 @@
         "laravel/ai": "^0.8.1",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.35",
         "php-ffmpeg/php-ffmpeg": "^1.4",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
