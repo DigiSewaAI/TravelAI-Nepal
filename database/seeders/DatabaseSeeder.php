@@ -64,7 +64,8 @@ class DatabaseSeeder extends Seeder
 
         // ─── 6-9. DEV-ONLY (test providers + services + tourism + assignments) ───
         // Production = fresh DB + curated demo (Hybrid strategy)
-        if (!app()->environment('production')) {
+        // Route providers = production-required (AI Planner dependency)
+        // Hidden from public via Path B (ProviderController filter)
             $this->call([
                 // §6 — Provider Seeders (12)
                 AnnapurnaProviderSeeder::class,
@@ -89,11 +90,9 @@ class DatabaseSeeder extends Seeder
 
                 // §9 — Assign Provider Types (depends on §6)
                 AssignProviderTypesSeeder::class,
-            ]);
-        }
+        ]);
 
         // ─── Always: production admin (idempotent, env-driven) ───
-        $this->call(ProductionAdminSeeder::class);
 
         // ─── Real entities (migrated from local — idempotent) ───
         $this->call(RealEntitiesSeeder::class);

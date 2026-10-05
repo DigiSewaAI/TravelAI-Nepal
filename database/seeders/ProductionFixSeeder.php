@@ -18,6 +18,9 @@ class ProductionFixSeeder extends Seeder
         $this->command->info('ProductionFixSeeder: starting...');
 
         // STEP 1 - Pre-step email renames (Trap 2)
+        // DEFENSIVE: Only rename if old exists AND new does NOT exist.
+        // Prevents "duplicate entry" error when DemoProvidersSeeder already
+        // created the target email (idempotent re-run safety).
         $emailRenames = [
             'demo.hotel@travelainepal.com'      => 'book@himalayanviewhotel.com',
             'demo.activity@travelainepal.com'   => 'info@adventurenepalsports.com',
@@ -26,11 +29,16 @@ class ProductionFixSeeder extends Seeder
             'demo.homestay@travelainepal.com'   => 'stay@gurungvillagehomestay.com',
         ];
         foreach ($emailRenames as $old => $new) {
-            User::where('email', $old)->update(['email' => $new]);
+            if (User::where('email', $old)->exists() && !User::where('email', $new)->exists()) {
+                User::where('email', $old)->update(['email' => $new]);
+            }
         }
-        $this->command->info('  [1/8] Emails renamed');
+        $this->command->info('  [1/8] Emails renamed (guarded)');
 
         // STEP 2 - Pre-step code renames (Trap 3)
+        // DEFENSIVE: Only rename if old exists AND new does NOT exist.
+        // Prevents "duplicate code" error when DemoProvidersSeeder already
+        // created the target code (idempotent re-run safety).
         $codeRenames = [
             'DMH'  => 'HVH',
             'DMA'  => 'ANS',
@@ -39,9 +47,11 @@ class ProductionFixSeeder extends Seeder
             'DMH2' => 'GVH',
         ];
         foreach ($codeRenames as $old => $new) {
-            Provider::where('code', $old)->update(['code' => $new]);
+            if (Provider::where('code', $old)->exists() && !Provider::where('code', $new)->exists()) {
+                Provider::where('code', $old)->update(['code' => $new]);
+            }
         }
-        $this->command->info('  [2/8] Codes renamed');
+        $this->command->info('  [2/8] Codes renamed (guarded)');
 
         // STEP 3 - Rename DMR (Pokhara Lakeside Resort) - id=477
         Provider::where('code', 'PGL')->update([
@@ -51,22 +61,31 @@ class ProductionFixSeeder extends Seeder
         ]);
         $this->command->info('  [3/8] PGL renamed');
 
-        // STEP 4 - Email domain fix (@travelai.com -> @travelainepal.com)
+        // STEP 4 - Email domain fix (GUARDED — prevents duplicate conflicts)
         foreach (DB::table('users')->where('email', 'LIKE', '%@travelai.com')->get() as $u) {
             $newEmail = str_replace('@travelai.com', '@travelainepal.com', $u->email);
-            DB::table('users')->where('id', $u->id)->update(['email' => $newEmail]);
+            // Skip if target already exists (duplicate from prior run)
+            if (!DB::table('users')->where('email', $newEmail)->exists()) {
+                DB::table('users')->where('id', $u->id)->update(['email' => $newEmail]);
+            } else {
+                // Target exists — merge: reassign providers, delete old
+                $newUser = DB::table('users')->where('email', $newEmail)->first();
+                DB::table('providers')->where('user_id', $u->id)->update(['user_id' => $newUser->id]);
+                DB::table('users')->where('id', $u->id)->delete();
+            }
         }
+        // Providers contact_email — always safe (no unique constraint)
         DB::table('providers')->where('contact_email', 'LIKE', '%@travelai.com')
             ->update(['contact_email' => DB::raw("REPLACE(contact_email, '@travelai.com', '@travelainepal.com')")]);
         $this->command->info('  [4/8] Domain fixed');
 
         // STEP 5 - Update demo provider emails (474-478)
         $demoUpdates = [
-            'HVH' => ['email' => 'book@himalayanviewhotel.com',      'name' => 'Bikash Thapa'],
-            'ANS' => ['email' => 'info@adventurenepalsports.com',    'name' => 'Pemba Sherpa'],
-            'NCE' => ['email' => 'hello@nepalcultural.com',           'name' => 'Sunita Gurung'],
-            'PGL' => ['email' => 'book@pokharagrandlakeview.com',    'name' => 'Rajesh Adhikari'],
-            'GVH' => ['email' => 'stay@gurungvillagehomestay.com',   'name' => 'Kamala Gurung'],
+            'HVH' => ['email' => 'book@himalayanviewhotel.com',    'name' => 'Bikash Thapa'],
+            'ANS' => ['email' => 'info@adventurenepalsports.com',  'name' => 'Pemba Sherpa'],
+            'NCE' => ['email' => 'hello@nepalcultural.com',         'name' => 'Sunita Gurung'],
+            'PGL' => ['email' => 'book@pokharagrandlakeview.com',  'name' => 'Rajesh Adhikari'],
+            'GVH' => ['email' => 'stay@gurungvillagehomestay.com', 'name' => 'Kamala Gurung'],
         ];
         foreach ($demoUpdates as $code => $data) {
             $provider = Provider::where('code', $code)->first();
