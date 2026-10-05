@@ -17,7 +17,7 @@
                                         <div class="mt-2">
                         @if($currentSubscription->plan->isContactOnly())
                             <span class="text-sm text-blue-600 font-semibold">{{ __('messages.contact_for_pricing') }}</span>
-                        @elseif($currentSubscription->plan->price_monthly == 0)
+                        @elseif((float) $currentSubscription->plan->price_monthly == 0)
                             <span class="text-sm text-green-600 font-semibold">{{ __('messages.free_plan') }}</span>
                         @else
                             <span class="text-sm text-gray-600">${{ number_format($currentSubscription->plan->price_monthly, 2) }} / {{ __('messages.month') }}</span>
@@ -63,15 +63,16 @@
                     <h3 class="font-bold text-gray-800">{{ $plan->name }}</h3>
                     <p class="text-gray-500 text-sm">{{ $plan->description }}</p>
                                         <div class="mt-2">
+                        {{-- FIX: Strict comparison — null is NOT 0 (Enterprise = Custom) --}}
                         @if($plan->isContactOnly())
                             <span class="text-sm font-semibold text-blue-600">{{ __('messages.contact_for_pricing') }}</span>
-                        @elseif($plan->price_monthly == 0)
+                        @elseif($plan->price_monthly === null)
+                            <span class="text-lg font-bold text-gray-800">{{ __('messages.custom') }}</span>
+                        @elseif((float) $plan->price_monthly == 0)
                             <span class="text-lg font-bold text-green-600">{{ __('messages.free') }}</span>
-                        @elseif($plan->price_monthly !== null)
+                        @else
                             <span class="text-lg font-bold text-gray-800">${{ number_format($plan->price_monthly, 2) }}</span>
                             <span class="text-sm text-gray-500">/ {{ __('messages.month') }}</span>
-                        @else
-                            <span class="text-lg font-bold text-gray-800">{{ __('messages.custom') }}</span>
                         @endif
                     </div>
 

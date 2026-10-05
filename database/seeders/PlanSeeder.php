@@ -43,6 +43,7 @@ class PlanSeeder extends Seeder
                 'description' => 'Custom solutions for large enterprises',
                 'price_monthly' => null,
                 'price_yearly' => null,
+                'requires_contact' => true,   // ← ADD
                 'features' => ['Unlimited Listings', 'Unlimited Staff', 'Unlimited AI', 'Unlimited Bookings', 'Custom Logo', 'Priority Support'],
                 'limits' => ['max_listings' => -1, 'max_staff' => -1, 'max_ai_requests' => -1, 'max_bookings' => -1, 'max_products' => -1],
             ],
