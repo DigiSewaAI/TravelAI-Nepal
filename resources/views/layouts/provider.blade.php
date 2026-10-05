@@ -40,7 +40,7 @@
                     <div class="flex items-center space-x-3">
                         <!-- 🔥 Provider Logo -->
                         @if($provider->logo_url)
-                            <img src="{{ asset('storage/' . $provider->logo_url) }}"
+                            <img src="{{ Storage::url($provider->logo_url) }}"
                                  alt="{{ $provider->name }} logo"
                                  class="w-10 h-10 rounded-full object-cover border border-gray-200"
                                  onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">

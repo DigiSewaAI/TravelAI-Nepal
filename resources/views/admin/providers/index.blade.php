@@ -23,7 +23,7 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
                             @if($provider->logo_url)
-                                <img src="{{ asset('storage/' . $provider->logo_url) }}" class="w-8 h-8 rounded-full object-cover">
+                                <img src="{{ Storage::url($provider->logo_url) }}" class="w-8 h-8 rounded-full object-cover">
                             @else
                                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                                     <i class="fas fa-building text-blue-600 text-xs"></i>

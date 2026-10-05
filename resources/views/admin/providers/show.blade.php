@@ -16,7 +16,7 @@
         <div class="md:col-span-2 bg-white rounded-xl shadow-sm border p-6">
             <div class="flex items-center gap-4 mb-4">
                 @if($provider->logo_url)
-                    <img src="{{ asset('storage/' . $provider->logo_url) }}" class="w-16 h-16 rounded-full object-cover">
+                    <img src="{{ Storage::url($provider->logo_url) }}" class="w-16 h-16 rounded-full object-cover">
                 @else
                     <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
                         <i class="fas fa-building text-blue-600 text-2xl"></i>
@@ -158,7 +158,7 @@
                                 {{ ucfirst($doc->status) }}
                             </span>
                         </div>
-                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank"
+                        <a href="{{ Storage::url($doc->file_path) }}" target="_blank"
                            class="text-blue-600 hover:text-blue-800 text-sm">
                             <i class="fas fa-eye"></i> View
                         </a>

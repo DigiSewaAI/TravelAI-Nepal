@@ -99,7 +99,7 @@
     {{-- ========== COVER IMAGE SECTION ========== --}}
 <div class="relative h-48 bg-gradient-to-r from-blue-500 to-indigo-600 overflow-hidden">
     @if($provider->cover_image)
-        <img src="{{ asset('storage/' . $provider->cover_image) }}" 
+        <img src="{{ Storage::url($provider->cover_image) }}" 
              alt="{{ $provider->name }} cover"
              class="w-full h-full object-cover object-left-center group-hover:scale-105 transition-transform duration-300"
              onerror="this.onerror=null; this.style.display='none';">
@@ -115,7 +115,7 @@
     {{-- LOGO + NAME + BADGES (bottom left) --}}
     <div class="absolute bottom-0 left-0 right-0 p-4 flex items-end gap-3">
         @if($provider->logo_url)
-            <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+            <img src="{{ Storage::url($provider->logo_url) }}" 
                  alt="{{ $provider->name }} logo"
                  class="w-16 h-16 rounded-full border-2 border-white shadow-lg object-cover bg-white flex-shrink-0"
                  onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';">

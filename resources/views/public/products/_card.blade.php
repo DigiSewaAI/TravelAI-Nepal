@@ -11,7 +11,7 @@
 
     <div class="bg-gray-100 overflow-hidden">
         @if($product->cover_image)
-            <img src="{{ asset('storage/' . $product->cover_image) }}" alt="{{ $product->name }}"
+            <img src="{{ Storage::url($product->cover_image) }}" alt="{{ $product->name }}"
                  class="w-full h-48 object-cover group-hover:scale-105 transition-transform">
         @else
             <div class="w-full h-48 flex items-center justify-center bg-gray-100 text-gray-400">

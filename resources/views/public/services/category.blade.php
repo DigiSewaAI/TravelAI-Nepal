@@ -127,7 +127,7 @@
         <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition border border-gray-100">
             <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
                 @if($service->cover_image)
-                    <img src="{{ asset('storage/' . $service->cover_image) }}"
+                    <img src="{{ Storage::url($service->cover_image) }}"
                          alt="{{ $service->name }}"
                          loading="lazy"
                          class="w-full h-full object-cover">

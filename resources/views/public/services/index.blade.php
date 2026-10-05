@@ -570,7 +570,7 @@
                              onclick="window.location='{{ route('public.services.show', $service->slug) }}'">
                         <div class="relative {{ $isFeatured ? 'h-72' : 'h-52' }} bg-gradient-to-br from-blue-400 to-indigo-500 overflow-hidden">
                             @if($service->cover_image)
-                                <img src="{{ asset('storage/' . $service->cover_image) }}"
+                                <img src="{{ Storage::url($service->cover_image) }}"
                                      alt="{{ $service->name }}"
                                      loading="lazy"
                                      class="premium-img w-full h-full object-cover">

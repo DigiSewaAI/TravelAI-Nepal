@@ -15,7 +15,7 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.logo') }}</label>
                 @if($provider->logo_url)
                     <div class="mb-2">
-                        <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                        <img src="{{ Storage::url($provider->logo_url) }}" 
                              class="h-20 w-20 object-cover rounded-full border-2 border-gray-200">
                     </div>
                 @endif
@@ -32,7 +32,7 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.cover_image') }}</label>
                 @if($provider->cover_image)
                     <div class="mb-2">
-                        <img src="{{ asset('storage/' . $provider->cover_image) }}" 
+                        <img src="{{ Storage::url($provider->cover_image) }}" 
                              class="w-full h-32 object-cover rounded-lg border-2 border-gray-200">
                     </div>
                 @endif

@@ -11,7 +11,7 @@
   "name": "{{ addslashes($provider->name) }}",
   "description": "{{ Str::limit(strip_tags($provider->description ?? ''), 200) }}",
   "url": "{{ url()->current() }}",
-  "image": "{{ $provider->logo_url ? asset('storage/' . $provider->logo_url) : asset('images/logo.png') }}",
+  "image": "{{ $provider->logo_url ? Storage::url($provider->logo_url) : asset('images/logo.png') }}",
   "address": {
     "@@type": "PostalAddress",
     "addressLocality": "{{ $provider->address ?? 'Kathmandu' }}",
@@ -40,7 +40,7 @@
     <div class="bg-white rounded-xl shadow-md border p-6 mb-6">
         <div class="flex items-center gap-4">
             @if($provider->logo_url)
-                <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+                <img src="{{ Storage::url($provider->logo_url) }}" 
                      class="w-20 h-20 rounded-full object-cover">
             @else
                 <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
@@ -97,7 +97,7 @@
             @foreach($provider->services as $service)
                 <div class="bg-white rounded-xl shadow-md border hover:shadow-lg transition overflow-hidden">
                     @if($service->cover_image)
-                        <img src="{{ asset('storage/' . $service->cover_image) }}" 
+                        <img src="{{ Storage::url($service->cover_image) }}" 
                              class="w-full h-40 object-cover">
                     @else
                         <div class="w-full h-40 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">

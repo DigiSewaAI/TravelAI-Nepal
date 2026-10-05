@@ -7,7 +7,7 @@
 <div class="bg-white rounded-xl shadow-sm border p-6 max-w-3xl mx-auto">
     <div class="flex items-center space-x-4 mb-6">
         @if($provider->logo_url)
-            <img src="{{ asset('storage/' . $provider->logo_url) }}" 
+            <img src="{{ Storage::url($provider->logo_url) }}" 
                  class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
         @else
             <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">

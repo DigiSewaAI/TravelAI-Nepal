@@ -134,7 +134,7 @@
 
                                 @if($method->qr_image_path)
                                     <div class="mt-2 text-center">
-                                        <img src="{{ asset('storage/' . $method->qr_image_path) }}"
+                                        <img src="{{ Storage::url($method->qr_image_path) }}"
                                              alt="{{ $method->label }} QR"
                                              class="w-32 h-32 mx-auto object-contain rounded border border-gray-200 bg-white p-1">
                                     </div>

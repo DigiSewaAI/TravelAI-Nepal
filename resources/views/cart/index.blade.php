@@ -47,7 +47,7 @@
                     <div class="bg-white rounded-xl shadow-sm border p-4 flex gap-4">
                         <div class="w-24 h-24 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
                             @if($product->cover_image)
-                                <img src="{{ asset('storage/' . $product->cover_image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                <img src="{{ Storage::url($product->cover_image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400">
                                     <i class="fas fa-image"></i>

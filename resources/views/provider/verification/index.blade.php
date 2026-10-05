@@ -94,7 +94,7 @@
                             <p class="text-sm text-gray-500">{{ $doc->created_at->format('M d, Y') }}</p>
                         </div>
                         <div class="flex gap-2">
-                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" 
+                            <a href="{{ Storage::url($doc->file_path) }}" target="_blank" 
                                class="text-blue-600 hover:text-blue-800 text-sm">
                                 <i class="fas fa-eye"></i> {{ __('messages.view') }}
                             </a>

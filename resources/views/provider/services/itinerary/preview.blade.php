@@ -105,7 +105,7 @@
                                         @foreach($day->media as $media)
                                             <div class="rounded border overflow-hidden bg-gray-100">
                                                 @if($media->media_type === 'image')
-                                                    <img src="{{ asset('storage/' . $media->file_path) }}"
+                                                    <img src="{{ Storage::url($media->file_path) }}"
                                                          alt="{{ $media->alt_text ?? '' }}"
                                                          class="w-full h-16 object-cover">
                                                 @else

@@ -33,7 +33,7 @@
 
         <div class="rounded-xl overflow-hidden bg-gray-100">
             @if($product->cover_image)
-                <img src="{{ asset('storage/' . $product->cover_image) }}" alt="{{ $product->name }}"
+                <img src="{{ Storage::url($product->cover_image) }}" alt="{{ $product->name }}"
                      class="w-full h-96 object-cover">
             @else
                 <div class="w-full h-96 flex items-center justify-center text-gray-400">

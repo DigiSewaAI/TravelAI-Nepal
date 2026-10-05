@@ -399,7 +399,7 @@
                     @foreach($userMedia->take(6) as $media)
                         <div class="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square bg-gray-100">
                             @if($media->media_type === 'image')
-                                <img src="{{ asset('storage/' . $media->optimized_path) }}" alt="{{ $media->file_name }}" class="w-full h-full object-cover">
+                                <img src="{{ Storage::url($media->optimized_path) }}" alt="{{ $media->file_name }}" class="w-full h-full object-cover">
                             @endif
                             <form action="{{ route('traveler.memory.delete') }}" method="POST" class="absolute top-1 right-1">
                                 @csrf

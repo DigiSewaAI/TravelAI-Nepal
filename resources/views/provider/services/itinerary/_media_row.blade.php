@@ -1,6 +1,6 @@
 <div class="relative group border rounded overflow-hidden bg-gray-50">
     @if($media->media_type === 'image')
-        <img src="{{ asset('storage/' . $media->file_path) }}"
+        <img src="{{ Storage::url($media->file_path) }}"
              alt="{{ $media->alt_text ?? 'Day media' }}"
              class="w-full h-20 object-cover">
     @else

@@ -11,7 +11,7 @@
   "@@type": "TouristTrip",
   "name": "{{ addslashes($service->name) }}",
   "description": "{{ Str::limit(strip_tags($service->description), 200) }}",
-  "image": "{{ $service->cover_image ? asset('storage/' . $service->cover_image) : asset('images/default-share.jpg') }}",
+  "image": "{{ $service->cover_image ? Storage::url($service->cover_image) : asset('images/default-share.jpg') }}",
   "url": "{{ url()->current() }}",
   "provider": {
     "@@type": "LocalBusiness",
@@ -44,7 +44,7 @@
         <!-- Gallery/Images -->
         <div>
             @if($service->cover_image)
-                <img src="{{ asset('storage/' . $service->cover_image) }}"
+                <img src="{{ Storage::url($service->cover_image) }}"
                      alt="{{ $service->name }}"
                      class="w-full rounded-xl shadow-lg object-cover h-96">
             @else
@@ -62,7 +62,7 @@
             @if(count($gallery) > 0)
                 <div class="grid grid-cols-4 gap-2 mt-2">
                     @foreach(array_slice($gallery, 0, 4) as $image)
-                        <img src="{{ asset('storage/' . $image) }}"
+                        <img src="{{ Storage::url($image) }}"
                              alt="{{ __('messages.gallery_image') }}"
                              class="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75">
                     @endforeach
@@ -200,7 +200,7 @@
                 <h3 class="font-semibold text-gray-700">{{ __('messages.provider') }}</h3>
                 <div class="flex items-center gap-3 mt-2">
                     @if($service->provider->logo_url)
-                        <img src="{{ asset('storage/' . $service->provider->logo_url) }}"
+                        <img src="{{ Storage::url($service->provider->logo_url) }}"
                              alt="{{ $service->provider->name }} logo"
                              class="w-14 h-14 rounded-full object-cover border-2 border-gray-200">
                     @else
@@ -442,11 +442,11 @@
                                             @if($media->media_type === 'image')
     <button type="button"
             class="media-lightbox-trigger block relative group overflow-hidden rounded-lg bg-gray-100 w-full text-left"
-            data-src="{{ asset('storage/' . $media->file_path) }}"
+            data-src="{{ Storage::url($media->file_path) }}"
             data-caption="{{ $media->alt_text ?? $day->title }}"
             data-day="{{ __('messages.day') }} {{ $day->day_number }}"
             aria-label="{{ __('messages.media_view_full') }}">
-        <img src="{{ asset('storage/' . $media->file_path) }}"
+        <img src="{{ Storage::url($media->file_path) }}"
              alt="{{ $media->alt_text ?? $day->title }}"
              loading="lazy"
              class="w-full h-24 md:h-32 object-cover group-hover:scale-105 transition-transform duration-300">
@@ -459,7 +459,7 @@
 @else
                                                 <div class="col-span-2 md:col-span-4">
                                                     <video controls preload="metadata" class="w-full rounded-lg max-h-72 bg-black">
-                                                        <source src="{{ asset('storage/' . $media->file_path) }}">
+                                                        <source src="{{ Storage::url($media->file_path) }}">
                                                         Video unavailable
                                                     </video>
                                                     @if($media->alt_text)
@@ -539,7 +539,7 @@
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition border border-gray-100 group">
                         <div class="h-40 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center overflow-hidden">
                             @if($related->cover_image)
-                                <img src="{{ asset('storage/' . $related->cover_image) }}"
+                                <img src="{{ Storage::url($related->cover_image) }}"
                                      alt="{{ $related->name }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @else

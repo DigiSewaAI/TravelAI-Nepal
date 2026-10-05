@@ -71,7 +71,7 @@
                 <input type="file" name="cover_image" accept="image/*"
                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 @if($service->cover_image)
-                    <p class="text-xs text-gray-400 mt-1">{{ __('messages.current') }}: <a href="{{ asset('storage/' . $service->cover_image) }}" target="_blank">{{ __('messages.view') }}</a></p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('messages.current') }}: <a href="{{ Storage::url($service->cover_image) }}" target="_blank">{{ __('messages.view') }}</a></p>
                 @endif
             </div>
 

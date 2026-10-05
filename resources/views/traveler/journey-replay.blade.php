@@ -226,7 +226,7 @@
                                 {{-- ✅ FIXED IMAGE CONTAINER with consistent aspect ratio --}}
                                 <div class="md:w-44 h-44 flex-shrink-0 bg-gray-100 relative overflow-hidden">
                                     @if($event['cover_image'])
-                                        <img src="{{ asset('storage/' . $event['cover_image']) }}"
+                                        <img src="{{ Storage::url($event['cover_image']) }}"
                                              alt="{{ $event['service_name'] }}"
                                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                              style="aspect-ratio: 1/1; object-fit: cover;"

@@ -76,7 +76,7 @@
         @forelse($treks as $item)
         <div class="bg-white rounded-2xl shadow-md overflow-hidden trek-card transition duration-300 hover:shadow-xl border border-gray-100">
             @if($item->cover_image)
-                <img src="{{ asset('storage/' . $item->cover_image) }}" class="h-48 w-full object-cover">
+                <img src="{{ Storage::url($item->cover_image) }}" class="h-48 w-full object-cover">
             @else
                 <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
                     @if($category == 'hotel')
