@@ -16,6 +16,11 @@ class ProviderController extends Controller
             ->where('verification_status', 'verified')
             ->whereHas('user', function ($q) {
                 $q->where('role', '!=', 'super_admin'); // Super Admin exclude
+            })
+            // PATH-B: Hide synthetic providers (route-generated 1-457) from public
+            ->where(function ($q) {
+                $q->whereNotNull('code')
+                  ->orWhere('id', '>=', 458);
             });
 
         // Filter by provider type
@@ -54,6 +59,11 @@ class ProviderController extends Controller
 
     public function show(Provider $provider)
     {
+        // PATH-B: Block synthetic providers (route-generated 1-457) from public view
+        if ($provider->code === null && $provider->id < 458) {
+            abort(404);
+        }
+
         $provider->load(['types', 'services' => function ($q) {
             $q->where('status', 'active')->with(['category', 'reviews']);
         }]);
