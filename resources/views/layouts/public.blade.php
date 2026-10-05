@@ -114,60 +114,60 @@
         }
     </script>
 </head>
-<body class="antialiased">
+<body class="antialiased overflow-x-hidden">
 
     <!-- ======================= HEADER ======================= -->
     <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/70 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 md:px-10 py-2 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-10 py-2 flex justify-between items-center gap-2">
             <!-- Logo -->
-            <a href="{{ url('/') }}" class="flex items-center space-x-0 group">
-                <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-2xl text-blue-600\'></i>'">
-                <span class="font-extrabold text-2xl tracking-tight text-gray-800 hidden sm:inline">{{ __('messages.app_name_short') }} <span class="text-blue-600">{{ __('messages.nepal') }}</span></span>
+            <a href="{{ url('/') }}" class="flex items-center space-x-0 group flex-shrink-0">
+                <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-10 sm:h-14 lg:h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl sm:text-2xl text-blue-600\'></i>'">
+                <span class="font-extrabold text-lg sm:text-xl lg:text-2xl tracking-tight text-gray-800 hidden sm:inline">{{ __('messages.app_name_short') }} <span class="text-blue-600">{{ __('messages.nepal') }}</span></span>
             </a>
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
-            <div class="flex gap-2 lg:gap-3 text-gray-700 font-medium items-center">
-                <!-- Navigation Links (पहिले जस्तै) -->
-                <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.home') }}</a>
-                <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.features') }}</a>
-                <a href="{{ route('public.services.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.explore') }}</a>
-                <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.nav_shop') }}</a>
-                <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.nav_rental') }}</a>
-                <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm">{{ __('messages.pricing') }}</a>
-                <a href="{{ url('/how-it-works') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.how_it_works') }}</a>
+            <div class="flex gap-1 lg:gap-3 text-gray-700 font-medium items-center min-w-0">
+                <!-- Desktop Navigation Links (hidden on mobile) -->
+                <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.home') }}</a>
+                <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.features') }}</a>
+                <a href="{{ route('public.services.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.explore') }}</a>
+                <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_shop') }}</a>
+                <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_rental') }}</a>
+                <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.pricing') }}</a>
+                <a href="{{ url('/how-it-works') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.how_it_works') }}</a>
                 <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.providers') }}</a>
 
-                <!-- ✅ Language Switcher (Get Early Access को ठाउँमा) -->
-                <div class="relative">
-    <button type="button" class="flex items-center text-gray-700 hover:text-gray-900 text-sm font-medium" id="languageDropdown">
-        <span class="mr-1">
-            @if(session('locale') == 'hi') 🇮🇳
-            @elseif(session('locale') == 'zh') 🇨🇳
-            @elseif(session('locale') == 'np') 🇳🇵
-            @else 🇬🇧
-            @endif
-        </span>
-        <span class="text-sm font-medium">
-            @if(session('locale') == 'hi') हिन्दी
-            @elseif(session('locale') == 'zh') 中文
-            @elseif(session('locale') == 'np') नेपाली
-            @else English
-            @endif
-        </span>
-        <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-    </button>
-    <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
-        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
-        <a href="{{ route('lang.switch', 'hi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇮🇳 हिन्दी</a>
-        <a href="{{ route('lang.switch', 'zh') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇨🇳 中文</a>
-        <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇳🇵 नेपाली</a>
-    </div>
-</div>
+                <!-- Desktop Language Switcher (hidden on mobile) -->
+                <div class="relative hidden lg:block">
+                    <button type="button" class="flex items-center text-gray-700 hover:text-gray-900 text-sm font-medium" id="languageDropdown">
+                        <span class="mr-1">
+                            @if(session('locale') == 'hi') 🇮🇳
+                            @elseif(session('locale') == 'zh') 🇨🇳
+                            @elseif(session('locale') == 'np') 🇳🇵
+                            @else 🇬🇧
+                            @endif
+                        </span>
+                        <span class="text-sm font-medium">
+                            @if(session('locale') == 'hi') हिन्दी
+                            @elseif(session('locale') == 'zh') 中文
+                            @elseif(session('locale') == 'np') नेपाली
+                            @else English
+                            @endif
+                        </span>
+                        <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
+                        <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
+                        <a href="{{ route('lang.switch', 'hi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇮🇳 हिन्दी</a>
+                        <a href="{{ route('lang.switch', 'zh') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇨🇳 中文</a>
+                        <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇳🇵 नेपाली</a>
+                    </div>
+                </div>
 
-                <!-- Currency Selector -->
-                <div class="flex items-center">
+                <!-- Desktop Currency Selector (hidden on mobile) -->
+                <div class="hidden lg:flex items-center">
                     <select id="currency-selector" class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:border-blue-400 transition">
                         <option value="USD" {{ session('display_currency', 'USD') === 'USD' ? 'selected' : '' }}>🇺🇸 USD</option>
                         <option value="NPR" {{ session('display_currency', 'USD') === 'NPR' ? 'selected' : '' }}>🇳🇵 NPR</option>
@@ -186,24 +186,88 @@
                     });
                 </script>
 
-                <!-- Auth Buttons (पहिले जस्तै) -->
-                @auth
-                    @if(auth()->user()->isSuperAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
-                    @elseif(auth()->user()->isProviderOwner())
-                        <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
-                    @elseif(auth()->user()->isTraveler())
-                        <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                <!-- Desktop Auth Buttons (hidden on mobile) -->
+                <div class="hidden lg:flex items-center gap-2">
+                    @auth
+                        @if(auth()->user()->isSuperAdmin())
+                            <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                        @elseif(auth()->user()->isProviderOwner())
+                            <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                        @elseif(auth()->user()->isTraveler())
+                            <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                        @else
+                            <a href="{{ route('home') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.home') }}</a>
+                        @endif
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="border border-red-500 text-red-500 hover:bg-red-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.logout') }}</button>
+                        </form>
                     @else
-                        <a href="{{ route('home') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.home') }}</a>
-                    @endif
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="border border-red-500 text-red-500 hover:bg-red-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.logout') }}</button>
-                    </form>
+                        <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.login') }}</a>
+                        <a href="{{ route('register') }}" class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.register') }}</a>
+                    @endauth
+                </div>
+
+                <!-- Mobile Auth Button (Login icon only) -->
+                <div class="flex lg:hidden items-center gap-1">
+                    @auth
+                        <a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route('traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
+                    @else
+                        <a href="{{ route('login') }}" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.login') }}</a>
+                    @endauth
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <button type="button" id="mobileMenuToggle" class="flex lg:hidden items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 transition" aria-label="Menu">
+                    <i class="fas fa-bars text-lg text-gray-700"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown (hidden by default) -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-200 bg-white">
+            <div class="px-4 py-3 space-y-1">
+                <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.home') }}</a>
+                <a href="{{ url('/features') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.features') }}</a>
+                <a href="{{ route('public.services.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.explore') }}</a>
+                <a href="{{ route('public.shop.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_shop') }}</a>
+                <a href="{{ route('public.rental.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_rental') }}</a>
+                <a href="{{ route('pages.pricing') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.pricing') }}</a>
+                <a href="{{ url('/how-it-works') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.how_it_works') }}</a>
+                <a href="{{ route('public.providers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.providers') }}</a>
+
+                <div class="border-t border-gray-200 my-2 pt-2">
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">{{ __('messages.language') ?? 'Language' }}</span>
+                        <select onchange="window.location.href='{{ url('/lang') }}/' + this.value" class="bg-gray-100 border border-gray-300 rounded-lg px-2 py-1 text-xs">
+                            <option value="en" {{ session('locale') == 'en' || !session('locale') ? 'selected' : '' }}>🇬🇧 English</option>
+                            <option value="hi" {{ session('locale') == 'hi' ? 'selected' : '' }}>🇮🇳 हिन्दी</option>
+                            <option value="zh" {{ session('locale') == 'zh' ? 'selected' : '' }}>🇨🇳 中文</option>
+                            <option value="np" {{ session('locale') == 'np' ? 'selected' : '' }}>🇳🇵 नेपाली</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Currency</span>
+                        <select id="mobile-currency-selector" class="bg-gray-100 border border-gray-300 rounded-lg px-2 py-1 text-xs">
+                            <option value="USD" {{ session('display_currency', 'USD') === 'USD' ? 'selected' : '' }}>🇺🇸 USD</option>
+                            <option value="NPR" {{ session('display_currency', 'USD') === 'NPR' ? 'selected' : '' }}>🇳🇵 NPR</option>
+                        </select>
+                    </div>
+                </div>
+
+                @auth
+                    <div class="border-t border-gray-200 pt-2">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50">
+                                {{ __('messages.logout') }}
+                            </button>
+                        </form>
+                    </div>
                 @else
-                    <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.login') }}</a>
-                    <a href="{{ route('register') }}" class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.register') }}</a>
+                    <div class="border-t border-gray-200 pt-2">
+                        <a href="{{ route('register') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-center border border-blue-600 text-blue-600 hover:bg-blue-50">{{ __('messages.register') }}</a>
+                    </div>
                 @endauth
             </div>
         </div>
@@ -218,12 +282,12 @@
         <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
             <!-- Logo + text -->
             <div>
-                <a href="{{ url('/') }}" class="flex flex-nowrap items-center space-x-1">
+                <a href="{{ url('/') }}" class="flex items-center gap-2">
                     <img src="{{ asset('images/logo-icon.png') }}"
                          alt="{{ __('messages.app_name') }}"
-                         class="h-32 w-auto min-w-[128px]"
+                         class="h-10 w-auto max-w-[40px] flex-shrink-0"
                          onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
-                    <span class="font-bold text-xl text-gray-800 whitespace-nowrap">{{ __('messages.app_name') }}</span>
+                    <span class="font-bold text-base text-gray-800 truncate">{{ __('messages.app_name') }}</span>
                 </a>
                 <p class="text-sm text-gray-500 mt-8">{{ __('messages.footer_tagline') }}</p>
                 <div class="flex space-x-4 mt-2">
@@ -270,6 +334,33 @@
     </footer>
 
     <!-- Language Switcher Dropdown JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile menu toggle
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileToggle && mobileMenu) {
+                mobileToggle.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-bars');
+                        icon.classList.toggle('fa-times');
+                    }
+                });
+            }
+
+            // Mobile currency selector
+            const mobileCurrency = document.getElementById('mobile-currency-selector');
+            if (mobileCurrency) {
+                mobileCurrency.addEventListener('change', function () {
+                    const baseUrl = '{{ url('/') }}';
+                    window.location.href = baseUrl + '/currency/switch?currency=' + this.value;
+                });
+            }
+        });
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const dropdownBtn = document.getElementById('languageDropdown');
