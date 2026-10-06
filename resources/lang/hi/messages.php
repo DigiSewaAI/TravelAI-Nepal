@@ -1645,6 +1645,10 @@ return [
     'sos_send_failed'         => 'SOS भेजने में विफल। पुनः प्रयास करें।',
     'sos_network_error'       => 'नेटवर्क त्रुटि। कनेक्शन जांचें।',
     'sos_location_denied'     => 'स्थान पहुंच अस्वीकृत। SOS के लिए अनुमति दें।',
+        // Forex Widget (Phase 1)
+    'forex_widget_title'    => 'विनिमय दरें',
+    'forex_widget_subtitle' => 'लाइव मुद्रा दर',
+    'forex_updated'         => 'अपडेट हुआ',
 
 // ======================
 // TRAVELER REVIEW CREATE

@@ -1641,6 +1641,10 @@ return [
     'sos_send_failed'         => 'Failed to send SOS. Try again.',
     'sos_network_error'       => 'Network error. Check connection.',
     'sos_location_denied'     => 'Location access denied. Enable to send SOS.',
+        // Forex Widget (Phase 1)
+    'forex_widget_title'    => 'Exchange Rates',
+    'forex_widget_subtitle' => 'Live currency rates',
+    'forex_updated'         => 'Updated',
 
 // ======================
 // TRAVELER REVIEW CREATE

@@ -102,6 +102,17 @@ class DashboardController extends Controller
         $weatherCity = 'Kathmandu';
         $weatherData = $this->weatherService->getWeatherForCoords(27.7172, 85.3240);
 
+        // Forex widget (Phase 1 — display only, graceful fail)
+        $forexRates = [];
+        $forexUpdatedAt = null;
+        try {
+            $forexService = app(\App\Services\ForexService::class);
+            $forexRates = $forexService->getAllRates();
+            $forexUpdatedAt = \App\Models\ExchangeRate::max('fetched_at');
+        } catch (\Throwable $e) {
+            \Log::warning('Forex widget fail', ['error' => $e->getMessage()]);
+        }
+
         return view('traveler.dashboard', compact(
             'user',
             'bookings',
@@ -117,8 +128,10 @@ class DashboardController extends Controller
             'mediaByCheckpoint',
             'userWaypoints',
             'unreadAlerts',   // ✅ NEW: Pass to view
-            'weatherData',    // ✅ NEW: Weather widget
-            'weatherCity'     // ✅ NEW: Weather city name
+            'weatherData',     // ✅ NEW: Weather widget
+            'weatherCity',     // ✅ NEW: Weather city name
+            'forexRates',      // ✅ NEW: Forex rates
+            'forexUpdatedAt'   // ✅ NEW: Forex fetch timestamp
         ));
     }
 

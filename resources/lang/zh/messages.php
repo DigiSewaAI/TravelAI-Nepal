@@ -1659,6 +1659,10 @@ return [
     'sos_send_failed'         => '发送 SOS 失败。请重试。',
     'sos_network_error'       => '网络错误。检查连接。',
     'sos_location_denied'     => '位置访问被拒绝。请允许发送 SOS。',
+        // Forex Widget (Phase 1)
+    'forex_widget_title'    => '汇率',
+    'forex_widget_subtitle' => '实时汇率',
+    'forex_updated'         => '更新时间',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

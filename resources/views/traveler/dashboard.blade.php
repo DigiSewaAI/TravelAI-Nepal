@@ -357,6 +357,38 @@
                 </div>
             </div>
 
+            {{-- 💱 Forex Widget (Phase 1) --}}
+            @if(!empty($forexRates) && count($forexRates) > 0)
+                <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800">{{ __('messages.forex_widget_title') }}</h4>
+                            <p class="text-xs text-gray-500">{{ __('messages.forex_widget_subtitle') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        @foreach($forexRates as $currency => $rate)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">1 {{ $currency }}</span>
+                                <span class="font-medium text-gray-800">
+                                    NPR {{ number_format($rate, 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @if($forexUpdatedAt)
+                        <p class="text-[10px] text-gray-400 mt-2 text-right">
+                            {{ __('messages.forex_updated') }}: {{ \Carbon\Carbon::parse($forexUpdatedAt)->diffForHumans() }}
+                        </p>
+                    @endif
+                </div>
+            @endif
+
             {{-- &#128248; My Travel Memories --}}
 <div class="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
     <div class="flex items-start gap-3">
