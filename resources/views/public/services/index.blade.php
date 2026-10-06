@@ -68,7 +68,7 @@
     }
 
     /* ═══════════════ MAP ═══════════════ */
-    #nepalMap { height: clamp(320px, 45vw, 520px); width: 100%; background: #f3f4f6; border-radius: 1rem; }
+    #nepalMap { height: clamp(260px, 65vw, 520px); width: 100%; background: #f3f4f6; border-radius: 1rem; }
     .custom-pin {
         width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid; background: #fff;
         display: grid; place-items: center; font-size: 13px;
@@ -299,34 +299,28 @@
             </div>
         </div>
 
+        <div class="mt-2 mb-3">
+            <label for="routeSelector" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">🗺️ Explore a Route</label>
+            <select id="routeSelector" class="mt-2 w-full md:w-1/2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700">
+                <option value="">— Select a route —</option>
+            </select>
+            <div id="routeMeta" class="mt-3 hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"></div>
+            <div id="routeError" class="mt-2 hidden text-xs text-red-600"></div>
+        </div>
+
         <div class="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100 bg-white">
-            {{-- GLOBE-06: Route selector — single route visualization --}}
-            <div class="mt-2 mb-4">
-                <label for="routeSelector" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">🗺️ Explore a Route</label>
-                <select id="routeSelector" class="mt-2 w-full md:w-1/2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700">
-                    <option value="">— Select a route —</option>
-                </select>
-                <div id="routeMeta" class="mt-3 hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"></div>
-                <div id="routeError" class="mt-2 hidden text-xs text-red-600"></div>
-            </div>
             <div id="nepalMap" role="img" aria-label="{{ __('messages.map_aria') }}"></div>
-            <div class="absolute bottom-4 left-4 z-[500] bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 px-4 py-3 text-xs space-y-1.5">
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> {{ __('messages.trek') }}</div>
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> {{ __('messages.tour') }}</div>
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> {{ __('messages.activity') }}</div>
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> {{ __('messages.pilgrimage') }}</div>
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> {{ __('messages.wildlife') }}</div>
-                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background-color: #991b1b;"></span> Cities</div>
+            <div class="absolute bottom-2 left-2 z-[500] bg-white/95 backdrop-blur rounded-md sm:rounded-lg shadow sm:shadow-md border border-gray-100 px-1.5 py-1 sm:px-3 sm:py-2 text-[9px] sm:text-xs grid grid-cols-2 gap-x-2 gap-y-0.5 sm:block sm:space-y-0.5">
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-600"></span> {{ __('messages.trek') }}</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-violet-600"></span> {{ __('messages.tour') }}</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> {{ __('messages.activity') }}</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-pink-500"></span> {{ __('messages.pilgrimage') }}</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> {{ __('messages.wildlife') }}</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background-color: #991b1b;"></span> Cities</div>
                         </div>
-            {{-- GLOBE-02: Boundary attribution (CC BY 4.0) --}}
-            <div class="absolute bottom-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-1.5 text-[10px] text-gray-600 max-w-[240px] leading-tight">
-                Boundaries:
-                                <a href="https://localboundries.oknp.org" target="_blank" rel="noopener"
-                   class="text-blue-600 hover:underline">Open Knowledge Nepal</a>
-                (CC BY 4.0)
-            </div>
+            {{-- GLOBE-02: Attribution removed per owner request --}}
                        {{-- GLOBE-03 v2: Hint badge (top-right, auto-hide at zoom >= 9) --}}
-            <div id="waypointHint" class="absolute top-4 right-4 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-3 py-2 text-xs text-gray-700 font-medium leading-tight max-w-[240px] transition-opacity duration-300">
+            <div id="waypointHint" class="absolute top-2 right-2 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-2 py-1 text-[10px] sm:px-3 sm:py-2 sm:text-xs text-gray-700 font-medium leading-tight max-w-[160px] sm:max-w-[240px] transition-opacity duration-300">
                 📍 <span id="waypointCountHint">8</span> mapped cities · zoom in to explore
             </div>
             {{-- GLOBE-04: District information panel --}}
@@ -1161,9 +1155,11 @@ function initMap() {
         zoom: 7,
         zoomControl: true,
         scrollWheelZoom: false,
-        maxBounds: [[26.3, 80.0], [30.5, 88.3]],
-        maxBoundsViscosity: 1.0,
-        minZoom: 7
+        maxBounds: [[25.5, 79.0], [31.5, 89.5]],
+        maxBoundsViscosity: 0.6,
+        attributionControl: false,
+        minZoom: 5,
+        zoomSnap: 0.25,
     });
     __nepalMapInstance = map;
 
@@ -1379,6 +1375,35 @@ function initMap() {
 
     el.addEventListener('click', function() { map.scrollWheelZoom.enable(); });
     el.addEventListener('mouseleave', function() { map.scrollWheelZoom.disable(); });
+
+    // MOBILE-ONLY FIX: Fit entire Nepal into narrow screens.
+    // Uses setTimeout + invalidateSize to defeat Leaflet's lazy sizing,
+    // and maxZoom cap so we don't over-zoom-out on tiny phones.
+    function fitNepalMobile() {
+        if (window.innerWidth >= 640) return;
+        map.invalidateSize();
+        map.fitBounds([[26.3, 80.0], [30.5, 88.3]], {
+            padding: [2, 2],
+            animate: false,
+            maxZoom: 6,
+        });
+    }
+
+    // Run twice — once soon, once after tiles/layout settle
+    setTimeout(fitNepalMobile, 150);
+    setTimeout(fitNepalMobile, 800);
+
+    // Re-fit on orientation change / resize
+    window.addEventListener('resize', function () {
+        if (window.innerWidth < 640 && __nepalMapInstance) {
+            __nepalMapInstance.invalidateSize();
+            __nepalMapInstance.fitBounds([[26.3, 80.0], [30.5, 88.3]], {
+                padding: [2, 2],
+                animate: false,
+                maxZoom: 6,
+            });
+        }
+    });
 }
 // ═══════════════ GLOBE-06: ROUTE SELECTOR ═══════════════
 

@@ -363,24 +363,24 @@
         <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-images text-green-500 text-xl"></i>
         </div>
-        <div class="flex-1">
+                <div class="flex-1 min-w-0">
             <h4 class="font-semibold text-gray-800">&#128248; {{ __('messages.traveler_memories_title') }}</h4>
             <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.traveler_memories_subtitle') }}</p>
 
             {{-- &#9989; Upload Form --}}
             <form id="uploadForm" class="mt-3" enctype="multipart/form-data">
                 @csrf
-                <div class="flex flex-wrap gap-2">
-                    <select name="checkpoint" id="checkpointSelect" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2" required>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <select name="checkpoint" id="checkpointSelect" class="w-full sm:flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2" required>
                         <option value="">{{ __('messages.traveler_checkpoint_select') }}</option>
                         @foreach($userWaypoints as $wp)
                             <option value="{{ $wp->name }}">{{ $wp->name }}</option>
                         @endforeach
                     </select>
-                    <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="flex-1 min-w-[150px] text-sm border border-gray-300 rounded-lg px-3 py-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700" required>
-                    <button type="submit" id="uploadBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">
-    <i class="fas fa-upload"></i> {{ __('messages.traveler_upload_btn') }}
-</button>
+                    <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="w-full sm:flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700" required>
+                    <button type="submit" id="uploadBtn" class="w-full sm:w-auto whitespace-nowrap bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">
+                        <i class="fas fa-upload"></i> {{ __('messages.traveler_upload_btn') }}
+                    </button>
                 </div>
                 <div id="uploadMessage" class="mt-2 text-sm hidden"></div>
             </form>
@@ -426,7 +426,7 @@
         <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
             <i class="fas fa-film text-2xl"></i>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
             <h4 class="font-bold text-lg">&#127916; {{ __('messages.traveler_replay_title') }}</h4>
             <p class="text-sm text-purple-100 mt-0.5">{{ __('messages.traveler_replay_subtitle') }}</p>
             <a href="{{ route('traveler.journey-replay') }}"
@@ -443,7 +443,7 @@
         <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-shield-alt text-red-500 text-xl"></i>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
             <div class="flex justify-between items-start">
                 <div>
                     <h4 class="font-semibold text-gray-800">{{ __('messages.traveler_safety_center_title') }}</h4>
