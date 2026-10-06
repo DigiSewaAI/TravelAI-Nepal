@@ -1631,6 +1631,20 @@ return [
     'rental_return_step_2'          => 'इस ऑर्डर पृष्ठ पर "वापस के रूप में चिह्नित करें" पर क्लिक करें।',
     'rental_return_step_3'          => 'प्रदाता स्थिति की पुष्टि करता है → जमा वापसी संसाधित।',
         'products' => 'उत्पाद',
+            // SOS UI (Phase 3)
+    'sos_button_label'        => 'आपातकालीन SOS',
+    'sos_button_subtitle'     => 'तुरंत बचाव दल को सूचित करें',
+    'sos_modal_title'         => 'आपातकालीन SOS',
+    'sos_modal_subtitle'      => 'बचाव दल और प्रदाता को सूचना भेजें',
+    'sos_message_label'       => 'संदेश (वैकल्पिक)',
+    'sos_message_placeholder' => 'अपनी स्थिति संक्षेप में बताएं...',
+    'sos_send_now'            => 'SOS भेजें',
+    'sos_getting_location'    => 'स्थान प्राप्त कर रहे हैं...',
+    'sos_geo_unsupported'     => 'इस डिवाइस पर जियोलोकेशन समर्थित नहीं',
+    'sos_sent_success'        => 'SOS भेजा गया। मदद आ रही है।',
+    'sos_send_failed'         => 'SOS भेजने में विफल। पुनः प्रयास करें।',
+    'sos_network_error'       => 'नेटवर्क त्रुटि। कनेक्शन जांचें।',
+    'sos_location_denied'     => 'स्थान पहुंच अस्वीकृत। SOS के लिए अनुमति दें।',
 
 // ======================
 // TRAVELER REVIEW CREATE

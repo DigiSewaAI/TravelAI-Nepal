@@ -1654,6 +1654,20 @@ return [
     'rental_return_step_2'          => 'यो अर्डर पृष्ठमा "फिर्ता भएको चिन्ह लगाउनुहोस्" क्लिक गर्नुहोस्।',
     'rental_return_step_3'          => 'प्रदायकले अवस्था पुष्टि गर्छन् → धरौटी फिर्ता प्रक्रिया।',
         'products' => 'उत्पादनहरू',
+            // SOS UI (Phase 3)
+    'sos_button_label'        => 'आपतकालीन SOS',
+    'sos_button_subtitle'     => 'तुरुन्तै उद्धार टोलीलाई सूचित गर्नुहोस्',
+    'sos_modal_title'         => 'आपतकालीन SOS',
+    'sos_modal_subtitle'      => 'उद्धार टोली र प्रदायकलाई सूचना पठाउनुहोस्',
+    'sos_message_label'       => 'सन्देश (वैकल्पिक)',
+    'sos_message_placeholder' => 'तपाईंको अवस्था संक्षेपमा लेख्नुहोस्...',
+    'sos_send_now'            => 'SOS पठाउनुहोस्',
+    'sos_getting_location'    => 'स्थान प्राप्त गर्दै...',
+    'sos_geo_unsupported'     => 'यो उपकरणमा स्थान समर्थित छैन',
+    'sos_sent_success'        => 'SOS सन्देश पठाइयो। सहयोग आउँदैछ।',
+    'sos_send_failed'         => 'SOS पठाउन असफल। पुनः प्रयास गर्नुहोस्।',
+    'sos_network_error'       => 'नेटवर्क त्रुटि। जडान जाँच्नुहोस्।',
+    'sos_location_denied'     => 'स्थान पहुँच अस्वीकृत। SOS पठाउन अनुमति दिनुहोस्।',
 
     // ======================
     // TRAVELER REVIEW CREATE

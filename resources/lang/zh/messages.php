@@ -1645,6 +1645,20 @@ return [
     'rental_return_step_2'          => '在此订单页面点击"标记为已归还"。',
     'rental_return_step_3'          => '供应商确认状态 → 押金退款处理。',
         'products' => '产品',
+            // SOS UI (Phase 3)
+    'sos_button_label'        => '紧急 SOS',
+    'sos_button_subtitle'     => '立即通知救援队',
+    'sos_modal_title'         => '紧急 SOS',
+    'sos_modal_subtitle'      => '向救援队和提供商发送警报',
+    'sos_message_label'       => '消息（可选）',
+    'sos_message_placeholder' => '简要描述您的情况...',
+    'sos_send_now'            => '发送 SOS',
+    'sos_getting_location'    => '正在获取位置...',
+    'sos_geo_unsupported'     => '此设备不支持地理定位',
+    'sos_sent_success'        => 'SOS 已发送。救援正在赶来。',
+    'sos_send_failed'         => '发送 SOS 失败。请重试。',
+    'sos_network_error'       => '网络错误。检查连接。',
+    'sos_location_denied'     => '位置访问被拒绝。请允许发送 SOS。',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

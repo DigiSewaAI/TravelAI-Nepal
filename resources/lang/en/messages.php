@@ -1627,6 +1627,20 @@ return [
     'rental_return_step_2'          => 'Click "Mark as Returned" on this order page.',
     'rental_return_step_3'          => 'Provider confirms condition → deposit refund processed.',
         'products' => 'Products',
+            // SOS UI (Phase 3 - User-based SOS)
+    'sos_button_label'        => 'Emergency SOS',
+    'sos_button_subtitle'     => 'Alert rescue team instantly',
+    'sos_modal_title'         => 'Emergency SOS',
+    'sos_modal_subtitle'      => 'Send alert to rescue team & provider',
+    'sos_message_label'       => 'Message (optional)',
+    'sos_message_placeholder' => 'Describe your situation briefly...',
+    'sos_send_now'            => 'Send SOS Now',
+    'sos_getting_location'    => 'Getting your location...',
+    'sos_geo_unsupported'     => 'Geolocation not supported on this device',
+    'sos_sent_success'        => 'SOS alert sent. Help is on the way.',
+    'sos_send_failed'         => 'Failed to send SOS. Try again.',
+    'sos_network_error'       => 'Network error. Check connection.',
+    'sos_location_denied'     => 'Location access denied. Enable to send SOS.',
 
 // ======================
 // TRAVELER REVIEW CREATE

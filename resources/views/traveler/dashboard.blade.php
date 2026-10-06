@@ -492,15 +492,137 @@
                 </div>
             @endif
 
-            <div class="mt-3">
+            <div class="mt-3 flex flex-col gap-2">
                 <a href="{{ route('safety.index') }}" class="text-sm text-blue-600 hover:underline">
-    {{ __('messages.traveler_view_safety_map') }} &rarr;
-</a>
+                    {{ __('messages.traveler_view_safety_map') }} &rarr;
+                </a>
+
+                {{-- 🆘 SOS EMERGENCY BUTTON --}}
+                <button type="button" onclick="openSosModal()"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-md mt-1">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>{{ __('messages.sos_button_label') }}</span>
+                </button>
             </div>
         </div>
     </div>
 </div>
 </div>
+</div>
+
+{{-- 🆘 SOS EMERGENCY MODAL + JS --}}
+<div id="sosModal" class="fixed inset-0 bg-black/60 hidden z-[9999] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <div class="min-w-0">
+                <h3 class="font-bold text-lg text-gray-900">{{ __('messages.sos_modal_title') }}</h3>
+                <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.sos_modal_subtitle') }}</p>
+            </div>
+        </div>
+
+        <div id="sosStatus" class="text-sm mb-3 hidden"></div>
+
+        <div class="mb-4">
+            <label for="sosMessage" class="block text-sm font-medium text-gray-700 mb-1">
+                {{ __('messages.sos_message_label') }}
+            </label>
+            <textarea id="sosMessage" rows="3" maxlength="500"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      placeholder="{{ __('messages.sos_message_placeholder') }}"></textarea>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="button" onclick="closeSosModal()"
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition">
+                {{ __('messages.cancel') ?? 'Cancel' }}
+            </button>
+            <button type="button" id="sosSendBtn" onclick="sendSos()"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-bold transition shadow-md disabled:opacity-50">
+                <i class="fas fa-paper-plane mr-1"></i>
+                <span>{{ __('messages.sos_send_now') }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openSosModal() {
+    const m = document.getElementById('sosModal');
+    m.classList.remove('hidden');
+    document.getElementById('sosStatus').classList.add('hidden');
+    document.getElementById('sosMessage').value = '';
+}
+
+function closeSosModal() {
+    document.getElementById('sosModal').classList.add('hidden');
+}
+
+function sendSos() {
+    const statusEl = document.getElementById('sosStatus');
+    const btn = document.getElementById('sosSendBtn');
+
+    statusEl.classList.remove('hidden');
+    statusEl.className = 'text-sm mb-3 text-blue-600';
+    statusEl.textContent = '{{ __("messages.sos_getting_location") }}';
+    btn.disabled = true;
+
+    if (!navigator.geolocation) {
+        statusEl.className = 'text-sm mb-3 text-red-600';
+        statusEl.textContent = '{{ __("messages.sos_geo_unsupported") }}';
+        btn.disabled = false;
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const response = await fetch('{{ url("/api/sos") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : '',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                        message: document.getElementById('sosMessage').value || null,
+                    }),
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    statusEl.className = 'text-sm mb-3 text-green-600 font-semibold';
+                    statusEl.textContent = '✅ ' + (data.message || '{{ __("messages.sos_sent_success") }}');
+                    setTimeout(() => closeSosModal(), 3000);
+                } else {
+                    statusEl.className = 'text-sm mb-3 text-red-600';
+                    statusEl.textContent = '❌ ' + (data.message || '{{ __("messages.sos_send_failed") }}');
+                }
+            } catch (err) {
+                statusEl.className = 'text-sm mb-3 text-red-600';
+                statusEl.textContent = '❌ {{ __("messages.sos_network_error") }}';
+            }
+            btn.disabled = false;
+        },
+        (error) => {
+            statusEl.className = 'text-sm mb-3 text-red-600';
+            statusEl.textContent = '❌ {{ __("messages.sos_location_denied") }}';
+            btn.disabled = false;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadForm');
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('uploadForm');

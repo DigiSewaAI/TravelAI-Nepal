@@ -8,8 +8,9 @@ use App\Http\Controllers\Api\MapDataController;
 // FIX-11: AI endpoint — 10/min (user or IP)
 Route::post('/itinerary/generate', [ItineraryController::class, 'generate'])->middleware('throttle:ai');
 
-// FIX-11: SOS — 3/min (IP)
-Route::post('/sos', [SosController::class, 'store'])->middleware('throttle:sos');
+// FIX-11 + SOS Phase 2: SOS — 3/min (IP) + web middleware for session auth
+Route::post('/sos', [SosController::class, 'store'])
+    ->middleware(['web', 'throttle:sos']);
 
 // ✅ Public: Provider list (no auth) — FIX-11: 30/min
 Route::get('/providers/list', [QuotationRequestController::class, 'providersList'])->middleware('throttle:api');
