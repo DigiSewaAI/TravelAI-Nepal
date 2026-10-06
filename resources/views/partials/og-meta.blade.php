@@ -1,7 +1,18 @@
 @php
+    use Illuminate\Support\Str;
+
     $ogTitle       = $ogTitle       ?? (trim($__env->yieldContent('title')) ?: __('messages.home_default_title'));
     $ogDescription = $ogDescription ?? (trim($__env->yieldContent('meta_description')) ?: __('messages.home_meta_description'));
     $ogImage       = $ogImage       ?? asset('images/default-share.jpg');
+
+    // Ensure absolute URL — Facebook / Twitter / WhatsApp require this
+    if (!Str::startsWith($ogImage, ['http://', 'https://'])) {
+        $ogImage = asset(ltrim($ogImage, '/'));
+    }
+
+    // Detect image MIME type dynamically
+    $ogImageType   = Str::endsWith(strtolower($ogImage), '.png') ? 'image/png' : 'image/jpeg';
+
     $ogUrl         = $ogUrl         ?? url()->current();
     $ogType        = $ogType        ?? 'website';
     $ogLocale      = match(app()->getLocale()) {
@@ -21,7 +32,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="{{ $ogTitle }}">
-<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:type" content="{{ $ogImageType }}">
 <meta property="og:url" content="{{ $ogUrl }}">
 <meta property="og:type" content="{{ $ogType }}">
 <meta property="og:locale" content="{{ $ogLocale }}">

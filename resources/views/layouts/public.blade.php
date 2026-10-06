@@ -54,29 +54,27 @@
 @stack('head')
 
 {{-- ========== JSON-LD: Organization ========== --}}
-@verbatim
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "TravelAgency",
-  "name": "TravelAI Nepal",
-  "url": "http://localhost:8000",
-  "logo": "http://localhost:8000/images/logo.png",
-  "description": "AI-powered trekking ecosystem connecting travelers with local agencies in Nepal.",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Kathmandu",
-    "addressRegion": "Bagmati",
-    "addressCountry": "NP"
-  },
-  "sameAs": [
-    "https://twitter.com/travelainepal",
-    "https://www.instagram.com/travelainepal",
-    "https://github.com/travelainepal"
-  ]
-}
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'TravelAgency',
+    'name' => 'TravelAI Nepal',
+    'url' => url('/'),
+    'logo' => asset('images/logo.png'),
+    'description' => 'AI-powered trekking ecosystem connecting travelers with local agencies in Nepal.',
+    'address' => [
+        '@type' => 'PostalAddress',
+        'addressLocality' => 'Kathmandu',
+        'addressRegion' => 'Bagmati',
+        'addressCountry' => 'NP',
+    ],
+    'sameAs' => [
+        'https://twitter.com/travelainepal',
+        'https://www.instagram.com/travelainepal',
+        'https://github.com/travelainepal',
+    ],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
-@endverbatim
 
     <!-- ========== Tailwind, Font Awesome, Fonts ========== -->
     <script src="https://cdn.tailwindcss.com"></script>
