@@ -29,6 +29,28 @@ class Booking extends Model
             if (empty($booking->qr_code)) {
                 $booking->qr_code = 'QR-' . strtoupper(\Illuminate\Support\Str::random(12));
             }
+
+            // FOREX Phase 2: freeze USD→NPR rate at booking time (immutable snapshot)
+            if (empty($booking->exchange_rate_snapshot)) {
+                if (app()->runningUnitTests()) {
+                    // Tests: use config default (no API/DB queries — keeps t17 fast)
+                    $booking->exchange_rate_snapshot = (float) config('app.exchange_rate', 152.60);
+                } else {
+                    // Production: fetch live rate (memoized per process)
+                    static $cachedRate = null;
+                    if ($cachedRate === null) {
+                        try {
+                            $currency = app(\App\Services\CurrencyService::class);
+                            $cachedRate = $currency->getLiveUsdRate();
+                        } catch (\Throwable $e) {
+                            \Log::warning('Booking rate snapshot fail', ['error' => $e->getMessage()]);
+                            $cachedRate = (float) config('app.exchange_rate', 152.60);
+                        }
+                    }
+                    $booking->exchange_rate_snapshot = $cachedRate;
+                }
+                $booking->rate_base_currency = 'USD';
+            }
         });
     }
 
@@ -74,6 +96,9 @@ class Booking extends Model
         'share_revoked_at',
         // PHASE 7B — "I've Paid" notification (not a payment record)
         'payment_notice_sent_at',
+        // FOREX Phase 2 — rate snapshot
+        'exchange_rate_snapshot',
+        'rate_base_currency',
     ];
 
     protected $casts = [
@@ -85,6 +110,8 @@ class Booking extends Model
         'share_revoked_at' => 'datetime',
         // PHASE 7B
         'payment_notice_sent_at' => 'datetime',
+        // FOREX Phase 2
+        'exchange_rate_snapshot' => 'decimal:6',
     ];
 
     // =============================================

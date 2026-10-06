@@ -48,6 +48,8 @@ class InvoiceService
             'total' => $payment->amount,
             'status' => 'paid',
             'payment_method' => $payment->gateway,
+            'exchange_rate_at_creation' => $this->getCurrentUsdRate(),
+            'rate_base_currency' => 'USD',
             'paid_at' => $payment->paid_at ?? now(),
             'due_date' => now()->addDays(30),
             'metadata' => [
@@ -59,7 +61,18 @@ class InvoiceService
 
         return $invoice;
     }
-
+    /**
+     * FOREX Phase 2: fetch live USD rate at invoice creation time.
+     */
+    protected function getCurrentUsdRate(): float
+    {
+        try {
+            return app(\App\Services\CurrencyService::class)->getLiveUsdRate();
+        } catch (\Throwable $e) {
+            \Log::warning('Invoice rate snapshot fail', ['error' => $e->getMessage()]);
+            return (float) config('app.exchange_rate', 152.60);
+        }
+    }
     /**
      * Generate PDF for an invoice
      */

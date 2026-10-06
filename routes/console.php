@@ -41,3 +41,9 @@ Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
 
 // FIX-12: Release stale AI reservations — every 5 minutes
 Schedule::job(new ReleaseStaleAiReservationsJob)->everyFiveMinutes()->withoutOverlapping();
+
+// FOREX Phase 3: Daily forex rate refresh at 6 AM Nepal time
+Schedule::command('forex:update')
+    ->dailyAt('06:00')
+    ->timezone('Asia/Kathmandu')
+    ->withoutOverlapping();

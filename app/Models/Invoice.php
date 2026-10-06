@@ -9,7 +9,8 @@ class Invoice extends Model
     protected $fillable = [
         'provider_id', 'subscription_id', 'booking_id',
         'invoice_number', 'receipt_number', 'amount', 'currency',
-        'tax', 'total', 'status', 'payment_method', 'paid_at', 'due_date', 'metadata'
+        'tax', 'total', 'status', 'payment_method', 'paid_at', 'due_date', 'metadata',
+        'exchange_rate_at_creation', 'rate_base_currency',
     ];
 
     protected $casts = [
@@ -19,6 +20,7 @@ class Invoice extends Model
         'paid_at' => 'datetime',
         'due_date' => 'datetime',
         'metadata' => 'array',
+        'exchange_rate_at_creation' => 'decimal:6',
     ];
 
     public function provider()
