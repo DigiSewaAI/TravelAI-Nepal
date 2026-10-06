@@ -122,7 +122,9 @@
             <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center space-x-0 group flex-shrink-0">
                 <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-10 sm:h-14 lg:h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl sm:text-2xl text-blue-600\'></i>'">
-                <span class="font-extrabold text-lg sm:text-xl lg:text-2xl tracking-tight text-gray-800 hidden sm:inline">{{ __('messages.app_name_short') }} <span class="text-blue-600">{{ __('messages.nepal') }}</span></span>
+                <span class="font-extrabold text-sm sm:text-xl lg:text-2xl tracking-tight text-gray-800 whitespace-nowrap">
+                    {{ __('messages.app_name_short') }} <span class="text-blue-600">{{ __('messages.nepal') }}</span>
+                </span>
             </a>
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
@@ -282,12 +284,12 @@
         <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
             <!-- Logo + text -->
             <div>
-                <a href="{{ url('/') }}" class="flex items-center gap-2">
-                    <img src="{{ asset('images/logo-icon.png') }}"
+                                <a href="{{ url('/') }}" class="flex items-center gap-2">
+                    <img src="{{ asset('images/logo.png') }}"
                          alt="{{ __('messages.app_name') }}"
-                         class="h-10 w-auto max-w-[40px] flex-shrink-0"
-                         onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}'">
-                    <span class="font-bold text-base text-gray-800 truncate">{{ __('messages.app_name') }}</span>
+                         class="h-10 sm:h-12 w-auto flex-shrink-0"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl text-blue-600\'></i>'">
+                    <span class="font-bold text-sm sm:text-base text-gray-800 leading-tight">{{ __('messages.app_name') }}</span>
                 </a>
                 <p class="text-sm text-gray-500 mt-8">{{ __('messages.footer_tagline') }}</p>
                 <div class="flex space-x-4 mt-2">
@@ -298,7 +300,7 @@
             </div>
 
             <div>
-                <h4 class="font-bold text-gray-800 mt-16 md:mt-10">{{ __('messages.product') }}</h4>
+            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.product') }}</h4>
                 <ul class="mt-3 space-y-2 text-sm text-gray-500">
                     <li><a href="{{ route('pages.features') }}" class="hover:text-blue-600">{{ __('messages.features') }}</a></li>
                     <li><a href="{{ route('pages.pricing') }}" class="hover:text-blue-600">{{ __('messages.pricing') }}</a></li>
@@ -310,7 +312,7 @@
             </div>
 
             <div>
-                <h4 class="font-bold text-gray-800 mt-16 md:mt-10">{{ __('messages.company') }}</h4>
+            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.company') }}</h4>
                 <ul class="mt-3 space-y-2 text-sm text-gray-500">
                     <li><a href="{{ route('pages.about') }}" class="hover:text-blue-600">{{ __('messages.about_nepal_trek') }}</a></li>
                     <li><a href="{{ route('pages.careers') }}" class="hover:text-blue-600">{{ __('messages.careers') }}</a></li>
@@ -320,7 +322,7 @@
             </div>
 
             <div>
-                <h4 class="font-bold text-gray-800 mt-16 md:mt-10">{{ __('messages.legal') }}</h4>
+            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.legal') }}</h4>
                 <ul class="mt-3 space-y-2 text-sm text-gray-500">
                     <li><a href="{{ route('pages.privacy') }}" class="hover:text-blue-600">{{ __('messages.privacy_policy') }}</a></li>
                     <li><a href="{{ route('pages.terms') }}" class="hover:text-blue-600">{{ __('messages.terms_service') }}</a></li>

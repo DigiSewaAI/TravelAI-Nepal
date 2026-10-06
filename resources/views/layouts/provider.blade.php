@@ -23,10 +23,17 @@
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
     </style>
 </head>
-<body>
-    <div class="flex h-screen">
+<body class="overflow-x-hidden">
+    <div class="flex h-screen relative">
+        <!-- Mobile sidebar overlay -->
+        <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
+
         <!-- Sidebar -->
-        <div class="w-64 bg-white border-r shadow-sm p-4 flex flex-col">
+        <aside id="providerSidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r shadow-sm p-4 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+            <!-- Mobile close button -->
+            <button type="button" id="sidebarClose" class="lg:hidden absolute top-3 right-3 w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-600" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
             <a href="{{ route('provider.dashboard') }}" class="flex items-center space-x-2 mb-6">
                 <img src="{{ asset('images/logo.png') }}"
                      alt="TravelAI Nepal"
@@ -50,7 +57,7 @@
                             </div>
                         @endif
                         <div class="flex-1 min-w-0">
-                            <span class="font-semibold text-sm text-gray-700 truncate block">{{ $provider->name }}</span>
+                            <span class="font-semibold text-sm text-gray-700 block leading-tight" title="{{ $provider->name }}">{{ $provider->name }}</span>
                             @if($provider->verification_status === 'verified')
                                 <span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> {{ __('messages.verified') }}</span>
                             @else
@@ -190,54 +197,73 @@
                     <span>{{ __('messages.logout') }}</span>
                 </button>
             </form>
-        </div>
+        </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden min-w-0">
             <!-- Header -->
-            <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
-                <h1 class="text-xl font-semibold text-gray-800">@yield('header', __('messages.dashboard'))</h1>
-                <div class="flex items-center space-x-4">
-                    <!-- User Name -->
-                    <span class="text-sm text-gray-600">
-                        <i class="fas fa-user-circle text-lg mr-1"></i>
-                        {{ Auth::user()->name ?? __('messages.guest') }}
-                    </span>
+                        <header class="bg-white border-b px-4 lg:px-6 py-3 lg:py-4 flex justify-between items-center shadow-sm gap-3">
+                <!-- Left: Hamburger + Logo + Title -->
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <button type="button" id="sidebarToggle" class="lg:hidden flex-shrink-0 w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-700" aria-label="Open menu">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                    <img src="{{ asset('images/logo.png') }}" alt="TravelAI Nepal" class="lg:hidden h-8 w-auto flex-shrink-0">
+                    <h1 class="hidden lg:block text-xl font-semibold text-gray-800 truncate">@yield('header', __('messages.dashboard'))</h1>
+                </div>
 
-                    <!-- ✅ Language Switcher Dropdown -->
+                <!-- Right: Language + User Dropdown -->
+                <div class="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+
+                    <!-- Language Switcher -->
                     <div class="relative">
-                        <button type="button" class="flex items-center text-gray-700 hover:text-gray-900" id="languageDropdown" aria-haspopup="true">
-                            <span class="mr-1">
+                        <button type="button" class="flex items-center gap-1 px-2 lg:px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-sm font-medium transition" id="languageDropdown" aria-haspopup="true">
+                            <span>
                                 @if(session('locale') == 'np') 🇳🇵
                                 @else 🇬🇧
                                 @endif
                             </span>
-                            <span class="text-sm font-medium">
+                            <span class="hidden sm:inline">
                                 @if(session('locale') == 'np') नेपाली
                                 @else English
                                 @endif
                             </span>
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
-
-                        <!-- Dropdown Menu -->
                         <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
-                            <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                🇬🇧 English
-                            </a>
-                            <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                🇳🇵 नेपाली
-                            </a>
+                            <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
+                            <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇳🇵 नेपाली</a>
                         </div>
                     </div>
 
-                    <!-- Logout -->
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">{{ __('messages.logout') }}</button>
-                    </form>
+                    <!-- User Dropdown (Name + Logout inside) -->
+                    <div class="relative">
+                        <button type="button" class="flex items-center gap-2 px-2 lg:px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-sm font-medium transition max-w-[140px] lg:max-w-[200px]" id="userDropdown" aria-haspopup="true">
+                            <i class="fas fa-user-circle text-lg flex-shrink-0"></i>
+                            <span class="truncate">{{ Auth::user()->name ?? __('messages.guest') }}</span>
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="userMenu">
+                            <!-- User info header -->
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name ?? __('messages.guest') }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email ?? '' }}</p>
+                            </div>
+                            <!-- Logout -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    {{ __('messages.logout') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </header>
 
@@ -267,6 +293,63 @@
                     }
                 });
             }
+
+            // User dropdown toggle
+            const userBtn = document.getElementById('userDropdown');
+            const userMenu = document.getElementById('userMenu');
+            if (userBtn && userMenu) {
+                userBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    userMenu.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!userBtn.contains(e.target) && !userMenu.contains(e.target)) {
+                        userMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Mobile Sidebar Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('providerSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggle = document.getElementById('sidebarToggle');
+            const close = document.getElementById('sidebarClose');
+
+            function openSidebar() {
+                if (!sidebar || !overlay) return;
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                if (!sidebar || !overlay) return;
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (toggle) toggle.addEventListener('click', openSidebar);
+            if (close) close.addEventListener('click', closeSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            if (sidebar) {
+                sidebar.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        if (window.innerWidth < 1024) closeSidebar();
+                    });
+                });
+            }
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 1024) closeSidebar();
+            });
         });
     </script>
 </body>
