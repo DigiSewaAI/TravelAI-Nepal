@@ -48,8 +48,13 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_link_label') }} *</label>
                     <input type="text" name="link_url" required value="{{ old('link_url') }}"
-                           placeholder="/services/my-service or https://..."
+                           placeholder="/explore/service/your-trek-slug"
                            class="w-full border rounded-lg px-3 py-2">
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                        <i class="fas fa-lightbulb text-amber-500"></i>
+                        {{ __('messages.ads_link_example_label') }}<br>
+                        <code class="bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded text-[11px]">/explore/service/everest-base-camp-trek-14-days</code>
+                    </p>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_link_target_label') }}</label>

@@ -31,7 +31,7 @@
             <div class="text-xs text-gray-500 uppercase">Last 30d CTR</div>
             @php
                 $ctr30 = $last30['impressions'] > 0
-                    ? round(($last30['clicks'] / $last30['impressions']) * 100, 2)
+                    ? min(100.0, round(($last30['clicks'] / $last30['impressions']) * 100, 2))
                     : 0;
             @endphp
             <div class="text-3xl font-bold text-amber-600 mt-1">{{ $ctr30 }}%</div>

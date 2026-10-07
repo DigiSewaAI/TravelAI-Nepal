@@ -1734,6 +1734,7 @@ return [
     'ads_featured_subtitle'       => 'हमारे भागीदारों से प्रायोजित सुझाव',
     'ads_sponsored_label'         => 'प्रायोजित',
     'ads_learn_more'              => 'और जानें',
+        'ads_link_example_label' => 'अपना सेवा पृष्ठ खोलें, फिर ब्राउज़र से URL कॉपी करें (/explore/service/ से शुरू होना चाहिए)। उदाहरण:',
 
 // ======================
 // TRAVELER REVIEW CREATE

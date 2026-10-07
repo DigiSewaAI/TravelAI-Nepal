@@ -95,9 +95,11 @@ class Ad extends Model
 
     public function getCtrAttribute(): float
     {
-        return $this->impressions > 0
-            ? round(($this->clicks / $this->impressions) * 100, 2)
-            : 0.0;
+        if ($this->impressions <= 0) {
+            return 0.0;
+        }
+        // Cap at 100% — session-deduped impressions can produce >100% CTR
+        return min(100.0, round(($this->clicks / $this->impressions) * 100, 2));
     }
 
     public function isExpired(): bool

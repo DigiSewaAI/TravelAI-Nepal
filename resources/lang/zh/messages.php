@@ -1748,6 +1748,7 @@ return [
     'ads_featured_subtitle'       => '来自合作伙伴的赞助推荐',
     'ads_sponsored_label'         => '赞助',
     'ads_learn_more'              => '了解更多',
+        'ads_link_example_label' => '打开您的服务页面，然后从浏览器复制 URL（应以 /explore/service/ 开头）。例如：',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================
