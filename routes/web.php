@@ -214,6 +214,13 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // 6. PROVIDER DASHBOARD ROUTES
 // =======================================
 Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
+        // Ads — Provider side
+    Route::prefix('ads')->name('ads.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Provider\AdController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Provider\AdController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Provider\AdController::class, 'store'])->name('store');
+        Route::get('/{ad}', [\App\Http\Controllers\Provider\AdController::class, 'show'])->name('show');
+    });
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
 
     // SOS Alerts (Phase 2 — provider notifications)
@@ -379,6 +386,10 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
 
+        // Ads — Traveler tracking
+        Route::post('/ads/{ad}/impression', [\App\Http\Controllers\Traveler\AdController::class, 'impression'])->name('ads.impression');
+        Route::get('/ads/{ad}/click', [\App\Http\Controllers\Traveler\AdController::class, 'click'])->name('ads.click');
+
         // Digital Trek Passport
         Route::get('/passport', [App\Http\Controllers\Traveler\PassportController::class, 'index'])->name('passport');
         Route::post('/passport/toggle', [App\Http\Controllers\Traveler\PassportController::class, 'toggleShare'])->name('passport.toggle');
@@ -443,6 +454,17 @@ Route::get('/journey/cinematic/{token}', [PublicJourneyReplayController::class, 
 // =======================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Ads — Admin moderation
+    Route::prefix('ads')->name('ads.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdController::class, 'index'])->name('index');
+        Route::get('/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'show'])->name('show');
+        Route::post('/{ad}/approve', [\App\Http\Controllers\Admin\AdController::class, 'approve'])->name('approve');
+        Route::post('/{ad}/reject', [\App\Http\Controllers\Admin\AdController::class, 'reject'])->name('reject');
+        Route::patch('/{ad}/toggle', [\App\Http\Controllers\Admin\AdController::class, 'toggle'])->name('toggle');
+        Route::delete('/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'destroy'])->name('destroy');
+        Route::get('/{ad}/analytics', [\App\Http\Controllers\Admin\AdController::class, 'analytics'])->name('analytics');
+    });
 
     // Providers
     Route::get('/providers', [AdminProviderController::class, 'index'])->name('providers.index');

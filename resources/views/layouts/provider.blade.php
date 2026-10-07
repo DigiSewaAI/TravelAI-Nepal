@@ -130,7 +130,12 @@
                     <i class="fas fa-crown w-5"></i>
                     <span>{{ __('messages.subscriptions') }}</span>
                 </a>
-
+                <!-- My Ads (paid promotion) -->
+                <a href="{{ route('provider.ads.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.ads.*') ? 'active' : '' }}">
+                    <i class="fas fa-bullhorn text-amber-500 w-5 text-center"></i>
+                    <span class="flex-1">{{ __('messages.ads_menu') }}</span>
+                </a>
                 <!-- Verification (Phase 8) -->
                 <a href="{{ route('provider.verification.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}">

@@ -333,6 +333,8 @@
                     </div>
                 @endif
             </div>
+            {{-- Ads: Featured for You (Phase 1 MVP) --}}
+            @include('partials.ad-carousel', ['featuredAds' => $featuredAds ?? collect()])
 
             {{-- Group: Tools & Shortcuts --}}
             <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider pt-2">

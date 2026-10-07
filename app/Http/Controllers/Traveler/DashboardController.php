@@ -9,6 +9,8 @@ use App\Models\UserMedia;
 use App\Models\Waypoint;
 use App\Services\Safety\AlertService;
 use App\Services\OpenMeteoService;
+use App\Services\AiLimitService;
+use App\Services\AdService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -112,6 +114,13 @@ class DashboardController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('Forex widget fail', ['error' => $e->getMessage()]);
         }
+                // Featured Ads (Phase 1 MVP — separate paid add-on)
+        $featuredAds = collect();
+        try {
+            $featuredAds = app(AdService::class)->getFeaturedAds(3);
+        } catch (\Throwable $e) {
+            \Log::warning('Featured ads fail', ['error' => $e->getMessage()]);
+        }
 
         return view('traveler.dashboard', compact(
             'user',
@@ -130,8 +139,9 @@ class DashboardController extends Controller
             'unreadAlerts',   // ✅ NEW: Pass to view
             'weatherData',     // ✅ NEW: Weather widget
             'weatherCity',     // ✅ NEW: Weather city name
-            'forexRates',      // ✅ NEW: Forex rates
-            'forexUpdatedAt'   // ✅ NEW: Forex fetch timestamp
+            'forexRates',       // ✅ Forex rates
+            'forexUpdatedAt',   // ✅ Forex fetch timestamp
+            'featuredAds'       // ✅ Featured ads (Phase 1 MVP)
         ));
     }
 
