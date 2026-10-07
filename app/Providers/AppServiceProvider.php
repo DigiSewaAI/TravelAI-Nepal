@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -56,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by($request->ip())
         );
 
-                RateLimiter::for('sos', fn (Request $request) =>
+        RateLimiter::for('sos', fn (Request $request) =>
             Limit::perMinute(3)->by($request->ip())
         );
 
@@ -64,5 +66,28 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('booking-public', fn (Request $request) =>
             Limit::perMinute(10)->by($request->ip())
         );
+
+        // ✅ Phase 2A: Provider SOS sidebar badge count
+        View::composer('layouts.provider', function ($view) {
+            $count = 0;
+
+            if (auth()->check()) {
+                $user     = auth()->user();
+                $provider = $user->provider
+                    ?? \App\Models\Provider::where('user_id', $user->id)->first();
+
+                if ($provider) {
+                    $count = Cache::remember(
+                        'provider_sos_unread_' . $provider->id,
+                        60,
+                        fn () => \App\Models\SosAlert::where('provider_id', $provider->id)
+                            ->whereIn('status', ['pending', 'sent'])
+                            ->count()
+                    );
+                }
+            }
+
+            $view->with('unreadSosCount', $count);
+        });
     }
 }

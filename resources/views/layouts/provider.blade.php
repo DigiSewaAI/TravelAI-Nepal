@@ -77,6 +77,18 @@
                     <span>{{ __('messages.dashboard') }}</span>
                 </a>
 
+                <!-- SOS Alerts (Phase 2 — provider safety notifications) -->
+                <a href="{{ route('provider.sos-alerts.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.sos-alerts.*') ? 'active' : '' }}">
+                    <i class="fas fa-exclamation-triangle text-red-500 w-5 text-center"></i>
+                    <span class="flex-1">{{ __('messages.sos_alerts_menu') }}</span>
+                    @if(isset($unreadSosCount) && $unreadSosCount > 0)
+                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                            {{ $unreadSosCount }}
+                        </span>
+                    @endif
+                </a>
+
                 <!-- Services -->
                 <a href="{{ route('provider.services.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">

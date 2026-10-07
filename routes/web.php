@@ -215,6 +215,13 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // =======================================
 Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
+
+    // SOS Alerts (Phase 2 — provider notifications)
+    Route::prefix('sos-alerts')->name('sos-alerts.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Provider\SosAlertController::class, 'index'])->name('index');
+        Route::get('/{sos}', [\App\Http\Controllers\Provider\SosAlertController::class, 'show'])->name('show');
+        Route::patch('/{sos}/resolve', [\App\Http\Controllers\Provider\SosAlertController::class, 'resolve'])->name('resolve');
+    });
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProviderProfileController::class, 'update'])->name('profile.update');
