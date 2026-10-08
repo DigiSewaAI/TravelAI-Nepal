@@ -96,6 +96,28 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         .trek-card:hover { transform: translateY(-8px); transition: 0.25s ease; }
+
+        /* Ad Carousel — plain CSS (Tailwind CDN मा निर्भर हुनु हुँदैन) */
+        #adsTrack {
+            display: flex !important;
+            transition: transform 0.5s ease-out !important;
+            will-change: transform;
+        }
+        #adsTrack .ad-slide {
+            min-width: 100% !important;
+            width: 100% !important;
+            flex-shrink: 0 !important;
+        }
+        #adsTrack .ad-slide > a {
+            display: block;
+            position: relative;
+        }
+        #adsTrack .ad-slide > a > span {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 10;
+        }
     </style>
 
     <script>

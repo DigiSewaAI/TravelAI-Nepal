@@ -658,9 +658,6 @@ function sendSos() {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('uploadForm');
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('uploadForm');
     const btn = document.getElementById('uploadBtn');
     const msg = document.getElementById('uploadMessage');
 

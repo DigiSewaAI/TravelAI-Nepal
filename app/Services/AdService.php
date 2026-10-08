@@ -16,19 +16,29 @@ class AdService
      * Get active ads for the traveler dashboard.
      * MVP: returns all active ads (targeting added Phase 2).
      */
-    public function getFeaturedAds(int $limit = 5)
+    public function getFeaturedAds(int $limit = 0)
     {
         $cacheKey = self::CACHE_KEY . 'dashboard';
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($limit) {
-            return Ad::active()
+        $ads = Cache::remember($cacheKey, self::CACHE_TTL, function () {
+            $query = Ad::active()
                 ->forPlacement('dashboard_featured')
                 ->with('provider')
                 ->orderBy('sort_order')
-                ->orderByDesc('created_at')
-                ->limit($limit)
-                ->get();
+                ->orderByDesc('created_at');
+
+            return $query->get();
         });
+
+        // Shuffle per request (fairness — different travelers see different order)
+        $shuffled = $ads->shuffle();
+
+        // Optional hard limit (0 = no limit)
+        if ($limit > 0) {
+            return $shuffled->take($limit);
+        }
+
+        return $shuffled;
     }
 
     /**

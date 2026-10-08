@@ -117,7 +117,7 @@ class DashboardController extends Controller
                 // Featured Ads (Phase 1 MVP — separate paid add-on)
         $featuredAds = collect();
         try {
-            $featuredAds = app(AdService::class)->getFeaturedAds(3);
+        $featuredAds = app(AdService::class)->getFeaturedAds();
         } catch (\Throwable $e) {
             \Log::warning('Featured ads fail', ['error' => $e->getMessage()]);
         }
