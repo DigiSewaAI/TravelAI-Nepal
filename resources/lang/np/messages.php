@@ -26,6 +26,7 @@ return [
 'about_cta_subtitle' => 'तपाईं यात्री होस् वा ट्राभल एजेन्सी — TravelAI Nepal तपाईंको लागि बनेको छ।',
 'about_cta_explore' => 'यात्रा अन्वेषण',
 'about_cta_partner' => 'साझेदार बन्नुहोस्',
+'journey_replay_meta_desc' => ':name को TravelAI Nepal यात्रा रिप्ले — हिमाली साहसिक यात्राका सिनेमाई सम्झनाहरू।',
 
 'enterprise_requires_contact'  => 'Enterprise को लागि विशेष मूल्य निर्धारण आवश्यक छ। कृपया हाम्रो बिक्री टोलीसँग सम्पर्क गर्नुहोस्।',
 'contact_sales_title'          => 'बिक्री सम्पर्क',

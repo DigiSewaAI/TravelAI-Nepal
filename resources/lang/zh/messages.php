@@ -26,6 +26,7 @@ return [
 'about_cta_subtitle' => '无论您是旅行者还是旅行社 — TravelAI Nepal 都为您而建。',
 'about_cta_explore' => '探索旅程',
 'about_cta_partner' => '成为合作伙伴',
+'journey_replay_meta_desc' => ':name 在 TravelAI Nepal 的旅程回放 — 喜马拉雅冒险的电影式回忆。',
 
 'enterprise_requires_contact'  => 'Enterprise 需要定制报价。请联系我们的销售团队。',
 'contact_sales_title'          => '联系销售',

@@ -33,6 +33,7 @@ return [
 'contact_sales_email_label'    => 'Email',
 'contact_sales_phone_label'    => 'Phone',
 'contact_sales_back'           => 'Back to home',
+'journey_replay_meta_desc' => ':name\'s personal journey replay on TravelAI Nepal — cinematic travel memories from Himalayan adventures.',
     // ======================
     // SIDEBAR (Provider)
     // ======================

@@ -56,14 +56,14 @@
 {{-- ========== JSON-LD: Organization ========== --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'TravelAgency',
+    '@@context' => 'https://schema.org',
+    '@@type' => 'TravelAgency',
     'name' => 'TravelAI Nepal',
     'url' => url('/'),
     'logo' => asset('images/logo.png'),
     'description' => 'AI-powered trekking ecosystem connecting travelers with local agencies in Nepal.',
     'address' => [
-        '@type' => 'PostalAddress',
+        '@@type' => 'PostalAddress',
         'addressLocality' => 'Kathmandu',
         'addressRegion' => 'Bagmati',
         'addressCountry' => 'NP',

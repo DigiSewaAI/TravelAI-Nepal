@@ -44,7 +44,7 @@
     </url>
     @endforeach
 
-    {{-- ========== Providers (individual pages) ========== --}}
+     {{-- ========== Providers (individual pages) ========== --}}
     @foreach($providers as $provider)
     <url>
         <loc>{{ route('public.providers.show', $provider->slug ?? $provider->id) }}</loc>
@@ -53,6 +53,30 @@
         @endif
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
+    </url>
+    @endforeach
+
+    {{-- ========== Products (shop/rental/wholesale) ========== --}}
+    @foreach($products as $product)
+    <url>
+        <loc>{{ url("/product/{$product->slug}") }}</loc>
+        @if($product->updated_at)
+        <lastmod>{{ $product->updated_at->toAtomString() }}</lastmod>
+        @endif
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
+
+    {{-- ========== Categories ========== --}}
+    @foreach($categories as $category)
+    <url>
+        <loc>{{ url("/explore/category/{$category->slug}") }}</loc>
+        @if($category->updated_at)
+        <lastmod>{{ $category->updated_at->toAtomString() }}</lastmod>
+        @endif
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
     </url>
     @endforeach
 

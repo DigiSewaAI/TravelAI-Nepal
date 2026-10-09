@@ -3,6 +3,40 @@
 @section('title', $product->name . ' | ' . __('messages.app_name'))
 @section('meta_description', \Illuminate\Support\Str::limit(strip_tags($product->description ?? ''), 150))
 
+@push('head')
+<script type="application/ld+json">
+{!! json_encode([
+  '@@context' => 'https://schema.org',
+  '@@type' => 'Product',
+  'name' => $product->name,
+  'description' => \Illuminate\Support\Str::limit(strip_tags($product->description ?? ''), 200),
+  'image' => $product->cover_image ? \Illuminate\Support\Facades\Storage::url($product->cover_image) : null,
+  'sku' => $product->slug,
+  'brand' => $product->provider ? ['@@type' => 'Brand', 'name' => $product->provider->name] : null,
+  'seller' => $product->provider ? ['@@type' => 'Organization', 'name' => $product->provider->name] : null,
+  'offers' => [
+    '@@type' => 'Offer',
+    'price' => (string) $product->price,
+    'priceCurrency' => $product->currency ?? 'NPR',
+    'availability' => $product->status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    'url' => url()->current(),
+  ],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+
+<script type="application/ld+json">
+{!! json_encode([
+  '@@context' => 'https://schema.org',
+  '@@type' => 'BreadcrumbList',
+  'itemListElement' => [
+    ['@@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+    ['@@type' => 'ListItem', 'position' => 2, 'name' => ucfirst($product->product_type), 'item' => url('/' . $product->product_type)],
+    ['@@type' => 'ListItem', 'position' => 3, 'name' => $product->name, 'item' => url()->current()],
+  ],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endpush
+
 @section('content')
 
 @php

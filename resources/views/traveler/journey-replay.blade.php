@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', __('messages.journey_replay_page_title'))
+@section('meta_description', __('messages.journey_replay_meta_desc', ['name' => auth()->user()->name ?? 'Traveler']))
 
 @push('head')
 <meta name="robots" content="noindex, nofollow">

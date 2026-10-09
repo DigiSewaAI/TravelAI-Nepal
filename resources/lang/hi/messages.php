@@ -27,6 +27,7 @@ return [
 'about_cta_subtitle' => 'आप यात्री हों या ट्रैवल एजेंसी — TravelAI Nepal आपके लिए बनाया गया है।',
 'about_cta_explore' => 'यात्राएं देखें',
 'about_cta_partner' => 'पार्टनर बनें',
+'journey_replay_meta_desc' => ':name की TravelAI Nepal यात्रा रीप्ले — हिमालयी रोमांच की सिनेमाई यादें।',
 
 'enterprise_requires_contact'  => 'Enterprise के लिए कस्टम मूल्य निर्धारण आवश्यक है। कृपया हमारी बिक्री टीम से संपर्क करें।',
 'contact_sales_title'          => 'बिक्री संपर्क',
