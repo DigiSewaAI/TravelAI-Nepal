@@ -63,4 +63,14 @@ ngrok
 docs/LARAVEL_CLOUD_ENV.md 
 deploy_env_list.txt 
 deploy_runbook.md 
-users.txt 
+users.txt
+# Scratch / temp files
+_*.php
+_globe*/
+globe*-diff.txt
+users.txt
+
+# Local credential files (never commit)
+_zoho_*.txt
+_brevo_*.txt
+_gsc_*.txt 
