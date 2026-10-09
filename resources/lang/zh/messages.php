@@ -732,7 +732,7 @@ return [
     'contact_address_line1' => '拉齐姆帕特，加德满都',
     'contact_address_line2' => '尼泊尔',
     'contact_phone_title' => '电话',
-    'contact_phone_hours' => '周一至周五，上午9点 - 下午6点',
+    'contact_phone_hours' => '周日至周五：上午 9 点至下午 6 点',
     'contact_hours_title' => '工作时间',
     'contact_hours_week' => '周日至周五：上午9点 - 下午6点',
     'contact_hours_weekend' => '周六：休息',
@@ -807,7 +807,7 @@ return [
         'gdpr_section6_text' => '我们使用也符合GDPR要求的可信第三方处理商（AWS等）。所有处理商都签署数据处理协议。',
     'gdpr_section7_title' => '7. 数据保留',
     'gdpr_section7_text' => '我们仅在概述的目的所需或法律要求的时间内保留您的数据。您可以请求提前删除。',
-    'gdpr_contact_dpo' => '如有任何GDPR相关问题，请联系我们的数据保护官 dpo@travelai.com',
+    'gdpr_contact_dpo' => '如有任何GDPR相关问题，请通过以下方式联系我们的数据保护官',
 
     // ======================
     // HOW IT WORKS PAGE (Chinese)
@@ -886,7 +886,7 @@ return [
     'privacy_section4_title' => '4. 第三方共享',
     'privacy_section4_text' => '我们仅与可信合作伙伴（供应商、支付网关）共享必要的数据以完成您的预订。我们从不出售您的数据。',
     'privacy_section5_title' => '5. 您的权利',
-    'privacy_section5_text' => '您可以通过 support@travelai.com 联系我们访问、更正或删除您的数据。',
+    'privacy_section5_text' => '您可以通过 support@travelainepal.com 联系我们访问、更正或删除您的数据。',
     'privacy_section6_title' => '6. Cookie',
     'privacy_section6_text' => '我们使用Cookie来增强您的体验。您可以在浏览器设置中控制Cookie偏好。',
     'privacy_section7_title' => '7. 本政策的变更',

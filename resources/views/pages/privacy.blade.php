@@ -99,7 +99,7 @@
         </div>
 
         <div class="pt-4 border-t">
-            <p class="text-sm text-gray-500">{{ __('messages.privacy_contact') }} <a href="mailto:support@travelai.com" class="text-blue-600 hover:underline">support@travelai.com</a></p>
+            <p class="text-sm text-gray-500">{{ __('messages.privacy_contact') }} <a href="mailto:support@travelainepal.com" class="text-blue-600 hover:underline">support@travelainepal.com</a></p>
         </div>
     </div>
 </div>

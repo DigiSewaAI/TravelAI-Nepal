@@ -86,7 +86,7 @@
                 <li><strong>{{ __('messages.gdpr_right_restrict') }}</strong> {{ __('messages.gdpr_right_restrict_desc') }}</li>
                 <li><strong>{{ __('messages.gdpr_right_portability') }}</strong> {{ __('messages.gdpr_right_portability_desc') }}</li>
             </ul>
-            <p class="text-gray-600 mt-2">{{ __('messages.gdpr_right_contact') }} <a href="mailto:support@travelai.com" class="text-blue-600 hover:underline">support@travelai.com</a>.</p>
+            <p class="text-gray-600 mt-2">{{ __('messages.gdpr_right_contact') }} <a href="mailto:support@travelainepal.com" class="text-blue-600 hover:underline">support@travelainepal.com</a>.</p>
         </div>
 
         <div>
@@ -105,7 +105,7 @@
         </div>
 
         <div class="pt-4 border-t">
-            <p class="text-sm text-gray-500">{{ __('messages.gdpr_contact_dpo') }} <a href="mailto:dpo@travelai.com" class="text-blue-600 hover:underline">dpo@travelai.com</a></p>
+            <p class="text-sm text-gray-500">{{ __('messages.gdpr_contact_dpo') }} <a href="mailto:admin@travelainepal.com" class="text-blue-600 hover:underline">admin@travelainepal.com</a></p>
         </div>
     </div>
 </div>

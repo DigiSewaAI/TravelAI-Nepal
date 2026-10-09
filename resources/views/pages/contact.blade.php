@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Contact Us — TravelAI Nepal | Support, Sales & Partnerships')
-@section('meta_description', 'Contact TravelAI Nepal for support, sales, partnerships, or press inquiries. Reach us by email, phone, or visit our office in Lazimpat, Kathmandu.')
+@section('meta_description', 'Contact TravelAI Nepal for support, sales, partnerships, or press inquiries. Reach us by email, phone, or visit us in Kathmandu, Nepal.')
 @section('meta_keywords', 'contact TravelAI Nepal, Nepal travel agency contact, trekking support Nepal, partnership inquiry, Kathmandu travel office')
 
 @push('head')
@@ -26,11 +26,11 @@
   "logo": "{{ asset('images/logo.png') }}",
   "image": "{{ asset('images/logo.png') }}",
   "description": "AI-powered trekking ecosystem connecting travelers with verified local providers in Nepal.",
-  "email": "support@travelai.com",
-  "telephone": "+977-1-4XXXXXX",
+  "email": "support@travelainepal.com",
+  "telephone": "+977-9761762036",
   "address": {
     "@@type": "PostalAddress",
-    "streetAddress": "Lazimpat",
+    "streetAddress": "Kathmandu",
     "addressLocality": "Kathmandu",
     "addressRegion": "Bagmati",
     "postalCode": "44600",
@@ -58,13 +58,13 @@
     {
       "@@type": "ContactPoint",
       "contactType": "customer support",
-      "email": "support@travelai.com",
+      "email": "support@travelainepal.com",
       "availableLanguage": ["en", "ne", "hi", "zh"]
     },
     {
       "@@type": "ContactPoint",
       "contactType": "sales",
-      "email": "sales@travelai.com",
+      "email": "info@travelainepal.com",
       "availableLanguage": ["en"]
     }
   ]
@@ -112,21 +112,20 @@
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
                 <i class="fas fa-envelope text-blue-600 text-2xl"></i>
                 <h3 class="font-bold text-gray-800 mt-2">{{ __('messages.contact_email_title') }}</h3>
-                <p class="text-gray-600">support@travelai.com</p>
-                <p class="text-gray-600">sales@travelai.com</p>
+                <p class="text-gray-600">support@travelainepal.com</p>
+                <p class="text-gray-600">info@travelainepal.com</p>
             </div>
 
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
                 <i class="fas fa-map-marker-alt text-blue-600 text-2xl"></i>
                 <h3 class="font-bold text-gray-800 mt-2">{{ __('messages.contact_address_title') }}</h3>
-                <p class="text-gray-600">{{ __('messages.contact_address_line1') }}</p>
-                <p class="text-gray-600">{{ __('messages.contact_address_line2') }}</p>
+                <p class="text-gray-600">Kathmandu, Nepal</p>
             </div>
 
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
                 <i class="fas fa-phone-alt text-blue-600 text-2xl"></i>
                 <h3 class="font-bold text-gray-800 mt-2">{{ __('messages.contact_phone_title') }}</h3>
-                <p class="text-gray-600">+977-1-4XXXXXX</p>
+                <p class="text-gray-600">+977-9761762036</p>
                 <p class="text-gray-500 text-sm">{{ __('messages.contact_phone_hours') }}</p>
             </div>
 
@@ -141,7 +140,7 @@
         {{-- Contact Form --}}
         <div class="bg-white rounded-xl shadow-md border p-8">
             <h3 class="text-xl font-bold text-gray-800 mb-4">{{ __('messages.contact_form_title') }}</h3>
-            <form action="mailto:support@travelai.com" method="POST" enctype="text/plain">
+            <form action="mailto:support@travelainepal.com" method="POST" enctype="text/plain">
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.contact_form_name') }}</label>
                     <input type="text" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">

@@ -138,7 +138,7 @@
                 <p class="text-gray-600 mt-3">{{ $job['description'] }}</p>
 
                 <div class="flex justify-end mt-4 pt-3 border-t border-gray-100">
-                    <a href="mailto:careers@travelai.com?subject=Application%20for%20{{ urlencode($job['title']) }}" 
+                    <a href="mailto:careers@travelainepal.com?subject=Application%20for%20{{ urlencode($job['title']) }}" 
                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg text-sm transition shadow-sm hover:shadow-md">
                         {{ __('messages.careers_apply_now') }} <i class="fas fa-arrow-right ml-1"></i>
                     </a>
@@ -157,7 +157,7 @@
     <div class="mt-12 bg-gray-50 rounded-2xl p-8 border text-center">
         <h3 class="text-xl font-bold text-gray-800">{{ __('messages.careers_spontaneous_title') }}</h3>
         <p class="text-gray-500 mt-1">{{ __('messages.careers_spontaneous_sub') }}</p>
-        <a href="mailto:careers@travelai.com?subject=Spontaneous%20Application" 
+        <a href="mailto:careers@travelainepal.com?subject=Spontaneous%20Application" 
            class="inline-block mt-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-6 py-2 rounded-lg transition">
             {{ __('messages.careers_spontaneous_btn') }} →
         </a>

@@ -741,7 +741,7 @@ return [
 'contact_address_line1' => 'Lazimpat, Kathmandu',
 'contact_address_line2' => 'Nepal',
 'contact_phone_title' => 'Phone',
-'contact_phone_hours' => 'Mon–Fri, 9 AM – 6 PM',
+'contact_phone_hours' => 'Sunday–Friday: 9 AM – 6 PM',
 'contact_hours_title' => 'Working Hours',
 'contact_hours_week' => 'Sunday–Friday: 9 AM – 6 PM',
 'contact_hours_weekend' => 'Saturday: Closed',
@@ -816,7 +816,7 @@ return [
 'gdpr_section6_text' => 'We use trusted third-party processors (AWS, etc.) that are also GDPR compliant. All processors sign Data Processing Agreements.',
 'gdpr_section7_title' => '7. Data Retention',
 'gdpr_section7_text' => 'We retain your data only as long as necessary for the purposes outlined, or as required by law. You may request earlier deletion.',
-'gdpr_contact_dpo' => 'For any GDPR-related questions, contact our Data Protection Officer at dpo@travelai.com',
+'gdpr_contact_dpo' => 'For any GDPR-related questions, please contact our Data Protection Officer at',
 
 // ======================
 // HOW IT WORKS PAGE
@@ -895,7 +895,7 @@ return [
 'privacy_section4_title' => '4. Third-Party Sharing',
 'privacy_section4_text' => 'We share data only with trusted partners (providers, payment gateways) as necessary to fulfill your bookings. We never sell your data.',
 'privacy_section5_title' => '5. Your Rights',
-'privacy_section5_text' => 'You may access, correct, or delete your data by contacting us at support@travelai.com.',
+'privacy_section5_text' => 'You may access, correct, or delete your data by contacting us at support@travelainepal.com.',
 'privacy_section6_title' => '6. Cookies',
 'privacy_section6_text' => 'We use cookies to enhance your experience. You can control cookie preferences in your browser settings.',
 'privacy_section7_title' => '7. Changes to This Policy',

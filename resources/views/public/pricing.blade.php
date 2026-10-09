@@ -207,7 +207,7 @@
                 @if($plan->slug === 'free')
                     <a href="{{ route('register') }}" class="w-full block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 rounded-xl transition">{{ __('messages.get_started_free') }}</a>
                 @elseif($plan->slug === 'enterprise')
-                    <a href="mailto:sales@travelai.com?subject=Enterprise%20Plan%20Inquiry" class="w-full block text-center bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition shadow-md">{{ __('messages.contact_for_pricing') }}</a>
+                    <a href="mailto:info@travelainepal.com?subject=Enterprise%20Plan%20Inquiry" class="w-full block text-center bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 rounded-xl transition shadow-md">{{ __('messages.contact_for_pricing') }}</a>
                 @else
                     <a href="{{ route('register', ['plan' => $plan->slug, 'billing_interval' => 'monthly']) }}" class="cta-button w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md" data-interval="monthly">{{ __('messages.choose_plan_btn', ['name' => $plan->name]) }}</a>
                     <a href="{{ route('register', ['plan' => $plan->slug, 'billing_interval' => 'yearly']) }}" class="cta-button hidden w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md" data-interval="yearly">{{ __('messages.choose_plan_btn', ['name' => $plan->name]) }}</a>
