@@ -115,4 +115,22 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Global "Reply-To" Address
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify a reply-to address that is used globally for all
+    | emails sent by your application. When a recipient replies to an email
+    | sent by your app, the reply will be routed to this address. This is
+    | useful when sending from a "noreply@" address but wanting replies
+    | to reach a monitored inbox like "admin@" or "support@".
+    |
+    */
+
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'name' => env('MAIL_REPLY_TO_NAME', env('MAIL_FROM_NAME', 'Example')),
+    ],
+
 ];

@@ -6,6 +6,7 @@ use App\Models\Route;
 use App\Observers\RouteObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -89,5 +90,15 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('unreadSosCount', $count);
         });
+
+        // ✅ Global Reply-To for all outgoing emails
+        // Ensures customer replies reach admin@travelainepal.com
+        // instead of the unmonitored noreply@ address.
+        if (config('mail.reply_to.address')) {
+            Mail::alwaysReplyTo(
+                config('mail.reply_to.address'),
+                config('mail.reply_to.name', config('mail.from.name', 'Example'))
+            );
+        }
     }
 }
