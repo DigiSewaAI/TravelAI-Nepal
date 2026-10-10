@@ -53,6 +53,8 @@ class InvoiceBrand
             'logo_mime'      => 'image/png',
             'footer_tagline' => 'TravelAI Nepal — AI + data-driven trekking ecosystem. Built for Nepal, by passion.',
             'copyright'      => '© ' . date('Y') . ' TravelAI Nepal. All rights reserved.',
+            'watermark_text' => 'TravelAI Nepal',
+            'watermark_show' => true,
         ];
     }
 
@@ -69,6 +71,8 @@ class InvoiceBrand
             'tier'        => self::TIER_LOGO_ONLY,
             'logo_base64' => $logo['data'],
             'logo_mime'   => $logo['mime'],
+            'watermark_text' => 'TravelAI Nepal',
+            'watermark_show' => true,
         ]);
     }
 
@@ -82,9 +86,10 @@ class InvoiceBrand
             'tier'           => self::TIER_WHITE,
             'name'           => $name,
             'logo_base64'    => $logo['data'] ?? $default['logo_base64'],
-            'logo_mime'      => $logo['mime'] ?? $default['logo_mime'],
             'footer_tagline' => $name . ' — powered by TravelAI Nepal',
             'copyright'      => '© ' . date('Y') . ' ' . $name . '. All rights reserved.',
+            'watermark_text' => $name,
+            'watermark_show' => true,
         ];
     }
 

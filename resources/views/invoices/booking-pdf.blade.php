@@ -5,7 +5,26 @@
     <title>Booking Invoice</title>
     <style>
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 14px; color: #333; margin: 0; padding: 0; }
-        .invoice-box { max-width: 800px; margin: 40px auto; padding: 30px; background: #fff; border: 1px solid #e5e7eb; }
+         .invoice-box { max-width: 800px; margin: 40px auto; padding: 30px; background: #fff; border: 1px solid #e5e7eb; position: relative; overflow: hidden; }
+        .watermark-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .watermark {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: #dbeafe;
+            white-space: nowrap;
+            transform: rotate(-30deg);
+            -webkit-transform: rotate(-30deg);
+        }
+        .invoice-content { position: relative; z-index: 1; }
 
         /* ===== HEADER (table-based — DOMPDF safe) ===== */
         .header { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -27,19 +46,41 @@
 
         /* ===== ITEMS TABLE ===== */
         .items { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .items th { background: #f3f4f6; text-align: left; padding: 10px; font-weight: 600; }
+        .items th { background: rgba(243, 244, 246, 0.25); text-align: left; padding: 10px; font-weight: 600; }
         .items td { padding: 10px; border-bottom: 1px solid #eee; }
         .items .amount { text-align: right; }
         .total-row { font-weight: bold; font-size: 16px; }
         .total-row td { border-top: 2px solid #333; padding-top: 10px; }
 
         /* ===== MISC ===== */
-        .service-info { margin: 10px 0; padding: 10px; background: #f9fafb; border-radius: 5px; }
+        .service-info { margin: 10px 0; padding: 10px; background: rgba(249, 250, 251, 0.25); border-radius: 5px; }
         .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
     </style>
 </head>
 <body>
     <div class="invoice-box">
+        @if(!empty($brand['watermark_text']) && ($brand['watermark_show'] ?? true))
+            @php
+                $wmRows = [
+                    ['top' => '5%',  'lefts' => ['-5%', '33%', '70%']],
+                    ['top' => '18%', 'lefts' => ['12%', '50%', '85%']],
+                    ['top' => '31%', 'lefts' => ['-5%', '33%', '70%']],
+                    ['top' => '44%', 'lefts' => ['12%', '50%', '85%']],
+                    ['top' => '57%', 'lefts' => ['-5%', '33%', '70%']],
+                    ['top' => '70%', 'lefts' => ['12%', '50%', '85%']],
+                    ['top' => '83%', 'lefts' => ['-5%', '33%', '70%']],
+                    ['top' => '96%', 'lefts' => ['12%', '50%', '85%']],
+                ];
+            @endphp
+            <div class="watermark-layer">
+                @foreach($wmRows as $row)
+                    @foreach($row['lefts'] as $left)
+                        <div class="watermark" style="top: {{ $row['top'] }}; left: {{ $left }};">{{ $brand['watermark_text'] }}</div>
+                    @endforeach
+                @endforeach
+            </div>
+        @endif
+        <div class="invoice-content">
 
         {{-- ===== HEADER: Logo | Brand + Title | Invoice# ===== --}}
         <table class="header">
@@ -114,6 +155,7 @@
             <p>{{ $brand['copyright'] ?? '© ' . date('Y') . ' TravelAI Nepal. All rights reserved.' }}</p>
             <p>This is a system-generated invoice. No signature required.</p>
         </div>
+        </div>{{-- /.invoice-content --}}
     </div>
 </body>
 </html>
