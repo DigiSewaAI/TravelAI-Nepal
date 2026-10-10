@@ -133,6 +133,20 @@
             });
         }
     </script>
+
+    {{-- Google Analytics 4 --}}
+    @if(config('services.ga4.measurement_id'))
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.ga4.measurement_id') }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ config('services.ga4.measurement_id') }}', {
+            anonymize_ip: true,
+            cookie_flags: 'SameSite=None;Secure'
+        });
+    </script>
+    @endif
 </head>
 <body class="antialiased overflow-x-hidden">
 

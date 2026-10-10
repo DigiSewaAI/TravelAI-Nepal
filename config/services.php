@@ -110,5 +110,8 @@ return [
         'api_key' => env('NEPAL_SMS_API_KEY'),
         'sender_id' => env('NEPAL_SMS_SENDER_ID'),
     ],
+        'ga4' => [
+        'measurement_id' => env('GA4_MEASUREMENT_ID'),
+    ],
 
 ];
