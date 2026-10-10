@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Support\InvoiceBrand;
 
 class BookingController extends Controller
 {
@@ -120,11 +121,14 @@ class BookingController extends Controller
             abort(403, 'Unauthorized.');
         }
 
+        $provider = $booking->service->provider;
+
         $data = [
-            'booking' => $booking,
-            'service' => $booking->service,
-            'provider' => $booking->service->provider,
+            'booking'  => $booking,
+            'service'  => $booking->service,
+            'provider' => $provider,
             'traveler' => $booking->traveler,
+            'brand'    => InvoiceBrand::forBookingInvoice($provider),
         ];
 
         $pdf = Pdf::loadView('invoices.booking-pdf', $data);
