@@ -23,7 +23,7 @@
                 <tbody>
                     @foreach($bookings as $booking)
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="py-3 text-sm">#{{ $booking->id }}</td>
+                        <td class="py-3 text-sm">{{ $booking->booking_number ?? '#' . $booking->id }}</td>
                         <td class="py-3 text-sm">{{ $booking->traveler->name ?? __('messages.guest') }}</td>
                         <td class="py-3 text-sm">{{ $booking->service->name ?? __('messages.na') }}</td>
                         <td class="py-3 text-sm">{{ $booking->start_date->format('Y-m-d') }}</td>
