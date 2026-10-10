@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -99,6 +101,21 @@ class AppServiceProvider extends ServiceProvider
                 config('mail.reply_to.address'),
                 config('mail.reply_to.name', config('mail.from.name', 'Example'))
             );
+
+            // Provider-specific reply-to override (fires AFTER global alwaysReplyTo)
+            Event::listen(MessageSending::class, function (MessageSending $event) {
+                $providerReplyTo = $event->data['__provider_reply_to'] ?? null;
+                if (!empty($providerReplyTo['address'])) {
+                    $headers = $event->message->getHeaders();
+                    $headers->remove('Reply-To');
+                    $event->message->replyTo(
+                        new \Symfony\Component\Mime\Address(
+                            $providerReplyTo['address'],
+                            $providerReplyTo['name'] ?? ''
+                        )
+                    );
+                }
+            });
         }
     }
 }

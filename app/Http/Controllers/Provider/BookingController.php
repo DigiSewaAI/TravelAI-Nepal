@@ -58,6 +58,31 @@ class BookingController extends Controller
         return $pdf->download($filename);
     }
 
+    public function emailInvoice(Booking $booking)
+    {
+        $this->authorize('view', $booking);
+
+        $travelerEmail = $booking->traveler->email ?? null;
+        if (!$travelerEmail) {
+            return back()->with('error', __('messages.email_invoice_no_email'));
+        }
+
+        $cacheKey = 'booking_invoice_email_' . $booking->id;
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            return back()->with('error', __('messages.email_invoice_rate_limit'));
+        }
+
+        $provider = $booking->service->provider;
+        $brand    = \App\Support\InvoiceBrand::forBookingInvoice($provider);
+
+        \Illuminate\Support\Facades\Mail::to($travelerEmail)
+        ->send(new \App\Mail\BookingInvoiceMail($booking, $brand));
+
+        \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addMinutes(5));
+
+        return back()->with('success', __('messages.email_invoice_sent'));
+    }
+
     public function updateStatus(Request $request, Booking $booking)
 {
     $this->authorize('update', $booking);

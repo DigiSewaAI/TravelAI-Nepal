@@ -1734,6 +1734,17 @@ return [
         'ads_link_example_label' => 'Open your service page, then copy the URL from browser (should start with /explore/service/). Example:',
     'download'      => 'Download',
         'download_invoice' => 'Download Invoice',
+            'email_invoice_to_traveler' => 'Email Invoice to Traveler',
+    'email_invoice_confirm'     => 'Send invoice to traveler?',
+    'email_invoice_sent'        => 'Invoice sent successfully',
+    'email_invoice_rate_limit'  => 'Please wait 5 minutes before resending',
+    'email_invoice_no_email'    => 'Traveler has no email on file',
+    'email_invoice_dear'        => 'Dear :name,',
+    'email_invoice_body'        => 'Please find your booking invoice attached.',
+    'email_invoice_attached'    => 'Attached: Booking Invoice',
+        'email_invoice_greeting'    => 'Namaste :name,',
+    'email_invoice_thanks'      => 'Thank you for booking with us. Please find your invoice attached.',
+    'email_invoice_questions'   => 'Have questions? Simply reply to this email.',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

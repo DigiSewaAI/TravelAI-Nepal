@@ -11,6 +11,17 @@
         </a>
     </div>
 
+    @if(session('success'))
+        <div class="mb-4 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+            <i class="fas fa-check-circle mr-1"></i> {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+            <i class="fas fa-exclamation-circle mr-1"></i> {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-start">
             <h2 class="text-2xl font-bold text-gray-900">{{ $booking->booking_number ?? __('messages.booking_hash', ['id' => $booking->id]) }}</h2>
@@ -76,6 +87,18 @@
                 <i class="fas fa-download"></i>
                 {{ __('messages.download_invoice') }}
             </a>
+        </div>
+
+        <div class="mt-4 border-t pt-4">
+            <form method="POST" action="{{ route('provider.bookings.emailInvoice', $booking) }}"
+                  onsubmit="return confirm('{{ __('messages.email_invoice_confirm') }}');">
+                @csrf
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-envelope"></i>
+                    {{ __('messages.email_invoice_to_traveler') }}
+                </button>
+            </form>
         </div>
     </div>
 </div>

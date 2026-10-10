@@ -382,6 +382,17 @@ return [
     'issued_at' => 'जारी गरिएको',
     'download' => 'डाउनलोड गर्नुहोस्',
     'download_invoice' => 'इनभ्वाइस डाउनलोड गर्नुहोस्',
+        'email_invoice_to_traveler' => 'यात्रीलाई इनभ्वाइस पठाउनुहोस्',
+    'email_invoice_confirm'     => 'यात्रीलाई इनभ्वाइस पठाउने?',
+    'email_invoice_sent'        => 'इनभ्वाइस सफलतापूर्वक पठाइयो',
+    'email_invoice_rate_limit'  => 'कृपया ५ मिनेट पर्खनुहोस्',
+    'email_invoice_no_email'    => 'यात्रीको इमेल छैन',
+    'email_invoice_dear'        => 'प्रिय :name,',
+    'email_invoice_body'        => 'कृपया तपाईंको बुकिङ इनभ्वाइस संलग्न फाइलमा हेर्नुहोस्।',
+    'email_invoice_attached'    => 'संलग्न: बुकिङ इनभ्वाइस',
+        'email_invoice_greeting'    => 'नमस्ते :name,',
+    'email_invoice_thanks'      => 'हामीसँग बुकिङ गर्नुभएकोमा धन्यवाद। कृपया संलग्न इनभ्वाइस हेर्नुहोस्।',
+    'email_invoice_questions'   => 'प्रश्न छ? यही इमेलमा जवाफ दिनुहोस्।',
     // ======================
     // COST & SERVICE NAMES
     // ======================

@@ -312,6 +312,7 @@ Route::prefix('services/{service}/itinerary/departures')
     Route::get('/bookings/{booking}', [ProviderBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{booking}/status', [ProviderBookingController::class, 'updateStatus'])->name('bookings.updateStatus');
     Route::get('/bookings/{booking}/invoice', [ProviderBookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+        Route::post('/bookings/{booking}/email-invoice', [ProviderBookingController::class, 'emailInvoice'])->name('bookings.emailInvoice');
     // Subscriptions (Phase 8)
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
