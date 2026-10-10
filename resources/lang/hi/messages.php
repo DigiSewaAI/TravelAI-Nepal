@@ -219,6 +219,7 @@ return [
     'payment_method' => 'भुगतान विधि',
     'paid_at' => 'भुगतान तिथि',
     'download_pdf' => 'PDF डाउनलोड करें',
+        'download' => 'डाउनलोड',
     'back_to_invoices' => '← इनवॉइस पर वापस जाएँ',
     'invoice_pdf_title' => 'इनवॉइस :number',
     'powered_by' => 'द्वारा संचालित',

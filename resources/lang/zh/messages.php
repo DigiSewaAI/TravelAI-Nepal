@@ -217,6 +217,7 @@ return [
     'payment_method' => '付款方式',
     'paid_at' => '付款于',
     'download_pdf' => '下载PDF',
+        'download' => '下载',
     'back_to_invoices' => '← 返回发票',
     'invoice_pdf_title' => '发票 :number',
     'powered_by' => '由...提供支持',
