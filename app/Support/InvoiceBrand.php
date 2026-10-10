@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Provider;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Resolve invoice branding for a given provider (booking → traveler).
@@ -92,32 +93,58 @@ class InvoiceBrand
      * Values look like: "providers/logos/abc123.png"
      */
     protected static function resolveProviderLogo(?string $logoUrl): ?array
-    {
-        if (!$logoUrl) {
-            return null;
-        }
+{
+    if (!$logoUrl) {
+        return null;
+    }
 
-        $clean = ltrim($logoUrl, '/');
-        $candidates = [
-            storage_path('app/public/' . $clean),
-            public_path($clean),
-            public_path('storage/' . $clean),
-        ];
+    $clean = ltrim($logoUrl, '/');
 
-        foreach ($candidates as $path) {
-            if (is_file($path)) {
-                $data = self::encodeImage($path);
-                if ($data !== null) {
+    // 1️⃣ Try Laravel Storage (R2 / S3 / default disk) – production
+    $disks = array_filter([
+        config('filesystems.default'), // often 'r2' on Laravel Cloud
+        'r2',
+        'public',
+        's3',
+    ]);
+
+    foreach (array_unique($disks) as $disk) {
+        try {
+            if (Storage::disk($disk)->exists($clean)) {
+                $bytes = Storage::disk($disk)->get($clean);
+                if ($bytes) {
                     return [
-                        'data' => $data,
-                        'mime' => File::mimeType($path) ?: 'image/png',
+                        'data' => base64_encode($bytes),
+                        'mime' => Storage::disk($disk)->mimeType($clean) ?: 'image/png',
                     ];
                 }
             }
+        } catch (\Throwable $e) {
+            // log silently? optional
         }
-
-        return null;
     }
+
+    // 2️⃣ Fallback to local file paths (development)
+    $candidates = [
+        storage_path('app/public/' . $clean),
+        public_path($clean),
+        public_path('storage/' . $clean),
+    ];
+
+    foreach ($candidates as $path) {
+        if (is_file($path)) {
+            $data = self::encodeImage($path);
+            if ($data !== null) {
+                return [
+                    'data' => $data,
+                    'mime' => File::mimeType($path) ?: 'image/png',
+                ];
+            }
+        }
+    }
+
+    return null;
+}
 
     protected static function encodeImage(string $path, int $maxDimension = 300): ?string
     {
