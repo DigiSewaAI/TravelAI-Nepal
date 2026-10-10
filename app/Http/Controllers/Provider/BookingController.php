@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 // 🔥 Import the notification class
 use App\Notifications\BookingStatusUpdated;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BookingController extends Controller
 {
@@ -35,6 +36,26 @@ class BookingController extends Controller
     {
         $this->authorize('view', $booking);
         return view('provider.bookings.show', compact('booking'));
+    }
+
+    public function downloadInvoice(Booking $booking)
+    {
+        $this->authorize('view', $booking);
+
+        $provider = $booking->service->provider;
+
+        $data = [
+            'booking'  => $booking,
+            'service'  => $booking->service,
+            'provider' => $provider,
+            'traveler' => $booking->traveler,
+            'brand'    => \App\Support\InvoiceBrand::forBookingInvoice($provider),
+        ];
+
+        $pdf = Pdf::loadView('invoices.booking-pdf', $data);
+        $filename = 'booking-invoice-' . ($booking->booking_number ?? $booking->id) . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     public function updateStatus(Request $request, Booking $booking)

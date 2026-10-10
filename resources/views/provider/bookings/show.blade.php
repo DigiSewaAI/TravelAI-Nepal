@@ -1,6 +1,6 @@
 @extends('layouts.provider')
 
-@section('title', __('messages.booking_detail_title', ['id' => $booking->id]))
+@section('title', __('messages.booking_detail_title', ['id' => $booking->booking_number ?? $booking->id]))
 @section('header', __('messages.booking_detail_header'))
 
 @section('content')
@@ -13,7 +13,7 @@
 
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-start">
-            <h2 class="text-2xl font-bold text-gray-900">{{ __('messages.booking_hash', ['id' => $booking->id]) }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900">{{ $booking->booking_number ?? __('messages.booking_hash', ['id' => $booking->id]) }}</h2>
             <span class="px-3 py-1 rounded-full text-sm font-semibold
                 @if($booking->status === 'pending') bg-yellow-100 text-yellow-800
                 @elseif($booking->status === 'confirmed') bg-blue-100 text-blue-800
@@ -68,6 +68,14 @@
                     {{ __('messages.update_status') }}
                 </button>
             </form>
+        </div>
+
+        <div class="mt-6 border-t pt-4">
+            <a href="{{ route('provider.bookings.invoice', $booking) }}"
+               class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                <i class="fas fa-download"></i>
+                {{ __('messages.download_invoice') }}
+            </a>
         </div>
     </div>
 </div>

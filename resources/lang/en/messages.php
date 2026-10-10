@@ -1733,6 +1733,7 @@ return [
     'ads_learn_more'              => 'Learn More',
         'ads_link_example_label' => 'Open your service page, then copy the URL from browser (should start with /explore/service/). Example:',
     'download'      => 'Download',
+        'download_invoice' => 'Download Invoice',
 // ======================
 // TRAVELER REVIEW CREATE
 // ======================

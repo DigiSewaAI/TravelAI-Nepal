@@ -220,6 +220,7 @@ return [
     'paid_at' => 'भुगतान तिथि',
     'download_pdf' => 'PDF डाउनलोड करें',
         'download' => 'डाउनलोड',
+            'download_invoice' => 'इनवॉइस डाउनलोड करें',
     'back_to_invoices' => '← इनवॉइस पर वापस जाएँ',
     'invoice_pdf_title' => 'इनवॉइस :number',
     'powered_by' => 'द्वारा संचालित',

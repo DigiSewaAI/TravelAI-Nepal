@@ -218,6 +218,7 @@ return [
     'paid_at' => '付款于',
     'download_pdf' => '下载PDF',
         'download' => '下载',
+            'download_invoice' => '下载发票',
     'back_to_invoices' => '← 返回发票',
     'invoice_pdf_title' => '发票 :number',
     'powered_by' => '由...提供支持',
