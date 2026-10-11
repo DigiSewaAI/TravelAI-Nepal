@@ -13,7 +13,7 @@
     <title>@yield('title', __('messages.dashboard') . ' | TravelAI Nepal')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background: #f9fafb; }
         .sidebar-link { transition: all 0.2s ease; }
