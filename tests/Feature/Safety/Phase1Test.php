@@ -6,13 +6,14 @@ use App\Models\SafetySource;
 use App\Models\TravelSafetyIncident;
 use App\Models\Waypoint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class Phase1Test extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function safety_source_model_can_be_created()
     {
         $source = SafetySource::create([
@@ -29,7 +30,7 @@ class Phase1Test extends TestCase
         $this->assertEquals(0.8, $source->reliability_score);
     }
 
-    /** @test */
+    #[Test]
     public function incident_can_be_created_with_sources()
     {
         // ✅ Fix: provide all required fields for SafetySource
@@ -67,7 +68,7 @@ class Phase1Test extends TestCase
         $this->assertEquals('landslide', $incident->incident_type);
     }
 
-    /** @test */
+    #[Test]
     public function waypoint_gets_safety_status_via_trait()
     {
         $waypoint = Waypoint::create([
@@ -105,7 +106,7 @@ class Phase1Test extends TestCase
         $this->assertEquals('high_risk', $waypoint->fresh()->safety_status);
     }
 
-    /** @test */
+    #[Test]
     public function risk_scoring_service_works()
     {
         $service = app(\App\Services\Safety\RiskScoringService::class);

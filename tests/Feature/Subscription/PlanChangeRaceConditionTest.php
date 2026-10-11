@@ -7,6 +7,7 @@ use App\Models\Provider;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PlanChangeRaceConditionTest extends TestCase
@@ -44,7 +45,7 @@ class PlanChangeRaceConditionTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function upgrading_in_production_does_not_cancel_current_subscription(): void
     {
         // Debug env
@@ -103,7 +104,7 @@ class PlanChangeRaceConditionTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function upgrade_cleans_up_old_pending_subscriptions(): void
     {
         [$user, $provider] = $this->makeProvider();
