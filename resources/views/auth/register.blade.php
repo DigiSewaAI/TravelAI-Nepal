@@ -75,6 +75,11 @@
                     </ul>
                 </div>
             @endif
+@php
+    $defaultAccountType = old('account_type', request('account_type', 'traveler'));
+    $defaultPlan        = old('plan', request('plan', 'free'));
+    $isProvider         = $defaultAccountType === 'provider';
+@endphp
 
             <form method="POST" action="{{ route('register') }}" id="registerForm">
                 @csrf
@@ -84,25 +89,25 @@
                     <label class="block text-gray-700 text-sm font-bold mb-3">{{ __('messages.register_account_type_question') }}</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Traveler Card --}}
-                        <div class="account-card border rounded-xl p-4 text-center {{ old('account_type', 'traveler') === 'traveler' ? 'selected' : '' }}" data-account="traveler">
+                        <div class="account-card border rounded-xl p-4 text-center {{ $defaultAccountType === 'traveler' ? 'selected' : '' }}" data-account="traveler">
                             <div class="checkmark"><i class="fas fa-check"></i></div>
                             <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
                                 <i class="fas fa-user text-blue-600 text-xl"></i>
                             </div>
                             <h3 class="font-bold text-gray-800">🧳 {{ __('messages.register_traveler') }}</h3>
                             <p class="text-xs text-gray-500 mt-1">{{ __('messages.register_traveler_desc') }}</p>
-                            <input type="radio" name="account_type" value="traveler" {{ old('account_type', 'traveler') === 'traveler' ? 'checked' : '' }} class="hidden account-radio">
+                            <input type="radio" name="account_type" value="traveler" {{ $defaultAccountType === 'traveler' ? 'checked' : '' }} class="hidden account-radio">
                         </div>
 
                         {{-- Business/Provider Card --}}
-                        <div class="account-card border rounded-xl p-4 text-center {{ old('account_type') === 'provider' ? 'selected' : '' }}" data-account="provider">
+                        <div class="account-card border rounded-xl p-4 text-center {{ $defaultAccountType === 'provider' ? 'selected' : '' }}" data-account="provider">
                             <div class="checkmark"><i class="fas fa-check"></i></div>
                             <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2">
                                 <i class="fas fa-building text-green-600 text-xl"></i>
                             </div>
                             <h3 class="font-bold text-gray-800">🏢 {{ __('messages.register_business') }}</h3>
                             <p class="text-xs text-gray-500 mt-1">{{ __('messages.register_business_desc') }}</p>
-                            <input type="radio" name="account_type" value="provider" {{ old('account_type') === 'provider' ? 'checked' : '' }} class="hidden account-radio">
+                            <input type="radio" name="account_type" value="provider" {{ $defaultAccountType === 'provider' ? 'checked' : '' }} class="hidden account-radio">
                         </div>
                     </div>
                 </div>
@@ -141,7 +146,7 @@
                 </div>
 
                 {{-- ========== PROVIDER FIELDS ========== --}}
-                <div id="providerFields" class="{{ old('account_type') === 'provider' ? 'block' : 'hidden' }} mt-6 pt-6 border-t">
+                <div id="providerFields" class="{{ $defaultAccountType === 'provider' ? 'block' : 'hidden' }} mt-6 pt-6 border-t">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_name') }} *</label>
                         <input type="text" name="business_name" value="{{ old('business_name') }}"
@@ -192,13 +197,12 @@
                                         <span class="font-bold text-gray-800 block">{{ $plan->name }}</span>
                                         @if($plan->slug == 'enterprise')
                                             <span class="text-sm text-blue-600 block">{{ __('messages.contact_for_pricing') }}</span>
-                                        @elseif($plan->price_monthly === 0 || $plan->price_yearly === 0)
+                                        @elseif($plan->price_monthly == 0)
                                             <span class="text-sm text-green-600 block">{{ __('messages.free') }}</span>
                                         @else
                                             <span class="text-sm text-blue-600 block">
-                                                {{ session('display_currency', 'USD') === 'USD' ? '$' : 'Rs. ' }}
-                                                {{ number_format($plan->price_monthly, 0) }}/mo
-                                            </span>
+    Rs. {{ number_format($plan->price_monthly, 0) }}/{{ __('messages.per_month') }}
+</span>
                                         @endif
                                     </div>
                                 </label>
@@ -211,7 +215,7 @@
                 {{-- ========== SUBMIT BUTTON ========== --}}
                 <div class="mt-6">
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                        <span id="submitBtnText">{{ old('account_type', 'traveler') === 'traveler' ? __('messages.create_traveler_account') : __('messages.create_business_account') }}</span>
+                        <span id="submitBtnText">{{ $defaultAccountType === 'traveler' ? __('messages.create_traveler_account') : __('messages.create_business_account') }}</span>
                     </button>
                 </div>
             </form>
