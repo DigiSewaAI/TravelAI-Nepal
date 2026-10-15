@@ -758,6 +758,18 @@ return [
     'contact_form_message' => 'संदेश',
     'contact_form_message_placeholder' => 'अपना संदेश यहाँ लिखें...',
     'contact_form_submit' => 'संदेश भेजें',
+        'contact_form_success' => 'धन्यवाद! हमें आपका संदेश मिल गया है और 24 घंटे के भीतर जवाब देंगे।',
+    'contact_form_error' => 'क्षमा करें, कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
+    
+    // Enterprise Inquiry Form
+    'enterprise_form_company' => 'कंपनी का नाम',
+    'enterprise_form_person' => 'संपर्क व्यक्ति',
+    'enterprise_form_email' => 'ईमेल पता',
+    'enterprise_form_phone' => 'फ़ोन नंबर (वैकल्पिक)',
+    'enterprise_form_requirements' => 'हमें अपनी आवश्यकताओं के बारे में बताएं',
+    'enterprise_form_submit' => 'पूछताछ भेजें',
+    'enterprise_form_success' => 'धन्यवाद! हमारी टीम 24 घंटे के भीतर संपर्क करेगी।',
+    'enterprise_form_error' => 'क्षमा करें, कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
 
     // ======================
     // FEATURES PAGE (Hindi)

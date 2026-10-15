@@ -792,6 +792,18 @@ return [
     'contact_form_message' => 'सन्देश',
     'contact_form_message_placeholder' => 'तपाईंको सन्देश यहाँ लेख्नुहोस्...',
     'contact_form_submit' => 'सन्देश पठाउनुहोस्',
+        'contact_form_success' => 'धन्यवाद! हामीले तपाईंको सन्देश प्राप्त गर्यौं र 24 घण्टा भित्र जवाफ दिनेछौं।',
+    'contact_form_error' => 'क्षमा गर्नुहोस्, केही समस्या भयो। कृपया फेरि प्रयास गर्नुहोस्।',
+    
+    // Enterprise Inquiry Form
+    'enterprise_form_company' => 'कम्पनीको नाम',
+    'enterprise_form_person' => 'सम्पर्क व्यक्ति',
+    'enterprise_form_email' => 'इमेल ठेगाना',
+    'enterprise_form_phone' => 'फोन नम्बर (वैकल्पिक)',
+    'enterprise_form_requirements' => 'तपाईंको आवश्यकताहरू बताउनुहोस्',
+    'enterprise_form_submit' => 'सोधपुछ पठाउनुहोस्',
+    'enterprise_form_success' => 'धन्यवाद! हाम्रो टोलीले 24 घण्टा भित्र सम्पर्क गर्नेछ।',
+    'enterprise_form_error' => 'क्षमा गर्नुहोस्, केही समस्या भयो। कृपया फेरि प्रयास गर्नुहोस्।',
 
     // ======================
     // FEATURES PAGE

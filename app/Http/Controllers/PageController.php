@@ -110,4 +110,26 @@ class PageController extends Controller
     {
         return view('pages.gdpr');
     }
+        public function submitContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name'    => 'required|string|max:100',
+            'email'   => 'required|email|max:150',
+            'subject' => 'required|string|max:200',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to('support@travelainepal.com')
+                ->send(new \App\Mail\ContactInquiryMail($validated));
+
+            return back()->with('contact_success', __('messages.contact_form_success'));
+        } catch (\Throwable $e) {
+            \Log::error('Contact form submission failed', [
+                'email' => $validated['email'],
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('contact_error', __('messages.contact_form_error'))->withInput();
+        }
+    }
 }

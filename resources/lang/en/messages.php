@@ -756,7 +756,18 @@ return [
 'contact_form_message' => 'Message',
 'contact_form_message_placeholder' => 'Write your message here...',
 'contact_form_submit' => 'Send Message',
-
+    'contact_form_success' => 'Thank you! We received your message and will respond within 24 hours.',
+    'contact_form_error' => 'Sorry, something went wrong. Please try again.',
+    
+    // Enterprise Inquiry Form
+    'enterprise_form_company' => 'Company Name',
+    'enterprise_form_person' => 'Contact Person',
+    'enterprise_form_email' => 'Email Address',
+    'enterprise_form_phone' => 'Phone Number (optional)',
+    'enterprise_form_requirements' => 'Tell us about your requirements',
+    'enterprise_form_submit' => 'Send Inquiry',
+    'enterprise_form_success' => 'Thank you! Our team will contact you within 24 hours.',
+    'enterprise_form_error' => 'Sorry, something went wrong. Please try again.',
 // ======================
 // FEATURES PAGE
 // ======================

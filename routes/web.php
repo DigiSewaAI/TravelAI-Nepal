@@ -60,11 +60,17 @@ Route::get('/pricing', [PageController::class, 'pricing'])->name('pages.pricing'
 
 Route::get('/contact-sales', [\App\Http\Controllers\PublicPage\ContactSalesController::class, 'show'])
     ->name('public.contact-sales');
+    Route::post('/contact-sales', [\App\Http\Controllers\PublicPage\ContactSalesController::class, 'submit'])
+    ->name('public.contact-sales.submit')
+    ->middleware('throttle:5,60');
 // Footer Pages (Company & Legal)
 Route::get('/about', [PageController::class, 'about'])->name('pages.about');
 Route::get('/careers', [PageController::class, 'careers'])->name('pages.careers');
 Route::get('/press', [PageController::class, 'press'])->name('pages.press');
 Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact');
+Route::post('/contact', [PageController::class, 'submitContact'])
+    ->name('pages.contact.submit')
+    ->middleware('throttle:5,60');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/gdpr', [PageController::class, 'gdpr'])->name('pages.gdpr');

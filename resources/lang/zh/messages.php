@@ -757,6 +757,18 @@ return [
     'contact_form_message' => '消息',
     'contact_form_message_placeholder' => '在此写下您的消息...',
     'contact_form_submit' => '发送消息',
+        'contact_form_success' => '感谢您！我们已收到您的留言，将在24小时内回复。',
+    'contact_form_error' => '抱歉，出了点问题。请重试。',
+    
+    // Enterprise Inquiry Form
+    'enterprise_form_company' => '公司名称',
+    'enterprise_form_person' => '联系人',
+    'enterprise_form_email' => '电子邮件',
+    'enterprise_form_phone' => '电话号码（可选）',
+    'enterprise_form_requirements' => '请告诉我们您的需求',
+    'enterprise_form_submit' => '发送咨询',
+    'enterprise_form_success' => '感谢您！我们的团队将在24小时内与您联系。',
+    'enterprise_form_error' => '抱歉，出了点问题。请重试。',
 
     // ======================
     // FEATURES PAGE (Chinese)

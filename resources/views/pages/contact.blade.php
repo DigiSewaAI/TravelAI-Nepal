@@ -112,8 +112,12 @@
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
                 <i class="fas fa-envelope text-blue-600 text-2xl"></i>
                 <h3 class="font-bold text-gray-800 mt-2">{{ __('messages.contact_email_title') }}</h3>
-                <p class="text-gray-600">support@travelainepal.com</p>
-                <p class="text-gray-600">info@travelainepal.com</p>
+                <p class="text-gray-600">
+                    <a href="mailto:support@travelainepal.com" class="text-blue-600 hover:underline">support@travelainepal.com</a>
+                </p>
+                <p class="text-gray-600">
+                    <a href="mailto:info@travelainepal.com" class="text-blue-600 hover:underline">info@travelainepal.com</a>
+                </p>
             </div>
 
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
@@ -125,7 +129,9 @@
             <div class="bg-white rounded-xl shadow-md border p-6 hover:shadow-lg transition">
                 <i class="fas fa-phone-alt text-blue-600 text-2xl"></i>
                 <h3 class="font-bold text-gray-800 mt-2">{{ __('messages.contact_phone_title') }}</h3>
-                <p class="text-gray-600">+977-9761762036</p>
+                <p class="text-gray-600">
+                    <a href="tel:+977-9761762036" class="text-blue-600 hover:underline">+977-9761762036</a>
+                </p>
                 <p class="text-gray-500 text-sm">{{ __('messages.contact_phone_hours') }}</p>
             </div>
 
@@ -140,24 +146,59 @@
         {{-- Contact Form --}}
         <div class="bg-white rounded-xl shadow-md border p-8">
             <h3 class="text-xl font-bold text-gray-800 mb-4">{{ __('messages.contact_form_title') }}</h3>
-            <form action="mailto:support@travelainepal.com" method="POST" enctype="text/plain">
+
+            {{-- Success / Error Messages --}}
+            @if(session('contact_success'))
+                <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded mb-4">
+                    {{ session('contact_success') }}
+                </div>
+            @endif
+            @if(session('contact_error'))
+                <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-4">
+                    {{ session('contact_error') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-4">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('pages.contact.submit') }}" method="POST" class="space-y-4">
+                @csrf
+
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.contact_form_name') }}</label>
-                    <input type="text" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" name="name" value="{{ old('name') }}" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
+
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.contact_form_email') }}</label>
-                    <input type="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="email" name="email" value="{{ old('email') }}" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
+
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.contact_form_subject') }}</label>
-                    <input type="text" name="subject" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="{{ __('messages.contact_form_subject_placeholder') }}">
+                    <input type="text" name="subject" value="{{ old('subject') }}" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                           placeholder="{{ __('messages.contact_form_subject_placeholder') }}">
                 </div>
+
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.contact_form_message') }}</label>
-                    <textarea name="message" rows="5" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="{{ __('messages.contact_form_message_placeholder') }}"></textarea>
+                    <textarea name="message" rows="5" required
+                              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="{{ __('messages.contact_form_message_placeholder') }}">{{ old('message') }}</textarea>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition shadow-md">
+
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition shadow-md">
                     <i class="fas fa-paper-plane mr-2"></i> {{ __('messages.contact_form_submit') }}
                 </button>
             </form>
