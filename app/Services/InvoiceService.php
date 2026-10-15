@@ -97,8 +97,7 @@ class InvoiceService
         $email = $provider->contact_email ?? ($provider->user->email ?? null);
 
         if ($email) {
-            $pdf = $this->generatePdf($invoice);
-            Mail::to($email)->send(new InvoiceMail($invoice, $pdf));
+            Mail::to($email)->send(new InvoiceMail($invoice));
         }
     }
 

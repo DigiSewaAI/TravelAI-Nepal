@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -15,14 +16,9 @@ class InvoiceMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public Invoice $invoice;
-    public $pdf;
-
-    public function __construct(Invoice $invoice, $pdf)
-    {
-        $this->invoice = $invoice;
-        $this->pdf = $pdf;
-    }
+    public function __construct(
+        public Invoice $invoice
+    ) {}
 
     public function envelope(): Envelope
     {
@@ -36,7 +32,7 @@ class InvoiceMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.invoice',
             with: [
-                'invoice' => $this->invoice,
+                'invoice'  => $this->invoice,
                 'provider' => $this->invoice->provider,
             ]
         );
@@ -44,8 +40,16 @@ class InvoiceMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
+        // Generate PDF at queue-process time (serialization-safe)
+        $pdf = Pdf::loadView('invoices.pdf', [
+            'invoice'      => $this->invoice,
+            'provider'     => $this->invoice->provider,
+            'subscription' => $this->invoice->subscription,
+            'booking'      => $this->invoice->booking,
+        ]);
+
         return [
-            Attachment::fromData(fn() => $this->pdf->output(), 'invoice-' . $this->invoice->invoice_number . '.pdf')
+            Attachment::fromData(fn() => $pdf->output(), 'invoice-' . $this->invoice->invoice_number . '.pdf')
                 ->withMime('application/pdf'),
         ];
     }
