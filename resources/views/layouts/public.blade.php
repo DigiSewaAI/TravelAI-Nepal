@@ -136,10 +136,18 @@
 
     {{-- Google Analytics 4 --}}
     @if(config('services.ga4.measurement_id'))
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.ga4.measurement_id') }}"></script>
     <script>
+        // GA4 Consent Mode v2 — default denied until user accepts
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied'
+        });
+        window.__GA_ID = '{{ config('services.ga4.measurement_id') }}';
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.ga4.measurement_id') }}"></script>
+    <script>
         gtag('js', new Date());
         gtag('config', '{{ config('services.ga4.measurement_id') }}', {
             anonymize_ip: true,
@@ -418,5 +426,6 @@
     </script>
 
     @stack('scripts')
+    @include('components.cookie-banner')
 </body>
 </html>
