@@ -5,6 +5,7 @@ namespace App\Services\Passport;
 use App\Models\User;
 use App\Models\Achievement;
 use App\Models\UserAchievement;
+use App\Models\QrScan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

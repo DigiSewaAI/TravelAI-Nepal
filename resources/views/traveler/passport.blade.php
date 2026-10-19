@@ -161,7 +161,13 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 @foreach($achievements as $item)
                     <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 text-center border border-amber-200 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="text-3xl mb-1">{{ $item->achievement->icon ?? '🏅' }}</div>
+                        <div class="text-3xl mb-1">
+    @if($item->achievement->icon)
+        <i class="fa-solid {{ $item->achievement->icon }}"></i>
+    @else
+        🏅
+    @endif
+</div>
                         <div class="font-semibold text-sm text-gray-800">{{ $item->achievement->name }}</div>
                         <div class="text-[10px] text-gray-500">{{ $item->earned_at->format('M d, Y') }}</div>
                         <div class="text-xs text-amber-600 font-medium">+{{ $item->achievement->points }} XP</div>
