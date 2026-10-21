@@ -43,15 +43,16 @@ class ProfileController extends Controller
         abort(403, 'No provider found.');
     }
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'contact_email' => 'nullable|email|max:255',
-        'contact_phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:500',
-        'description' => 'nullable|string|max:2000',
-        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-    ]);
+$validated = $request->validate([
+    'name' => 'required|string|max:255',
+    'contact_email' => 'nullable|email|max:255',
+    'contact_phone' => 'nullable|string|max:20',
+    'website' => 'nullable|url|max:255',
+    'address' => 'nullable|string|max:500',
+    'description' => 'nullable|string|max:2000',
+    'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+]);
 
     // Logo upload — FIX-05 Phase 3: gate by custom_logo feature
 if ($request->hasFile('logo')) {
