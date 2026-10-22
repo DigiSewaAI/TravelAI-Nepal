@@ -505,7 +505,7 @@ class AiItineraryDraftController extends Controller
             }
 
             // 4K-F4: Update detail table duration if requested (category-aware)
-            if ($request->boolean('update_service_duration', false) && $insertedDays > 0) {
+            if (request()->boolean('update_service_duration', false) && $insertedDays > 0) {
                 if ($service->trekDetail) {
                     $service->trekDetail->update(['duration_days' => $insertedDays]);
                 } elseif ($service->tourDetail) {
