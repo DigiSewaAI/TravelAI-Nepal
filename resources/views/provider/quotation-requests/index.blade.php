@@ -38,7 +38,7 @@
                     <td class="px-6 py-4">{{ $req->traveler->name ?? 'Guest' }}</td>
                     <td class="px-6 py-4">{{ $req->traveler_input['destination'] ?? 'N/A' }}</td>
                     <td class="px-6 py-4">{{ $req->traveler_input['days'] ?? 'N/A' }}</td>
-                    <td class="px-6 py-4">${{ $req->traveler_input['budget'] ?? 'N/A' }}</td>
+                    <td class="px-6 py-4">NPR {{ number_format((float)($req->traveler_input['budget'] ?? 0), 2) }}</td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full 
                             @if($req->status == 'pending') bg-yellow-100 text-yellow-800

@@ -85,7 +85,7 @@
         <div class="grid grid-cols-2 gap-4">
             <div><strong>Destination:</strong> {{ $quotationRequest->traveler_input['destination'] ?? 'N/A' }}</div>
             <div><strong>Days:</strong> {{ $quotationRequest->traveler_input['days'] ?? 'N/A' }}</div>
-            <div><strong>Budget:</strong> ${{ $quotationRequest->traveler_input['budget'] ?? 'N/A' }}</div>
+            <div><strong>Budget:</strong> NPR {{ number_format((float)($quotationRequest->traveler_input['budget'] ?? 0), 2) }}</div>
             <div><strong>Style:</strong> {{ $quotationRequest->traveler_input['travel_style'] ?? 'N/A' }}</div>
             <div class="col-span-2">
                 <strong>Interests:</strong> {{ implode(', ', $quotationRequest->traveler_input['interests'] ?? []) ?: 'None' }}
