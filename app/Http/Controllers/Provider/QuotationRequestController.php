@@ -412,68 +412,86 @@ PROMPT;
             $content .= sprintf("GRAND TOTAL: %s %s\n\n", $currency, number_format($grandTotal, 2));
             }
 
-// ✅ NEW: Budget Comparison Section
+// ✅ NEW: Budget Comparison Section (FIX-CURRENCY-03)
 $travelerBudget = $quotationRequest->traveler_input['budget'] ?? null;
 if ($travelerBudget && is_numeric($travelerBudget) && $travelerBudget > 0) {
-    $budget = (float) $travelerBudget;
+    // FIX-CURRENCY-03: traveler_input['budget'] is stored in NPR (converted at planner stage).
+    // Convert to USD for apples-to-apples comparison with provider quote.
+    $currency   = $currency ?? 'USD';
+    $budgetNpr  = (float) $travelerBudget;
+    $usdRate    = (float) app(\App\Services\CurrencyService::class)->getLiveUsdRate();
     $finalTotal = (float) $grandTotal;
-    $difference = $finalTotal - $budget;
-    $percentDiff = round(($difference / $budget) * 100, 1);
 
     $content .= "BUDGET COMPARISON\n";
     $content .= "-----------------\n";
-    $content .= "Traveler's Budget: USD " . number_format($budget, 2) . "\n";
-    $content .= "Our Quotation:     USD " . number_format($finalTotal, 2) . "\n";
 
-    if ($finalTotal > $budget) {
-        $content .= sprintf("Difference:        +USD %s (%s%% over budget)\n\n",
-            number_format($difference, 2), $percentDiff);
-    } else {
-        $savings = abs($difference);
-        $content .= sprintf("Difference:        -USD %s (%s%% under budget)\n\n",
-            number_format($savings, 2), abs($percentDiff));
-    }
+    if ($usdRate > 0) {
+        $budgetUsd   = round($budgetNpr / $usdRate, 2);
+        $difference  = $finalTotal - $budgetUsd;
+        $percentDiff = $budgetUsd > 0 ? round(($difference / $budgetUsd) * 100, 1) : 0;
 
-    // ✅ Check if provider wrote custom note
-    $providerNote = trim($q['provider_budget_note'] ?? '');
+        $content .= sprintf("Traveler's Budget: NPR %s (approx. USD %s)\n",
+            number_format($budgetNpr, 2),
+            number_format($budgetUsd, 2));
+        $content .= sprintf("Our Quotation:     %s %s\n",
+            $currency,
+            number_format($finalTotal, 2));
 
-    if (!empty($providerNote)) {
-        // Provider को custom message
-        $content .= "📝 " . $providerNote . "\n\n";
-    } else {
-        // Automatic message (English only)
-        if ($finalTotal > $budget) {
-            if ($percentDiff <= 10) {
-                $content .= "📌 NOTE: Our quotation is slightly above your stated budget. We can discuss\n";
-                $content .= "   minor adjustments or payment flexibility to accommodate your needs.\n\n";
-            } elseif ($percentDiff <= 25) {
-                $content .= "📌 NOTE: Our quotation exceeds your budget by " . $percentDiff . "%. This reflects the\n";
-                $content .= "   quality and completeness of our package. We are open to discussing:\n";
-                $content .= "   • Alternative accommodation options\n";
-                $content .= "   • Adjusted service inclusions\n";
-                $content .= "   • Flexible payment terms\n\n";
-            } else {
-                $content .= "📌 NOTE: Our quotation significantly exceeds your budget (" . $percentDiff . "%). To\n";
-                $content .= "   accommodate your budget, we can customize this package by:\n";
-                $content .= "   • Using budget-tier accommodations\n";
-                $content .= "   • Reducing certain inclusions\n";
-                $content .= "   • Adjusting the itinerary scope\n";
-                $content .= "   Please contact us to discuss a tailored option.\n\n";
-            }
+        if ($finalTotal > $budgetUsd) {
+            $content .= sprintf("Difference:        +%s %s (%s%% over budget)\n\n",
+                $currency, number_format($difference, 2), $percentDiff);
         } else {
             $savings = abs($difference);
-            if ($savings == 0) {
-                $content .= "✅ GOOD NEWS: Our quotation matches your budget exactly. We look forward to\n";
-                $content .= "   providing you with an excellent trekking experience.\n\n";
-            } elseif ($percentDiff >= -15) {
-                $content .= "✅ GOOD NEWS: Our quotation fits comfortably within your budget. We will\n";
-                $content .= "   provide the full package as described, with high-quality service.\n\n";
+            $content .= sprintf("Difference:        -%s %s (%s%% under budget)\n\n",
+                $currency, number_format($savings, 2), abs($percentDiff));
+        }
+
+        // ✅ Check if provider wrote custom note
+        $providerNote = trim($q['provider_budget_note'] ?? '');
+
+        if (!empty($providerNote)) {
+            $content .= "📝 " . $providerNote . "\n\n";
+        } else {
+            // Automatic message (English only)
+            if ($finalTotal > $budgetUsd) {
+                if ($percentDiff <= 10) {
+                    $content .= "📌 NOTE: Our quotation is slightly above your stated budget. We can discuss\n";
+                    $content .= "   minor adjustments or payment flexibility to accommodate your needs.\n\n";
+                } elseif ($percentDiff <= 25) {
+                    $content .= "📌 NOTE: Our quotation exceeds your budget by " . $percentDiff . "%. This reflects the\n";
+                    $content .= "   quality and completeness of our package. We are open to discussing:\n";
+                    $content .= "   • Alternative accommodation options\n";
+                    $content .= "   • Adjusted service inclusions\n";
+                    $content .= "   • Flexible payment terms\n\n";
+                } else {
+                    $content .= "📌 NOTE: Our quotation significantly exceeds your budget (" . $percentDiff . "%). To\n";
+                    $content .= "   accommodate your budget, we can customize this package by:\n";
+                    $content .= "   • Using budget-tier accommodations\n";
+                    $content .= "   • Reducing certain inclusions\n";
+                    $content .= "   • Adjusting the itinerary scope\n";
+                    $content .= "   Please contact us to discuss a tailored option.\n\n";
+                }
             } else {
-                $content .= "✅ EXCELLENT NEWS: Our quotation is well within your budget (saving you USD " . number_format($savings, 2) . ").\n";
-                $content .= "   We can offer this complete package at the quoted price, or discuss\n";
-                $content .= "   upgrading certain services using the available budget difference.\n\n";
+                $savings = abs($difference);
+                if ($savings == 0) {
+                    $content .= "✅ GOOD NEWS: Our quotation matches your budget exactly. We look forward to\n";
+                    $content .= "   providing you with an excellent trekking experience.\n\n";
+                } elseif ($percentDiff >= -15) {
+                    $content .= "✅ GOOD NEWS: Our quotation fits comfortably within your budget. We will\n";
+                    $content .= "   provide the full package as described, with high-quality service.\n\n";
+                } else {
+                    $content .= "✅ EXCELLENT NEWS: Our quotation is well within your budget (saving you {$currency} " . number_format($savings, 2) . ").\n";
+                    $content .= "   We can offer this complete package at the quoted price, or discuss\n";
+                    $content .= "   upgrading certain services using the available budget difference.\n\n";
+                }
             }
         }
+    } else {
+        // Rate unavailable — show budget without comparison (graceful degradation)
+        $content .= sprintf("Traveler's Budget: NPR %s\n", number_format($budgetNpr, 2));
+        $content .= sprintf("Our Quotation:     %s %s\n\n",
+            $currency,
+            number_format($finalTotal, 2));
     }
 }
 
