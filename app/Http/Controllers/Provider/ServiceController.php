@@ -25,27 +25,35 @@ class ServiceController extends Controller
     use AuthorizesRequests;
 
     public function index()
-{
-    $provider = Auth::user()->ownProvider();
-    $services = $provider
-        ? $provider->services()->withCount('itineraryDays')->get()
-        : collect();
-    return view('provider.services.index', compact('services'));
-}
+    {
+        $provider = Auth::user()->ownProvider();
+        $services = $provider
+            ? $provider->services()->withCount('itineraryDays')->get()
+            : collect();
+        return view('provider.services.index', compact('services'));
+    }
 
-        public function create()
+    public function create()
     {
         $provider = Auth::user()->ownProvider();
         $providerType = $provider?->types()->first();
 
-        // 4M-3-2 REDO: Pivot-based allowed categories
-        $allowedCategories = $providerType
-            ? $providerType->serviceCategories
-            : collect();
+        // DYNAMIC-UI: Product Provider (Wholesale, Shop, Rental) लाई Service बनाउन नदिने
+        $productSlugs = ['shop-owner', 'rental-provider', 'wholesale-provider'];
+        if ($providerType && in_array($providerType->slug, $productSlugs)) {
+            return redirect()->route('provider.products.create')
+                ->with('info', 'Please create a Product instead of a Service.');
+        }
 
-        // Custom fallback (Q2): unmapped type = all allowed
-        if ($allowedCategories->isEmpty()) {
-            $allowedCategories = ServiceCategory::all();
+        // Product Category (shop, rental, wholesale) लाई Service को फर्मबाट हटाउने
+        $productCategorySlugs = ['shop', 'rental', 'wholesale'];
+
+        if ($providerType && $providerType->serviceCategories->isNotEmpty()) {
+            $allowedCategories = $providerType->serviceCategories->reject(function ($cat) use ($productCategorySlugs) {
+                return in_array($cat->slug, $productCategorySlugs);
+            });
+        } else {
+            $allowedCategories = ServiceCategory::whereNotIn('slug', $productCategorySlugs)->get();
         }
 
         $categories = $allowedCategories;
@@ -54,9 +62,8 @@ class ServiceController extends Controller
         return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType', 'locations'));
     }
 
-        public function store(Request $request)
+    public function store(Request $request)
     {
-        // FIX-15 D4: explicit create authorization
         $this->authorize('create', Service::class);
 
         $provider = Auth::user()->ownProvider();
@@ -65,7 +72,13 @@ class ServiceController extends Controller
             abort(403, 'No provider found.');
         }
 
-                $validated = $request->validate([
+        // DYNAMIC-UI: Product Provider ले सिधै URL बाट पनि Service बनाउन नपाउने
+        $providerTypeSlug = $provider->types()->first()?->slug;
+        if (in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider'])) {
+            abort(403, 'Product providers cannot create services.');
+        }
+
+        $validated = $request->validate([
             'name'                => 'required|string|max:255',
             'service_category_id' => 'required|exists:service_categories,id',
             'price'               => 'nullable|numeric|min:0',
@@ -75,21 +88,21 @@ class ServiceController extends Controller
             'status'              => 'nullable|in:active,inactive',
         ]);
 
-        // 4M-3-2 REDO (D6): Pivot-based category constraint
         $providerType = $provider->types()->first();
-        $allowedCategories = $providerType
-            ? $providerType->serviceCategories
-            : collect();
+        $allowedCategories = $providerType ? $providerType->serviceCategories : collect();
+        $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 
         if ($allowedCategories->isNotEmpty()) {
-            $allowedIds = $allowedCategories->pluck('id')->all();
+            $allowedIds = $allowedCategories->reject(function($cat) use ($productCategorySlugs) {
+                return in_array($cat->slug, $productCategorySlugs);
+            })->pluck('id')->all();
+            
             if (!in_array((int) $validated['service_category_id'], $allowedIds, true)) {
                 abort(403, __('messages.category_not_allowed'));
             }
         }
 
-        // Fast pre-check (non-atomic) — avoid file upload if clearly over limit
-        $quickMax = $provider->max_listings; // FIX-15 D5: uses helper
+        $quickMax = $provider->max_listings;
         if ($quickMax !== -1 && $quickMax !== null) {
             $quickCount = Service::where('provider_id', $provider->id)
                 ->where('status', 'active')
@@ -100,13 +113,11 @@ class ServiceController extends Controller
             }
         }
 
-        // File upload (outside transaction)
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('services', 'public');
             $validated['cover_image'] = $path;
         }
 
-                // Phase 4M-2-3+4: Category detection + detail validation
         $category = ServiceCategory::find($validated['service_category_id']);
         $slug     = $category ? $category->slug : '';
         $detailData = $this->validateDetailFields($request, $slug);
@@ -120,22 +131,19 @@ class ServiceController extends Controller
         $effectiveMax = 0;
 
         try {
-                        DB::transaction(function () use ($provider, $validated, $slug, $detailData, &$limitReached, &$effectiveMax) {
-                // FIX-15 D1: atomic row lock on provider to serialize concurrent creations
+            DB::transaction(function () use ($provider, $validated, $slug, $detailData, &$limitReached, &$effectiveMax) {
                 $lockedProvider = Provider::where('id', $provider->id)
                     ->lockForUpdate()
                     ->first();
 
                 $max = $lockedProvider->max_listings;
 
-                // Enterprise unlimited: -1 means no limit
                 if ($max === -1 || $max === null) {
                     $max = PHP_INT_MAX;
                 }
 
                 $effectiveMax = $max;
 
-                // FIX-15 D2: active-only counting (unchanged behavior, now documented)
                 $activeCount = Service::where('provider_id', $lockedProvider->id)
                     ->where('status', 'active')
                     ->count();
@@ -145,7 +153,7 @@ class ServiceController extends Controller
                     return;
                 }
 
-                                $service = Service::create($validated);
+                $service = Service::create($validated);
                 $this->upsertDetailRecord($service, $slug, $detailData);
             });
         } catch (\Throwable $e) {
@@ -176,9 +184,6 @@ class ServiceController extends Controller
             ->with('success', 'Service created successfully.');
     }
 
-    /**
-     * Phase 4M-2-3+4: Validate category-specific detail fields.
-     */
     private function validateDetailFields(Request $request, string $slug): array
     {
         return match ($slug) {
@@ -224,9 +229,6 @@ class ServiceController extends Controller
         };
     }
 
-    /**
-     * Phase 4M-2-3+4: Upsert category-specific detail record.
-     */
     private function upsertDetailRecord(Service $service, string $slug, array $data): void
     {
         if ($slug === 'hotel' && isset($data['amenities']) && is_string($data['amenities'])) {
@@ -235,12 +237,10 @@ class ServiceController extends Controller
             ));
         }
 
-        // Normalize transport: booleans + hours→minutes
         if ($slug === 'transport') {
             $data['ac_available']    = !empty($data['ac_available']);
             $data['driver_included'] = !empty($data['driver_included']);
             $data['fuel_included']   = !empty($data['fuel_included']);
-            // Convert form hours to storage minutes
             if (isset($data['duration_hours'])) {
                 $data['duration_minutes'] = (int) round($data['duration_hours'] * 60);
                 unset($data['duration_hours']);
@@ -258,9 +258,6 @@ class ServiceController extends Controller
         };
     }
 
-    /**
-     * FIX-15: Shared limit-reached response (preserves original UX message).
-     */
     protected function limitReachedResponse(int $maxServices)
     {
         return back()
@@ -271,25 +268,24 @@ class ServiceController extends Controller
             ->withInput();
     }
 
-        public function edit(Service $service)
+    public function edit(Service $service)
     {
         $this->authorize('update', $service);
 
         $provider = Auth::user()->ownProvider();
         $providerType = $provider?->types()->first();
+        $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 
-        // 4M-3-2 REDO: Pivot-based allowed categories
-        $allowedCategories = $providerType
-            ? $providerType->serviceCategories
-            : collect();
-
-        if ($allowedCategories->isEmpty()) {
-            $allowedCategories = ServiceCategory::all();
+        if ($providerType && $providerType->serviceCategories->isNotEmpty()) {
+            $allowedCategories = $providerType->serviceCategories->reject(function ($cat) use ($productCategorySlugs) {
+                return in_array($cat->slug, $productCategorySlugs);
+            });
+        } else {
+            $allowedCategories = ServiceCategory::whereNotIn('slug', $productCategorySlugs)->get();
         }
 
         $categories = $allowedCategories;
 
-        // Legacy detection: service in disallowed category
         $allowedIds = $allowedCategories->pluck('id')->all();
         $isLegacy = !in_array((int) $service->service_category_id, $allowedIds, true);
         $currentCategory = ServiceCategory::find($service->service_category_id);
@@ -303,56 +299,54 @@ class ServiceController extends Controller
     }
 
     public function update(Request $request, Service $service)
-{
-    $this->authorize('update', $service);
+    {
+        $this->authorize('update', $service);
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'service_category_id' => 'required|exists:service_categories,id',
-        'price' => 'nullable|numeric|min:0',
-        'currency' => 'required|in:USD,NPR',  // ✅ Added
-        'description' => 'nullable|string',
-        'cover_image' => 'nullable|image|max:2048',
-                                'status' => 'nullable|in:active,inactive',
-    ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'service_category_id' => 'required|exists:service_categories,id',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'required|in:USD,NPR',
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|image|max:2048',
+            'status' => 'nullable|in:active,inactive',
+        ]);
 
-    // 4M-3-2 REDO (D6 + D4): Pivot constraint with legacy bypass
-    $provider = Auth::user()->ownProvider();
-    $providerType = $provider?->types()->first();
-    $allowedCategories = $providerType
-        ? $providerType->serviceCategories
-        : collect();
+        $provider = Auth::user()->ownProvider();
+        $providerType = $provider?->types()->first();
+        $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 
-    if ($allowedCategories->isNotEmpty()) {
-        $allowedIds = $allowedCategories->pluck('id')->all();
-        $submittedId = (int) $validated['service_category_id'];
+        if ($providerType && $providerType->serviceCategories->isNotEmpty()) {
+            $allowedIds = $providerType->serviceCategories->reject(function($cat) use ($productCategorySlugs) {
+                return in_array($cat->slug, $productCategorySlugs);
+            })->pluck('id')->all();
 
-        if (!in_array($submittedId, $allowedIds, true)) {
-            // Legacy bypass: unchanged disallowed category = allow
-            $isLegacyUnchanged = (int) $service->service_category_id === $submittedId;
-            if (!$isLegacyUnchanged) {
-                abort(403, __('messages.category_not_allowed'));
+            $submittedId = (int) $validated['service_category_id'];
+
+            if (!in_array($submittedId, $allowedIds, true)) {
+                $isLegacyUnchanged = (int) $service->service_category_id === $submittedId;
+                if (!$isLegacyUnchanged) {
+                    abort(403, __('messages.category_not_allowed'));
+                }
             }
         }
-    }
 
-    // Phase 4M-2-3+4: Category detection + detail validation
-    $category   = ServiceCategory::find($validated['service_category_id']);
-    $slug       = $category ? $category->slug : '';
-    $detailData = $this->validateDetailFields($request, $slug);
+        $category   = ServiceCategory::find($validated['service_category_id']);
+        $slug       = $category ? $category->slug : '';
+        $detailData = $this->validateDetailFields($request, $slug);
 
-    if ($request->hasFile('cover_image')) {
-        if ($service->cover_image) {
-            \Storage::disk('public')->delete($service->cover_image);
+        if ($request->hasFile('cover_image')) {
+            if ($service->cover_image) {
+                \Storage::disk('public')->delete($service->cover_image);
+            }
+            $path = $request->file('cover_image')->store('services', 'public');
+            $validated['cover_image'] = $path;
         }
-        $path = $request->file('cover_image')->store('services', 'public');
-        $validated['cover_image'] = $path;
-    }
 
-                $service->update($validated);
-    $this->upsertDetailRecord($service, $slug, $detailData);
+        $service->update($validated);
+        $this->upsertDetailRecord($service, $slug, $detailData);
 
-    return redirect()->route('provider.services.index')->with('success', 'Service updated successfully.');
+        return redirect()->route('provider.services.index')->with('success', 'Service updated successfully.');
     }
 
     public function destroy(Service $service)

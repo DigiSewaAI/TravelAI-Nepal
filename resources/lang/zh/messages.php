@@ -1062,6 +1062,10 @@ return [
     'view_bookings' => '查看预订',
     'manage_checkins' => '管理登记 (QR)',
     'view_payments' => '查看付款和发票',
+        'actions' => '操作',
+    'cancel' => '取消',
+    'save' => '保存更改',
+    'create' => '创建',
 
 // ======================
 // PRICING

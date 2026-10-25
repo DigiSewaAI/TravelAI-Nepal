@@ -1061,6 +1061,10 @@ return [
     'view_bookings' => 'View Bookings',
     'manage_checkins' => 'Manage Check-ins (QR)',
     'view_payments' => 'View Payments & Invoices',
+        'actions' => 'Actions',
+    'cancel' => 'Cancel',
+    'save' => 'Save Changes',
+    'create' => 'Create',
 
 // ======================
 // PRICING

@@ -28,24 +28,36 @@
         @endif
     </div>
 
-    {{-- Filter tabs --}}
+    {{-- Filter tabs (Dynamic based on Provider Type) --}}
+    @php
+        $providerTypeSlug = auth()->user()->getCurrentProvider()?->types->first()?->slug;
+    @endphp
     <div class="flex gap-2 mb-4 border-b pb-2 overflow-x-auto">
         <a href="{{ route('provider.products.index') }}"
            class="px-3 py-1.5 text-sm rounded-lg {{ !$type ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
             {{ __('messages.products_filter_all') }} ({{ $counts['all'] }})
         </a>
+
+        @if($providerTypeSlug === 'shop-owner' || !$providerTypeSlug)
         <a href="{{ route('provider.products.index', ['type' => 'shop']) }}"
            class="px-3 py-1.5 text-sm rounded-lg {{ $type === 'shop' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
             {{ __('messages.products_filter_shop') }} ({{ $counts['shop'] }})
         </a>
+        @endif
+
+        @if($providerTypeSlug === 'rental-provider' || !$providerTypeSlug)
         <a href="{{ route('provider.products.index', ['type' => 'rental']) }}"
            class="px-3 py-1.5 text-sm rounded-lg {{ $type === 'rental' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
             {{ __('messages.products_filter_rental') }} ({{ $counts['rental'] }})
         </a>
+        @endif
+
+        @if($providerTypeSlug === 'wholesale-provider' || !$providerTypeSlug)
         <a href="{{ route('provider.products.index', ['type' => 'wholesale']) }}"
            class="px-3 py-1.5 text-sm rounded-lg {{ $type === 'wholesale' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
             {{ __('messages.products_filter_wholesale') }} ({{ $counts['wholesale'] }})
         </a>
+        @endif
     </div>
 
     @if($products->count() > 0)

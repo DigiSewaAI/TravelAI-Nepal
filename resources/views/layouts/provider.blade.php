@@ -68,6 +68,13 @@
                 </div>
             @endif
 
+            {{-- DYNAMIC-UI: Provider Type Logic --}}
+            @php
+                $currentProvider = auth()->user()->getCurrentProvider();
+                $providerTypeSlug = $currentProvider?->types->first()?->slug;
+                $isProductProvider = in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider']);
+            @endphp
+
                         <!-- Navigation -->
             <nav class="flex-1 space-y-1">
                 <!-- Dashboard (सबैले देख्ने) -->
@@ -87,10 +94,21 @@
                         @endif
                     </a>
 
+                    <!-- Services (Only for Service Providers) -->
+                    @if(!$isProductProvider)
                     <a href="{{ route('provider.services.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
                         <i class="fas fa-list w-5"></i>
                         <span>{{ __('messages.services') }}</span>
                     </a>
+                    @endif
+
+                    <!-- Products (Only for Product Providers) -->
+                    @if($isProductProvider)
+                    <a href="{{ route('provider.products.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.products.*') ? 'active' : '' }}">
+                        <i class="fas fa-box w-5"></i>
+                        <span>{{ __('messages.products') ?? 'Products' }}</span>
+                    </a>
+                    @endif
 
                     <a href="{{ route('provider.quotation.create') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
                         <i class="fas fa-file-invoice-dollar w-5"></i>
@@ -273,6 +291,33 @@
 
             <!-- 🔥 Main Content – Flash Messages REMOVED from Layout -->
             <main class="flex-1 overflow-y-auto p-6">
+                
+                {{-- KYC Verification Alert --}}
+                @php
+                    $currentProvider = auth()->user()->getCurrentProvider();
+                    $needsVerification = $currentProvider && $currentProvider->verification_status !== 'verified';
+                @endphp
+
+                @if($needsVerification)
+                <div id="kycAlert" class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-xl shadow-sm relative flex items-start gap-3 transition-all duration-300">
+                    <div class="flex-shrink-0 pt-0.5">
+                        <i class="fas fa-exclamation-triangle text-amber-500 text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-amber-800">Account Unverified</h3>
+                        <p class="text-sm text-amber-700 mt-1">Your account is currently unverified. Please upload your KYC documents to start selling.</p>
+                        <div class="mt-3 flex gap-3">
+                            <a href="{{ route('provider.verification.index') }}" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm inline-flex items-center gap-2">
+                                <i class="fas fa-shield-alt"></i> Verify Now
+                            </a>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('kycAlert').style.display='none'" class="text-amber-400 hover:text-amber-600 transition-colors p-1" title="Dismiss">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>

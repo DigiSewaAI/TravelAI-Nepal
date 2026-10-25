@@ -66,12 +66,28 @@ class ProductController extends Controller
                 ->with('error', __('messages.product_limit_reached', ['max' => $provider->max_products]));
         }
 
-        $type = $request->query('type', 'shop');
+        // DYNAMIC-UI: Provider Type अनुसार default Product Type फेर्ने
+        $providerTypeSlug = $provider->types->first()?->slug;
+        $defaultType = match($providerTypeSlug) {
+            'rental-provider' => 'rental',
+            'wholesale-provider' => 'wholesale',
+            default => 'shop',
+        };
+
+        $type = $request->query('type', $defaultType);
         if (!in_array($type, ['shop', 'rental', 'wholesale'])) {
-            $type = 'shop';
+            $type = $defaultType;
         }
 
-        return view('provider.products.create', compact('type', 'provider'));
+        // नयाँ थपिएको कोड: सही प्रकार मात्र पास गर्ने
+        $allowedTypes = match($providerTypeSlug) {
+            'wholesale-provider' => ['wholesale'],
+            'rental-provider' => ['rental'],
+            'shop-owner' => ['shop'],
+            default => ['shop', 'rental', 'wholesale'],
+        };
+
+        return view('provider.products.create', compact('type', 'provider', 'allowedTypes'));
     }
 
     public function store(Request $request)
@@ -91,7 +107,7 @@ class ProductController extends Controller
             'description'  => 'nullable|string|max:5000',
             'price'        => 'required|numeric|min:0',
             'currency'     => 'required|string|size:3',
-            'cover_image'  => 'nullable|string|max:255',
+            'cover_image'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'status'       => 'required|in:active,inactive',
             'location_id'  => 'nullable|exists:locations,id',
         ];
@@ -118,6 +134,12 @@ class ProductController extends Controller
         });
 
         $validated = $request->validate($rules);
+
+        // ✅ File Upload Logic for Product Image (New)
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('products', 'public');
+            $validated['cover_image'] = $path;
+        }
 
         DB::transaction(function () use ($provider, $validated, $type) {
             $locked = Provider::lockForUpdate()->find($provider->id);
@@ -201,7 +223,7 @@ class ProductController extends Controller
             'description' => 'nullable|string|max:5000',
             'price'       => 'required|numeric|min:0',
             'currency'    => 'required|string|size:3',
-            'cover_image' => 'nullable|string|max:255',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'status'      => 'required|in:active,inactive',
             'location_id' => 'nullable|exists:locations,id',
         ];
@@ -228,6 +250,19 @@ class ProductController extends Controller
         });
 
         $validated = $request->validate($rules);
+
+        // ✅ File Upload Logic for Update (New)
+        if ($request->hasFile('cover_image')) {
+            // पुरानो फोटो डिलिट गर्ने
+            if ($product->cover_image) {
+                \Storage::disk('public')->delete($product->cover_image);
+            }
+            $path = $request->file('cover_image')->store('products', 'public');
+            $validated['cover_image'] = $path;
+        } else {
+            // यदि नयाँ फोटो अपलोड गरिएको छैन भने पुरानै फोटो राख्ने
+            $validated['cover_image'] = $product->cover_image;
+        }
 
         DB::transaction(function () use ($product, $validated, $type) {
             $product->update([

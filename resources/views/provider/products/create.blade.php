@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('provider.products.store') }}">
+    <form method="POST" action="{{ route('provider.products.store') }}" enctype="multipart/form-data">
         @csrf
 
         <div class="space-y-4">
@@ -32,14 +32,24 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('messages.product_type') }} *</label>
                 <div class="flex gap-4">
-                    @foreach(['shop', 'rental', 'wholesale'] as $t)
+                    @if(in_array('shop', $allowedTypes ?? []))
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="product_type" value="{{ $t }}"
-                                   data-type-toggle
-                                   {{ old('product_type', $type) === $t ? 'checked' : '' }}>
-                            <span>{{ __('messages.product_type_' . $t) }}</span>
+                            <input type="radio" name="product_type" value="shop" data-type-toggle {{ old('product_type', $type) === 'shop' ? 'checked' : '' }}>
+                            <span>{{ __('messages.product_type_shop') }}</span>
                         </label>
-                    @endforeach
+                    @endif
+                    @if(in_array('rental', $allowedTypes ?? []))
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="product_type" value="rental" data-type-toggle {{ old('product_type', $type) === 'rental' ? 'checked' : '' }}>
+                            <span>{{ __('messages.product_type_rental') }}</span>
+                        </label>
+                    @endif
+                    @if(in_array('wholesale', $allowedTypes ?? []))
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="product_type" value="wholesale" data-type-toggle {{ old('product_type', $type) === 'wholesale' ? 'checked' : '' }}>
+                            <span>{{ __('messages.product_type_wholesale') }}</span>
+                        </label>
+                    @endif
                 </div>
             </div>
 
@@ -75,9 +85,9 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.product_cover_image') }}</label>
-                <input type="text" name="cover_image" value="{{ old('cover_image') }}" maxlength="255"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="path/to/image.jpg">
+                <input type="file" name="cover_image" accept="image/*"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG, WEBP · Max 5MB</p>
             </div>
 
             <div>
@@ -109,11 +119,11 @@
         <div class="flex justify-end gap-3 mt-6">
             <a href="{{ route('provider.products.index') }}"
                class="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-                {{ __('messages.cancel') ?? 'Cancel' }}
+                {{ __('messages.cancel') }}
             </a>
             <button type="submit"
                     class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                {{ __('messages.save') ?? 'Save' }}
+                {{ __('messages.products_create_btn') }}
             </button>
         </div>
     </form>
@@ -128,8 +138,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSections() {
         const selected = document.querySelector('[data-type-toggle]:checked');
         const type = selected ? selected.value : 'shop';
+        
         sections.forEach(sec => {
-            sec.style.display = (sec.dataset.typeSection === type) ? 'block' : 'none';
+            const isActive = sec.dataset.typeSection === type;
+            
+            // Show/Hide section
+            sec.style.display = isActive ? 'block' : 'none';
+            
+            // Disable/Enable inputs inside to bypass HTML5 validation on hidden fields
+            const inputs = sec.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.disabled = !isActive;
+            });
         });
     }
 
