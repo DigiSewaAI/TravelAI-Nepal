@@ -8,7 +8,8 @@ class PlannerRequest extends Model
 {
     protected $fillable = [
         'user_id', 'session_id', 'route_id', 'destination',
-        'days', 'budget', 'travel_style', 'interests'
+        'days', 'budget', 'travel_style', 'interests', 'currency',
+'exchange_rate_snapshot',
     ];
 
     protected $casts = [

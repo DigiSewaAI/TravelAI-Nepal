@@ -28,6 +28,8 @@ class QuotationRequest extends Model
         'edited_at',
         'sent_at',
         'edited_by',
+        'currency',
+'exchange_rate_snapshot',
     ];
 
     protected $casts = [
@@ -37,6 +39,7 @@ class QuotationRequest extends Model
         'quotation_final' => 'array',
         'sent_at' => 'datetime',
         'edited_at' => 'datetime',
+        'exchange_rate_snapshot' => 'decimal:6',
     ];
 
     // Relationships

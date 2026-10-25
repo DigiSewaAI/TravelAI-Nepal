@@ -39,28 +39,33 @@ class PlannerController extends Controller
                 'fitness_level' => 'nullable|in:easy,moderate,hard',
             ]);
 
-            // ✅ session बाट लिइएको locale पास गर्ने
-           // PHASE E1-BUDGET: Convert session-currency budget → NPR
-           $input = $request->all();
-           $sessionCurrency = session('display_currency', 'USD');
+            $input = $request->all();
 
-           if ($sessionCurrency === 'USD') {
-               $currencyService = app(\App\Services\CurrencyService::class);
-               $input['budget'] = (int) round(
-                   $currencyService->convert(
-                       (float) $request->input('budget'),
-                       'USD',
-                       'NPR'
-                   )
-               );
-           }
-           // Else: budget already NPR — pass as-is
+            // ✅ CURRENCY-CONVERSION-02: Convert session-currency budget -> NPR
+            $currency = strtoupper(session('display_currency', 'USD'));
+            $currencyService = app(\App\Services\CurrencyService::class);
+            
+            if ($currency === 'USD') {
+                $rate = $currencyService->getLiveUsdRate();
+                $input['budget'] = (int) round(
+                    $currencyService->convert(
+                        (float) $request->input('budget'),
+                        'USD',
+                        'NPR'
+                    )
+                );
+                $input['currency'] = 'USD';
+                $input['exchange_rate_snapshot'] = $rate;
+            } else {
+                $input['currency'] = 'NPR';
+                $input['exchange_rate_snapshot'] = 1.0;
+            }
 
-           $result = $this->planner->generate($input, $locale);
+            $result = $this->planner->generate($input, $locale);
 
-// PHASE 5B: LLM narrative enrichment (R5 SAFE — PlannerService untouched)
-$result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
-    ->enrichCollection($result['days'], $locale, $request->input('destination'));
+            // PHASE 5B: LLM narrative enrichment (R5 SAFE — PlannerService untouched)
+            $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
+                ->enrichCollection($result['days'], $locale, $request->input('destination'));
 
             // PHASE-5G-PADDING: honest banner for auto-added rest days
             $meta          = $result['metadata'] ?? [];
@@ -103,7 +108,7 @@ $result['days'] = app(\App\Services\AI\PlannerNarrativeService::class)
                 'success' => false,
                 'errors' => $e->errors(),
             ], 422);
-                } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again.',
