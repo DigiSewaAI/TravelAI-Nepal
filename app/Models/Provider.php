@@ -80,10 +80,12 @@ class Provider extends Model
         'website',
         'verification_status',
         'is_active',
+        'is_demo',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_demo'   => 'boolean',
     ];
 
     // =====================================================

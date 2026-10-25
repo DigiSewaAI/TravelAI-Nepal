@@ -49,6 +49,11 @@
             @endif
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ $provider->name }}</h1>
+                @if($provider->is_demo)
+    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 mt-2">
+        Demo / Preview Profile
+    </span>
+@endif
                 <div class="flex flex-wrap gap-2 mt-1">
                     @foreach($provider->types as $type)
                         <span class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full">

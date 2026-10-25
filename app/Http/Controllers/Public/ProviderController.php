@@ -34,7 +34,8 @@ class ProviderController extends Controller
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-
+        // Demo Labeling: Real providers (is_demo=0) पहिले, Demo (is_demo=1) पछि
+        $query->orderBy('is_demo', 'asc');
         // 🔥 Sorting
         $sort = $request->get('sort', 'latest');
         switch ($sort) {

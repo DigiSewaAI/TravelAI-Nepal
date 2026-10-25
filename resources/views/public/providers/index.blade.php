@@ -127,6 +127,11 @@
 
         <div class="flex-1 min-w-0">
             <h3 class="font-bold text-white drop-shadow-lg truncate text-shadow">{{ $provider->name }}</h3>
+            @if($provider->is_demo)
+    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 mt-2">
+        Demo / Preview Profile
+    </span>
+@endif
             <div class="flex flex-wrap gap-1 mt-1">
                 @foreach($provider->types as $type)
                     <span class="text-xs bg-white/20 backdrop-blur-sm text-white px-2 py-0.5 rounded-full">
