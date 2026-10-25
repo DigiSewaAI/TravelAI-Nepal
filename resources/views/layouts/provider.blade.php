@@ -68,142 +68,129 @@
                 </div>
             @endif
 
-            <!-- Navigation -->
+                        <!-- Navigation -->
             <nav class="flex-1 space-y-1">
-                <!-- Dashboard -->
+                <!-- Dashboard (सबैले देख्ने) -->
                 <a href="{{ route('provider.dashboard') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-chart-line w-5"></i>
                     <span>{{ __('messages.dashboard') }}</span>
                 </a>
 
-                <!-- SOS Alerts (Phase 2 — provider safety notifications) -->
-                <a href="{{ route('provider.sos-alerts.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.sos-alerts.*') ? 'active' : '' }}">
-                    <i class="fas fa-exclamation-triangle text-red-500 w-5 text-center"></i>
-                    <span class="flex-1">{{ __('messages.sos_alerts_menu') }}</span>
-                    @if(isset($unreadSosCount) && $unreadSosCount > 0)
-                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            {{ $unreadSosCount }}
-                        </span>
+                <!-- === OWNER ONLY MENUS === -->
+                @if(auth()->user()->isProviderOwner())
+                    <a href="{{ route('provider.sos-alerts.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.sos-alerts.*') ? 'active' : '' }}">
+                        <i class="fas fa-exclamation-triangle text-red-500 w-5 text-center"></i>
+                        <span class="flex-1">{{ __('messages.sos_alerts_menu') }}</span>
+                        @if(isset($unreadSosCount) && $unreadSosCount > 0)
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $unreadSosCount }}</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('provider.services.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
+                        <i class="fas fa-list w-5"></i>
+                        <span>{{ __('messages.services') }}</span>
+                    </a>
+
+                    <a href="{{ route('provider.quotation.create') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
+                        <i class="fas fa-file-invoice-dollar w-5"></i>
+                        <span>AI Quotation</span>
+                    </a>
+
+                    <a href="{{ route('provider.quotation-requests.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation-requests.*') ? 'active' : '' }}">
+                        <i class="fas fa-inbox w-5"></i>
+                        <span>Quotation Requests</span>
+                        @php
+                            $pendingCount = 0;
+                            if (Auth::check() && Auth::user()->getCurrentProvider()) {
+                                $pendingCount = \App\Models\QuotationRequest::where('provider_id', Auth::user()->getCurrentProvider()->id)->where('status', 'pending')->count();
+                            }
+                        @endphp
+                        @if($pendingCount > 0)
+                            <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('provider.subscriptions.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}">
+                        <i class="fas fa-crown w-5"></i>
+                        <span>{{ __('messages.subscriptions') }}</span>
+                    </a>
+
+                    <a href="{{ route('provider.ads.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.ads.*') ? 'active' : '' }}">
+                        <i class="fas fa-bullhorn text-amber-500 w-5 text-center"></i>
+                        <span class="flex-1">{{ __('messages.ads_menu') }}</span>
+                    </a>
+
+                    <a href="{{ route('provider.verification.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>{{ __('messages.verification') }}</span>
+                    </a>
+
+                    @if(Route::has('provider.settings.payment-methods.index'))
+                    <a href="{{ route('provider.settings.payment-methods.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.settings.payment-methods.*') ? 'active' : '' }}">
+                        <i class="fas fa-wallet w-5"></i>
+                        <span>{{ __('messages.pm_page_title') }}</span>
+                    </a>
                     @endif
-                </a>
 
-                <!-- Services -->
-                <a href="{{ route('provider.services.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
-                    <i class="fas fa-list w-5"></i>
-                    <span>{{ __('messages.services') }}</span>
-                </a>
+                    @if(Route::has('provider.invoices.index'))
+                    <a href="{{ route('provider.invoices.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.invoices.*') ? 'active' : '' }}">
+                        <i class="fas fa-file-invoice w-5"></i>
+                        <span>{{ __('messages.invoices') }}</span>
+                    </a>
+                    @endif
 
-                <a href="{{ route('provider.quotation.create') }}"
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
-    <i class="fas fa-file-invoice-dollar w-5"></i>
-    <span>AI Quotation</span>
-</a>
+                    @if(Auth::check() && Auth::user()->ownProvider()?->hasFeature('full_analytics'))
+                    <a href="{{ route('provider.analytics.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span>{{ __('messages.analytics') }}</span>
+                    </a>
+                    @endif
+                @endif
+                <!-- === END OWNER ONLY MENUS === -->
 
-<!-- Quotation Requests -->
-<a href="{{ route('provider.quotation-requests.index') }}"
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation-requests.*') ? 'active' : '' }}">
-    <i class="fas fa-inbox w-5"></i>
-    <span>Quotation Requests</span>
-    @php
-        $pendingCount = 0;
-        if (Auth::check() && Auth::user()->getCurrentProvider()) {
-            $pendingCount = \App\Models\QuotationRequest::where('provider_id', Auth::user()->getCurrentProvider()->id)
-                            ->where('status', 'pending')->count();
-        }
-    @endphp
-    @if($pendingCount > 0)
-        <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
-    @endif
-</a>                <!-- Bookings -->
-                <a href="{{ route('provider.bookings.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
+                <!-- === PERMISSION GATED MENUS === -->
+                @if(auth()->user()->hasPermission('view_bookings'))
+                <a href="{{ route('provider.bookings.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>{{ __('messages.bookings') }}</span>
                 </a>
+                @endif
 
-                <!-- Subscriptions (Phase 8) -->
-                <a href="{{ route('provider.subscriptions.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}">
-                    <i class="fas fa-crown w-5"></i>
-                    <span>{{ __('messages.subscriptions') }}</span>
-                </a>
-                <!-- My Ads (paid promotion) -->
-                <a href="{{ route('provider.ads.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.ads.*') ? 'active' : '' }}">
-                    <i class="fas fa-bullhorn text-amber-500 w-5 text-center"></i>
-                    <span class="flex-1">{{ __('messages.ads_menu') }}</span>
-                </a>
-                <!-- Verification (Phase 8) -->
-                <a href="{{ route('provider.verification.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}">
-                    <i class="fas fa-shield-alt w-5"></i>
-                    <span>{{ __('messages.verification') }}</span>
-                </a>
-
-                                <!-- Payments (Phase 9) -->
-                <a href="{{ route('provider.payments.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.payments.index') || request()->routeIs('provider.payments.detail') || request()->routeIs('provider.payments.show') ? 'active' : '' }}">
+                @if(auth()->user()->hasPermission('view_payments'))
+                <a href="{{ route('provider.payments.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.payments.index') || request()->routeIs('provider.payments.detail') || request()->routeIs('provider.payments.show') ? 'active' : '' }}">
                     <i class="fas fa-credit-card w-5"></i>
                     <span>{{ __('messages.payments') }}</span>
                 </a>
-
-                <!-- PHASE 7E.1b — Payment Methods Settings -->
-                @if(Route::has('provider.settings.payment-methods.index'))
-                <a href="{{ route('provider.settings.payment-methods.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.settings.payment-methods.*') ? 'active' : '' }}">
-                    <i class="fas fa-wallet w-5"></i>
-                    <span>{{ __('messages.pm_page_title') }}</span>
-                </a>
                 @endif
 
-                <!-- Invoices (Phase 13) -->
-                @if(Route::has('provider.invoices.index'))
-                <a href="{{ route('provider.invoices.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.invoices.*') ? 'active' : '' }}">
-                    <i class="fas fa-file-invoice w-5"></i>
-                    <span>{{ __('messages.invoices') }}</span>
+                @if(auth()->user()->hasPermission('manage_checkins'))
+                <a href="{{ route('provider.checkins.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
+                    <i class="fas fa-qrcode w-5"></i>
+                    <span>{{ __('messages.checkins') }}</span>
                 </a>
                 @endif
+                <!-- === END PERMISSION GATED MENUS === -->
 
-                <!-- Profile -->
-                <a href="{{ route('provider.profile') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
+                <!-- Profile (सबैले देख्ने) -->
+                <a href="{{ route('provider.profile') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.profile') ? 'active' : '' }}">
                     <i class="fas fa-user w-5"></i>
                     <span>{{ __('messages.profile') }}</span>
                 </a>
 
-                <!-- Team (Staff Management) -->
-                <a href="{{ route('provider.staff.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
+                <!-- Team (Owner Only) -->
+                @if(auth()->user()->isProviderOwner())
+                <a href="{{ route('provider.staff.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
                     <i class="fas fa-users w-5"></i>
                     <span>Team</span>
                 </a>
+                @endif
 
-                {{-- Analytics (Phase 11) — FIX-05 Phase 3: feature-gated --}}
-@if(Auth::check() && Auth::user()->ownProvider()?->hasFeature('full_analytics'))
-<a href="{{ route('provider.analytics.index') }}"
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.analytics.*') ? 'active' : '' }}">
-    <i class="fas fa-chart-bar w-5"></i>
-    <span>{{ __('messages.analytics') }}</span>
-</a>
-@endif
-
-                <!-- Check-ins (Phase 12) -->
-                <a href="{{ route('provider.checkins.index') }}"
-                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
-                    <i class="fas fa-qrcode w-5"></i>
-                    <span>{{ __('messages.checkins') }}</span>
+                <!-- Safety (सबैले देख्ने) -->
+                <a href="{{ route('safety.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-shield-alt w-5"></i>
+                    <span>{{ __('messages.safety') }}</span>
                 </a>
-
-                <!-- Safety (Phase 6) -->
-<a href="{{ route('safety.index') }}"
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
-    <i class="fas fa-shield-alt w-5"></i>
-        <span>{{ __('messages.safety') }}</span>
-</a>
             </nav>
 
             <!-- Logout -->
@@ -369,5 +356,6 @@
             });
         });
     </script>
+    @stack('scripts')
 </body>
 </html>

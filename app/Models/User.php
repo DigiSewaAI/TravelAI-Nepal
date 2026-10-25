@@ -227,6 +227,18 @@ class User extends Authenticatable
     {
         return in_array($providerId, $this->accessibleProviderIds());
     }
+        public function hasPermission(string $permission): bool
+    {
+        if ($this->isProviderOwner() || $this->isSuperAdmin()) return true;
+        if (!$this->isStaff()) return false;
+        
+        $staff = $this->staffMemberships()->first();
+        if (!$staff || empty($staff->permissions)) return false;
+        
+        $permissions = (array) $staff->permissions;
+        // 'all' (Full A-Z) छ भने सबै पर्मिशन दिने
+        return in_array('all', $permissions) || in_array($permission, $permissions);
+    }
 
     // =====================================================
     // ADDITIONAL HELPERS

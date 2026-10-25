@@ -135,7 +135,7 @@ class StaffController extends Controller
         return view('provider.staff.edit', compact('staff'));
     }
 
-    /**
+        /**
      * Update a staff member's details.
      */
     public function update(Request $request, ProviderStaff $staff)
@@ -144,12 +144,18 @@ class StaffController extends Controller
         $this->authorize('update', $staff);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'role' => 'nullable|string|max:255',
+            'name'        => 'required|string|max:255',
+            'role'        => 'nullable|string|max:255',
+            'permissions' => 'nullable|array',
         ]);
 
         $staff->user->update(['name' => $validated['name']]);
-        $staff->update(['role' => $validated['role'] ?? $staff->role]);
+        
+        // Permissions सहित अपडेट गर्ने
+        $staff->update([
+            'role'        => $validated['role'] ?? $staff->role,
+            'permissions' => $request->input('permissions', []),
+        ]);
 
         return redirect()->route('provider.staff.index')
             ->with('success', 'Staff updated successfully.');

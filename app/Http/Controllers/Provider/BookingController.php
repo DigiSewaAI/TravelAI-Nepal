@@ -19,7 +19,8 @@ class BookingController extends Controller
 
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        // FIX: Staff ले पनि बुकिङ हेर्न पाउनको लागि getCurrentProvider() प्रयोग गरियो
+        $provider = Auth::user()->getCurrentProvider();
 
         if (!$provider) {
             abort(403, 'No provider found.');
@@ -84,69 +85,69 @@ class BookingController extends Controller
     }
 
     public function updateStatus(Request $request, Booking $booking)
-{
-    $this->authorize('update', $booking);
+    {
+        $this->authorize('update', $booking);
 
-    $request->validate([
-        'status' => 'required|in:pending,confirmed,completed,cancelled,rejected',
-    ]);
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,completed,cancelled,rejected',
+        ]);
 
-    $newStatus = $request->status;
+        $newStatus = $request->status;
 
         DB::transaction(function () use ($booking, $newStatus) {
-    // PROVIDER-ITINERARY-09B-04: Canonical lock order
-    // Departure lock FIRST if this booking is departure-bound.
-    $departureId = Booking::where('id', $booking->id)->value('departure_id');
-    if ($departureId !== null) {
-        \App\Models\Departure::where('id', $departureId)->lockForUpdate()->first();
+            // PROVIDER-ITINERARY-09B-04: Canonical lock order
+            // Departure lock FIRST if this booking is departure-bound.
+            $departureId = Booking::where('id', $booking->id)->value('departure_id');
+            if ($departureId !== null) {
+                \App\Models\Departure::where('id', $departureId)->lockForUpdate()->first();
+            }
+
+            $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
+
+            $oldStatus = $locked->status;
+
+            if ($oldStatus === $newStatus) {
+                return;  // idempotent no-op
+            }
+
+            if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
+                throw new \DomainException(
+                    "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
+                );
+            }
+
+            $wasCancelled = in_array($oldStatus, ['cancelled', 'rejected'], true);
+            $nowCancelled = in_array($newStatus, ['cancelled', 'rejected'], true);
+
+            $locked->status = $newStatus;
+            $locked->save();
+
+            if (!$wasCancelled && $nowCancelled) {
+                app(\App\Services\BookingLimitService::class)->release(
+                    $locked->service->provider,
+                    $locked->quota_month
+                );
+            }
+
+            $bookingId = $locked->id;
+            $providerId = $locked->service->provider_id;
+            $oldStatusCapture = $oldStatus;
+            $newStatusCapture = $newStatus;
+
+            DB::afterCommit(function () use ($bookingId, $providerId, $oldStatusCapture, $newStatusCapture) {
+                Log::info('Booking status transitioned', [
+                    'booking_id'  => $bookingId,
+                    'provider_id' => $providerId,
+                    'old_status'  => $oldStatusCapture,
+                    'new_status'  => $newStatusCapture,
+                ]);
+            });
+        });
+
+        if ($booking->fresh()->traveler) {
+            $booking->fresh()->traveler->notify(new BookingStatusUpdated($booking->fresh()));
+        }
+
+        return back()->with('success', 'Booking status updated and traveler notified.');
     }
-
-    $locked = Booking::where('id', $booking->id)->lockForUpdate()->first();
-
-    $oldStatus = $locked->status;
-
-    if ($oldStatus === $newStatus) {
-        return;  // idempotent no-op
-    }
-
-    if (!\App\Support\BookingStatusTransitions::canTransition($oldStatus, $newStatus)) {
-        throw new \DomainException(
-            "Cannot transition from '{$oldStatus}' to '{$newStatus}'."
-        );
-    }
-
-    $wasCancelled = in_array($oldStatus, ['cancelled', 'rejected'], true);
-    $nowCancelled = in_array($newStatus, ['cancelled', 'rejected'], true);
-
-        $locked->status = $newStatus;
-    $locked->save();
-
-    if (!$wasCancelled && $nowCancelled) {
-        app(\App\Services\BookingLimitService::class)->release(
-            $locked->service->provider,
-            $locked->quota_month
-        );
-    }
-
-    $bookingId = $locked->id;
-    $providerId = $locked->service->provider_id;
-    $oldStatusCapture = $oldStatus;
-    $newStatusCapture = $newStatus;
-
-    DB::afterCommit(function () use ($bookingId, $providerId, $oldStatusCapture, $newStatusCapture) {
-        Log::info('Booking status transitioned', [
-            'booking_id'  => $bookingId,
-            'provider_id' => $providerId,
-            'old_status'  => $oldStatusCapture,
-            'new_status'  => $newStatusCapture,
-        ]);
-    });
-});
-
-    if ($booking->fresh()->traveler) {
-        $booking->fresh()->traveler->notify(new BookingStatusUpdated($booking->fresh()));
-    }
-
-    return back()->with('success', 'Booking status updated and traveler notified.');
-}
 }
