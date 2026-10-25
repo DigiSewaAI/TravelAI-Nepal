@@ -69,9 +69,8 @@
         'addressCountry' => 'NP',
     ],
     'sameAs' => [
-        'https://twitter.com/travelainepal',
-        'https://www.instagram.com/travelainepal',
-        'https://github.com/travelainepal',
+        'https://facebook.com/travelainepal',
+        'https://youtube.com/@travelainepal',
     ],
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
@@ -322,57 +321,74 @@
     </main>
 
     <!-- ======================= FOOTER ======================= -->
-    <footer class="bg-white border-t border-gray-200 pt-4 pb-8 px-6 md:px-10">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-            <!-- Logo + text -->
-            <div>
-                                <a href="{{ url('/') }}" class="flex items-center gap-2">
+    <footer class="bg-gray-900 text-gray-400 pt-14 pb-8 px-6 md:px-10 font-sans border-t border-gray-800">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
+            
+            <!-- Logo + text (Takes 4 columns) -->
+            <div class="md:col-span-4 flex flex-col items-start">
+                <a href="{{ url('/') }}" class="flex items-center gap-2 group">
                     <img src="{{ asset('images/logo.png') }}"
                          alt="{{ __('messages.app_name') }}"
-                         class="h-10 sm:h-12 w-auto flex-shrink-0"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl text-blue-600\'></i>'">
-                    <span class="font-bold text-sm sm:text-base text-gray-800 leading-tight">{{ __('messages.app_name') }}</span>
+                         class="h-10 sm:h-12 w-auto flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-2xl text-blue-500\'></i>'">
+                    <span class="font-bold text-lg text-white leading-tight tracking-wide">{{ __('messages.app_name') }}</span>
                 </a>
-                <p class="text-sm text-gray-500 mt-8">{{ __('messages.footer_tagline') }}</p>
-                <div class="flex space-x-4 mt-2">
-                    <i class="fab fa-twitter text-gray-400 hover:text-blue-500"></i>
-                    <i class="fab fa-instagram text-gray-400 hover:text-pink-500"></i>
-                    <i class="fab fa-github text-gray-400 hover:text-gray-800"></i>
+                
+                <!-- max-w-xs ले text लाई 2-3 line मा wrap गराउँछ, right तिर बग्न दिँदैन -->
+                <p class="text-sm text-gray-400 mt-5 max-w-[280px] leading-relaxed">
+                    {{ __('messages.footer_tagline') }}
+                </p>
+                
+                <!-- Social Icons with smooth scale hover -->
+                <div class="flex space-x-4 mt-6">
+                    <a href="https://facebook.com/travelainepal" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-300 hover:-translate-y-1">
+                        <i class="fab fa-facebook text-lg"></i>
+                    </a>
+                    <a href="https://youtube.com/@travelainepal" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all duration-300 hover:-translate-y-1">
+                        <i class="fab fa-youtube text-lg"></i>
+                    </a>
                 </div>
             </div>
 
-            <div>
-            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.product') }}</h4>
-                <ul class="mt-3 space-y-2 text-sm text-gray-500">
-                    <li><a href="{{ route('pages.features') }}" class="hover:text-blue-600">{{ __('messages.features') }}</a></li>
-                    <li><a href="{{ route('pages.pricing') }}" class="hover:text-blue-600">{{ __('messages.pricing') }}</a></li>
-                    <li><a href="{{ route('public.providers.index') }}" class="hover:text-blue-600">{{ __('messages.providers') }}</a></li>
-                    <li><a href="{{ route('public.wholesale.index') }}" class="hover:text-blue-600">{{ __('messages.nav_wholesale') }}</a></li>
-                    <li><a href="{{ route('safety.index') }}" class="hover:text-blue-600">🛡️ {{ __('messages.travel_safety') }}</a></li>
-                    <li><a href="{{ route('register') }}" class="hover:text-blue-600">{{ __('messages.become_partner') }}</a></li>
+            <!-- Product (Takes 2 columns) -->
+            <div class="md:col-span-2">
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wider">{{ __('messages.product') }}</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="{{ route('pages.features') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.features') }}</a></li>
+                    <li><a href="{{ route('pages.pricing') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.pricing') }}</a></li>
+                    <li><a href="{{ route('public.providers.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.providers') }}</a></li>
+                    <li><a href="{{ route('public.wholesale.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.nav_wholesale') }}</a></li>
+                    <li><a href="{{ route('safety.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300"><i class="fas fa-shield-alt mr-1 text-blue-500"></i> {{ __('messages.travel_safety') }}</a></li>
                 </ul>
             </div>
 
-            <div>
-            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.company') }}</h4>
-                <ul class="mt-3 space-y-2 text-sm text-gray-500">
-                    <li><a href="{{ route('pages.about') }}" class="hover:text-blue-600">{{ __('messages.about_nepal_trek') }}</a></li>
-                    <li><a href="{{ route('pages.careers') }}" class="hover:text-blue-600">{{ __('messages.careers') }}</a></li>
-                    <li><a href="{{ route('pages.press') }}" class="hover:text-blue-600">{{ __('messages.press') }}</a></li>
-                    <li><a href="{{ route('pages.contact') }}" class="hover:text-blue-600">{{ __('messages.contact_us') }}</a></li>
+            <!-- Company (Takes 3 columns) -->
+            <div class="md:col-span-3">
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wider">{{ __('messages.company') }}</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="{{ route('pages.about') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.about_nepal_trek') }}</a></li>
+                    <li><a href="{{ route('pages.careers') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.careers') }}</a></li>
+                    <li><a href="{{ route('pages.press') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.press') }}</a></li>
+                    <li><a href="{{ route('pages.contact') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.contact_us') }}</a></li>
+                    <!-- Become Partner moved here -->
+                    <li><a href="{{ route('register') }}" class="text-blue-400 font-semibold hover:text-blue-300 hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.become_partner') }} &rarr;</a></li>
                 </ul>
             </div>
 
-            <div>
-            <h4 class="font-bold text-gray-800 mb-3">{{ __('messages.legal') }}</h4>
-                <ul class="mt-3 space-y-2 text-sm text-gray-500">
-                    <li><a href="{{ route('pages.privacy') }}" class="hover:text-blue-600">{{ __('messages.privacy_policy') }}</a></li>
-                    <li><a href="{{ route('pages.terms') }}" class="hover:text-blue-600">{{ __('messages.terms_service') }}</a></li>
-                    <li><a href="{{ route('pages.gdpr') }}" class="hover:text-blue-600">{{ __('messages.gdpr_data_safety') }}</a></li>
+            <!-- Legal (Takes 3 columns) -->
+            <div class="md:col-span-3">
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wider">{{ __('messages.legal') }}</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="{{ route('pages.privacy') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.privacy_policy') }}</a></li>
+                    <li><a href="{{ route('pages.terms') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.terms_service') }}</a></li>
+                    <li><a href="{{ route('pages.gdpr') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.gdpr_data_safety') }}</a></li>
                 </ul>
             </div>
+            
         </div>
-        <div class="border-t border-gray-200 mt-6 pt-6 text-center text-xs text-gray-400">
+        
+        <!-- Copyright Bar -->
+        <div class="max-w-7xl mx-auto border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-500">
             {{ __('messages.footer_copyright', ['year' => date('Y')]) }}
         </div>
     </footer>
