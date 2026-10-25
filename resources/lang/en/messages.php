@@ -1041,6 +1041,26 @@ return [
 // Demo labeling (PROVIDER-DEMO-LABELING-01)
 'demo_label' => 'Demo / Preview',
 'demo_profile_label' => 'Demo / Preview Profile',
+    // --- NEW UI TRANSLATIONS ---
+    'welcome_back' => 'Welcome back',
+    'dashboard_subtitle' => 'Here is what\'s happening with your business today.',
+    'status' => 'Status',
+    'left' => 'left',
+    'of_this_month' => 'of :limit this month',
+    'line_chart' => 'Line',
+    'bar_chart' => 'Bar',
+    'pie_chart' => 'Pie',
+    'view_all' => 'View All',
+    'view_map' => 'View Map',
+    'view' => 'View',
+    'checked_in_at' => 'Checked-in at',
+    'checkin_map_overview' => 'Check-in Map Overview',
+    'staff_access_permissions' => 'Staff Access Permissions',
+    'select_modules' => 'Select which modules this staff member can access.',
+    'full_access' => 'Full Access (A-Z)',
+    'view_bookings' => 'View Bookings',
+    'manage_checkins' => 'Manage Check-ins (QR)',
+    'view_payments' => 'View Payments & Invoices',
 
 // ======================
 // PRICING

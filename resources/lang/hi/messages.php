@@ -1043,6 +1043,26 @@ return [
 // Demo labeling (PROVIDER-DEMO-LABELING-01)
 'demo_label' => 'डेमो / पूर्वावलोकन',
 'demo_profile_label' => 'डेमो / पूर्वावलोकन प्रोफ़ाइल',
+    // --- NEW UI TRANSLATIONS ---
+    'welcome_back' => 'वापसी पर स्वागत है',
+    'dashboard_subtitle' => 'यहाँ देखें कि आज आपके व्यवसाय में क्या हो रहा है।',
+    'status' => 'स्थिति',
+    'left' => 'शेष',
+    'of_this_month' => 'इस महीने के :limit में से',
+    'line_chart' => 'लाइन',
+    'bar_chart' => 'बार',
+    'pie_chart' => 'पाई',
+    'view_all' => 'सभी देखें',
+    'view_map' => 'नक्शा देखें',
+    'view' => 'देखें',
+    'checked_in_at' => 'चेक-इन किया गया',
+    'checkin_map_overview' => 'चेक-इन नक्शा अवलोकन',
+    'staff_access_permissions' => 'स्टाफ एक्सेस अनुमतियां',
+    'select_modules' => 'चुनें कि यह स्टाफ सदस्य किन मॉड्यूल तक पहुंच सकता है।',
+    'full_access' => 'पूर्ण पहुंच (A-Z)',
+    'view_bookings' => 'बुकिंग देखें',
+    'manage_checkins' => 'चेक-इन प्रबंधित करें (QR)',
+    'view_payments' => 'भुगतान और चालान देखें',
 
 // ======================
 // PRICING

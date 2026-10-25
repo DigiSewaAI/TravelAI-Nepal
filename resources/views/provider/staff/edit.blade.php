@@ -1,11 +1,11 @@
 @extends('layouts.provider')
 
-@section('title', 'Edit Staff Member')
-@section('header', 'Edit Staff')
+@section('title', __('messages.edit_staff_title'))
+@section('header', __('messages.edit_staff_header'))
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">Edit Staff Member</h2>
+    <h2 class="text-2xl font-bold mb-4">{{ __('messages.edit_staff_title') }}</h2>
 
     @if(session('error'))
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
@@ -13,7 +13,7 @@
             @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
                 <br>
                 <a href="{{ route('provider.subscriptions.index') }}" class="text-blue-600 hover:text-blue-800 font-medium underline inline-block mt-1">
-                    <i class="fas fa-arrow-up"></i> Upgrade Your Plan
+                    <i class="fas fa-arrow-up"></i> {{ __('messages.upgrade_plan') }}
                 </a>
             @endif
         </div>
@@ -30,34 +30,34 @@
         @method('PUT')
 
         <div class="mb-4">
-            <label class="block font-medium mb-1">Full Name *</label>
+            <label class="block font-medium mb-1">{{ __('messages.full_name') }} *</label>
             <input type="text" name="name" class="w-full border rounded-lg px-4 py-2" value="{{ old('name', $staff->user->name) }}" required>
             @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="mb-4">
-            <label class="block font-medium mb-1">Email</label>
+            <label class="block font-medium mb-1">{{ __('messages.email') }}</label>
             <p class="text-gray-600">{{ $staff->user->email }}</p>
-            <p class="text-xs text-gray-400">Email cannot be changed.</p>
+            <p class="text-xs text-gray-400">{{ __('messages.email_cannot_be_changed') }}</p>
         </div>
 
         <div class="mb-4">
-            <label class="block font-medium mb-1">Role (optional)</label>
-            <input type="text" name="role" class="w-full border rounded-lg px-4 py-2" value="{{ old('role', $staff->role) }}" placeholder="e.g., Manager, Guide">
+            <label class="block font-medium mb-1">{{ __('messages.role_optional') }}</label>
+            <input type="text" name="role" class="w-full border rounded-lg px-4 py-2" value="{{ old('role', $staff->role) }}" placeholder="{{ __('messages.role_placeholder') }}">
             @error('role') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         <!-- STAFF-PERMISSIONS-02: Access Control -->
         <div class="mb-6 border-t pt-4">
-            <label class="block font-bold text-lg mb-2 text-gray-800">Staff Access Permissions</label>
-            <p class="text-sm text-gray-500 mb-4">Select which modules this staff member can access.</p>
+            <label class="block font-bold text-lg mb-2 text-gray-800">{{ __('messages.staff_access_permissions') }}</label>
+            <p class="text-sm text-gray-500 mb-4">{{ __('messages.select_modules') }}</p>
             
             @php
                 $currentPermissions = $staff->permissions ?? [];
                 $availablePermissions = [
-                    'view_bookings'   => 'View Bookings',
-                    'manage_checkins' => 'Manage Check-ins (QR)',
-                    'view_payments'   => 'View Payments & Invoices',
+                    'view_bookings'   => __('messages.view_bookings'),
+                    'manage_checkins' => __('messages.manage_checkins'),
+                    'view_payments'   => __('messages.view_payments'),
                 ];
                 $hasAllAccess = in_array('all', $currentPermissions);
             @endphp
@@ -68,7 +68,7 @@
                     <input type="checkbox" name="permissions[]" value="all" id="all_access"
                            class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                            {{ $hasAllAccess ? 'checked' : '' }}>
-                    <span class="font-bold text-blue-800">Full Access (A-Z)</span>
+                    <span class="font-bold text-blue-800">{{ __('messages.full_access') }}</span>
                 </label>
 
                 <!-- SPECIFIC PERMISSIONS -->
@@ -83,9 +83,9 @@
         </div>
 
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
-            Update Staff
+            {{ __('messages.update_staff') }}
         </button>
-        <a href="{{ route('provider.staff.index') }}" class="ml-2 text-gray-600 hover:underline">Cancel</a>
+        <a href="{{ route('provider.staff.index') }}" class="ml-2 text-gray-600 hover:underline">{{ __('messages.cancel') }}</a>
     </form>
 </div>
 

@@ -89,9 +89,10 @@
             // Add Marker
             const marker = L.marker([lat, lng]).addTo(map);
             
+            // 👇 यहाँ 'Checkpoint' लाई __('messages.checkpoint') ले फेरिएको छ
             const popupContent = `
                 <div class="text-sm font-sans text-center">
-                    <strong>${@json($scan->checkpoint_name ?? 'Checkpoint')}</strong><br>
+                    <strong>${@json($scan->checkpoint_name ?? __('messages.checkpoint'))}</strong><br>
                     <span class="text-gray-500">${new Date(@json($scan->scanned_at)).toLocaleString()}</span>
                 </div>
             `;

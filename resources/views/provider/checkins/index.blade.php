@@ -37,7 +37,7 @@
         <!-- Map Container -->
         <div class="mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <i class="fas fa-map-marked-alt text-blue-500"></i> Check-in Map Overview
+                <i class="fas fa-map-marked-alt text-blue-500"></i> {{ __('messages.checkin_map_overview') }}
             </h3>
             <!-- relative z-0 ले नक्सालाई साइडबारको माथि नआउन दिन्छ -->
             <div id="checkinsMap" class="w-full h-96 rounded-xl border border-gray-200 relative z-0"></div>
@@ -110,6 +110,10 @@
             const markers = [];
             const checkinsData = @json($checkins->items());
 
+            // 👇 यहाँ ट्रान्सलेसनको लागि भेरिएबल राखिएको छ
+            const guestText = @json(__('messages.guest'));
+            const checkpointText = @json(__('messages.checkpoint') ?? 'Checkpoint');
+
             checkinsData.forEach(function(scan) {
                 if (scan.latitude && scan.longitude) {
                     const lat = parseFloat(scan.latitude);
@@ -119,8 +123,8 @@
                     
                     const popupContent = `
                         <div class="text-sm font-sans">
-                            <strong>${scan.booking?.traveler?.name || 'Guest'}</strong><br>
-                            <span class="text-gray-500">${scan.checkpoint_name || 'Checkpoint'}</span><br>
+                            <strong>${scan.booking?.traveler?.name || guestText}</strong><br>
+                            <span class="text-gray-500">${scan.checkpoint_name || checkpointText}</span><br>
                             <small class="text-gray-400">${new Date(scan.scanned_at).toLocaleString()}</small>
                         </div>
                     `;

@@ -1079,6 +1079,26 @@ return [
 // Demo labeling (PROVIDER-DEMO-LABELING-01)
 'demo_label' => 'डेमो / पूर्वावलोकन',
 'demo_profile_label' => 'डेमो / पूर्वावलोकन प्रोफाइल',
+    // --- NEW UI TRANSLATIONS ---
+    'welcome_back' => 'स्वागत छ',
+    'dashboard_subtitle' => 'आज तपाईंको व्यवसायमा के भइरहेको छ, यहाँ हेर्नुहोस्।',
+    'status' => 'स्थिति',
+    'left' => 'बाँकी',
+    'of_this_month' => 'यो महिनाको :limit मध्ये',
+    'line_chart' => 'लाइन',
+    'bar_chart' => 'बार',
+    'pie_chart' => 'पाई',
+    'view_all' => 'सबै हेर्नुहोस्',
+    'view_map' => 'नक्सा हेर्नुहोस्',
+    'view' => 'हेर्नुहोस्',
+    'checked_in_at' => 'चेक-इन गरिएको',
+    'checkin_map_overview' => 'चेक-इन नक्सा अवलोकन',
+    'staff_access_permissions' => 'स्टाफ पहुँच अनुमतिहरू',
+    'select_modules' => 'यो स्टाफ सदस्यले कुन-कुन मोड्युलमा पहुँच पाउने हो छान्नुहोस्।',
+    'full_access' => 'पूर्ण पहुँच (A-Z)',
+    'view_bookings' => 'बुकिङ हेर्नुहोस्',
+    'manage_checkins' => 'चेक-इन व्यवस्थापन (QR)',
+    'view_payments' => 'भुक्तानी र इनभ्वाइस हेर्नुहोस्',
 
     // ======================
     // PRICING

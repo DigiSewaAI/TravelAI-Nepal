@@ -1042,6 +1042,26 @@ return [
 // Demo labeling (PROVIDER-DEMO-LABELING-01)
 'demo_label' => '演示 / 预览',
 'demo_profile_label' => '演示 / 预览资料',
+    // --- NEW UI TRANSLATIONS ---
+    'welcome_back' => '欢迎回来',
+    'dashboard_subtitle' => '以下是您今天业务的最新动态。',
+    'status' => '状态',
+    'left' => '剩余',
+    'of_this_month' => '本月限额 :limit',
+    'line_chart' => '折线图',
+    'bar_chart' => '柱状图',
+    'pie_chart' => '饼图',
+    'view_all' => '查看全部',
+    'view_map' => '查看地图',
+    'view' => '查看',
+    'checked_in_at' => '登记于',
+    'checkin_map_overview' => '登记地图概览',
+    'staff_access_permissions' => '员工访问权限',
+    'select_modules' => '选择该员工可以访问的模块。',
+    'full_access' => '完全访问权限 (A-Z)',
+    'view_bookings' => '查看预订',
+    'manage_checkins' => '管理登记 (QR)',
+    'view_payments' => '查看付款和发票',
 
 // ======================
 // PRICING

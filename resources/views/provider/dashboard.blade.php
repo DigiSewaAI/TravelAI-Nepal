@@ -12,16 +12,16 @@
     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h2 class="text-3xl font-black mb-1 flex items-center gap-2 text-white">
-                Welcome back, {{ $provider->name ?? Auth::user()->name }}! 👋
+                {{ __('messages.welcome_back') }}, {{ $provider->name ?? Auth::user()->name }}! 👋
             </h2>
-            <p class="text-blue-100 font-medium">Here is what's happening with your business today.</p>
+            <p class="text-blue-100 font-medium">{{ __('messages.dashboard_subtitle') }}</p>
         </div>
         <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
                 <i class="fas fa-shield-alt text-xl"></i>
             </div>
             <div>
-                <p class="text-xs text-blue-200 font-semibold uppercase tracking-wider">Status</p>
+                <p class="text-xs text-blue-200 font-semibold uppercase tracking-wider">{{ __('messages.status') }}</p>
                 <p class="font-bold text-white">{{ ucfirst($provider->verification_status ?? 'Active') }}</p>
             </div>
         </div>
@@ -68,14 +68,14 @@
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <i class="fas fa-robot text-6xl"></i>
         </div>
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">🤖 AI Requests</p>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">🤖 {{ __('messages.ai_requests') }}</p>
         @if($aiUsage['is_unlimited'])
-            <h3 class="text-3xl font-black text-white">♾️ Unlimited</h3>
+            <h3 class="text-3xl font-black text-white">♾️ {{ __('messages.unlimited') }}</h3>
         @else
             <h3 class="text-3xl font-black {{ $aiUsage['remaining'] > 0 ? 'text-white' : 'text-red-400' }}">
-                {{ $aiUsage['remaining'] }} <span class="text-sm font-medium text-gray-500">left</span>
+                {{ $aiUsage['remaining'] }} <span class="text-sm font-medium text-gray-500">{{ __('messages.left') }}</span>
             </h3>
-            <p class="text-[11px] text-gray-400 mt-1 font-medium">of {{ $aiUsage['limit'] }} this month</p>
+            <p class="text-[11px] text-gray-400 mt-1 font-medium">{{ __('messages.of_this_month', ['limit' => $aiUsage['limit']]) }}</p>
         @endif
     </div>
 </div>
@@ -90,8 +90,8 @@
             </h3>
             <!-- Toggle Buttons for Trend -->
             <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <button onclick="changeChartType('trend', 'line', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-line mr-1"></i> Line</button>
-                <button onclick="changeChartType('trend', 'bar', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-bar mr-1"></i> Bar</button>
+                <button onclick="changeChartType('trend', 'line', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-line mr-1"></i> {{ __('messages.line_chart') }}</button>
+                <button onclick="changeChartType('trend', 'bar', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-bar mr-1"></i> {{ __('messages.bar_chart') }}</button>
             </div>
         </div>
         <div class="relative w-full h-72">
@@ -114,8 +114,8 @@
             </h3>
             <!-- Toggle Buttons for Top Services -->
             <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <button onclick="changeChartType('top', 'bar', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-bar mr-1"></i> Bar</button>
-                <button onclick="changeChartType('top', 'doughnut', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-pie mr-1"></i> Pie</button>
+                <button onclick="changeChartType('top', 'bar', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-bar mr-1"></i> {{ __('messages.bar_chart') }}</button>
+                <button onclick="changeChartType('top', 'doughnut', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-pie mr-1"></i> {{ __('messages.pie_chart') }}</button>
             </div>
         </div>
         <div class="relative w-full h-72">
@@ -146,7 +146,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 class="font-bold text-gray-800 text-lg">{{ __('messages.recent_bookings') }}</h3>
-            <a href="{{ route('provider.bookings.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">View All &rarr;</a>
+            <a href="{{ route('provider.bookings.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_all') }} &rarr;</a>
         </div>
         <div class="flex-1 divide-y divide-gray-100">
             @if($recentBookings && $recentBookings->count() > 0)
@@ -164,7 +164,6 @@
                             </div>
                         </div>
                         
-                        <!-- यहाँ View बटन स्पष्ट देखिने गरी राखिएको छ -->
                         <div class="flex items-center gap-2 sm:gap-3">
                             <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider 
                                 @if($booking->status == 'pending') bg-amber-100 text-amber-800
@@ -175,7 +174,7 @@
                             </span>
                             
                             <a href="{{ route('provider.bookings.show', $booking) }}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 font-bold text-xs transition-colors flex items-center gap-1.5" title="View Booking">
-                                <i class="fas fa-eye"></i> View
+                                <i class="fas fa-eye"></i> {{ __('messages.view') }}
                             </a>
                         </div>
                     </div>
@@ -193,7 +192,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 class="font-bold text-gray-800 text-lg">{{ __('messages.recent_checkins') }}</h3>
-            <a href="{{ route('provider.checkins.index') ?? '#' }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">View Map &rarr;</a>
+            <a href="{{ route('provider.checkins.index') ?? '#' }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_map') }} &rarr;</a>
         </div>
         <div class="flex-1 divide-y divide-gray-100 max-h-[350px] overflow-y-auto custom-scrollbar">
             @if(isset($checkinHistory) && $checkinHistory->count() > 0)
@@ -209,7 +208,7 @@
                                     {{ $scan->booking->traveler->name ?? __('messages.guest') }}
                                 </p>
                                 <p class="text-xs text-gray-600 mt-0.5">
-                                    Checked-in at <span class="font-semibold text-gray-800">{{ $scan->checkpoint_name ?? __('messages.checkin_default') }}</span>
+                                    {{ __('messages.checked_in_at') }} <span class="font-semibold text-gray-800">{{ $scan->checkpoint_name ?? __('messages.checkin_default') }}</span>
                                 </p>
                                 <p class="text-[10px] text-gray-400 mt-1">
                                     <i class="far fa-clock mr-1"></i> {{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y - H:i') : __('messages.na') }}
@@ -254,7 +253,7 @@
         const trendData = @json($bookingsTrend ?? []);
         const topData = @json($topServices ?? []);
 
-        // Chart Instances (पुरानो चार्ट मेटाउन प्रयोग हुन्छ)
+        // Chart Instances
         let trendChartInstance = null;
         let topChartInstance = null;
 
@@ -281,7 +280,6 @@
                 tension: 0.4,
             };
 
-            // Line Chart मा Gradient हाल्ने
             if (type === 'line') {
                 let gradientBlue = ctx.createLinearGradient(0, 0, 0, 400);
                 gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
@@ -324,7 +322,7 @@
                         backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'],
                         borderRadius: isPie ? 0 : 6,
                         barThickness: isPie ? undefined : 30,
-                        cutout: type === 'doughnut' ? '60%' : 0, // Donut को बीच खाली गर्न
+                        cutout: type === 'doughnut' ? '60%' : 0,
                     }]
                 },
                 options: {
@@ -332,7 +330,7 @@
                     maintainAspectRatio: false,
                     plugins: { 
                         legend: { 
-                            display: isPie, // Pie/Donut भए Legend देखाउने
+                            display: isPie,
                             position: 'right' 
                         } 
                     },
@@ -352,7 +350,6 @@
         // ==========================================
         
         window.changeChartType = function(chartName, type, btn) {
-            // बटनको एक्टिभ कलर चेन्ज गर्ने
             const parent = btn.parentElement;
             parent.querySelectorAll('.chart-btn').forEach(b => {
                 b.classList.remove('active', 'text-blue-600');
@@ -361,7 +358,6 @@
             btn.classList.add('active', 'text-blue-600');
             btn.classList.remove('text-gray-500');
 
-            // चार्ट रि-रेन्डर गर्ने
             if (chartName === 'trend') {
                 renderTrendChart(type);
             } else {
@@ -370,7 +366,7 @@
         };
 
         // ==========================================
-        // 3. Initial Render (पहिलो पटक लोड हुँदा)
+        // 3. Initial Render
         // ==========================================
         if (trendData.length > 0) renderTrendChart('line');
         if (topData.length > 0) renderTopChart('bar');
