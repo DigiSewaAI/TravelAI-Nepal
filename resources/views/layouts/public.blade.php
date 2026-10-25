@@ -170,7 +170,7 @@
             </a>
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
-            <div class="flex gap-1 lg:gap-3 text-gray-700 font-medium items-center min-w-0">
+            <div class="flex gap-2 lg:gap-4 xl:gap-6 text-gray-700 font-medium items-center min-w-0">
                 <!-- Desktop Navigation Links (hidden on mobile) -->
                 <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.home') }}</a>
                 <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.features') }}</a>
@@ -230,8 +230,8 @@
                     });
                 </script>
 
-                <!-- Desktop Auth Buttons (hidden on mobile) -->
-                <div class="hidden lg:flex items-center gap-2">
+                                <!-- Desktop Auth Buttons (hidden on mobile) -->
+                <div class="hidden lg:flex items-center gap-3">
                     @auth
                         @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
@@ -250,7 +250,19 @@
                         <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.login') }}</a>
                         <a href="{{ route('register') }}" class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.register') }}</a>
                     @endauth
+
+                    <!-- 🛒 Cart Icon (Compact) -->
+                    <a href="{{ route('cart.index') }}" class="relative text-gray-700 hover:text-blue-600 transition-colors p-2 ml-1">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        @php $cartCount = app(\App\Services\CartService::class)->count(); @endphp
+                        @if($cartCount > 0)
+                            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
+                
 
                 <!-- Mobile Auth Button (Login icon only) -->
                 <div class="flex lg:hidden items-center gap-1">

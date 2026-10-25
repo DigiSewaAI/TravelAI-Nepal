@@ -1079,6 +1079,20 @@ return [
         'greeting_morning' => 'सुप्रभात',
     'greeting_afternoon' => 'नमस्कार',
     'greeting_evening' => 'शुभ संध्या',
+        'checkout_total' => 'कुल योग',
+    'checkout_title' => 'चेकआउट',
+    'checkout_contact_section' => 'संपर्क जानकारी',
+    'checkout_contact_name' => 'पूरा नाम',
+    'checkout_contact_email' => 'ईमेल',
+    'checkout_contact_phone' => 'फोन',
+    'checkout_shipping_section' => 'शिपिंग विवरण',
+    'checkout_shipping_address' => 'पता',
+    'checkout_shipping_city' => 'शहर',
+    'checkout_shipping_country' => 'देश',
+    'checkout_notes' => 'ऑर्डर नोट्स (वैकल्पिक)',
+    'checkout_cart_summary' => 'कार्ट सारांश',
+    'checkout_deposit_refundable' => 'वापसी योग्य जमा',
+    'checkout_place_order' => 'ऑर्डर करें',
 
 // ======================
 // PRICING

@@ -1078,6 +1078,20 @@ return [
         'greeting_morning' => '早上好',
     'greeting_afternoon' => '下午好',
     'greeting_evening' => '晚上好',
+        'checkout_total' => '总计',
+    'checkout_title' => '结账',
+    'checkout_contact_section' => '联系信息',
+    'checkout_contact_name' => '全名',
+    'checkout_contact_email' => '电子邮件',
+    'checkout_contact_phone' => '电话',
+    'checkout_shipping_section' => '配送详情',
+    'checkout_shipping_address' => '地址',
+    'checkout_shipping_city' => '城市',
+    'checkout_shipping_country' => '国家',
+    'checkout_notes' => '订单备注（可选）',
+    'checkout_cart_summary' => '购物车摘要',
+    'checkout_deposit_refundable' => '可退还押金',
+    'checkout_place_order' => '下订单',
 
 // ======================
 // PRICING

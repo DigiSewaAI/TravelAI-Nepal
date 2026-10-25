@@ -107,7 +107,16 @@
                     
                     <a href="{{ route('provider.orders.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.orders.*') ? 'active' : '' }}">
                         <i class="fas fa-shopping-bag w-5"></i>
-                        <span>{{ __('messages.orders') }}</span>
+                        <span class="flex-1">{{ __('messages.orders') }}</span>
+                        @php
+                            $pendingOrdersCount = 0;
+                            if ($currentProvider) {
+                                $pendingOrdersCount = \App\Models\Order::whereHas('items', function($q) use ($currentProvider) {
+                                    $q->where('provider_id', $currentProvider->id);
+                                })->where('status', 'pending')->count();
+                            }
+                        @endphp
+                        <span id="orders-badge" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full {{ $pendingOrdersCount > 0 ? '' : 'hidden' }}">{{ $pendingOrdersCount }}</span>
                     </a>
                     @endif
 
@@ -429,6 +438,16 @@
                             quotationBadge.classList.remove('hidden');
                         } else {
                             quotationBadge.classList.add('hidden');
+                        }
+                    }
+                                        // Update Orders Badge
+                    const ordersBadge = document.getElementById('orders-badge');
+                    if (ordersBadge) {
+                        if (data.orders > 0) {
+                            ordersBadge.innerText = data.orders;
+                            ordersBadge.classList.remove('hidden');
+                        } else {
+                            ordersBadge.classList.add('hidden');
                         }
                     }
                 })

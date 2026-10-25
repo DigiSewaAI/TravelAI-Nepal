@@ -87,10 +87,12 @@ class CartService
         return $this->items()->sum(fn($item) => $item->subtotal);
     }
 
-    public function mergeGuestCart(int $userId): void
+    public function mergeGuestCart(int $userId, ?string $oldSessionId = null): void
     {
-        $sessionId = session()->getId();
+        // यदि पुरानो session ID पठाइएको छ भने त्यही प्रयोग गर्ने, नत्र current session ID
+        $sessionId = $oldSessionId ?? session()->getId();
         $guestItems = Cart::where('session_id', $sessionId)->get();
+
 
         foreach ($guestItems as $guest) {
             $existing = Cart::where('user_id', $userId)

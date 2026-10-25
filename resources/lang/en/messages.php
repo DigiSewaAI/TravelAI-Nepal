@@ -1077,6 +1077,20 @@ return [
         'greeting_morning' => 'Good Morning',
     'greeting_afternoon' => 'Good Afternoon',
     'greeting_evening' => 'Good Evening',
+        'checkout_total' => 'Total',
+    'checkout_title' => 'Checkout',
+    'checkout_contact_section' => 'Contact Information',
+    'checkout_contact_name' => 'Full Name',
+    'checkout_contact_email' => 'Email',
+    'checkout_contact_phone' => 'Phone',
+    'checkout_shipping_section' => 'Shipping Details',
+    'checkout_shipping_address' => 'Address',
+    'checkout_shipping_city' => 'City',
+    'checkout_shipping_country' => 'Country',
+    'checkout_notes' => 'Order Notes (optional)',
+    'checkout_cart_summary' => 'Cart Summary',
+    'checkout_deposit_refundable' => 'Refundable Deposit',
+    'checkout_place_order' => 'Place Order',
 
 // ======================
 // PRICING

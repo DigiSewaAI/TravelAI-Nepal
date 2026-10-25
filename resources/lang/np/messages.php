@@ -1115,6 +1115,20 @@ return [
         'greeting_morning' => 'शुभ प्रभात',
     'greeting_afternoon' => 'शुभ दिन',
     'greeting_evening' => 'शुभ सन्ध्या',
+        'checkout_total' => 'कुल जम्मा',
+    'checkout_title' => 'चेकआउट',
+    'checkout_contact_section' => 'सम्पर्क जानकारी',
+    'checkout_contact_name' => 'पूरा नाम',
+    'checkout_contact_email' => 'इमेल',
+    'checkout_contact_phone' => 'फोन',
+    'checkout_shipping_section' => 'ढुवानी विवरण',
+    'checkout_shipping_address' => 'ठेगाना',
+    'checkout_shipping_city' => 'सहर',
+    'checkout_shipping_country' => 'देश',
+    'checkout_notes' => 'अर्डर नोटहरू (वैकल्पिक)',
+    'checkout_cart_summary' => 'कार्ट सारांश',
+    'checkout_deposit_refundable' => 'फिर्ता हुने डिपोजिट',
+    'checkout_place_order' => 'अर्डर गर्नुहोस्',
 
     // ======================
     // PRICING

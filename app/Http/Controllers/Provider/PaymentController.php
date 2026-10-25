@@ -154,6 +154,18 @@ class PaymentController extends Controller
             'subscription_id' => $subscription->id,
         ]);
 
+                // NOTIFICATION-PRIORITY-01: Notify Admin about Payment Proof
+        try {
+            \Illuminate\Support\Facades\Notification::route('mail', env('ADMIN_EMAIL', 'admin@travelainepal.com'))
+                ->notify(new \App\Notifications\AdminAlertNotification(
+                    'New Payment Proof Submitted',
+                    'Provider **' . $provider->name . '** has submitted payment proof for the **' . ($subscription->plan->name ?? 'Plan') . '** plan. Amount: NPR ' . number_format($payment->amount, 2) . '. Reference: ' . $payment->reference_number,
+                    route('admin.payments.verify') // ✅ Verified from route:list
+                ));
+        } catch (\Exception $e) {
+            Log::error('Failed to send Admin Payment Notification: ' . $e->getMessage());
+        }
+
         return redirect()
             ->route('provider.payments.show', $subscription->id)
             ->with('success', 'Payment proof submitted. Verification within 24 hours.');

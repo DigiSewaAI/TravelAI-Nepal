@@ -96,9 +96,9 @@
                 @endforeach
             </div>
 
-            <aside class="lg:col-span-1">
+                        <aside class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-sm border p-5 sticky top-4">
-                    <h2 class="font-semibold text-gray-900 mb-4">{{ __('messages.cart_subtotal') }}</h2>
+                    <h2 class="font-semibold text-gray-900 mb-4 text-lg">Order Summary</h2>
 
                     {{-- PATH-3C C1: Deposit calculation --}}
                     @php
@@ -108,26 +108,30 @@
 
                     <div class="flex justify-between text-sm mb-2">
                         <span class="text-gray-600">{{ __('messages.cart_subtotal') }}</span>
-                        <span>{{ $currencyService->format($currencyService->convert($subtotal, 'NPR', $displayCurrency), $displayCurrency) }}</span>
+                        <span class="font-medium text-gray-900">{{ $currencyService->format($subtotal, $displayCurrency) }}</span>
                     </div>
 
                     @if($rentalDeposit > 0)
                         <div class="flex justify-between text-sm mb-2 text-gray-600">
                             <span>{{ __('messages.cart_deposit_refundable') }}</span>
-                            <span class="font-medium">
+                            <span class="font-medium text-gray-900">
                                 {{ $currencyService->format($currencyService->convert($rentalDeposit, 'NPR', $displayCurrency), $displayCurrency) }}
                             </span>
                         </div>
                     @endif
 
-                    <p class="text-2xl font-bold text-blue-600 mb-4 pt-2 border-t">
-                        {{ $currencyService->format($currencyService->convert($subtotal + ($rentalDeposit ?? 0), 'NPR', $displayCurrency), $displayCurrency) }}
-                    </p>
+                    <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-200 mb-6">
+                        <span class="text-base font-bold text-gray-900">Total</span>
+                        <span class="text-2xl font-black text-blue-600">
+                            {{ $currencyService->format($subtotal + ($rentalDeposit ?? 0), $displayCurrency) }}
+                        </span>
+                    </div>
+
                     <a href="{{ route('checkout.index') }}"
-                       class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
+                       class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg">
                         {{ __('messages.cart_checkout_btn') }}
                     </a>
-                    <a href="{{ route('public.shop.index') }}" class="block text-center mt-3 text-sm text-gray-500 hover:text-blue-600">
+                    <a href="{{ route('public.shop.index') }}" class="block text-center mt-4 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors">
                         {{ __('messages.cart_continue_shopping') }}
                     </a>
                 </div>

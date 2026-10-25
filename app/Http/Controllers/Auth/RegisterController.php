@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class RegisterController extends Controller
@@ -30,156 +31,165 @@ class RegisterController extends Controller
      * Handle a registration request.
      */
     public function register(Request $request)
-{
-    // Base validation rules
-    $rules = [
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6|confirmed',
-        'plan' => 'nullable|exists:plans,slug',
-        'phone' => 'nullable|string|max:20',
-        'billing_interval' => 'nullable|in:monthly,yearly', // ✅ New
-    ];
+    {
+        // Base validation rules
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+            'plan' => 'nullable|exists:plans,slug',
+            'phone' => 'nullable|string|max:20',
+            'billing_interval' => 'nullable|in:monthly,yearly', 
+        ];
 
-    // If provider registration (provider_type field exists)
-    if ($request->filled('provider_type')) {
-        $rules['business_name'] = 'required|string|max:255';
-        $rules['address'] = 'nullable|string|max:500';
-
-        // If "Other" selected, custom_provider_type is required
-        if ($request->provider_type == 'other') {
-            $rules['custom_provider_type'] = 'required|string|max:255';
-        } else {
-            $rules['provider_type'] = 'required|exists:provider_types,id';
-        }
-    }
-
-    $validated = $request->validate($rules);
-
-    // Get selected plan (default: free)
-    $planSlug = $request->plan ?? 'free';
-    $plan = Plan::where('slug', $planSlug)->first();
-
-    if (!$plan) {
-        return back()->withErrors(['plan' => 'Selected plan not found.'])->withInput();
-    }
-
-    // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
-if ($plan->isContactOnly()) {
-    return redirect()
-        ->route('public.contact-sales')
-        ->with('info', __('messages.enterprise_requires_contact'));
-}
-
-    // ✅ Determine billing interval
-    $billingInterval = $request->input('billing_interval', 'monthly');
-
-    DB::beginTransaction();
-
-    try {
-        // Create user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->filled('provider_type') ? 'provider_owner' : 'traveler',
-            'phone' => $request->phone,
-        ]);
-
-        // If provider registration
+        // If provider registration (provider_type field exists)
         if ($request->filled('provider_type')) {
-            // Determine provider type ID
+            $rules['business_name'] = 'required|string|max:255';
+            $rules['address'] = 'nullable|string|max:500';
+
+            // If "Other" selected, custom_provider_type is required
             if ($request->provider_type == 'other') {
-                $customTypeName = trim($request->custom_provider_type);
-                $customTypeSlug = Str::slug($customTypeName);
-
-                $providerType = ProviderType::firstOrCreate(
-                    ['slug' => $customTypeSlug],
-                    ['name' => $customTypeName]
-                );
-
-                $providerTypeId = $providerType->id;
-                \Log::info("New provider type created: {$customTypeName} (ID: {$providerTypeId})");
+                $rules['custom_provider_type'] = 'required|string|max:255';
             } else {
-                $providerType = ProviderType::find($request->provider_type);
-                if (!$providerType) {
-                    throw new \Exception('Invalid provider type selected.');
-                }
-                $providerTypeId = $providerType->id;
+                $rules['provider_type'] = 'required|exists:provider_types,id';
             }
+        }
 
-            // Create provider
-            $provider = Provider::create([
-                'user_id' => $user->id,
-                'name' => $request->business_name,
-                'slug' => Str::slug($request->business_name) . '-' . Str::random(6),
-                'description' => $request->description ?? null,
-                'contact_email' => $request->email,
-                'contact_phone' => $request->phone ?? null,
-                'address' => $request->address ?? null,
-                'verification_status' => 'pending',
-                'is_active' => true,
+        $validated = $request->validate($rules);
+
+        // Get selected plan (default: free)
+        $planSlug = $request->plan ?? 'free';
+        $plan = Plan::where('slug', $planSlug)->first();
+
+        if (!$plan) {
+            return back()->withErrors(['plan' => 'Selected plan not found.'])->withInput();
+        }
+
+        // FIX-01: Contact-only plans (Enterprise) must NOT create an active subscription
+        if ($plan->isContactOnly()) {
+            return redirect()
+                ->route('public.contact-sales')
+                ->with('info', __('messages.enterprise_requires_contact'));
+        }
+
+        // ✅ Determine billing interval
+        $billingInterval = $request->input('billing_interval', 'monthly');
+
+        DB::beginTransaction();
+
+        try {
+            // Create user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->filled('provider_type') ? 'provider_owner' : 'traveler',
+                'phone' => $request->phone,
             ]);
 
-            // Attach provider type
-            $provider->types()->attach($providerTypeId);
+            // If provider registration
+            if ($request->filled('provider_type')) {
+                // Determine provider type ID
+                if ($request->provider_type == 'other') {
+                    $customTypeName = trim($request->custom_provider_type);
+                    $customTypeSlug = Str::slug($customTypeName);
 
-            // ✅ Create subscription with billing interval
-            $isFree = $plan->isFree();
+                    $providerType = ProviderType::firstOrCreate(
+                        ['slug' => $customTypeSlug],
+                        ['name' => $customTypeName]
+                    );
 
-            $subscriptionData = [
-                'provider_id' => $provider->id,
-                'plan_id' => $plan->id,
-                'billing_interval' => $billingInterval,
-                'start_date' => null,
-                'end_date' => null,
-            ];
+                    $providerTypeId = $providerType->id;
+                    Log::info("New provider type created: {$customTypeName} (ID: {$providerTypeId})");
+                } else {
+                    $providerType = ProviderType::find($request->provider_type);
+                    if (!$providerType) {
+                        throw new \Exception('Invalid provider type selected.');
+                    }
+                    $providerTypeId = $providerType->id;
+                }
 
-            if ($isFree) {
-                $subscriptionData['status'] = 'active';
-                $subscriptionData['start_date'] = now();
-                $subscriptionData['end_date'] = now()->addYear(); // Free plan: 1 year
-            } else {
-                $subscriptionData['status'] = 'pending'; // Payment required
-                $subscriptionData['start_date'] = now();
-                // Tentative end_date based on billing interval (activates after payment)
-                $subscriptionData['end_date'] = $billingInterval === 'yearly'
-                    ? now()->addYear()
-                    : now()->addMonth();
+                // Create provider
+                $provider = Provider::create([
+                    'user_id' => $user->id,
+                    'name' => $request->business_name,
+                    'slug' => Str::slug($request->business_name) . '-' . Str::random(6),
+                    'description' => $request->description ?? null,
+                    'contact_email' => $request->email,
+                    'contact_phone' => $request->phone ?? null,
+                    'address' => $request->address ?? null,
+                    'verification_status' => 'pending',
+                    'is_active' => true,
+                ]);
+
+                // Attach provider type
+                $provider->types()->attach($providerTypeId);
+
+                // ✅ Create subscription with billing interval
+                $isFree = $plan->isFree();
+
+                $subscriptionData = [
+                    'provider_id' => $provider->id,
+                    'plan_id' => $plan->id,
+                    'billing_interval' => $billingInterval,
+                    'start_date' => null,
+                    'end_date' => null,
+                ];
+
+                if ($isFree) {
+                    $subscriptionData['status'] = 'active';
+                    $subscriptionData['start_date'] = now();
+                    $subscriptionData['end_date'] = now()->addYear(); // Free plan: 1 year
+                } else {
+                    $subscriptionData['status'] = 'pending'; // Payment required
+                    $subscriptionData['start_date'] = now();
+                    // Tentative end_date based on billing interval (activates after payment)
+                    $subscriptionData['end_date'] = $billingInterval === 'yearly'
+                        ? now()->addYear()
+                        : now()->addMonth();
+                }
+
+                $subscription = Subscription::create($subscriptionData);
+
+                DB::commit();
+
+                // ✅ Cart Merge Fix for Provider
+                $oldSessionId = session()->getId();
+                Auth::login($user);
+                app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
+
+                // Redirect based on plan
+                if ($isFree) {
+                    return redirect()->route('provider.dashboard')
+                        ->with('success', '🎉 Free plan activated! Welcome to TravelAI Nepal.');
+                } else {
+                    // Redirect to payment page
+                    return redirect()->route('provider.payments.show', $subscription->id)
+                        ->with('info', 'Please complete the payment to activate your subscription.');
+                }
             }
 
-            $subscription = Subscription::create($subscriptionData);
-
+            // Traveler registration
             DB::commit();
-
+            
+            // ✅ Cart Merge Fix for Traveler
+            $oldSessionId = session()->getId();
             Auth::login($user);
+            app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
 
-            // Redirect based on plan
-            if ($isFree) {
-                return redirect()->route('provider.dashboard')
-                    ->with('success', '🎉 Free plan activated! Welcome to TravelAI Nepal.');
-            } else {
-                // Redirect to payment page
-                return redirect()->route('provider.payments.show', $subscription->id)
-                    ->with('info', 'Please complete the payment to activate your subscription.');
-            }
+            // ✅ Redirect intended checkout or dashboard
+            return redirect()->intended(route('traveler.dashboard'))
+                ->with('success', '🎉 Account created successfully! Welcome to TravelAI Nepal.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Registration failed: ' . $e->getMessage(), [
+                'email' => $request->email,
+                'provider_type' => $request->provider_type ?? null,
+            ]);
+            return back()->withErrors([
+                'error' => 'Registration failed. Please try again.'
+            ])->withInput();
         }
-
-        // Traveler registration
-        DB::commit();
-        Auth::login($user);
-        return redirect()->route('home')
-            ->with('success', '🎉 Account created successfully! Welcome to TravelAI Nepal.');
-
-            } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Registration failed: ' . $e->getMessage(), [
-            'email' => $request->email,
-            'provider_type' => $request->provider_type ?? null,
-        ]);
-        return back()->withErrors([
-            'error' => 'Registration failed. Please try again.'
-        ])->withInput();
     }
-}
 }

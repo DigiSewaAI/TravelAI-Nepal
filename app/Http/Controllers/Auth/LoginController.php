@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\ProviderStaff;
 
 class LoginController extends Controller
 {
@@ -29,6 +30,9 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
 
+        // ✅ GUEST CART FIX: Login हुनु अघि पुरानो Session ID समात्ने
+        $oldSessionId = session()->getId();
+
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
@@ -39,24 +43,27 @@ class LoginController extends Controller
                 'role'    => $user->role,
             ]);
 
-            // PATH-3B B2: merge guest cart into user cart
-            app(\App\Services\CartService::class)->mergeGuestCart($user->id);
+            // ✅ GUEST CART FIX: पुरानो Session ID पठाएर कार्ट मर्ज गर्ने
+            app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
 
-            // ---------------------------------------------------------
-            // FIX: Force redirect (intended() हटाइयो ताकि गलत पेजमा नजाओस्)
-            // ---------------------------------------------------------
-            
+            // Redirect based on role (with Intended URL support for Cart/Checkout)
             if ($user->isSuperAdmin()) {
-                return redirect()->route('admin.dashboard');
-            } 
-            
-            // If the user has a Provider record OR is Staff, go to Provider Dashboard
-            if ($user->getCurrentProvider()) {
-                return redirect()->route('provider.dashboard');
-            } 
-            
-            // Otherwise, send to Traveler Dashboard
-            return redirect()->route('traveler.dashboard');
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->isProviderOwner() || $user->isStaff()) {
+                if (!$user->getCurrentProvider()) {
+                    Log::warning('Login blocked: provider profile missing', [
+                        'user_id' => $user->id,
+                        'role'    => $user->role,
+                    ]);
+                    auth()->logout();
+                    return redirect()->route('login')->withErrors([
+                        'email' => 'Your account is not linked to a provider profile. Please contact support.'
+                    ]);
+                }
+                return redirect()->intended(route('provider.dashboard'));
+            } else {
+                return redirect()->intended(route('traveler.dashboard'));
+            }
         }
 
         Log::warning('Failed login attempt', [

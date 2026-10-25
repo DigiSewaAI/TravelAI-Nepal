@@ -49,10 +49,16 @@ class CheckoutService
 
             $subtotal = 0;
             $itemsData = [];
+            $orderCurrency = 'NPR'; // Default fallback
 
-            foreach ($cartItems as $cart) {
+            foreach ($cartItems as $index => $cart) {
                 $product = $cart->product;
                 if (!$product) continue;
+
+                // ✅ BUG FIX: पहिलो प्रोडक्टको करेन्सी लिएर अर्डरको करेन्सी सेट गर्ने
+                if ($index === 0) {
+                    $orderCurrency = $product->currency ?? 'NPR';
+                }
 
                 $lineTotal = $cart->subtotal;
                 $subtotal += $lineTotal;
@@ -116,7 +122,7 @@ class CheckoutService
                 'shipping_fee'     => $shippingFee,
                 'deposit_total'    => $depositTotal,
                 'total'            => $total,
-                'currency'                 => 'NPR',
+                'currency'                 => $orderCurrency, // ✅ BUG FIX: डायनामिक करेन्सी
                 'payment_status'           => 'pending',
                 'payment_methods_snapshot' => $paymentMethodsSnapshot,
                 'notes'                    => $data['notes'] ?? null,
