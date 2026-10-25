@@ -1,3 +1,8 @@
+@php
+    $currentProvider = auth()->user()->getCurrentProvider();
+    $providerTypeSlug = $currentProvider?->types->first()?->slug;
+    $isProductProvider = in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider']);
+@endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -68,13 +73,6 @@
                 </div>
             @endif
 
-            {{-- DYNAMIC-UI: Provider Type Logic --}}
-            @php
-                $currentProvider = auth()->user()->getCurrentProvider();
-                $providerTypeSlug = $currentProvider?->types->first()?->slug;
-                $isProductProvider = in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider']);
-            @endphp
-
                         <!-- Navigation -->
             <nav class="flex-1 space-y-1">
                 <!-- Dashboard (सबैले देख्ने) -->
@@ -102,14 +100,21 @@
                     </a>
                     @endif
 
-                    <!-- Products (Only for Product Providers) -->
+                    <!-- Products & Orders (Only for Product Providers) -->
                     @if($isProductProvider)
                     <a href="{{ route('provider.products.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.products.*') ? 'active' : '' }}">
                         <i class="fas fa-box w-5"></i>
                         <span>{{ __('messages.products') ?? 'Products' }}</span>
                     </a>
+                    
+                    <a href="{{ route('provider.orders.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.orders.*') ? 'active' : '' }}">
+                        <i class="fas fa-shopping-bag w-5"></i>
+                        <span>{{ __('messages.orders') }}</span>
+                    </a>
                     @endif
 
+                    <!-- AI Quotation & Quotation Requests (Only for Service Providers) -->
+                    @if(!$isProductProvider)
                     <a href="{{ route('provider.quotation.create') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
                         <i class="fas fa-file-invoice-dollar w-5"></i>
                         <span>AI Quotation</span>
@@ -128,6 +133,7 @@
                             <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
                         @endif
                     </a>
+                    @endif
 
                     <a href="{{ route('provider.subscriptions.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}">
                         <i class="fas fa-crown w-5"></i>
@@ -168,8 +174,8 @@
                 <!-- === END OWNER ONLY MENUS === -->
 
                 <!-- === PERMISSION GATED MENUS === -->
-                @if(auth()->user()->hasPermission('view_bookings'))
-                <a href="{{ route('provider.bookings.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
+                @if(!$isProductProvider && auth()->user()->hasPermission('view_bookings'))
+                <a href="{{ route('provider.bookings.index') }}" ...>
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>{{ __('messages.bookings') }}</span>
                 </a>
@@ -182,8 +188,8 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('manage_checkins'))
-                <a href="{{ route('provider.checkins.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
+                @if(!$isProductProvider && auth()->user()->hasPermission('manage_checkins'))
+                <a href="{{ route('provider.checkins.index') }}" ...>
                     <i class="fas fa-qrcode w-5"></i>
                     <span>{{ __('messages.checkins') }}</span>
                 </a>

@@ -100,7 +100,6 @@ class ProductController extends Controller
                 'product_type' => 'Invalid product type.',
             ]);
         }
-
         $rules = [
             'product_type' => 'required|in:shop,rental,wholesale',
             'name'         => 'required|string|max:255',
@@ -110,6 +109,8 @@ class ProductController extends Controller
             'cover_image'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'status'       => 'required|in:active,inactive',
             'location_id'  => 'nullable|exists:locations,id',
+            'stock_count'  => 'nullable|integer|min:0', // ✅ नयाँ
+            'sku'          => 'nullable|string|max:255', // ✅ नयाँ
         ];
 
         $rules = array_merge($rules, match ($type) {
@@ -226,6 +227,8 @@ class ProductController extends Controller
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'status'      => 'required|in:active,inactive',
             'location_id' => 'nullable|exists:locations,id',
+            'stock_count' => 'nullable|integer|min:0', // ✅ नयाँ
+            'sku'         => 'nullable|string|max:255', // ✅ नयाँ
         ];
 
         $rules = array_merge($rules, match ($type) {

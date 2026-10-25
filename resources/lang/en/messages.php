@@ -1065,6 +1065,15 @@ return [
     'cancel' => 'Cancel',
     'save' => 'Save Changes',
     'create' => 'Create',
+        'total_products' => 'Total Products',
+    'total_orders' => 'Total Orders',
+    'orders_trend' => 'Orders Trend',
+    'top_products' => 'Top Products',
+    'recent_orders' => 'Recent Orders',
+    'no_order_data' => 'No order data',
+    'no_orders_yet' => 'No orders yet.',
+    'orders' => 'Orders',
+    'view_order' => 'View Order',
 
 // ======================
 // PRICING

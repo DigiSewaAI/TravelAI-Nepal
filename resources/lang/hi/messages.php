@@ -1067,6 +1067,15 @@ return [
     'cancel' => 'रद्द करें',
     'save' => 'परिवर्तन सहेजें',
     'create' => 'बनाएं',
+        'total_products' => 'कुल उत्पाद',
+    'total_orders' => 'कुल ऑर्डर',
+    'orders_trend' => 'ऑर्डर रुझान',
+    'top_products' => 'शीर्ष उत्पाद',
+    'recent_orders' => 'हाल के ऑर्डर',
+    'no_order_data' => 'कोई ऑर्डर डेटा नहीं',
+    'no_orders_yet' => 'अभी तक कोई ऑर्डर नहीं।',
+    'orders' => 'ऑर्डर',
+    'view_order' => 'ऑर्डर देखें',
 
 // ======================
 // PRICING

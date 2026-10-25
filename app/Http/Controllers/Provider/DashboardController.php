@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\QrScan;
 use App\Models\Service;
 use App\Services\AiLimitService;
@@ -15,77 +17,102 @@ class DashboardController extends Controller
 {
     public function index(AiLimitService $aiLimit)
     {
-
-        // Auth check
         if (!auth()->check()) {
             return redirect()->route('login');
         }
 
         $user = Auth::user();
-        
-        // Staff ले login गर्दा पनि provider resolve गर्न (owner + staff)
         $provider = $user->getCurrentProvider();
 
         if (!$provider) {
-            return redirect()->route('home')
-                ->with('error', 'Provider profile not found. Please contact support.');
+            return redirect()->route('home')->with('error', 'Provider profile not found.');
         }
 
-        // Get all services for this provider
+        // Check if this is a Product Provider (Shop, Rental, Wholesale)
+        $productSlugs = ['shop-owner', 'rental-provider', 'wholesale-provider'];
+        $providerTypeSlug = $provider->types->first()?->slug;
+        $isProductProvider = in_array($providerTypeSlug, $productSlugs);
+
+        // 1. Services Data (for Service Providers)
         $services = $provider->services()->get();
         $serviceIds = $services->pluck('id');
         $totalServices = $services->count();
 
-        // Get all bookings for this provider's services
         $bookingsQuery = Booking::whereIn('service_id', $serviceIds);
         $totalBookings = $bookingsQuery->count();
         $pendingBookings = $bookingsQuery->where('status', 'pending')->count();
 
-        // Recent bookings
         $recentBookings = Booking::whereIn('service_id', $serviceIds)
-            ->with(['traveler', 'service'])
-            ->latest()
-            ->take(10)
-            ->get();
+            ->with(['traveler', 'service'])->latest()->take(10)->get();
 
-        // Bookings Trend (Last 30 Days)
         $bookingsTrend = Booking::whereIn('service_id', $serviceIds)
             ->where('created_at', '>=', now()->subDays(30))
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
+            ->groupBy('date')->orderBy('date', 'asc')->get();
 
-        // Top Services by Bookings
         $topServices = Service::whereIn('id', $serviceIds)
-            ->withCount('bookings')
-            ->orderBy('bookings_count', 'desc')
-            ->limit(5)
-            ->get();
+            ->withCount('bookings')->orderBy('bookings_count', 'desc')->limit(5)->get();
 
-        // Recent Check-ins (QR Scans) for this provider's services
+        // 2. Products & Orders Data (for Product Providers)
+        $products = $provider->products()->get();
+        $totalProducts = $products->count();
+        
+        $ordersTrend = collect();
+        $recentOrders = collect();
+        $topProducts = collect(); // ✅ नयाँ थपियो
+
+        if ($isProductProvider) {
+            // Get all order IDs that contain this provider's products
+            $orderIds = OrderItem::where('provider_id', $provider->id)->pluck('order_id')->unique();
+            
+            // Orders Trend (Last 30 Days)
+            $ordersTrend = Order::whereIn('id', $orderIds)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->get();
+
+            // Recent Orders
+            $recentOrders = Order::whereIn('id', $orderIds)
+                ->with(['items'])
+                ->latest()
+                ->take(10)
+                ->get();
+
+            // ✅ Top Products (by Sales/Orders)
+            $topProducts = \App\Models\OrderItem::where('provider_id', $provider->id)
+                ->select('product_id', DB::raw('COUNT(*) as sales_count'))
+                ->groupBy('product_id')
+                ->with('product')
+                ->orderByDesc('sales_count')
+                ->limit(5)
+                ->get();
+        }
+
+        // 3. Check-ins (Service Providers only)
         $checkinHistory = QrScan::whereIn('booking_id', function ($query) use ($serviceIds) {
-            $query->select('id')
-                  ->from('bookings')
-                  ->whereIn('service_id', $serviceIds);
-        })->with(['booking.traveler', 'booking.service'])
-          ->latest('scanned_at')
-          ->take(20)
-          ->get();
+            $query->select('id')->from('bookings')->whereIn('service_id', $serviceIds);
+        })->with(['booking.traveler', 'booking.service'])->latest('scanned_at')->take(20)->get();
 
-        // ✅ AI Usage Data (for Dashboard Widget)
+        // 4. AI Usage
         $aiUsage = $aiLimit->getUsage($provider);
 
         return view('provider.dashboard', compact(
             'provider',
+            'isProductProvider',
             'totalServices',
+            'totalProducts',
             'totalBookings',
             'pendingBookings',
             'recentBookings',
             'bookingsTrend',
             'topServices',
+            'topProducts',        // ✅ नयाँ थपियो
+            'recentOrders',
+            'ordersTrend',
             'checkinHistory',
-            'aiUsage'  // ✅ Pass to view
+            'aiUsage'
         ));
     }
 }

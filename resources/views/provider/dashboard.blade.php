@@ -5,7 +5,7 @@
 
 @section('content')
 
-<!-- ========== 1. WELCOME BANNER (Gradient) ========== -->
+<!-- ========== 1. WELCOME BANNER ========== -->
 <div class="relative rounded-3xl p-8 mb-8 text-white overflow-hidden shadow-xl" style="background: linear-gradient(to right, #1d4ed8, #4338ca, #6b21a8);">
     <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white opacity-10 rounded-full blur-2xl"></div>
     <div class="absolute bottom-0 right-32 -mb-16 w-48 h-48 bg-white opacity-10 rounded-full blur-xl"></div>
@@ -28,42 +28,51 @@
     </div>
 </div>
 
-<!-- ========== 2. STATS CARDS (Colored & Modern) ========== -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Services -->
+<!-- ========== 2. STATS CARDS ========== -->
+<div class="grid grid-cols-1 md:grid-cols-2 {{ $isProductProvider ? 'lg:grid-cols-3' : 'lg:grid-cols-4' }} gap-6 mb-8">
+    <!-- Total Services/Products -->
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
         <div>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ __('messages.total_services') }}</p>
-            <h3 class="text-3xl font-black text-gray-800">{{ $totalServices ?? 0 }}</h3>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                {{ $isProductProvider ? 'Total Products' : __('messages.total_services') }}
+            </p>
+            <h3 class="text-3xl font-black text-gray-800">
+                {{ $isProductProvider ? $totalProducts : $totalServices }}
+            </h3>
         </div>
         <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
             <i class="fas fa-concierge-bell text-2xl text-blue-500"></i>
         </div>
     </div>
 
-    <!-- Total Bookings -->
+    <!-- Total Bookings/Orders -->
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
         <div>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ __('messages.total_bookings') }}</p>
-            <h3 class="text-3xl font-black text-gray-800">{{ $totalBookings ?? 0 }}</h3>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                {{ $isProductProvider ? 'Total Orders' : __('messages.total_bookings') }}
+            </p>
+            <h3 class="text-3xl font-black text-gray-800">
+                {{ $isProductProvider ? $recentOrders->count() : $totalBookings }}
+            </h3>
         </div>
         <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
             <i class="fas fa-calendar-check text-2xl text-emerald-500"></i>
         </div>
     </div>
 
-    <!-- Pending Bookings -->
+    <!-- Pending -->
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
         <div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ __('messages.pending') }}</p>
-            <h3 class="text-3xl font-black text-gray-800">{{ $pendingBookings ?? 0 }}</h3>
+            <h3 class="text-3xl font-black text-gray-800">{{ $pendingBookings }}</h3>
         </div>
         <div class="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
             <i class="fas fa-clock text-2xl text-amber-500"></i>
         </div>
     </div>
 
-    <!-- AI Usage (Dark Card) -->
+        @if(!$isProductProvider)
+    <!-- AI Usage (Dark Card) - Only for Service Providers -->
     <div class="bg-gray-900 p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.2)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-center relative overflow-hidden group text-white">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <i class="fas fa-robot text-6xl"></i>
@@ -78,82 +87,95 @@
             <p class="text-[11px] text-gray-400 mt-1 font-medium">{{ __('messages.of_this_month', ['limit' => $aiUsage['limit']]) }}</p>
         @endif
     </div>
+    @endif
 </div>
 
 <!-- ========== 3. CHARTS SECTION ========== -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Bookings Trend -->
+    <!-- Trend Chart -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 relative">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
-                <i class="fas fa-chart-line text-blue-500"></i> {{ __('messages.bookings_trend') }}
+                <i class="fas fa-chart-line text-blue-500"></i> 
+                {{ $isProductProvider ? 'Orders Trend' : __('messages.bookings_trend') }}
             </h3>
-            <!-- Toggle Buttons for Trend -->
-            <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <button onclick="changeChartType('trend', 'line', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-line mr-1"></i> {{ __('messages.line_chart') }}</button>
-                <button onclick="changeChartType('trend', 'bar', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-bar mr-1"></i> {{ __('messages.bar_chart') }}</button>
-            </div>
         </div>
         <div class="relative w-full h-72">
-            @if(isset($bookingsTrend) && $bookingsTrend->count() > 0)
+            @php $hasTrendData = $isProductProvider ? ($ordersTrend->count() > 0) : ($bookingsTrend->count() > 0); @endphp
+            @if($hasTrendData)
                 <canvas id="trendChart"></canvas>
             @else
                 <div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
                     <i class="fas fa-chart-area text-4xl text-gray-300 mb-3"></i>
-                    <p class="text-gray-400 font-medium">{{ __('messages.no_booking_data') }}</p>
+                    <p class="text-gray-400 font-medium">{{ $isProductProvider ? 'No order data' : __('messages.no_booking_data') }}</p>
                 </div>
             @endif
         </div>
     </div>
 
-    <!-- Top Services -->
+    <!-- Top Chart (Services/Products) -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 relative">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
-                <i class="fas fa-trophy text-amber-500"></i> {{ __('messages.top_services') }}
+                <i class="fas fa-trophy text-amber-500"></i> 
+                {{ $isProductProvider ? 'Top Products' : __('messages.top_services') }}
             </h3>
-            <!-- Toggle Buttons for Top Services -->
-            <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                <button onclick="changeChartType('top', 'bar', this)" class="chart-btn active px-3 py-1.5 text-xs font-bold rounded-md transition-all"><i class="fas fa-chart-bar mr-1"></i> {{ __('messages.bar_chart') }}</button>
-                <button onclick="changeChartType('top', 'doughnut', this)" class="chart-btn px-3 py-1.5 text-xs font-bold rounded-md transition-all text-gray-500 hover:text-gray-800"><i class="fas fa-chart-pie mr-1"></i> {{ __('messages.pie_chart') }}</button>
-            </div>
         </div>
         <div class="relative w-full h-72">
-            @if(isset($topServices) && $topServices->count() > 0)
+            @if($isProductProvider && $totalProducts > 0)
+                <canvas id="topServicesChart"></canvas>
+            @elseif(!$isProductProvider && $topServices->count() > 0)
                 <canvas id="topServicesChart"></canvas>
             @else
                 <div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
                     <i class="fas fa-medal text-4xl text-gray-300 mb-3"></i>
-                    <p class="text-gray-400 font-medium">{{ __('messages.no_service_data') }}</p>
+                    <p class="text-gray-400 font-medium">{{ $isProductProvider ? 'No product data' : __('messages.no_service_data') }}</p>
                 </div>
             @endif
         </div>
     </div>
 </div>
 
-<style>
-    /* Active Chart Button Style */
-    .chart-btn.active {
-        background-color: #ffffff;
-        color: #2563eb; /* text-blue-600 */
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-</style>
-
-<!-- ========== 4. RECENT ACTIVITY (Lists) ========== -->
+<!-- ========== 4. RECENT ACTIVITY ========== -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Recent Bookings -->
+    <!-- Recent Bookings / Orders -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h3 class="font-bold text-gray-800 text-lg">{{ __('messages.recent_bookings') }}</h3>
-            <a href="{{ route('provider.bookings.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_all') }} &rarr;</a>
+            <h3 class="font-bold text-gray-800 text-lg">{{ $isProductProvider ? 'Recent Orders' : __('messages.recent_bookings') }}</h3>
+            <a href="{{ $isProductProvider ? route('provider.orders.index') : route('provider.bookings.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_all') }} &rarr;</a>
         </div>
         <div class="flex-1 divide-y divide-gray-100">
-            @if($recentBookings && $recentBookings->count() > 0)
-                @foreach($recentBookings as $booking)
+            @if($isProductProvider)
+                @forelse($recentOrders as $order)
                     <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors gap-3">
                         <div class="flex items-center gap-3">
-                            <!-- Avatar Circle -->
+                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                {{ substr($order->customer_name ?? $order->user->name ?? 'G', 0, 1) }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm">Order #{{ $order->order_number }}</p>
+                                <p class="text-xs text-gray-500">{{ $order->created_at->format('M d, Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800">
+                                {{ ucfirst($order->status) }}
+                            </span>
+                            <a href="{{ route('provider.orders.show', $order) }}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 font-bold text-xs transition-colors flex items-center gap-1.5" title="View Order">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <i class="fas fa-shopping-bag text-4xl text-gray-200 mb-3"></i>
+                        <p class="text-gray-500 font-medium">No orders yet.</p>
+                    </div>
+                @endforelse
+            @else
+                @forelse($recentBookings as $booking)
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors gap-3">
+                        <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
                                 {{ substr($booking->traveler->name ?? 'G', 0, 1) }}
                             </div>
@@ -163,81 +185,57 @@
                                 <p class="text-[10px] text-gray-400 mt-0.5"><i class="far fa-calendar-alt mr-1"></i> {{ $booking->start_date->format('M d, Y') }}</p>
                             </div>
                         </div>
-                        
                         <div class="flex items-center gap-2 sm:gap-3">
-                            <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider 
-                                @if($booking->status == 'pending') bg-amber-100 text-amber-800
-                                @elseif($booking->status == 'confirmed') bg-blue-100 text-blue-800
-                                @elseif($booking->status == 'completed') bg-emerald-100 text-emerald-800
-                                @else bg-red-100 text-red-800 @endif">
-                                {{ ucfirst($booking->status) }}
-                            </span>
-                            
                             <a href="{{ route('provider.bookings.show', $booking) }}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 font-bold text-xs transition-colors flex items-center gap-1.5" title="View Booking">
-                                <i class="fas fa-eye"></i> {{ __('messages.view') }}
+                                <i class="fas fa-eye"></i> View
                             </a>
                         </div>
                     </div>
-                @endforeach
-            @else
-                <div class="flex flex-col items-center justify-center py-10">
-                    <i class="fas fa-calendar-times text-4xl text-gray-200 mb-3"></i>
-                    <p class="text-gray-500 font-medium">{{ __('messages.no_bookings_yet') }}</p>
-                </div>
+                @empty
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <i class="fas fa-calendar-times text-4xl text-gray-200 mb-3"></i>
+                        <p class="text-gray-500 font-medium">{{ __('messages.no_bookings_yet') }}</p>
+                    </div>
+                @endforelse
             @endif
         </div>
     </div>
 
-    <!-- Recent Check-ins -->
+    <!-- Recent Check-ins (Only for Service Providers) -->
+    @if(!$isProductProvider)
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 class="font-bold text-gray-800 text-lg">{{ __('messages.recent_checkins') }}</h3>
-            <a href="{{ route('provider.checkins.index') ?? '#' }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_map') }} &rarr;</a>
+            <a href="{{ route('provider.checkins.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">{{ __('messages.view_map') }} &rarr;</a>
         </div>
         <div class="flex-1 divide-y divide-gray-100 max-h-[350px] overflow-y-auto custom-scrollbar">
-            @if(isset($checkinHistory) && $checkinHistory->count() > 0)
-                @foreach($checkinHistory as $scan)
-                    <div class="p-4 flex items-start justify-between hover:bg-gray-50 transition-colors">
-                        <div class="flex items-start gap-3">
-                            <!-- Location Icon -->
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i class="fas fa-map-marker-alt text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-800 text-sm">
-                                    {{ $scan->booking->traveler->name ?? __('messages.guest') }}
-                                </p>
-                                <p class="text-xs text-gray-600 mt-0.5">
-                                    {{ __('messages.checked_in_at') }} <span class="font-semibold text-gray-800">{{ $scan->checkpoint_name ?? __('messages.checkin_default') }}</span>
-                                </p>
-                                <p class="text-[10px] text-gray-400 mt-1">
-                                    <i class="far fa-clock mr-1"></i> {{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y - H:i') : __('messages.na') }}
-                                </p>
-                            </div>
+            @forelse($checkinHistory as $scan)
+                <div class="p-4 flex items-start justify-between hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-map-marker-alt text-sm"></i>
                         </div>
                         <div>
-                            <span class="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-                                <i class="fas fa-check-circle mr-1"></i> {{ __('messages.checked_in') }}
-                            </span>
+                            <p class="font-bold text-gray-800 text-sm">{{ $scan->booking->traveler->name ?? __('messages.guest') }}</p>
+                            <p class="text-xs text-gray-600 mt-0.5">{{ __('messages.checked_in_at') }} <span class="font-semibold text-gray-800">{{ $scan->checkpoint_name ?? __('messages.checkin_default') }}</span></p>
                         </div>
                     </div>
-                @endforeach
-            @else
+                </div>
+            @empty
                 <div class="flex flex-col items-center justify-center py-10">
                     <i class="fas fa-map-signs text-4xl text-gray-200 mb-3"></i>
                     <p class="text-gray-500 font-medium">{{ __('messages.no_checkins_yet') }}</p>
                 </div>
-            @endif
+            @endforelse
         </div>
     </div>
+    @endif
 </div>
 
-<!-- Slight CSS tweak for scrollbar in check-ins -->
 <style>
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 </style>
 
 @endsection
@@ -249,49 +247,38 @@
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#9ca3af';
 
-        // Data from Backend
-        const trendData = @json($bookingsTrend ?? []);
-        const topData = @json($topServices ?? []);
-
-        // Chart Instances
-        let trendChartInstance = null;
-        let topChartInstance = null;
-
-        // ==========================================
-        // 1. Render Functions
-        // ==========================================
+        // Data for Chart
+        @if($isProductProvider)
+            const trendData = @json($ordersTrend ?? []);
+        @else
+            const trendData = @json($bookingsTrend ?? []);
+        @endif
         
-        function renderTrendChart(type) {
-            if (trendChartInstance) trendChartInstance.destroy();
-            const ctx = document.getElementById('trendChart')?.getContext('2d');
-            if (!ctx) return;
+        @if($isProductProvider)
+            const topData = @json($topProducts ?? []); 
+        @else
+            const topData = @json($topServices ?? []);
+        @endif
 
-            let dataset = {
-                label: 'Bookings',
-                data: trendData.map(item => item.total),
-                borderColor: '#3b82f6',
-                backgroundColor: type === 'bar' ? '#3b82f6' : 'rgba(59, 130, 246, 0.2)',
-                borderWidth: type === 'bar' ? 0 : 3,
-                borderRadius: type === 'bar' ? 6 : 0,
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: '#3b82f6',
-                pointBorderWidth: 2,
-                fill: type === 'line',
-                tension: 0.4,
-            };
+        if (trendData.length > 0 && document.getElementById('trendChart')) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
-            if (type === 'line') {
-                let gradientBlue = ctx.createLinearGradient(0, 0, 0, 400);
-                gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-                gradientBlue.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-                dataset.backgroundColor = gradientBlue;
-            }
-
-            trendChartInstance = new Chart(ctx, {
-                type: type,
+            new Chart(ctx, {
+                type: 'line',
                 data: {
                     labels: trendData.map(item => item.date),
-                    datasets: [dataset]
+                    datasets: [{
+                        label: '{{ $isProductProvider ? "Orders" : "Bookings" }}',
+                        data: trendData.map(item => item.total),
+                        backgroundColor: gradient,
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                    }]
                 },
                 options: {
                     responsive: true,
@@ -305,71 +292,34 @@
             });
         }
 
-        function renderTopChart(type) {
-            if (topChartInstance) topChartInstance.destroy();
-            const ctx = document.getElementById('topServicesChart')?.getContext('2d');
-            if (!ctx) return;
-
-            const isPie = type === 'doughnut' || type === 'pie';
-
-            topChartInstance = new Chart(ctx, {
-                type: type,
+        if (topData.length > 0 && document.getElementById('topServicesChart')) {
+            const ctx = document.getElementById('topServicesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: topData.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
+                    labels: topData.map(item => {
+                        let name = item.product ? item.product.name : (item.name || 'Unknown');
+                        return name.length > 15 ? name.substring(0, 15) + '...' : name;
+                    }),
                     datasets: [{
-                        label: 'Bookings',
-                        data: topData.map(item => item.bookings_count),
+                        label: '{{ $isProductProvider ? "Sales" : "Bookings" }}',
+                        data: topData.map(item => item.sales_count ?? item.bookings_count ?? 0),
                         backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'],
-                        borderRadius: isPie ? 0 : 6,
-                        barThickness: isPie ? undefined : 30,
-                        cutout: type === 'doughnut' ? '60%' : 0,
+                        borderRadius: 6,
+                        barThickness: 30
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { 
-                            display: isPie,
-                            position: 'right' 
-                        } 
-                    },
-                    scales: isPie ? { 
-                        x: { display: false }, 
-                        y: { display: false } 
-                    } : { 
+                    plugins: { legend: { display: false } },
+                    scales: { 
                         y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, 
                         x: { grid: { display: false } } 
                     }
                 }
             });
         }
-
-        // ==========================================
-        // 2. Toggle Button Logic
-        // ==========================================
-        
-        window.changeChartType = function(chartName, type, btn) {
-            const parent = btn.parentElement;
-            parent.querySelectorAll('.chart-btn').forEach(b => {
-                b.classList.remove('active', 'text-blue-600');
-                b.classList.add('text-gray-500');
-            });
-            btn.classList.add('active', 'text-blue-600');
-            btn.classList.remove('text-gray-500');
-
-            if (chartName === 'trend') {
-                renderTrendChart(type);
-            } else {
-                renderTopChart(type);
-            }
-        };
-
-        // ==========================================
-        // 3. Initial Render
-        // ==========================================
-        if (trendData.length > 0) renderTrendChart('line');
-        if (topData.length > 0) renderTopChart('bar');
     });
 </script>
 @endpush

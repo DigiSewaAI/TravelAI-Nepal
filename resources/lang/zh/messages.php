@@ -1066,6 +1066,15 @@ return [
     'cancel' => '取消',
     'save' => '保存更改',
     'create' => '创建',
+        'total_products' => '总产品',
+    'total_orders' => '总订单',
+    'orders_trend' => '订单趋势',
+    'top_products' => '热门产品',
+    'recent_orders' => '最近订单',
+    'no_order_data' => '无订单数据',
+    'no_orders_yet' => '暂无订单。',
+    'orders' => '订单',
+    'view_order' => '查看订单',
 
 // ======================
 // PRICING
