@@ -5,6 +5,9 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * @deprecated Use OpenMeteoService instead. This service (OpenWeatherMap) is no longer maintained in the codebase.
+ */
 class WeatherService
 {
     protected $apiKey;

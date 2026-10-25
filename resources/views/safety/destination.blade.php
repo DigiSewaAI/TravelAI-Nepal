@@ -130,20 +130,36 @@
                             {{ __('messages.current_weather') }}
                         </p>
                         <div class="flex items-end gap-3 mt-1">
-                            <span class="text-4xl font-extrabold text-blue-700">{{ $weather['temp'] }}°C</span>
-                            <span class="text-gray-600 text-lg capitalize">{{ $weather['condition'] ?? 'N/A' }}</span>
+        <span class="text-4xl font-extrabold text-blue-700">{{ $weather['temperature'] }}°C</span>
+<span class="text-gray-600 text-lg capitalize">{{ $weather['wmo_label'] ?? 'N/A' }}</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
                             <span class="inline-flex items-center gap-1"><i class="fas fa-tint text-blue-400"></i> {{ $weather['humidity'] ?? 0 }}%</span>
                             <span class="inline-flex items-center gap-1"><i class="fas fa-wind text-gray-400"></i> {{ $weather['wind_speed'] ?? 0 }} m/s</span>
-                            <span class="inline-flex items-center gap-1"><i class="fas fa-thermometer-half text-orange-400"></i> {{ __('messages.feels_like') }} {{ $weather['feels_like'] ?? $weather['temp'] }}°C</span>
+<span class="inline-flex items-center gap-1"><i class="fas fa-thermometer-half text-orange-400"></i> {{ __('messages.feels_like') }} {{ $weather['feels_like'] ?? $weather['temperature'] }}°C</span>
                         </div>
                     </div>
-                    @if(isset($weather['icon']))
-                        <div class="flex-shrink-0">
-                            <img src="https://openweathermap.org/img/wn/{{ $weather['icon'] }}@2x.png" 
-                                 alt="{{ $weather['condition'] ?? 'Weather' }}" 
-                                 class="w-20 h-20 -my-2">
+                    @if(isset($weather['wmo_icon']))
+                        <div class="flex-shrink-0 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 flex items-center justify-center text-sky-500">
+                                @switch($weather['wmo_icon'])
+                                    @case('clear')
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                                        @break
+                                    @case('cloud')
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h10a4 4 0 000-8 6 6 0 00-11.5-1.5A4 4 0 003 15z"/></svg>
+                                        @break
+                                    @case('rain')
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13a4 4 0 004 4h10a4 4 0 000-8 6 6 0 00-11.5-1.5A4 4 0 003 13z"/><path stroke-linecap="round" d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg>
+                                        @break
+                                    @case('snow')
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13a4 4 0 004 4h10a4 4 0 000-8 6 6 0 00-11.5-1.5A4 4 0 003 13z"/><circle cx="8" cy="20" r="0.6" fill="currentColor"/><circle cx="12" cy="21" r="0.6" fill="currentColor"/><circle cx="16" cy="20" r="0.6" fill="currentColor"/></svg>
+                                        @break
+                                    @default
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M9.5 9.5h.01M14.5 9.5h.01M8.5 15c1-1 2.5-1.5 3.5-1.5s2.5.5 3.5 1.5"/></svg>
+                                @endswitch
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1">{{ $weather['wmo_label'] }}</span>
                         </div>
                     @endif
                 </div>

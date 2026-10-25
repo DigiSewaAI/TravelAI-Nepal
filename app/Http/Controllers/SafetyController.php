@@ -298,44 +298,47 @@ public function destination(Request $request, string $slug)
      * ✅ NEW: Get weather for a specific destination (cached)
      */
     protected function getWeatherForDestination($entity): ?array
-{
-    if (!$entity || !($entity instanceof Waypoint)) {
-        return null;
-    }
-
-    if (!$entity->latitude || !$entity->longitude) {
-        return null;
-    }
-
-    $cacheKey = "weather_wp_{$entity->id}";
-    
-    return Cache::remember($cacheKey, 900, function () use ($entity) {
-        try {
-            $data = $this->weatherService->getWeatherByCoords(
-                $entity->latitude,
-                $entity->longitude
-            );
-
-            // ✅ If data is null or missing temp, return null
-            if (!$data || !isset($data['temp'])) {
-                return null;
-            }
-
-            return [
-                'temp' => round($data['temp'] ?? 0),
-                'feels_like' => round($data['feels_like'] ?? 0),
-                'humidity' => $data['humidity'] ?? 0,
-                'condition' => $data['condition'] ?? 'Unknown',
-                'icon' => $data['icon'] ?? '01d',
-                'wind_speed' => $data['wind_speed'] ?? 0,
-                'precipitation' => $data['precipitation'] ?? 0,
-            ];
-        } catch (\Exception $e) {
-            \Log::error('Weather fetch failed: ' . $e->getMessage());
+    {
+        if (!$entity || !($entity instanceof Waypoint)) {
             return null;
         }
-    });
-}
+
+        if (!$entity->latitude || !$entity->longitude) {
+            return null;
+        }
+
+        $cacheKey = "weather_wp_{$entity->id}";
+
+        return Cache::remember($cacheKey, 900, function () use ($entity) {
+            try {
+                // OpenMeteo (Free, No API Key required) प्रयोग गर्ने
+                $weatherService = app(\App\Services\OpenMeteoService::class);
+                
+                $data = $weatherService->getWeatherForCoords(
+                    (float) $entity->latitude,
+                    (float) $entity->longitude
+                );
+
+                if (!$data || !isset($data['temperature'])) {
+                    return null;
+                }
+
+                // WMO Code बाट Icon र Label निकाल्ने
+                $wmo = \App\Services\OpenMeteoService::describeWmoCode($data['weather_code'] ?? null);
+
+                return [
+                    'temperature' => round($data['temperature']),
+                    'weather_code' => $data['weather_code'],
+                    'wmo_icon' => $wmo['icon'],
+                    'wmo_label' => $wmo['label'],
+                    'wind_speed' => $data['wind_speed'] ?? null,
+                    'humidity' => $data['humidity'] ?? null,
+                ];
+            } catch (\Throwable $e) {
+                return null;
+            }
+        });
+    }
 
     /**
      * Helper: Get color for severity
