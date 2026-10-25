@@ -699,12 +699,16 @@ if ($isRoundTrip && $distance > 0) {
                 'np' => "दिन {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
                 default => "Day {$dayNumber}: {$fromDisplay} → {$landmarkName} → {$toDisplay}",
             };
-                        $desc = match($locale) {
-                                'hi' => "{$fromDisplay} से {$landmarkName} तक की यात्रा और वापसी। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लंबा दिन – 15 किमी से अधिक।" : ""),
-                'zh' => "从 {$fromDisplay} 到 {$landmarkName} 的往返旅行。距离：{$distance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
-                'np' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$distance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा。" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी。" : ""),
-                default => "Round trip from {$fromDisplay} to {$landmarkName} and back. Distance: {$distance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
+                                    // FIX-R25: Round-trip distance must be doubled (e.g., 7km -> 14km)
+            $displayDistance = $distance * 2;
+
+            $desc = match($locale) {
+                'hi' => "{$fromDisplay} से {$landmarkName} तक की यात्रा और वापसी। दूरी: {$displayDistance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घंटे।" . ($isLongDay ? " ⚠️ लंबा दिन – 15 किमी से अधिक।" : ""),
+                'zh' => "从 {$fromDisplay} 到 {$landmarkName} 的往返旅行。距离：{$displayDistance}公里，预计时间：{$seg->estimated_time_hours}小时。" . ($isLongDay ? " ⚠️ 长日 – 超过15公里。" : ""),
+                'np' => "{$fromDisplay} बाट {$landmarkName} को यात्रा र फिर्ता। दूरी: {$displayDistance} किमी, अनुमानित समय: {$seg->estimated_time_hours} घण्टा।" . ($isLongDay ? " ⚠️ लामो दिन – १५ किमी भन्दा बढी।" : ""),
+                default => "Round trip from {$fromDisplay} to {$landmarkName} and back. Distance: {$displayDistance} km, estimated time: {$seg->estimated_time_hours} hrs." . ($isLongDay ? " ⚠️ Long day – over 15km." : ""),
             };
+
         } elseif ($isRoundTrip && $distance > 0) {
             // Phase 4R-fix-4: Same-location RT — use route name.
             $title = match($locale) {
@@ -841,7 +845,7 @@ $serviceName = $service
             'title' => $title,
             'description' => $desc,
             'overnight_waypoint_id' => $targetWaypoint->id,
-'distance_km' => $distance,
+'distance_km' => $isRoundTrip ? ($distance * 2) : $distance,
 'estimated_time_hours' => (float) $seg->estimated_time_hours,
 'altitude_m' => $targetWaypoint->altitude,
             'items' => [
