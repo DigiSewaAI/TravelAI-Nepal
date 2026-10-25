@@ -115,4 +115,37 @@ class DashboardController extends Controller
             'aiUsage'
         ));
     }
+        /**
+     * REALTIME-INCONSISTENCY-01: Get live counts for badges without page reload.
+     */
+    public function getLiveAlertCounts()
+    {
+        $user = Auth::user();
+        $provider = $user->getCurrentProvider();
+
+        if (!$provider) {
+            return response()->json(['sos' => 0, 'quotations' => 0, 'orders' => 0]);
+        }
+
+        // 1. Unread SOS Alerts (assuming status 'pending' means unread)
+        $unreadSos = \App\Models\SosAlert::where('provider_id', $provider->id)
+            ->where('status', 'pending')
+            ->count();
+
+        // 2. Pending Quotation Requests
+        $pendingQuotations = \App\Models\QuotationRequest::where('provider_id', $provider->id)
+            ->where('status', 'pending')
+            ->count();
+
+        // 3. Pending Orders (for Product Providers)
+        $pendingOrders = \App\Models\OrderItem::where('provider_id', $provider->id)
+            ->where('status', 'pending')
+            ->count(); // Adjust based on your order status logic
+
+        return response()->json([
+            'sos' => $unreadSos,
+            'quotations' => $pendingQuotations,
+            'orders' => $pendingOrders,
+        ]);
+    }
 }

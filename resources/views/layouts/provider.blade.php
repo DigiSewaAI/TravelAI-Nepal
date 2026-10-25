@@ -87,9 +87,7 @@
                     <a href="{{ route('provider.sos-alerts.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.sos-alerts.*') ? 'active' : '' }}">
                         <i class="fas fa-exclamation-triangle text-red-500 w-5 text-center"></i>
                         <span class="flex-1">{{ __('messages.sos_alerts_menu') }}</span>
-                        @if(isset($unreadSosCount) && $unreadSosCount > 0)
-                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $unreadSosCount }}</span>
-                        @endif
+<span id="sos-badge" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full {{ (isset($unreadSosCount) && $unreadSosCount > 0) ? '' : 'hidden' }}">{{ $unreadSosCount ?? 0 }}</span>
                     </a>
 
                     <!-- Services (Only for Service Providers) -->
@@ -129,9 +127,7 @@
                                 $pendingCount = \App\Models\QuotationRequest::where('provider_id', Auth::user()->getCurrentProvider()->id)->where('status', 'pending')->count();
                             }
                         @endphp
-                        @if($pendingCount > 0)
-                            <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $pendingCount }}</span>
-                        @endif
+<span id="quotation-badge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 {{ $pendingCount > 0 ? '' : 'hidden' }}">{{ $pendingCount }}</span>
                     </a>
                     @endif
 
@@ -407,6 +403,39 @@
             });
         });
     </script>
+        @auth
+    <script>
+        // REALTIME-INCONSISTENCY-01: Poll for alerts every 45 seconds
+        setInterval(function() {
+            fetch("{{ route('provider.alerts.live-counts') }}")
+                .then(response => response.json())
+                .then(data => {
+                    // Update SOS Badge
+                    const sosBadge = document.getElementById('sos-badge');
+                    if (sosBadge) {
+                        if (data.sos > 0) {
+                            sosBadge.innerText = data.sos;
+                            sosBadge.classList.remove('hidden');
+                        } else {
+                            sosBadge.classList.add('hidden');
+                        }
+                    }
+
+                    // Update Quotation Badge
+                    const quotationBadge = document.getElementById('quotation-badge');
+                    if (quotationBadge) {
+                        if (data.quotations > 0) {
+                            quotationBadge.innerText = data.quotations;
+                            quotationBadge.classList.remove('hidden');
+                        } else {
+                            quotationBadge.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching alerts:', error));
+        }, 45000); // 45 seconds
+    </script>
+    @endauth
     @stack('scripts')
 </body>
 </html>

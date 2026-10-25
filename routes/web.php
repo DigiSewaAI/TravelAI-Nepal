@@ -228,7 +228,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::get('/{ad}', [\App\Http\Controllers\Provider\AdController::class, 'show'])->name('show');
     });
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
-
+    // REALTIME-INCONSISTENCY-01: AJAX endpoint for live alert counts
+    Route::get('/alerts/live-counts', [ProviderDashboardController::class, 'getLiveAlertCounts'])->name('alerts.live-counts');
     // SOS Alerts (Phase 2 — provider notifications)
     Route::prefix('sos-alerts')->name('sos-alerts.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Provider\SosAlertController::class, 'index'])->name('index');
