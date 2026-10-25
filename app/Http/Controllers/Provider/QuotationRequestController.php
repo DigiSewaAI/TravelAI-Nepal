@@ -463,7 +463,9 @@ PROMPT;
                     number_format($finalTotal, 2));
             }
         }
-
+        // ✅ KTM-STAY-DISCLAIMER-05
+        $content .= "IMPORTANT NOTE\n--------------\n";
+        $content .= "Please note that this quotation covers the trekking package only. Kathmandu accommodation (hotel) and meals are not included. We can arrange them for you at an additional cost if needed.\n\n";
         if (isset($q['terms_and_conditions']) && is_array($q['terms_and_conditions'])) {
             $content .= "TERMS & CONDITIONS\n-------------------\n";
             $i = 1;
