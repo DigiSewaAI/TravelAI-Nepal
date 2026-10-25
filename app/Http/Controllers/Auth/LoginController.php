@@ -29,7 +29,7 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-                if (Auth::attempt($credentials, $request->filled('remember'))) {
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -42,27 +42,24 @@ class LoginController extends Controller
             // PATH-3B B2: merge guest cart into user cart
             app(\App\Services\CartService::class)->mergeGuestCart($user->id);
 
-            // Redirect based on role
+            // ---------------------------------------------------------
+            // FIX: Force redirect (intended() हटाइयो ताकि गलत पेजमा नजाओस्)
+            // ---------------------------------------------------------
+            
             if ($user->isSuperAdmin()) {
-    return redirect()->intended(route('admin.dashboard'));
-} elseif ($user->isProviderOwner() || $user->isStaff()) {
-    if (!$user->getCurrentProvider()) {
-        Log::warning('Login blocked: provider profile missing', [
-            'user_id' => $user->id,
-            'role'    => $user->role,
-        ]);
-        auth()->logout();
-        return redirect()->route('login')->withErrors([
-            'email' => 'Your account is not linked to a provider profile. Please contact support.'
-        ]);
-    }
-    return redirect()->intended(route('provider.dashboard'));
-} else {
-    return redirect()->intended(route('traveler.dashboard'));
-}
+                return redirect()->route('admin.dashboard');
+            } 
+            
+            // If the user has a Provider record OR is Staff, go to Provider Dashboard
+            if ($user->getCurrentProvider()) {
+                return redirect()->route('provider.dashboard');
+            } 
+            
+            // Otherwise, send to Traveler Dashboard
+            return redirect()->route('traveler.dashboard');
         }
 
-                Log::warning('Failed login attempt', [
+        Log::warning('Failed login attempt', [
             'email_hash' => hash('sha256', strtolower(trim($request->input('email', '')))),
             'ip_hash'    => hash('sha256', $request->ip() ?? 'unknown'),
         ]);
