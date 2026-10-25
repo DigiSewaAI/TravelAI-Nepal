@@ -121,6 +121,15 @@ class DashboardController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('Featured ads fail', ['error' => $e->getMessage()]);
         }
+                // TRAVELER-GREETING-01: Time-based greeting
+        $hour = now()->timezone('Asia/Kathmandu')->hour;
+        if ($hour < 12) {
+            $greeting = 'morning';
+        } elseif ($hour < 17) {
+            $greeting = 'afternoon';
+        } else {
+            $greeting = 'evening';
+        }
 
         return view('traveler.dashboard', compact(
             'user',

@@ -10,7 +10,7 @@
         <div class="flex flex-wrap justify-between items-center gap-4">
             <div class="flex-1 min-w-0">
                 <h1 class="text-2xl md:text-3xl font-bold">
-                    {{ __('messages.traveler_greeting', ['greeting' => __('messages.greeting_' . strtolower($greeting ?? 'morning')), 'name' => Auth::user()->name ?? 'Traveler']) }}
+<span id="dynamic-greeting">{{ __('messages.greeting_morning') }}</span>, {{ Auth::user()->name ?? 'Traveler' }} 👋
                 </h1>
                 <p class="text-blue-100 text-sm mt-1">{{ __('messages.traveler_ready_for_adventure') }}</p>
 
@@ -702,3 +702,31 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ट्राभलरको ब्राउजरको लोकल समय (Local Time) लिने
+        const localHour = new Date().getHours();
+        
+        // Blade बाट अनुवादित शब्दहरू लिने (ताकि भाषा फेरिँदा पनि सही देखियोस्)
+        const greetingMorning = @json(__('messages.greeting_morning'));
+        const greetingAfternoon = @json(__('messages.greeting_afternoon'));
+        const greetingEvening = @json(__('messages.greeting_evening'));
+
+        let greetingText = greetingMorning;
+
+        // समय अनुसार Greeting छान्ने
+        if (localHour >= 12 && localHour < 17) {
+            greetingText = greetingAfternoon;
+        } else if (localHour >= 17 || localHour < 5) {
+            greetingText = greetingEvening;
+        }
+
+        // HTML मा देखाउने
+        const greetingElement = document.getElementById('dynamic-greeting');
+        if (greetingElement) {
+            greetingElement.innerText = greetingText;
+        }
+    });
+</script>
+@endpush

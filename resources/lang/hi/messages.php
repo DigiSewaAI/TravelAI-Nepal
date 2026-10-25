@@ -1076,6 +1076,9 @@ return [
     'no_orders_yet' => 'अभी तक कोई ऑर्डर नहीं।',
     'orders' => 'ऑर्डर',
     'view_order' => 'ऑर्डर देखें',
+        'greeting_morning' => 'सुप्रभात',
+    'greeting_afternoon' => 'नमस्कार',
+    'greeting_evening' => 'शुभ संध्या',
 
 // ======================
 // PRICING

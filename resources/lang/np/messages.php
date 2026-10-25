@@ -1112,6 +1112,9 @@ return [
     'no_orders_yet' => 'अहिलेसम्म कुनै अर्डर छैन।',
     'orders' => 'अर्डरहरू',
     'view_order' => 'अर्डर हेर्नुहोस्',
+        'greeting_morning' => 'शुभ प्रभात',
+    'greeting_afternoon' => 'शुभ दिन',
+    'greeting_evening' => 'शुभ सन्ध्या',
 
     // ======================
     // PRICING

@@ -1074,6 +1074,9 @@ return [
     'no_orders_yet' => 'No orders yet.',
     'orders' => 'Orders',
     'view_order' => 'View Order',
+        'greeting_morning' => 'Good Morning',
+    'greeting_afternoon' => 'Good Afternoon',
+    'greeting_evening' => 'Good Evening',
 
 // ======================
 // PRICING

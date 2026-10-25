@@ -1075,6 +1075,9 @@ return [
     'no_orders_yet' => '暂无订单。',
     'orders' => '订单',
     'view_order' => '查看订单',
+        'greeting_morning' => '早上好',
+    'greeting_afternoon' => '下午好',
+    'greeting_evening' => '晚上好',
 
 // ======================
 // PRICING
