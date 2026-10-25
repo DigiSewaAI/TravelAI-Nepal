@@ -235,7 +235,7 @@
                     @auth
                         @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
-                        @elseif(auth()->user()->isProviderOwner())
+                        @elseif(auth()->user()->isProviderOwner() || auth()->user()->isStaff())
                             <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
                         @elseif(auth()->user()->isTraveler())
                             <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
@@ -255,7 +255,7 @@
                 <!-- Mobile Auth Button (Login icon only) -->
                 <div class="flex lg:hidden items-center gap-1">
                     @auth
-                        <a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route('traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
+                        <a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner() || auth()->user()->isStaff()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route('traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
                     @else
                         <a href="{{ route('login') }}" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.login') }}</a>
                     @endauth

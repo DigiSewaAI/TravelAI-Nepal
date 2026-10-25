@@ -45,9 +45,8 @@ class LoginController extends Controller
             // Redirect based on role
             if ($user->isSuperAdmin()) {
     return redirect()->intended(route('admin.dashboard'));
-} elseif ($user->isProviderOwner() || $user->role === 'manager' || $user->role === 'staff') {
-    // प्रोभाइडर प्रोफाइल छ कि जाँच गरौं
-        if (!$user->provider) {
+} elseif ($user->isProviderOwner() || $user->isStaff()) {
+    if (!$user->getCurrentProvider()) {
         Log::warning('Login blocked: provider profile missing', [
             'user_id' => $user->id,
             'role'    => $user->role,

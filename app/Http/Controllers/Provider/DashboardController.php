@@ -23,13 +23,8 @@ class DashboardController extends Controller
 
         $user = Auth::user();
         
-        // ✅ hasOne relationship प्रयोग गर्नुहोस्
-        $provider = $user->provider;
-
-        // 🔥 Fallback – यदि relationship काम गरेन भने direct query
-        if (!$provider) {
-            $provider = \App\Models\Provider::where('user_id', $user->id)->first();
-        }
+        // Staff ले login गर्दा पनि provider resolve गर्न (owner + staff)
+        $provider = $user->getCurrentProvider();
 
         if (!$provider) {
             return redirect()->route('home')

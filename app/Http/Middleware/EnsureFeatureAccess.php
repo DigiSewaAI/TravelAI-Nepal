@@ -23,7 +23,7 @@ class EnsureFeatureAccess
                 : redirect()->route('login');
         }
 
-        $provider = $user->ownProvider();
+        $provider = $user->getCurrentProvider();
 
         if (!$provider || !$provider->hasFeature($feature)) {
             if ($request->expectsJson()) {
