@@ -1011,10 +1011,10 @@ return [
 // ======================
 // REVIEWS (Phase 09A)
 // ======================
-'reviews' => 'समीक्षाएँ',
-'review' => 'समीक्षा',
-'write_review' => 'समीक्षा लिखें',
-'no_reviews_yet' => 'अभी तक कोई समीक्षा नहीं।',
+'reviews' => '评论',
+'review' => '评论',
+'write_review' => '写评论',
+'no_reviews_yet' => '暂无评论。',
 
 // ======================
 // PROVIDERS
@@ -1038,6 +1038,10 @@ return [
 'no_description_available' => '无可用描述。',
 'services_by_provider' => ':name 提供的服务',
 'independent_agency' => '独立机构',
+
+// Demo labeling (PROVIDER-DEMO-LABELING-01)
+'demo_label' => '演示 / 预览',
+'demo_profile_label' => '演示 / 预览资料',
 
 // ======================
 // PRICING

@@ -1038,6 +1038,10 @@ return [
 'services_by_provider' => 'Services by :name',
 'independent_agency' => 'Independent Agency',
 
+// Demo labeling (PROVIDER-DEMO-LABELING-01)
+'demo_label' => 'Demo / Preview',
+'demo_profile_label' => 'Demo / Preview Profile',
+
 // ======================
 // PRICING
 // ======================

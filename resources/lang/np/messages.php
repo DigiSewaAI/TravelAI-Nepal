@@ -1076,6 +1076,10 @@ return [
     'services_by_provider' => ':name द्वारा सेवाहरू',
     'independent_agency' => 'स्वतन्त्र एजेन्सी',
 
+// Demo labeling (PROVIDER-DEMO-LABELING-01)
+'demo_label' => 'डेमो / पूर्वावलोकन',
+'demo_profile_label' => 'डेमो / पूर्वावलोकन प्रोफाइल',
+
     // ======================
     // PRICING
     // ======================

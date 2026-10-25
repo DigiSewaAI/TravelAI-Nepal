@@ -51,7 +51,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">{{ $provider->name }}</h1>
                 @if($provider->is_demo)
     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 mt-2">
-        Demo / Preview Profile
+        {{ __('messages.demo_profile_label') }}
     </span>
 @endif
                 <div class="flex flex-wrap gap-2 mt-1">

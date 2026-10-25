@@ -129,7 +129,7 @@
             <h3 class="font-bold text-white drop-shadow-lg truncate text-shadow">{{ $provider->name }}</h3>
             @if($provider->is_demo)
     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800 mt-2">
-        Demo / Preview Profile
+        {{ __('messages.demo_label') }}
     </span>
 @endif
             <div class="flex flex-wrap gap-1 mt-1">
