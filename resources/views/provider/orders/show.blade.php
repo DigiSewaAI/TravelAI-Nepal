@@ -17,6 +17,17 @@
             {{ session('success') }}
         </div>
     @endif
+    @if(session('info'))
+    <div class="mb-4 p-4 bg-blue-100 text-blue-800 border border-blue-300 rounded-lg">
+        {{ session('info') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded-lg">
+        {{ session('error') }}
+    </div>
+@endif
 
     {{-- Order Header --}}
     <div class="flex justify-between items-start mb-6">
