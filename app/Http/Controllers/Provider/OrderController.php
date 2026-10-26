@@ -77,6 +77,18 @@ class OrderController extends Controller
             'status' => 'required|in:confirmed,shipped,delivered,cancelled',
         ]);
 
+        // 🆕 DUPLICATE GUARD: Prevent same-status re-submission
+        // (duplicate timeline entries + duplicate emails)
+        // Check this provider's items only — order.status may reflect other providers
+        $currentProviderStatuses = OrderItem::where('order_id', $order->id)
+            ->where('provider_id', $provider->id)
+            ->pluck('provider_status')
+            ->unique();
+
+        if ($currentProviderStatuses->count() === 1 && $currentProviderStatuses->first() === $validated['status']) {
+            return back()->with('info', 'Status is already ' . $validated['status'] . '. No change made.');
+        }
+
         $oldStatus = $order->status;
 
         $updated = DB::transaction(function () use ($order, $provider, $validated) {
@@ -111,7 +123,7 @@ class OrderController extends Controller
 
         try {
             \Mail::to($order->user->email)
-                ->queue(new \App\Mail\OrderStatusChangedMail($order, $oldStatus, $validated['status']));
+                ->send(new \App\Mail\OrderStatusChangedMail($order, $oldStatus, $validated['status']));
         } catch (\Throwable $e) {
             \Log::warning('OrderStatusChangedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
@@ -147,7 +159,7 @@ class OrderController extends Controller
         );
 
         try {
-            \Mail::to($order->user->email)->queue(new \App\Mail\OrderPaymentVerifiedMail($order));
+            \Mail::to($order->user->email)->send(new \App\Mail\OrderPaymentVerifiedMail($order));
         } catch (\Throwable $e) {
             \Log::warning('OrderPaymentVerifiedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
@@ -196,7 +208,7 @@ class OrderController extends Controller
         // Notify buyer
         try {
             \Mail::to($order->user->email)
-                ->queue(new \App\Mail\ReturnConfirmedMail($order, $item, $finalRefund));
+                ->send(new \App\Mail\ReturnConfirmedMail($order, $item, $finalRefund));
         } catch (\Throwable $e) {
             \Log::warning('ReturnConfirmedMail failed', ['order' => $order->id, 'error' => $e->getMessage()]);
         }
