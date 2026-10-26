@@ -53,8 +53,25 @@ class OrdersController extends Controller
         \App\Models\OrderStatusHistory::record(
             $order, $order->status, $order->status, null, auth()->id(), 'buyer', 'Payment notice sent'
         );
-
+        // 🔔 Notify providers: traveler sent payment notice
+        try {
+            $providerIds = $order->items()->pluck('provider_id')->unique();
+            $providers = \App\Models\Provider::whereIn('id', $providerIds)->with('user')->get();
+            foreach ($providers as $prov) {
+                if ($prov->user) {
+                    $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
+                        'Payment Notice Received',
+                        'Traveler sent payment for order ' . $order->order_number . ' (Ref: ' . $validated['payment_reference'] . ')',
+                        'payment',
+                        route('provider.orders.show', $order->id)
+                    ));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Provider payment notice notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
         return back()->with('success', __('messages.order_payment_notified'));
+        
     }
 
     // ═══════════════════════════════════════════

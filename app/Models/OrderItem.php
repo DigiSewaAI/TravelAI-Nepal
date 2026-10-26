@@ -53,6 +53,25 @@ class OrderItem extends Model
         return $q->where('provider_status', $status);
     }
 
+    // 🔔 Notify provider when a new order item is created
+    protected static function booted()
+    {
+        static::created(function ($item) {
+            try {
+                if ($item->provider && $item->provider->user) {
+                    $item->provider->user->notify(new \App\Notifications\ProviderAlertNotification(
+                        'New Order Received',
+                        'New order ' . ($item->order->order_number ?? '#' . $item->order_id) . ' — ' . $item->product_name . ' (Qty: ' . $item->quantity . ')',
+                        'order',
+                        route('provider.orders.show', $item->order_id)
+                    ));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Provider new order notification failed', ['item_id' => $item->id, 'error' => $e->getMessage()]);
+            }
+        });
+    }
+
     // ═══════════════════════════════════════════
     // PATH-3C C2: Return flow helpers
     // ═══════════════════════════════════════════

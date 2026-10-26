@@ -43,15 +43,22 @@ class QuotationRequestController extends Controller
 
     public function show(QuotationRequest $quotationRequest)
     {
-        $provider = Auth::user()->getCurrentProvider();
+        $provider = auth()->user()->getCurrentProvider();
         if (!$provider || $quotationRequest->provider_id !== $provider->id) {
-            abort(403, 'Unauthorized.');
+            abort(403);
         }
 
         if ($quotationRequest->status === 'pending') {
             $quotationRequest->update(['status' => 'viewed']);
             $quotationRequest->refresh();
         }
+
+        // Cascade: mark linked notifications as read (reverse sync)
+        auth()->user()->unreadNotifications()
+            ->get()
+            ->filter(fn($n) => isset($n->data['quotation_request_id'])
+                && $n->data['quotation_request_id'] == $quotationRequest->id)
+            ->each->markAsRead();
 
         return view('provider.quotation-requests.show', compact('quotationRequest'));
     }

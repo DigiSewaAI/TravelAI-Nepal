@@ -228,6 +228,11 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::get('/{ad}', [\App\Http\Controllers\Provider\AdController::class, 'show'])->name('show');
     });
     Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
+        // 🆕 Provider notifications (in-app bell)
+    Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Provider\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Provider\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
     // REALTIME-INCONSISTENCY-01: AJAX endpoint for live alert counts
     Route::get('/alerts/live-counts', [ProviderDashboardController::class, 'getLiveAlertCounts'])->name('alerts.live-counts');
     // SOS Alerts (Phase 2 — provider notifications)

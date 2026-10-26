@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png?v=3') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png?v=3') }}">
     <meta name="theme-color" content="#2563eb">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', __('messages.dashboard') . ' | TravelAI Nepal')</title>
@@ -247,6 +248,22 @@
 
                 <!-- Right: Language + User Dropdown -->
                 <div class="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+                                            {{-- Provider Notification Bell --}}
+                        <div class="relative" id="providerNotifWrapper">
+                            <button type="button" id="providerNotifToggle" class="relative text-gray-700 hover:text-blue-600 p-2 cursor-pointer">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span id="providerNotifBadge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">0</span>
+                            </button>
+                            <div id="providerNotifPanel" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                                <div class="px-4 py-3 border-b flex justify-between items-center">
+                                    <h3 class="font-semibold text-gray-800">Notifications</h3>
+                                    <a href="#" id="providerNotifMarkAll" class="text-xs text-blue-600 hover:underline">Mark all read</a>
+                                </div>
+                                <div id="providerNotifList">
+                                    <p class="p-4 text-sm text-gray-500 text-center">No notifications</p>
+                                </div>
+                            </div>
+                        </div>
 
                     <!-- Language Switcher -->
                     <div class="relative">
@@ -455,6 +472,90 @@
         }, 45000); // 45 seconds
     </script>
     @endauth
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    const wrapper = document.getElementById('providerNotifWrapper');
+    const toggle = document.getElementById('providerNotifToggle');
+    const panel = document.getElementById('providerNotifPanel');
+    const badge = document.getElementById('providerNotifBadge');
+    const list = document.getElementById('providerNotifList');
+    const markAll = document.getElementById('providerNotifMarkAll');
+
+    if (!wrapper) return;
+
+    async function fetchAlerts() {
+        try {
+            const res = await fetch('{{ route('provider.notifications.index') }}', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (data.notifications.length === 0) {
+                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No notifications</p>';
+            } else {
+                list.innerHTML = data.notifications.map(n => `
+                    <a href="${n.url}" data-id="${n.id}" class="provider-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">
+                        <p class="text-xs font-semibold text-gray-800">${n.title}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">${n.message}</p>
+                        <p class="text-xs text-gray-400 mt-1">${n.created_at}</p>
+                    </a>
+                `).join('');
+
+                list.querySelectorAll('.provider-notif-item').forEach(item => {
+                    item.addEventListener('click', async function(e) {
+                        e.preventDefault();
+                        const url = this.href;
+                        try {
+                            await fetch(`{{ url('provider/notifications') }}/${this.dataset.id}/read`, {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                            });
+                        } catch (err) {}
+                        window.location.href = url;
+                    });
+                });
+            }
+        } catch (e) {
+            console.error('Provider notif fetch error:', e);
+        }
+    }
+
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) fetchAlerts();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) panel.classList.add('hidden');
+    });
+
+   markAll.addEventListener('click', async function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+        await fetch('{{ route('provider.notifications.mark-all-read') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+        });
+    } catch (err) {
+        console.error('Mark all read failed:', err);
+    }
+    fetchAlerts();
+});
+
+    fetchAlerts();
+    setInterval(fetchAlerts, 30000);
+});
+</script>
     @stack('scripts')
 </body>
 </html>

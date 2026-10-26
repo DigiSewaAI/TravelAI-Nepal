@@ -127,25 +127,30 @@ class DashboardController extends Controller
             return response()->json(['sos' => 0, 'quotations' => 0, 'orders' => 0]);
         }
 
-        // 1. Unread SOS Alerts (assuming status 'pending' means unread)
-        $unreadSos = \App\Models\SosAlert::where('provider_id', $provider->id)
-            ->where('status', 'pending')
-            ->count();
+        try {
+            // 1. Pending SOS Alerts
+            $unreadSos = \App\Models\SosAlert::where('provider_id', $provider->id)
+                ->where('status', 'pending')
+                ->count();
 
-        // 2. Pending Quotation Requests
-        $pendingQuotations = \App\Models\QuotationRequest::where('provider_id', $provider->id)
-            ->where('status', 'pending')
-            ->count();
+            // 2. Pending Quotation Requests
+            $pendingQuotations = \App\Models\QuotationRequest::where('provider_id', $provider->id)
+                ->where('status', 'pending')
+                ->count();
 
-        // 3. Pending Orders (for Product Providers)
-        $pendingOrders = \App\Models\OrderItem::where('provider_id', $provider->id)
-            ->where('status', 'pending')
-            ->count(); // Adjust based on your order status logic
+            // 3. Pending Orders (correct column: provider_status)
+            $pendingOrders = \App\Models\OrderItem::where('provider_id', $provider->id)
+                ->where('provider_status', 'pending')
+                ->count();
 
-        return response()->json([
-            'sos' => $unreadSos,
-            'quotations' => $pendingQuotations,
-            'orders' => $pendingOrders,
-        ]);
+            return response()->json([
+                'sos' => $unreadSos,
+                'quotations' => $pendingQuotations,
+                'orders' => $pendingOrders,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('getLiveAlertCounts failed', ['provider_id' => $provider->id, 'error' => $e->getMessage()]);
+            return response()->json(['sos' => 0, 'quotations' => 0, 'orders' => 0], 200);
+        }
     }
-}
+    }
