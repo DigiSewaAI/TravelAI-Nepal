@@ -491,37 +491,48 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const data = await res.json();
 
-            if (data.unread_count > 0) {
-                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            // ✅ Update ALL badges and FORCE HIDE
+            const badges = document.querySelectorAll('#providerNotifBadge');
+            badges.forEach(b => {
+                if (data.unread_count > 0) {
+                    b.innerText = data.unread_count > 99 ? '99+' : data.unread_count;
+                    b.classList.remove('hidden');
+                    b.style.display = 'inline-flex';
+                } else {
+                    b.innerText = '0';
+                    b.classList.add('hidden');
+                    b.style.display = 'none'; // ✅ Force hide (Tailwind override)
+                }
+            });
 
-            if (data.notifications.length === 0) {
-                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No notifications</p>';
-            } else {
-                list.innerHTML = data.notifications.map(n => `
-                    <a href="${n.url}" data-id="${n.id}" class="provider-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">
-                        <p class="text-xs font-semibold text-gray-800">${n.title}</p>
-                        <p class="text-sm text-gray-600 mt-0.5">${n.message}</p>
-                        <p class="text-xs text-gray-400 mt-1">${n.created_at}</p>
-                    </a>
-                `).join('');
+            // List update
+            const list = document.getElementById('providerNotifList');
+            if (list) {
+                if (data.notifications.length === 0) {
+                    list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No notifications</p>';
+                } else {
+                    list.innerHTML = data.notifications.map(n => `
+                        <a href="${n.url}" data-id="${n.id}" class="provider-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">
+                            <p class="text-xs font-semibold text-gray-800">${n.title}</p>
+                            <p class="text-sm text-gray-600 mt-0.5">${n.message}</p>
+                            <p class="text-xs text-gray-400 mt-1">${n.created_at}</p>
+                        </a>
+                    `).join('');
 
-                list.querySelectorAll('.provider-notif-item').forEach(item => {
-                    item.addEventListener('click', async function(e) {
-                        e.preventDefault();
-                        const url = this.href;
-                        try {
-                            await fetch(`{{ url('provider/notifications') }}/${this.dataset.id}/read`, {
-                                method: 'POST',
-                                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-                            });
-                        } catch (err) {}
-                        window.location.href = url;
+                    list.querySelectorAll('.provider-notif-item').forEach(item => {
+                        item.addEventListener('click', async function(e) {
+                            e.preventDefault();
+                            const url = this.href;
+                            try {
+                                await fetch(`{{ url('provider/notifications') }}/${this.dataset.id}/read`, {
+                                    method: 'POST',
+                                    headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                                });
+                            } catch (err) {}
+                            window.location.href = url;
+                        });
                     });
-                });
+                }
             }
         } catch (e) {
             console.error('Provider notif fetch error:', e);
@@ -541,6 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
    markAll.addEventListener('click', async function(e) {
     e.preventDefault();
     e.stopPropagation();
+    
     try {
         await fetch('{{ route('provider.notifications.mark-all-read') }}', {
             method: 'POST',
@@ -549,9 +561,24 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (err) {
         console.error('Mark all read failed:', err);
     }
-    fetchAlerts();
+    
+    // 1. Bell badge instantly update (fetchAlerts)
+    await fetchAlerts();
+    
+    // 2. Sidebar Quotation badge instantly hide (UI ko lagi)
+    const sidebarBadge = document.getElementById('quotation-badge');
+    if (sidebarBadge) {
+        sidebarBadge.innerText = '0';
+        sidebarBadge.classList.add('hidden');
+    }
+    
+    // 3. Dropdown auto-close (taki user le bell badge 0 bhayeko dekhos)
+    if (panel) {
+        panel.classList.add('hidden');
+    }
 });
 
+    console.log('[NOTIF-DEBUG] Initial fetchAlerts running...');
     fetchAlerts();
     setInterval(fetchAlerts, 30000);
 });
