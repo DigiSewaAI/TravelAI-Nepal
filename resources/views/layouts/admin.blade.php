@@ -9,6 +9,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png?v=3') }}">
     <meta name="theme-color" content="#2563eb">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel | TravelAI Nepal')</title>
@@ -212,17 +213,35 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header (Logo + Admin Name) -->
             <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
-                <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/logo.png') }}"
-                         alt="TravelAI Nepal"
-                         class="h-8 w-auto">
-                    <h1 class="text-xl font-semibold text-gray-800">@yield('header', 'Admin Panel')</h1>
+    <div class="flex items-center space-x-3">
+        <img src="{{ asset('images/logo.png') }}"
+             alt="TravelAI Nepal"
+             class="h-8 w-auto">
+        <h1 class="text-xl font-semibold text-gray-800">@yield('header', 'Admin Panel')</h1>
+    </div>
+    <div class="flex items-center gap-3">
+        {{-- Admin Notification Bell --}}
+        <div class="relative" id="adminNotifWrapper">
+            <button type="button" id="adminNotifToggle" class="relative text-gray-700 hover:text-blue-600 p-2 cursor-pointer">
+                <i class="fas fa-bell text-lg"></i>
+                <span id="adminNotifBadge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">0</span>
+            </button>
+            <div id="adminNotifPanel" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div class="px-4 py-3 border-b flex justify-between items-center">
+                    <h3 class="font-semibold text-gray-800">Admin Alerts</h3>
+                    <a href="#" id="adminNotifMarkAll" class="text-xs text-blue-600 hover:underline">Mark all read</a>
                 </div>
-                <span class="text-sm text-gray-600">
-                    <i class="fas fa-user-circle text-lg mr-1"></i>
-                    {{ Auth::user()->name ?? 'Admin' }}
-                </span>
-            </header>
+                <div id="adminNotifList">
+                    <p class="p-4 text-sm text-gray-500 text-center">No alerts</p>
+                </div>
+            </div>
+        </div>
+        <span class="text-sm text-gray-600">
+            <i class="fas fa-user-circle text-lg mr-1"></i>
+            {{ Auth::user()->name ?? 'Admin' }}
+        </span>
+    </div>
+</header>
 
             <!-- Main Content -->
             <main class="flex-1 overflow-y-auto p-6">
@@ -242,6 +261,80 @@
             </footer>
         </div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    const wrapper = document.getElementById('adminNotifWrapper');
+    const toggle = document.getElementById('adminNotifToggle');
+    const panel = document.getElementById('adminNotifPanel');
+    const badge = document.getElementById('adminNotifBadge');
+    const list = document.getElementById('adminNotifList');
+    const markAll = document.getElementById('adminNotifMarkAll');
+
+    if (!wrapper) return;
+
+    async function fetchAlerts() {
+        try {
+            const res = await fetch('{{ route('admin.notifications.index') }}', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (data.notifications.length === 0) {
+                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No alerts</p>';
+            } else {
+                list.innerHTML = data.notifications.map(n => `
+                    <a href="${n.url}" data-id="${n.id}" class="admin-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">
+                        <p class="text-xs font-semibold text-gray-800">${n.title}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">${n.message}</p>
+                        <p class="text-xs text-gray-400 mt-1">${n.created_at}</p>
+                    </a>
+                `).join('');
+
+                list.querySelectorAll('.admin-notif-item').forEach(item => {
+                    item.addEventListener('click', async function() {
+                        await fetch(`{{ url('admin/notifications') }}/${this.dataset.id}/read`, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                        });
+                    });
+                });
+            }
+        } catch (e) {
+            console.error('Admin notif fetch error:', e);
+        }
+    }
+
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) fetchAlerts();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) panel.classList.add('hidden');
+    });
+
+    markAll.addEventListener('click', async function(e) {
+        e.preventDefault();
+        await fetch('{{ route('admin.notifications.mark-all-read') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+        });
+        fetchAlerts();
+    });
+
+    fetchAlerts();
+    setInterval(fetchAlerts, 30000);
+});
+</script>
 
     @stack('scripts')
 </body>

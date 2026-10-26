@@ -134,7 +134,23 @@ class OrderController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('OrderStatusChanged notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
-
+        // 🔔 Notify admins: order cancelled
+        if ($validated['status'] === 'cancelled') {
+            try {
+                $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new \App\Notifications\AdminAlertNotification(
+                        'Order Cancelled',
+                        'Order ' . $order->order_number . ' was cancelled by ' . $provider->name,
+                        'cancelled',
+                        route('admin.providers.show', $provider->id),
+                        $order->id
+                    ));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Admin cancellation notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+        }
         return back()->with('success', __('messages.provider_order_status_updated', ['count' => $updated]));
     }
 
@@ -177,7 +193,21 @@ class OrderController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('Payment notification failed', ['order_id' => $order->id]);
         }
-
+        // 🔔 Notify admins: payment verified
+        try {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'Payment Verified',
+                    'Order ' . $order->order_number . ' payment verified by ' . $provider->name . ' ($' . number_format($order->total, 2) . ')',
+                    'payment',
+                    route('admin.providers.show', $provider->id),
+                    $order->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin payment notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
         return back()->with('success', __('messages.order_payment_verified_success'));
     }
 
@@ -232,7 +262,21 @@ class OrderController extends Controller
             $order, 'returned', $order->status, null, auth()->id(), 'provider',
             'Return confirmed: ' . $validated['return_condition']
         );
-
+        // 🔔 Notify admins: return confirmed
+        try {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'Return Confirmed',
+                    'Return confirmed (' . $validated['return_condition'] . ') for order ' . $order->order_number . ' by ' . $provider->name,
+                    'return',
+                    route('admin.providers.show', $provider->id),
+                    $order->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin return notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
         return back()->with('success', __('messages.return_confirmed'));
     }
 }
