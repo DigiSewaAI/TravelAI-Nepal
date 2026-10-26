@@ -1177,8 +1177,8 @@ return [
     'traveler_no_safety_alerts'       => '目前没有安全警报。',
     'traveler_view_safety_map'        => '查看安全地图',
         'greeting_morning'   => '早上好',
-    'greeting_afternoon' => '下午好',
-    'greeting_evening'   => '晚上好',
+'greeting_afternoon' => '下午好',
+'greeting_evening'   => '晚上好',
 // ======================
 // TREKS
 // ======================

@@ -1177,9 +1177,9 @@ return [
     'traveler_mark_read_btn'          => 'पढ़ा हुआ चिह्नित करें',
     'traveler_no_safety_alerts'       => 'इस समय कोई सुरक्षा चेतावनी नहीं है।',
     'traveler_view_safety_map'        => 'सुरक्षा मानचित्र देखें',
-        'greeting_morning'   => 'सुप्रभात',
-    'greeting_afternoon' => 'नमस्कार',
-    'greeting_evening'   => 'शुभ संध्या',
+       'greeting_morning'   => 'सुप्रभात',
+'greeting_afternoon' => 'शुभ दोपहर',
+'greeting_evening'   => 'शुभ संध्या',
 // ======================
 // TREKS
 // ======================

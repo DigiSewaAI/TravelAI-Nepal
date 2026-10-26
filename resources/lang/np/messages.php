@@ -1214,9 +1214,9 @@ return [
     'traveler_mark_read_btn'          => 'पढेको चिन्ह लगाउनुहोस्',
     'traveler_no_safety_alerts'       => 'अहिले कुनै सुरक्षा सूचना छैन।',
     'traveler_view_safety_map'        => 'सुरक्षा नक्सा हेर्नुहोस्',
-        'greeting_morning'   => 'बिहान',
-    'greeting_afternoon' => 'दिउँसो',
-    'greeting_evening'   => 'साँझ',
+       'greeting_morning'   => 'शुभ प्रभात',
+'greeting_afternoon' => 'शुभ दिउँसो',
+'greeting_evening'   => 'शुभ सन्ध्या',
         // Traveler Dashboard — Design Pass 1 (Phase 7I)
     'traveler_quick_treks'      => 'ट्रेक',
     'traveler_quick_bookings'   => 'बुकिङ',

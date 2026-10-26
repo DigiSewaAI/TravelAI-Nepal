@@ -1175,9 +1175,9 @@ return [
     'traveler_mark_read_btn'          => 'Mark as Read',
     'traveler_no_safety_alerts'       => 'No safety alerts at this time.',
     'traveler_view_safety_map'        => 'View Safety Map',
-        'greeting_morning'   => 'Morning',
-    'greeting_afternoon' => 'Afternoon',
-    'greeting_evening'   => 'Evening',
+    'greeting_morning'   => 'Good Morning',
+    'greeting_afternoon' => 'Good Afternoon',
+    'greeting_evening'   => 'Good Evening',
         // Traveler Dashboard — Design Pass 1 (Phase 7I)
     'traveler_quick_treks'      => 'Treks',
     'traveler_quick_bookings'   => 'Bookings',
