@@ -19,13 +19,19 @@
     @if($services && $services->count() > 0)
         <div class="overflow-x-auto">
             <table class="w-full">
+                @php
+    $itineraryCategories = ['trek', 'tour', 'activity', 'experience'];
+    $showItineraryColumn = $services->contains(fn($s) => in_array($s->category->slug ?? '', $itineraryCategories));
+@endphp
                 <thead>
                     <tr class="border-b">
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.name') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.category') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.price') }}</th>
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.status') }}</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.itinerary') }}</th>
+                @if($showItineraryColumn)
+    <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.itinerary') }}</th>
+@endif
                         <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
@@ -53,28 +59,30 @@
         @if($service->status === 'active') {{ __('messages.active') }} @else {{ __('messages.inactive') }} @endif
     </span>
 </td>
-<td class="py-3 text-sm">
-    @php $daysCount = $service->itinerary_days_count ?? 0; @endphp
-    <div class="flex items-center gap-2">
-        @if($daysCount === 0)
-            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
-                {{ __('messages.no_itinerary_yet') }}
-            </span>
-        @elseif($service->itinerary_status === 'published')
-            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                {{ __('messages.published') }}
-            </span>
-        @else
-            <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                {{ __('messages.draft') }}
-            </span>
-        @endif
-        <a href="{{ route('provider.services.itinerary.index', $service) }}"
-           class="text-blue-600 hover:text-blue-800 text-xs font-medium whitespace-nowrap">
-            {{ __('messages.manage_itinerary') }}
-        </a>
-    </div>
-</td>
+@if($showItineraryColumn)
+    <td class="py-3 text-sm">
+        @php $daysCount = $service->itinerary_days_count ?? 0; @endphp
+        <div class="flex items-center gap-2">
+            @if($daysCount === 0)
+                <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
+                    {{ __('messages.no_itinerary_yet') }}
+                </span>
+            @elseif($service->itinerary_status === 'published')
+                <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                    {{ __('messages.published') }}
+                </span>
+            @else
+                <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                    {{ __('messages.draft') }}
+                </span>
+            @endif
+            <a href="{{ route('provider.services.itinerary.index', $service) }}"
+               class="text-blue-600 hover:text-blue-800 text-xs font-medium whitespace-nowrap">
+                {{ __('messages.manage_itinerary') }}
+            </a>
+        </div>
+    </td>
+@endif
 <td class="py-3 text-sm">
     <a href="{{ route('provider.services.edit', $service) }}" class="text-blue-600 hover:text-blue-800 mr-2">
                                 <i class="fas fa-edit"></i>
