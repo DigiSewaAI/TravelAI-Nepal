@@ -227,8 +227,14 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         Route::post('/', [\App\Http\Controllers\Provider\AdController::class, 'store'])->name('store');
         Route::get('/{ad}', [\App\Http\Controllers\Provider\AdController::class, 'show'])->name('show');
     });
-    Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
-        // 🆕 Provider notifications (in-app bell)
+        Route::get('/dashboard', [ProviderDashboardController::class, 'index'])->name('dashboard');
+
+    // 🆕 Restaurant vertical dashboard routes
+    Route::get('/restaurant/dashboard', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'index'])->name('restaurant.dashboard');
+    Route::patch('/restaurant/orders/{order}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateOrderStatus'])->name('restaurant.orders.status');
+    Route::patch('/restaurant/tables/{table}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateTableStatus'])->name('restaurant.tables.status');
+
+    // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Provider\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\Provider\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');

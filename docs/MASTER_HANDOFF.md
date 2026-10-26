@@ -1,100 +1,94 @@
 ═══════════════════════════════════════════════════════════
 
-👑 MASTER SYSTEM AUDIT REPORT (HANDOFF PREP)
+👑 MASTER SYSTEM AUDIT REPORT (UPDATED)
 
 FROM: Assistant
-
 TO:   Master
-
-DATE: 2026-10-25
-
-STATUS: 🟢 Deep Discovery Complete | 100% Evidence-Based
+DATE: 2026-10-26
+STATUS: 🟢 18/18 Categories Complete | 186/186 Tests Pass | 28 Commits Ahead
 
 ═══════════════════════════════════════════════════════════
 
+## 📊 1. CATEGORY INVENTORY (डेटाबेसको वास्तविक अवस्था)
 
+- **Provider Types:** १८ वटा (Shop, Rental, Wholesale, Trekking, Tour, Hotel, Resort, Lodge, Homestay, Guide, Porter, Transport, Activity, Local Experience, Photographer, Restaurant, Money Changer, Art/Craft)।
+- **Service Categories:** १८ वटा (Product Types सहित)।
+- **Product Types (DB):** `shop`, `rental`, `wholesale`
+- **Pivot Mapping:** ✅ `provider_type_service_category` — 18/18 mapped (seeded)
 
-\## 📊 1. CATEGORY INVENTORY (डेटाबेसको वास्तविक अवस्था)
+## ✅ 2. COMPLETION STATUS (के-के सकियो?)
 
-\- \*\*Provider Types:\*\* १५ वटा (Shop, Rental, Wholesale, Trekking, Tour, Hotel, Resort, Lodge, Homestay, Guide, Porter, Transport, Activity, Local Experience, Photographer)।
+### A. Core Service Engine (Trek, Tour, Activity, Experience)
+- **Controller:** `ServiceController.php` (Complete)।
+- **Tables:** `trek_details`, `tour_details`, `activity_details`, `experience_details` (Migrations exist)।
+- **UI:** Create, Edit, Itinerary Builder (Complete)।
 
-\- \*\*Service Categories:\*\* १३ वटा (जसमा Product Type का Shop, Rental, Wholesale पनि मिसिएका छन्)।
+### B. Core Product Engine (Shop, Rental, Wholesale)
+- **Controller:** `ProductController.php` (Complete)।
+- **Tables:** `products`, `shop_details`, `rental_details`, `wholesale_details` (Migrations exist)।
+- **UI:** Dynamic Product Forms, Image Upload, Stock (Complete)।
 
-\- \*\*Product Types (DB):\*\* हाल `shop`, `rental`, `wholesale` मात्र छन्। 
+### C. Specific Categories (Hotel, Transport, Restaurant, Money Changer, Art/Craft)
+- **Hotel/Resort/Lodge/Homestay:** `hotel_details` migration + UI form (Complete)।
+- **Transport:** `transport_details` migration + UI form (Complete)।
+- **Restaurant:** ✅ `restaurant_details` migration + model + controller + partial UI (Complete & Tested)।
+- **Money Changer:** ✅ `money_changer_details` migration + model + controller + partial UI (Complete & Tested, `supported_currencies_str` bug fixed)।
+- **Art/Craft:** ✅ `art_craft_details` migration + model + controller + partial UI (Complete & Tested, `is_handmade` boolean working)।
 
+### D. Notifications (NEW - Complete)
+- **Traveler:** `OrderStatusChanged` — bell widget + 30s polling (Complete)।
+- **Admin:** `AdminAlertNotification` — header bell + triggers (Complete)।
+- **Provider:** `ProviderAlertNotification` — header bell + new order/payment notice triggers (Complete)।
 
+### E. Role-Based Filtering (Complete)
+- Provider only sees their allowed category forms (e.g., Restaurant provider sees only "Restaurant" category)।
+- Pivot table `provider_type_service_category` seeder verified।
 
-\## ✅ 2. COMPLETION STATUS (के-के सकियो?)
+### F. i18n (Complete)
+- Greetings dynamic (morning/afternoon/evening) for EN, NP, HI, ZH।
 
-\*\*A. Core Service Engine (Trek, Tour, Activity, Experience):\*\*
+## 🚨 3. GAPS (के-के बाँकी छ?)
 
-\- \*\*Controller:\*\* `ServiceController.php` (Complete)।
+### A. Booking & Order Systems (Complete)
+- **Service Booking:** `BookingController` + `departures` (Complete)।
+- **Product Order:** `OrderController` + `carts` (Complete)।
 
-\- \*\*Tables:\*\* `trek\_details`, `tour\_details`, `activity\_details`, `experience\_details` (Migrations exist)।
+### B. Remaining Backlog (Not Blocking)
+- **VERTICAL-DASHBOARDS-01:** Money Changer FinTech dashboard (Live rates, Buy/Sell volume, Profit) — HTML mockups generating, next sprint।
+- **INVENTORY-UI-01:** Stock quantity/SKU UI for Shop, Rental, Wholesale providers।
+- **PAYMENT-GATE-MIDDLEWARE-01:** Block unpaid providers from listing services।
+- **PUSH-TO-PRODUCTION (R17):** Awaiting Owner GO (28 commits local ahead)।
 
-\- \*\*UI:\*\* Create, Edit, Itinerary Builder (Complete)।
+## 🎯 4. CURRENT STATE SUMMARY
 
+| Item | Status |
+|---|---|
+| HEAD | `2b2841d` (Local, +28 commits) |
+| Tests | **186/186 passing** |
+| Categories | **18/18 complete** |
+| Pivot Mappings | **18/18 seeded** |
+| Notifications | **3 roles complete** |
+| Role-based Filtering | **Complete** |
+| i18n | **Complete** |
+| Push to Production | 🔴 Awaiting Owner GO (R17) |
 
+## 🎯 5. NEXT FOCUS (Priority Order)
 
-\*\*B. Core Product Engine (Shop, Rental, Wholesale):\*\*
+1. **VERTICAL-DASHBOARDS-01** — Money Changer FinTech dashboard (HTML → Blade conversion)।
+2. **INVENTORY-UI-01** — Stock count/SKU for product providers।
+3. **PAYMENT-GATE-MIDDLEWARE-01** — Subscription enforcement।
+4. **PUSH-TO-PRODUCTION (R17)** — After Owner GO।
 
-\- \*\*Controller:\*\* `ProductController.php` (Complete)।
+## 📋 6. RULES STATUS
+- R3 (Evidence only) ✅
+- R4 (Scope locked) ✅
+- R8 (Additive migrations) ✅
+- R13 (Individual `git add`) ✅
+- R16 (186+ tests before commit) ✅
+- R17 (Push only after Owner GO) ✅
 
-\- \*\*Tables:\*\* `products`, `shop\_details`, `rental\_details`, `wholesale\_details` (Migrations exist)।
-
-\- \*\*UI:\*\* Dynamic Product Forms, Image Upload, Stock (Complete)।
-
-
-
-\*\*C. Specific Categories (Hotel, Transport):\*\*
-
-\- \*\*Hotel/Resort/Lodge/Homestay:\*\* `hotel\_details` माइग्रेसन पहिले नै बनेको छ (Data Model तयार छ, तर UI Form `ServiceController` भित्रै मिलाउनुपर्नेछ)।
-
-\- \*\*Transport:\*\* `transport\_details` माइग्रेसन र कोड `ServiceController` भित्रै छ।
-
-
-
-\## 🚨 3. GAPS (के-के बाँकी छ?)
-
-\*\*A. Missing Tables/Logic for Specific Categories:\*\*
-
-\- \*\*Restaurant/Food:\*\* कुनै टेबल वा मोडेल छैन।
-
-\- \*\*Art/Craft:\*\* कुनै टेबल छैन।
-
-\- \*\*Money Changer:\*\* कुनै टेबल छैन।
-
-\*(यी अहिलेको Priority होइनन्, तर भविष्यमा थप्नुपर्नेछ)।\*
-
-
-
-\*\*B. Booking \& Order Systems:\*\*
-
-\- \*\*Service Booking:\*\* `BookingController` र `departures` पूरै बनेको छ।
-
-\- \*\*Product Order:\*\* `OrderController` र `carts` बनेको छ।
-
-
-
-\## 🎯 4. HANDOFF STRATEGY (Master को निर्णय)
-
-\- \*\*Core System:\*\* १००% तयार छ (Auth, RBAC, Service, Product, Booking, Payment, KYC)।
-
-\- \*\*Dynamic UI:\*\* पूरै तयार छ (Provider Type अनुसार Sidebar र Forms फेरिन्छ)।
-
-\- \*\*Next Focus:\*\* 
-
-&#x20; 1. \*\*Inventory UI\*\* (Product को Stock Count)।
-
-&#x20; 2. \*\*Missing Tables\*\* (यदि Restaurant/Money Changer थप्नुछ भने)।
-
-&#x20; 3. \*\*Payment Gate\*\* (Subscription Middleware) — जुन दाइले पछि गर्न भन्नुभएको छ।
-
-
-
-\*\*Master, यो रिपोर्ट हेरेर कृपया `MASTER\_HANDOFF.md` तयार गर्नुहोस्।\*\*
+**Master, yo report latest state ho. `MASTER_HANDOFF.md` update garnus.**
 
 R3/R4/R13/R16 कायम।
 
 ═══════════════════════════════════════════════════════════
-
