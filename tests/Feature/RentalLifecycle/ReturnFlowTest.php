@@ -125,7 +125,8 @@ class ReturnFlowTest extends TestCase
         $item->refresh();
         $this->assertSame('good', $item->return_condition);
         $this->assertSame('2000.00', (string) $item->deposit_refund_amount);
-        Mail::assertQueued(ReturnConfirmedMail::class);
+        Mail::assertSent(ReturnConfirmedMail::class);
+
     }
 
     public function test_provider_confirms_return_damaged_deducts(): void
@@ -209,7 +210,8 @@ class ReturnFlowTest extends TestCase
             route('provider.orders.items.confirm-return', [$order, $item]),
             ['return_condition' => 'good']
         );
-        Mail::assertQueued(ReturnConfirmedMail::class);
+        Mail::assertSent(ReturnConfirmedMail::class);
+
     }
 
     public function test_order_deposit_refunded_total_updated(): void

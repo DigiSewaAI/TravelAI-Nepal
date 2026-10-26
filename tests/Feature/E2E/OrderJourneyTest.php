@@ -120,7 +120,8 @@ class OrderJourneyTest extends TestCase
         $this->assertSame('pending', $latestHistory->from_status);
 
         // Email queued to buyer
-        Mail::assertQueued(OrderStatusChangedMail::class);
+        Mail::assertSent(OrderStatusChangedMail::class);
+
     }
 
     public function test_buyer_notifies_payment_then_provider_verifies(): void
@@ -156,7 +157,8 @@ class OrderJourneyTest extends TestCase
         $this->assertSame($this->providerUser->id, $order->payment_verified_by);
 
         // Email queued
-        Mail::assertQueued(OrderPaymentVerifiedMail::class);
+        Mail::assertSent(OrderPaymentVerifiedMail::class);
+
     }
 
     public function test_full_rental_journey_with_dates(): void

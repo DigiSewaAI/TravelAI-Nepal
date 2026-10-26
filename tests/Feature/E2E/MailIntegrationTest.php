@@ -78,14 +78,16 @@ class MailIntegrationTest extends TestCase
             route('provider.orders.updateStatus', $order),
             ['status' => 'confirmed']
         );
-        Mail::assertQueued(OrderStatusChangedMail::class);
+        Mail::assertSent(OrderStatusChangedMail::class);
+
 
         // 3. Payment verified → OrderPaymentVerifiedMail
         $this->actingAs($this->buyer)->post(route('orders.notifyPayment', $order), [
             'payment_reference' => 'ESW-MAIL-01',
         ]);
         $this->actingAs($this->providerUser)->patch(route('provider.orders.verifyPayment', $order));
-        Mail::assertQueued(OrderPaymentVerifiedMail::class);
+        Mail::assertSent(OrderPaymentVerifiedMail::class);
+
     }
 
     public function test_mail_failure_does_not_break_order_flow(): void
@@ -123,7 +125,8 @@ class MailIntegrationTest extends TestCase
         );
 
         // Assert mail was queued (to correct buyer — verify via order relation)
-        Mail::assertQueued(OrderStatusChangedMail::class, function ($mail) use ($order) {
+        Mail::assertSent(OrderStatusChangedMail::class, function ($mail) use ($order) {
+
             return $mail->order->id === $order->id
                 && $mail->order->user_id === $this->buyer->id;
         });

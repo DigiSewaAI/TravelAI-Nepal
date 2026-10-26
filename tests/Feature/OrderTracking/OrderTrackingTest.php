@@ -128,7 +128,8 @@ class OrderTrackingTest extends TestCase
         $this->actingAs($this->providerUser)->patch(route('provider.orders.updateStatus', $order), [
             'status' => 'confirmed',
         ]);
-        Mail::assertQueued(OrderStatusChangedMail::class);
+        Mail::assertSent(OrderStatusChangedMail::class);
+
     }
 
     public function test_payment_verified_mail_queued(): void
@@ -139,7 +140,8 @@ class OrderTrackingTest extends TestCase
         ]);
         $this->actingAs($this->providerUser)->patch(route('provider.orders.verifyPayment', $order));
 
-        Mail::assertQueued(OrderPaymentVerifiedMail::class);
+        Mail::assertSent(OrderPaymentVerifiedMail::class);
+
     }
 
     public function test_mail_failure_does_not_break_flow(): void
