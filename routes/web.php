@@ -235,6 +235,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::patch('/restaurant/tables/{table}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateTableStatus'])->name('restaurant.tables.status');
         // 🆕 Money Changer vertical dashboard route
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
+        // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
+    Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
+    Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');
+    
 
     // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');

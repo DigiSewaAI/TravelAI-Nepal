@@ -27,6 +27,11 @@ class DashboardController extends Controller
         if ($user && $user->getCurrentProvider()?->types->contains('slug', 'money-changer')) {
             return redirect()->route('provider.money-changer.dashboard');
         }
+        
+        // 🆕 Inventory (product providers) vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->whereIn('slug', ['shop-owner', 'rental-provider', 'wholesale-provider'])->isNotEmpty()) {
+            return redirect()->route('provider.inventory.dashboard');
+        }
         if (!auth()->check()) {
             return redirect()->route('login');
         }

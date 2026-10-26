@@ -14,18 +14,25 @@ class Product extends Model
         'product_type',
         'name',
         'slug',
+        'sku',
         'description',
         'price',
         'currency',
+        'cost_price',
         'cover_image',
         'gallery',
         'status',
+        'stock_quantity',
+        'low_stock_threshold',
         'location_id',
     ];
 
     protected $casts = [
-        'gallery' => 'array',
-        'price'   => 'decimal:2',
+        'gallery'             => 'array',
+        'price'               => 'decimal:2',
+        'cost_price'          => 'decimal:2',
+        'stock_quantity'      => 'integer',
+        'low_stock_threshold' => 'integer',
     ];
 
     // =============================================
