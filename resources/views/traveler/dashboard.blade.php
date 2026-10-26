@@ -4,6 +4,36 @@
 
 @section('content')
 
+{{-- 🔥 Notif flash animation (Tailwind-independent) --}}
+<style>
+@keyframes notifFlashRed {
+    0%, 100% {
+        color: #ffffff;
+        text-shadow:
+            0 0 6px #ffffff,
+            0 0 12px #ffffff,
+            0 0 20px rgba(255, 255, 255, 0.7),
+            0 0 30px rgba(255, 255, 255, 0.5);
+        transform: scale(1);
+    }
+    50% {
+        color: #ffffff;
+        text-shadow:
+            0 0 10px #ffffff,
+            0 0 20px #ffffff,
+            0 0 30px rgba(255, 255, 255, 0.9),
+            0 0 45px rgba(255, 255, 255, 0.7),
+            0 0 60px rgba(255, 255, 255, 0.5);
+        transform: scale(1.25);
+    }
+}
+.notif-flash-red {
+    animation: notifFlashRed 1.1s ease-in-out infinite !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+</style>
+
 {{-- ========== HERO / WELCOME SECTION ========== --}}
 <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-6 px-4">
     <div class="max-w-7xl mx-auto">
@@ -28,8 +58,33 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-3 items-center">
-                {{-- Weather Widget --}}
-                @if(!empty($weatherData) && isset($weatherData['temperature']))
+                {{-- Notification Bell Widget (left of weather) --}}
+<div class="relative" id="dashNotifWrapper">
+    <button type="button" id="dashNotifToggle" 
+            class="bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/20 transition-all duration-200 cursor-pointer">
+        <i class="fas fa-bell text-2xl text-yellow-300"></i>
+        <div class="leading-tight text-left">
+            <p class="text-[10px] uppercase tracking-wider text-blue-100/80">Notifications</p>
+            <p class="text-lg font-bold">
+    <span id="dashNotifBadge" class="text-white">0</span> 
+    <span id="dashNotifLabel" class="text-blue-100/80">unread</span>
+</p>
+        </div>
+    </button>
+    <div id="dashNotifPanel" 
+         class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div class="px-4 py-3 border-b flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Notifications</h3>
+            <a href="#" id="dashNotifMarkAll" class="text-xs text-blue-600 hover:underline">Mark all read</a>
+        </div>
+        <div id="dashNotifList">
+            <p class="p-4 text-sm text-gray-500 text-center">No notifications</p>
+        </div>
+    </div>
+</div>
+
+{{-- Weather Widget --}}
+@if(!empty($weatherData) && isset($weatherData['temperature']))
                     @php
                         $wmo = \App\Services\OpenMeteoService::describeWmoCode($weatherData['weather_code'] ?? null);
                         $iconMap = [
@@ -702,31 +757,115 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 @endsection
+
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ट्राभलरको ब्राउजरको लोकल समय (Local Time) लिने
-        const localHour = new Date().getHours();
-        
-        // Blade बाट अनुवादित शब्दहरू लिने (ताकि भाषा फेरिँदा पनि सही देखियोस्)
-        const greetingMorning = @json(__('messages.greeting_morning'));
-        const greetingAfternoon = @json(__('messages.greeting_afternoon'));
-        const greetingEvening = @json(__('messages.greeting_evening'));
+document.addEventListener('DOMContentLoaded', function() {
+    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    const wrapper = document.getElementById('dashNotifWrapper');
+    const toggle = document.getElementById('dashNotifToggle');
+    const panel = document.getElementById('dashNotifPanel');
+const badge = document.getElementById('dashNotifBadge');
+const label = document.getElementById('dashNotifLabel');   // ← NAYA
+const list = document.getElementById('dashNotifList');
+    const markAll = document.getElementById('dashNotifMarkAll');
 
-        let greetingText = greetingMorning;
+    if (!wrapper) return;
 
-        // समय अनुसार Greeting छान्ने
-        if (localHour >= 12 && localHour < 17) {
-            greetingText = greetingAfternoon;
-        } else if (localHour >= 17 || localHour < 5) {
-            greetingText = greetingEvening;
+    async function fetchNotifs() {
+        try {
+            const res = await fetch('{{ route('traveler.notifications.index') }}', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+
+            const count = data.unread_count;
+badge.textContent = count > 99 ? '99+' : count;
+
+if (count > 0) {
+    // 🔥 FLASHY RED — vivid color + custom pulse + strong glow
+    badge.classList.add('notif-flash-red');
+    badge.classList.remove('text-white');
+
+    label.classList.add('notif-flash-red');
+    label.classList.remove('text-blue-100/80');
+} else {
+    // ⚪ Normal white
+    badge.classList.remove('notif-flash-red');
+    badge.classList.add('text-white');
+
+    label.classList.remove('notif-flash-red');
+    label.classList.add('text-blue-100/80');
+}
+
+            if (data.notifications.length === 0) {
+                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No notifications</p>';
+            } else {
+                list.innerHTML = data.notifications.map(n => `
+                    <a href="${n.url}" data-id="${n.id}" class="dash-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">
+                        <p class="text-sm text-gray-800">${n.message}</p>
+                        <p class="text-xs text-gray-500 mt-1">${n.created_at}</p>
+                    </a>
+                `).join('');
+
+                list.querySelectorAll('.dash-notif-item').forEach(item => {
+                    item.addEventListener('click', async function() {
+                        await fetch(`{{ url('traveler/notifications') }}/${this.dataset.id}/read`, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                        });
+                    });
+                });
+            }
+        } catch (e) {
+            console.error('Notif fetch error:', e);
         }
+    }
 
-        // HTML मा देखाउने
-        const greetingElement = document.getElementById('dynamic-greeting');
-        if (greetingElement) {
-            greetingElement.innerText = greetingText;
-        }
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) fetchNotifs();
     });
+
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) panel.classList.add('hidden');
+    });
+
+    markAll.addEventListener('click', async function(e) {
+        e.preventDefault();
+        await fetch('{{ route('traveler.notifications.mark-all-read') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+        });
+        fetchNotifs();
+    });
+
+    fetchNotifs();
+    setInterval(fetchNotifs, 30000);
+});
+</script>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const localHour = new Date().getHours();
+    const greetingMorning = @json(__('messages.greeting_morning'));
+    const greetingAfternoon = @json(__('messages.greeting_afternoon'));
+    const greetingEvening = @json(__('messages.greeting_evening'));
+
+    let greetingText = greetingMorning;
+    if (localHour >= 12 && localHour < 17) {
+        greetingText = greetingAfternoon;
+    } else if (localHour >= 17 || localHour < 5) {
+        greetingText = greetingEvening;
+    }
+
+    const greetingElement = document.getElementById('dynamic-greeting');
+    if (greetingElement) {
+        greetingElement.innerText = greetingText;
+    }
+});
 </script>
 @endpush

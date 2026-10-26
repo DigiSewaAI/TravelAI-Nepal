@@ -393,7 +393,10 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
     Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
-
+        // 🆕 Traveler notifications (in-app bell)
+        Route::get('/notifications', [\App\Http\Controllers\Traveler\NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Traveler\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::post('/notifications/read-all', [\App\Http\Controllers\Traveler\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
         // Ads — Traveler tracking
         Route::post('/ads/{ad}/impression', [\App\Http\Controllers\Traveler\AdController::class, 'impression'])->name('ads.impression');
         Route::get('/ads/{ad}/click', [\App\Http\Controllers\Traveler\AdController::class, 'click'])->name('ads.click');

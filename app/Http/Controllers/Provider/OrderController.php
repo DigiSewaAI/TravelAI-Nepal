@@ -128,6 +128,13 @@ class OrderController extends Controller
             \Log::warning('OrderStatusChangedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
 
+        // 🆕 In-app notification
+        try {
+            $order->user->notify(new \App\Notifications\OrderStatusChanged($order, $oldStatus, $validated['status']));
+        } catch (\Throwable $e) {
+            \Log::warning('OrderStatusChanged notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
         return back()->with('success', __('messages.provider_order_status_updated', ['count' => $updated]));
     }
 
@@ -162,6 +169,13 @@ class OrderController extends Controller
             \Mail::to($order->user->email)->send(new \App\Mail\OrderPaymentVerifiedMail($order));
         } catch (\Throwable $e) {
             \Log::warning('OrderPaymentVerifiedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        // 🆕 In-app notification for payment verified
+        try {
+            $order->user->notify(new \App\Notifications\OrderStatusChanged($order, $oldStatus, 'confirmed'));
+        } catch (\Throwable $e) {
+            \Log::warning('Payment notification failed', ['order_id' => $order->id]);
         }
 
         return back()->with('success', __('messages.order_payment_verified_success'));
