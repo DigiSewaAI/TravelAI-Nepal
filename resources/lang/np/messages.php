@@ -1223,6 +1223,25 @@ return [
     'traveler_quick_reviews'    => 'समीक्षा',
     'traveler_group_travels'    => 'मेरा यात्राहरू',
         'traveler_group_tools'      => 'उपकरण र सर्टकटहरू',
+            // === Restaurant / Money Changer / Art Craft details ===
+    'restaurant_details'        => 'रेस्टुरेन्ट विवरण',
+    'cuisine_type'              => 'खानाको प्रकार',
+    'seating_capacity'          => 'बस्ने क्षमता',
+    'opening_hours'             => 'खुल्ने समय',
+    'menu_url'                  => 'मेनु URL',
+
+    'money_changer_details'     => 'मनी चेन्जर विवरण',
+    'license_number'            => 'इजाजतपत्र नम्बर',
+    'exchange_rate_margin'      => 'विनिमय दर मार्जिन (%)',
+    'supported_currencies'      => 'समर्थित मुद्राहरू (कमाले छुट्याउनुहोस्)',
+    'supported_currencies_hint' => 'मुद्राहरू कमाले छुट्याएर लेख्नुहोस्',
+
+    'art_craft_details'         => 'कला/शिल्प विवरण',
+    'craft_type'                => 'शिल्प प्रकार',
+    'materials'                 => 'सामग्री',
+    'artist_name'               => 'कलाकारको नाम',
+    'dimensions'                => 'आयाम',
+    'is_handmade'               => 'हस्तनिर्मित हो?',
             // ============================================
     // Journey Replay (I18N-JOURNEY-REPLAY-01)
     // ============================================

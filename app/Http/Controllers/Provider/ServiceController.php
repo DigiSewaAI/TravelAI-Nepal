@@ -17,6 +17,9 @@ use App\Models\HotelDetail;
 use App\Models\ActivityDetail;
 use App\Models\ExperienceDetail;
 use App\Models\TransportDetail;
+use App\Models\RestaurantDetail;
+use App\Models\MoneyChangerDetail;
+use App\Models\ArtCraftDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -96,7 +99,7 @@ class ServiceController extends Controller
             $allowedIds = $allowedCategories->reject(function($cat) use ($productCategorySlugs) {
                 return in_array($cat->slug, $productCategorySlugs);
             })->pluck('id')->all();
-            
+
             if (!in_array((int) $validated['service_category_id'], $allowedIds, true)) {
                 abort(403, __('messages.category_not_allowed'));
             }
@@ -225,6 +228,31 @@ class ServiceController extends Controller
                 'cancellation_policy' => 'nullable|string',
                 'description'       => 'nullable|string',
             ]),
+
+            // 🆕 Restaurant
+            'restaurant' => $request->validate([
+                'cuisine_type'     => 'nullable|string|max:100',
+                'seating_capacity' => 'nullable|integer|min:0',
+                'opening_hours'    => 'nullable|string|max:100',
+                'menu_url'         => 'nullable|url|max:255',
+            ]),
+
+            // 🆕 Money Changer
+            'money-changer' => $request->validate([
+                'license_number'           => 'nullable|string|max:100',
+                'exchange_rate_margin'     => 'nullable|numeric|min:0|max:100',
+                'supported_currencies_str' => 'nullable|string|max:500',
+            ]),
+
+            // 🆕 Art / Craft
+            'art-craft' => $request->validate([
+                'craft_type'  => 'nullable|string|max:100',
+                'materials'   => 'nullable|string|max:255',
+                'artist_name' => 'nullable|string|max:100',
+                'dimensions'  => 'nullable|string|max:100',
+                'is_handmade' => 'nullable|boolean',
+            ]),
+
             default => [],
         };
     }
@@ -247,14 +275,32 @@ class ServiceController extends Controller
             }
         }
 
+        // 🆕 Money Changer: supported_currencies_str (string) → supported_currencies (array)
+        if ($slug === 'money-changer') {
+            if (!empty($data['supported_currencies_str'])) {
+                $data['supported_currencies'] = array_values(array_filter(
+                    array_map('trim', explode(',', $data['supported_currencies_str']))
+                ));
+            }
+            unset($data['supported_currencies_str']);
+        }
+
+        // 🆕 Art/Craft: is_handmade checkbox → boolean
+        if ($slug === 'art-craft') {
+            $data['is_handmade'] = !empty($data['is_handmade']);
+        }
+
         match ($slug) {
-            'trek'       => TrekDetail::updateOrCreate(['service_id' => $service->id], $data),
-            'tour'       => TourDetail::updateOrCreate(['service_id' => $service->id], $data),
-            'hotel'      => HotelDetail::updateOrCreate(['service_id' => $service->id], $data),
-            'activity'   => ActivityDetail::updateOrCreate(['service_id' => $service->id], $data),
-            'experience' => ExperienceDetail::updateOrCreate(['service_id' => $service->id], $data),
-            'transport'  => TransportDetail::updateOrCreate(['service_id' => $service->id], $data),
-            default      => null,
+            'trek'           => TrekDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'tour'           => TourDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'hotel'          => HotelDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'activity'       => ActivityDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'experience'     => ExperienceDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'transport'      => TransportDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'restaurant'     => RestaurantDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'money-changer'  => MoneyChangerDetail::updateOrCreate(['service_id' => $service->id], $data),
+            'art-craft'      => ArtCraftDetail::updateOrCreate(['service_id' => $service->id], $data),
+            default          => null,
         };
     }
 

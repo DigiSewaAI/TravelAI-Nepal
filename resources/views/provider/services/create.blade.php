@@ -134,6 +134,9 @@
             @include('provider.services._fields_activity', ['service' => null])
             @include('provider.services._fields_experience', ['service' => null])
             @include('provider.services._fields_transport', ['service' => null])
+            @include('provider.services._fields_restaurant', ['service' => null])       {{-- 🆕 --}}
+            @include('provider.services._fields_money_changer', ['service' => null])    {{-- 🆕 --}}
+            @include('provider.services._fields_art_craft', ['service' => null])        {{-- 🆕 --}}
         </div>
 
         <div class="mt-6 flex gap-3">

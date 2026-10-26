@@ -66,6 +66,20 @@ class Service extends Model
     {
         return $this->hasOne(HotelDetail::class);
     }
+        public function restaurantDetail()
+    {
+        return $this->hasOne(RestaurantDetail::class);
+    }
+
+    public function moneyChangerDetail()
+    {
+        return $this->hasOne(MoneyChangerDetail::class);
+    }
+
+    public function artCraftDetail()
+    {
+        return $this->hasOne(ArtCraftDetail::class);
+    }
     public function activityDetail()
     {
         return $this->hasOne(ActivityDetail::class);

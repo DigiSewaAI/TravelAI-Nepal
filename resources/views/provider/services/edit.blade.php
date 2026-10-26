@@ -34,7 +34,7 @@
                     {{-- 4M-3-2 REDO: Dropdown (multiple allowed) --}}
                     <select name="service_category_id" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">{{ __('messages.select_category') }}</option>
-                        @foreach($categories as $category)
+                        @foreach($allowedCategories as $category)
                             <option value="{{ $category->id }}" data-slug="{{ $category->slug }}" {{ old('service_category_id', $service->service_category_id) == $category->id ? 'selected' : '' }}>
                                                         {{ $category->name }}
                             </option>
@@ -90,6 +90,9 @@
             @include('provider.services._fields_activity', ['service' => $service])
             @include('provider.services._fields_experience', ['service' => $service])
             @include('provider.services._fields_transport', ['service' => $service])
+            @include('provider.services._fields_restaurant', ['service' => $service])       {{-- 🆕 --}}
+            @include('provider.services._fields_money_changer', ['service' => $service])    {{-- 🆕 --}}
+            @include('provider.services._fields_art_craft', ['service' => $service])        {{-- 🆕 --}}
         </div>
 
         <div class="mt-6 flex gap-3">

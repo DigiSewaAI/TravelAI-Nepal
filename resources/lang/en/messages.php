@@ -1184,6 +1184,25 @@ return [
     'traveler_quick_reviews'    => 'Reviews',
     'traveler_group_travels'    => 'My Travels',
     'traveler_group_tools'      => 'Tools & Shortcuts',
+        // === Restaurant / Money Changer / Art Craft details ===
+    'restaurant_details'        => 'Restaurant Details',
+    'cuisine_type'              => 'Cuisine Type',
+    'seating_capacity'          => 'Seating Capacity',
+    'opening_hours'             => 'Opening Hours',
+    'menu_url'                  => 'Menu URL',
+
+    'money_changer_details'     => 'Money Changer Details',
+    'license_number'            => 'License Number',
+    'exchange_rate_margin'      => 'Exchange Rate Margin (%)',
+    'supported_currencies'      => 'Supported Currencies (Comma Separated)',
+    'supported_currencies_hint' => 'Enter currencies separated by commas',
+
+    'art_craft_details'         => 'Art/Craft Details',
+    'craft_type'                => 'Craft Type',
+    'materials'                 => 'Materials',
+    'artist_name'               => 'Artist Name',
+    'dimensions'                => 'Dimensions',
+    'is_handmade'               => 'Is Handmade?',
         // ============================================
     // Journey Replay (I18N-JOURNEY-REPLAY-01)
     // ============================================
