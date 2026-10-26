@@ -22,6 +22,11 @@ class DashboardController extends Controller
         if ($user && $user->getCurrentProvider()?->types->contains('slug', 'restaurant')) {
             return redirect()->route('provider.restaurant.dashboard');
         }
+        
+        // 🆕 Money Changer vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->contains('slug', 'money-changer')) {
+            return redirect()->route('provider.money-changer.dashboard');
+        }
         if (!auth()->check()) {
             return redirect()->route('login');
         }
