@@ -4,63 +4,94 @@
 @section('header', 'Add Staff')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">Add Staff Member</h2>
+<style>
+  .form-wrap{max-width:680px;margin:0 auto;}
+  .form-card{background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px -15px rgba(0,0,0,.12);}
+  .form-hero{background:linear-gradient(135deg,var(--accent,#2563eb),var(--accent-d,#1d4ed8));padding:24px 28px;color:#fff;position:relative;overflow:hidden;}
+  .form-hero::before{content:'';position:absolute;top:-60%;right:-10%;width:60%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 60%);pointer-events:none;}
+  .form-hero h1{font-size:20px;font-weight:800;margin:0 0 5px;letter-spacing:-.3px;position:relative;z-index:1;}
+  .form-hero p{font-size:13px;opacity:.92;margin:0;font-weight:500;position:relative;z-index:1;}
+  .form-body{padding:26px 28px;}
+  .form-group{margin-bottom:20px;}
+  .form-label{display:block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted,#6b7280);margin-bottom:8px;}
+  .form-input{width:100%;padding:12px 14px;border:1.5px solid var(--line,#e5e7eb);border-radius:11px;font-family:inherit;font-size:14px;color:var(--text,#1f2937);background:var(--card,#fff);transition:.15s;box-sizing:border-box;}
+  .form-input:focus{outline:none;border-color:var(--accent,#2563eb);box-shadow:0 0 0 4px var(--accent-soft,#eff6ff);}
+  .form-input::placeholder{color:#b8b3ab;}
+  .form-error{font-size:12px;color:var(--red,#dc2626);margin-top:6px;font-weight:600;}
+  .form-hint{font-size:12px;color:var(--muted,#6b7280);margin-top:6px;font-weight:500;}
+  .form-actions{display:flex;gap:10px;align-items:center;padding-top:18px;border-top:1px solid var(--line,#e5e7eb);margin-top:6px;}
+  .btn-primary-grad{display:inline-flex;align-items:center;gap:7px;padding:12px 22px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--accent,#2563eb),var(--accent-d,#1d4ed8));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -8px var(--accent,#2563eb);transition:.15s;}
+  .btn-primary-grad:hover{transform:translateY(-1px);box-shadow:0 12px 24px -8px var(--accent,#2563eb);}
+  .btn-cancel{padding:12px 20px;border-radius:11px;background:var(--card,#fff);border:1.5px solid var(--line,#e5e7eb);color:var(--muted,#6b7280);font-size:13px;font-weight:800;text-decoration:none;transition:.15s;}
+  .btn-cancel:hover{border-color:var(--accent,#2563eb);color:var(--accent-d,#1d4ed8);}
+  .alert{padding:12px 16px;border-radius:11px;font-size:13px;font-weight:600;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px;border-left:4px solid;}
+  .alert-success{background:var(--green-soft,#dcfce7);color:var(--green,#16a34a);border-color:var(--green,#16a34a);}
+  .alert-error{background:var(--red-soft,#fee2e2);color:var(--red,#dc2626);border-color:var(--red,#dc2626);}
+  .alert a{color:inherit;font-weight:800;text-decoration:underline;}
+</style>
 
-    @if(session('error'))
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
-            {{ session('error') }}
-            @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
-                <br>
-                <a href="{{ route('provider.subscriptions.index') }}" class="text-blue-600 hover:text-blue-800 font-medium underline inline-block mt-1">
-                    <i class="fas fa-arrow-up"></i> Upgrade Your Plan
-                </a>
-            @endif
-        </div>
-    @endif
+<div class="form-wrap">
+  @if(session('error'))
+    <div class="alert alert-error">
+      <span>⚠</span>
+      <div>
+        {{ session('error') }}
+        @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
+          <br><a href="{{ route('provider.subscriptions.index') }}">→ Upgrade Your Plan</a>
+        @endif
+      </div>
+    </div>
+  @endif
+  @if(session('success'))
+    <div class="alert alert-success"><span>✓</span><span>{{ session('success') }}</span></div>
+  @endif
 
-    @if(session('success'))
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
+  <form method="POST" action="{{ route('provider.staff.store') }}" class="form-card">
+    @csrf
+    <div class="form-hero">
+      <h1>👤 Add Staff Member</h1>
+      <p>Create a new team member with login credentials</p>
+    </div>
+    <div class="form-body">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="name" class="form-input" value="{{ old('name') }}" required placeholder="e.g., Ram Bahadur">
+        @error('name') <p class="form-error">{{ $message }}</p> @enderror
+      </div>
 
-    <form method="POST" action="{{ route('provider.staff.store') }}" class="bg-white p-6 rounded-lg shadow">
-        @csrf
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" name="email" class="form-input" value="{{ old('email') }}" required placeholder="staff@example.com">
+        @error('email') <p class="form-error">{{ $message }}</p> @enderror
+      </div>
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Full Name *</label>
-            <input type="text" name="name" class="w-full border rounded-lg px-4 py-2" value="{{ old('name') }}" required>
-            @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <input type="password" name="password" class="form-input" required placeholder="Minimum 8 characters">
+        <p class="form-hint">Minimum 8 characters</p>
+        @error('password') <p class="form-error">{{ $message }}</p> @enderror
+      </div>
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Email *</label>
-            <input type="email" name="email" class="w-full border rounded-lg px-4 py-2" value="{{ old('email') }}" required>
-            @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password *</label>
+        <input type="password" name="password_confirmation" class="form-input" required placeholder="Re-enter password">
+      </div>
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Password *</label>
-            <input type="password" name="password" class="w-full border rounded-lg px-4 py-2" required>
-            @error('password') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
+      <div class="form-group">
+        <label class="form-label">Role (optional)</label>
+        <input type="text" name="role" class="form-input" value="{{ old('role') }}" placeholder="e.g., Manager, Guide, Accountant">
+        <p class="form-hint">Leave blank to use default "Staff" role</p>
+        @error('role') <p class="form-error">{{ $message }}</p> @enderror
+      </div>
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Confirm Password *</label>
-            <input type="password" name="password_confirmation" class="w-full border rounded-lg px-4 py-2" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Role (optional)</label>
-            <input type="text" name="role" class="w-full border rounded-lg px-4 py-2" value="{{ old('role') }}" placeholder="e.g., Manager, Guide, Accountant">
-            @error('role') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-            Add Staff
+      <div class="form-actions">
+        <button type="submit" class="btn-primary-grad">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M20 6L9 17l-5-5"/></svg>
+          Add Staff
         </button>
-        <a href="{{ route('provider.staff.index') }}" class="ml-2 text-gray-600 hover:underline">Cancel</a>
-    </form>
+        <a href="{{ route('provider.staff.index') }}" class="btn-cancel">Cancel</a>
+      </div>
+    </div>
+  </form>
 </div>
 @endsection
