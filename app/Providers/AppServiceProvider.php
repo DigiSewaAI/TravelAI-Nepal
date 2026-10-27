@@ -12,14 +12,12 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth; // ✅ नयाँ थपियो
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         // ✅ Phase 1 Services
@@ -32,12 +30,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Safety\LocationResolutionService::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // F8-03: Force HTTPS scheme in production (behind TLS-terminating proxy)
+        // F8-03: Force HTTPS scheme in production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
@@ -45,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         // Register Route Observer
         Route::observe(RouteObserver::class);
 
-        // ✅ Force Translation Loader to use `lang/` folder with namespace
+        // ✅ Force Translation Loader
         $this->loadTranslationsFrom(base_path('lang'), 'messages');
 
         // FIX-11: Named rate limiters
@@ -65,10 +60,34 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(3)->by($request->ip())
         );
 
-        // PROVIDER-ITINERARY-09B-04: Public booking throttle
         RateLimiter::for('booking-public', fn (Request $request) =>
             Limit::perMinute(10)->by($request->ip())
         );
+
+        // ✅ 🆕 DYNAMIC LAYOUT RESOLVER (Shared pages लेआउट फिक्स)
+        View::composer('*', function ($view) {
+            if (Auth::check()) {
+                $user = Auth::user();
+                $provider = $user->ownProvider() ?? null;
+
+                if ($provider) {
+                    $type = $provider->types()->first()?->slug;
+
+                    $layout = match($type) {
+                        'restaurant' => 'layouts.provider-restaurant',
+                        'hotel', 'resort', 'lodge', 'homestay' => 'layouts.provider-hotel',
+                        'money-changer' => 'layouts.provider-money-changer',
+                        'transport-provider' => 'layouts.provider-transport',
+                        'shop-owner', 'rental-provider', 'wholesale-provider' => 'layouts.provider-inventory',
+                        'art-craft' => 'layouts.provider-art-craft',
+                        'guide', 'porter', 'photographer' => 'layouts.provider-individual',
+                        default => 'layouts.provider',
+                    };
+
+                    $view->with('provider_layout', $layout);
+                }
+            }
+        });
 
         // ✅ Phase 2A: Provider SOS sidebar badge count
         View::composer('layouts.provider', function ($view) {
@@ -94,15 +113,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ✅ Global Reply-To for all outgoing emails
-        // Ensures customer replies reach admin@travelainepal.com
-        // instead of the unmonitored noreply@ address.
         if (config('mail.reply_to.address')) {
             Mail::alwaysReplyTo(
                 config('mail.reply_to.address'),
                 config('mail.reply_to.name', config('mail.from.name', 'Example'))
             );
 
-            // Provider-specific reply-to override (fires AFTER global alwaysReplyTo)
             Event::listen(MessageSending::class, function (MessageSending $event) {
                 $providerReplyTo = $event->data['__provider_reply_to'] ?? null;
                 if (!empty($providerReplyTo['address'])) {

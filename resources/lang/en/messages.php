@@ -1796,6 +1796,11 @@ return [
     'artist_name'               => 'Artist Name',
     'dimensions'                => 'Dimensions',
     'is_handmade'               => 'Is Handmade?',
+        'choose_plan_subtitle' => 'Choose the right plan for your business',
+    'forever_free' => 'Forever free',
+    'most_popular' => 'Most Popular',
+    'choose_plan' => 'Choose Plan',
+    'switch_to_plan' => 'Switch to :name',
         // ============================================
     // Journey Replay (I18N-JOURNEY-REPLAY-01)
     // ============================================

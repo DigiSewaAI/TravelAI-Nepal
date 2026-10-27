@@ -1,120 +1,127 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.subscription_page_title'))
 @section('header', __('messages.subscription_header'))
 
 @section('content')
-<div class="max-w-4xl mx-auto">
-    <!-- Current Plan -->
-    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ __('messages.current_plan') }}</h2>
+<div style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+
+    {{-- Current Plan Section --}}
+    <div style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 15px;">{{ __('messages.current_plan') }}</h2>
 
         @if($currentSubscription)
-            <div class="flex justify-between items-center">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                 <div>
-                    <span class="text-2xl font-bold text-blue-600">{{ $currentSubscription->plan->name }}</span>
-                    <p class="text-gray-500 text-sm">{{ $currentSubscription->plan->description }}</p>
-                                        <div class="mt-2">
-                        @if($currentSubscription->plan->isContactOnly())
-                            <span class="text-sm text-blue-600 font-semibold">{{ __('messages.contact_for_pricing') }}</span>
+                    <span style="font-size: 24px; font-weight: 800; color: var(--sky);">{{ $currentSubscription->plan->name }}</span>
+                    <p style="font-size: 13px; color: var(--muted); margin-top: 5px;">{{ $currentSubscription->plan->description }}</p>
+                    <div style="margin-top: 10px;">
+                        @if($currentSubscription->plan->requires_contact)
+                            <span style="font-size: 14px; font-weight: 700; color: var(--sky);">{{ __('messages.contact_for_pricing') }}</span>
                         @elseif((float) $currentSubscription->plan->price_monthly == 0)
-                            <span class="text-sm text-green-600 font-semibold">{{ __('messages.free_plan') }}</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--green);">{{ __('messages.free_plan') }}</span>
                         @else
-                            <span class="text-sm text-gray-600">${{ number_format($currentSubscription->plan->price_monthly, 2) }} / {{ __('messages.month') }}</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--text);">Rs. {{ number_format($currentSubscription->plan->price_monthly) }} / {{ __('messages.month') }}</span>
                         @endif
-                        <span class="text-xs text-gray-400 ml-2">
+                        <span style="font-size: 12px; color: var(--muted); margin-left: 10px;">
                             {{ __('messages.active_since') }} {{ $currentSubscription->start_date->format('M d, Y') }}
                         </span>
                     </div>
                 </div>
-                <div>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold
-                        @if($currentSubscription->status === 'active') bg-green-100 text-green-800
-                        @elseif($currentSubscription->status === 'cancelled') bg-red-100 text-red-800
-                        @else bg-gray-100 text-gray-800 @endif">
-                        @if($currentSubscription->status === 'active') {{ __('messages.active_sub') }}
-                        @elseif($currentSubscription->status === 'cancelled') {{ __('messages.cancelled_sub') }}
-                        @else {{ ucfirst($currentSubscription->status) }} @endif
+                <div style="text-align: right;">
+                    <span style="padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; 
+                        background: {{ $currentSubscription->status === 'active' ? 'var(--green-soft)' : 'var(--red-soft)' }}; 
+                        color: {{ $currentSubscription->status === 'active' ? 'var(--green)' : 'var(--red)' }};">
+                        {{ ucfirst($currentSubscription->status) }}
                     </span>
-                </div>
-            </div>
-            @if($currentSubscription->status === 'active')
-                <div class="mt-4">
-                    <form method="POST" action="{{ route('provider.subscriptions.cancel') }}"
-                          onsubmit="return confirm('{{ __('messages.cancel_subscription_confirm') }}')">
+                    @if($currentSubscription->status === 'active')
+                    <form method="POST" action="{{ route('provider.subscriptions.cancel') }}" onsubmit="return confirm('{{ __('messages.cancel_subscription_confirm') }}')" style="margin-top: 15px;">
                         @csrf
-                        <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                            <i class="fas fa-times-circle mr-1"></i> {{ __('messages.cancel_subscription_btn') }}
+                        <button type="submit" style="background: none; border: none; color: var(--red); font-size: 13px; font-weight: 700; cursor: pointer;">
+                            <i class="fas fa-times-circle"></i> {{ __('messages.cancel_subscription_btn') }}
                         </button>
                     </form>
+                    @endif
                 </div>
-            @endif
+            </div>
         @else
-            <p class="text-gray-500">{{ __('messages.no_active_subscription') }}</p>
+            <p style="font-size: 14px; color: var(--muted);">{{ __('messages.no_active_subscription') }}</p>
         @endif
     </div>
 
-    <!-- Available Plans -->
-    <div class="bg-white rounded-xl shadow-sm border p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ __('messages.available_plans') }}</h2>
-        <div class="grid md:grid-cols-3 gap-4">
-            @foreach($plans as $plan)
-                <div class="border rounded-lg p-4 hover:shadow-md transition">
-                    <h3 class="font-bold text-gray-800">{{ $plan->name }}</h3>
-                    <p class="text-gray-500 text-sm">{{ $plan->description }}</p>
-                                        <div class="mt-2">
-                        {{-- FIX: Strict comparison — null is NOT 0 (Enterprise = Custom) --}}
-                        @if($plan->isContactOnly())
-                            <span class="text-sm font-semibold text-blue-600">{{ __('messages.contact_for_pricing') }}</span>
-                        @elseif($plan->price_monthly === null)
-                            <span class="text-lg font-bold text-gray-800">{{ __('messages.custom') }}</span>
-                        @elseif((float) $plan->price_monthly == 0)
-                            <span class="text-lg font-bold text-green-600">{{ __('messages.free') }}</span>
+    {{-- Available Plans --}}
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--text);">{{ __('messages.available_plans') }}</h2>
+        <p style="font-size: 14px; color: var(--muted); margin-top: 5px;">{{ __('messages.choose_plan_subtitle') }}</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+        @foreach($plans as $plan)
+            @php
+                $isPopular = strtolower($plan->slug) === 'professional';
+                $isCurrent = $currentSubscription && $currentSubscription->plan_id === $plan->id;
+            @endphp
+            
+            <div style="background: var(--card); border: 1px solid {{ $isPopular ? 'var(--sky)' : 'var(--line)' }}; border-radius: 16px; padding: 25px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; {{ $isPopular ? 'box-shadow: 0 8px 24px rgba(14,165,233,0.12);' : '' }}">
+                
+                @if($isPopular)
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--sky); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
+                    {{ __('messages.most_popular') }}
+                </div>
+                @endif
+
+                <div style="flex: 1;">
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 5px;">{{ $plan->name }}</h3>
+                    <p style="font-size: 12px; color: var(--muted); height: 36px; margin-bottom: 15px;">{{ $plan->description }}</p>
+                    
+                    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed var(--line);">
+                        @if($plan->requires_contact)
+                            <span style="font-size: 24px; font-weight: 800; color: var(--text);">{{ __('messages.custom') }}</span>
+                            <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ __('messages.contact_for_pricing') }}</p>
+                        @elseif($plan->price_monthly > 0)
+                            <span style="font-size: 28px; font-weight: 800; color: var(--text);">Rs. {{ number_format($plan->price_monthly) }}</span>
+                            <span style="font-size: 13px; color: var(--muted);">/ {{ __('messages.month') }}</span>
                         @else
-                            <span class="text-lg font-bold text-gray-800">${{ number_format($plan->price_monthly, 2) }}</span>
-                            <span class="text-sm text-gray-500">/ {{ __('messages.month') }}</span>
+                            <span style="font-size: 28px; font-weight: 800; color: var(--green);">{{ __('messages.free') }}</span>
+                            <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ __('messages.forever_free') }}</p>
                         @endif
                     </div>
 
-                    <!-- Features -->
-                    <ul class="mt-3 space-y-1 text-sm text-gray-600">
+                    <ul style="list-style: none; padding: 0; margin: 0 0 25px 0; font-size: 13px; color: var(--text);">
                         @php $features = $plan->features ?? []; @endphp
-                        @foreach(array_slice($features, 0, 3) as $feature)
-                            <li><i class="fas fa-check text-green-500 mr-1"></i> {{ $feature }}</li>
+                        @foreach(array_slice($features, 0, 4) as $feature)
+                            <li style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+                                <i class="fas fa-check-circle" style="color: var(--green); margin-top: 2px; margin-right: 8px;"></i>
+                                <span>{{ $feature }}</span>
+                            </li>
                         @endforeach
-                        @if(count($features) > 3)
-                            <li class="text-gray-400">{{ __('messages.plus_more', ['count' => count($features) - 3]) }}</li>
+                        @if(count($features) > 4)
+                            <li style="font-size: 12px; color: var(--muted); font-style: italic; margin-top: 5px;">+ {{ count($features) - 4 }} more features</li>
                         @endif
                     </ul>
+                </div>
 
-                                        <!-- Action -->
-                    @if($currentSubscription && $currentSubscription->plan_id === $plan->id)
-                        <span class="mt-3 inline-block bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-lg w-full text-center">
-                            {{ __('messages.current_plan_label') }}
-                        </span>
-                    @elseif($plan->isContactOnly())
-                        {{-- FIX-01: Enterprise → Contact Sales (no POST upgrade) --}}
-                        <form method="GET" action="{{ route('public.contact-sales') }}" class="mt-3">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition">
-                                <i class="fas fa-headset mr-1"></i> {{ __('messages.contact_for_pricing') }}
-                            </button>
-                        </form>
+                <div style="margin-top: auto;">
+                    @if($isCurrent)
+                        <button disabled style="width: 100%; background: var(--sky-soft); color: var(--sky-d); font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: 1px solid var(--sky); cursor: not-allowed;">
+                            <i class="fas fa-check"></i> {{ __('messages.current_plan_label') }}
+                        </button>
+                    @elseif($plan->requires_contact)
+                        <a href="{{ route('public.contact-sales') }}" style="display: block; text-align: center; width: 100%; background: var(--text); color: #fff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; text-decoration: none; transition: 0.2s;">
+                            {{ __('messages.contact_for_pricing') }}
+                        </a>
                     @else
-                        <form method="POST" action="{{ $currentSubscription ? route('provider.subscriptions.upgrade') : route('provider.subscriptions.store') }}" class="mt-3">
+                        <form method="POST" action="{{ $currentSubscription ? route('provider.subscriptions.upgrade') : route('provider.subscriptions.store') }}">
                             @csrf
                             <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition">
-                                @if($currentSubscription)
-                                    <i class="fas fa-arrow-right mr-1"></i> {{ __('messages.switch_to_plan', ['name' => $plan->name]) }}
-                                @else
-                                    <i class="fas fa-arrow-right mr-1"></i> {{ __('messages.choose_plan', ['name' => $plan->name]) }}
-                                @endif
+                            <button type="submit" style="width: 100%; background: var(--sky); color: #fff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(14,165,233,0.3);">
+                                {{ __('messages.choose_plan') }}
                             </button>
                         </form>
                     @endif
                 </div>
-            @endforeach
-        </div>
+            </div>
+        @endforeach
     </div>
 </div>
 @endsection
