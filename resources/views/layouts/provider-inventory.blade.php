@@ -88,13 +88,17 @@
 <body>
 <div class="overlay" id="overlay"></div>
 <aside class="sidebar" id="sidebar">
-  <div class="brand">
-    <div class="brand-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-    </div>
-    <div>
-      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? __('messages.inventory_brand_default'), 13) }}</h1>
-      <span>{{ __('messages.inventory_upper') }}</span>
+    <div class="brand" style="display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 20px;">
+    <a href="{{ url('/') }}" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <img src="{{ asset('images/logo.png') }}" alt="TravelAI" style="height: 26px; width: auto;" onerror="this.style.display='none'">
+        <span style="font-size: 14px; font-weight: 800; color: #fff; letter-spacing: 0.5px;">TravelAI Nepal</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+        <div class="brand-logo">📦</div>
+        <div>
+          <h1 style="font-size: 16px; margin: 0;">{{ \Illuminate\Support\Str::limit($provider->name ?? 'Stockly', 13) }}</h1>
+          <span style="font-size: 9px; color: #8b9bb0;">INVENTORY</span>
+        </div>
     </div>
   </div>
   <nav class="nav">
