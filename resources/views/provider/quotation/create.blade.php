@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', 'AI Quotation')
 @section('header', 'AI Quotation Generator')

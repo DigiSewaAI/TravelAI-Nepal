@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.ads_buy_new'))
 

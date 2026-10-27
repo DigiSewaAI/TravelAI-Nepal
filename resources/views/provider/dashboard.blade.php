@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.dashboard_page_title'))
 @section('header', __('messages.dashboard_header'))

@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.booking_detail_title', ['id' => $booking->booking_number ?? $booking->id]))
 @section('header', __('messages.booking_detail_header'))

@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.invoice_detail_title', ['number' => $invoice->invoice_number]))
 @section('header', __('messages.invoice_detail_header'))

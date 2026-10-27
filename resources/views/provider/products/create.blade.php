@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', __('messages.products_create_btn'))
 @section('header', __('messages.products_create_btn'))

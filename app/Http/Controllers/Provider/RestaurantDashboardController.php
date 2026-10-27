@@ -315,4 +315,27 @@ class RestaurantDashboardController extends Controller
         $tables = RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get();
         return view('provider.restaurant.tables', compact('provider', 'tables'));
     }
+        public function reportsPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $totalSales = RestaurantOrder::where('provider_id', $provider->id)->where('status', '!=', 'cancelled')->sum('total');
+        $totalOrders = RestaurantOrder::where('provider_id', $provider->id)->count();
+        $avgOrder = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+        $orders = RestaurantOrder::where('provider_id', $provider->id)->latest()->take(10)->get();
+        
+        return view('provider.restaurant.reports', compact('provider', 'totalSales', 'totalOrders', 'avgOrder', 'orders'));
+    }
+
+    public function offersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        // Dummy offers for UI (No offers table yet in R8 scope)
+        $offers = collect([
+            (object)['title' => 'Happy Hour (4-6 PM)', 'discount' => '20% Off', 'valid_until' => now()->addDays(7), 'status' => 'active'],
+            (object)['title' => 'Weekend Family Combo', 'discount' => '15% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
+            (object)['title' => 'Student Discount', 'discount' => '10% Off', 'valid_until' => now()->addDays(30), 'status' => 'inactive'],
+        ]);
+        
+        return view('provider.restaurant.offers', compact('provider', 'offers'));
+    }
 }

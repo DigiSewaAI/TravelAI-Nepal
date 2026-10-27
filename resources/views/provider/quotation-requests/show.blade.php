@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', 'Quotation Request #' . $quotationRequest->id)
 @section('header', 'Quotation Request Detail')

@@ -242,6 +242,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'ordersPage'])->name('restaurant.orders.list');
     Route::get('/restaurant/menu', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'menuPage'])->name('restaurant.menu.list');
     Route::get('/restaurant/tables', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'tablesPage'])->name('restaurant.tables.list');
+        // Restaurant Reports & Offers
+    Route::get('/restaurant/reports', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'reportsPage'])->name('restaurant.reports.list');
+    Route::get('/restaurant/offers', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'offersPage'])->name('restaurant.offers.list');
         // 🆕 Money Changer vertical dashboard route
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
         // Money Changer CRUD Routes

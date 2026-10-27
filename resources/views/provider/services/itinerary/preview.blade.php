@@ -1,4 +1,4 @@
-@extends('layouts.provider')
+@extends($provider_layout ?? 'layouts.provider')
 
 @section('title', 'Preview Itinerary — ' . $service->name)
 @section('header', 'Itinerary Preview: ' . $service->name)
