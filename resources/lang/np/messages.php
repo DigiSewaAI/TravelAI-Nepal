@@ -1463,6 +1463,23 @@ return [
     'no_orders_found' => 'अहिलेसम्म कुनै अर्डर प्राप्त भएको छैन।',
         'back_to_dashboard' => 'ड्यासबोर्डमा फर्कनुहोस्',
     'seats'             => 'सिट',
+        // Art/Craft Sidebar & Unlock
+    'gallery' => 'ग्यालरी',
+    'custom_orders' => 'कस्टम अर्डरहरू',
+    'artists' => 'कलाकारहरू',
+    'gallery_management' => 'ग्यालरी व्यवस्थापन',
+    'manage_gallery_subtitle' => 'आफ्नो ग्यालरीमा भएका सबै कलाकृतिहरू हेर्नुहोस्',
+    'artwork_col' => 'कलाकृति',
+    'artist_col' => 'कलाकार',
+    'price_col' => 'मूल्य',
+    'status_col' => 'स्थिति',
+    'orders_management' => 'कस्टम अर्डरहरू',
+    'manage_custom_orders_subtitle' => 'ग्राहकको कमिसन र विशेष अनुरोधहरू व्यवस्थापन गर्नुहोस्',
+    'client_col' => 'ग्राहक',
+    'budget_col' => 'बजेट',
+    'deadline_col' => 'समयसीमा',
+    'no_artworks_found' => 'अहिलेसम्म कुनै कलाकृति थपिएको छैन।',
+    'no_custom_orders_found' => 'अहिलेसम्म कुनै कस्टम अर्डर प्राप्त भएको छैन।',
 
 
     // ======================

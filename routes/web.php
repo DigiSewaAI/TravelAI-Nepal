@@ -289,6 +289,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/art-craft/dashboard', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'index'])->name('art-craft.dashboard');
     Route::patch('/art-craft/artworks/{artwork}/status', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateArtworkStatus'])->name('art-craft.artworks.status');
     Route::patch('/art-craft/orders/{order}/status', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateOrderStatus'])->name('art-craft.orders.status');
+        // Art/Craft Sidebar Unlocks
+    Route::get('/art-craft/gallery', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'galleryPage'])->name('art-craft.gallery');
+    Route::get('/art-craft/custom-orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'ordersPage'])->name('art-craft.orders');
         // Art/Craft CRUD Routes
     Route::post('/art-craft/artworks', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeArtwork'])->name('art-craft.artworks.store');
     Route::delete('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyArtwork'])->name('art-craft.artworks.destroy');

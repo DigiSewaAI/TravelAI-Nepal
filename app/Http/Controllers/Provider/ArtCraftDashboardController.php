@@ -16,7 +16,7 @@ class ArtCraftDashboardController extends Controller
         $provider = Provider::where('user_id', Auth::id())
             ->whereHas('types', fn($q) => $q->where('slug', 'art-craft'))
             ->first();
-            
+
         abort_unless($provider, 403, 'Art/Craft provider profile not found.');
 
         $today = now()->startOfDay();
@@ -24,7 +24,7 @@ class ArtCraftDashboardController extends Controller
 
         // KPIs
         $totalArtworks = Artwork::where('provider_id', $provider->id)->count();
-        
+
         $soldCount = Artwork::where('provider_id', $provider->id)
             ->where('status', 'sold')
             ->where('updated_at', '>=', $monthStart)
@@ -40,7 +40,7 @@ class ArtCraftDashboardController extends Controller
 
         // Chart Data (Last 7 days)
         $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
-        
+
         $salesRaw = Artwork::where('provider_id', $provider->id)
             ->where('status', 'sold')
             ->where('updated_at', '>=', now()->subDays(6)->startOfDay())
@@ -65,12 +65,12 @@ class ArtCraftDashboardController extends Controller
         $artworks = Artwork::where('provider_id', $provider->id)->latest()->get();
         $orders = CustomOrder::where('provider_id', $provider->id)->latest()->get();
 
-        // Profile Stats
+        // Profile Stats (sidebar artist card)
         $artistName = $provider->name;
-        $completedWorks = $totalArtworks; // कुल आर्टवर्क संख्या
+        $completedWorks = $totalArtworks;
         $rating = 4.9;
-        $clients = \App\Models\CustomOrder::where('provider_id', $provider->id)
-                    ->distinct('client_email')->count('client_email'); // कुल क्लाइन्ट संख्या
+        $clients = CustomOrder::where('provider_id', $provider->id)
+            ->distinct('client_email')->count('client_email');
 
         return view('provider.art-craft.dashboard', compact(
             'provider', 'totalArtworks', 'soldCount', 'pendingOrders', 'totalRevenue',
@@ -107,7 +107,8 @@ class ArtCraftDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $order->status]);
     }
-        public function storeArtwork(Request $request)
+
+    public function storeArtwork(Request $request)
     {
         $provider = Auth::user()->ownProvider();
         abort_unless($provider, 403);
@@ -127,7 +128,7 @@ class ArtCraftDashboardController extends Controller
             'category' => $validated['category'],
             'price' => $validated['price'],
             'emoji' => $validated['emoji'] ?? '🖼️',
-            'gradient' => 'linear-gradient(135deg,#f9dad0,#c65d3b)', // Default gradient
+            'gradient' => 'linear-gradient(135deg,#f9dad0,#c65d3b)',
             'status' => 'available',
         ]);
 
@@ -176,5 +177,41 @@ class ArtCraftDashboardController extends Controller
 
         $order->delete();
         return back()->with('success', __('messages.order_deleted_success'));
+    }
+
+    public function galleryPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $artworks = Artwork::where('provider_id', $provider->id)->latest()->get();
+
+        // 🆕 Sidebar artist card values (layout ले चाहिन्छ)
+        $completedWorks = Artwork::where('provider_id', $provider->id)->count();
+        $rating = 4.9;
+        $clients = CustomOrder::where('provider_id', $provider->id)
+            ->distinct('client_email')->count('client_email');
+
+        return view('provider.art-craft.gallery', compact(
+            'provider', 'artworks', 'completedWorks', 'rating', 'clients'
+        ));
+    }
+
+    public function ordersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $orders = CustomOrder::where('provider_id', $provider->id)->latest()->get();
+
+        // 🆕 Sidebar artist card values (layout ले चाहिन्छ)
+        $completedWorks = Artwork::where('provider_id', $provider->id)->count();
+        $rating = 4.9;
+        $clients = CustomOrder::where('provider_id', $provider->id)
+            ->distinct('client_email')->count('client_email');
+
+        return view('provider.art-craft.orders', compact(
+            'provider', 'orders', 'completedWorks', 'rating', 'clients'
+        ));
     }
 }

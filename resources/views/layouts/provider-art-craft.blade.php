@@ -66,9 +66,9 @@
   .icon-btn:hover{background:#fbf1ea;color:var(--terracotta-d);border-color:#f0cdb8}
   .icon-btn svg{width:18px;height:18px;stroke-width:2}
   .dot-n{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
-  .btn-primary{display:flex;align-items:center;gap:8px;padding:11px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#e88a5a,#c65d3b);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(198,93,59,.35);white-space:nowrap}
+  .btn-primary{display:flex;align-items:center;gap:8px;padding:11px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#e88a5a,#c65d3b);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(198,93,59,.35);white-space:nowrap;flex-shrink:0}
   .btn-primary svg{width:16px;height:16px;stroke-width:2.6}
-  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
+  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s;flex-shrink:0}
   .lang-select:hover{border-color:var(--terracotta);color:var(--terracotta-d)}
   .hamburger{display:none}
   .overlay{position:fixed;inset:0;background:rgba(30,22,18,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
@@ -91,22 +91,27 @@
   </div>
   <nav class="nav">
     <div class="nav-label">{{ __('messages.main') }}</div>
-    <a href="{{ route('provider.art-craft.dashboard') }}" class="active">
+
+    <a href="{{ route('provider.art-craft.dashboard') }}" class="{{ request()->routeIs('provider.art-craft.dashboard') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.art-craft.gallery') }}" class="{{ request()->routeIs('provider.art-craft.gallery') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      {{ __('messages.nav_gallery') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_gallery') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.art-craft.orders') }}" class="{{ request()->routeIs('provider.art-craft.orders') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
-      {{ __('messages.nav_custom_orders') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_custom_orders') }}
     </a>
+
     <a href="#" class="disabled">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       {{ __('messages.nav_artists') }} <span class="badge">{{ __('messages.soon') }}</span>
     </a>
+
     <div class="nav-label">{{ __('messages.account') }}</div>
     <a href="{{ route('provider.verification.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
@@ -125,14 +130,14 @@
     </form>
   </nav>
   <div class="artist-card">
-    <div class="artist-avatar">{{ substr($provider->name ?? 'A', 0, 1) }}</div>
-    <div class="artist-name">{{ $provider->name ?? __('messages.artist_fallback') }}</div>
+    <div class="artist-avatar">{{ substr($provider?->name ?? 'A', 0, 1) }}</div>
+    <div class="artist-name">{{ $provider?->name ?? __('messages.artist_fallback') }}</div>
     <div class="artist-role">{{ __('messages.contemporary_artist') }}</div>
     <div class="artist-stars">★★★★★</div>
     <div class="artist-meta">
-      <div><b>{{ $completedWorks }}</b><span>{{ __('messages.works_label') }}</span></div>
-      <div><b>{{ $rating }}</b><span>{{ __('messages.rating_label') }}</span></div>
-      <div><b>{{ $clients }}</b><span>{{ __('messages.clients_label') }}</span></div>
+      <div><b>{{ $completedWorks ?? 0 }}</b><span>{{ __('messages.works_label') }}</span></div>
+      <div><b>{{ $rating ?? '4.9' }}</b><span>{{ __('messages.rating_label') }}</span></div>
+      <div><b>{{ $clients ?? 0 }}</b><span>{{ __('messages.clients_label') }}</span></div>
     </div>
   </div>
   <div class="user-box">
