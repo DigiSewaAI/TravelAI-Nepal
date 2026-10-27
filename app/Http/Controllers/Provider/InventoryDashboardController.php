@@ -198,4 +198,45 @@ class InventoryDashboardController extends Controller
             default     => '🛍️',
         };
     }
+        public function storeProduct(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'product_type' => 'required|in:shop,rental,wholesale',
+            'stock_quantity' => 'required|integer|min:0',
+            'low_stock_threshold' => 'required|integer|min:0',
+            'emoji' => 'nullable|string|max:10',
+        ]);
+
+        // Generate SKU
+        $sku = 'SKU-' . $provider->id . '-' . strtoupper(Str::random(4));
+
+        Product::create([
+            'provider_id' => $provider->id,
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            'price' => $validated['price'],
+            'product_type' => $validated['product_type'],
+            'stock_quantity' => $validated['stock_quantity'],
+            'low_stock_threshold' => $validated['low_stock_threshold'],
+            'sku' => $sku,
+            'emoji' => $validated['emoji'] ?? '📦',
+            'status' => 'active',
+        ]);
+
+        return back()->with('success', __('messages.product_created_success'));
+    }
+
+    public function destroyProduct(Product $product)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $product->provider_id === $provider->id, 403);
+
+        $product->delete();
+        return back()->with('success', __('messages.product_deleted_success'));
+    }
 }

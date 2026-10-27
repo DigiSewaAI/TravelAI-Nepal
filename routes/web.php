@@ -243,6 +243,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
     Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');
+        // Inventory CRUD Routes
+    Route::post('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'storeProduct'])->name('inventory.products.store');
+    Route::delete('/inventory/products/{product}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'destroyProduct'])->name('inventory.products.destroy');
         // 🆕 Hotel vertical dashboard routes
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
