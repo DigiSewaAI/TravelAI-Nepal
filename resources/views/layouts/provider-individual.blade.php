@@ -62,9 +62,9 @@
   .icon-btn:hover{background:#f2faf5;color:var(--emerald-d);border-color:#bfe6d2}
   .icon-btn svg{width:18px;height:18px;stroke-width:2}
   .dot-notif{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
-  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(16,185,129,.35);white-space:nowrap}
+  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(16,185,129,.35);white-space:nowrap;flex-shrink:0}
   .btn-primary svg{width:16px;height:16px;stroke-width:2.6}
-  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
+  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s;flex-shrink:0}
   .lang-select:hover{border-color:var(--emerald);color:var(--emerald-d)}
   .hamburger{display:none}
   .overlay{position:fixed;inset:0;background:rgba(15,36,25,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
@@ -83,28 +83,38 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m2 22 5-14 5 6 4-9 6 17z"/></svg>
     </div>
     <div>
-      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? __('messages.wayfarer_brand_default'), 13) }}</h1>
+      <h1>{{ \Illuminate\Support\Str::limit($provider?->name ?? __('messages.wayfarer_brand_default'), 13) }}</h1>
       <span>{{ __('messages.guide_porter_photo') }}</span>
     </div>
   </div>
   <nav class="nav">
     <div class="nav-label">{{ __('messages.main') }}</div>
-    <a href="{{ route('provider.individual.dashboard') }}" class="active">
+
+    <a href="{{ route('provider.individual.dashboard') }}" class="{{ request()->routeIs('provider.individual.dashboard') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.individual.bookings.list') }}" class="{{ request()->routeIs('provider.individual.bookings.list') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-      {{ __('messages.nav_bookings') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_bookings') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.individual.calendar') }}" class="{{ request()->routeIs('provider.individual.calendar') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-      {{ __('messages.nav_calendar') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_calendar') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.individual.earnings') }}" class="{{ request()->routeIs('provider.individual.earnings') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      {{ __('messages.nav_earnings') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_earnings') }}
     </a>
+
+    <a href="{{ route('provider.individual.reviews') }}" class="{{ request()->routeIs('provider.individual.reviews') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      {{ __('messages.reviews') }}
+    </a>
+
     <div class="nav-label">{{ __('messages.account') }}</div>
     <a href="{{ route('provider.verification.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>

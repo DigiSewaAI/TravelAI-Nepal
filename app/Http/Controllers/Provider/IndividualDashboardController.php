@@ -15,7 +15,7 @@ class IndividualDashboardController extends Controller
         $provider = Provider::where('user_id', Auth::id())
             ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
             ->first();
-            
+
         abort_unless($provider, 403, 'Individual provider profile not found.');
 
         $today = now()->startOfDay();
@@ -31,16 +31,16 @@ class IndividualDashboardController extends Controller
             ->where('created_at', '>=', $monthStart)->count();
 
         $profileViews = $provider->profile_views ?? 0;
-        
+
         // Average Rating (Hardcoded for Phase 1, as reviews table uses service_id)
-        $avgRating = 4.9; 
+        $avgRating = 4.9;
         $reviewCount = 127;
 
         // Chart (Last 7 days earnings)
         $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
-        
+
         $chartRaw = IndividualBooking::where('provider_id', $provider->id)
-            ->whereIn('status', ['completed', 'confirmed']) // ✅ यहाँ फिक्स गरियो
+            ->whereIn('status', ['completed', 'confirmed'])
             ->where('created_at', '>=', now()->subDays(6)->startOfDay())
             ->selectRaw('DATE(created_at) as d, SUM(amount) as v')
             ->groupBy('d')->pluck('v', 'd');
@@ -55,7 +55,7 @@ class IndividualDashboardController extends Controller
 
         // Calendar & Upcoming Assignments
         $assignments = IndividualBooking::where('provider_id', $provider->id)
-            ->where('start_date', '>=', now()->subMonth()) // include recent past
+            ->where('start_date', '>=', now()->subMonth())
             ->orderBy('start_date')
             ->get()
             ->map(fn($b) => [
@@ -91,7 +91,8 @@ class IndividualDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
-        public function storeAssignment(Request $request)
+
+    public function storeAssignment(Request $request)
     {
         $provider = Provider::where('user_id', Auth::id())
             ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
@@ -129,5 +130,99 @@ class IndividualDashboardController extends Controller
 
         $booking->delete();
         return back()->with('success', __('messages.assignment_deleted_success'));
+    }
+
+    public function bookingsPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403, 'Provider not found.');
+
+        $bookings = IndividualBooking::where('provider_id', $provider->id)
+            ->orderByDesc('start_date')
+            ->get();
+
+        return view('provider.individual.bookings', compact('provider', 'bookings'));
+    }
+
+    public function calendarPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403, 'Provider not found.');
+
+        $assignments = IndividualBooking::where('provider_id', $provider->id)->get();
+
+        return view('provider.individual.calendar', compact('provider', 'assignments'));
+    }
+
+    public function earningsPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403, 'Provider not found.');
+
+        $totalEarnings = IndividualBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['completed', 'confirmed'])
+            ->sum('amount');
+
+        $completedJobs = IndividualBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['completed', 'confirmed'])
+            ->count();
+
+        // 🆕 Recent earning jobs
+        $recentJobs = IndividualBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['completed', 'confirmed'])
+            ->orderByDesc('start_date')
+            ->limit(10)
+            ->get();
+
+        // 🆕 Last 7 days earnings chart
+        $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
+        $chartRaw = IndividualBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['completed', 'confirmed'])
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, SUM(amount) as v')
+            ->groupBy('d')->pluck('v', 'd');
+
+        $chartData = [];
+        foreach ($days as $date) {
+            $chartData[] = [
+                'day' => \Carbon\Carbon::parse($date)->format('D'),
+                'v' => (float) ($chartRaw[$date] ?? 0),
+            ];
+        }
+
+        return view('provider.individual.earnings', compact(
+            'provider', 'totalEarnings', 'completedJobs', 'recentJobs', 'chartData'
+        ));
+    }
+
+    public function reviewsPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403, 'Provider not found.');
+
+        $serviceIds = $provider->services()->pluck('id');
+
+        $reviewsRaw = \App\Models\Review::whereIn('service_id', $serviceIds)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // ग्राहकको नाम मिलाउने (UI dummy mapping — Phase 1)
+        $clientNames = ['Emily Watson', 'Arjun Sharma', 'Maria Garcia', 'Rohan Kapoor', 'Priya Nair'];
+
+        $reviews = $reviewsRaw->map(function ($r, $index) use ($clientNames) {
+            $r->client_name = $clientNames[$index % count($clientNames)];
+            return $r;
+        });
+
+        return view('provider.individual.reviews', compact('provider', 'reviews'));
     }
 }

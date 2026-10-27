@@ -1480,6 +1480,24 @@ return [
     'deadline_col' => 'समयसीमा',
     'no_artworks_found' => 'अहिलेसम्म कुनै कलाकृति थपिएको छैन।',
     'no_custom_orders_found' => 'अहिलेसम्म कुनै कस्टम अर्डर प्राप्त भएको छैन।',
+        // Individual Sidebar & Unlock
+    'my_bookings' => 'मेरा बुकिङहरू',
+    'calendar_view' => 'क्यालेन्डर',
+    'earnings' => 'आम्दानी',
+    'reviews' => 'समीक्षाहरू',
+    'manage_assignments_subtitle' => 'विगत र आउँदै गरेका सबै कामहरू हेर्नुहोस्',
+    'full_calendar' => 'पूर्ण क्यालेन्डर',
+    'calendar_subtitle' => 'आफ्नो तालिका र उपलब्धता व्यवस्थापन गर्नुहोस्',
+    'earnings_overview' => 'आम्दानीको अवलोकन',
+    'earnings_subtitle' => 'आफ्नो आय र भुक्तानी ट्र्याक गर्नुहोस्',
+    'total_earnings' => 'कुल आम्दानी',
+    'completed_jobs' => 'सम्पन्न कामहरू',
+    'client_reviews' => 'ग्राहक समीक्षाहरू',
+    'reviews_subtitle' => 'तपाईंका ग्राहकहरूले के भनिरहेका छन्',
+    'no_bookings_yet' => 'कुनै काम भेटिएन।',
+    'no_reviews_yet' => 'अहिलेसम्म कुनै समीक्षा प्राप्त भएको छैन।',
+    'back_to_dashboard' => 'ड्यासबोर्डमा फर्कनुहोस्',
+        'recent_earnings' => 'हालका आम्दानी कामहरू',
 
 
     // ======================

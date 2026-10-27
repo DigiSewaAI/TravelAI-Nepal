@@ -90,7 +90,7 @@
   .asm-amt{font-size:12.5px;font-weight:800}
   .asm-st{font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;cursor:pointer;border:none}
   .s-confirm{background:var(--emerald-soft);color:var(--emerald-d)}.s-pend{background:var(--amber-soft);color:#b45309}.s-comp{background:var(--blue-soft);color:#1d4ed8}
-  .delete-assignment{background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;font-weight:800;margin-top:6px;padding:2px 4px;border-radius:4px;display:block;width:100%;text-align:right;transition:.15s}
+  .delete-assignment{background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;font-weight:800;padding:2px 6px;border-radius:4px;transition:.15s}
   .delete-assignment:hover{background:var(--red-soft)}
   .asm-empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:12.5px;font-weight:700}
   .action-bar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:18px;flex-wrap:wrap}
@@ -363,8 +363,10 @@ function renderUpcoming(){
       </div>
       <div class="asm-amount">
         <div class="asm-amt">Rs ${(a.amount/1000).toFixed(0)}k</div>
-        <button class="asm-st ${stCls}" data-id="${a.id}" data-status="${a.status}">${STATUS_LABEL[a.status] || a.status.toUpperCase()}</button>
-        <button class="delete-assignment" data-id="${a.id}" title="${T.delete_assignment}">✕ ${T.delete_assignment}</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-top:5px">
+          <button class="asm-st ${stCls}" data-id="${a.id}" data-status="${a.status}">${STATUS_LABEL[a.status] || a.status.toUpperCase()}</button>
+          <button class="delete-assignment" data-id="${a.id}" title="${T.delete_assignment}">✕</button>
+        </div>
       </div>
     </div>`;
   }).join('');
