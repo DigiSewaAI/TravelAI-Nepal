@@ -165,4 +165,31 @@ class HotelDashboardController extends Controller
         $booking->delete();
         return back()->with('success', __('messages.booking_deleted'));
     }
+    public function bookingsPage()
+{
+    $provider = Auth::user()->ownProvider();
+    $bookings = HotelBooking::with('room')->where('provider_id', $provider->id)->latest()->get();
+    return view('provider.hotel.bookings', compact('provider', 'bookings'));
+}
+
+public function roomsPage()
+{
+    $provider = Auth::user()->ownProvider();
+    $rooms = HotelRoom::where('provider_id', $provider->id)->orderBy('room_number')->get();
+    return view('provider.hotel.rooms', compact('provider', 'rooms'));
+}
+
+public function guestsPage()
+{
+    $provider = Auth::user()->ownProvider();
+    $guests = HotelBooking::with('room')->where('provider_id', $provider->id)->where('status', 'checked_in')->get();
+    return view('provider.hotel.guests', compact('provider', 'guests'));
+}
+
+public function housekeepingPage()
+{
+    $provider = Auth::user()->ownProvider();
+    $tasks = HousekeepingTask::with('room')->where('provider_id', $provider->id)->latest()->get();
+    return view('provider.hotel.housekeeping', compact('provider', 'tasks'));
+}
 }

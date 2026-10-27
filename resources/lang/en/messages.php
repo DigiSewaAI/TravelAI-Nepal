@@ -1645,6 +1645,50 @@ return [
     'rate_deleted_success'          => 'Rate deleted successfully!',
     'transaction_created_success'   => 'Transaction recorded successfully!',
     'transaction_deleted_success'   => 'Transaction deleted successfully!',
+        // Hotel Sidebar Pages
+    'all_bookings'                => 'All Bookings',
+    'all_bookings_subtitle'       => 'Manage all your hotel reservations',
+    'room_management'             => 'Room Management',
+    'room_management_subtitle'    => 'Manage your property rooms',
+    'active_guests'               => 'Active Guests',
+    'active_guests_subtitle'      => 'Guests currently checked in',
+    'housekeeping_tasks_page'     => 'Housekeeping Tasks',
+    'housekeeping_tasks_subtitle' => 'Manage cleaning and maintenance tasks',
+    'room_no'                     => 'Room No.',
+    'floor_label'                 => 'Floor',
+    'task_label'                  => 'Task',
+    'assigned_to'                 => 'Assigned To',
+
+    // Empty states
+    'no_bookings_found'           => 'No bookings found',
+    'no_rooms_found'              => 'No rooms found',
+    'no_active_guests'            => 'No guests currently checked in',
+    'no_housekeeping_tasks'       => 'No housekeeping tasks found',
+
+    // Booking status labels
+    'status_checked_in'           => 'Checked In',
+    'status_checked_out'          => 'Checked Out',
+    'status_cancelled'            => 'Cancelled',
+
+    // Room status labels
+    'status_available'            => 'Available',
+    'status_occupied'             => 'Occupied',
+    'status_reserved'             => 'Reserved',
+    'status_dirty'                => 'Dirty',
+    'status_maintenance'          => 'Maintenance',
+
+    // Housekeeping status labels
+    'status_queue'                => 'Queue',
+    'status_done'                 => 'Done',
+
+    // Room types (DB values)
+    'room_type_standard'          => 'Standard',
+    'room_type_deluxe'            => 'Deluxe',
+    'room_type_suite'             => 'Suite',
+    'room_type_superior'          => 'Superior',
+    'room_type_premium'           => 'Premium',
+        'status_pending'      => 'Pending',
+    'status_in_progress'  => 'In Progress',
 
     'money_changer_details'     => 'Money Changer Details',
     'license_number'            => 'License Number',

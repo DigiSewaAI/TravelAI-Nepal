@@ -52,16 +52,16 @@
   .user-box .u-name{font-size:12.5px;font-weight:700;color:#e2e8f0;line-height:1.3}
   .user-box .u-role{font-size:10.5px;color:#8b9bb0;font-weight:600}
   .main{margin-left:262px;padding:24px 30px 46px;min-height:100vh}
+
+  /* Topbar — Grid layout (prevents wrap) */
   .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin-bottom:24px}
-  .topbar > div:first-child{flex:1 1 auto;min-width:0}
-  .topbar > div:first-child > div{min-width:0}
+  .topbar > div:first-child{min-width:0;overflow:hidden}
+  .topbar > div:first-child > div{min-width:0;overflow:hidden}
   .topbar h2{font-size:23px;font-weight:800;letter-spacing:-.7px}
-  .topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-weight:500}
   .topbar h2,.topbar p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.topbar > div:first-child{min-width:0;overflow:hidden}
-.topbar > div:first-child > div{min-width:0;overflow:hidden}
-.topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:nowrap}
-  .topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0}
+  .topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:nowrap}
+
   .search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;width:230px;transition:.2s}
   .search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,162,39,.13)}
   .search svg{width:16px;height:16px;color:#9aa8bc;flex-shrink:0}
@@ -70,9 +70,9 @@
   .icon-btn:hover{background:#fbf8ee;color:var(--gold-d);border-color:#ecdfb4}
   .icon-btn svg{width:18px;height:18px;stroke-width:2}
   .dot{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
-  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#d9b64a,#c9a227);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(201,162,39,.35);white-space:nowrap}
+  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#d9b64a,#c9a227);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(201,162,39,.35);white-space:nowrap;flex-shrink:0}
   .btn-primary svg{width:16px;height:16px;stroke-width:2.6}
-  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
+  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s;flex-shrink:0}
   .lang-select:hover{border-color:var(--gold);color:var(--gold-d)}
   .hamburger{display:none}
   .overlay{position:fixed;inset:0;background:rgba(14,23,38,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
@@ -95,26 +95,32 @@
   </div>
   <nav class="nav">
     <div class="nav-label">{{ __('messages.main') }}</div>
-    <a href="{{ route('provider.hotel.dashboard') }}" class="active">
+
+    <a href="{{ route('provider.hotel.dashboard') }}" class="{{ request()->routeIs('provider.hotel.dashboard') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.hotel.bookings') }}" class="{{ request()->routeIs('provider.hotel.bookings') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-      {{ __('messages.bookings') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.bookings') }}
     </a>
-    <a href="{{ route('provider.products.index') }}" class="disabled">
+
+    <a href="{{ route('provider.hotel.rooms') }}" class="{{ request()->routeIs('provider.hotel.rooms') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
-      {{ __('messages.rooms') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.rooms') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.hotel.guests') }}" class="{{ request()->routeIs('provider.hotel.guests') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      {{ __('messages.guests') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.guests') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.hotel.housekeeping') }}" class="{{ request()->routeIs('provider.hotel.housekeeping') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6"/><path d="M15 2v6"/><path d="M4 8h16l-1 13H5L4 8z"/></svg>
-      {{ __('messages.housekeeping') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.housekeeping') }}
     </a>
+
     <div class="nav-label">{{ __('messages.account') }}</div>
     <a href="{{ route('provider.verification.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>

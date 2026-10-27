@@ -258,6 +258,11 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // Hotel CRUD Routes
     Route::post('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeBooking'])->name('hotel.bookings.store');
     Route::delete('/hotel/bookings/{booking}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyBooking'])->name('hotel.bookings.destroy');
+        // Hotel Sidebar Unlocks (Read-Only Views)
+    Route::get('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'bookingsPage'])->name('hotel.bookings');
+    Route::get('/hotel/rooms', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'roomsPage'])->name('hotel.rooms');
+    Route::get('/hotel/guests', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'guestsPage'])->name('hotel.guests');
+    Route::get('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');
         // 🆕 Transport vertical dashboard routes
     Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');

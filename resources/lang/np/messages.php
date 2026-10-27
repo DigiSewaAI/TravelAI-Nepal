@@ -1360,6 +1360,50 @@ return [
     'rate_deleted_success'          => 'दर सफलतापूर्वक मेटाइयो!',
     'transaction_created_success'   => 'कारोबार सफलतापूर्वक दर्ता भयो!',
     'transaction_deleted_success'   => 'कारोबार सफलतापूर्वक मेटाइयो!',
+        // Hotel Sidebar Pages
+    'all_bookings'                => 'सबै बुकिङहरू',
+    'all_bookings_subtitle'       => 'तपाईंका सबै होटल आरक्षणहरू व्यवस्थापन गर्नुहोस्',
+    'room_management'             => 'कोठा व्यवस्थापन',
+    'room_management_subtitle'    => 'तपाईंको होटलका कोठाहरू व्यवस्थापन गर्नुहोस्',
+    'active_guests'               => 'सक्रिय आगन्तुकहरू',
+    'active_guests_subtitle'      => 'अहिले चेक-इन भएका आगन्तुकहरू',
+    'housekeeping_tasks_page'     => 'हाउसकिपिङ कार्यहरू',
+    'housekeeping_tasks_subtitle' => 'सफाई र मर्मत कार्यहरू व्यवस्थापन गर्नुहोस्',
+    'room_no'                     => 'कोठा नं.',
+    'floor_label'                 => 'तल्ला',
+    'task_label'                  => 'कार्य',
+    'assigned_to'                 => 'जिम्मेवार',
+
+    // Empty states
+    'no_bookings_found'           => 'कुनै बुकिङ फेला परेन',
+    'no_rooms_found'              => 'कुनै कोठा फेला परेन',
+    'no_active_guests'            => 'अहिले कुनै आगन्तुक चेक-इन छैनन्',
+    'no_housekeeping_tasks'       => 'कुनै हाउसकिपिङ कार्य फेला परेन',
+
+    // Booking status labels
+    'status_checked_in'           => 'चेक-इन भयो',
+    'status_checked_out'          => 'चेक-आउट भयो',
+    'status_cancelled'            => 'रद्द',
+
+    // Room status labels
+    'status_available'            => 'उपलब्ध',
+    'status_occupied'             => 'भरिएको',
+    'status_reserved'             => 'आरक्षित',
+    'status_dirty'                => 'फोहोर',
+    'status_maintenance'          => 'मर्मत',
+
+    // Housekeeping status labels
+    'status_queue'                => 'पर्खाइमा',
+    'status_done'                 => 'सम्पन्न',
+
+    // Room types (DB values)
+    'room_type_standard'          => 'स्ट्यान्डर्ड',
+    'room_type_deluxe'            => 'डिलक्स',
+    'room_type_suite'             => 'सुइट',
+    'room_type_superior'          => 'सुपिरियर',
+    'room_type_premium'           => 'प्रिमियम',
+        'status_pending'      => 'पेन्डिङ',
+    'status_in_progress'  => 'जारी छ',
 
 
     // ======================
