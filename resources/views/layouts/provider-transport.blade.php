@@ -174,6 +174,13 @@
     </div>
   </header>
   @yield('content')
+
+
+        {{-- Universal Footer --}}
+        <footer style="margin-top: auto; padding: 20px 30px; border-top: 1px solid var(--line, #e5e7eb); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted, #6b7280); background: transparent;">
+            <span>&copy; {{ date('Y') }} TravelAI Nepal &middot; All rights reserved.</span>
+            <span>TravelAI OS v1.0</span>
+        </footer>
 </main>
 <script>
   const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');
