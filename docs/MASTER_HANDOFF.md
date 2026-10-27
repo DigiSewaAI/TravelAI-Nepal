@@ -1,249 +1,282 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER SYSTEM AUDIT REPORT (UPDATED)
-FROM: Assistant
-TO:   Master
-DATE: 2026-10-27
-STATUS: 🟢 7/7 Dashboards & 7/7 CRUDs Complete | 🟡 Sidebar Unlock + QA Phase | 🔴 SEO & Push Locked
+👑 MASTER SYSTEM AUDIT REPORT (UPDATED — ACCURATE STATE)
+FROM: Assistant (Current Session)
+TO:   Master / Future Reference
+DATE: 2026-10-27 (EOD)
+HEAD: Local main (57 commits ahead of origin/main)
+STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Staff Premium Redesign | 🟢 Staff Link on all 8 layouts | 🟡 QA Audit Pending | 🟡 Profile/Settings Redesign Pending | 🔴 SEO & Push Locked
 ═══════════════════════════════════════════════════════════
 
-## 📊 1. CATEGORY INVENTORY (डेटाबेसको वास्तविक अवस्था)
-- **Provider Types:** १८ वटा (Shop, Rental, Wholesale, Trekking, Tour, Hotel, Resort, Lodge, Homestay, Guide, Porter, Transport, Activity, Local Experience, Photographer, Restaurant, Money Changer, Art/Craft)।
-- **Service Categories:** १८ वटा (Product Types सहित)।
+## 📊 1. CATEGORY INVENTORY (Database Reality)
+- **Provider Types:** 18 (Shop, Rental, Wholesale, Trekking, Tour, Hotel, Resort, Lodge, Homestay, Guide, Porter, Transport, Activity, Local Experience, Photographer, Restaurant, Money Changer, Art/Craft)
+- **Service Categories:** 18 (including Product Types)
 - **Pivot Mapping:** ✅ `provider_type_service_category` — 18/18 mapped (seeded)
 
 ═══════════════════════════════════════════════════════════
 
-## ✅ 2. COMPLETION STATUS
+## ✅ 2. COMPLETION STATUS (Verified via Git Log)
 
 ### A. Core Service & Product Engine
-- **Controllers:** `ServiceController.php` & `ProductController.php` (Complete)।
-- **UI:** Create, Edit, Itinerary Builder, Dynamic Product Forms, Image Upload, Stock (Complete)।
+- **Controllers:** `ServiceController.php` & `ProductController.php` (Complete)
+- **UI:** Create, Edit, Itinerary Builder, Dynamic Product Forms, Image Upload, Stock (Complete)
 
 ### B. Vertical Dashboards (Phase 1) — 7/7 COMPLETE ✅
-1. 🍜 Restaurant — `provider.restaurant.dashboard`
-2. 💱 Money Changer — `provider.money-changer.dashboard`
-3. 📦 Inventory — `provider.inventory.dashboard`
-4. 🏨 Hotel — `provider.hotel.dashboard`
-5. ✈️ Transport — `provider.transport.dashboard`
-6. 🧑‍✈️ Individual Services — `provider.individual.dashboard`
-7. 🎨 Art/Craft — `provider.art-craft.dashboard`
-
-**Features:** KPI Cards, SVG Charts, AJAX Status Updates, Premium UI Themes।
+1. 🍜 Restaurant — `24d83b8`
+2. 💱 Money Changer — `9a28aa9`
+3. 📦 Inventory — `11bd444`
+4. 🏨 Hotel — `8df5f65`
+5. ✈️ Transport — `d06988f`
+6. 🧑‍✈️ Individual Services — `67db438`
+7. 🎨 Art/Craft — `54eabb2`
 
 ### C. Phase 2 (CRUD & Multilingual) — 7/7 COMPLETE ✅
-| # | Module | CRUD Features | Status |
-|---|--------|--------------|--------|
-| 1 | 🏨 Hotel | Add/Delete Booking, Check-in/out | ✅ Commit `080529c` |
-| 2 | 🍜 Restaurant | Add Menu Item, Create/Delete Order | ✅ Commit `add1d5e` |
-| 3 | ✈️ Transport | Add Vehicle, Create/Delete Booking | ✅ Commit |
-| 4 | 📦 Inventory | Add/Delete Product, Quick Stock | ✅ Commit |
-| 5 | 🎨 Art/Craft | Add Artwork, Create/Delete Custom Order | ✅ Commit |
-| 6 | 🧑‍✈️ Individual | Add/Delete Assignment | ✅ Commit |
-| 7 | 💱 Money Changer | Add Rate, Create/Delete Transaction | ✅ Commit (Latest) |
+| # | Module | CRUD | Commit |
+|---|--------|------|--------|
+| 1 | 🏨 Hotel | Add/Delete Booking, Check-in/out | `080529c` |
+| 2 | 🍜 Restaurant | Add Menu, Create/Delete Order | `add1d5e` |
+| 3 | ✈️ Transport | Add Vehicle, Create/Delete Booking | `f574696` |
+| 4 | 📦 Inventory | Add/Delete Product, Quick Stock | `a3ec604` |
+| 5 | 🎨 Art/Craft | Add Artwork, Create/Delete Custom Order | `d6f7c7d` |
+| 6 | 🧑‍✈️ Individual | Add/Delete Assignment | `42fdd3e` |
+| 7 | 💱 Money Changer | Add Rate, Create/Delete Transaction | `38f5b34` |
 
-**Note:** सबै 7 CRUD modules EN/NP translation सहित complete।
-
-### D. Notifications & i18n
-- **Notifications:** Traveler, Admin, Provider (Bidirectional sync, instant UI)।
-- **i18n:** Greetings & Dashboard UI (EN, NP, HI, ZH)।
-
-═══════════════════════════════════════════════════════════
-
-## 🎯 3. IMMEDIATE PRIORITY — Sidebar Unlock + QA (Phase 3)
-
-### 🔴 CRITICAL ISSUE FOUND
-सबै 7 modules को **main dashboard CRUD** complete भयो ✅ **तर** हरेक module को **sidebar links** (Bookings, Rooms, Guests, Housekeeping, etc.) अझै **locked ("Coming Soon")** छन् ❌
-
-**User Impact:** Sidebar button थिच्दा केही हुँदैन → **खराब UX** → User frustrate हुन्छ।
-
-### ✅ Solution — 2-Step Priority Order
-
-#### 🔓 Priority 1: Sidebar Unlock (सबै modules को)
-हरेक module का locked sidebar links unlock गर्ने + basic UI (table views) बनाउने।
-
-#### 🧪 Priority 2: Module-by-Module Testing (QA)
-Unlock भएपछि हरेक module को CRUD + overall test गर्ने।
-
-### 📋 Module-by-Module Sequence (एक-एक गरेर)
-
-**Rule:** एक module पूरा complete (unlock + test) → अर्को module सुरु
-
-| # | Module | Unlock Targets | Status |
+### D. Sidebar Unlock (Phase 3) — 6/7 COMPLETE ✅
+| # | Module | Unlocked Pages | Commit |
 |---|--------|----------------|--------|
-| 1 | 🏨 **Hotel** | Bookings, Rooms, Guests, Housekeeping | ⏳ **START HERE** |
-| 2 | ✈️ Transport | Vehicles, Trips, Drivers, Routes | ⏳ Next |
-| 3 | 📦 Inventory | Products, Categories, Orders, Suppliers | ⏳ |
-| 4 | 🍜 Restaurant | Orders, Menu, Tables, Staff | ⏳ |
-| 5 | 🎨 Art/Craft | Gallery, Custom Orders, Artists | ⏳ |
-| 6 | 🧑‍✈️ Individual | Bookings, Calendar, Earnings | ⏳ |
-| 7 | 💱 Money Changer | Rates, Transactions, Customers, Reports | ⏳ |
+| 1 | 🏨 Hotel | Bookings, Rooms, Guests, Housekeeping | `7fd936d` |
+| 2 | ✈️ Transport | Vehicles, Routes, Drivers | `cd36bab` + `4981a5a` |
+| 3 | 📦 Inventory | Products, Orders | `95ecbc8` |
+| 4 | 🍜 Restaurant | Orders, Menu, Tables, Reports, Offers | `1d6c565` + `886b2be` |
+| 5 | 🎨 Art/Craft | Gallery, Custom Orders | `71d61d4` |
+| 6 | 🧑‍✈️ Individual | Bookings, Calendar, Earnings | `66e9bab` |
+| 7 | 💱 **Money Changer** | Rates, Transactions, Customers, Reports | ⏸️ **INTENTIONALLY LAST** (Owner's decision) |
+
+### E. Notifications & i18n — COMPLETE ✅
+- **Notifications:** Traveler (`e09dc58`), Admin (`993a35a`), Provider (`3b227a5`) — Bidirectional sync (`b75f1c6`)
+- **i18n:** EN, NP, HI, ZH Greetings (`c2361be`) + dashboard UI (`66eaef0`)
+
+### F. UI Polish — COMPLETE ✅
+- Universal Footer — all 8 layouts (`8776dd3`)
+- TravelAI Nepal Branding — all verticals (`195225f`)
+- Welcome Banners — vertical dashboards (`8776dd3`, `a8ab76a`)
+- Transport Shiny Banner — premium gradient (`a8ab76a`)
+- EN/NP translation fixes — no placeholders (`a8ab76a`)
+- Subscription & Verification pages — dynamic + premium (`25c4344`)
+- Profile edit translation keys (`6b16437`)
+- Restaurant Reports/Offers + universal layout fix (`886b2be`)
+
+### G. Staff Module Redesign — COMPLETE ✅ (NEW — 2026-10-27)
+- **Premium Staff views redesign** — `staff/index`, `staff/create`, `staff/edit`
+  - Hero cards, stat boxes, role pills, permissions grid, empty states
+  - Uses `var(--accent, #2563eb)` pattern — theme-aware across all verticals
+  - All routes, forms, validation, `@csrf`, `@method`, permission JS preserved
+- **Staff sidebar link added to 6 layouts** — Hotel, Transport, Inventory, Money Changer, Art/Craft, Individual
+  - Trekking (`provider.blade.php`) and Restaurant already had it — untouched
+- **`--accent` CSS aliases added to 6 vertical layouts** — each layout now exposes its native brand color as `--accent`, `--accent-d`, `--accent-soft`:
+  - Hotel → `#c9a227` (gold) | Transport → `#0ea5e9` (sky) | Inventory → `#6366f1` (indigo)
+  - Money Changer → `#10b981` (green) | Art/Craft → `#c65d3b` (terracotta) | Individual → `#10b981` (emerald)
+- **Trekking (`provider.blade.php`) not touched** — uses Tailwind blue fallback naturally
 
 ═══════════════════════════════════════════════════════════
 
-## 🛠️ 4. HOTEL MODULE — Sidebar Unlock Plan (Priority 1)
+## 🎯 3. NEXT PRIORITY — Phase 3 (QA & Polish)
 
-### Step 1: Layout Update (`layouts/provider-hotel.blade.php`)
-Locked links लाई active routes मा convert गर्ने:
-- Bookings → `route('provider.hotel.bookings')`
-- Rooms → `route('provider.hotel.rooms')`
-- Guests → `route('provider.hotel.guests')`
-- Housekeeping → `route('provider.hotel.housekeeping')`
-- "Soon" badge हटाउने
-- `class="{{ request()->routeIs(...) ? 'active' : '' }}"` dynamic active state
+### 🟡 Immediate Tasks
 
-### Step 2: Routes (`routes/web.php`)
-```php
-Route::get('/hotel/bookings', [HotelDashboardController::class, 'bookingsPage'])->name('hotel.bookings');
-Route::get('/hotel/rooms', [HotelDashboardController::class, 'roomsPage'])->name('hotel.rooms');
-Route::get('/hotel/guests', [HotelDashboardController::class, 'guestsPage'])->name('hotel.guests');
-Route::get('/hotel/housekeeping', [HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');
-Step 3: Controller Methods (HotelDashboardController.php)
-4 वटा methods थप्नु:
+#### 1. Profile/Settings Page Premium Redesign (START HERE TOMORROW)
+- File: `resources/views/provider/profile.blade.php` (or settings equivalent — confirm path first)
+- Current: Plain table (screenshot shown by Owner with "Everest Spice Kitchen" page)
+- Target: Hero card + info cards + theme-aware using same `var(--accent)` pattern
+- Must follow the exact pattern used for Staff redesign (fallback `#2563eb`, variables only)
 
-bookingsPage() — सबै bookings with room
+#### 2. QA Audit — 7 Modules (One-by-One)
+नियम: एक module पूरा test → अर्को module
 
-roomsPage() — सबै rooms
+| # | Module | Sidebar | CRUD | i18n | Layout | Console | Status |
+|---|--------|---------|------|------|--------|---------|--------|
+| 1 | 🍜 Restaurant | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending (reference) |
+| 2 | 🏨 Hotel | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 3 | ✈️ Transport | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 4 | 📦 Inventory | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 5 | 🎨 Art/Craft | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 6 | 🧑‍✈️ Individual | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 7 | 💱 Money Changer | ❌ | ⏳ | ⏳ | ⏳ | ⏳ | Unlock pending |
 
-guestsPage() — checked_in guests
-
-housekeepingPage() — सबै tasks
-
-Step 4: New View Files (Basic UI)
-text
-resources/views/provider/hotel/bookings.blade.php
-resources/views/provider/hotel/rooms.blade.php
-resources/views/provider/hotel/guests.blade.php
-resources/views/provider/hotel/housekeeping.blade.php
-हरेकमा table view + EN/NP translation।
-
-Step 5: Test
-Cache clear
-
-Hotel provider login
-
-Sidebar 4 links click → page खुल्नुपर्ने → data देखिनुपर्ने → कोई 404 नहुने
+#### 3. Money Changer Sidebar Unlock (Last by Design)
+- Rates → `provider.money-changer.rates`
+- Transactions → `provider.money-changer.transactions`
+- Customers → `provider.money-changer.customers`
+- Reports → `provider.money-changer.reports`
 
 ═══════════════════════════════════════════════════════════
 
-🧪 5. QA TESTING PROTOCOL (हरेक module को)
-Module Test Checklist
-A. Sidebar Links (Unlock Test)
+## 🧪 4. QA TESTING PROTOCOL (Per Module)
 
-□ सबै nav links click गर्नु → page खुल्नुपर्ने
-□ कोई "Coming Soon" badge बाँकी नहुने
-□ कोई 404 error नहुने
-□ Active state सही highlight हुने
-B. Dashboard CRUD Test
+### A. Sidebar Links
+- [ ] सबै nav links click → page खुल्नुपर्ने
+- [ ] "Coming Soon" badge बाँकी नहुने
+- [ ] 404 error नहुने
+- [ ] Active state सही highlight
 
-□ Create: Modal खुल्ने → form submit → DB save → UI update
-□ Read: Data सही load हुने
-□ Update: Status cycle / inline edit काम गर्ने
-□ Delete: Confirm → AJAX delete → reload
-C. Multilingual Test
+### B. Dashboard CRUD
+- [ ] Create: Modal → submit → DB save → UI update
+- [ ] Read: Data सही load
+- [ ] Update: Status cycle / inline edit
+- [ ] Delete: Confirm → AJAX delete → reload
 
-□ EN mode: सबै labels English
-□ NP switch: सबै labels Nepali
-□ कोई raw messages.xxx key नदेखिने
-□ JS strings (confirm, toast) translated
-D. Layout Test
+### C. Multilingual
+- [ ] EN: सबै labels English
+- [ ] NP: सबै labels Nepali
+- [ ] कोई raw `messages.xxx` key नदेखिने
+- [ ] JS strings (confirm, toast) translated
 
-□ Topbar wrap issue छैन (grid fix verified)
-□ Buttons natural size
-□ Duplicate buttons छैनन्
-□ Mobile view responsive
-E. Console Test
+### D. Layout
+- [ ] Topbar wrap issue छैन
+- [ ] Buttons natural size
+- [ ] Duplicate buttons छैनन्
+- [ ] Mobile responsive
 
-□ F12 Console → कोई error छैन
-□ कोई 404/500 network error छैन
-Final Module Sign-off
-सबै 5 tests pass → Module ✅ Complete → अर्को module सुरु
+### E. Console
+- [ ] F12 Console — कोई error छैन
+- [ ] कोई 404/500 network error छैन
 
-═══════════════════════════════════════════════════════════
-
-🔴 6. LOCKED ITEMS (Owner's Order — DO NOT TOUCH)
-🔒 SEO FIX (Locked)
-robots.txt — Locked
-
-Will do 5 mins before Push
-
-Do NOT touch until final
-
-🔒 PAYMENT-GATE-MIDDLEWARE (Locked)
-Not started
-
-Do NOT touch until Owner GO
-
-🔒 PUSH-TO-PRODUCTION (Locked — R17)
-Local commits only (+42 commits ahead)
-
-Do NOT push until Owner GO
-
-Final step: git push origin main (after all work done)
+**Sign-off:** सबै ५ tests pass → Module ✅ Complete → अर्को module
 
 ═══════════════════════════════════════════════════════════
 
-📊 7. CURRENT STATE SUMMARY
-Item	Status
-HEAD	54eabb2 (Local, +42 commits)
-Tests	186/186 passing
-Categories	18/18 complete
-Vertical Dashboards	7/7 complete (Phase 1)
-CRUD & Translations	7/7 complete (Phase 2)
-Sidebar Unlock	🔴 0/7 — START HERE
-QA Audit & Fixes	🟡 0/7 — After unlock
-Push to Production	🔴 Locked (R17)
-═══════════════════════════════════════════════════════════
+## 🔴 5. LOCKED ITEMS (Owner's Orders — DO NOT TOUCH)
 
-📋 8. RULES STATUS
-R3 (Evidence only) ✅
+### 🔒 SEO Fix (Locked)
+- `robots.txt` — Locked
+- Will do 5 mins before Push
+- Do NOT touch until final
 
-R4 (Scope locked) ✅
+### 🔒 Payment-Gate-Middleware (Locked)
+- Not started
+- Do NOT touch until Owner GO
 
-R8 (Additive migrations) ✅
-
-R13 (Individual git add) ✅
-
-R16 (186+ tests before commit) ✅
-
-R17 (Push only after Owner GO) ✅
+### 🔒 Push-to-Production (Locked — R17)
+- Local commits only (57 commits ahead)
+- Do NOT push until Owner GO
+- Final step: `git push origin main` (after all work done)
 
 ═══════════════════════════════════════════════════════════
 
-🎯 9. NEXT ACTION — Owner GO Required
-Immediate Next Step (Priority 1):
-Hotel Module Sidebar Unlock — 4 links (Bookings, Rooms, Guests, Housekeeping)
+## 📊 6. CURRENT STATE SUMMARY
 
-Deliverables:
-
-Layout update (4 links unlock)
-
-Routes (4 new GET routes)
-
-Controller (4 page methods)
-
-4 new view files (basic table UI)
-
-EN/NP translations
-
-Cache clear + test
-
-After Hotel Complete:
-→ Transport sidebar unlock
-→ Inventory sidebar unlock
-→ Restaurant sidebar unlock
-→ Art/Craft sidebar unlock
-→ Individual sidebar unlock
-→ Money Changer sidebar unlock
-
-After All 7 Unlocks:
-→ Full QA testing (module by module)
-→ Final sign-off
-→ SEO fix (5 mins)
-→ Push to production (Owner GO)
+| Item | Status |
+|------|--------|
+| **HEAD** | Local main, +57 commits ahead of origin/main |
+| **Tests** | 186/186 passing |
+| **Categories** | 18/18 complete |
+| **Vertical Dashboards** | 7/7 complete (Phase 1) |
+| **CRUD & Translations** | 7/7 complete (Phase 2) |
+| **Sidebar Unlock** | 6/7 complete (Money Changer last by design) |
+| **UI Polish** | Footer + Banners + Branding complete |
+| **Staff Premium Redesign** | ✅ Complete (index/create/edit) |
+| **Staff Link (all layouts)** | ✅ 8/8 (Trekking + Restaurant already had it) |
+| **Accent Aliases (6 layouts)** | ✅ Complete |
+| **Profile/Settings Redesign** | 🟡 Pending — START TOMORROW |
+| **QA Audit** | 🟡 0/7 — After profile redesign |
+| **SEO Fix** | 🔴 Locked |
+| **Payment Gate** | 🔴 Locked |
+| **Push to Production** | 🔴 Locked (R17) |
 
 ═══════════════════════════════════════════════════════════
 
-Master, yo report latest state ho. 7/7 CRUD Complete. Sidebar Unlock + QA is now the main focus. SEO & Push Locked until Owner GO. Ready to start Hotel Sidebar Unlock.
+## 📋 7. RULES STATUS
+
+- R3 (Evidence only) ✅
+- R4 (Scope locked) ✅
+- R8 (Additive migrations) ✅
+- R13 (Individual git add) ✅
+- R16 (186+ tests before commit) ✅
+- R17 (Push only after Owner GO) ✅
+- **Communication:** Owner = "दाइ", commands in ONE block ✅
 
 ═══════════════════════════════════════════════════════════
 
+## 🎯 8. RECOMMENDED SEQUENCE (Tomorrow Morning)
+
+### Step 1: Profile/Settings Premium Redesign (Start Here)
+1. Confirm exact file path (`provider/profile.blade.php` or `provider/settings/*`)
+2. Apply same `var(--accent)` pattern used for Staff — fallback `#2563eb`
+3. Test across all 8 verticals (Trekking blue, Restaurant orange, Hotel gold, etc.)
+
+### Step 2: QA Audit (One-by-One)
+1. 🍜 Restaurant (reference module)
+2. 🏨 Hotel
+3. ✈️ Transport
+4. 📦 Inventory
+5. 🎨 Art/Craft
+6. 🧑‍✈️ Individual
+
+### Step 3: Money Changer Sidebar Unlock (Last by Design)
+- Rates, Transactions, Customers, Reports
+- Then QA Money Changer
+
+### Step 4: Final Sign-off
+- All 7 modules QA passed
+- Profile/Settings redesign complete
+- 186+ tests still passing
+
+### Step 5: Locked Items (5 mins before Push)
+- SEO Fix (robots.txt)
+- Final QA pass
+- `git push origin main` — after Owner GO (R17)
+
+═══════════════════════════════════════════════════════════
+
+## 📝 9. IMPORTANT NOTES FOR NEXT ASSISTANT
+
+### 🎨 Shared View Theming Pattern (CRITICAL — Follow Strictly)
+
+Shared views (staff, profile, settings, subscription, verification) must use **only CSS variables** with **Trekking fallback**:
+
+- `var(--accent, #2563eb)` — brand color, blue for Trekking
+- `var(--accent-d, #1d4ed8)` — darker variant
+- `var(--accent-soft, #eff6ff)` — soft background
+- `var(--card, #fff)` — surface
+- `var(--line, #e5e7eb)` — borders
+- `var(--text, #1f2937)` — primary text
+- `var(--muted, #6b7280)` — secondary text
+- `var(--green-soft, #dcfce7)`, `var(--red-soft, #fee2e2)`, `var(--blue-soft, #dbeafe)`, `var(--purple-soft, #ede9fe)` — semantic variants
+
+**Why:** Trekking `provider.blade.php` does not define `--accent` → uses Tailwind blue fallback naturally. Restaurant/vertical layouts define `--accent` in `:root` → shared views auto-match their theme. One file, 8 themes.
+
+**Never do:**
+- Hardcode hex like `#f97316` (Restaurant orange) as fallback — breaks Trekking
+- Use `sidebar-link` or layout-specific classes in shared views — not inherited
+- Touch `provider.blade.php` — Trekking identity preserved
+- Touch `provider-restaurant.blade.php` `:root` — already has `--accent:#f97316`
+
+### ✅ What's Been Completed (Full Summary)
+- Universal footer (8 layouts), TravelAI branding, welcome banners
+- Transport shiny premium banner
+- Subscription/Verification pages dynamic + premium
+- Translation fixes (no raw keys)
+- Restaurant full module (`886b2be`) — Reports/Offers + 38 views dynamic layout
+- **Staff premium redesign (index/create/edit)** — theme-aware
+- **Staff sidebar link added to 6 layouts** (Trekking + Restaurant already had)
+- **`--accent` aliases added to 6 vertical layouts** — each uses its native brand color
+
+### ⚠️ Known Issues / Pending
+- **Money Changer sidebar** links still locked (intentional, last by design)
+- **Profile/Settings page** still plain Tailwind (needs premium redesign — START TOMORROW)
+- **QA Audit** never formally run — 0/7 modules tested end-to-end
+
+### 🔧 Technical Notes
+- Layouts use `$provider_layout` variable (38 provider views updated) — shared views extend it dynamically
+- Vertical themes: Restaurant (orange), Hotel (gold), Transport (sky), Inventory (indigo), Art/Craft (terracotta), Individual (emerald), Money Changer (green), Trekking (Tailwind blue default)
+- Translation files: `resources/lang/{en,np}/messages.php`
+- Staff route: `Route::resource('staff', StaffController::class)->except(['show'])`
+- **Windows Encoding Warning:** Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual paste only. For English-only scripts (adding links, aliases), PowerShell is safe.
+- **PowerShell Script Pattern:** When adding CSS variables or HTML blocks via script, insert before `--radius:` or `messages.account` anchors, using `[System.IO.File]::WriteAllText` with UTF-8 no BOM
+
+═══════════════════════════════════════════════════════════
+
+**Report prepared by:** Assistant (Current Session)
+**Verified against:** `git log --oneline -50` (verified staff commits) + `git status` (57 commits ahead)
+**Next action (tomorrow):** Profile/Settings Premium Redesign → QA Audit → Money Changer unlock → Final Push
+
+═══════════════════════════════════════════════════════════
