@@ -251,6 +251,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // Inventory CRUD Routes
     Route::post('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'storeProduct'])->name('inventory.products.store');
     Route::delete('/inventory/products/{product}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'destroyProduct'])->name('inventory.products.destroy');
+        // Inventory Sidebar Unlocks
+    Route::get('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'productsPage'])->name('inventory.products');
+    Route::get('/inventory/orders', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'ordersPage'])->name('inventory.orders');
         // 🆕 Hotel vertical dashboard routes
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
@@ -272,6 +275,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyVehicle'])->name('transport.vehicles.destroy');
     Route::post('/transport/bookings', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeBooking'])->name('transport.bookings.store');
     Route::delete('/transport/bookings/{booking}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyBooking'])->name('transport.bookings.destroy');
+            // Transport Sidebar Unlocks (Read-Only Views)
+    Route::get('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'vehiclesPage'])->name('transport.vehicles');
+    Route::get('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'routesPage'])->name('transport.routes');
+    Route::get('/transport/drivers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'driversPage'])->name('transport.drivers');
         // 🆕 Individual Services vertical dashboard routes
     Route::get('/individual/dashboard', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'index'])->name('individual.dashboard');
     Route::patch('/individual/bookings/{booking}/status', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateBookingStatus'])->name('individual.bookings.status');

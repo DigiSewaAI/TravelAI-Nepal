@@ -71,10 +71,10 @@
   .icon-btn:hover{background:#f4f5ff;color:var(--indigo-d);border-color:#d6d9fb}
   .icon-btn svg{width:18px;height:18px;stroke-width:2}
   .dot{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
-  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;transition:.2s;box-shadow:0 8px 20px rgba(99,102,241,.35);white-space:nowrap}
+  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;transition:.2s;box-shadow:0 8px 20px rgba(99,102,241,.35);white-space:nowrap;flex-shrink:0}
   .btn-primary:hover{filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 11px 25px rgba(99,102,241,.45)}
   .btn-primary svg{width:16px;height:16px;stroke-width:2.6}
-  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
+  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s;flex-shrink:0}
   .lang-select:hover{border-color:var(--indigo);color:var(--indigo-d)}
   .hamburger{display:none}
   .overlay{position:fixed;inset:0;background:rgba(20,26,46,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
@@ -99,30 +99,37 @@
   </div>
   <nav class="nav">
     <div class="nav-label">{{ __('messages.main') }}</div>
-    <a href="{{ route('provider.inventory.dashboard') }}" class="active">
+
+    <a href="{{ route('provider.inventory.dashboard') }}" class="{{ request()->routeIs('provider.inventory.dashboard') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
-    <a href="{{ route('provider.products.index') }}">
+
+    <a href="{{ route('provider.inventory.products') }}" class="{{ request()->routeIs('provider.inventory.products') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
       {{ __('messages.nav_products') }}
     </a>
+
     <a href="#" class="disabled">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
       {{ __('messages.nav_inventory') }} <span class="badge">{{ __('messages.soon') }}</span>
     </a>
-    <a href="{{ route('provider.orders.index') }}">
+
+    <a href="{{ route('provider.inventory.orders') }}" class="{{ request()->routeIs('provider.inventory.orders') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
       {{ __('messages.nav_orders') }}
     </a>
+
     <a href="#" class="disabled">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
       {{ __('messages.nav_suppliers') }} <span class="badge">{{ __('messages.soon') }}</span>
     </a>
+
     <a href="#" class="disabled">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
       {{ __('messages.nav_reports') }} <span class="badge">{{ __('messages.soon') }}</span>
     </a>
+
     <div class="nav-label">{{ __('messages.account') }}</div>
     <a href="{{ route('provider.verification.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>

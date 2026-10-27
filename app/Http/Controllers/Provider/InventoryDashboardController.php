@@ -239,4 +239,30 @@ class InventoryDashboardController extends Controller
         $product->delete();
         return back()->with('success', __('messages.product_deleted_success'));
     }
+        public function productsPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $products = Product::where('provider_id', $provider->id)->orderBy('name')->get();
+        
+        // Sidebar Health Calculation
+        $totalProducts = $products->count();
+        $inStockCount = $products->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        return view('provider.inventory.products', compact('provider', 'products', 'stockHealth'));
+    }
+
+    public function ordersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $orderIds = OrderItem::where('provider_id', $provider->id)->pluck('order_id')->unique();
+        $orders = Order::whereIn('id', $orderIds)->with('user')->latest()->get();
+
+        // Sidebar Health Calculation
+        $totalProducts = Product::where('provider_id', $provider->id)->count();
+        $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        return view('provider.inventory.orders', compact('provider', 'orders', 'stockHealth'));
+    }
 }
