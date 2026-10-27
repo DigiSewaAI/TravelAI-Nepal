@@ -1,8 +1,13 @@
 @extends('layouts.provider-transport')
 
-@section('title', 'Transport Dashboard')
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Namaste ' . (auth()->user()->name ?? 'Manager') . ' 👋 — Here\'s your fleet status today')
+@php
+    $greetingName = auth()->user()->name ?? __('messages.manager');
+    $subtitle = __('messages.transport_welcome_subtitle', ['name' => $greetingName]);
+@endphp
+
+@section('title', __('messages.transport_dashboard_title'))
+@section('page-title', __('messages.dashboard'))
+@section('page-subtitle', $subtitle)
 
 @push('transport-head')
 <style>
@@ -31,7 +36,7 @@
   .fleet{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .veh{border-radius:13px;padding:13px;cursor:pointer;transition:.2s;border:1.5px solid var(--line);background:#fff;position:relative}
   .veh:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(12,30,51,.09)}
-  .veh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .veh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-right:18px}
   .veh-ic{font-size:20px;line-height:1}
   .veh-st{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,.02)}
   .veh-id{font-size:11.5px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -58,13 +63,34 @@
   .pill{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:20px;display:inline-block}
   .p-confirm{background:var(--green-soft);color:#047857}.p-pending{background:var(--amber-soft);color:#b45309}.p-cancel{background:var(--red-soft);color:#b91c1c}
   .empty{font-size:12.5px;color:var(--muted);text-align:center;padding:18px 0;font-weight:600}
+  .action-bar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--line);box-shadow:none}
+  .delete-vehicle{position:absolute;top:8px;right:8px;background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:5px;transition:.15s;z-index:2}
+  .delete-vehicle:hover{background:var(--red-soft)}
+  .delete-booking{background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:5px;transition:.15s}
+  .delete-booking:hover{background:var(--red-soft)}
   @media (max-width:1250px){.stats{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:1080px){.grid{grid-template-columns:1fr}.span-2{grid-column:span 1}.fleet{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:640px){.stats{grid-template-columns:1fr}.card{padding:16px}.fleet{grid-template-columns:1fr}}
+  @media (max-width:640px){.stats{grid-template-columns:1fr}.card{padding:16px}.fleet{grid-template-columns:1fr}.action-bar{justify-content:stretch}.action-bar button{flex:1}}
 </style>
 @endpush
 
 @section('content')
+
+{{-- 🆕 Action Bar --}}
+<div class="action-bar">
+  <button class="btn-primary btn-secondary" id="addVehicleBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;stroke-width:2.6">
+      <path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/>
+    </svg>
+    <span>{{ __('messages.add_vehicle') }}</span>
+  </button>
+  <button class="btn-primary" id="newTripBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    <span>{{ __('messages.new_trip') }}</span>
+  </button>
+</div>
+
 {{-- KYC Banner --}}
 @php
     $vp = auth()->user()->getCurrentProvider();
@@ -74,51 +100,141 @@
 <div style="background:#fff7ed;border-left:4px solid #f59e0b;padding:16px 20px;margin-bottom:20px;border-radius:12px;display:flex;align-items:start;gap:14px">
     <div style="flex-shrink:0;width:38px;height:38px;background:#fef5e3;border-radius:10px;display:grid;place-items:center;font-size:18px">⚠️</div>
     <div style="flex:1">
-        <h4 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:4px">Account Unverified</h4>
-        <p style="font-size:12.5px;color:#b45309;font-weight:500;line-height:1.5">Your transport account is not verified yet. Upload your KYC documents to accept ride bookings and receive payouts.</p>
-        <a href="{{ route('provider.verification.index') }}" style="display:inline-block;margin-top:10px;background:#f59e0b;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800">Verify Now →</a>
+        <h4 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:4px">{{ __('messages.account_unverified') }}</h4>
+        <p style="font-size:12.5px;color:#b45309;font-weight:500;line-height:1.5">{{ __('messages.kyc_transport_message') }}</p>
+        <a href="{{ route('provider.verification.index') }}" style="display:inline-block;margin-top:10px;background:#f59e0b;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800">{{ __('messages.verify_now') }}</a>
     </div>
 </div>
 @endif
 
 <section class="stats">
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-sky">🛣️</div><span class="delta up">▲ Today</span></div><div class="stat-label">Total Trips Today</div><div class="stat-value">{{ $totalTripsToday }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-green">🚌</div><span class="delta up">▲ Live</span></div><div class="stat-label">Active Fleet</div><div class="stat-value">{{ $activeFleet }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-amber">🎫</div><span class="delta up">▲ Live</span></div><div class="stat-label">Pending Bookings</div><div class="stat-value">{{ $pendingBookings }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-purple">💰</div><span class="delta up">▲ Today</span></div><div class="stat-label">Today's Revenue</div><div class="stat-value"><small>Rs</small> {{ number_format($todayRevenue, 0) }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-sky">🛣️</div><span class="delta up">▲ {{ __('messages.today') }}</span></div><div class="stat-label">{{ __('messages.total_trips_today') }}</div><div class="stat-value">{{ $totalTripsToday }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-green">🚌</div><span class="delta up">▲ {{ __('messages.live') }}</span></div><div class="stat-label">{{ __('messages.active_fleet') }}</div><div class="stat-value">{{ $activeFleet }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-amber">🎫</div><span class="delta up">▲ {{ __('messages.live') }}</span></div><div class="stat-label">{{ __('messages.pending_bookings') }}</div><div class="stat-value">{{ $pendingBookings }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-purple">💰</div><span class="delta up">▲ {{ __('messages.today') }}</span></div><div class="stat-label">{{ __('messages.today_revenue') }}</div><div class="stat-value"><small>Rs</small> {{ number_format($todayRevenue, 0) }}</div></div>
 </section>
 
 <section class="grid">
   <div class="card span-2">
     <div class="card-head">
-      <div><h3>Trip Volume</h3><div class="chart-total"><b>Last 7 days</b><span>Land Transport</span></div></div>
-      <div class="legend"><span><i style="background:#0ea5e9"></i>Trips</span></div>
+      <div><h3>{{ __('messages.trip_volume') }}</h3><div class="chart-total"><b>{{ __('messages.last_7_days') }}</b><span>{{ __('messages.land_transport') }}</span></div></div>
+      <div class="legend"><span><i style="background:#0ea5e9"></i>{{ __('messages.trips') }}</span></div>
     </div>
     <div id="chart"></div>
   </div>
   <div class="card">
-    <div class="card-head"><div><h3>Ground Fleet</h3><div class="sub">Click a vehicle to cycle its status</div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.ground_fleet') }}</h3><div class="sub">{{ __('messages.click_vehicle_cycle') }}</div></div></div>
     <div class="fleet" id="fleet"></div>
     <div class="fleet-legend">
-      <span><i style="background:#22c55e"></i>Available</span>
-      <span><i style="background:#0ea5e9"></i>On Route</span>
-      <span><i style="background:#8b5cf6"></i>Charging</span>
-      <span><i style="background:#ef4444"></i>Maintenance</span>
+      <span><i style="background:#22c55e"></i>{{ __('messages.available') }}</span>
+      <span><i style="background:#0ea5e9"></i>{{ __('messages.on_route') }}</span>
+      <span><i style="background:#8b5cf6"></i>{{ __('messages.charging') }}</span>
+      <span><i style="background:#ef4444"></i>{{ __('messages.maintenance') }}</span>
     </div>
   </div>
 </section>
 
 <section class="grid">
   <div class="card" style="grid-column:span 3">
-    <div class="card-head"><div><h3>Recent Bookings</h3><div class="sub">Latest reservations</div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.recent_bookings') }}</h3><div class="sub">{{ __('messages.latest_reservations') }}</div></div></div>
     <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Passenger</th><th>Vehicle</th><th>Route</th><th>Ref</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+        <thead><tr>
+          <th>{{ __('messages.passenger') }}</th>
+          <th>{{ __('messages.vehicle') }}</th>
+          <th>{{ __('messages.route') }}</th>
+          <th>{{ __('messages.ref') }}</th>
+          <th>{{ __('messages.date') }}</th>
+          <th>{{ __('messages.amount') }}</th>
+          <th>{{ __('messages.status') }}</th>
+          <th>{{ __('messages.action') }}</th>
+        </tr></thead>
         <tbody id="bookingsBody"></tbody>
       </table>
     </div>
   </div>
 </section>
+
+{{-- 🆕 Add Vehicle Modal --}}
+<div id="vehicleModal" style="display:none;position:fixed;inset:0;background:rgba(10,28,51,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
+    <div style="background:#fff;border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:18px;font-weight:800;color:var(--text)">{{ __('messages.add_vehicle') }}</h3>
+            <button type="button" id="closeVehicleModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
+        </div>
+        <form action="{{ route('provider.transport.vehicles.store') }}" method="POST">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_number') }}</label>
+                    <input type="text" name="vehicle_number" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="BA-1-KHA-1234">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_type') }}</label>
+                    <input type="text" name="vehicle_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Bus / Van / Car">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.capacity') }}</label>
+                    <input type="number" name="capacity" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="42">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.driver_name') }}</label>
+                    <input type="text" name="driver_name" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Ram B.">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.route') }}</label>
+                    <input type="text" name="route_name" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="KTM → Pokhara">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.add_vehicle') }}</button>
+        </form>
+    </div>
+</div>
+
+{{-- 🆕 New Trip Modal --}}
+<div id="tripModal" style="display:none;position:fixed;inset:0;background:rgba(10,28,51,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
+    <div style="background:#fff;border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:18px;font-weight:800;color:var(--text)">{{ __('messages.new_trip') }}</h3>
+            <button type="button" id="closeTripModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
+        </div>
+        <form action="{{ route('provider.transport.bookings.store') }}" method="POST">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.passenger_name') }}</label>
+                    <input type="text" name="passenger_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="John Doe">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.passenger_email') }}</label>
+                    <input type="email" name="passenger_email" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="john@example.com">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle') }}</label>
+                    <select name="vehicle_id" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                        <option value="">—</option>
+                        @foreach($vehicles as $v)
+                            <option value="{{ $v->id }}">{{ $v->vehicle_number }} ({{ $v->vehicle_type }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.route') }}</label>
+                    <input type="text" name="route_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="KTM → Pokhara">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.travel_date') }}</label>
+                    <input type="date" name="travel_date" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.amount') }} (Rs)</label>
+                    <input type="number" name="amount" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="1500">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.create_booking') }}</button>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('transport-scripts')
@@ -130,6 +246,22 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 const VEH_STATUSES = ['available','on-route','charging','maintenance'];
 
+/* Multilingual JS strings */
+const T = {
+  no_vehicles:   @json(__('messages.no_vehicles_registered')),
+  no_bookings:   @json(__('messages.no_bookings_yet')),
+  unassigned:    @json(__('messages.unassigned')),
+  seats:         @json(__('messages.seats')),
+  pending:       @json(__('messages.pending')),
+  confirmed:     @json(__('messages.confirmed')),
+  cancelled:     @json(__('messages.cancelled')),
+  confirm_del_v: @json(__('messages.confirm_delete_vehicle')),
+  confirm_del_b: @json(__('messages.confirm_delete_booking')),
+  delete_v:      @json(__('messages.delete_vehicle')),
+  delete_b:      @json(__('messages.delete_booking'))
+};
+const STATUS_LABEL = { confirmed: T.confirmed, pending: T.pending, cancelled: T.cancelled };
+
 function renderChart(){
   const W=780, H=260, padL=44, padR=10, padT=16, padB=32;
   const plotW=W-padL-padR, plotH=H-padT-padB;
@@ -139,7 +271,7 @@ function renderChart(){
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="gTrip" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient></defs>`;
-  
+
   for(let i=0;i<=5;i++){
     const val=(max/5)*i,y=padT+plotH-(val/max)*plotH;
     svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#eef4fa" stroke-width="1"/>`;
@@ -157,19 +289,21 @@ function renderChart(){
 
 function renderFleet(){
   const box = document.getElementById('fleet');
-  if(!VEHICLES.length){ box.innerHTML='<p class="empty" style="grid-column:1/-1">No vehicles registered</p>'; return; }
+  if(!VEHICLES.length){ box.innerHTML='<p class="empty" style="grid-column:1/-1">'+T.no_vehicles+'</p>'; return; }
   box.innerHTML = VEHICLES.map((v,i)=>`
     <div class="veh veh-${v.status}" data-id="${v.id}" data-status="${v.status}">
+      <button class="delete-vehicle" data-id="${v.id}" title="${T.delete_v}">✕</button>
       <div class="veh-top"><div class="veh-ic">${v.vehicle_type.includes('Bus')?'🚌':(v.vehicle_type==='Van'||v.vehicle_type==='Hiace'?'🚐':(v.vehicle_type==='SUV'||v.vehicle_type==='Jeep'?'🚙':'🚗'))}</div><div class="veh-st"></div></div>
       <div class="veh-id">${v.vehicle_number}</div>
       <div class="veh-type">${v.vehicle_type}</div>
       <div class="veh-route">${v.route_name || '—'}</div>
-      <div class="veh-driver">${v.driver_name || 'Unassigned'} • ${v.capacity} seats</div>
+      <div class="veh-driver">${v.driver_name || T.unassigned} • ${v.capacity} ${T.seats}</div>
     </div>
   `).join('');
 
   document.querySelectorAll('.veh').forEach(el=>{
-    el.addEventListener('click', async function(){
+    el.addEventListener('click', async function(e){
+      if (e.target.classList.contains('delete-vehicle')) return; // delete handled separately
       const id = this.dataset.id;
       const cur = VEH_STATUSES.indexOf(this.dataset.status);
       const next = VEH_STATUSES[(cur+1) % VEH_STATUSES.length];
@@ -181,14 +315,14 @@ function renderFleet(){
       } catch(e){ console.error(e); }
     });
   });
-  
+
   const active = VEHICLES.filter(v=>v.status==='available'||v.status==='on-route').length;
   document.getElementById('fleetVal').innerHTML = active + ' <small>/ ' + VEHICLES.length + ' active</small>';
 }
 
 function renderBookings(){
   const body = document.getElementById('bookingsBody');
-  if(!BOOKINGS.length){ body.innerHTML = '<tr><td colspan="7"><p class="empty">No bookings yet</p></td></tr>'; return; }
+  if(!BOOKINGS.length){ body.innerHTML = '<tr><td colspan="8"><p class="empty">'+T.no_bookings+'</p></td></tr>'; return; }
   body.innerHTML = BOOKINGS.map(b=>{
     const payCls = b.status==='confirmed'?'p-confirm':(b.status==='pending'?'p-pending':'p-cancel');
     const inits = b.passenger_name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -199,11 +333,53 @@ function renderBookings(){
       <td style="color:#64748b">${b.booking_ref}</td>
       <td>${new Date(b.travel_date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</td>
       <td style="font-weight:800">Rs ${Number(b.amount).toLocaleString()}</td>
-      <td><span class="pill ${payCls}">${b.status}</span></td>
+      <td><span class="pill ${payCls}">${STATUS_LABEL[b.status] || b.status}</span></td>
+      <td><button class="delete-booking" data-id="${b.id}" title="${T.delete_b}">✕</button></td>
     </tr>`;
   }).join('');
 }
 
 renderChart(); renderFleet(); renderBookings();
+
+/* ========== Modals ========== */
+const vehicleModal = document.getElementById('vehicleModal');
+const tripModal = document.getElementById('tripModal');
+document.getElementById('addVehicleBtn')?.addEventListener('click', () => { vehicleModal.style.display = 'flex'; });
+document.getElementById('newTripBtn')?.addEventListener('click', () => { tripModal.style.display = 'flex'; });
+document.getElementById('closeVehicleModal')?.addEventListener('click', () => { vehicleModal.style.display = 'none'; });
+document.getElementById('closeTripModal')?.addEventListener('click', () => { tripModal.style.display = 'none'; });
+vehicleModal?.addEventListener('click', (e) => { if (e.target === vehicleModal) vehicleModal.style.display = 'none'; });
+tripModal?.addEventListener('click', (e) => { if (e.target === tripModal) tripModal.style.display = 'none'; });
+
+/* ========== Delete Handlers (Vehicle + Booking) ========== */
+document.addEventListener('click', async function(e) {
+  if (e.target.classList.contains('delete-vehicle')) {
+    if (!confirm(T.confirm_del_v)) return;
+    const id = e.target.dataset.id;
+    e.target.disabled = true;
+    try {
+      const res = await fetch(`/provider/transport/vehicles/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+      });
+      if (res.ok) window.location.reload();
+      else e.target.disabled = false;
+    } catch (err) { console.error(err); e.target.disabled = false; }
+  }
+
+  if (e.target.classList.contains('delete-booking')) {
+    if (!confirm(T.confirm_del_b)) return;
+    const id = e.target.dataset.id;
+    e.target.disabled = true;
+    try {
+      const res = await fetch(`/provider/transport/bookings/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+      });
+      if (res.ok) window.location.reload();
+      else e.target.disabled = false;
+    } catch (err) { console.error(err); e.target.disabled = false; }
+  }
+});
 </script>
 @endpush

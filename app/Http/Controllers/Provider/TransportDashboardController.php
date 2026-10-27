@@ -92,4 +92,76 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
+        public function storeVehicle(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'vehicle_number' => 'required|string|max:50',
+            'vehicle_type' => 'required|string|max:50',
+            'capacity' => 'required|integer|min:1',
+            'driver_name' => 'nullable|string|max:100',
+            'route_name' => 'nullable|string|max:150',
+        ]);
+
+        TransportVehicle::create([
+            'provider_id' => $provider->id,
+            'vehicle_number' => $validated['vehicle_number'],
+            'vehicle_type' => $validated['vehicle_type'],
+            'capacity' => $validated['capacity'],
+            'driver_name' => $validated['driver_name'],
+            'route_name' => $validated['route_name'],
+            'status' => 'available',
+        ]);
+
+        return back()->with('success', __('messages.vehicle_created_success'));
+    }
+
+    public function destroyVehicle(TransportVehicle $vehicle)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
+        
+        $vehicle->delete();
+        return back()->with('success', __('messages.vehicle_deleted_success'));
+    }
+
+    public function storeBooking(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'vehicle_id' => 'required|exists:transport_vehicles,id',
+            'passenger_name' => 'required|string|max:100',
+            'passenger_email' => 'nullable|email|max:150',
+            'route_name' => 'required|string|max:150',
+            'travel_date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        TransportBooking::create([
+            'provider_id' => $provider->id,
+            'vehicle_id' => $validated['vehicle_id'],
+            'passenger_name' => $validated['passenger_name'],
+            'passenger_email' => $validated['passenger_email'] ?? null,
+            'booking_ref' => 'TRP-' . strtoupper(uniqid()),
+            'route_name' => $validated['route_name'],
+            'travel_date' => $validated['travel_date'],
+            'amount' => $validated['amount'],
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', __('messages.booking_created_success'));
+    }
+
+    public function destroyBooking(TransportBooking $booking)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $booking->delete();
+        return back()->with('success', __('messages.booking_deleted_success'));
+    }
 }

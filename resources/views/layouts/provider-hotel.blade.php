@@ -52,10 +52,16 @@
   .user-box .u-name{font-size:12.5px;font-weight:700;color:#e2e8f0;line-height:1.3}
   .user-box .u-role{font-size:10.5px;color:#8b9bb0;font-weight:600}
   .main{margin-left:262px;padding:24px 30px 46px;min-height:100vh}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px;flex-wrap:wrap}
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin-bottom:24px}
+  .topbar > div:first-child{flex:1 1 auto;min-width:0}
+  .topbar > div:first-child > div{min-width:0}
   .topbar h2{font-size:23px;font-weight:800;letter-spacing:-.7px}
-  .topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-weight:500}
-  .topbar-right{display:flex;align-items:center;gap:11px}
+  .topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar h2,.topbar p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.topbar > div:first-child{min-width:0;overflow:hidden}
+.topbar > div:first-child > div{min-width:0;overflow:hidden}
+.topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:nowrap}
+  .topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0}
   .search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;width:230px;transition:.2s}
   .search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,162,39,.13)}
   .search svg{width:16px;height:16px;color:#9aa8bc;flex-shrink:0}
@@ -72,6 +78,7 @@
   .overlay{position:fixed;inset:0;background:rgba(14,23,38,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
   .overlay.show{opacity:1;pointer-events:auto}
   @media (max-width:1080px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:20px 18px 42px}.hamburger{display:grid}.search{width:170px}}
+  @media (max-width:900px){.topbar{grid-template-columns:1fr}}
   @media (max-width:640px){.topbar h2{font-size:19px}.search{display:none}.btn-primary span{display:none}.btn-primary{padding:11px}.main{padding:16px 14px 38px}}
 </style>
 @stack('hotel-head')

@@ -1052,6 +1052,27 @@ return [
     'review' => 'समीक्षा',
     'write_review' => 'समीक्षा लेख्नुहोस्',
     'no_reviews_yet' => 'अझै कुनै समीक्षा छैन',
+        // Transport CRUD
+    'add_vehicle' => 'नयाँ गाडी थप्नुहोस्',
+    'new_trip' => 'नयाँ यात्रा / बुकिङ',
+    'vehicle_number' => 'गाडीको नम्बर',
+    'vehicle_type' => 'गाडीको प्रकार',
+    'capacity' => 'क्षमता (सिट)',
+    'driver_name' => 'चालकको नाम',
+    'route' => 'रुट (जस्तै: KTM → Pokhara)',
+    'passenger_name' => 'यात्रुको नाम',
+    'travel_date' => 'यात्रा मिति',
+    'booking_ref' => 'बुकिङ रेफ',
+    'create_booking' => 'बुकिङ सिर्जना गर्नुहोस्',
+    'delete_booking' => 'बुकिङ मेटाउनुहोस्',
+    'delete_vehicle' => 'गाडी मेटाउनुहोस्',
+    'confirm_delete_booking' => 'के तपाईं यो बुकिङ मेटाउन चाहनुहुन्छ?',
+    'confirm_delete_vehicle' => 'के तपाईं यो गाडी मेटाउन चाहनुहुन्छ?',
+    'booking_created_success' => 'बुकिङ सफलतापूर्वक सिर्जना भयो!',
+    'booking_deleted_success' => 'बुकिङ सफलतापूर्वक मेटाइयो!',
+    'vehicle_created_success' => 'गाडी सफलतापूर्वक थपियो!',
+    'vehicle_deleted_success' => 'गाडी सफलतापूर्वक मेटाइयो!',
+    'action' => 'कार्य',
 
 
     // ======================
