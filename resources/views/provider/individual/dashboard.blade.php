@@ -1,11 +1,24 @@
 @extends('layouts.provider-individual')
 
-@section('title', 'Individual Dashboard')
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Namaste ' . (auth()->user()->name ?? 'Pro') . ' 👋 You have ' . count($assignments->where('dateKey', '>=', now()->format('Y-m-d'))) . ' upcoming assignments')
+@php
+    $greetingName = auth()->user()->name ?? __('messages.pro_fallback');
+    $upcomingCount = count($assignments->where('dateKey', '>=', now()->format('Y-m-d')));
+    $subtitle = __('messages.upcoming_assignments_count', ['name' => $greetingName, 'count' => $upcomingCount]);
+@endphp
+
+@section('title', __('messages.individual_dashboard_title'))
+@section('page-title', __('messages.dashboard'))
+@section('page-subtitle', $subtitle)
 
 @push('ind-head')
 <style>
+  /* Topbar fix — grid layout to prevent wrap */
+  .topbar{display:grid !important;grid-template-columns:minmax(0,1fr) auto !important;align-items:center !important;gap:18px !important;margin-bottom:24px !important}
+  .topbar > div:first-child{min-width:0;overflow:hidden}
+  .topbar > div:first-child > div{min-width:0;overflow:hidden}
+  .topbar h2,.topbar p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .topbar-right{flex-shrink:0;flex-wrap:nowrap}
+
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
   .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:19px;transition:.25s;position:relative;overflow:hidden}
   .stat:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(13,31,23,.09)}
@@ -77,14 +90,27 @@
   .asm-amt{font-size:12.5px;font-weight:800}
   .asm-st{font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;margin-top:3px;display:inline-block;cursor:pointer;border:none}
   .s-confirm{background:var(--emerald-soft);color:var(--emerald-d)}.s-pend{background:var(--amber-soft);color:#b45309}.s-comp{background:var(--blue-soft);color:#1d4ed8}
+  .delete-assignment{background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;font-weight:800;margin-top:6px;padding:2px 4px;border-radius:4px;display:block;width:100%;text-align:right;transition:.15s}
+  .delete-assignment:hover{background:var(--red-soft)}
   .asm-empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:12.5px;font-weight:700}
+  .action-bar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:18px;flex-wrap:wrap}
   @media (max-width:1250px){.stats{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:1080px){.grid{grid-template-columns:1fr}.span-2{grid-column:span 1}}
-  @media (max-width:640px){.stats{grid-template-columns:1fr}.card{padding:16px}.cal-day{font-size:11.5px}}
+  @media (max-width:900px){.topbar{grid-template-columns:1fr !important}}
+  @media (max-width:640px){.stats{grid-template-columns:1fr}.card{padding:16px}.cal-day{font-size:11.5px}.action-bar{justify-content:stretch}.action-bar button{flex:1}}
 </style>
 @endpush
 
 @section('content')
+
+{{-- 🆕 New Assignment Action Bar --}}
+<div class="action-bar">
+  <button class="btn-primary" id="newAssignmentBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+    <span>{{ __('messages.new_assignment') }}</span>
+  </button>
+</div>
+
 {{-- KYC Banner --}}
 @php
     $vp = auth()->user()->getCurrentProvider();
@@ -94,72 +120,155 @@
 <div style="background:#fff7ed;border-left:4px solid #f59e0b;padding:16px 20px;margin-bottom:20px;border-radius:12px;display:flex;align-items:start;gap:14px">
     <div style="flex-shrink:0;width:38px;height:38px;background:#fef5e3;border-radius:10px;display:grid;place-items:center;font-size:18px">⚠️</div>
     <div style="flex:1">
-        <h4 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:4px">Account Unverified</h4>
-        <p style="font-size:12.5px;color:#b45309;font-weight:500;line-height:1.5">Your individual service profile is not verified yet. Upload your KYC documents to accept bookings.</p>
-        <a href="{{ route('provider.verification.index') }}" style="display:inline-block;margin-top:10px;background:#f59e0b;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800">Verify Now →</a>
+        <h4 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:4px">{{ __('messages.account_unverified') }}</h4>
+        <p style="font-size:12.5px;color:#b45309;font-weight:500;line-height:1.5">{{ __('messages.kyc_individual_message') }}</p>
+        <a href="{{ route('provider.verification.index') }}" style="display:inline-block;margin-top:10px;background:#f59e0b;color:#fff;padding:7px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800">{{ __('messages.verify_now') }}</a>
     </div>
 </div>
 @endif
 
 <section class="stats">
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-em">💰</div><span class="delta up">▲ Month</span></div><div class="stat-label">Total Earnings</div><div class="stat-value"><small>Rs</small> {{ number_format($totalEarnings, 0) }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-blue">📅</div><span class="delta up">▲ Total</span></div><div class="stat-label">Bookings This Month</div><div class="stat-value">{{ $bookingsThisMonth }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-pur">👁️</div><span class="delta up">▲ Views</span></div><div class="stat-label">Profile Views</div><div class="stat-value">{{ number_format($profileViews) }}</div></div>
-  <div class="stat"><div class="stat-top"><div class="stat-icon i-amb">⭐</div><span class="delta up">▲ Avg</span></div><div class="stat-label">Avg. Rating</div><div class="stat-value">{{ $avgRating }}<span class="star">★</span></div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-em">💰</div><span class="delta up">▲ {{ __('messages.month_badge') }}</span></div><div class="stat-label">{{ __('messages.total_earnings') }}</div><div class="stat-value"><small>Rs</small> {{ number_format($totalEarnings, 0) }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-blue">📅</div><span class="delta up">▲ {{ __('messages.total_badge') }}</span></div><div class="stat-label">{{ __('messages.bookings_this_month') }}</div><div class="stat-value">{{ $bookingsThisMonth }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-pur">👁️</div><span class="delta up">▲ {{ __('messages.views_badge') }}</span></div><div class="stat-label">{{ __('messages.profile_views') }}</div><div class="stat-value">{{ number_format($profileViews) }}</div></div>
+  <div class="stat"><div class="stat-top"><div class="stat-icon i-amb">⭐</div><span class="delta up">▲ {{ __('messages.avg_badge') }}</span></div><div class="stat-label">{{ __('messages.avg_rating') }}</div><div class="stat-value">{{ $avgRating }}<span class="star">★</span></div></div>
 </section>
 
 <section class="grid">
   <div class="card span-2">
-    <div class="card-head"><div><h3>Weekly Earnings</h3><div class="chart-total"><b>Rs {{ number_format(collect($chartData)->sum('v'), 0) }}</b><span>Last 7 days</span></div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.weekly_earnings') }}</h3><div class="chart-total"><b>Rs {{ number_format(collect($chartData)->sum('v'), 0) }}</b><span>{{ __('messages.last_7_days') }}</span></div></div></div>
     <div id="chart"></div>
   </div>
   <div class="card">
-    <div class="card-head"><div><h3>Profile Stats</h3><div class="sub">Public profile overview</div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.profile_stats') }}</h3><div class="sub">{{ __('messages.public_profile_overview') }}</div></div></div>
     <div class="profile-head">
       <div class="profile-av">{{ substr($provider->name ?? 'P', 0, 1) }}</div>
-      <div style="min-width:0"><div class="profile-name">{{ $provider->name ?? 'Provider' }}</div><div class="profile-role">Service Provider <span class="verified">✓ VERIFIED</span></div></div>
+      <div style="min-width:0"><div class="profile-name">{{ $provider->name ?? __('messages.provider_fallback') }}</div><div class="profile-role">{{ __('messages.service_provider') }} <span class="verified">{{ __('messages.verified_badge') }}</span></div></div>
     </div>
     <div class="rating-big">
       <div class="rb-num">{{ $avgRating }}<small>/5</small></div>
       <div class="rb-stars">★★★★★</div>
-      <div class="rb-meta">Based on {{ $reviewCount }} reviews</div>
+      <div class="rb-meta">{{ __('messages.based_on_reviews', ['count' => $reviewCount]) }}</div>
     </div>
     <div class="profile-stats">
-      <div class="ps-item"><span>Completed</span><b>{{ $provider->completed_jobs ?? 218 }}</b></div>
-      <div class="ps-item"><span>Repeat clients</span><b>{{ $provider->repeat_clients_pct ?? 68 }}%</b></div>
+      <div class="ps-item"><span>{{ __('messages.completed') }}</span><b>{{ $provider->completed_jobs ?? 218 }}</b></div>
+      <div class="ps-item"><span>{{ __('messages.repeat_clients') }}</span><b>{{ $provider->repeat_clients_pct ?? 68 }}%</b></div>
     </div>
   </div>
 </section>
 
 <section class="grid">
   <div class="card">
-    <div class="card-head"><div><h3>Booking Calendar</h3><div class="sub">Click a date to filter assignments</div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.booking_calendar') }}</h3><div class="sub">{{ __('messages.click_date_filter') }}</div></div></div>
     <div class="cal-nav">
       <button id="calPrev" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" style="width:14px;height:14px;stroke-width:2.5"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="cal-month" id="calMonth">—</div>
       <button id="calNext" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" style="width:14px;height:14px;stroke-width:2.5"><path d="m9 18 6-6-6-6"/></svg></button>
-      <button class="cal-today-btn" id="calTodayBtn" type="button">Today</button>
+      <button class="cal-today-btn" id="calTodayBtn" type="button">{{ __('messages.today_btn') }}</button>
     </div>
-    <div class="cal-days"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+    <div class="cal-days">
+      <div>{{ __('messages.day_sun') }}</div><div>{{ __('messages.day_mon') }}</div><div>{{ __('messages.day_tue') }}</div>
+      <div>{{ __('messages.day_wed') }}</div><div>{{ __('messages.day_thu') }}</div><div>{{ __('messages.day_fri') }}</div>
+      <div>{{ __('messages.day_sat') }}</div>
+    </div>
     <div class="cal-grid" id="calGrid"></div>
     <div class="cal-legend">
-      <span><i class="dot-guide"></i>Guide</span><span><i class="dot-porter"></i>Porter</span><span><i class="dot-photographer"></i>Photographer</span>
+      <span><i class="dot-guide"></i>{{ __('messages.guide') }}</span>
+      <span><i class="dot-porter"></i>{{ __('messages.porter') }}</span>
+      <span><i class="dot-photographer"></i>{{ __('messages.photographer') }}</span>
     </div>
   </div>
   <div class="card span-2">
-    <div class="card-head"><div><h3>Upcoming Assignments</h3><div class="sub" id="upcSub">Your next confirmed bookings</div></div></div>
+    <div class="card-head"><div><h3>{{ __('messages.upcoming_assignments') }}</h3><div class="sub" id="upcSub">{{ __('messages.your_next_bookings') }}</div></div></div>
     <div class="upc-list" id="upcList"></div>
   </div>
 </section>
+
+{{-- 🆕 New Assignment Modal --}}
+<div id="assignmentModal" style="display:none;position:fixed;inset:0;background:rgba(15,36,25,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
+    <div style="background:#fff;border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:18px;font-weight:800;color:var(--text)">{{ __('messages.new_assignment') }}</h3>
+            <button type="button" id="closeAssignmentModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
+        </div>
+        <form action="{{ route('provider.individual.assignments.store') }}" method="POST">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.assignment_title') }}</label>
+                    <input type="text" name="title" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="EBC Trek — 12 days">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.client_name') }}</label>
+                    <input type="text" name="client_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="John Doe">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.service_type') }}</label>
+                    <select name="service_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                        <option value="guide">{{ __('messages.guide') }}</option>
+                        <option value="porter">{{ __('messages.porter') }}</option>
+                        <option value="photographer">{{ __('messages.photographer') }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.start_date') }}</label>
+                    <input type="date" name="start_date" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.duration') }}</label>
+                    <input type="text" name="duration" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="10 days">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.amount') }} (Rs)</label>
+                    <input type="number" name="amount" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="50000">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.create_assignment') }}</button>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('ind-scripts')
 <script>
 const ASSIGNMENTS = @json($assignments);
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const TYPE_LABEL = { guide:'GUIDE', porter:'PORTER', photographer:'PHOTO' };
-const TYPE_ICON  = { guide:'🥾', porter:'🎒', photographer:'📷' };
+
+const MONTHS = [
+  @json(__('messages.month_january')),
+  @json(__('messages.month_february')),
+  @json(__('messages.month_march')),
+  @json(__('messages.month_april')),
+  @json(__('messages.month_may')),
+  @json(__('messages.month_june')),
+  @json(__('messages.month_july')),
+  @json(__('messages.month_august')),
+  @json(__('messages.month_september')),
+  @json(__('messages.month_october')),
+  @json(__('messages.month_november')),
+  @json(__('messages.month_december'))
+];
+
+/* Multilingual JS strings */
+const T = {
+  guide_upper:        @json(__('messages.guide_upper')),
+  porter_upper:       @json(__('messages.porter_upper')),
+  photo_upper:        @json(__('messages.photo_upper')),
+  pending_upper:      @json(__('messages.pending_upper')),
+  confirmed_upper:    @json(__('messages.confirmed_upper')),
+  completed_upper:    @json(__('messages.completed_upper')),
+  no_assignments_date: @json(__('messages.no_assignments_date')),
+  no_upcoming:        @json(__('messages.no_upcoming_assignments')),
+  nothing_scheduled:  @json(__('messages.nothing_scheduled_day')),
+  showing_selected:   @json(__('messages.showing_selected_date')),
+  your_next:          @json(__('messages.your_next_bookings')),
+  pax:                @json(__('messages.pax_label')),
+  delete_assignment:  @json(__('messages.delete_assignment')),
+  confirm_delete:     @json(__('messages.confirm_delete_assignment'))
+};
+const TYPE_LABEL = { guide: T.guide_upper, porter: T.porter_upper, photographer: T.photo_upper };
+const TYPE_ICON  = { guide: '🥾', porter: '🎒', photographer: '📷' };
+const STATUS_LABEL = { pending: T.pending_upper, confirmed: T.confirmed_upper, completed: T.completed_upper };
 
 let calDate = new Date();
 let selectedDate = null;
@@ -233,11 +342,11 @@ function renderUpcoming(){
   const subEl = document.getElementById('upcSub');
 
   if(!list.length){
-    listEl.innerHTML = `<div class="asm-empty">📭 ${selectedDate ? 'No assignments on this date' : 'No upcoming assignments'}</div>`;
-    subEl.textContent = selectedDate ? 'Nothing scheduled for selected day' : 'Your next confirmed bookings';
+    listEl.innerHTML = `<div class="asm-empty">📭 ${selectedDate ? T.no_assignments_date : T.no_upcoming}</div>`;
+    subEl.textContent = selectedDate ? T.nothing_scheduled : T.your_next;
     return;
   }
-  subEl.textContent = selectedDate ? 'Showing assignments for selected date' : 'Your next confirmed bookings';
+  subEl.textContent = selectedDate ? T.showing_selected : T.your_next;
 
   listEl.innerHTML = list.map(a=>{
     const stCls = a.status==='confirmed'?'s-confirm':(a.status==='completed'?'s-comp':'s-pend');
@@ -249,12 +358,13 @@ function renderUpcoming(){
         <div class="asm-client">${a.client}</div>
         <div class="asm-meta">
           <span class="asm-date">📅 ${a.dateStr}</span>
-          <span class="asm-date">👥 ${a.pax} pax · ${a.duration}</span>
+          <span class="asm-date">👥 ${a.pax} ${T.pax} · ${a.duration}</span>
         </div>
       </div>
       <div class="asm-amount">
         <div class="asm-amt">Rs ${(a.amount/1000).toFixed(0)}k</div>
-        <button class="asm-st ${stCls}" data-id="${a.id}" data-status="${a.status}">${a.status.toUpperCase()}</button>
+        <button class="asm-st ${stCls}" data-id="${a.id}" data-status="${a.status}">${STATUS_LABEL[a.status] || a.status.toUpperCase()}</button>
+        <button class="delete-assignment" data-id="${a.id}" title="${T.delete_assignment}">✕ ${T.delete_assignment}</button>
       </div>
     </div>`;
   }).join('');
@@ -280,5 +390,30 @@ document.getElementById('calNext').addEventListener('click', ()=>{ calDate = new
 document.getElementById('calTodayBtn').addEventListener('click', ()=>{ calDate = new Date(); selectedDate = null; renderCalendar(); renderUpcoming(); });
 
 renderChart(); renderCalendar(); renderUpcoming();
+
+/* ========== New Assignment Modal ========== */
+const assignmentModal = document.getElementById('assignmentModal');
+document.getElementById('newAssignmentBtn')?.addEventListener('click', () => { assignmentModal.style.display = 'flex'; });
+document.getElementById('closeAssignmentModal')?.addEventListener('click', () => { assignmentModal.style.display = 'none'; });
+assignmentModal?.addEventListener('click', (e) => { if (e.target === assignmentModal) assignmentModal.style.display = 'none'; });
+
+/* ========== Delete Assignment (AJAX) ========== */
+document.addEventListener('click', async function(e) {
+  if (!e.target.classList.contains('delete-assignment')) return;
+  if (!confirm(T.confirm_delete)) return;
+  const id = e.target.dataset.id;
+  e.target.disabled = true;
+  try {
+    const res = await fetch(`/provider/individual/assignments/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+    });
+    if (res.ok) window.location.reload();
+    else e.target.disabled = false;
+  } catch(err) {
+    console.error(err);
+    e.target.disabled = false;
+  }
+});
 </script>
 @endpush

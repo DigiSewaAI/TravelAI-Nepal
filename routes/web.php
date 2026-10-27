@@ -265,6 +265,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // 🆕 Individual Services vertical dashboard routes
     Route::get('/individual/dashboard', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'index'])->name('individual.dashboard');
     Route::patch('/individual/bookings/{booking}/status', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateBookingStatus'])->name('individual.bookings.status');
+        // Individual CRUD Routes
+    Route::post('/individual/assignments', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'storeAssignment'])->name('individual.assignments.store');
+    Route::delete('/individual/assignments/{booking}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'destroyAssignment'])->name('individual.assignments.destroy');
         // 🆕 Art/Craft vertical dashboard routes
     Route::get('/art-craft/dashboard', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'index'])->name('art-craft.dashboard');
     Route::patch('/art-craft/artworks/{artwork}/status', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateArtworkStatus'])->name('art-craft.artworks.status');

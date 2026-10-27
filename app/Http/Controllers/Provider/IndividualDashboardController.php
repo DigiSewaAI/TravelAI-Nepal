@@ -91,4 +91,43 @@ class IndividualDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
+        public function storeAssignment(Request $request)
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:150',
+            'client_name' => 'required|string|max:100',
+            'service_type' => 'required|in:guide,porter,photographer',
+            'start_date' => 'required|date',
+            'duration' => 'required|string|max:50',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        IndividualBooking::create([
+            'provider_id' => $provider->id,
+            'service_type' => $validated['service_type'],
+            'client_name' => $validated['client_name'],
+            'title' => $validated['title'],
+            'pax' => 1,
+            'start_date' => $validated['start_date'],
+            'duration' => $validated['duration'],
+            'amount' => $validated['amount'],
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', __('messages.assignment_created_success'));
+    }
+
+    public function destroyAssignment(IndividualBooking $booking)
+    {
+        $provider = Provider::where('user_id', Auth::id())->first();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $booking->delete();
+        return back()->with('success', __('messages.assignment_deleted_success'));
+    }
 }
