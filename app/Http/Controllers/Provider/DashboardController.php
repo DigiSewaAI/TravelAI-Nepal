@@ -45,6 +45,10 @@ class DashboardController extends Controller
         if ($user && $user->getCurrentProvider()?->types->whereIn('slug', ['guide', 'porter', 'photographer', 'freelancer'])->isNotEmpty()) {
             return redirect()->route('provider.individual.dashboard');
         }
+                // 🆕 Art/Craft vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->contains('slug', 'art-craft')) {
+            return redirect()->route('provider.art-craft.dashboard');
+        }
         if (!auth()->check()) {
             return redirect()->route('login');
         }
