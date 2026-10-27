@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
-  :root{--bg:#f4f8f5;--card:#fff;--text:#0d1f17;--muted:#6b7d73;--line:#e2ebe5;--emerald:#10b981;--emerald-d:#059669;--emerald-soft:#e7f7ef;--forest:#0f2419;--amber:#f59e0b;--amber-soft:#fef4e2;--purple:#8b5cf6;--purple-soft:#f2ecfe;--blue:#3b82f6;--blue-soft:#e9f1fe;--red:#ef4444;--red-soft:#fdecec;--radius:18px}
+  :root{--bg:#f4f8f5;--card:#fff;--text:#0d1f17;--muted:#6b7d73;--line:#e2ebe5;--emerald:#10b981;--emerald-d:#059669;--emerald-soft:#e7f7ef;--forest:#0f2419;--amber:#f59e0b;--amber-soft:#fef4e2;--purple:#8b5cf6;--purple-soft:#f2ecfe;--blue:#3b82f6;--blue-soft:#e9f1fe;--red:#ef4444;--red-soft:#fdecec;--accent:#10b981;--accent-d:#059669;--accent-soft:#e7f7ef;--radius:18px}
   *{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
   body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   .sidebar{position:fixed;inset:0 auto 0 0;width:262px;background:linear-gradient(180deg,#0f2419 0%,#163324 100%);padding:24px 16px;display:flex;flex-direction:column;z-index:100;transition:transform .32s cubic-bezier(.4,0,.2,1)}
@@ -117,6 +117,11 @@
     <a href="{{ route('provider.individual.reviews') }}" class="{{ request()->routeIs('provider.individual.reviews') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
       {{ __('messages.reviews') }}
+    </a>
+
+    <a href="{{ route('provider.staff.index') }}" class="{{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.staff') }}
     </a>
 
     <div class="nav-label">{{ __('messages.account') }}</div>

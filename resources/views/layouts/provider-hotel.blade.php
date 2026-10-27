@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
-  :root{--bg:#f5f7fb;--card:#fff;--text:#0e1726;--muted:#6b7a90;--line:#e6ecf4;--gold:#c9a227;--gold-d:#a8861c;--gold-soft:#fbf5e2;--navy:#0e1726;--green:#10b981;--green-soft:#e7f8f1;--blue:#3b82f6;--blue-soft:#e9f1fe;--amber:#f59e0b;--amber-soft:#fef5e3;--red:#ef4444;--red-soft:#fdecec;--purple:#8b5cf6;--purple-soft:#f2ecfe;--radius:18px}
+  :root{--bg:#f5f7fb;--card:#fff;--text:#0e1726;--muted:#6b7a90;--line:#e6ecf4;--gold:#c9a227;--gold-d:#a8861c;--gold-soft:#fbf5e2;--navy:#0e1726;--green:#10b981;--green-soft:#e7f8f1;--blue:#3b82f6;--blue-soft:#e9f1fe;--amber:#f59e0b;--amber-soft:#fef5e3;--red:#ef4444;--red-soft:#fdecec;--purple:#8b5cf6;--purple-soft:#f2ecfe;--accent:#c9a227;--accent-d:#a8861c;--accent-soft:#fbf5e2;--radius:18px}
   *{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
   body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   .sidebar{position:fixed;inset:0 auto 0 0;width:262px;background:linear-gradient(180deg,#0e1726 0%,#132033 100%);padding:24px 16px;display:flex;flex-direction:column;z-index:100;transition:transform .32s cubic-bezier(.4,0,.2,1)}
@@ -125,6 +125,11 @@
     <a href="{{ route('provider.hotel.housekeeping') }}" class="{{ request()->routeIs('provider.hotel.housekeeping') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6"/><path d="M15 2v6"/><path d="M4 8h16l-1 13H5L4 8z"/></svg>
       {{ __('messages.housekeeping') }}
+    </a>
+
+    <a href="{{ route('provider.staff.index') }}" class="{{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.staff') }}
     </a>
 
     <div class="nav-label">{{ __('messages.account') }}</div>
