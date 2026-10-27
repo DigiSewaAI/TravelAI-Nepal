@@ -81,6 +81,10 @@ class Provider extends Model
         'verification_status',
         'is_active',
         'is_demo',
+        'profile_views',
+        'completed_jobs',
+        'repeat_clients_pct', 
+        'experience_years',
     ];
 
     protected $casts = [

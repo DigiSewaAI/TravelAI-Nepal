@@ -37,9 +37,13 @@ class DashboardController extends Controller
         if ($user && $user->getCurrentProvider()?->types->whereIn('slug', ['hotel', 'resort', 'lodge', 'homestay'])->isNotEmpty()) {
             return redirect()->route('provider.hotel.dashboard');
         }
-                // 🆕 Transport vertical dashboard
-        if (in_array($typeSlug, ['transport-provider'])) {
+        // 🆕 Transport vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->contains('slug', 'transport-provider')) {
             return redirect()->route('provider.transport.dashboard');
+        }
+                // 🆕 Individual Services vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->whereIn('slug', ['guide', 'porter', 'photographer', 'freelancer'])->isNotEmpty()) {
+            return redirect()->route('provider.individual.dashboard');
         }
         if (!auth()->check()) {
             return redirect()->route('login');
