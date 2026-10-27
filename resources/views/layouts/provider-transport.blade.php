@@ -1,7 +1,7 @@
 @php
     use Illuminate\Support\Facades\Auth;
     $currentUser = Auth::user();
-    $avatarName  = $currentUser?->name ?? 'Guest';
+    $avatarName  = $currentUser?->name ?? __('messages.guest');
     $initials    = collect(explode(' ', $avatarName))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->join('') ?: 'GU';
 @endphp
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('title', 'Transport Dashboard') — TravelAI Nepal</title>
+<title>@yield('title', __('messages.transport_dashboard_title')) — TravelAI Nepal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,10 +53,16 @@
   .user-box .u-name{font-size:12.5px;font-weight:700;color:#d6e4f5;line-height:1.3}
   .user-box .u-role{font-size:10.5px;color:#6f88a6;font-weight:600}
   .main{margin-left:262px;padding:24px 30px 46px;min-height:100vh}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px;flex-wrap:wrap}
+
+  /* 🔧 TOPBAR — Grid layout (prevents wrap) */
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin-bottom:24px}
+  .topbar > div:first-child{min-width:0;overflow:hidden}
+  .topbar > div:first-child > div{min-width:0;overflow:hidden}
   .topbar h2{font-size:23px;font-weight:800;letter-spacing:-.7px}
   .topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-weight:500}
-  .topbar-right{display:flex;align-items:center;gap:11px}
+  .topbar h2,.topbar p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .topbar-right{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:nowrap}
+
   .search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;width:230px;transition:.2s}
   .search:focus-within{border-color:var(--sky);box-shadow:0 0 0 4px rgba(14,165,233,.12)}
   .search svg{width:16px;height:16px;color:#9aa9bc;flex-shrink:0}
@@ -65,14 +71,15 @@
   .icon-btn:hover{background:#f0f8ff;color:var(--sky-d);border-color:#bfe0f5}
   .icon-btn svg{width:18px;height:18px;stroke-width:2}
   .dot{position:absolute;top:10px;right:11px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
-  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(14,165,233,.35);white-space:nowrap}
+  .btn-primary{display:flex;align-items:center;gap:7px;padding:11px 17px;border:none;border-radius:12px;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 8px 20px rgba(14,165,233,.35);white-space:nowrap;flex-shrink:0}
   .btn-primary svg{width:16px;height:16px;stroke-width:2.6}
-  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
+  .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s;flex-shrink:0}
   .lang-select:hover{border-color:var(--sky);color:var(--sky-d)}
   .hamburger{display:none}
   .overlay{position:fixed;inset:0;background:rgba(10,28,51,.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.3s;z-index:90}
   .overlay.show{opacity:1;pointer-events:auto}
   @media (max-width:1080px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:20px 18px 42px}.hamburger{display:grid}.search{width:170px}}
+  @media (max-width:900px){.topbar{grid-template-columns:1fr}}
   @media (max-width:640px){.topbar h2{font-size:19px}.search{display:none}.btn-primary span{display:none}.btn-primary{padding:11px}.main{padding:16px 14px 38px}}
 </style>
 @stack('transport-head')
@@ -83,37 +90,58 @@
   <div class="brand">
     <div class="brand-logo">🚌</div>
     <div>
-      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? 'SkyRoute', 13) }}</h1>
-      <span>TRANSPORT</span>
+      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? __('messages.skyroute_brand_default'), 13) }}</h1>
+      <span>{{ __('messages.transport_upper') }}</span>
     </div>
   </div>
   <nav class="nav">
-    <div class="nav-label">Main</div>
-    <a href="{{ route('provider.transport.dashboard') }}" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M9 7V4"/><path d="M15 7V4"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>Land Transport <span class="badge">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.5-2V4L9 6"/><path d="M15 4l5.5 2v14L15 18"/><path d="M9 6l6-2"/><path d="M9 20l6-2"/></svg>Routes <span class="badge">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Drivers <span class="badge">Soon</span></a>
-    <div class="nav-label">Account</div>
-    <a href="{{ route('provider.verification.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>Verification</a>
-    <a href="{{ route('provider.subscriptions.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>Subscription</a>
+    <div class="nav-label">{{ __('messages.main') }}</div>
+    <a href="{{ route('provider.transport.dashboard') }}" class="{{ request()->routeIs('provider.transport.dashboard') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      {{ __('messages.dashboard') }}
+    </a>
+    <a href="{{ route('provider.transport.vehicles') }}" class="{{ request()->routeIs('provider.transport.vehicles') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M9 7V4"/><path d="M15 7V4"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
+      {{ __('messages.land_transport') }}
+    </a>
+    <a href="{{ route('provider.transport.routes') }}" class="{{ request()->routeIs('provider.transport.routes') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.5-2V4L9 6"/><path d="M15 4l5.5 2v14L15 18"/><path d="M9 6l6-2"/><path d="M9 20l6-2"/></svg>
+      {{ __('messages.routes') }}
+    </a>
+    <a href="{{ route('provider.transport.drivers') }}" class="{{ request()->routeIs('provider.transport.drivers') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.drivers') }}
+    </a>
+    <div class="nav-label">{{ __('messages.account') }}</div>
+    <a href="{{ route('provider.verification.index') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      {{ __('messages.verification') }}
+    </a>
+    <a href="{{ route('provider.subscriptions.index') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>
+      {{ __('messages.subscription') }}
+    </a>
     <form method="POST" action="{{ route('logout') }}">
       @csrf
-      <button type="submit" class="nav-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Logout</button>
+      <button type="submit" class="nav-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        {{ __('messages.logout') }}
+      </button>
     </form>
   </nav>
   <div class="fleet-card">
-    <div class="fc-top"><span>FLEET STATUS</span><span class="live"><i></i>LIVE</span></div>
-    <div class="fc-val" id="fleetVal">— <small>/ — active</small></div>
+    <div class="fc-top"><span>{{ __('messages.fleet_status_upper') }}</span><span class="live"><i></i>{{ __('messages.live_upper') }}</span></div>
+    <div class="fc-val" id="fleetVal">— <small>/ — {{ __('messages.active') }}</small></div>
     <div class="fc-legend">
-      <span><i style="background:#22c55e"></i>Available</span>
-      <span><i style="background:#0ea5e9"></i>On Route</span>
+      <span><i style="background:#22c55e"></i>{{ __('messages.available') }}</span>
+      <span><i style="background:#0ea5e9"></i>{{ __('messages.on_route') }}</span>
     </div>
   </div>
   <div class="user-box">
     <div class="avatar">{{ $initials }}</div>
     <div>
-      <div class="u-name">{{ $currentUser?->name ?? 'Guest' }}</div>
-      <div class="u-role">Operations Manager</div>
+      <div class="u-name">{{ $currentUser?->name ?? __('messages.guest') }}</div>
+      <div class="u-role">{{ __('messages.operations_manager') }}</div>
     </div>
   </div>
 </aside>
@@ -122,18 +150,21 @@
     <div style="display:flex;align-items:center;gap:13px">
       <button class="icon-btn hamburger" id="hamburger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg></button>
       <div>
-        <h2>@yield('page-title', 'Dashboard')</h2>
+        <h2>@yield('page-title', __('messages.dashboard'))</h2>
         <p>@yield('page-subtitle', '')</p>
       </div>
     </div>
     <div class="topbar-right">
-      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" placeholder="Search vehicles, routes…"></div>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="{{ __('messages.search_vehicles_routes') }}">
+      </div>
       <select class="lang-select" onchange="window.location.href='/lang/' + this.value">
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>
       <button class="icon-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
-      <button class="btn-primary" type="button" title="Coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>New Trip</span></button>
+      {{-- 🆕 Duplicate "New Trip" button हटाइयो — dashboard action bar मा functional छ --}}
     </div>
   </header>
   @yield('content')

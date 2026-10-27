@@ -21,7 +21,7 @@
   .stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px}
   .stat-value{font-size:23px;font-weight:800;letter-spacing:-.8px}.stat-value small{font-size:13px;font-weight:700;color:var(--muted)}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;min-width:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;min-width:0;overflow:hidden}
   .span-2{grid-column:span 2}
   .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
   .card-head h3{font-size:15px;font-weight:800}
@@ -33,8 +33,8 @@
   .chart-total{display:flex;align-items:baseline;gap:9px;margin-top:3px;flex-wrap:wrap}
   .chart-total b{font-size:25px;font-weight:800}.chart-total span{font-size:11.5px;font-weight:800;color:#059669;background:var(--green-soft);padding:3px 9px;border-radius:20px}
   .chart-svg{width:100%;height:auto;display:block;overflow:visible;margin-top:8px}
-  .fleet{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .veh{border-radius:13px;padding:13px;cursor:pointer;transition:.2s;border:1.5px solid var(--line);background:#fff;position:relative}
+  .fleet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+  .veh{border-radius:13px;padding:13px;cursor:pointer;transition:.2s;border:1.5px solid var(--line);background:#fff;position:relative;min-width:0;overflow:hidden}
   .veh:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(12,30,51,.09)}
   .veh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-right:18px}
   .veh-ic{font-size:20px;line-height:1}

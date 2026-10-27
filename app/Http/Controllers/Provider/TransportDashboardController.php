@@ -164,4 +164,31 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
         $booking->delete();
         return back()->with('success', __('messages.booking_deleted_success'));
     }
+        public function vehiclesPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $vehicles = TransportVehicle::where('provider_id', $provider->id)->orderBy('vehicle_number')->get();
+        return view('provider.transport.vehicles', compact('provider', 'vehicles'));
+    }
+
+    public function routesPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        // Get unique routes from vehicles
+        $routes = TransportVehicle::where('provider_id', $provider->id)
+            ->whereNotNull('route_name')
+            ->get()
+            ->groupBy('route_name');
+        return view('provider.transport.routes', compact('provider', 'routes'));
+    }
+
+    public function driversPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $drivers = TransportVehicle::where('provider_id', $provider->id)
+            ->whereNotNull('driver_name')
+            ->orderBy('driver_name')
+            ->get();
+        return view('provider.transport.drivers', compact('provider', 'drivers'));
+    }
 }
