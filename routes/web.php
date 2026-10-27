@@ -238,7 +238,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
     Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');
-    
+        // 🆕 Hotel vertical dashboard routes
+    Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
+    Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
+    Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
 
     // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
