@@ -317,7 +317,7 @@ function renderFleet(){
   });
 
   const active = VEHICLES.filter(v=>v.status==='available'||v.status==='on-route').length;
-  document.getElementById('fleetVal').innerHTML = active + ' <small>/ ' + VEHICLES.length + ' active</small>';
+  document.getElementById('fleetVal').innerHTML = active + ' <small>/ ' + VEHICLES.length + ' ' + @json(\Illuminate\Support\Str::lower(__('messages.active'))) + '</small>';
 }
 
 function renderBookings(){

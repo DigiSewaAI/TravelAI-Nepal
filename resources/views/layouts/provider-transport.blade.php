@@ -44,7 +44,7 @@
   .live i{width:6px;height:6px;border-radius:50%;background:#38bdf8;animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(56,189,248,.6)}50%{opacity:.6;box-shadow:0 0 0 5px rgba(56,189,248,0)}}
   .fc-val{font-size:23px;font-weight:800;color:#fff;letter-spacing:-.7px}
-  .fc-val small{font-size:12px;color:#6f88a6;font-weight:700;letter-spacing:0}
+  .fc-val small{font-size:12px;color:#6f88a6;font-weight:700;letter-spacing:0;text-transform:lowercase}
   .fc-legend{display:flex;gap:12px;margin-top:11px}
   .fc-legend span{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#8ba0b8}
   .fc-legend i{width:7px;height:7px;border-radius:50%}
@@ -131,7 +131,7 @@
   </nav>
   <div class="fleet-card">
     <div class="fc-top"><span>{{ __('messages.fleet_status_upper') }}</span><span class="live"><i></i>{{ __('messages.live_upper') }}</span></div>
-    <div class="fc-val" id="fleetVal">— <small>/ — {{ __('messages.active') }}</small></div>
+    <div class="fc-val" id="fleetVal">{{ $activeFleet ?? 0 }} <small>/ {{ $totalFleet ?? 0 }} {{ \Illuminate\Support\Str::lower(__('messages.active')) }}</small></div>
     <div class="fc-legend">
       <span><i style="background:#22c55e"></i>{{ __('messages.available') }}</span>
       <span><i style="background:#0ea5e9"></i>{{ __('messages.on_route') }}</span>

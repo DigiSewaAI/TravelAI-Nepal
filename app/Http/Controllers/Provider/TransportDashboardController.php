@@ -13,10 +13,10 @@ class TransportDashboardController extends Controller
     public function index()
     {
         $provider = \App\Models\Provider::where('user_id', Auth::id())
-    ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
-    ->first();
+            ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
+            ->first();
 
-abort_unless($provider, 403, 'Transport provider profile not found.');
+        abort_unless($provider, 403, 'Transport provider profile not found.');
 
         $today = now()->startOfDay();
 
@@ -34,7 +34,9 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
         $activeFleet = TransportVehicle::where('provider_id', $provider->id)
             ->whereIn('status', ['available', 'on-route'])
             ->count();
-            
+
+        $totalFleet = TransportVehicle::where('provider_id', $provider->id)->count();
+
         $pendingBookings = TransportBooking::where('provider_id', $provider->id)
             ->where('status', 'pending')->count();
 
@@ -58,8 +60,15 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
         $recentBookings = TransportBooking::with('vehicle')->where('provider_id', $provider->id)->latest()->limit(6)->get();
 
         return view('provider.transport.dashboard', compact(
-            'provider', 'todayRevenue', 'totalTripsToday', 'activeFleet', 'pendingBookings',
-            'chartData', 'vehicles', 'recentBookings'
+            'provider',
+            'todayRevenue',
+            'totalTripsToday',
+            'activeFleet',
+            'totalFleet',          // 🆕 थपियो — sidebar fleet count को लागि
+            'pendingBookings',
+            'chartData',
+            'vehicles',
+            'recentBookings'
         ));
     }
 
@@ -92,7 +101,8 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
-        public function storeVehicle(Request $request)
+
+    public function storeVehicle(Request $request)
     {
         $provider = Auth::user()->ownProvider();
         abort_unless($provider, 403);
@@ -122,7 +132,7 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
     {
         $provider = Auth::user()->ownProvider();
         abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
-        
+
         $vehicle->delete();
         return back()->with('success', __('messages.vehicle_deleted_success'));
     }
@@ -164,31 +174,39 @@ abort_unless($provider, 403, 'Transport provider profile not found.');
         $booking->delete();
         return back()->with('success', __('messages.booking_deleted_success'));
     }
-        public function vehiclesPage()
+
+    public function vehiclesPage()
     {
         $provider = Auth::user()->ownProvider();
         $vehicles = TransportVehicle::where('provider_id', $provider->id)->orderBy('vehicle_number')->get();
-        return view('provider.transport.vehicles', compact('provider', 'vehicles'));
+
+        $totalFleet = $vehicles->count();
+        $activeFleet = $vehicles->whereIn('status', ['available', 'on-route'])->count();
+
+        return view('provider.transport.vehicles', compact('provider', 'vehicles', 'activeFleet', 'totalFleet'));
     }
 
     public function routesPage()
     {
         $provider = Auth::user()->ownProvider();
-        // Get unique routes from vehicles
-        $routes = TransportVehicle::where('provider_id', $provider->id)
-            ->whereNotNull('route_name')
-            ->get()
-            ->groupBy('route_name');
-        return view('provider.transport.routes', compact('provider', 'routes'));
+        $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
+        $routes = $vehicles->whereNotNull('route_name')->groupBy('route_name');
+
+        $totalFleet = $vehicles->count();
+        $activeFleet = $vehicles->whereIn('status', ['available', 'on-route'])->count();
+
+        return view('provider.transport.routes', compact('provider', 'routes', 'activeFleet', 'totalFleet'));
     }
 
     public function driversPage()
     {
         $provider = Auth::user()->ownProvider();
-        $drivers = TransportVehicle::where('provider_id', $provider->id)
-            ->whereNotNull('driver_name')
-            ->orderBy('driver_name')
-            ->get();
-        return view('provider.transport.drivers', compact('provider', 'drivers'));
+        $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
+        $drivers = $vehicles->whereNotNull('driver_name')->sortBy('driver_name');
+
+        $totalFleet = $vehicles->count();
+        $activeFleet = $vehicles->whereIn('status', ['available', 'on-route'])->count();
+
+        return view('provider.transport.drivers', compact('provider', 'drivers', 'activeFleet', 'totalFleet'));
     }
 }

@@ -1746,6 +1746,8 @@ return [
     'amount' => 'Amount',
     'no_products_found' => 'No products added yet.',
     'no_orders_found' => 'No orders received yet.',
+        'back_to_dashboard' => 'Back to Dashboard',
+    'seats'             => 'seats',
 
     'money_changer_details'     => 'Money Changer Details',
     'license_number'            => 'License Number',
