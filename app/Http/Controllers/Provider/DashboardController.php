@@ -37,6 +37,10 @@ class DashboardController extends Controller
         if ($user && $user->getCurrentProvider()?->types->whereIn('slug', ['hotel', 'resort', 'lodge', 'homestay'])->isNotEmpty()) {
             return redirect()->route('provider.hotel.dashboard');
         }
+                // 🆕 Transport vertical dashboard
+        if (in_array($typeSlug, ['transport-provider'])) {
+            return redirect()->route('provider.transport.dashboard');
+        }
         if (!auth()->check()) {
             return redirect()->route('login');
         }

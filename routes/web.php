@@ -242,6 +242,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
     Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
+        // 🆕 Transport vertical dashboard routes
+    Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
+    Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');
+    Route::patch('/transport/bookings/{booking}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateBookingStatus'])->name('transport.bookings.status');
 
     // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
