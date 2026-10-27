@@ -103,18 +103,19 @@
 
                 <div style="margin-top: auto;">
                     @if($isCurrent)
-                        <button disabled style="width: 100%; background: var(--sky-soft); color: var(--sky-d); font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: 1px solid var(--sky); cursor: not-allowed;">
+                        <button disabled style="width: 100%; background: #f3f4f6; color: #6b7280; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; cursor: not-allowed;">
                             <i class="fas fa-check"></i> {{ __('messages.current_plan_label') }}
                         </button>
                     @elseif($plan->requires_contact)
-                        <a href="{{ route('public.contact-sales') }}" style="display: block; text-align: center; width: 100%; background: var(--text); color: #fff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; text-decoration: none; transition: 0.2s;">
+                        <a href="{{ route('public.contact-sales') }}" style="display: block; text-align: center; width: 100%; background: #111827; color: #fff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; text-decoration: none; transition: 0.2s;">
                             {{ __('messages.contact_for_pricing') }}
                         </a>
                     @else
                         <form method="POST" action="{{ $currentSubscription ? route('provider.subscriptions.upgrade') : route('provider.subscriptions.store') }}">
                             @csrf
                             <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                            <button type="submit" style="width: 100%; background: var(--sky); color: #fff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(14,165,233,0.3);">
+                            <!-- यहाँ Indigo (#4f46e5) रंग प्रयोग गरियो जुन सबै ड्यासबोर्डमा देखिन्छ -->
+                            <button type="submit" style="width: 100%; background: #4f46e5; color: #ffffff; font-weight: 800; font-size: 13px; padding: 12px; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
                                 {{ __('messages.choose_plan') }}
                             </button>
                         </form>

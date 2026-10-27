@@ -2,7 +2,7 @@
 
 @php
     $greetingName = auth()->user()->name ?? __('messages.manager');
-    $subtitle = __('messages.inventory_welcome_subtitle', ['name' => $greetingName]);
+    $subtitle = __('messages.inventory_welcome_subtitle');
 @endphp
 
 @section('title', __('messages.inventory_dashboard_title'))
@@ -102,8 +102,16 @@
 @endpush
 
 @section('content')
+{{-- 🆕 Welcome Banner --}}
+<div style="background: linear-gradient(135deg, var(--indigo), var(--indigo-d)); border-radius: 16px; padding: 25px; margin-bottom: 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);">
+    <div>
+        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">{{ __('messages.welcome_back') }}, {{ $greetingName }}! 👋</h1>
+        <p style="font-size: 13px; opacity: 0.9;">{{ $subtitle }}</p>
+    </div>
+    <div style="font-size: 45px; opacity: 0.4;">📦</div>
+</div>
 
-{{-- 🆕 New Product Action Bar --}}
+{{-- New Product Action Bar --}}
 <div class="action-bar">
   <button class="btn-primary" id="newProductBtn" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>

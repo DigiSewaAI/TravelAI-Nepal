@@ -1841,6 +1841,14 @@ return [
     'most_popular' => 'सबैभन्दा लोकप्रिय',
     'choose_plan' => 'योजना छान्नुहोस्',
     'switch_to_plan' => ':name मा परिवर्तन गर्नुहोस्',
+        // === Welcome Banner subtitles ===
+    'transport_welcome_subtitle' => "आज तपाईंको फ्लीटको स्थिति यहाँ छ",
+    'hotel_welcome_subtitle' => "आज तपाईंको होटलको स्थिति यहाँ छ",
+    'inventory_welcome_subtitle' => "तपाईंको इन्भेन्टरी अवलोकन यहाँ छ",
+    'restaurant_welcome_subtitle' => "आज तपाईंको रेस्टुरेन्टको स्थिति यहाँ छ",
+    'money_changer_welcome_subtitle' => "आजको अवलोकन यहाँ छ",
+    'art_craft_welcome_subtitle' => "तपाईंको स्टुडियोको एक नजर",
+    'individual_welcome_subtitle' => "तपाईंसँग आउँदै गरेका कामहरू छन्",
             // ============================================
     // Journey Replay (I18N-JOURNEY-REPLAY-01)
     // ============================================

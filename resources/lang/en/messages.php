@@ -1303,7 +1303,6 @@ return [
     'menu_item_created_success' => 'Menu item added successfully!',
     'menu_item_deleted_success' => 'Menu item deleted successfully!',
         // Restaurant Dashboard — missing keys
-    'restaurant_welcome_subtitle' => 'Namaste :name 👋 — Here\'s how :property is doing today',
     'orders_today'                => 'Orders Today',
     'avg_order_value'             => 'Avg. Order Value',
     'tables_occupied'             => 'Tables Occupied',
@@ -1373,7 +1372,6 @@ return [
     'product_created_success' => 'Product created successfully!',
     'product_deleted_success' => 'Product deleted successfully!',
         // Inventory Dashboard — missing keys
-    'inventory_welcome_subtitle' => 'Namaste :name 👋 — Here\'s your inventory overview',
     'needs_action'               => 'Needs action',
     'value'                      => 'Value',
     'low_stock_alerts'           => 'Low Stock Alerts',
@@ -1720,7 +1718,6 @@ return [
     'fleet_status_upper'        => 'FLEET STATUS',
     'operations_manager'        => 'Operations Manager',
     'search_vehicles_routes'    => 'Search vehicles, routes…',
-        'transport_welcome_subtitle' => 'Namaste :name 👋 — Here\'s your fleet status today',
     'total_trips_today'          => 'Total Trips Today',
     'active_fleet'               => 'Active Fleet',
     'pending_bookings'           => 'Pending Bookings',
@@ -2710,4 +2707,14 @@ return [
 '1000_bookingsmo' => '1000 Bookings/mo',
     ],
 ],
+
+
+    // === Welcome Banner subtitles ===
+    'transport_welcome_subtitle' => "Here's your fleet status today",
+    'hotel_welcome_subtitle' => "Here's how your property is doing today",
+    'inventory_welcome_subtitle' => "Here's your inventory overview",
+    'restaurant_welcome_subtitle' => "Here's how your restaurant is doing today",
+    'money_changer_welcome_subtitle' => "Here's today's overview",
+    'art_craft_welcome_subtitle' => "Your studio at a glance",
+    'individual_welcome_subtitle' => "You have upcoming assignments",
 ];

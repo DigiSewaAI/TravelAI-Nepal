@@ -144,7 +144,7 @@
     </form>
   </nav>
   <div class="sidebar-footer">
-    @if($liveUsd)
+    @if(isset($liveUsd) && $liveUsd)
     <div class="rate-card">
       <div class="rc-top">
         <span>USD / NPR</span>
