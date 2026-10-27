@@ -1190,6 +1190,98 @@ return [
     'seating_capacity'          => 'Seating Capacity',
     'opening_hours'             => 'Opening Hours',
     'menu_url'                  => 'Menu URL',
+        // ======================
+    // HOTEL DASHBOARD — MISSING KEYS
+    // ======================
+    'hotel_dashboard_title'    => 'Hotel Dashboard',
+    'manager'                  => 'Manager',
+    'your_property'            => 'your property',
+    'welcome_subtitle'         => 'Namaste :name 👋 — Here\'s today at :property',
+
+    // KYC
+    'account_unverified'       => 'Account Unverified',
+    'kyc_hotel_message'        => 'Your property is not verified yet. Upload your KYC documents to accept bookings and receive payouts.',
+    'verify_now'               => 'Verify Now →',
+
+    // Stats
+    'today_revenue'            => 'Today\'s Revenue',
+    'bookings_today'           => 'Bookings Today',
+    'rooms_occupied'           => 'Rooms Occupied',
+    'guests_in_house'          => 'Guests In-House',
+    'today'                    => 'Today',
+
+    // Chart
+    'room_nights_sold'         => 'Room Nights Sold',
+    'last_7_days_performance'  => 'Last 7 days performance',
+    'occupied'                 => 'Occupied',
+    'available'                => 'Available',
+
+    // Front Desk
+    'front_desk'               => 'Front Desk',
+    'checkins_checkouts'       => 'Check-ins & check-outs',
+    'no_checkins_today'        => 'No check-ins or check-outs today',
+    'pending_actions'          => 'pending actions',
+    'check_in'                 => 'Check In',
+    'check_out'                => 'Check Out',
+    'done'                     => 'Done',
+
+    // Rooms
+    'room_status'              => 'Room Status',
+    'click_room_cycle'         => 'Click a room to cycle its status',
+    'all_rooms'                => 'All Rooms',
+    'floor'                    => 'Floor',
+    'reserved'                 => 'Reserved',
+    'dirty'                    => 'Dirty',
+    'maintenance'              => 'Maintenance',
+
+    // Housekeeping
+    'housekeeping'             => 'Housekeeping',
+    'todays_tasks'             => 'Today\'s tasks',
+    'no_tasks_pending'         => 'No tasks pending',
+    'in_progress'              => 'In Progress',
+    'queue'                    => 'Queue',
+
+    // Bookings table
+    'latest_reservations'      => 'Latest reservations across all channels',
+    'room'                     => 'Room',
+    'checkin_col'              => 'Check-in',
+    'checkout_col'             => 'Check-out',
+    'nights'                   => 'Nights',
+    'action'                   => 'Action',
+
+    // Modal
+    'new_booking'              => 'New Booking',
+    'guest_name'               => 'Guest Name',
+    'guest_name_placeholder'   => 'John Doe',
+    'email_optional'           => 'Email (Optional)',
+    'amount_rs'                => 'Amount (Rs)',
+    'payment_status'           => 'Payment Status',
+    'create_booking'           => 'Create Booking',
+
+    // CRUD flash / JS
+    'confirm_delete_booking'   => 'Are you sure you want to delete this booking?',
+    'failed_to_delete'         => 'Failed to delete',
+    'delete'                   => 'Delete',
+    'booking_created'          => 'Booking created successfully!',
+    'booking_deleted'          => 'Booking deleted successfully!',
+
+    // Layout — brand & nav
+    'hotel_brand_default'      => 'Aurelia',
+    'hotel_resort'             => 'HOTEL & RESORT',
+    'main'                     => 'Main',
+    'rooms'                    => 'Rooms',
+    'guests'                   => 'Guests',
+    'account'                  => 'Account',
+    'subscription'             => 'Subscription',
+    'soon'                     => 'Soon',
+
+    // Layout — occupancy & user
+    'occupancy'                => 'OCCUPANCY',
+    'live_upper'               => 'LIVE',
+    'general_manager'          => 'General Manager',
+
+    // Layout — search
+    'search_guests_rooms'      => 'Search guests, rooms…',
 
     'money_changer_details'     => 'Money Changer Details',
     'license_number'            => 'License Number',

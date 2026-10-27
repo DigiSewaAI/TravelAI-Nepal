@@ -1,7 +1,7 @@
 @php
     use Illuminate\Support\Facades\Auth;
     $currentUser = Auth::user();
-    $avatarName  = $currentUser?->name ?? 'Guest';
+    $avatarName  = $currentUser?->name ?? __('messages.guest');
     $initials    = collect(explode(' ', $avatarName))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->join('') ?: 'GU';
 @endphp
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('title', 'Hotel Dashboard') — TravelAI Nepal</title>
+<title>@yield('title', __('messages.hotel_dashboard_title')) — TravelAI Nepal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -82,35 +82,59 @@
   <div class="brand">
     <div class="brand-logo">🏨</div>
     <div>
-      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? 'Aurelia', 13) }}</h1>
-      <span>HOTEL & RESORT</span>
+      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? __('messages.hotel_brand_default'), 13) }}</h1>
+      <span>{{ __('messages.hotel_resort') }}</span>
     </div>
   </div>
   <nav class="nav">
-    <div class="nav-label">Main</div>
-    <a href="{{ route('provider.hotel.dashboard') }}" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Bookings <span class="badge">Soon</span></a>
-    <a href="{{ route('provider.products.index') }}" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>Rooms <span class="badge">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Guests <span class="badge">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6"/><path d="M15 2v6"/><path d="M4 8h16l-1 13H5L4 8z"/></svg>Housekeeping <span class="badge">Soon</span></a>
-    <div class="nav-label">Account</div>
-    <a href="{{ route('provider.verification.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>Verification</a>
-    <a href="{{ route('provider.subscriptions.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>Subscription</a>
+    <div class="nav-label">{{ __('messages.main') }}</div>
+    <a href="{{ route('provider.hotel.dashboard') }}" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      {{ __('messages.dashboard') }}
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+      {{ __('messages.bookings') }} <span class="badge">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="{{ route('provider.products.index') }}" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+      {{ __('messages.rooms') }} <span class="badge">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.guests') }} <span class="badge">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6"/><path d="M15 2v6"/><path d="M4 8h16l-1 13H5L4 8z"/></svg>
+      {{ __('messages.housekeeping') }} <span class="badge">{{ __('messages.soon') }}</span>
+    </a>
+    <div class="nav-label">{{ __('messages.account') }}</div>
+    <a href="{{ route('provider.verification.index') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      {{ __('messages.verification') }}
+    </a>
+    <a href="{{ route('provider.subscriptions.index') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>
+      {{ __('messages.subscription') }}
+    </a>
     <form method="POST" action="{{ route('logout') }}">
       @csrf
-      <button type="submit" class="nav-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Logout</button>
+      <button type="submit" class="nav-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        {{ __('messages.logout') }}
+      </button>
     </form>
   </nav>
   <div class="occ-card">
-    <div class="occ-top"><span>OCCUPANCY</span><span class="live"><i></i>LIVE</span></div>
+    <div class="occ-top"><span>{{ __('messages.occupancy') }}</span><span class="live"><i></i>{{ __('messages.live_upper') }}</span></div>
     <div class="occ-val" id="occVal">— <small>— / —</small></div>
     <div class="occ-bar"><div id="occBar"></div></div>
   </div>
   <div class="user-box">
     <div class="avatar">{{ $initials }}</div>
     <div>
-      <div class="u-name">{{ $currentUser?->name ?? 'Guest' }}</div>
-      <div class="u-role">General Manager</div>
+      <div class="u-name">{{ $currentUser?->name ?? __('messages.guest') }}</div>
+      <div class="u-role">{{ __('messages.general_manager') }}</div>
     </div>
   </div>
 </aside>
@@ -119,18 +143,24 @@
     <div style="display:flex;align-items:center;gap:13px">
       <button class="icon-btn hamburger" id="hamburger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg></button>
       <div>
-        <h2>@yield('page-title', 'Dashboard')</h2>
+        <h2>@yield('page-title', __('messages.dashboard'))</h2>
         <p>@yield('page-subtitle', '')</p>
       </div>
     </div>
     <div class="topbar-right">
-      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" placeholder="Search guests, rooms…"></div>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="{{ __('messages.search_guests_rooms') }}">
+      </div>
       <select class="lang-select" onchange="window.location.href='/lang/' + this.value">
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>
       <button class="icon-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
-      <button class="btn-primary" type="button" title="Coming soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>New Booking</span></button>
+      <button class="btn-primary" id="newBookingBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span>{{ __('messages.new_booking') }}</span>
+      </button>
     </div>
   </header>
   @yield('content')

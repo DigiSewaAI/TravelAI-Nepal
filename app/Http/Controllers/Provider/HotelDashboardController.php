@@ -30,7 +30,7 @@ class HotelDashboardController extends Controller
 
         $roomsOccupied = HotelRoom::where('provider_id', $provider->id)->where('status', 'occupied')->count();
         $totalRooms = HotelRoom::where('provider_id', $provider->id)->count();
-        
+
         $guestsInHouse = HotelBooking::where('provider_id', $provider->id)
             ->where('status', 'checked_in')->count();
 
@@ -45,7 +45,7 @@ class HotelDashboardController extends Controller
         foreach ($days as $date) {
             $chartData[] = [
                 'day' => \Carbon\Carbon::parse($date)->format('D'),
-                'occ' => (int) ($chartRaw[$date] ?? 0), // Mocking booked nights per day for chart
+                'occ' => (int) ($chartRaw[$date] ?? 0),
                 'avail' => max(0, $totalRooms - (int) ($chartRaw[$date] ?? 0))
             ];
         }
@@ -114,5 +114,55 @@ class HotelDashboardController extends Controller
         });
 
         return response()->json(['success' => true]);
+    }
+
+    public function storeBooking(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'room_id'        => 'required|exists:hotel_rooms,id',
+            'guest_name'     => 'required|string|max:100',
+            'guest_email'    => 'nullable|email|max:150',
+            'check_in_date'  => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'amount'         => 'required|numeric|min:0',
+            'payment_status' => 'required|in:paid,pending,refunded',
+        ]);
+
+        $checkIn = \Carbon\Carbon::parse($validated['check_in_date']);
+        $checkOut = \Carbon\Carbon::parse($validated['check_out_date']);
+        $nights = $checkIn->diffInDays($checkOut);
+
+        HotelBooking::create([
+            'provider_id'    => $provider->id,
+            'room_id'        => $validated['room_id'],
+            'guest_name'     => $validated['guest_name'],
+            'guest_email'    => $validated['guest_email'] ?? null,
+            'check_in_date'  => $validated['check_in_date'],
+            'check_out_date' => $validated['check_out_date'],
+            'nights'         => $nights > 0 ? $nights : 1,
+            'amount'         => $validated['amount'],
+            'payment_status' => $validated['payment_status'],
+            'status'         => 'pending',
+        ]);
+
+        HotelRoom::where('id', $validated['room_id'])->update(['status' => 'reserved']);
+
+        return back()->with('success', __('messages.booking_created'));
+    }
+
+    public function destroyBooking(HotelBooking $booking)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        if ($booking->room) {
+            $booking->room->update(['status' => 'available']);
+        }
+
+        $booking->delete();
+        return back()->with('success', __('messages.booking_deleted'));
     }
 }

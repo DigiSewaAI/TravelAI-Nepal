@@ -242,6 +242,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
     Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
+        // Hotel CRUD Routes
+    Route::post('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeBooking'])->name('hotel.bookings.store');
+    Route::delete('/hotel/bookings/{booking}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyBooking'])->name('hotel.bookings.destroy');
         // 🆕 Transport vertical dashboard routes
     Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');

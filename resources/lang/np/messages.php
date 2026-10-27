@@ -1229,6 +1229,98 @@ return [
     'seating_capacity'          => 'बस्ने क्षमता',
     'opening_hours'             => 'खुल्ने समय',
     'menu_url'                  => 'मेनु URL',
+        // ======================
+    // HOTEL DASHBOARD — MISSING KEYS
+    // ======================
+    'hotel_dashboard_title'    => 'होटल ड्यासबोर्ड',
+    'manager'                  => 'म्यानेजर',
+    'your_property'            => 'तपाईंको होटल',
+    'welcome_subtitle'         => 'नमस्ते :name 👋 — आज :property को जानकारी',
+
+    // KYC
+    'account_unverified'       => 'खाता अप्रमाणित',
+    'kyc_hotel_message'        => 'तपाईंको होटल अझै प्रमाणित भएको छैन। बुकिङ स्वीकार गर्न र भुक्तानी लिन KYC कागजातहरू अपलोड गर्नुहोस्।',
+    'verify_now'               => 'अहिले प्रमाणित गर्नु →',
+
+    // Stats
+    'today_revenue'            => 'आजको आम्दानी',
+    'bookings_today'           => 'आजका बुकिङ',
+    'rooms_occupied'           => 'भरिएका कोठा',
+    'guests_in_house'          => 'होटलमा आगन्तुक',
+    'today'                    => 'आज',
+
+    // Chart
+    'room_nights_sold'         => 'बिक्री भएका रातहरू',
+    'last_7_days_performance'  => 'पछिल्लो ७ दिनको प्रदर्शन',
+    'occupied'                 => 'भरिएको',
+    'available'                => 'उपलब्ध',
+
+    // Front Desk
+    'front_desk'               => 'फ्रन्ट डेस्क',
+    'checkins_checkouts'       => 'चेक-इन र चेक-आउट',
+    'no_checkins_today'        => 'आज कुनै चेक-इन वा चेक-आउट छैन',
+    'pending_actions'          => 'बाँकी कार्यहरू',
+    'check_in'                 => 'चेक इन',
+    'check_out'                => 'चेक आउट',
+    'done'                     => 'सम्पन्न',
+
+    // Rooms
+    'room_status'              => 'कोठा स्थिति',
+    'click_room_cycle'         => 'स्थिति परिवर्तन गर्न कोठामा क्लिक गर्नुहोस्',
+    'all_rooms'                => 'सबै कोठा',
+    'floor'                    => 'तल्ला',
+    'reserved'                 => 'आरक्षित',
+    'dirty'                    => 'फोहोर',
+    'maintenance'              => 'मर्मत',
+
+    // Housekeeping
+    'housekeeping'             => 'हाउसकिपिङ',
+    'todays_tasks'             => 'आजका कार्यहरू',
+    'no_tasks_pending'         => 'कुनै कार्य बाँकी छैन',
+    'in_progress'              => 'जारी छ',
+    'queue'                    => 'पर्खाइमा',
+
+    // Bookings table
+    'latest_reservations'      => 'सबै च्यानलका नवीनतम आरक्षणहरू',
+    'room'                     => 'कोठा',
+    'checkin_col'              => 'चेक-इन',
+    'checkout_col'             => 'चेक-आउट',
+    'nights'                   => 'रात',
+    'action'                   => 'कार्य',
+
+    // Modal
+    'new_booking'              => 'नयाँ बुकिङ',
+    'guest_name'               => 'आगन्तुकको नाम',
+    'guest_name_placeholder'   => 'राम बहादुर',
+    'email_optional'           => 'इमेल (वैकल्पिक)',
+    'amount_rs'                => 'रकम (रु)',
+    'payment_status'           => 'भुक्तानी स्थिति',
+    'create_booking'           => 'बुकिङ सिर्जना गर्नु',
+
+    // CRUD flash / JS
+    'confirm_delete_booking'   => 'के तपाईं यो बुकिङ मेट्न चाहनुहुन्छ?',
+    'failed_to_delete'         => 'मेट्न असफल भयो',
+    'delete'                   => 'मेट्नु',
+    'booking_created'          => 'बुकिङ सफलतापूर्वक सिर्जना गरियो!',
+    'booking_deleted'          => 'बुकिङ सफलतापूर्वक मेटाइयो!',
+
+    // Layout — brand & nav
+    'hotel_brand_default'      => 'औरेलिया',
+    'hotel_resort'             => 'होटल र रिसोर्ट',
+    'main'                     => 'मुख्य',
+    'rooms'                    => 'कोठा',
+    'guests'                   => 'आगन्तुक',
+    'account'                  => 'खाता',
+    'subscription'             => 'सदस्यता',
+    'soon'                     => 'चाँडै',
+
+    // Layout — occupancy & user
+    'occupancy'                => 'अधिभोग',
+    'live_upper'               => 'लाइभ',
+    'general_manager'          => 'महाप्रबन्धक',
+
+    // Layout — search
+    'search_guests_rooms'      => 'आगन्तुक वा कोठा खोज्नु…',
 
     'money_changer_details'     => 'मनी चेन्जर विवरण',
     'license_number'            => 'इजाजतपत्र नम्बर',
