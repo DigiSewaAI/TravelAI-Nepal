@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ExchangeTransaction;
 use App\Models\ProviderExchangeRate;
 use App\Models\ServiceCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MoneyChangerDashboardController extends Controller
@@ -72,6 +73,7 @@ class MoneyChangerDashboardController extends Controller
             ->orderBy('currency_code')
             ->get()
             ->map(fn($r) => [
+                'db_id' => $r->id,           // 🆕 थपियो — delete button काम गर्न
                 'code'  => $r->currency_code,
                 'name'  => $r->currency_name,
                 'flag'  => $r->flag_emoji,
@@ -114,5 +116,91 @@ class MoneyChangerDashboardController extends Controller
             'recentTransactions' => $recent,
             'liveUsd'            => $liveUsd,
         ]);
+    }
+
+    public function storeRate(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'currency_code' => 'required|string|max:10',
+            'currency_name' => 'nullable|string|max:100',
+            'buy_rate' => 'required|numeric|min:0',
+            'sell_rate' => 'required|numeric|min:0',
+            'flag_emoji' => 'nullable|string|max:10',
+        ]);
+
+        ProviderExchangeRate::updateOrCreate(
+            [
+                'provider_id' => $provider->id,
+                'currency_code' => strtoupper($validated['currency_code']),
+                'effective_date' => now()->toDateString()
+            ],
+            [
+                'service_id' => $provider->services()->first()->id,
+                'currency_name' => $validated['currency_name'] ?? strtoupper($validated['currency_code']),
+                'flag_emoji' => $validated['flag_emoji'] ?? '💱',
+                'buy_rate' => $validated['buy_rate'],
+                'sell_rate' => $validated['sell_rate'],
+                'is_active' => true,
+            ]
+        );
+
+        return back()->with('success', __('messages.rate_created_success'));
+    }
+
+    public function destroyRate(ProviderExchangeRate $rate)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $rate->provider_id === $provider->id, 403);
+
+        $rate->delete();
+        return back()->with('success', __('messages.rate_deleted_success'));
+    }
+
+    public function storeTransaction(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:100',
+            'type' => 'required|in:buy,sell',
+            'currency_code' => 'required|string|max:10',
+            'amount_foreign' => 'required|numeric|min:0.01',
+            'rate' => 'required|numeric|min:0.0001',
+        ]);
+
+        $nprAmount = $validated['amount_foreign'] * $validated['rate'];
+
+        // Simple profit calculation (Assuming 2% margin if exact spread isn't known)
+        $profit = $nprAmount * 0.02;
+
+        ExchangeTransaction::create([
+            'transaction_number' => 'TXN-' . strtoupper(uniqid()),
+            'provider_id' => $provider->id,
+            'service_id' => $provider->services()->first()->id,
+            'customer_name' => $validated['customer_name'],
+            'customer_initials' => collect(explode(' ', $validated['customer_name']))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->join(''),
+            'type' => $validated['type'],
+            'currency_code' => strtoupper($validated['currency_code']),
+            'amount_foreign' => $validated['amount_foreign'],
+            'rate' => $validated['rate'],
+            'npr_amount' => $nprAmount,
+            'profit' => $profit,
+            'status' => 'completed',
+        ]);
+
+        return back()->with('success', __('messages.transaction_created_success'));
+    }
+
+    public function destroyTransaction(ExchangeTransaction $transaction)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $transaction->provider_id === $provider->id, 403);
+
+        $transaction->delete();
+        return back()->with('success', __('messages.transaction_deleted_success'));
     }
 }
