@@ -107,4 +107,74 @@ class ArtCraftDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $order->status]);
     }
+        public function storeArtwork(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:150',
+            'artist_name' => 'nullable|string|max:100',
+            'category' => 'required|in:painting,sculpture,handicraft',
+            'price' => 'required|numeric|min:0',
+            'emoji' => 'nullable|string|max:10',
+        ]);
+
+        Artwork::create([
+            'provider_id' => $provider->id,
+            'name' => $validated['name'],
+            'artist_name' => $validated['artist_name'] ?? $provider->name,
+            'category' => $validated['category'],
+            'price' => $validated['price'],
+            'emoji' => $validated['emoji'] ?? '🖼️',
+            'gradient' => 'linear-gradient(135deg,#f9dad0,#c65d3b)', // Default gradient
+            'status' => 'available',
+        ]);
+
+        return back()->with('success', __('messages.artwork_created_success'));
+    }
+
+    public function destroyArtwork(Artwork $artwork)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $artwork->provider_id === $provider->id, 403);
+
+        $artwork->delete();
+        return back()->with('success', __('messages.artwork_deleted_success'));
+    }
+
+    public function storeCustomOrder(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'client_name' => 'required|string|max:100',
+            'client_email' => 'nullable|email|max:150',
+            'type' => 'required|string|max:50',
+            'budget' => 'required|numeric|min:0',
+            'deadline' => 'required|date',
+        ]);
+
+        CustomOrder::create([
+            'provider_id' => $provider->id,
+            'client_name' => $validated['client_name'],
+            'client_email' => $validated['client_email'] ?? null,
+            'type' => $validated['type'],
+            'budget' => $validated['budget'],
+            'deadline' => $validated['deadline'],
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', __('messages.order_created_success'));
+    }
+
+    public function destroyOrder(CustomOrder $order)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $order->provider_id === $provider->id, 403);
+
+        $order->delete();
+        return back()->with('success', __('messages.order_deleted_success'));
+    }
 }
