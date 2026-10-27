@@ -238,6 +238,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/restaurant/menu-items/{menuItem}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyMenuItem'])->name('restaurant.menu.destroy');
     Route::post('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeOrder'])->name('restaurant.orders.store');
     Route::delete('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyOrder'])->name('restaurant.orders.destroy');
+        // Restaurant Sidebar Unlocks
+    Route::get('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'ordersPage'])->name('restaurant.orders.list');
+    Route::get('/restaurant/menu', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'menuPage'])->name('restaurant.menu.list');
+    Route::get('/restaurant/tables', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'tablesPage'])->name('restaurant.tables.list');
         // 🆕 Money Changer vertical dashboard route
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
         // Money Changer CRUD Routes

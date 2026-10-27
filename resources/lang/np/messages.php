@@ -1849,6 +1849,24 @@ return [
     'money_changer_welcome_subtitle' => "आजको अवलोकन यहाँ छ",
     'art_craft_welcome_subtitle' => "तपाईंको स्टुडियोको एक नजर",
     'individual_welcome_subtitle' => "तपाईंसँग आउँदै गरेका कामहरू छन्",
+        // Restaurant Sidebar Unlock
+    'order_history' => 'अर्डर इतिहास',
+    'manage_orders_desc' => 'सबै आउँदै गरेका अर्डरहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्',
+    'menu_management' => 'मेनु व्यवस्थापन',
+    'manage_menu_desc' => 'आफ्नो रेस्टुरेन्टको मेनु परिकारहरू व्यवस्थापन गर्नुहोस्',
+    'table_management' => 'टेबल व्यवस्थापन',
+    'manage_tables_desc' => 'टेबलको स्थिति हेर्नुहोस् र व्यवस्थापन गर्नुहोस्',
+    'order_id' => 'अर्डर आईडी',
+    'items_col' => 'परिकारहरू',
+    'table_col' => 'टेबल',
+    'menu_items' => 'मेनु परिकारहरू',
+    'add_new_item' => 'नयाँ परिकार थप्नुहोस्',
+    'tables' => 'टेबलहरू',
+    'seats' => 'सिटहरू',
+    'status_col' => 'स्थिति',
+    'no_orders_found' => 'कुनै अर्डर भेटिएन।',
+    'no_menu_items_found' => 'अहिलेसम्म कुनै परिकार थपिएको छैन।',
+    'no_tables_found' => 'अहिलेसम्म कुनै टेबल थपिएको छैन।',
             // ============================================
     // Journey Replay (I18N-JOURNEY-REPLAY-01)
     // ============================================
@@ -2750,6 +2768,7 @@ return [
 '100_bookingsmo'  => '१०० बुकिङ/महिना',
 '500_ai_requestsmo' => '५०० AI अनुरोध/महिना',
 '1000_bookingsmo' => '१००० बुकिङ/महिना',
+    'menu' => 'मेनु',
 
     ],
 ],

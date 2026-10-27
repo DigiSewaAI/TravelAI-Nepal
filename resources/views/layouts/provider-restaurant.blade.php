@@ -90,21 +90,25 @@
   </div>
   <nav class="nav">
     <div class="nav-label">{{ __('messages.main') }}</div>
-    <a href="{{ route('provider.restaurant.dashboard') }}" class="active">
+    {{-- ✅ Dashboard --}}
+    <a href="{{ route('provider.restaurant.dashboard') }}" class="{{ request()->routeIs('provider.restaurant.dashboard') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-      {{ __('messages.dashboard') }}
+      {{ __('messages.dashboard') ?? 'Dashboard' }}
     </a>
-    <a href="#" class="disabled">
+    {{-- ✅ Orders (Unlocked) --}}
+    <a href="{{ route('provider.restaurant.orders.list') }}" class="{{ request()->routeIs('provider.restaurant.orders.list') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
-      {{ __('messages.nav_orders') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+      {{ __('messages.orders') ?? 'Orders' }}
     </a>
-    <a href="#" class="disabled">
+    {{-- ✅ Menu (Unlocked) --}}
+    <a href="{{ route('provider.restaurant.menu.list') }}" class="{{ request()->routeIs('provider.restaurant.menu.list') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M5 11v11"/><path d="M19 2c-1.7 0-3 1.3-3 3v7h3v10"/></svg>
-      {{ __('messages.nav_menu') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+      {{ __('messages.menu') ?? 'Menu' }}
     </a>
-    <a href="#" class="disabled">
+    {{-- ✅ Tables (Unlocked) --}}
+    <a href="{{ route('provider.restaurant.tables.list') }}" class="{{ request()->routeIs('provider.restaurant.tables.list') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-      {{ __('messages.tables') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+      {{ __('messages.tables') ?? 'Tables' }}
     </a>
     <a href="{{ route('provider.staff.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>

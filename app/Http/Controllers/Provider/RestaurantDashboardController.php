@@ -295,4 +295,24 @@ class RestaurantDashboardController extends Controller
         $order->delete();
         return back()->with('success', __('messages.order_deleted_success'));
     }
+        public function ordersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $orders = RestaurantOrder::where('provider_id', $provider->id)->with('items')->latest()->get();
+        return view('provider.restaurant.orders', compact('provider', 'orders'));
+    }
+
+    public function menuPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $menuItems = MenuItem::where('provider_id', $provider->id)->orderBy('category')->get();
+        return view('provider.restaurant.menu', compact('provider', 'menuItems'));
+    }
+
+    public function tablesPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        $tables = RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get();
+        return view('provider.restaurant.tables', compact('provider', 'tables'));
+    }
 }
