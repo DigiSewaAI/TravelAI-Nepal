@@ -1,7 +1,7 @@
 @php
     use Illuminate\Support\Facades\Auth;
     $currentUser = Auth::user();
-    $avatarName  = $currentUser?->name ?? 'Guest';
+    $avatarName  = $currentUser?->name ?? __('messages.guest');
     $initials    = collect(explode(' ', $avatarName))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->join('') ?: 'GU';
 @endphp
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('title', 'Restaurant Dashboard') — TravelAI Nepal</title>
+<title>@yield('title', __('messages.restaurant_dashboard_title')) — TravelAI Nepal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -63,11 +63,9 @@
   .overlay.show{opacity:1;pointer-events:auto}
   @media (max-width:1080px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:20px 18px 42px}.hamburger{display:grid}.search{width:170px}}
   @media (max-width:640px){.topbar h2{font-size:19px}.search{display:none}.btn-primary span{display:none}.btn-primary{padding:11px}.main{padding:16px 14px 38px}}
-  /* 🆕 Account section — logout button */
   .nav-logout{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#f87171;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;width:100%;transition:.2s;margin-top:8px}
   .nav-logout:hover{background:rgba(239,68,68,.18);color:#fca5a5;transform:translateX(2px)}
   .nav-logout svg{width:18px;height:18px;flex-shrink:0;stroke-width:2}
-  /* 🆕 Language switcher */
   .lang-select{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;outline:none;transition:.2s}
   .lang-select:hover{border-color:var(--accent);color:var(--accent-d)}
   .lang-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,.15)}
@@ -80,53 +78,74 @@
   <div class="brand">
     <div class="brand-logo">🍜</div>
     <div>
-      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? 'Savory', 14) }}</h1>
-      <span>RESTAURANT</span>
+      <h1>{{ \Illuminate\Support\Str::limit($provider->name ?? __('messages.restaurant_brand_default'), 14) }}</h1>
+      <span>{{ __('messages.restaurant_subtitle') }}</span>
     </div>
   </div>
   <nav class="nav">
-    <div class="nav-label">Main</div>
+    <div class="nav-label">{{ __('messages.main') }}</div>
     <a href="{{ route('provider.restaurant.dashboard') }}" class="active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-      Dashboard
+      {{ __('messages.dashboard') }}
     </a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>Orders <span class="badge soon">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M5 11v11"/><path d="M19 2c-1.7 0-3 1.3-3 3v7h3v10"/></svg>Menu <span class="badge soon">Soon</span></a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Tables <span class="badge soon">Soon</span></a>
-    <a href="{{ route('provider.staff.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Staff</a>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Reports <span class="badge soon">Soon</span></a>
-    <div class="nav-label">Others</div>
-    <a href="#" class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Offers <span class="badge soon">Soon</span></a>
-    <a href="{{ route('provider.profile') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.44.65.81.81H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
+      {{ __('messages.nav_orders') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2"/><path d="M5 11v11"/><path d="M19 2c-1.7 0-3 1.3-3 3v7h3v10"/></svg>
+      {{ __('messages.nav_menu') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      {{ __('messages.tables') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="{{ route('provider.staff.index') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.staff') }}
+    </a>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+      {{ __('messages.reports') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+    </a>
+    <div class="nav-label">{{ __('messages.others') }}</div>
+    <a href="#" class="disabled">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      {{ __('messages.offers') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+    </a>
+    <a href="{{ route('provider.profile') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.44.65.81.81H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      {{ __('messages.settings') }}
+    </a>
 
-    {{-- 🆕 Account Section --}}
-    <div class="nav-label">Account</div>
+    {{-- Account Section --}}
+    <div class="nav-label">{{ __('messages.account') }}</div>
     <a href="{{ route('provider.verification.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-      Verification
+      {{ __('messages.verification') }}
     </a>
     <a href="{{ route('provider.subscriptions.index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg>
-      Subscription
+      {{ __('messages.subscription') }}
     </a>
     <form method="POST" action="{{ route('logout') }}">
       @csrf
       <button type="submit" class="nav-logout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-        Logout
+        {{ __('messages.logout') }}
       </button>
     </form>
   </nav>
   <div class="side-promo">
-    <h4>🔥 Weekend Offer</h4>
-    <p>Enable "Happy Hour" pricing for 4–6 PM and boost evening orders.</p>
-    <button type="button">Activate Now</button>
+    <h4>{{ __('messages.weekend_offer_title') }}</h4>
+    <p>{{ __('messages.weekend_offer_desc') }}</p>
+    <button type="button">{{ __('messages.activate_now') }}</button>
   </div>
   <div class="user-box">
     <div class="avatar">{{ $initials }}</div>
     <div>
-      <div class="u-name">{{ $currentUser?->name ?? 'Guest' }}</div>
-      <div class="u-role">Restaurant Owner</div>
+      <div class="u-name">{{ $currentUser?->name ?? __('messages.guest') }}</div>
+      <div class="u-role">{{ __('messages.restaurant_owner') }}</div>
     </div>
   </div>
 </aside>
@@ -135,24 +154,23 @@
     <div style="display:flex;align-items:center;gap:13px">
       <button class="icon-btn hamburger" id="hamburger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg></button>
       <div>
-        <h2>@yield('page-title', 'Dashboard')</h2>
+        <h2>@yield('page-title', __('messages.dashboard'))</h2>
         <p>@yield('page-subtitle', '')</p>
       </div>
     </div>
     <div class="topbar-right">
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" placeholder="Search orders, dishes…">
+        <input type="text" placeholder="{{ __('messages.search_orders_dishes') }}">
       </div>
 
-      {{-- 🆕 Language switcher --}}
       <select class="lang-select" onchange="window.location.href='/lang/' + this.value">
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>
 
       <button class="icon-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
-      <button class="btn-primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>New Order</span></button>
+      {{-- 🆕 Duplicate "New Order" button हटाइयो — dashboard action bar मा proper functional buttons छन् --}}
     </div>
   </header>
   @yield('content')

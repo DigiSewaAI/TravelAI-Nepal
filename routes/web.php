@@ -233,6 +233,11 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/restaurant/dashboard', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'index'])->name('restaurant.dashboard');
     Route::patch('/restaurant/orders/{order}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateOrderStatus'])->name('restaurant.orders.status');
     Route::patch('/restaurant/tables/{table}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateTableStatus'])->name('restaurant.tables.status');
+        // Restaurant CRUD Routes
+    Route::post('/restaurant/menu-items', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeMenuItem'])->name('restaurant.menu.store');
+    Route::delete('/restaurant/menu-items/{menuItem}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyMenuItem'])->name('restaurant.menu.destroy');
+    Route::post('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeOrder'])->name('restaurant.orders.store');
+    Route::delete('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyOrder'])->name('restaurant.orders.destroy');
         // 🆕 Money Changer vertical dashboard route
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)

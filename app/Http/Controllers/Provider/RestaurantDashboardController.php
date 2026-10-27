@@ -197,4 +197,102 @@ class RestaurantDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $table->status]);
     }
+        public function storeMenuItem(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string|max:50',
+            'emoji' => 'nullable|string|max:10',
+        ]);
+
+        MenuItem::create([
+            'provider_id' => $provider->id,
+            'service_id' => $provider->services()->first()->id,
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'currency' => 'NPR',
+            'category' => $validated['category'],
+            'emoji' => $validated['emoji'] ?? '🍽️',
+            'is_available' => true,
+        ]);
+
+        return back()->with('success', __('messages.menu_item_created_success'));
+    }
+
+    public function destroyMenuItem(MenuItem $menuItem)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $menuItem->provider_id === $provider->id, 403);
+        
+        $menuItem->delete();
+        return back()->with('success', __('messages.menu_item_deleted_success'));
+    }
+
+    public function storeOrder(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'table_id' => 'required|exists:restaurant_tables,id',
+            'items' => 'required|array|min:1',
+            'items.*.id' => 'required|exists:menu_items,id',
+            'items.*.qty' => 'required|integer|min:1',
+        ]);
+
+        $total = 0;
+        $orderItemsData = [];
+
+        foreach ($validated['items'] as $item) {
+            $menuItem = MenuItem::find($item['id']);
+            $lineTotal = $menuItem->price * $item['qty'];
+            $total += $lineTotal;
+
+            $orderItemsData[] = [
+                'menu_item_id' => $menuItem->id,
+                'item_name' => $menuItem->name,
+                'unit_price' => $menuItem->price,
+                'quantity' => $item['qty'],
+                'line_total' => $lineTotal,
+            ];
+        }
+
+        $order = RestaurantOrder::create([
+            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'provider_id' => $provider->id,
+            'service_id' => $provider->services()->first()->id,
+            'table_id' => $validated['table_id'],
+            'status' => 'pending',
+            'subtotal' => $total,
+            'tax' => 0,
+            'total' => $total,
+            'currency' => 'NPR',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $order->items()->createMany($orderItemsData);
+
+        // Mark table as occupied
+        RestaurantTable::where('id', $validated['table_id'])->update(['status' => 'occupied']);
+
+        return back()->with('success', __('messages.order_created_success'));
+    }
+
+    public function destroyOrder(RestaurantOrder $order)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $order->provider_id === $provider->id, 403);
+
+        // Free the table
+        if ($order->table) {
+            $order->table->update(['status' => 'available']);
+        }
+
+        $order->delete();
+        return back()->with('success', __('messages.order_deleted_success'));
+    }
 }

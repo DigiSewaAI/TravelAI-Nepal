@@ -1045,12 +1045,13 @@ return [
     'book_this_service' => 'यो सेवा बुक गर्नुहोस्',
     'related_services' => 'सम्बन्धित सेवाहरू',
     // ======================
-// REVIEWS (Phase 09A)
-// ======================
-'reviews' => 'Reviews',
-'review' => 'Review',
-'write_review' => 'Write a Review',
-'no_reviews_yet' => 'No reviews yet.',
+    // ======================
+    // REVIEWS (Phase 09A)
+    // ======================
+    'reviews' => 'समीक्षाहरू',
+    'review' => 'समीक्षा',
+    'write_review' => 'समीक्षा लेख्नुहोस्',
+    'no_reviews_yet' => 'अझै कुनै समीक्षा छैन',
 
 
     // ======================
@@ -1321,6 +1322,61 @@ return [
 
     // Layout — search
     'search_guests_rooms'      => 'आगन्तुक वा कोठा खोज्नु…',
+        // Restaurant CRUD
+    'new_order' => 'नयाँ अर्डर',
+    'add_menu_item' => 'नयाँ परिकार थप्नुहोस्',
+    'select_table' => 'टेबल छान्नुहोस्',
+    'select_menu_items' => 'परिकारहरू छान्नुहोस्',
+    'quantity' => 'मात्रा',
+    'total_amount' => 'कुल रकम',
+    'create_order' => 'अर्डर सिर्जना गर्नुहोस्',
+    'delete_order' => 'अर्डर मेटाउनुहोस्',
+    'confirm_delete_order' => 'के तपाईं यो अर्डर मेटाउन चाहनुहुन्छ?',
+    'menu_item_name' => 'परिकारको नाम',
+    'price' => 'मूल्य',
+    'category' => 'श्रेणी',
+    'emoji' => 'इमोजी',
+    'delete_menu_item' => 'परिकार मेटाउनुहोस्',
+    'confirm_delete_menu_item' => 'के तपाईं यो परिकार मेटाउन चाहनुहुन्छ?',
+    'order_created_success' => 'अर्डर सफलतापूर्वक सिर्जना भयो!',
+    'order_deleted_success' => 'अर्डर सफलतापूर्वक मेटाइयो!',
+    'menu_item_created_success' => 'परिकार सफलतापूर्वक थपियो!',
+    'menu_item_deleted_success' => 'परिकार सफलतापूर्वक मेटाइयो!',
+        // Restaurant Dashboard — missing keys
+    'restaurant_welcome_subtitle' => 'नमस्ते :name 👋 — आज :property को जानकारी',
+    'orders_today'                => 'आजका अर्डर',
+    'avg_order_value'             => 'औसत अर्डर मूल्य',
+    'tables_occupied'             => 'भरिएका टेबल',
+    'revenue_by_hour'             => 'घण्टाअनुसार आम्दानी',
+    'full_report'                 => 'पूर्ण रिपोर्ट',
+    'live_orders'                 => 'लाइभ अर्डरहरू',
+    'active_now'                  => 'अहिले सक्रिय',
+    'ready'                       => 'तयार',
+    'preparing'                   => 'तयारी हुँदै',
+    'served'                      => 'सर्भ भयो',
+    'table_map'                   => 'टेबल नक्सा',
+    'tap_table_hint'              => 'स्थिति परिवर्तन गर्न टेबलमा क्लिक गर्नुहोस्',
+    'manage_tables'               => 'टेबल व्यवस्थापन',
+    'cleaning'                    => 'सफा गर्दै',
+    'popular_dishes'              => 'लोकप्रिय परिकारहरू',
+    'top_5_week'                  => 'यो हप्ताको शीर्ष ५',
+        // Restaurant Layout
+    'restaurant_dashboard_title'  => 'रेस्टुरेन्ट ड्यासबोर्ड',
+    'restaurant_brand_default'    => 'सेभरी',
+    'restaurant_subtitle'         => 'रेस्टुरेन्ट',
+    'nav_orders'                  => 'अर्डरहरू',
+    'nav_menu'                    => 'मेनु',
+    'tables'                      => 'टेबलहरू',
+    'staff'                       => 'कर्मचारी',
+    'reports'                     => 'रिपोर्टहरू',
+    'others'                      => 'अन्य',
+    'offers'                      => 'अफरहरू',
+    'settings'                    => 'सेटिङ',
+    'restaurant_owner'            => 'रेस्टुरेन्ट मालिक',
+    'search_orders_dishes'        => 'अर्डर वा परिकार खोज्नु…',
+    'weekend_offer_title'         => '🔥 साप्ताहिक अफर',
+    'weekend_offer_desc'          => '४–६ बजे "ह्यापी आवर" मूल्य सक्षम गर्नुहोस् र साँझको अर्डर बढाउनुहोस्।',
+    'activate_now'                => 'अहिले सक्रिय गर्नुहोस्',
 
     'money_changer_details'     => 'मनी चेन्जर विवरण',
     'license_number'            => 'इजाजतपत्र नम्बर',
