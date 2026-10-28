@@ -232,6 +232,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     // 🆕 Restaurant vertical dashboard routes
     Route::get('/restaurant/dashboard', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'index'])->name('restaurant.dashboard');
     Route::patch('/restaurant/orders/{order}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateOrderStatus'])->name('restaurant.orders.status');
+    Route::post('/restaurant/tables', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeTable'])->name('restaurant.tables.store');
+    Route::put('/restaurant/tables/{table}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateTable'])->name('restaurant.tables.update');
+    Route::delete('/restaurant/tables/{table}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyTable'])->name('restaurant.tables.destroy');
     Route::patch('/restaurant/tables/{table}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateTableStatus'])->name('restaurant.tables.status');
         // Restaurant CRUD Routes
     Route::post('/restaurant/menu-items', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeMenuItem'])->name('restaurant.menu.store');

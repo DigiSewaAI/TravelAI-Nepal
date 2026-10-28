@@ -199,7 +199,11 @@ class RestaurantDashboardController extends Controller
         $table->status = $validated['status'];
         $table->save();
 
-        return response()->json(['success' => true, 'status' => $table->status]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'status' => $table->status]);
+        }
+
+        return redirect()->back()->with('success', 'Table status updated.');
     }
         public function storeMenuItem(Request $request)
     {
@@ -356,5 +360,76 @@ class RestaurantDashboardController extends Controller
 
         $menuItem->update($validated);
         return redirect()->back()->with('success', 'Menu item updated.');
+    }
+
+    public function storeTable(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'table_number' => 'required|string|max:20',
+            'seats' => 'required|integer|min:1',
+            'status' => 'nullable|in:free,occupied,reserved,cleaning',
+        ]);
+
+        $exists = RestaurantTable::where('provider_id', $provider->id)
+            ->where('table_number', $validated['table_number'])
+            ->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['table_number' => 'This table number already exists.'])->withInput();
+        }
+
+        $serviceId = RestaurantTable::where('provider_id', $provider->id)
+            ->whereNotNull('service_id')
+            ->value('service_id');
+
+        RestaurantTable::create([
+            'provider_id' => $provider->id,
+            'service_id' => $serviceId,
+            'table_number' => $validated['table_number'],
+            'seats' => $validated['seats'],
+            'status' => $validated['status'] ?? 'free',
+        ]);
+
+        return redirect()->back()->with('success', 'Table added successfully.');
+    }
+
+    public function updateTable(Request $request, RestaurantTable $table)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $table->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'table_number' => 'required|string|max:20',
+            'seats' => 'required|integer|min:1',
+            'status' => 'required|in:free,occupied,reserved,cleaning',
+        ]);
+
+        $exists = RestaurantTable::where('provider_id', $provider->id)
+            ->where('table_number', $validated['table_number'])
+            ->where('id', '!=', $table->id)
+            ->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['table_number' => 'This table number already exists.'])->withInput();
+        }
+
+        $table->update($validated);
+
+        return redirect()->back()->with('success', 'Table updated successfully.');
+    }
+
+    public function destroyTable(RestaurantTable $table)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $table->provider_id === $provider->id, 403);
+
+        if ($table->currentOrder()->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete this table - it has active orders.');
+        }
+
+        $table->delete();
+
+        return redirect()->back()->with('success', 'Table deleted successfully.');
     }
 }
