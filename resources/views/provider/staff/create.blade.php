@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider')
 
-@section('title', 'Add Staff Member')
-@section('header', 'Add Staff')
+@section('title', __('messages.add_staff_member'))
+@section('header', __('messages.add_staff'))
 
 @section('content')
 <style>
@@ -37,7 +37,7 @@
       <div>
         {{ session('error') }}
         @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
-          <br><a href="{{ route('provider.subscriptions.index') }}">→ Upgrade Your Plan</a>
+          <br><a href="{{ route('provider.subscriptions.index') }}">→ {{ __('messages.upgrade_your_plan') }}</a>
         @endif
       </div>
     </div>
@@ -49,47 +49,47 @@
   <form method="POST" action="{{ route('provider.staff.store') }}" class="form-card">
     @csrf
     <div class="form-hero">
-      <h1>👤 Add Staff Member</h1>
-      <p>Create a new team member with login credentials</p>
+      <h1>👤 {{ __('messages.add_staff_member') }}</h1>
+      <p>{{ __('messages.add_staff_hero_desc') }}</p>
     </div>
     <div class="form-body">
       <div class="form-group">
-        <label class="form-label">Full Name *</label>
-        <input type="text" name="name" class="form-input" value="{{ old('name') }}" required placeholder="e.g., Ram Bahadur">
+        <label class="form-label">{{ __('messages.full_name') }} *</label>
+        <input type="text" name="name" class="form-input" value="{{ old('name') }}" required placeholder="{{ __('messages.full_name_placeholder') }}">
         @error('name') <p class="form-error">{{ $message }}</p> @enderror
       </div>
 
       <div class="form-group">
-        <label class="form-label">Email *</label>
-        <input type="email" name="email" class="form-input" value="{{ old('email') }}" required placeholder="staff@example.com">
+        <label class="form-label">{{ __('messages.email') }} *</label>
+        <input type="email" name="email" class="form-input" value="{{ old('email') }}" required placeholder="{{ __('messages.email_placeholder') }}">
         @error('email') <p class="form-error">{{ $message }}</p> @enderror
       </div>
 
       <div class="form-group">
-        <label class="form-label">Password *</label>
-        <input type="password" name="password" class="form-input" required placeholder="Minimum 8 characters">
-        <p class="form-hint">Minimum 8 characters</p>
+        <label class="form-label">{{ __('messages.password') }} *</label>
+        <input type="password" name="password" class="form-input" required placeholder="{{ __('messages.password_min_hint') }}">
+        <p class="form-hint">{{ __('messages.password_min_hint') }}</p>
         @error('password') <p class="form-error">{{ $message }}</p> @enderror
       </div>
 
       <div class="form-group">
-        <label class="form-label">Confirm Password *</label>
-        <input type="password" name="password_confirmation" class="form-input" required placeholder="Re-enter password">
+        <label class="form-label">{{ __('messages.confirm_password') }} *</label>
+        <input type="password" name="password_confirmation" class="form-input" required placeholder="{{ __('messages.confirm_password_placeholder') }}">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Role (optional)</label>
-        <input type="text" name="role" class="form-input" value="{{ old('role') }}" placeholder="e.g., Manager, Guide, Accountant">
-        <p class="form-hint">Leave blank to use default "Staff" role</p>
+        <label class="form-label">{{ __('messages.role_optional') }}</label>
+        <input type="text" name="role" class="form-input" value="{{ old('role') }}" placeholder="{{ __('messages.role_placeholder') }}">
+        <p class="form-hint">{{ __('messages.role_blank_hint') }}</p>
         @error('role') <p class="form-error">{{ $message }}</p> @enderror
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-primary-grad">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M20 6L9 17l-5-5"/></svg>
-          Add Staff
+          {{ __('messages.add_staff') }}
         </button>
-        <a href="{{ route('provider.staff.index') }}" class="btn-cancel">Cancel</a>
+        <a href="{{ route('provider.staff.index') }}" class="btn-cancel">{{ __('messages.cancel') }}</a>
       </div>
     </div>
   </form>

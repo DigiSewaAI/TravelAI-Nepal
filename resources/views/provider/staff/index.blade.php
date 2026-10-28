@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider')
 
-@section('title', 'Team Management')
-@section('header', 'Team Members')
+@section('title', __('messages.team_management'))
+@section('header', __('messages.team_members'))
 
 @section('content')
 <style>
@@ -56,13 +56,13 @@
 <div class="staff-wrap">
   <div class="staff-hero">
     <div class="staff-hero-text">
-      <h1>👥 Team Members</h1>
-      <p>Manage your staff, roles, and access permissions</p>
+      <h1>👥 {{ __('messages.team_members') }}</h1>
+      <p>{{ __('messages.manage_team_desc') }}</p>
     </div>
     <div class="staff-hero-actions">
       <a href="{{ route('provider.staff.create') }}" class="btn-add">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 5v14M5 12h14"/></svg>
-        Add Staff
+        {{ __('messages.add_staff') }}
       </a>
     </div>
   </div>
@@ -76,7 +76,7 @@
       <div>
         {{ session('error') }}
         @if(str_contains(session('error'), 'staff limit') || str_contains(session('error'), 'Staff limit'))
-          <br><a href="{{ route('provider.subscriptions.index') }}">→ Upgrade Your Plan</a>
+          <br><a href="{{ route('provider.subscriptions.index') }}">→ {{ __('messages.upgrade_your_plan') }}</a>
         @endif
       </div>
     </div>
@@ -92,7 +92,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
       <div>
-        <div class="stat-label">Total Staff</div>
+        <div class="stat-label">{{ __('messages.total_staff') }}</div>
         <div class="stat-value">{{ $staff->count() }}</div>
       </div>
     </div>
@@ -101,8 +101,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
       <div>
-        <div class="stat-label">Max Allowed</div>
-        <div class="stat-value">{{ ($maxStaff == -1 || $maxStaff == null) ? '∞ Unlimited' : $maxStaff }}</div>
+        <div class="stat-label">{{ __('messages.max_allowed') }}</div>
+        <div class="stat-value">{{ ($maxStaff == -1 || $maxStaff == null) ? '∞ ' . __('messages.unlimited') . ' ' : $maxStaff }}</div>
       </div>
     </div>
     <div class="stat-box">
@@ -110,7 +110,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       </div>
       <div>
-        <div class="stat-label">Slots Left</div>
+        <div class="stat-label">{{ __('messages.slots_left') }}</div>
         <div class="stat-value">
           @if($maxStaff == -1 || $maxStaff == null)
             ∞
@@ -124,9 +124,9 @@
 
   <div class="team-card">
     <div class="team-head">
-      <h2>All Members ({{ $staff->count() }})</h2>
+      <h2>{{ __('messages.all_members') }} ({{ $staff->count() }})</h2>
       @if($isLimitReached)
-        <a href="{{ route('provider.subscriptions.index') }}" style="font-size:12px;font-weight:800;color:var(--accent-d,#1d4ed8);text-decoration:none;">Upgrade Plan →</a>
+        <a href="{{ route('provider.subscriptions.index') }}" style="font-size:12px;font-weight:800;color:var(--accent-d,#1d4ed8);text-decoration:none;">{{ __('messages.upgrade_plan') }} →</a>
       @endif
     </div>
     @forelse($staff as $member)
@@ -137,17 +137,17 @@
           <div class="member-email">{{ $member->user->email }}</div>
         </div>
         @php $roleClass = $member->role === 'manager' ? 'role-manager' : ($member->role === 'staff' ? 'role-staff' : 'role-other'); @endphp
-        <span class="role-pill {{ $roleClass }}">{{ ucfirst($member->role ?? 'Staff') }}</span>
+        <span class="role-pill {{ $roleClass }}">{{ $member->role === 'manager' ? __('messages.manager_role') : ($member->role === 'staff' ? __('messages.staff_role_label') : ($member->role === 'guide' ? __('messages.guide_role') : ucfirst($member->role ?? __('messages.role_staff_default')))) }}</span>
         <div class="member-actions">
           <a href="{{ route('provider.staff.edit', $member) }}" class="btn-icon btn-edit">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit
+            {{ __('messages.edit') }}
           </a>
-          <form action="{{ route('provider.staff.destroy', $member) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Remove this staff member?')">
+          <form action="{{ route('provider.staff.destroy', $member) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('{{ __('messages.remove_staff_confirm') }}')">
             @csrf @method('DELETE')
             <button type="submit" class="btn-icon btn-del">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
-              Remove
+              {{ __('messages.remove_btn') }}
             </button>
           </form>
         </div>
@@ -155,8 +155,8 @@
     @empty
       <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
-        <h3>No staff members yet</h3>
-        <p>Click "Add Staff" above to invite your first team member.</p>
+        <h3>{{ __('messages.no_staff_members') }}</h3>
+        <p>{{ __('messages.no_staff_click') }}</p>
       </div>
     @endforelse
   </div>

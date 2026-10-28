@@ -68,7 +68,7 @@
     <div class="form-hero">
       <div>
         <h1>{{ __('messages.edit_staff_title') }}</h1>
-        <p>Update details, role, and permissions</p>
+        <p>{{ __('messages.update_staff_details_desc') }}</p>
       </div>
       <div class="hero-avatar">{{ strtoupper(substr($staff->user->name, 0, 1)) }}</div>
     </div>
