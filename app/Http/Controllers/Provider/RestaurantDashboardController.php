@@ -180,7 +180,11 @@ class RestaurantDashboardController extends Controller
         }
         $order->save();
 
-        return response()->json(['success' => true, 'status' => $order->status]);
+                if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'status' => $order->status]);
+        }
+
+        return redirect()->back()->with('success', 'Order status updated.');
     }
 
     public function updateTableStatus(Request $request, RestaurantTable $table)
@@ -337,5 +341,20 @@ class RestaurantDashboardController extends Controller
         ]);
         
         return view('provider.restaurant.offers', compact('provider', 'offers'));
+    }
+        public function updateMenuItem(Request $request, MenuItem $menuItem)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $menuItem->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string|max:100',
+            'emoji' => 'nullable|string|max:10',
+        ]);
+
+        $menuItem->update($validated);
+        return redirect()->back()->with('success', 'Menu item updated.');
     }
 }

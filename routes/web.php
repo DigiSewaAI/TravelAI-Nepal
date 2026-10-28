@@ -237,6 +237,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::post('/restaurant/menu-items', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeMenuItem'])->name('restaurant.menu.store');
     Route::delete('/restaurant/menu-items/{menuItem}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyMenuItem'])->name('restaurant.menu.destroy');
     Route::post('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeOrder'])->name('restaurant.orders.store');
+        Route::put('/restaurant/menu-items/{menuItem}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateMenuItem'])->name('restaurant.menu.update');
     Route::delete('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyOrder'])->name('restaurant.orders.destroy');
         // Restaurant Sidebar Unlocks
     Route::get('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'ordersPage'])->name('restaurant.orders.list');

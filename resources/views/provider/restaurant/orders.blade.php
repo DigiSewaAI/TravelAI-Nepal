@@ -12,6 +12,12 @@
   .tbl td{padding:15px;font-size:13px;font-weight:600;border-bottom:1px solid #f3f5fb;vertical-align:middle;}
   .tbl tbody tr:hover{background:#fafbff}
   .pill{font-size:11px;font-weight:800;padding:5px 10px;border-radius:20px;display:inline-block;}
+  .act-btn{padding:6px 10px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:800;transition:.15s;margin-right:4px;}
+  .act-status{background:var(--blue-soft);color:#1d4ed8;}
+  .act-status:hover{background:#3b82f6;color:#fff;}
+  .act-del{background:var(--red-soft);color:#b91c1c;}
+  .act-del:hover{background:#dc2626;color:#fff;}
+  .status-select{padding:5px 8px;border-radius:6px;border:1px solid var(--line);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;}
 </style>
 @endpush
 
@@ -19,8 +25,10 @@
 <div class="card">
     <div class="card-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
         <div><h3 style="font-size:16px; font-weight:800;">{{ __('messages.order_history') }}</h3></div>
-        <button type="button" onclick="openOrderModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;margin-right:8px;">+ {{ __('messages.new_order') }}</button>
-        <a href="{{ route('provider.restaurant.dashboard') }}" class="btn-primary" style="background:var(--accent); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
+        <div style="display:flex; gap:10px;">
+            <button type="button" onclick="openOrderModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;margin-right:8px;">+ {{ __('messages.new_order') }}</button>
+            <a href="{{ route('provider.restaurant.dashboard') }}" class="btn-primary" style="background:var(--card); color:var(--text); border:1px solid var(--line); padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700; box-shadow:none;">{{ __('messages.back_to_dashboard') }}</a>
+        </div>
     </div>
     <div class="tbl-wrap">
         <table class="tbl">
@@ -31,6 +39,7 @@
                     <th>{{ __('messages.items_col') }}</th>
                     <th>{{ __('messages.amount') }}</th>
                     <th>{{ __('messages.status_col') }}</th>
+                    <th style="text-align:right;">{{ __('messages.actions') ?? 'Actions' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,23 +65,29 @@
                         @endphp
                         <span class="pill" style="background:{{ $c }};">{{ ucfirst($o->status) }}</span>
                     </td>
+                    <td style="text-align:right;">
+                        <form action="{{ route('provider.restaurant.orders.status', $o) }}" method="POST" style="display:inline;margin:0;">
+                            @csrf @method('PATCH')
+                            <select name="status" class="status-select" onchange="this.form.submit()">
+                                <option value="pending" {{ $o->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="preparing" {{ $o->status === 'preparing' ? 'selected' : '' }}>Preparing</option>
+                                <option value="ready" {{ $o->status === 'ready' ? 'selected' : '' }}>Ready</option>
+                                <option value="served" {{ $o->status === 'served' ? 'selected' : '' }}>Served</option>
+                            </select>
+                        </form>
+                        <form action="{{ route('provider.restaurant.orders.destroy', $o) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete this order?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="act-btn act-del"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--muted);">{{ __('messages.no_orders_found') }}</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">{{ __('messages.no_orders_found') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
-
-@php
-if (!isset($tablesData)) {
-    $tablesData = \App\Models\RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get()->map(fn($t) => ['db_id' => $t->id, 'n' => $t->table_number, 'seats' => $t->seats])->all();
-}
-if (!isset($allProducts)) {
-    $allProducts = \App\Models\MenuItem::where('provider_id', $provider->id)->where('is_available', true)->orderBy('name')->get()->map(fn($i) => ['db_id' => $i->id, 'emoji' => $i->emoji ?? 'ðŸ½ï¸', 'name' => $i->name, 'price' => (float) $i->price])->all();
-}
-@endphp
 
 {{-- New Order Modal --}}
 <div id="orderModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
@@ -81,6 +96,14 @@ if (!isset($allProducts)) {
             <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.new_order') }}</h3>
             <button type="button" onclick="closeOrderModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
+        @php
+        if (!isset($tablesData)) {
+            $tablesData = \App\Models\RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get()->map(fn($t) => ['db_id' => $t->id, 'n' => $t->table_number, 'seats' => $t->seats])->all();
+        }
+        if (!isset($allProducts)) {
+            $allProducts = \App\Models\MenuItem::where('provider_id', $provider->id)->where('is_available', true)->orderBy('name')->get()->map(fn($i) => ['db_id' => $i->id, 'emoji' => $i->emoji ?? '🍽️', 'name' => $i->name, 'price' => (float) $i->price])->all();
+        }
+        @endphp
         <form action="{{ route('provider.restaurant.orders.store') }}" method="POST">
             @csrf
             <div style="margin-bottom:20px">
@@ -98,7 +121,7 @@ if (!isset($allProducts)) {
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border-bottom:1px solid #f0f0f0;gap:8px">
                     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
                         <input type="checkbox" class="order-item-check" data-price="{{ $item['price'] ?? 0 }}" name="items[{{ $loop->index }}][id]" value="{{ $item['db_id'] ?? '' }}">
-                        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">{{ $item['emoji'] ?? 'ðŸ½ï¸' }} {{ $item['name'] ?? '' }} (Rs {{ number_format($item['price'] ?? 0) }})</span>
+                        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">{{ $item['emoji'] ?? '🍽️' }} {{ $item['name'] ?? '' }} (Rs {{ number_format($item['price'] ?? 0) }})</span>
                     </div>
                     <input type="number" name="items[{{ $loop->index }}][qty]" class="item-qty" data-price="{{ $item['price'] ?? 0 }}" value="1" min="1" style="width:60px;padding:4px;text-align:center;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12px" disabled>
                 </div>
@@ -108,7 +131,7 @@ if (!isset($allProducts)) {
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:15px;background:var(--bg,#faf6f1);border-radius:12px">
                 <span style="font-size:14px;font-weight:700">{{ __('messages.total_amount') }}</span>
-                <span style="font-size:18px;font-weight:800" id="orderTotalDisplay2">Rs 0</span>
+                <span style="font-size:18px;font-weight:800" id="orderTotalDisplay">Rs 0</span>
             </div>
             <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.create_order') }}</button>
         </form>
@@ -121,15 +144,14 @@ function closeOrderModal() { document.getElementById('orderModal').style.display
 document.getElementById('orderModal').addEventListener('click', function(e) { if (e.target === this) closeOrderModal(); });
 function updateOrderTotal() {
     var total = 0;
-    document.querySelectorAll('#orderModal .order-item-check:checked').forEach(function(chk) {
+    document.querySelectorAll('.order-item-check:checked').forEach(function(chk) {
         var parent = chk.closest('div').parentElement;
         var qty = parent.querySelector('.item-qty');
         total += parseFloat(chk.dataset.price || 0) * (parseInt(qty.value) || 1);
     });
-    var el = document.getElementById('orderTotalDisplay2');
-    if (el) el.textContent = 'Rs ' + total.toLocaleString();
+    document.getElementById('orderTotalDisplay').textContent = 'Rs ' + total.toLocaleString();
 }
-document.querySelectorAll('#orderModal .order-item-check').forEach(function(chk) {
+document.querySelectorAll('.order-item-check').forEach(function(chk) {
     chk.addEventListener('change', function() {
         var parent = this.closest('div').parentElement;
         var qty = parent.querySelector('.item-qty');
@@ -137,8 +159,6 @@ document.querySelectorAll('#orderModal .order-item-check').forEach(function(chk)
         updateOrderTotal();
     });
 });
-document.querySelectorAll('#orderModal .item-qty').forEach(function(q) {
-    q.addEventListener('input', updateOrderTotal);
-});
+document.querySelectorAll('.item-qty').forEach(function(q) { q.addEventListener('input', updateOrderTotal); });
 </script>
 @endsection
