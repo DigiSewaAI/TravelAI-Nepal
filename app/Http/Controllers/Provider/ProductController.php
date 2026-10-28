@@ -49,10 +49,10 @@ class ProductController extends Controller
 
         $maxProducts   = $provider->max_products;
         $canCreateMore = $maxProducts === -1 || $counts['all'] < $maxProducts;
-
-        return view('provider.products.index', compact(
-            'products', 'type', 'counts', 'maxProducts', 'canCreateMore'
-        ));
+                $totalProducts = Product::where('provider_id', $provider->id)->count();
+        $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+                return view('provider.products.index', compact('products', 'counts', 'type', 'maxProducts', 'provider', 'stockHealth'));
     }
 
     public function create(Request $request)
@@ -191,9 +191,8 @@ class ProductController extends Controller
                 ]),
             };
         });
-
         return redirect()
-            ->route('provider.products.index')
+            ->route('provider.inventory.products')
             ->with('success', __('messages.product_created'));
     }
 
