@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-hotel')
 @section('title', __('messages.offers_management'))
 @section('page-title', __('messages.offers_management'))
-@section('page-subtitle', 'Manage hotel promotions and special offers')
+@section('page-subtitle', __('messages.offers_subtitle'))
 
 @section('content')
 <style>
@@ -22,7 +22,7 @@
 
 <div class="off-hero">
   <h1>🎁 {{ __('messages.offers_management') }}</h1>
-  <p>Manage hotel promotions and special offers</p>
+  <p>{{ __('messages.offers_subtitle') }}</p>
 </div>
 
 <div class="off-table">

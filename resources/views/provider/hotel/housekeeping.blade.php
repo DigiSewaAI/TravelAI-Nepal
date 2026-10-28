@@ -47,7 +47,7 @@
 <div class="page-card">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;">
     <div style="font-size:15px;font-weight:800;color:var(--text);">{{ __('messages.housekeeping_tasks_page') }} ({{ $tasks->count() }})</div>
-    <button type="button" onclick="openAddTaskModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;">+ Add Task</button>
+    <button type="button" onclick="openAddTaskModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;">+ {{ __('messages.add_task') }}</button>
   </div>
   <div class="tbl-wrap">
     <table class="tbl">
@@ -57,7 +57,7 @@
           <th>{{ __('messages.room') }}</th>
           <th>{{ __('messages.assigned_to') }}</th>
           <th>{{ __('messages.status') }}</th>
-          <th style="text-align:right;">Actions</th>
+          <th style="text-align:right;">{{ __('messages.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -84,9 +84,9 @@
               <form action="{{ route('provider.hotel.housekeeping.status', $task) }}" method="POST" style="display:inline;margin:0;">
                 @csrf @method('PATCH')
                 <select name="status" class="status-select" onchange="this.form.submit()">
-                  <option value="queue" {{ $task->status === 'queue' ? 'selected' : '' }}>Queue</option>
-                  <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                  <option value="done" {{ $task->status === 'done' ? 'selected' : '' }}>Done</option>
+                  <option value="queue" {{ $task->status === 'queue' ? 'selected' : '' }}>{{ __('messages.status_queue') }}</option>
+                  <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>{{ __('messages.status_in_progress') }}</option>
+                  <option value="done" {{ $task->status === 'done' ? 'selected' : '' }}>{{ __('messages.status_done') }}</option>
                 </select>
               </form>
               <form action="{{ route('provider.hotel.housekeeping.destroy', $task) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete this task?')">

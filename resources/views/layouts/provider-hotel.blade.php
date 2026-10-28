@@ -106,6 +106,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
+    <a href="{{ route('provider.services.index') }}" class="{{ request()->routeIs('provider.services.*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+      {{ __('messages.services') }}
+    </a>
 
     <a href="{{ route('provider.hotel.bookings') }}" class="{{ request()->routeIs('provider.hotel.bookings') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
@@ -195,10 +199,12 @@
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>
       <button class="icon-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+      @if(request()->routeIs('provider.hotel.dashboard', 'provider.hotel.bookings', 'provider.hotel.rooms'))
       <button class="btn-primary" id="newBookingBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
         <span>{{ __('messages.new_booking') }}</span>
       </button>
+      @endif
     </div>
   </header>
   @yield('content')
@@ -293,6 +299,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+{{-- Occupancy Widget Sync (all pages) --}}
+@php
+    if (!isset($occupiedRooms) || !isset($totalRooms)) {
+        $__occP = $provider ?? (auth()->check() ? auth()->user()->ownProvider() : null);
+        if ($__occP) {
+            $totalRooms = \App\Models\HotelRoom::where('provider_id', $__occP->id)->count();
+            $occupiedRooms = \App\Models\HotelRoom::where('provider_id', $__occP->id)->where('status', 'occupied')->count();
+        } else { $totalRooms = 0; $occupiedRooms = 0; }
+    }
+@endphp
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const occ = {{ (int) $occupiedRooms }};
+    const total = {{ (int) $totalRooms }};
+    const pct = total > 0 ? Math.round((occ / total) * 100) : 0;
+    const el = document.getElementById('occVal');
+    const bar = document.getElementById('occBar');
+    if (el) el.innerHTML = pct + '% <small>' + occ + ' / ' + total + '</small>';
+    if (bar) bar.style.width = pct + '%';
+});
+</script>
 @stack('hotel-scripts')
 </body>
 </html>

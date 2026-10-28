@@ -48,7 +48,7 @@
 <div class="page-card">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;">
     <div style="font-size:15px;font-weight:800;color:var(--text);">{{ __('messages.room_management') }} ({{ $rooms->count() }})</div>
-    <button type="button" onclick="openAddRoomModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;">+ Add Room</button>
+    <button type="button" onclick="openAddRoomModal()" style="background:var(--accent);color:#fff;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;">+ {{ __('messages.add_room') }}</button>
   </div>
   <div class="tbl-wrap">
     <table class="tbl">
@@ -58,7 +58,7 @@
           <th>{{ __('messages.type') }}</th>
           <th>{{ __('messages.floor_label') }}</th>
           <th>{{ __('messages.status') }}</th>
-          <th style="text-align:right;">Actions</th>
+          <th style="text-align:right;">{{ __('messages.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -87,7 +87,7 @@
             <td>{{ __('messages.floor_label') }} {{ $room->floor }}</td>
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
             <td style="text-align:right;">
-              <button type="button" class="act-btn act-edit" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ $room->status }}')"><i class="fas fa-edit"></i> Edit</button>
+              <button type="button" class="act-btn act-edit" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ $room->status }}')"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
               <form action="{{ route('provider.hotel.rooms.destroy', $room) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete room {{ $room->room_number }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="act-btn act-del"><i class="fas fa-trash"></i></button>
