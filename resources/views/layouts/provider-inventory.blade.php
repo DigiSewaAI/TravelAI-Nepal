@@ -114,9 +114,9 @@
       {{ __('messages.nav_products') }}
     </a>
 
-    <a href="#" class="disabled">
+    <a href="{{ route('provider.inventory.inventory') }}" class="{{ request()->routeIs('provider.inventory.inventory') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-      {{ __('messages.nav_inventory') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_inventory') }}
     </a>
 
     <a href="{{ route('provider.inventory.orders') }}" class="{{ request()->routeIs('provider.inventory.orders') ? 'active' : '' }}">
@@ -124,14 +124,19 @@
       {{ __('messages.nav_orders') }}
     </a>
 
-    <a href="#" class="disabled">
+    <a href="{{ route('provider.inventory.suppliers') }}" class="{{ request()->routeIs('provider.inventory.suppliers') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
-      {{ __('messages.nav_suppliers') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_suppliers') }}
     </a>
 
-    <a href="#" class="disabled">
+    <a href="{{ route('provider.inventory.reports') }}" class="{{ request()->routeIs('provider.inventory.reports') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
-      {{ __('messages.nav_reports') }} <span class="badge">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_reports') }}
+    </a>
+
+    <a href="{{ route('provider.inventory.offers') }}" class="{{ request()->routeIs('provider.inventory.offers') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      {{ __('messages.offers') }}
     </a>
 
     <a href="{{ route('provider.profile') }}" class="{{ request()->routeIs('provider.profile') ? 'active' : '' }}">

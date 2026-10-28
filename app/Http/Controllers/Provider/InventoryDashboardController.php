@@ -265,4 +265,95 @@ class InventoryDashboardController extends Controller
 
         return view('provider.inventory.orders', compact('provider', 'orders', 'stockHealth'));
     }
+        public function inventoryPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $products = Product::where('provider_id', $provider->id)->orderBy('name')->get();
+
+        $totalProducts = $products->count();
+        $inStockCount = $products->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        $healthy = $products->filter(fn($p) => $p->stock_quantity > $p->low_stock_threshold);
+        $low = $products->filter(fn($p) => $p->stock_quantity > 0 && $p->stock_quantity <= $p->low_stock_threshold);
+        $out = $products->filter(fn($p) => $p->stock_quantity <= 0);
+
+        return view('provider.inventory.inventory', compact('provider', 'products', 'stockHealth', 'healthy', 'low', 'out', 'totalProducts'));
+    }
+
+    public function suppliersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $totalProducts = Product::where('provider_id', $provider->id)->count();
+        $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        $suppliers = collect([]);
+
+        return view('provider.inventory.suppliers', compact('provider', 'suppliers', 'stockHealth'));
+    }
+
+    public function reportsPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $totalProducts = Product::where('provider_id', $provider->id)->where('status', 'active')->count();
+        $lowStockCount = Product::where('provider_id', $provider->id)->where('status', 'active')
+            ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count();
+        $stockValue = (float) Product::where('provider_id', $provider->id)->where('status', 'active')
+            ->selectRaw('SUM(stock_quantity * COALESCE(cost_price, price)) as total')->value('total') ?? 0;
+
+        $ordersToday = Order::whereHas('items', fn($q) => $q->where('provider_id', $provider->id))
+            ->where('created_at', '>=', now()->startOfDay())->count();
+
+        $inStockCount = Product::where('provider_id', $provider->id)->where('status', 'active')
+            ->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        $topProducts = Product::where('provider_id', $provider->id)->where('status', 'active')
+            ->selectRaw('*, (stock_quantity * COALESCE(cost_price, price)) as total_value')
+            ->orderByDesc('total_value')->limit(5)->get();
+
+        $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
+        $chartRaw = OrderItem::join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.provider_id', $provider->id)
+            ->where('orders.created_at', '>=', now()->subDays(6)->startOfDay())
+            ->where('orders.status', '!=', 'cancelled')
+            ->selectRaw('DATE(orders.created_at) as d, SUM(order_items.line_total) as v')
+            ->groupBy('d')->get()->keyBy('d');
+
+        $chartData = [];
+        foreach ($days as $date) {
+            $chartData[] = [
+                'day' => \Carbon\Carbon::parse($date)->format('D'),
+                'value' => (float) (($chartRaw[$date]->v ?? 0)),
+            ];
+        }
+        $chartTotal = collect($chartData)->sum('value');
+
+        return view('provider.inventory.reports', compact('provider', 'totalProducts', 'lowStockCount', 'stockValue', 'ordersToday', 'stockHealth', 'topProducts', 'chartData', 'chartTotal'));
+    }
+
+    public function offersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $totalProducts = Product::where('provider_id', $provider->id)->count();
+        $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
+        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
+        $offers = collect([
+            (object)['title' => 'Seasonal Discount', 'discount' => '15% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
+            (object)['title' => 'Bulk Purchase Deal', 'discount' => '20% Off', 'valid_until' => now()->addDays(30), 'status' => 'active'],
+            (object)['title' => 'Rental Weekend Special', 'discount' => '10% Off', 'valid_until' => now()->addDays(7), 'status' => 'inactive'],
+        ]);
+
+        return view('provider.inventory.offers', compact('provider', 'offers', 'stockHealth'));
+    }
 }

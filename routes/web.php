@@ -261,6 +261,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // Inventory Sidebar Unlocks
     Route::get('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'productsPage'])->name('inventory.products');
     Route::get('/inventory/orders', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'ordersPage'])->name('inventory.orders');
+        Route::get('/inventory/inventory', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'inventoryPage'])->name('inventory.inventory');
+    Route::get('/inventory/suppliers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'suppliersPage'])->name('inventory.suppliers');
+    Route::get('/inventory/reports', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'reportsPage'])->name('inventory.reports');
+    Route::get('/inventory/offers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'offersPage'])->name('inventory.offers');
         // 🆕 Hotel vertical dashboard routes
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');

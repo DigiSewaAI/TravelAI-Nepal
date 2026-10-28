@@ -2755,4 +2755,18 @@ return [
     'location_details' => 'Location & About',
         'visuals' => 'Business Visuals',
     'business_details' => 'Business Details',
+        // Inventory Phase 3
+    'inventory_management' => 'Inventory',
+    'manage_inventory_desc' => 'Full stock overview and management',
+    'suppliers_management' => 'Suppliers',
+    'manage_suppliers_desc' => 'Manage your product suppliers',
+    'add_supplier' => 'Add Supplier',
+    'no_suppliers_found' => 'No suppliers added yet.',
+    'healthy_stock' => 'Healthy',
+    'low_stock' => 'Low Stock',
+    'out_of_stock' => 'Out of Stock',
+    'total_products' => 'Total Products',
+    'product' => 'Product',
+    'stock' => 'Stock',
+    'min' => 'Min',
 ];
