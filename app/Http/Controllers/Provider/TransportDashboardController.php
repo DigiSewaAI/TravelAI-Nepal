@@ -209,4 +209,76 @@ class TransportDashboardController extends Controller
 
         return view('provider.transport.drivers', compact('provider', 'drivers', 'activeFleet', 'totalFleet'));
     }
+        public function reportsPage()
+    {
+        $provider = \App\Models\Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
+            ->first();
+        abort_unless($provider, 403);
+
+        $totalBookings = TransportBooking::where('provider_id', $provider->id)->count();
+        $totalRevenue = (float) TransportBooking::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->sum('amount');
+
+        $activeFleet = TransportVehicle::where('provider_id', $provider->id)
+            ->whereIn('status', ['available', 'on-route'])->count();
+        $totalFleet = TransportVehicle::where('provider_id', $provider->id)->count();
+
+        // 7-day booking chart (matches index() pattern — uses created_at)
+        $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
+        $chartRaw = TransportBooking::where('provider_id', $provider->id)
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as v')
+            ->groupBy('d')->pluck('v', 'd');
+
+        $chartData = [];
+        foreach ($days as $date) {
+            $chartData[] = [
+                'day' => \Carbon\Carbon::parse($date)->format('D'),
+                'trips' => (int) ($chartRaw[$date] ?? 0),
+            ];
+        }
+        $chartTotal = collect($chartData)->sum('trips');
+
+        // Top 5 routes by revenue (group by route_name, amount)
+        $topRoutes = TransportBooking::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->selectRaw('route_name, SUM(amount) as total_revenue, COUNT(*) as booking_count')
+            ->groupBy('route_name')
+            ->orderByDesc('total_revenue')
+            ->limit(5)
+            ->get()
+            ->map(fn($row) => (object)[
+                'name' => $row->route_name ?: '—',
+                'revenue' => (float) $row->total_revenue,
+                'bookings' => (int) $row->booking_count,
+            ]);
+
+        return view('provider.transport.reports', compact(
+            'provider', 'totalBookings', 'totalRevenue',
+            'activeFleet', 'totalFleet',
+            'chartData', 'chartTotal', 'topRoutes'
+        ));
+    }
+
+    public function offersPage()
+    {
+        $provider = \App\Models\Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
+            ->first();
+        abort_unless($provider, 403);
+
+        $activeFleet = TransportVehicle::where('provider_id', $provider->id)
+            ->whereIn('status', ['available', 'on-route'])->count();
+        $totalFleet = TransportVehicle::where('provider_id', $provider->id)->count();
+
+        $offers = collect([
+            (object)['title' => 'Dashain Travel Discount', 'discount' => '20% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
+            (object)['title' => 'Group Booking Special', 'discount' => '15% Off', 'valid_until' => now()->addDays(30), 'status' => 'active'],
+            (object)['title' => 'Weekend Getaway Offer', 'discount' => '10% Off', 'valid_until' => now()->addDays(7), 'status' => 'inactive'],
+        ]);
+
+        return view('provider.transport.offers', compact('provider', 'offers', 'activeFleet', 'totalFleet'));
+    }
 }

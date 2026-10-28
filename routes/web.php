@@ -292,6 +292,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'vehiclesPage'])->name('transport.vehicles');
     Route::get('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'routesPage'])->name('transport.routes');
     Route::get('/transport/drivers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'driversPage'])->name('transport.drivers');
+        Route::get('/transport/reports', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'reportsPage'])->name('transport.reports');
+    Route::get('/transport/offers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'offersPage'])->name('transport.offers');
         // 🆕 Individual Services vertical dashboard routes
     Route::get('/individual/dashboard', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'index'])->name('individual.dashboard');
     Route::patch('/individual/bookings/{booking}/status', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateBookingStatus'])->name('individual.bookings.status');
