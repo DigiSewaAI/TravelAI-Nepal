@@ -2769,4 +2769,5 @@ return [
     'product' => 'Product',
     'stock' => 'Stock',
     'min' => 'Min',
+    'no_menu_items_yet' => 'No menu items added yet.',
 ];
