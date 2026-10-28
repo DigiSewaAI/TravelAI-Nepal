@@ -189,8 +189,14 @@ public function guestsPage()
 public function housekeepingPage()
 {
     $provider = Auth::user()->ownProvider();
+    abort_unless($provider, 403);
+
     $tasks = HousekeepingTask::with('room')->where('provider_id', $provider->id)->latest()->get();
-    return view('provider.hotel.housekeeping', compact('provider', 'tasks'));
+    $rooms = HotelRoom::where('provider_id', $provider->id)->orderBy('room_number')->get();
+    $totalRooms = HotelRoom::where('provider_id', $provider->id)->count();
+    $occupiedRooms = HotelRoom::where('provider_id', $provider->id)->where('status', 'occupied')->count();
+
+    return view('provider.hotel.housekeeping', compact('provider', 'tasks', 'rooms', 'totalRooms', 'occupiedRooms'));
 }
     public function reportsPage()
     {
@@ -258,5 +264,128 @@ public function housekeepingPage()
         ]);
 
         return view('provider.hotel.offers', compact('provider', 'offers'));
+    }
+
+    public function storeRoom(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'room_number' => 'required|string|max:20',
+            'room_type'   => 'required|string|max:50',
+            'floor'       => 'required|integer|min:1',
+            'status'      => 'nullable|in:available,occupied,reserved,dirty,maintenance',
+        ]);
+
+        $exists = HotelRoom::where('provider_id', $provider->id)
+            ->where('room_number', $validated['room_number'])
+            ->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['room_number' => 'This room number already exists.'])->withInput();
+        }
+
+        HotelRoom::create([
+            'provider_id' => $provider->id,
+            'room_number' => $validated['room_number'],
+            'room_type'   => $validated['room_type'],
+            'floor'       => $validated['floor'],
+            'status'      => $validated['status'] ?? 'available',
+        ]);
+
+        return redirect()->back()->with('success', 'Room added successfully.');
+    }
+
+    public function updateRoom(Request $request, HotelRoom $room)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $room->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'room_number' => 'required|string|max:20',
+            'room_type'   => 'required|string|max:50',
+            'floor'       => 'required|integer|min:1',
+            'status'      => 'required|in:available,occupied,reserved,dirty,maintenance',
+        ]);
+
+        $exists = HotelRoom::where('provider_id', $provider->id)
+            ->where('room_number', $validated['room_number'])
+            ->where('id', '!=', $room->id)
+            ->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['room_number' => 'This room number already exists.'])->withInput();
+        }
+
+        $room->update($validated);
+
+        return redirect()->back()->with('success', 'Room updated successfully.');
+    }
+
+    public function destroyRoom(HotelRoom $room)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $room->provider_id === $provider->id, 403);
+
+        $activeBookings = HotelBooking::where('room_id', $room->id)
+            ->whereIn('status', ['pending', 'checked_in'])->exists();
+        if ($activeBookings) {
+            return redirect()->back()->with('error', 'Cannot delete this room - it has active bookings.');
+        }
+
+        $room->delete();
+
+        return redirect()->back()->with('success', 'Room deleted successfully.');
+    }
+
+    public function storeTask(Request $request)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'task_name'   => 'required|string|max:100',
+            'room_id'     => 'nullable|integer|exists:hotel_rooms,id',
+            'assigned_to' => 'nullable|string|max:100',
+            'status'      => 'nullable|in:queue,in_progress,done',
+        ]);
+
+        HousekeepingTask::create([
+            'provider_id' => $provider->id,
+            'room_id'     => $validated['room_id'] ?? null,
+            'task_name'   => $validated['task_name'],
+            'assigned_to' => $validated['assigned_to'] ?? null,
+            'status'      => $validated['status'] ?? 'queue',
+        ]);
+
+        return redirect()->back()->with('success', 'Task added successfully.');
+    }
+
+    public function updateTaskStatus(Request $request, HousekeepingTask $task)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $task->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'status' => 'required|in:queue,in_progress,done',
+        ]);
+
+        $task->status = $validated['status'];
+        $task->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'status' => $task->status]);
+        }
+
+        return redirect()->back()->with('success', 'Task status updated.');
+    }
+
+    public function destroyTask(HousekeepingTask $task)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $task->provider_id === $provider->id, 403);
+
+        $task->delete();
+
+        return redirect()->back()->with('success', 'Task deleted successfully.');
     }
 }

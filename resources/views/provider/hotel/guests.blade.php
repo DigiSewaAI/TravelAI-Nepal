@@ -65,4 +65,25 @@
     </table>
   </div>
 </div>
+
+@php
+    if (!isset($occupiedRooms) || !isset($totalRooms)) {
+        $__p = $provider ?? (auth()->check() ? auth()->user()->ownProvider() : null);
+        if ($__p) {
+            $totalRooms = \App\Models\HotelRoom::where('provider_id', $__p->id)->count();
+            $occupiedRooms = \App\Models\HotelRoom::where('provider_id', $__p->id)->where('status', 'occupied')->count();
+        } else { $totalRooms = 0; $occupiedRooms = 0; }
+    }
+@endphp
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const occ = {{ (int) $occupiedRooms }};
+    const total = {{ (int) $totalRooms }};
+    const pct = total > 0 ? Math.round((occ / total) * 100) : 0;
+    const el = document.getElementById('occVal');
+    const bar = document.getElementById('occBar');
+    if (el) el.innerHTML = pct + '% <small>' + occ + ' / ' + total + '</small>';
+    if (bar) bar.style.width = pct + '%';
+});
+</script>
 @endsection

@@ -215,6 +215,84 @@
   document.getElementById('hamburger').addEventListener('click',()=>{sidebar.classList.add('open');overlay.classList.add('show')});
   overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('show')});
 </script>
+
+{{-- New Booking Modal (universal) --}}
+@php
+    $__modalRooms = $rooms ?? collect();
+    if ($__modalRooms->isEmpty() ?? true) {
+        $__modalP = auth()->check() ? auth()->user()->ownProvider() : null;
+        if ($__modalP) {
+            $__modalRooms = \App\Models\HotelRoom::where('provider_id', $__modalP->id)->orderBy('room_number')->get();
+        }
+    }
+@endphp
+<div id="bookingModal" style="display:none;position:fixed;inset:0;background:rgba(14,23,38,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
+    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:520px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.new_booking') }}</h3>
+            <button type="button" id="closeBookingModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
+        </div>
+        <form action="{{ route('provider.hotel.bookings.store') }}" method="POST">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.guest_name') }}</label>
+                    <input type="text" name="guest_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.email_optional') }}</label>
+                    <input type="email" name="guest_email" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.room') }}</label>
+                    <select name="room_id" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                        @foreach($__modalRooms as $r)
+                            <option value="{{ $r->id }}">{{ __('messages.room') }} {{ $r->room_number }} ({{ $r->room_type }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.amount_rs') }}</label>
+                    <input type="number" name="amount" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.checkin_col') }}</label>
+                    <input type="date" name="check_in_date" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.checkout_col') }}</label>
+                    <input type="date" name="check_out_date" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.payment_status') }}</label>
+                    <select name="payment_status" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                        <option value="pending">{{ __('messages.pending') }}</option>
+                        <option value="paid">{{ __('messages.paid') }}</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.create_booking') }}</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var bm = document.getElementById('bookingModal');
+    document.getElementById('newBookingBtn')?.addEventListener('click', function() {
+        if (bm) bm.style.display = 'flex';
+    });
+    document.getElementById('closeBookingModal')?.addEventListener('click', function() {
+        if (bm) bm.style.display = 'none';
+    });
+    if (bm) {
+        bm.addEventListener('click', function(e) {
+            if (e.target === bm) bm.style.display = 'none';
+        });
+    }
+});
+</script>
+
 @stack('hotel-scripts')
 </body>
 </html>

@@ -276,6 +276,12 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/inventory/offers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'offersPage'])->name('inventory.offers');
         // 🆕 Hotel vertical dashboard routes
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
+    Route::post('/hotel/rooms', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeRoom'])->name('hotel.rooms.store');
+    Route::put('/hotel/rooms/{room}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoom'])->name('hotel.rooms.update');
+    Route::delete('/hotel/rooms/{room}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyRoom'])->name('hotel.rooms.destroy');
+    Route::post('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeTask'])->name('hotel.housekeeping.store');
+    Route::patch('/hotel/housekeeping/{task}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateTaskStatus'])->name('hotel.housekeeping.status');
+    Route::delete('/hotel/housekeeping/{task}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyTask'])->name('hotel.housekeeping.destroy');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
     Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
         // Hotel CRUD Routes
