@@ -120,6 +120,8 @@ class ProductController extends Controller
             ],
             'rental' => [
                 'rental_price_per_day' => 'required|numeric|min:0',
+                'stock_quantity'       => 'required|integer|min:0',
+                'sku'                  => 'nullable|string|max:100',
                 'rental_deposit'       => 'nullable|numeric|min:0',
                 'rental_condition'     => 'nullable|string|max:50',
                 'rental_min_days'      => 'nullable|integer|min:1',
@@ -130,6 +132,8 @@ class ProductController extends Controller
             ],
             'wholesale' => [
                 'min_order_qty' => 'required|integer|min:1',
+                'stock_quantity' => 'required|integer|min:0',
+                'sku'            => 'nullable|string|max:100',
                 'bulk_pricing'  => 'nullable|array',
             ],
         });
@@ -165,6 +169,8 @@ class ProductController extends Controller
                 'cover_image'  => $validated['cover_image'] ?? null,
                 'status'       => $validated['status'],
                 'location_id'  => $validated['location_id'] ?? null,
+                'stock_quantity' => (int) ($validated['stock_count'] ?? $validated['stock_quantity'] ?? 0),
+                'sku'            => $validated['sku'] ?? null,
             ]);
 
             match ($type) {
@@ -237,6 +243,8 @@ class ProductController extends Controller
             ],
             'rental' => [
                 'rental_price_per_day' => 'required|numeric|min:0',
+                'stock_quantity'       => 'required|integer|min:0',
+                'sku'                  => 'nullable|string|max:100',
                 'rental_deposit'       => 'nullable|numeric|min:0',
                 'rental_condition'     => 'nullable|string|max:50',
                 'rental_min_days'      => 'nullable|integer|min:1',
@@ -247,6 +255,8 @@ class ProductController extends Controller
             ],
             'wholesale' => [
                 'min_order_qty' => 'required|integer|min:1',
+                'stock_quantity' => 'required|integer|min:0',
+                'sku'            => 'nullable|string|max:100',
                 'bulk_pricing'  => 'nullable|array',
             ],
         });
