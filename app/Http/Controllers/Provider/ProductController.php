@@ -278,13 +278,15 @@ class ProductController extends Controller
 
         DB::transaction(function () use ($product, $validated, $type) {
             $product->update([
-                'name'        => $validated['name'],
-                'description' => $validated['description'] ?? null,
-                'price'       => $validated['price'],
-                'currency'    => $validated['currency'],
-                'cover_image' => $validated['cover_image'] ?? null,
-                'status'      => $validated['status'],
-                'location_id' => $validated['location_id'] ?? null,
+                'name'           => $validated['name'],
+                'description'    => $validated['description'] ?? null,
+                'price'          => $validated['price'],
+                'currency'       => $validated['currency'],
+                'cover_image'    => $validated['cover_image'] ?? null,
+                'status'         => $validated['status'],
+                'location_id'    => $validated['location_id'] ?? null,
+                'stock_quantity' => (int) ($validated['stock_count'] ?? $validated['stock_quantity'] ?? $product->stock_quantity),
+                'sku'            => $validated['sku'] ?? $product->sku,
             ]);
 
             match ($type) {
