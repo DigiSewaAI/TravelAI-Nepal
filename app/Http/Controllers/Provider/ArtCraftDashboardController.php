@@ -214,4 +214,85 @@ class ArtCraftDashboardController extends Controller
             'provider', 'orders', 'completedWorks', 'rating', 'clients'
         ));
     }
+        public function artistsPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->where('slug', 'art-craft'))
+            ->first();
+        abort_unless($provider, 403);
+
+        $artists = Artwork::where('provider_id', $provider->id)
+            ->whereNotNull('artist_name')
+            ->where('artist_name', '!=', '')
+            ->selectRaw('artist_name, COUNT(*) as artwork_count, SUM(CASE WHEN status = ? THEN price ELSE 0 END) as revenue, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as sold_count', ['sold', 'sold'])
+            ->groupBy('artist_name')
+            ->orderByDesc('artwork_count')
+            ->get();
+
+        $totalArtists = $artists->count();
+
+        // Sidebar stats (match dashboard pattern)
+        $totalArtworks = Artwork::where('provider_id', $provider->id)->count();
+        $artistName = $provider->name;
+        $rating = 4.9;
+        $clients = CustomOrder::where('provider_id', $provider->id)
+            ->distinct('client_email')->count('client_email');
+                    // Sidebar compatibility (layout uses $completedWorks)
+        $completedWorks = $totalArtworks;
+
+                return view('provider.art-craft.artists', compact(
+            'provider', 'artists', 'totalArtists',
+            'totalArtworks', 'completedWorks', 'artistName', 'rating', 'clients'
+        ));
+    }
+
+    public function salesPage()
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->where('slug', 'art-craft'))
+            ->first();
+        abort_unless($provider, 403);
+
+        // Sold artworks (all-time)
+        $soldArtworks = Artwork::where('provider_id', $provider->id)
+            ->where('status', 'sold')
+            ->orderByDesc('updated_at')
+            ->get();
+
+        $totalRevenue = (float) $soldArtworks->sum('price');
+        $soldCount = $soldArtworks->count();
+        $avgPrice = $soldCount > 0 ? $totalRevenue / $soldCount : 0;
+
+        // 7-day chart (uses updated_at — no sold_at column exists)
+        $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
+        $salesRaw = Artwork::where('provider_id', $provider->id)
+            ->where('status', 'sold')
+            ->where('updated_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(updated_at) as d, SUM(price) as v')
+            ->groupBy('d')->pluck('v', 'd');
+
+        $chartData = [];
+        foreach ($days as $date) {
+            $chartData[] = [
+                'day' => \Carbon\Carbon::parse($date)->format('D'),
+                'value' => (float) ($salesRaw[$date] ?? 0),
+            ];
+        }
+        $chartTotal = collect($chartData)->sum('value');
+
+        // Sidebar stats
+        $totalArtworks = Artwork::where('provider_id', $provider->id)->count();
+        $artistName = $provider->name;
+        $rating = 4.9;
+        $clients = CustomOrder::where('provider_id', $provider->id)
+            ->distinct('client_email')->count('client_email');
+                    // Sidebar compatibility (layout uses $completedWorks)
+        $completedWorks = $totalArtworks;
+
+                return view('provider.art-craft.sales', compact(
+            'provider', 'soldArtworks', 'totalRevenue', 'soldCount', 'avgPrice',
+            'chartData', 'chartTotal',
+            'totalArtworks', 'completedWorks', 'artistName', 'rating', 'clients'
+        ));
+    }
 }

@@ -317,6 +317,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyArtwork'])->name('art-craft.artworks.destroy');
     Route::post('/art-craft/orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeCustomOrder'])->name('art-craft.orders.store');
     Route::delete('/art-craft/orders/{order}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyOrder'])->name('art-craft.orders.destroy');
+        Route::get('/art-craft/artists', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'artistsPage'])->name('art-craft.artists');
+    Route::get('/art-craft/sales', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'salesPage'])->name('art-craft.sales');
 
     // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
