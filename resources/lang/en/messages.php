@@ -2332,4 +2332,5 @@ return [
     'update_vehicle' => 'Update Vehicle',
     'transport_reports_subtitle' => 'Revenue, bookings, and fleet performance',
     'total_vehicles' => 'Total Vehicles',
+    'passenger_email' => 'Email (Optional)',
 ];

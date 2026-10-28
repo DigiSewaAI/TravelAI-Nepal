@@ -2353,4 +2353,5 @@ return [
     'update_vehicle' => 'सवारी अद्यावधिक',
     'transport_reports_subtitle' => 'आम्दानी, बुकिङ र फ्लीट प्रदर्शन',
     'total_vehicles' => 'कुल सवारी',
+    'passenger_email' => 'इमेल (वैकल्पिक)',
 ];
