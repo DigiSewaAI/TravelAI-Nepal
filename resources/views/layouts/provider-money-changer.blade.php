@@ -110,21 +110,24 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       {{ __('messages.dashboard') }}
     </a>
-    <a href="#" class="disabled">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-      {{ __('messages.nav_exchange_rates') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+        <a href="{{ route('provider.money-changer.rates') }}" class="{{ request()->routeIs('provider.money-changer.rates') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      {{ __('messages.nav_exchange_rates') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.money-changer.transactions') }}" class="{{ request()->routeIs('provider.money-changer.transactions') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-1V2H4z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
-      {{ __('messages.nav_transactions') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_transactions') }}
     </a>
-    <a href="#" class="disabled">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      {{ __('messages.nav_customers') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+
+    <a href="{{ route('provider.money-changer.customers') }}" class="{{ request()->routeIs('provider.money-changer.customers') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {{ __('messages.nav_customers') }}
     </a>
-    <a href="#" class="disabled">
+
+    <a href="{{ route('provider.money-changer.reports') }}" class="{{ request()->routeIs('provider.money-changer.reports') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
-      {{ __('messages.nav_reports') }} <span class="badge soon">{{ __('messages.soon') }}</span>
+      {{ __('messages.nav_reports') }}
     </a>
     <a href="{{ route('provider.profile') }}" class="{{ request()->routeIs('provider.profile') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>

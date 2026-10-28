@@ -252,6 +252,10 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/money-changer/rates/{rate}', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'destroyRate'])->name('money-changer.rates.destroy');
     Route::post('/money-changer/transactions', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'storeTransaction'])->name('money-changer.transactions.store');
     Route::delete('/money-changer/transactions/{transaction}', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'destroyTransaction'])->name('money-changer.transactions.destroy');
+        Route::get('/money-changer/rates', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'ratesPage'])->name('money-changer.rates');
+    Route::get('/money-changer/transactions', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'transactionsPage'])->name('money-changer.transactions');
+    Route::get('/money-changer/customers', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'customersPage'])->name('money-changer.customers');
+    Route::get('/money-changer/reports', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'reportsPage'])->name('money-changer.reports');
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
     Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');

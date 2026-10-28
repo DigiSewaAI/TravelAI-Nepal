@@ -203,4 +203,119 @@ class MoneyChangerDashboardController extends Controller
         $transaction->delete();
         return back()->with('success', __('messages.transaction_deleted_success'));
     }
+        public function ratesPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $rates = ProviderExchangeRate::where('provider_id', $provider->id)
+            ->orderBy('currency_code')
+            ->orderByDesc('effective_date')
+            ->get();
+
+        $activeCount = $rates->where('is_active', true)->count();
+        $currencyCount = $rates->pluck('currency_code')->unique()->count();
+
+        return view('provider.money-changer.rates', compact('provider', 'rates', 'activeCount', 'currencyCount'));
+    }
+
+    public function transactionsPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $transactions = ExchangeTransaction::where('provider_id', $provider->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $totalVolume = (float) $transactions->where('status', '!=', 'cancelled')->sum('npr_amount');
+        $totalProfit = (float) $transactions->where('status', '!=', 'cancelled')->sum('profit');
+        $buyCount = $transactions->where('type', 'buy')->where('status', '!=', 'cancelled')->count();
+        $sellCount = $transactions->where('type', 'sell')->where('status', '!=', 'cancelled')->count();
+
+        return view('provider.money-changer.transactions', compact('provider', 'transactions', 'totalVolume', 'totalProfit', 'buyCount', 'sellCount'));
+    }
+
+    public function customersPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $customers = ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->selectRaw('customer_name, customer_initials, COUNT(*) as tx_count, SUM(npr_amount) as total_volume, SUM(profit) as total_profit, MAX(created_at) as last_tx_at')
+            ->groupBy('customer_name', 'customer_initials')
+            ->orderByDesc('total_volume')
+            ->get();
+
+        $totalCustomers = $customers->count();
+        $repeatCustomers = $customers->where('tx_count', '>', 1)->count();
+        $totalVolume = (float) $customers->sum('total_volume');
+
+        return view('provider.money-changer.customers', compact('provider', 'customers', 'totalCustomers', 'repeatCustomers', 'totalVolume'));
+    }
+
+    public function reportsPage()
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider, 403);
+
+        $today = now()->startOfDay();
+
+        $allTimeVolume = (float) ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->sum('npr_amount');
+        $allTimeProfit = (float) ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->sum('profit');
+        $totalTxCount = ExchangeTransaction::where('provider_id', $provider->id)->count();
+        $todayVolume = (float) ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->where('created_at', '>=', $today)
+            ->sum('npr_amount');
+
+        // 7-day buy vs sell chart (same pattern as dashboard index)
+        $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
+        $weeklyRaw = ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as d, type, SUM(npr_amount) as v')
+            ->groupBy('d', 'type')
+            ->get()
+            ->groupBy('d');
+
+        $chartData = [];
+        foreach ($days as $date) {
+            $dayTx = $weeklyRaw[$date] ?? collect();
+            $chartData[] = [
+                'day'  => \Carbon\Carbon::parse($date)->format('D'),
+                'buy'  => (float) $dayTx->where('type', 'buy')->sum('v'),
+                'sell' => (float) $dayTx->where('type', 'sell')->sum('v'),
+            ];
+        }
+        $chartTotal = collect($chartData)->sum('buy') + collect($chartData)->sum('sell');
+
+        // Top 5 currencies by volume
+        $topCurrencies = ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->selectRaw('currency_code, COUNT(*) as tx_count, SUM(npr_amount) as total_volume')
+            ->groupBy('currency_code')
+            ->orderByDesc('total_volume')
+            ->limit(5)
+            ->get();
+
+        // Top 5 customers by volume
+        $topCustomers = ExchangeTransaction::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
+            ->selectRaw('customer_name, SUM(npr_amount) as total_volume, COUNT(*) as tx_count')
+            ->groupBy('customer_name')
+            ->orderByDesc('total_volume')
+            ->limit(5)
+            ->get();
+
+        return view('provider.money-changer.reports', compact(
+            'provider', 'allTimeVolume', 'allTimeProfit', 'totalTxCount', 'todayVolume',
+            'chartData', 'chartTotal', 'topCurrencies', 'topCustomers'
+        ));
+    }
 }
