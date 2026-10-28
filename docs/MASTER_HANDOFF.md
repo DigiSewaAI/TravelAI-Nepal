@@ -1,103 +1,129 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER SYSTEM AUDIT REPORT (UPDATED — 7/7 MODULES COMPLETE)
+👑 MASTER SYSTEM AUDIT REPORT (UPDATED — QA IN PROGRESS)
 FROM: Assistant (Current Session)
 TO:   Master / Future Reference
-DATE: 2026-10-28 (Session 3)
-HEAD: Local main (69+ commits ahead of origin/main)
-STATUS: 🟢 7/7 Modules Complete (all verticals fully unlocked) | 🟢 Services redesign | 🟡 QA Audit Pending | 🔴 SEO & Push Locked
+DATE: 2026-10-28 (Session 5)
+HEAD: Local main (80 commits ahead of origin/main)
+STATUS: 🟢 7/7 Verticals Complete | 🟢 Restaurant QA PASSED | 🟢 Inventory QA PASSED | 🟡 Hotel Next | 🔴 SEO & Push Locked
 ═══════════════════════════════════════════════════════════
 
 ## 🎉 MAJOR MILESTONE — All 7 Verticals 100% Complete
 
-| # | Module | Status |
-|---|--------|--------|
-| 1 | 🍜 Restaurant | ✅ 100% (Orders, Menu, Tables, Reports, Offers) |
-| 2 | 📦 Inventory | ✅ 100% (Products, Orders, Inventory, Suppliers, Reports, Offers) |
-| 3 | 🏨 Hotel | ✅ 100% (Bookings, Rooms, Guests, Housekeeping, Reports, Offers) |
-| 4 | ✈️ Transport | ✅ 100% (Vehicles, Routes, Drivers, Reports, Offers) |
-| 5 | 🎨 Art/Craft | ✅ 100% (Gallery, Custom Orders, Artists, Sales) |
-| 6 | 🧑‍✈️ Individual | ✅ 100% (Bookings, Calendar, Earnings, Reviews, Services link) |
-| 7 | 💱 Money Changer | ✅ 100% (Rates, Transactions, Customers, Reports) |
-
-**Plus:** Staff premium redesign, Services index/create/edit redesign, Profile links, theme-aware shared pages, universal footer — all complete.
+| # | Module | Code Status | QA Status |
+|---|--------|-------------|-----------|
+| 1 | 🍜 Restaurant | ✅ 100% | ✅ QA PASSED (5/5) |
+| 2 | 📦 Inventory | ✅ 100% | ✅ QA PASSED (7/7) |
+| 3 | 🏨 Hotel | ✅ 100% | ⏳ Next (3/7) |
+| 4 | ✈️ Transport | ✅ 100% | ⏳ Pending |
+| 5 | 🎨 Art/Craft | ✅ 100% | ⏳ Pending |
+| 6 | 🧑‍✈️ Individual | ✅ 100% | ⏳ Pending |
+| 7 | 💱 Money Changer | ✅ 100% | ⏳ Pending |
 
 ═══════════════════════════════════════════════════════════
 
-## 📊 SESSION 3 WORK
+## ✅ SESSION 4 — RESTAURANT QA (PASSED)
 
-### 1. Individual "My Services" — COMPLETE ✅
-- Sidebar link added → `provider.services.index` (existing generic resource)
-- Preserved R4 scope lock — no new pages
+**Date:** 2026-10-28
+**Commits:** 01d5db3 → de32c5f
 
-### 2. Services Premium Redesign — COMPLETE ✅
-- **Index** (`services/index.blade.php`): Hero + 3 stat cards + premium table with theme pills, action buttons, itinerary status
-- **Create** (`services/create.blade.php`): Hero + sectioned form cards + theme-colored submit/cancel
-- **Edit** (`services/edit.blade.php`): Same as create + existing data + cover image "view" link
-- **Fix:** Tailwind `hidden` class not compiled → added `.category-fields.hidden{display:none !important}` inline CSS
-- **Fix:** `messages.category_specific_fields` raw key → "Additional Details" literal
-- All 9 `_fields_*.blade.php` partials untouched (Trek/Tour/Hotel/Activity/Experience/Transport/Restaurant/MoneyChanger/ArtCraft)
-- Category-aware JS preserved (slug-based show/hide + disable)
+### Bugs Fixed
+| # | Bug | Commit |
+|---|-----|--------|
+| 1 | Missing "Add Menu/Order" buttons | `01d5db3` + `0e3448d` |
+| 2 | Corrupted emoji 🍽️ (14 bytes, double-encode) | `6e6eaf1` |
+| 3 | Missing `no_menu_items_yet` translation | `0e3448d` |
+| 4 | Menu/Orders no Actions column (Edit/Delete) | `9b28bb7` |
+| 5 | Status dropdown returned raw JSON (dual-response) | `9b28bb7` |
+| 6 | Tables — no CRUD (Add/Edit/Delete) | `de32c5f` |
+| 7 | "Available" vs "free" status mismatch | `de32c5f` |
+| 8 | updateTableStatus JSON only | `de32c5f` |
 
-### 3. Money Changer Phase 3 — COMPLETE ✅
-- **Rates** (`rates.blade.php`): 3 stat cards + table (currency flag/code/name, buy/sell, effective, status, delete)
-- **Transactions** (`transactions.blade.php`): 4 stat cards + 11-column table (tx#, customer, type, currency, foreign amount, rate, NPR, profit, status, date, delete)
-- **Customers** (`customers.blade.php`): 3 stat cards + customer cards (avatar, tx count, volume, profit)
-- **Reports** (`reports.blade.php`): 4 stat cards + 7-day buy/sell chart + Top 5 currencies + Top 5 customers
-- **Sidebar:** All 4 "Soon" links unlocked
-- **Modal buttons:** "Add New Rate" / "Add Transaction" → modals inline (not dashboard redirect)
-- **Verified schema:** `npr_amount` (not `total`), `profit`, `type` (buy/sell), `status`, `customer_name`, `currency_code`, `buy_rate`/`sell_rate`
-- 4 new controller methods (ratesPage, transactionsPage, customersPage, reportsPage), 4 routes
+### Test Results (5/5)
+- Sidebar links (10/10) ✅
+- CRUD (Menu, Orders, Tables) ✅
+- i18n EN/NP (no raw keys) ✅
+- Layout (orange theme, mobile) ✅
+- Console (clean) ✅
+
+═══════════════════════════════════════════════════════════
+
+## ✅ SESSION 5 — INVENTORY QA (PASSED)
+
+**Date:** 2026-10-28
+**Commits:** 32bf533 → 8bdfcc7
+
+### Verified Provider Types
+- Rental (Himalayan Gear) ✅
+- Wholesale (SAI) ✅
+- Shop (generic form code path)
+
+### Bugs Fixed
+| # | Bug | Commit |
+|---|-----|--------|
+| 1 | Missing `use Illuminate\Support\Str` (500 error) | `e268543` |
+| 2 | Products no Actions column (Edit/Delete) | `e268543` |
+| 3 | No `updateProduct` method + route | `e268543` |
+| 4 | Stock widget `--` on products/orders | `e268543` |
+| 5 | Create/Edit plain design | `32bf533` |
+| 6 | `store()` redirect → premium `inventory.products` | `039c407` |
+| 7 | Missing translations: `everything_healthy`, `all_well_stocked`, `no_sku` | `039c407` + `8bdfcc7` |
+| 8 | Stock+SKU missing in rental/wholesale partials | `8bdfcc7` |
+| 9 | Update block not saving `stock_quantity` + `sku` | `41a50e1` |
+
+### Test Results (7/7)
+- Sidebar (9/9 links) ✅
+- Products CRUD (all 3 types) ✅
+- Orders (read-only accept) ✅
+- Stock Widget (all pages) ✅
+- Create/Edit premium design ✅
+- i18n 95% (2 section titles English — accept)
+- Console ✅
 
 ═══════════════════════════════════════════════════════════
 
 ## 🎨 Shared View Theming Pattern (CRITICAL — Follow Strictly)
 
-All shared views must use CSS variables:
+All shared views use CSS variables:
 - `var(--accent, #2563eb)` — brand color (Trekking blue fallback)
 - `var(--accent-d, #1d4ed8)` — darker
 - `var(--accent-soft, #eff6ff)` — soft bg
 - `var(--card, #fff)`, `var(--line, #e5e7eb)`, `var(--text, #1f2937)`, `var(--muted, #6b7280)`
 - Semantic: `var(--green-soft)`, `var(--red-soft)`, `var(--blue-soft)`, `var(--purple-soft)`
 
-**Why:** Trekking `provider.blade.php` doesn't define `--accent` → uses Tailwind blue fallback. Verticals define `--accent` in `:root` → auto-match. One file, 8 themes.
+**Why:** Trekking `provider.blade.php` doesn't define `--accent` → Tailwind blue fallback. Verticals define `--accent` in `:root` → auto-match. One file, 8 themes.
 
 **Never do:**
 - Hardcode hex like `#f97316` as fallback
-- Use layout-specific classes (e.g., `sidebar-link`) in shared views
-- Touch `provider.blade.php` — Trekking identity preserved
-- Touch `provider-restaurant.blade.php` `:root` — has `--accent:#f97316`
+- Use layout-specific classes in shared views
+- Touch `provider.blade.php` (Trekking preserved)
+- Touch `provider-restaurant.blade.php` `:root` (has `--accent:#f97316`)
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 NEXT PRIORITY — Full QA Audit
+## 🎯 REMAINING QA (5/7 modules)
 
-### Per Module — 5 Tests
-| # | Module | Sidebar | CRUD | i18n | Layout | Console | Status |
-|---|--------|---------|------|------|--------|---------|--------|
-| 1 | 🍜 Restaurant | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 2 | 📦 Inventory | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 3 | 🏨 Hotel | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 4 | ✈️ Transport | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 5 | 🎨 Art/Craft | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 6 | 🧑‍✈️ Individual | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
-| 7 | 💱 Money Changer | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready |
+| # | Module | Order |
+|---|--------|-------|
+| 3 | 🏨 Hotel | **NEXT** |
+| 4 | ✈️ Transport | After Hotel |
+| 5 | 🎨 Art/Craft | After Transport |
+| 6 | 🧑‍✈️ Individual | After Art/Craft |
+| 7 | 💱 Money Changer | Last |
 
-**Also test:** Services (index/create/edit) across all 8 verticals.
-
-### QA Test Categories
-- **A. Sidebar Links:** All open, no 404, active state correct
-- **B. CRUD:** Create/Read/Update/Delete working (modals submit properly)
-- **C. Multilingual:** EN/NP — no raw `messages.xxx` keys
-- **D. Layout:** Topbar wrap, buttons natural, no duplicates, mobile responsive
-- **E. Console:** No JS errors, no 404/500 network errors
+### QA Protocol (per module — 5 tests)
+- A. Sidebar Links (all open, no 404, active state)
+- B. CRUD (Create/Read/Update/Delete, modals work)
+- C. i18n (EN/NP, no raw `messages.xxx`)
+- D. Layout (topbar, buttons, mobile)
+- E. Console (no JS/network errors)
 
 ═══════════════════════════════════════════════════════════
 
 ## 🔴 LOCKED ITEMS (Owner's Orders)
 
-### 🔒 SEO Fix (robots.txt) — untouched, will do 5 mins before Push
+### 🔒 SEO Fix (robots.txt) — untouched, 5 mins before Push
 ### 🔒 Payment-Gate-Middleware — not started
-### 🔒 Push-to-Production (R17) — **69+ commits local**, not pushed
+### 🔒 Push-to-Production (R17) — **80 commits local**, not pushed
 
 ═══════════════════════════════════════════════════════════
 
@@ -105,24 +131,22 @@ All shared views must use CSS variables:
 
 | Item | Status |
 |------|--------|
-| **HEAD** | Local main, +69 commits ahead |
+| **HEAD** | Local main, +80 commits ahead |
 | **Tests** | 186/186 passing |
 | **Vertical Dashboards** | 7/7 complete |
-| **CRUD & Translations** | 7/7 complete |
-| **Phase 3 Sidebar Unlock** | **7/7 complete** ✅ |
-| **Staff Premium Redesign** | ✅ Complete |
-| **Services Premium Redesign** | ✅ Complete (index/create/edit) |
-| **Profile Link** | ✅ All 8 layouts (user icons) |
-| **Theme-Aware Shared Pages** | ✅ Complete |
-| **Money Changer Modals** | ✅ Inline (rates/transactions pages) |
-| **QA Audit** | 🟡 0/7 — START HERE |
+| **Phase 3 Sidebar Unlock** | 7/7 complete |
+| **Restaurant QA** | ✅ PASSED (Session 4) |
+| **Inventory QA** | ✅ PASSED (Session 5) |
+| **Hotel QA** | ⏳ Next |
+| **Transport / Art/Craft / Individual / Money Changer QA** | ⏳ Pending |
+| **Profile/Settings Redesign** | 🟡 Pending (functional but plain) |
 | **SEO / Payment / Push** | 🔴 Locked |
 
 ═══════════════════════════════════════════════════════════
 
 ## 📋 RULES STATUS
-- R3 (Evidence only) ✅ — verified all schemas before implement
-- R4 (Scope locked) ✅ — no DB migrations, placeholder data for empty modules
+- R3 (Evidence only) ✅ — verified schemas before every fix
+- R4 (Scope locked) ✅ — no scope creep (Master GO for Tables CRUD)
 - R8 (Additive migrations) ✅
 - R13 (Individual git add) ✅
 - R16 (186+ tests before commit) ✅
@@ -130,56 +154,44 @@ All shared views must use CSS variables:
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 RECOMMENDED SEQUENCE
-
-### Step 1: Full QA Audit (7 modules one-by-one)
-Order: Restaurant → Inventory → Hotel → Transport → Art/Craft → Individual → Money Changer
-
-### Step 2: Fix bugs found in QA
-
-### Step 3: Profile/Settings Redesign (optional, plain but functional)
-
-### Step 4: Locked Items
-- SEO Fix (robots.txt) — 5 mins before Push
-- `git push origin main` — Owner GO only (R17)
-
-═══════════════════════════════════════════════════════════
-
 ## 📝 TECHNICAL NOTES
 
 ### Layout Variable Pattern
-All shared views use `@extends($provider_layout ?? 'layouts.provider')`. 38+ provider views use this pattern.
+All shared views use `@extends($provider_layout ?? 'layouts.provider')`. 38+ provider views use this.
 
 ### Sidebar Widget Pattern (per module)
-Each vertical layout has a sidebar widget populated by view JS:
 - **Inventory:** `#scVal` / `#scBar` — needs `$stockHealth`
 - **Hotel:** `#occVal` / `#occBar` — needs `$occupiedRooms`, `$totalRooms`
 - **Transport:** `#fleetVal` — needs `$activeFleet`, `$totalFleet`
 - **Art/Craft:** `$completedWorks` — for artist card works count
-- **Money Changer:** Currency rate widget (from dashboard `$rates`)
+- **Money Changer:** Currency rate widget
 
-### Modal Pattern (Money Changer)
-Modals inline in views (`rateModal`, `transactionModal`). Buttons call `openRateModal()` / `openTxModal()` JS. Modal click-outside closes. Forms post to `provider.money-changer.rates.store` / `transactions.store`.
+### Products: Two Create Flows
+- **Inventory Dashboard** ("New Product" modal) → `InventoryDashboardController@storeProduct`
+- **Products page** ("+ Add Product" → generic form) → `ProductController@store`
+- **Stock+SKU sync:** Both `store()` and `update()` in `ProductController` now pass `stock_quantity` + `sku` to `Product::create/update` (was missing → dashboard showed 0)
 
 ### Translation Files
 `resources/lang/{en,np}/messages.php`
 
 ### Verify-Before-Implement Pattern (Critical)
-When adding features to shared views:
-1. `findstr /C:"@extends"` — check dynamic vs hardcoded
-2. Read existing `index()` controller method — copy exact column names
+1. `findstr /C:"@extends"` — dynamic vs hardcoded
+2. Read `index()` method — copy exact column names
 3. Check migration — confirm actual DB schema
-4. Verify route exists — `php artisan route:list`
+4. Verify route — `php artisan route:list`
 
-**Session 3 lesson:** Hotel `total` vs `amount` error taught this. Verified Money Changer `npr_amount`/`profit` before code.
+**Lessons:**
+- Hotel: `total` vs `amount` (verified fix)
+- Products: `stock_count` (ShopDetail) vs `stock_quantity` (Product) — dual-table sync
+- Money Changer: `npr_amount` (not `total`)
 
 ### Windows Encoding Warning
-Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual paste for Nepali text. English-only scripts (HTML structure, CSS, JS, class names) are safe.
+Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual paste. English-only scripts (HTML/CSS/JS) safe.
 
 ### PowerShell Script Pattern
 - `[System.IO.File]::WriteAllText` with UTF-8 no BOM
-- Insert before `--radius:` (CSS), `messages.account` (sidebar), `@endsection` (view)
 - Guard with `if ($content -match 'already_has_this')` to prevent double-insert
+- For emoji, use PHP byte literals (`"\xF0\x9F..."`) — never .ps1
 
 ═══════════════════════════════════════════════════════════
 
@@ -188,21 +200,22 @@ Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual 
 1. **VERTICAL-AI-FEATURES-01:** Category-wise AI Tools
    - Restaurant: AI Menu Describer
    - Hotel: AI Room Description & Dynamic Pricing
-   - Money Changer: AI Profit Optimizer (rate suggestions)
+   - Money Changer: AI Profit Optimizer
    - Inventory: AI Restock Predictor
    - Art/Craft: AI Storyteller
    - Individual: AI Portfolio Bio
-2. **TRAVEL-AGENCY-COMBO-01:** B2B Marketplace (Tour/Trek + Transport combo)
+2. **TRAVEL-AGENCY-COMBO-01:** B2B Marketplace (Tour/Trek + Transport)
 3. **INVENTORY-STOCK-HISTORY:** `inventory_movements` UI
 4. **PAYMENT-GATE-MIDDLEWARE-01:** Subscription enforcement
 5. **EMAIL-CONSOLIDATION-01:** info@, support@ → admin@travelainepal.com
 6. **PROVIDER-ONBOARDING-PHASES:** Phase A, B, C, D, F
 7. **REALTIME-INCONSISTENCY-01:** Check-ins + Alerts live consistency
+8. **PROFILE-SETTINGS-REDESIGN:** Plain but functional (optional)
 
 ═══════════════════════════════════════════════════════════
 
-**Report prepared by:** Assistant (Session 3)
-**Verified against:** git log HEAD + full schema verification
-**Next action:** Full QA Audit → fix bugs → Push (Owner GO)
+**Report prepared by:** Assistant (Session 5)
+**Verified against:** git log HEAD (80 commits) + full QA results
+**Next action:** Hotel QA (verify-first) → Transport → Art/Craft → Individual → Money Changer
 
 ═══════════════════════════════════════════════════════════
