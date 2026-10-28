@@ -18,7 +18,7 @@
   .vf-card-head .vf-ic{
     width:40px;height:40px;border-radius:12px;
     display:grid;place-items:center;font-size:18px;flex-shrink:0;
-    background:rgba(59,130,246,.1);color:#3b82f6;
+    background:var(--accent-soft,#eff6ff);color:var(--accent,#2563eb);
   }
   .vf-card-head h2{
     font-size:16px;font-weight:800;letter-spacing:-.3px;
@@ -71,14 +71,14 @@
     font-weight:600;color:var(--text,#0f172a);outline:none;transition:.2s;
   }
   .vf-field select:focus, .vf-field input[type=file]:focus{
-    border-color:#3b82f6;background:#fff;
+    border-color:var(--accent,#2563eb);background:#fff;
     box-shadow:0 0 0 4px rgba(59,130,246,.12);
   }
   .vf-hint{font-size:11px;color:var(--muted,#64748b);font-weight:600;margin-top:6px}
   .vf-btn{
     display:inline-flex;align-items:center;gap:8px;
     padding:11px 20px;border:none;border-radius:11px;
-    background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;
+    background:linear-gradient(135deg,var(--accent,#2563eb),var(--accent-d,#1d4ed8));color:#fff;
     font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;
     box-shadow:0 6px 16px rgba(59,130,246,.3);transition:.2s;
     margin-top:16px;
@@ -119,7 +119,7 @@
     display:grid;place-items:center;cursor:pointer;transition:.18s;
     text-decoration:none;
   }
-  .vf-doc-btn.view{color:#3b82f6}
+  .vf-doc-btn.view{color:var(--accent,#2563eb)}
   .vf-doc-btn.view:hover{background:#eff6ff;border-color:#bfdbfe}
   .vf-doc-btn.del{color:#dc2626}
   .vf-doc-btn.del:hover{background:#fef2f2;border-color:#fecaca}
@@ -188,7 +188,7 @@
   {{-- ============ UPLOAD DOCUMENTS ============ --}}
   <div class="vf-card">
     <div class="vf-card-head">
-      <div class="vf-ic" style="background:#eff6ff;color:#2563eb">📤</div>
+      <div class="vf-ic" style="background:var(--accent-soft,#eff6ff);color:var(--accent-d,#1d4ed8)">📤</div>
       <div>
         <h2>{{ __('messages.upload_documents') }}</h2>
         <p>{{ __('messages.file_hint') }}</p>

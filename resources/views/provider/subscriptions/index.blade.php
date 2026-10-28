@@ -13,11 +13,11 @@
         @if($currentSubscription)
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                 <div>
-                    <span style="font-size: 24px; font-weight: 800; color: var(--sky);">{{ $currentSubscription->plan->name }}</span>
+                    <span style="font-size: 24px; font-weight: 800; color: var(--accent,#2563eb);">{{ $currentSubscription->plan->name }}</span>
                     <p style="font-size: 13px; color: var(--muted); margin-top: 5px;">{{ $currentSubscription->plan->description }}</p>
                     <div style="margin-top: 10px;">
                         @if($currentSubscription->plan->requires_contact)
-                            <span style="font-size: 14px; font-weight: 700; color: var(--sky);">{{ __('messages.contact_for_pricing') }}</span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--accent,#2563eb);">{{ __('messages.contact_for_pricing') }}</span>
                         @elseif((float) $currentSubscription->plan->price_monthly == 0)
                             <span style="font-size: 14px; font-weight: 700; color: var(--green);">{{ __('messages.free_plan') }}</span>
                         @else
@@ -62,10 +62,10 @@
                 $isCurrent = $currentSubscription && $currentSubscription->plan_id === $plan->id;
             @endphp
             
-            <div style="background: var(--card); border: 1px solid {{ $isPopular ? 'var(--sky)' : 'var(--line)' }}; border-radius: 16px; padding: 25px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; {{ $isPopular ? 'box-shadow: 0 8px 24px rgba(14,165,233,0.12);' : '' }}">
+            <div style="background: var(--card); border: 1px solid {{ $isPopular ? 'var(--accent,#2563eb)' : 'var(--line)' }}; border-radius: 16px; padding: 25px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; {{ $isPopular ? 'box-shadow: 0 8px 24px rgba(14,165,233,0.12);' : '' }}">
                 
                 @if($isPopular)
-                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--sky); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent,#2563eb); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">
                     {{ __('messages.most_popular') }}
                 </div>
                 @endif
