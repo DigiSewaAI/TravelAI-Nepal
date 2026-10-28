@@ -207,6 +207,25 @@
   document.getElementById('hamburger').addEventListener('click',()=>{sidebar.classList.add('open');overlay.classList.add('show')});
   overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('show')});
 </script>
+
+{{-- Fleet Widget Sync --}}
+@php
+    if (!isset($activeFleet) || !isset($totalFleet)) {
+        $__fp = auth()->check() ? auth()->user()->ownProvider() : null;
+        if ($__fp) {
+            $activeFleet = \App\Models\TransportVehicle::where('provider_id', $__fp->id)->whereIn('status', ['available', 'on-route'])->count();
+            $totalFleet = \App\Models\TransportVehicle::where('provider_id', $__fp->id)->count();
+        } else { $activeFleet = 0; $totalFleet = 0; }
+    }
+@endphp
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const active = {{ (int) $activeFleet }};
+    const total = {{ (int) $totalFleet }};
+    const el = document.getElementById('fleetVal');
+    if (el) el.innerHTML = active + ' <small>/ ' + total + ' {{ \Illuminate\Support\Str::lower(__('messages.active')) }}</small>';
+});
+</script>
 @stack('transport-scripts')
 </body>
 </html>

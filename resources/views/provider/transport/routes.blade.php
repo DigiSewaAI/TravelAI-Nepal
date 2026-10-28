@@ -22,7 +22,7 @@
             <h3 style="font-size:16px; font-weight:800;">{{ __('messages.route_management') }}</h3>
             <p style="font-size:12px; color:var(--muted); margin-top:4px;">{{ __('messages.manage_routes_subtitle') }}</p>
         </div>
-        <a href="{{ route('provider.transport.dashboard') }}" class="btn-primary" style="background:var(--sky); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">Back to Dashboard</a>
+        <a href="{{ route('provider.transport.dashboard') }}" class="btn-primary" style="background:var(--sky); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
     </div>
     
     <div class="tbl-wrap">

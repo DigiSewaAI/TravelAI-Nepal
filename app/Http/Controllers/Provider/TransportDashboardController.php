@@ -281,4 +281,29 @@ class TransportDashboardController extends Controller
 
         return view('provider.transport.offers', compact('provider', 'offers', 'activeFleet', 'totalFleet'));
     }
+
+    public function updateVehicle(Request $request, TransportVehicle $vehicle)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'vehicle_number' => 'required|string|max:50',
+            'vehicle_type'   => 'required|string|max:50',
+            'capacity'       => 'required|integer|min:1',
+            'driver_name'    => 'nullable|string|max:100',
+            'route_name'     => 'nullable|string|max:150',
+            'status'         => 'required|in:available,on-route,maintenance,charging',
+        ]);
+
+        $exists = TransportVehicle::where('provider_id', $provider->id)
+            ->where('vehicle_number', $validated['vehicle_number'])
+            ->where('id', '!=', $vehicle->id)->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['vehicle_number' => __('messages.vehicle_number_exists')])->withInput();
+        }
+
+        $vehicle->update($validated);
+        return redirect()->back()->with('success', __('messages.vehicle_updated_success'));
+    }
 }

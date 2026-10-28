@@ -300,6 +300,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::patch('/transport/bookings/{booking}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateBookingStatus'])->name('transport.bookings.status');
         // Transport CRUD Routes
     Route::post('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeVehicle'])->name('transport.vehicles.store');
+    Route::put('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicle'])->name('transport.vehicles.update');
     Route::delete('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyVehicle'])->name('transport.vehicles.destroy');
     Route::post('/transport/bookings', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeBooking'])->name('transport.bookings.store');
     Route::delete('/transport/bookings/{booking}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyBooking'])->name('transport.bookings.destroy');

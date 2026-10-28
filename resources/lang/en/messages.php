@@ -2324,4 +2324,12 @@ return [
     'staff_updated_success' => 'Staff updated successfully.',
     'staff_removed_success' => 'Staff removed successfully.',
     'staff_create_failed' => 'Could not create staff. Please try again.',
+    'transport_offers_subtitle' => 'Manage transport promotions and special offers',
+    'top_routes_revenue' => 'Top 5 Routes by Revenue',
+    'vehicle_updated_success' => 'Vehicle updated successfully.',
+    'vehicle_number_exists' => 'This vehicle number already exists.',
+    'edit_vehicle' => 'Edit Vehicle',
+    'update_vehicle' => 'Update Vehicle',
+    'transport_reports_subtitle' => 'Revenue, bookings, and fleet performance',
+    'total_vehicles' => 'Total Vehicles',
 ];

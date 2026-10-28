@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-transport')
 @section('title', __('messages.reports_management'))
 @section('page-title', __('messages.reports_management'))
-@section('page-subtitle', 'Revenue, bookings, and fleet performance')
+@section('page-subtitle', __('messages.transport_reports_subtitle'))
 
 @section('content')
 <style>
@@ -30,18 +30,18 @@
 
 <div class="rep-hero">
   <h1>📊 {{ __('messages.reports_management') }}</h1>
-  <p>Revenue, bookings, and fleet performance</p>
+  <p>{{ __('messages.transport_reports_subtitle') }}</p>
 </div>
 
 <div class="rep-grid">
-  <div class="rep-stat"><div class="rep-lbl">Total Revenue</div><div class="rep-val accent">Rs {{ number_format($totalRevenue) }}</div></div>
-  <div class="rep-stat"><div class="rep-lbl">Total Bookings</div><div class="rep-val">{{ $totalBookings }}</div></div>
-  <div class="rep-stat"><div class="rep-lbl">Active Fleet</div><div class="rep-val" style="color:var(--green,#10b981);">{{ $activeFleet }} / {{ $totalFleet }}</div></div>
-  <div class="rep-stat"><div class="rep-lbl">Total Vehicles</div><div class="rep-val">{{ $totalFleet }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.total_revenue') }}</div><div class="rep-val accent">Rs {{ number_format($totalRevenue) }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.total_bookings') }}</div><div class="rep-val">{{ $totalBookings }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.active_fleet') }}</div><div class="rep-val" style="color:var(--green,#10b981);">{{ $activeFleet }} / {{ $totalFleet }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.total_vehicles') }}</div><div class="rep-val">{{ $totalFleet }}</div></div>
 </div>
 
 <div class="rep-card">
-  <h3>📈 Bookings — Last 7 Days</h3>
+  <h3>📈 {{ __('messages.bookings_last_7_days') }}</h3>
   @php $maxV = collect($chartData)->max('trips') ?: 1; @endphp
   <div class="rep-chart">
     @foreach($chartData as $c)
@@ -51,11 +51,11 @@
       </div>
     @endforeach
   </div>
-  <div style="text-align:right;font-size:14px;font-weight:800;color:var(--text,#0c1e33);margin-top:10px;">Total: <span style="color:var(--accent,#0ea5e9);">{{ $chartTotal }} bookings</span></div>
+  <div style="text-align:right;font-size:14px;font-weight:800;color:var(--text,#0c1e33);margin-top:10px;">{{ __('messages.total') }}: <span style="color:var(--accent,#0ea5e9);">{{ $chartTotal }} {{ __('messages.bookings_label') }}</span></div>
 </div>
 
 <div class="rep-card">
-  <h3>🏆 Top 5 Routes by Revenue</h3>
+  <h3>🏆 {{ __('messages.top_routes_revenue') }}</h3>
   @forelse($topRoutes as $i => $r)
     <div class="rep-bar">
       <div class="lhs"><div class="rank">{{ $i + 1 }}</div><span>{{ $r->name }}</span></div>

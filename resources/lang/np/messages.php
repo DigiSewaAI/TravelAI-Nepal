@@ -2345,4 +2345,12 @@ return [
     'staff_updated_success' => 'स्टाफ सफलतापूर्वक अद्यावधिक भयो।',
     'staff_removed_success' => 'स्टाफ सफलतापूर्वक हटाइयो।',
     'staff_create_failed' => 'स्टाफ सिर्जना गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।',
+    'transport_offers_subtitle' => 'यातायात प्रचार र विशेष अफरहरू व्यवस्थापन गर्नुहोस्',
+    'top_routes_revenue' => 'आम्दानी अनुसार शीर्ष ५ रुट',
+    'vehicle_updated_success' => 'सवारी सफलतापूर्वक अद्यावधिक भयो।',
+    'vehicle_number_exists' => 'यो सवारी नम्बर पहिल्यै अवस्थित छ।',
+    'edit_vehicle' => 'सवारी सम्पादन',
+    'update_vehicle' => 'सवारी अद्यावधिक',
+    'transport_reports_subtitle' => 'आम्दानी, बुकिङ र फ्लीट प्रदर्शन',
+    'total_vehicles' => 'कुल सवारी',
 ];
