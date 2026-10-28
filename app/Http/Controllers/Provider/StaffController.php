@@ -46,7 +46,7 @@ class StaffController extends Controller
 
         if ($maxStaff !== -1 && $maxStaff !== null && $currentStaffCount >= $maxStaff) {
             return redirect()->route('provider.staff.index')
-                ->with('error', 'You have reached your staff limit. Please upgrade your plan to add more staff.');
+                ->with('error', __('messages.staff_limit_msg'));
         }
 
         return view('provider.staff.create');
@@ -111,17 +111,17 @@ class StaffController extends Controller
             ]);
 
             return back()
-                ->withErrors(['error' => 'Could not create staff. Please try again.'])
+                ->withErrors(['error' => __('messages.staff_create_failed')])
                 ->withInput();
         }
 
         if ($limitReached) {
             return redirect()->route('provider.staff.index')
-                ->with('error', 'Staff limit reached. Please upgrade your plan.');
+                ->with('error', __('messages.staff_limit_short'));
         }
 
         return redirect()->route('provider.staff.index')
-            ->with('success', 'Staff member added successfully.');
+            ->with('success', __('messages.staff_created_success'));
     }
 
     /**
@@ -158,7 +158,7 @@ class StaffController extends Controller
         ]);
 
         return redirect()->route('provider.staff.index')
-            ->with('success', 'Staff updated successfully.');
+            ->with('success', __('messages.staff_updated_success'));
     }
 
     /**
@@ -172,7 +172,7 @@ class StaffController extends Controller
         $staff->delete();
 
         return redirect()->route('provider.staff.index')
-            ->with('success', 'Staff removed successfully.');
+            ->with('success', __('messages.staff_removed_success'));
     }
 
     /**
