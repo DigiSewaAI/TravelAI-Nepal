@@ -2772,4 +2772,5 @@ return [
     'no_menu_items_yet' => 'No menu items added yet.',
         'everything_healthy' => 'Everything is healthy',
     'all_well_stocked' => 'All items are well stocked.',
+        'no_sku' => 'No SKU',
 ];
