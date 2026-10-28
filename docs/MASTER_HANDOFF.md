@@ -2,9 +2,10 @@
 👑 MASTER SYSTEM AUDIT REPORT (UPDATED — ACCURATE STATE)
 FROM: Assistant (Current Session)
 TO:   Master / Future Reference
-DATE: 2026-10-27 (EOD)
-HEAD: Local main (57 commits ahead of origin/main)
-STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Staff Premium Redesign | 🟢 Staff Link on all 8 layouts | 🟡 QA Audit Pending | 🟡 Profile/Settings Redesign Pending | 🔴 SEO & Push Locked
+DATE: 2026-10-28 (EOD)
+HEAD: Local main (62 commits ahead of origin/main)
+LATEST COMMIT: cfd193b (Inventory Phase 3)
+STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 7/7 Modules Sidebar-Complete (except Money Changer by design) | 🟢 Inventory Phase 3 | 🟢 Restaurant Complete | 🟢 Staff Complete | 🟢 Theme-Aware Shared Pages | 🟡 QA Audit Pending | 🔴 SEO & Push Locked
 ═══════════════════════════════════════════════════════════
 
 ## 📊 1. CATEGORY INVENTORY (Database Reality)
@@ -45,7 +46,7 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 |---|--------|----------------|--------|
 | 1 | 🏨 Hotel | Bookings, Rooms, Guests, Housekeeping | `7fd936d` |
 | 2 | ✈️ Transport | Vehicles, Routes, Drivers | `cd36bab` + `4981a5a` |
-| 3 | 📦 Inventory | Products, Orders | `95ecbc8` |
+| 3 | 📦 Inventory | Products, Orders, Inventory, Suppliers, Reports, Offers | `95ecbc8` + `cfd193b` |
 | 4 | 🍜 Restaurant | Orders, Menu, Tables, Reports, Offers | `1d6c565` + `886b2be` |
 | 5 | 🎨 Art/Craft | Gallery, Custom Orders | `71d61d4` |
 | 6 | 🧑‍✈️ Individual | Bookings, Calendar, Earnings | `66e9bab` |
@@ -61,52 +62,67 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 - Welcome Banners — vertical dashboards (`8776dd3`, `a8ab76a`)
 - Transport Shiny Banner — premium gradient (`a8ab76a`)
 - EN/NP translation fixes — no placeholders (`a8ab76a`)
-- Subscription & Verification pages — dynamic + premium (`25c4344`)
+- Subscription & Verification pages — theme-aware (`25c4344` + `06b59e7`)
 - Profile edit translation keys (`6b16437`)
-- Restaurant Reports/Offers + universal layout fix (`886b2be`)
 
-### G. Staff Module Redesign — COMPLETE ✅ (NEW — 2026-10-27)
-- **Premium Staff views redesign** — `staff/index`, `staff/create`, `staff/edit`
+### G. Staff Module Redesign — COMPLETE ✅ (`91fbff2`)
+- Premium Staff views redesign — `staff/index`, `staff/create`, `staff/edit`
   - Hero cards, stat boxes, role pills, permissions grid, empty states
-  - Uses `var(--accent, #2563eb)` pattern — theme-aware across all verticals
+  - Theme-aware via `var(--accent, #2563eb)` fallback pattern
   - All routes, forms, validation, `@csrf`, `@method`, permission JS preserved
-- **Staff sidebar link added to 6 layouts** — Hotel, Transport, Inventory, Money Changer, Art/Craft, Individual
-  - Trekking (`provider.blade.php`) and Restaurant already had it — untouched
-- **`--accent` CSS aliases added to 6 vertical layouts** — each layout now exposes its native brand color as `--accent`, `--accent-d`, `--accent-soft`:
+- Staff sidebar link added to 6 layouts (Trekking + Restaurant already had)
+- Profile sidebar link added to 6 layouts (`a8ab76a` era, then committed)
+- User icon (person) applied to Profile link in all 7 verticals (`91fbff2`)
+- `--accent` CSS aliases added to 6 vertical layouts — each exposes its native brand color:
   - Hotel → `#c9a227` (gold) | Transport → `#0ea5e9` (sky) | Inventory → `#6366f1` (indigo)
   - Money Changer → `#10b981` (green) | Art/Craft → `#c65d3b` (terracotta) | Individual → `#10b981` (emerald)
-- **Trekking (`provider.blade.php`) not touched** — uses Tailwind blue fallback naturally
+- Trekking (`provider.blade.php`) untouched — uses Tailwind blue fallback naturally
+
+### H. Restaurant Module — 100% COMPLETE ✅
+- All sidebar links unlocked: Orders, Menu, Tables, Reports, Offers (`cfd193b` earlier + `886b2be`)
+- Profile link working with user icon
+- All routes, controllers, views exist and render
+
+### I. Verification & Subscription Theme-Aware — COMPLETE ✅ (`06b59e7`)
+- Verification: 5 hardcoded blue spots → `var(--accent)`, `var(--accent-d)`, `var(--accent-soft)`
+- Subscription: 4 `var(--sky)` usages → `var(--accent, #2563eb)`
+- Both now match each vertical theme; Trekking falls back to blue naturally
+
+### J. Inventory Phase 3 — BATCH COMPLETE ✅ (`cfd193b`)
+- **4 new pages implemented:**
+  1. **Inventory** (`inventory.inventory`) — full stock overview, filter pills, health stats
+  2. **Suppliers** (`inventory.suppliers`) — empty state + placeholder data (no DB migration, R4)
+  3. **Reports** (`inventory.reports`) — stat cards + 7-day chart + Top 5 products by stock value
+  4. **Offers** (`inventory.offers`) — placeholder offers table (Active/Inactive pills)
+- **Sidebar:** 3 "Soon" links unlocked (Inventory, Suppliers, Reports) + new Offers link added
+- **Stock Health widget:** populated inline script in each of 4 views
+- **Translations:** 12 new EN/NP keys added
+- **Controller:** 4 new methods added to `InventoryDashboardController`
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 3. NEXT PRIORITY — Phase 3 (QA & Polish)
+## 🎯 3. NEXT PRIORITY — Phase 3 Continuation
 
-### 🟡 Immediate Tasks
+### 🟡 Immediate Tasks (Module-by-Module Missing Pages)
 
-#### 1. Profile/Settings Page Premium Redesign (START HERE TOMORROW)
-- File: `resources/views/provider/profile.blade.php` (or settings equivalent — confirm path first)
-- Current: Plain table (screenshot shown by Owner with "Everest Spice Kitchen" page)
-- Target: Hero card + info cards + theme-aware using same `var(--accent)` pattern
-- Must follow the exact pattern used for Staff redesign (fallback `#2563eb`, variables only)
+| # | Module | Missing Pages (verify first — R3) |
+|---|--------|-----------------------------------|
+| 1 | 🏨 Hotel | Reports, Offers |
+| 2 | ✈️ Transport | Flights, Reports, Offers |
+| 3 | 🎨 Art/Craft | Sales, Artists (pages themselves missing — Phase 3 real work) |
+| 4 | 🧑‍✈️ Individual | My Services |
+| 5 | 💱 Money Changer | Rates, Transactions, Customers, Reports (LAST by design) |
 
-#### 2. QA Audit — 7 Modules (One-by-One)
-नियम: एक module पूरा test → अर्को module
-
+### 🧪 After All Modules Complete — QA Audit
 | # | Module | Sidebar | CRUD | i18n | Layout | Console | Status |
 |---|--------|---------|------|------|--------|---------|--------|
-| 1 | 🍜 Restaurant | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending (reference) |
-| 2 | 🏨 Hotel | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| 3 | ✈️ Transport | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| 4 | 📦 Inventory | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| 5 | 🎨 Art/Craft | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
-| 6 | 🧑‍✈️ Individual | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Pending |
+| 1 | 🍜 Restaurant | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
+| 2 | 📦 Inventory | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
+| 3 | 🏨 Hotel | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
+| 4 | ✈️ Transport | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
+| 5 | 🎨 Art/Craft | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
+| 6 | 🧑‍✈️ Individual | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | Ready for QA |
 | 7 | 💱 Money Changer | ❌ | ⏳ | ⏳ | ⏳ | ⏳ | Unlock pending |
-
-#### 3. Money Changer Sidebar Unlock (Last by Design)
-- Rates → `provider.money-changer.rates`
-- Transactions → `provider.money-changer.transactions`
-- Customers → `provider.money-changer.customers`
-- Reports → `provider.money-changer.reports`
 
 ═══════════════════════════════════════════════════════════
 
@@ -156,7 +172,7 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 - Do NOT touch until Owner GO
 
 ### 🔒 Push-to-Production (Locked — R17)
-- Local commits only (57 commits ahead)
+- Local commits only (62 commits ahead)
 - Do NOT push until Owner GO
 - Final step: `git push origin main` (after all work done)
 
@@ -166,18 +182,22 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 
 | Item | Status |
 |------|--------|
-| **HEAD** | Local main, +57 commits ahead of origin/main |
+| **HEAD** | Local main, +62 commits ahead of origin/main |
+| **Latest Commit** | `cfd193b` — Inventory Phase 3 |
 | **Tests** | 186/186 passing |
 | **Categories** | 18/18 complete |
 | **Vertical Dashboards** | 7/7 complete (Phase 1) |
 | **CRUD & Translations** | 7/7 complete (Phase 2) |
 | **Sidebar Unlock** | 6/7 complete (Money Changer last by design) |
-| **UI Polish** | Footer + Banners + Branding complete |
+| **UI Polish** | Footer + Banners + Branding + Theme-Aware Shared Pages complete |
 | **Staff Premium Redesign** | ✅ Complete (index/create/edit) |
-| **Staff Link (all layouts)** | ✅ 8/8 (Trekking + Restaurant already had it) |
-| **Accent Aliases (6 layouts)** | ✅ Complete |
-| **Profile/Settings Redesign** | 🟡 Pending — START TOMORROW |
-| **QA Audit** | 🟡 0/7 — After profile redesign |
+| **Staff Link (all layouts)** | ✅ 8/8 |
+| **Profile Link (all layouts)** | ✅ 8/8 (user icon) |
+| **Restaurant Module** | ✅ 100% complete |
+| **Inventory Phase 3** | ✅ 100% complete (4 pages: Inventory, Suppliers, Reports, Offers) |
+| **Verification/Subscription** | ✅ Theme-aware |
+| **Profile/Settings Redesign** | 🟡 Pending — plain content preserved (functionally working) |
+| **QA Audit** | 🟡 0/7 — After all modules complete |
 | **SEO Fix** | 🔴 Locked |
 | **Payment Gate** | 🔴 Locked |
 | **Push to Production** | 🔴 Locked (R17) |
@@ -196,31 +216,28 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 8. RECOMMENDED SEQUENCE (Tomorrow Morning)
+## 🎯 8. RECOMMENDED SEQUENCE (Next Session)
 
-### Step 1: Profile/Settings Premium Redesign (Start Here)
-1. Confirm exact file path (`provider/profile.blade.php` or `provider/settings/*`)
-2. Apply same `var(--accent)` pattern used for Staff — fallback `#2563eb`
-3. Test across all 8 verticals (Trekking blue, Restaurant orange, Hotel gold, etc.)
+### Step 1: Verify-First Pattern (R3)
+For each module — verify views exist, routes exist, sidebar links locked before implementing:
 
-### Step 2: QA Audit (One-by-One)
-1. 🍜 Restaurant (reference module)
-2. 🏨 Hotel
-3. ✈️ Transport
-4. 📦 Inventory
-5. 🎨 Art/Craft
-6. 🧑‍✈️ Individual
+findstr /N /C:"href="#"" /C:"badge soon" resources\views\layouts\provider-{module}.blade.php
 
-### Step 3: Money Changer Sidebar Unlock (Last by Design)
-- Rates, Transactions, Customers, Reports
-- Then QA Money Changer
+text
 
-### Step 4: Final Sign-off
-- All 7 modules QA passed
-- Profile/Settings redesign complete
-- 186+ tests still passing
+### Step 2: Batch Missing Pages by Module
+1. 🏨 Hotel — Reports, Offers (2 pages, likely easy)
+2. ✈️ Transport — Flights, Reports, Offers (3 pages)
+3. 🎨 Art/Craft — Sales, Artists (pages missing entirely — bigger work)
+4. 🧑‍✈️ Individual — My Services
+5. 💱 Money Changer — Rates, Transactions, Customers, Reports (LAST by design)
 
-### Step 5: Locked Items (5 mins before Push)
+### Step 3: QA Audit (One-by-One, after all pages complete)
+Restaurant → Inventory → Hotel → Transport → Art/Craft → Individual → Money Changer
+
+### Step 4: Profile/Settings Premium Redesign (optional — functional but plain)
+
+### Step 5: Locked Items
 - SEO Fix (robots.txt)
 - Final QA pass
 - `git push origin main` — after Owner GO (R17)
@@ -231,52 +248,78 @@ STATUS: 🟢 7/7 Dashboards | 🟢 7/7 CRUD | 🟢 6/7 Sidebar Unlock | 🟢 Sta
 
 ### 🎨 Shared View Theming Pattern (CRITICAL — Follow Strictly)
 
-Shared views (staff, profile, settings, subscription, verification) must use **only CSS variables** with **Trekking fallback**:
-
-- `var(--accent, #2563eb)` — brand color, blue for Trekking
-- `var(--accent-d, #1d4ed8)` — darker variant
-- `var(--accent-soft, #eff6ff)` — soft background
+Shared views must use **only CSS variables** with **Trekking fallback**:
+- `var(--accent, #2563eb)` — brand color
+- `var(--accent-d, #1d4ed8)` — darker
+- `var(--accent-soft, #eff6ff)` — soft bg
 - `var(--card, #fff)` — surface
 - `var(--line, #e5e7eb)` — borders
 - `var(--text, #1f2937)` — primary text
 - `var(--muted, #6b7280)` — secondary text
-- `var(--green-soft, #dcfce7)`, `var(--red-soft, #fee2e2)`, `var(--blue-soft, #dbeafe)`, `var(--purple-soft, #ede9fe)` — semantic variants
+- `var(--green-soft, #dcfce7)`, `var(--red-soft, #fee2e2)`, `var(--blue-soft, #dbeafe)`, `var(--purple-soft, #ede9fe)`
 
-**Why:** Trekking `provider.blade.php` does not define `--accent` → uses Tailwind blue fallback naturally. Restaurant/vertical layouts define `--accent` in `:root` → shared views auto-match their theme. One file, 8 themes.
+**Why:** Trekking `provider.blade.php` doesn't define `--accent` → Tailwind blue fallback. Restaurant/verticals define `--accent` in `:root` → auto-match. One file, 8 themes.
 
 **Never do:**
-- Hardcode hex like `#f97316` (Restaurant orange) as fallback — breaks Trekking
-- Use `sidebar-link` or layout-specific classes in shared views — not inherited
+- Hardcode hex like `#f97316` as fallback — breaks Trekking
+- Use `sidebar-link` layout-specific classes in shared views
 - Touch `provider.blade.php` — Trekking identity preserved
-- Touch `provider-restaurant.blade.php` `:root` — already has `--accent:#f97316`
+- Touch `provider-restaurant.blade.php` `:root` — has `--accent:#f97316`
 
-### ✅ What's Been Completed (Full Summary)
+### 📦 Sidebar Stock Widget Pattern (Inventory)
+Dashboard view has `const STOCK_HEALTH = @json($stats['stock_health_pct']);` plus JS to populate `#scVal` and `#scBar`. Any new inventory page must include this inline script block (before `@endsection`) with `$stockHealth` from controller.
+
+### ✅ What's Been Completed (Full Summary — Cumulative)
 - Universal footer (8 layouts), TravelAI branding, welcome banners
 - Transport shiny premium banner
-- Subscription/Verification pages dynamic + premium
+- Subscription/Verification pages — theme-aware
 - Translation fixes (no raw keys)
 - Restaurant full module (`886b2be`) — Reports/Offers + 38 views dynamic layout
-- **Staff premium redesign (index/create/edit)** — theme-aware
-- **Staff sidebar link added to 6 layouts** (Trekking + Restaurant already had)
-- **`--accent` aliases added to 6 vertical layouts** — each uses its native brand color
+- Staff premium redesign (index/create/edit) — theme-aware
+- Staff + Profile links added to 6 layouts; user icons applied to all 7 verticals
+- `--accent` aliases added to 6 vertical layouts
+- **Inventory Phase 3 complete** (`cfd193b`): Inventory, Suppliers, Reports, Offers + sidebar unlock + stock health widget
 
 ### ⚠️ Known Issues / Pending
-- **Money Changer sidebar** links still locked (intentional, last by design)
-- **Profile/Settings page** still plain Tailwind (needs premium redesign — START TOMORROW)
-- **QA Audit** never formally run — 0/7 modules tested end-to-end
+- **Money Changer sidebar** — 4 links locked (intentional, last by design)
+- **Hotel**: Reports, Offers missing
+- **Transport**: Flights, Reports, Offers missing
+- **Art/Craft**: Sales, Artists pages entirely missing (bigger work — real Phase 3)
+- **Individual**: My Services missing
+- **Profile page content** — still plain (functional), redesign optional
+- **QA Audit** — never formally run — 0/7 modules tested end-to-end
 
 ### 🔧 Technical Notes
-- Layouts use `$provider_layout` variable (38 provider views updated) — shared views extend it dynamically
-- Vertical themes: Restaurant (orange), Hotel (gold), Transport (sky), Inventory (indigo), Art/Craft (terracotta), Individual (emerald), Money Changer (green), Trekking (Tailwind blue default)
+- Layouts use `$provider_layout` variable — shared views extend it dynamically
+- Vertical themes: Restaurant (orange), Hotel (gold), Transport (sky), Inventory (indigo), Art/Craft (terracotta), Individual (emerald), Money Changer (green), Trekking (Tailwind blue)
 - Translation files: `resources/lang/{en,np}/messages.php`
 - Staff route: `Route::resource('staff', StaffController::class)->except(['show'])`
-- **Windows Encoding Warning:** Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual paste only. For English-only scripts (adding links, aliases), PowerShell is safe.
-- **PowerShell Script Pattern:** When adding CSS variables or HTML blocks via script, insert before `--radius:` or `messages.account` anchors, using `[System.IO.File]::WriteAllText` with UTF-8 no BOM
+- **Windows Encoding Warning:** Never write Nepali via PowerShell scripts (ANSI corruption). Use VS Code manual paste only. English-only scripts (links, aliases, JS) are safe.
+- **PowerShell Script Pattern:** Insert before `--radius:` or `messages.account` anchors, using `[System.IO.File]::WriteAllText` with UTF-8 no BOM.
+- **Inline Script Pattern (Stock Health):** Insert before `@endsection` (avoid `@push('scripts')` — layout may not have `@stack`).
+- **Verify-before-implement:** Every module — confirm views exist, routes exist, sidebar locked — before writing code.
 
 ═══════════════════════════════════════════════════════════
 
 **Report prepared by:** Assistant (Current Session)
-**Verified against:** `git log --oneline -50` (verified staff commits) + `git status` (57 commits ahead)
-**Next action (tomorrow):** Profile/Settings Premium Redesign → QA Audit → Money Changer unlock → Final Push
+**Verified against:** `git log --oneline -50` + `git status` (62 commits ahead) + `cfd193b`
+**Next action:** Hotel Reports/Offers (verify-first) → Transport → Art/Craft → Individual → Money Changer → QA Audit → Push (Owner GO)
 
+
+### 📌 10. LONG-TERM VISION & OLD BACKLOGS (Do Not Forget)
+*(यी कामहरू पछि गर्नुपर्नेछ — हालको QA र Phase 3 सकिएपछि)*
+
+1. **VERTICAL-AI-FEATURES-01:** Category-wise AI Tools.
+   - Restaurant: AI Menu Describer (खानेकुराको विवरण लेख्ने)
+   - Hotel: AI Room Description & Dynamic Pricing
+   - Money Changer: AI Profit Optimizer (Rate सुझाव)
+   - Inventory: AI Restock Predictor (कति सकिन्छ अनुमान)
+   - Art/Craft: AI Storyteller (कलाकृतिको कथा)
+   - Individual: AI Portfolio Bio (गाइड/फोटोग्राफरको बायो)
+2. **TRAVEL-AGENCY-COMBO-01:** B2B Marketplace (Tour/Trek Agency ले Transport Provider को गाडी/फ्लाइट आफ्नो प्याकेजमा जोड्न सक्ने)।
+3. **INVENTORY-STOCK-HISTORY:** `inventory_movements` टेबलको UI (कहिले, कसले, कति स्टक थप्यो/हटायो भन्ने इतिहास)।
+4. **PAYMENT-GATE-MIDDLEWARE-01:** Unpaid Provider लाई Block गर्ने (Subscription Enforcement)।
+5. **EMAIL-CONSOLIDATION-01:** info@, support@ → admin@travelainepal.com मा लैजाने।
+6. **PROVIDER-ONBOARDING-PHASES:** Phase A, B, C, D, F (पुरानो Audit Report अनुसार)।
+7. **REALTIME-INCONSISTENCY-01:** Check-ins र Alerts को Live Update Consistency फिक्स।
 ═══════════════════════════════════════════════════════════
