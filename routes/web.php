@@ -277,6 +277,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/hotel/rooms', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'roomsPage'])->name('hotel.rooms');
     Route::get('/hotel/guests', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'guestsPage'])->name('hotel.guests');
     Route::get('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');
+        Route::get('/hotel/reports', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'reportsPage'])->name('hotel.reports');
+    Route::get('/hotel/offers', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'offersPage'])->name('hotel.offers');
         // 🆕 Transport vertical dashboard routes
     Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');

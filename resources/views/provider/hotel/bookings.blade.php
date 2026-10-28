@@ -82,4 +82,24 @@
     </table>
   </div>
 </div>
+
+@php
+    $__occR = $occupiedRooms ?? null;
+    $__totR = $totalRooms ?? null;
+    if ($__occR === null || $__totR === null) {
+        $__totR = \App\Models\HotelRoom::where('provider_id', $provider->id)->count();
+        $__occR = \App\Models\HotelRoom::where('provider_id', $provider->id)->where('status', 'occupied')->count();
+    }
+@endphp
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const occ = {{ (int) $__occR }};
+    const total = {{ (int) $__totR }};
+    const pct = total > 0 ? Math.round((occ / total) * 100) : 0;
+    const el = document.getElementById('occVal');
+    const bar = document.getElementById('occBar');
+    if (el) el.innerHTML = pct + '% <small>' + occ + ' / ' + total + '</small>';
+    if (bar) bar.style.width = pct + '%';
+});
+</script>
 @endsection
