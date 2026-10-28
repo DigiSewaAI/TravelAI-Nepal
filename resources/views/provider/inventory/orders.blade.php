@@ -71,4 +71,14 @@
         </table>
     </div>
 </div>
+{{-- Stock Health widget sync --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const SH = {{ (int)($stockHealth ?? 0) }};
+    const el = document.getElementById('scVal');
+    const bar = document.getElementById('scBar');
+    if (el) el.innerHTML = SH + '% <small>{{ __('messages.in_stock_label') }}</small>';
+    if (bar) bar.style.width = SH + '%';
+});
+</script>
 @endsection

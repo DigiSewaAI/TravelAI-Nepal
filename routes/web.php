@@ -265,6 +265,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');
         // Inventory CRUD Routes
     Route::post('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'storeProduct'])->name('inventory.products.store');
+    Route::put('/inventory/products/{product}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateProduct'])->name('inventory.products.update');
     Route::delete('/inventory/products/{product}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'destroyProduct'])->name('inventory.products.destroy');
         // Inventory Sidebar Unlocks
     Route::get('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'productsPage'])->name('inventory.products');

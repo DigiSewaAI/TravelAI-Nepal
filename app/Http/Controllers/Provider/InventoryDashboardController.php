@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class InventoryDashboardController extends Controller
 {
@@ -355,5 +356,23 @@ class InventoryDashboardController extends Controller
         ]);
 
         return view('provider.inventory.offers', compact('provider', 'offers', 'stockHealth'));
+    }
+
+    public function updateProduct(Request $request, Product $product)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $product->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'product_type' => 'required|in:shop,rental,wholesale',
+            'stock_quantity' => 'required|integer|min:0',
+            'low_stock_threshold' => 'required|integer|min:0',
+        ]);
+
+        $product->update($validated);
+
+        return redirect()->back()->with('success', 'Product updated successfully.');
     }
 }
