@@ -45,7 +45,7 @@
 </div>
 
 <div class="mc-card">
-  <h3>📊 Buy vs Sell — Last 7 Days</h3>
+  <h3>📊 {{ __('messages.buy_vs_sell_7days') }}</h3>
   @php $maxV = collect($chartData)->map(fn($d) => max($d['buy'], $d['sell']))->max() ?: 1; @endphp
   <div class="chart">
     @foreach($chartData as $c)
@@ -59,14 +59,14 @@
     @endforeach
   </div>
   <div class="chart-legend">
-    <span><i style="background:#3b82f6"></i>Buy</span>
-    <span><i style="background:#10b981"></i>Sell</span>
+    <span><i style="background:#3b82f6"></i>{{ __('messages.buy') }}</span>
+    <span><i style="background:#10b981"></i>{{ __('messages.sell') }}</span>
   </div>
-  <div style="text-align:right;font-size:14px;font-weight:800;margin-top:10px;">Total: <span style="color:var(--accent,#10b981);">Rs {{ number_format($chartTotal) }}</span></div>
+  <div style="text-align:right;font-size:14px;font-weight:800;margin-top:10px;">{{ __('messages.total') }}: <span style="color:var(--accent,#10b981);">Rs {{ number_format($chartTotal) }}</span></div>
 </div>
 
 <div class="mc-card">
-  <h3>🏆 Top 5 Currencies by Volume</h3>
+  <h3>🏆 {{ __('messages.top_currencies_volume') }}</h3>
   @forelse($topCurrencies as $i => $c)
     <div class="mc-bar">
       <div class="lhs"><div class="rank">{{ $i + 1 }}</div><span>{{ $c->currency_code }} ({{ $c->tx_count }} tx)</span></div>
@@ -78,7 +78,7 @@
 </div>
 
 <div class="mc-card">
-  <h3>👥 Top 5 Customers by Volume</h3>
+  <h3>👥 {{ __('messages.top_customers_volume') }}</h3>
   @forelse($topCustomers as $i => $c)
     <div class="mc-bar">
       <div class="lhs"><div class="rank">{{ $i + 1 }}</div><span>{{ $c->customer_name }} ({{ $c->tx_count }} tx)</span></div>

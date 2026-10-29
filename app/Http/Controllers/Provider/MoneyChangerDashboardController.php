@@ -318,4 +318,22 @@ class MoneyChangerDashboardController extends Controller
             'chartData', 'chartTotal', 'topCurrencies', 'topCustomers'
         ));
     }
+
+    public function updateRate(Request $request, ProviderExchangeRate $rate)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $rate->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'currency_code' => 'required|string|max:10',
+            'currency_name' => 'nullable|string|max:100',
+            'buy_rate'      => 'required|numeric|min:0',
+            'sell_rate'     => 'required|numeric|min:0',
+            'flag_emoji'    => 'nullable|string|max:16',
+        ]);
+
+        $rate->update($validated);
+
+        return redirect()->back()->with('success', __('messages.rate_updated'));
+    }
 }

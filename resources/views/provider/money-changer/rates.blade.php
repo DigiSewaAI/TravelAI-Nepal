@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-money-changer')
 @section('title', __('messages.nav_exchange_rates'))
 @section('page-title', __('messages.nav_exchange_rates'))
-@section('page-subtitle', 'All your currency exchange rates')
+@section('page-subtitle', __('messages.mc_rates_subtitle'))
 
 @section('content')
 <style>
@@ -35,18 +35,18 @@
 <div class="mc-hero">
   <div>
     <h1>💱 {{ __('messages.nav_exchange_rates') }}</h1>
-    <p>All your currency exchange rates</p>
+    <p>{{ __('messages.mc_rates_subtitle') }}</p>
   </div>
   <button type="button" onclick="openRateModal()" class="mc-btn-add" style="border:none;cursor:pointer;font-family:inherit;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M12 5v14M5 12h14"/></svg>
-    Add New Rate
-  </a>
+    {{ __('messages.mc_add_rate_btn') }}
+  </button>
 </div>
 
 <div class="mc-stats">
-  <div class="mc-stat"><div class="mc-stat-ic">💱</div><div><div class="mc-stat-lbl">Total Rates</div><div class="mc-stat-val">{{ $rates->count() }}</div></div></div>
-  <div class="mc-stat"><div class="mc-stat-ic">✅</div><div><div class="mc-stat-lbl">Active Rates</div><div class="mc-stat-val">{{ $activeCount }}</div></div></div>
-  <div class="mc-stat"><div class="mc-stat-ic">🌍</div><div><div class="mc-stat-lbl">Currencies</div><div class="mc-stat-val">{{ $currencyCount }}</div></div></div>
+  <div class="mc-stat"><div class="mc-stat-ic">💱</div><div><div class="mc-stat-lbl">{{ __('messages.total_rates') }}</div><div class="mc-stat-val">{{ $rates->count() }}</div></div></div>
+  <div class="mc-stat"><div class="mc-stat-ic">✅</div><div><div class="mc-stat-lbl">{{ __('messages.active_rates') }}</div><div class="mc-stat-val">{{ $activeCount }}</div></div></div>
+  <div class="mc-stat"><div class="mc-stat-ic">🌍</div><div><div class="mc-stat-lbl">{{ __('messages.currencies') }}</div><div class="mc-stat-val">{{ $currencyCount }}</div></div></div>
 </div>
 
 <div class="mc-tbl-card" style="overflow-x:auto;">
@@ -54,12 +54,12 @@
     <table class="mc-tbl">
       <thead>
         <tr>
-          <th>Currency</th>
-          <th>Buy Rate</th>
-          <th>Sell Rate</th>
-          <th>Effective Date</th>
-          <th>Status</th>
-          <th>Action</th>
+          <th>{{ __('messages.currency') }}</th>
+          <th>{{ __('messages.buy_rate_col') }}</th>
+          <th>{{ __('messages.sell_rate_col') }}</th>
+          <th>{{ __('messages.effective_date_col') }}</th>
+          <th>{{ __('messages.status') }}</th>
+          <th>{{ __('messages.action_col') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -75,12 +75,13 @@
             <td>{{ $r->effective_date?->format('M d, Y') ?? '—' }}</td>
             <td>
               <span class="mc-pill {{ $r->is_active ? 'p-on' : 'p-off' }}">
-                {{ $r->is_active ? 'Active' : 'Inactive' }}
+                {{ $r->is_active ? __('messages.active') : __('messages.inactive') }}
               </span>
             </td>
             <td>
+              <button type="button" onclick="openEditRateModal({{ $r->id }}, '{{ addslashes($r->currency_code) }}', '{{ addslashes($r->currency_name ?? '') }}', {{ (float) $r->buy_rate }}, {{ (float) $r->sell_rate }}, '{{ addslashes($r->flag_emoji ?? '') }}')" style="background:var(--blue-soft);color:#1d4ed8;border:none;width:34px;height:34px;border-radius:8px;cursor:pointer;margin-right:4px;"><i class="fas fa-edit"></i></button>
               <form method="POST" action="{{ route('provider.money-changer.rates.destroy', $r) }}" style="display:inline;margin:0;"
-                    onsubmit="return confirm('Delete this rate?')">
+                    onsubmit="return confirm('{{ __('messages.delete_rate_confirm') }}')">
                 @csrf @method('DELETE')
                 <button type="submit" class="mc-del"><i class="fas fa-trash"></i></button>
               </form>
@@ -90,7 +91,7 @@
       </tbody>
     </table>
   @else
-    <div class="mc-empty">💱 No exchange rates added yet. Add from dashboard.</div>
+    <div class="mc-empty">💱 {{ __('messages.no_rates_yet') }}</div>
   @endif
 </div>
 
@@ -136,5 +137,55 @@ function closeRateModal() { document.getElementById('rateModal').style.display =
 document.getElementById('rateModal').addEventListener('click', function(e) {
     if (e.target === this) closeRateModal();
 });
+</script>
+
+{{-- Edit Rate Modal --}}
+<div id="editRateModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
+    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:18px;font-weight:800;color:var(--text,#0f172a);margin:0">{{ __('messages.edit_rate') }}</h3>
+            <button type="button" onclick="closeEditRateModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted,#64748b);line-height:1">&times;</button>
+        </div>
+        <form id="editRateForm" method="POST">
+            @csrf @method('PUT')
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.currency_code') }}</label>
+                    <input type="text" name="currency_code" id="er_code" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.currency_name') }}</label>
+                    <input type="text" name="currency_name" id="er_name" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.buy_rate') }}</label>
+                    <input type="number" step="0.01" name="buy_rate" id="er_buy" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.sell_rate') }}</label>
+                    <input type="number" step="0.01" name="sell_rate" id="er_sell" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.flag_emoji') }}</label>
+                    <input type="text" name="flag_emoji" id="er_flag" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">
+                </div>
+            </div>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#10b981),var(--accent-d,#059669));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_rate_btn') }}</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditRateModal(id, code, name, buy, sell, flag) {
+    document.getElementById('editRateForm').action = '/provider/money-changer/rates/' + id;
+    document.getElementById('er_code').value = code;
+    document.getElementById('er_name').value = name;
+    document.getElementById('er_buy').value = buy;
+    document.getElementById('er_sell').value = sell;
+    document.getElementById('er_flag').value = flag;
+    document.getElementById('editRateModal').style.display = 'flex';
+}
+function closeEditRateModal() { document.getElementById('editRateModal').style.display = 'none'; }
+document.getElementById('editRateModal').addEventListener('click', function(e) { if (e.target === this) closeEditRateModal(); });
 </script>
 @endsection

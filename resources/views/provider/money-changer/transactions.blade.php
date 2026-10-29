@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-money-changer')
 @section('title', __('messages.nav_transactions'))
 @section('page-title', __('messages.nav_transactions'))
-@section('page-subtitle', 'All your currency exchange transactions')
+@section('page-subtitle', __('messages.mc_transactions_subtitle'))
 
 @section('content')
 <style>
@@ -37,19 +37,19 @@
 <div class="mc-hero">
   <div>
     <h1>📊 {{ __('messages.nav_transactions') }}</h1>
-    <p>All your currency exchange transactions</p>
+    <p>{{ __('messages.mc_transactions_subtitle') }}</p>
   </div>
   <button type="button" onclick="openTxModal()" class="mc-btn-add" style="border:none;cursor:pointer;font-family:inherit;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M12 5v14M5 12h14"/></svg>
-    Add Transaction
-  </a>
+    {{ __('messages.mc_add_tx_btn') }}
+  </button>
 </div>
 
 <div class="mc-stats">
-  <div class="mc-stat"><div class="mc-stat-lbl">Total Volume</div><div class="mc-stat-val accent">Rs {{ number_format($totalVolume) }}</div></div>
-  <div class="mc-stat"><div class="mc-stat-lbl">Total Profit</div><div class="mc-stat-val" style="color:var(--green,#10b981);">Rs {{ number_format($totalProfit) }}</div></div>
-  <div class="mc-stat"><div class="mc-stat-lbl">Buy</div><div class="mc-stat-val">{{ $buyCount }}</div></div>
-  <div class="mc-stat"><div class="mc-stat-lbl">Sell</div><div class="mc-stat-val">{{ $sellCount }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.total_volume') }}</div><div class="mc-stat-val accent">Rs {{ number_format($totalVolume) }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.total_profit') }}</div><div class="mc-stat-val" style="color:var(--green,#10b981);">Rs {{ number_format($totalProfit) }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.buy') }}</div><div class="mc-stat-val">{{ $buyCount }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.sell') }}</div><div class="mc-stat-val">{{ $sellCount }}</div></div>
 </div>
 
 <div class="mc-tbl-card" style="overflow-x:auto;">
@@ -57,17 +57,17 @@
     <table class="mc-tbl">
       <thead>
         <tr>
-          <th>Transaction #</th>
-          <th>Customer</th>
-          <th>Type</th>
-          <th>Currency</th>
-          <th>Foreign Amount</th>
-          <th>Rate</th>
-          <th>NPR Amount</th>
-          <th>Profit</th>
-          <th>Status</th>
-          <th>Date</th>
-          <th>Action</th>
+          <th>{{ __('messages.transaction_num') }}</th>
+          <th>{{ __('messages.customer') }}</th>
+          <th>{{ __('messages.transaction_type') }}</th>
+          <th>{{ __('messages.currency') }}</th>
+          <th>{{ __('messages.foreign_amount') }}</th>
+          <th>{{ __('messages.rate') }}</th>
+          <th>{{ __('messages.npr_amount_col') }}</th>
+          <th>{{ __('messages.profit_col') }}</th>
+          <th>{{ __('messages.status') }}</th>
+          <th>{{ __('messages.date_col') }}</th>
+          <th>{{ __('messages.action_col') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -88,7 +88,7 @@
             <td style="color:var(--muted,#64748b);">{{ $tx->created_at?->format('M d, Y') }}</td>
             <td>
               <form method="POST" action="{{ route('provider.money-changer.transactions.destroy', $tx) }}" style="display:inline;margin:0;"
-                    onsubmit="return confirm('Delete this transaction?')">
+                    onsubmit="return confirm('{{ __('messages.delete_tx_confirm') }}')">
                 @csrf @method('DELETE')
                 <button type="submit" class="mc-del"><i class="fas fa-trash"></i></button>
               </form>
@@ -98,7 +98,7 @@
       </tbody>
     </table>
   @else
-    <div class="mc-empty">📊 No transactions yet. Add from dashboard.</div>
+    <div class="mc-empty">📊 {{ __('messages.no_transactions_yet') }}</div>
   @endif
 </div>
 

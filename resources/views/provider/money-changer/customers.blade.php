@@ -36,9 +36,9 @@
 </div>
 
 <div class="mc-stats">
-  <div class="mc-stat"><div class="mc-stat-lbl">Total Customers</div><div class="mc-stat-val">{{ $totalCustomers }}</div></div>
-  <div class="mc-stat"><div class="mc-stat-lbl">Repeat Customers</div><div class="mc-stat-val accent">{{ $repeatCustomers }}</div></div>
-  <div class="mc-stat"><div class="mc-stat-lbl">Total Volume</div><div class="mc-stat-val">Rs {{ number_format($totalVolume) }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.total_customers') }}</div><div class="mc-stat-val">{{ $totalCustomers }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.repeat_customers') }}</div><div class="mc-stat-val accent">{{ $repeatCustomers }}</div></div>
+  <div class="mc-stat"><div class="mc-stat-lbl">{{ __('messages.total_volume') }}</div><div class="mc-stat-val">Rs {{ number_format($totalVolume) }}</div></div>
 </div>
 
 @if($customers->count())
@@ -54,7 +54,7 @@
         </div>
         <div class="cust-rows">
           <div class="cust-row"><span class="k">Transactions</span><span class="v">{{ $c->tx_count }}</span></div>
-          <div class="cust-row"><span class="k">Total Volume</span><span class="v accent">Rs {{ number_format($c->total_volume) }}</span></div>
+          <div class="cust-row"><span class="k">{{ __('messages.total_volume') }}</span><span class="v accent">Rs {{ number_format($c->total_volume) }}</span></div>
           <div class="cust-row"><span class="k">Profit</span><span class="v">Rs {{ number_format($c->total_profit) }}</span></div>
         </div>
       </div>

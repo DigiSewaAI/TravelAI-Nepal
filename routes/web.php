@@ -253,6 +253,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
         // Money Changer CRUD Routes
     Route::post('/money-changer/rates', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'storeRate'])->name('money-changer.rates.store');
+    Route::put('/money-changer/rates/{rate}', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'updateRate'])->name('money-changer.rates.update');
     Route::delete('/money-changer/rates/{rate}', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'destroyRate'])->name('money-changer.rates.destroy');
     Route::post('/money-changer/transactions', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'storeTransaction'])->name('money-changer.transactions.store');
     Route::delete('/money-changer/transactions/{transaction}', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'destroyTransaction'])->name('money-changer.transactions.destroy');
