@@ -65,7 +65,7 @@ class AdController extends Controller
         ];
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.ads.index', compact('ads', 'stats', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.ads.index' : 'provider.ads.index-premium', compact('ads', 'stats', 'provider_layout'));
     }
 
     /**
@@ -76,7 +76,7 @@ return view('provider.ads.index', compact('ads', 'stats', 'provider_layout'));
         $pricing = Ad::PRICING;
         $provider = Auth::user()->getCurrentProvider();
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.ads.create', compact('pricing', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 'provider.ads.create-premium', compact('pricing', 'provider_layout'));
     }
 
     /**

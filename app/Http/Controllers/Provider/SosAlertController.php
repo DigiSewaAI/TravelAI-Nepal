@@ -79,7 +79,7 @@ class SosAlertController extends Controller
             'resolved' => \App\Models\SosAlert::where('provider_id', $provider->id)->where('status', 'resolved')->count(),
         ];
 
-        return view('provider.sos-alerts.index', compact('alerts', 'activeCount', 'status', 'provider_layout', 'stats'));
+        return view(($provider_layout === 'layouts.provider') ? 'provider.sos-alerts.index' : 'provider.sos-alerts.index-premium', compact('alerts', 'activeCount', 'status', 'provider_layout', 'stats'));
     }
 
     /**

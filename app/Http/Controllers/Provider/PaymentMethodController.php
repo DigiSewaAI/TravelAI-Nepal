@@ -68,7 +68,7 @@ class PaymentMethodController extends Controller
         $methods  = $provider->paymentMethods()->orderBy('sort_order')->orderBy('id')->get();
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.settings.payment-methods', [
+return view(($provider_layout === 'layouts.provider') ? 'provider.settings.payment-methods' : 'provider.settings.payment-methods-premium', [
             'provider'      => $provider,
             'domestic'      => $methods->whereIn('type', self::DOMESTIC_TYPES),
             'international' => $methods->whereIn('type', self::INTERNATIONAL_TYPES),

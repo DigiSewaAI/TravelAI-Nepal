@@ -66,7 +66,7 @@ class InvoiceController extends Controller
         ];
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.invoices.index', compact('invoices', 'stats', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.invoices.index' : 'provider.invoices.index-premium', compact('invoices', 'stats', 'provider_layout'));
     }
 
     public function show(Invoice $invoice)

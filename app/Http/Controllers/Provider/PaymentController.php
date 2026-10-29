@@ -72,7 +72,7 @@ class PaymentController extends Controller
             'pending' => $payments->where('status', 'pending')->count(),
         ];
 
-        return view('provider.payments.history', compact('payments', 'provider_layout', 'stats'));
+        return view(($provider_layout === 'layouts.provider') ? 'provider.payments.history' : 'provider.payments.history-premium', compact('payments', 'provider_layout', 'stats'));
     }
 
     /**
