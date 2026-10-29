@@ -155,6 +155,6 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 
         $ad->load(['payments', 'verifiedBy']);
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.ads.show', compact('ad', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.ads.show' : 'provider.ads.show-premium', compact('ad', 'provider_layout'));
     }
 }

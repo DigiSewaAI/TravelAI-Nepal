@@ -87,7 +87,7 @@ class PaymentController extends Controller
             ->findOrFail($id);
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.payments.detail', compact('payment', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.payments.detail' : 'provider.payments.detail-premium', compact('payment', 'provider_layout'));
     }
 
         /**
@@ -121,7 +121,7 @@ return view('provider.payments.detail', compact('payment', 'provider_layout'));
             ->first();
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.payments.show', compact('subscription',
+return view(($provider_layout === 'layouts.provider') ? 'provider.payments.show' : 'provider.payments.show-premium', compact('subscription',
             'platformMethods',
             'pendingPayment', 'provider_layout'));
     }

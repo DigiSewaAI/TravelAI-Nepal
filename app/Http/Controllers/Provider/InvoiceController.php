@@ -83,7 +83,7 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.invoices.index
         }
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.invoices.show', compact('invoice', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.invoices.show' : 'provider.invoices.show-premium', compact('invoice', 'provider_layout'));
     }
 
     public function download(Invoice $invoice)

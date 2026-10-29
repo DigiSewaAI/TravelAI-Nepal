@@ -96,7 +96,7 @@ class SosAlertController extends Controller
         $sos->load(['traveler', 'booking.service']);
 
         $provider_layout = $this->getProviderLayout($provider);
-return view('provider.sos-alerts.show', compact('sos', 'provider_layout'));
+return view(($provider_layout === 'layouts.provider') ? 'provider.sos-alerts.show' : 'provider.sos-alerts.show-premium', compact('sos', 'provider_layout'));
     }
 
     /**
