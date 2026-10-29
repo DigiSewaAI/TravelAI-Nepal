@@ -12,12 +12,33 @@
         'wholesale' => __('messages.wholesale_index_subtitle'),
     ];
     $typeEyebrows = [
-        'shop'      => 'Verified Artisans · Direct from Nepal',
+        'shop'      => 'Handcrafted in Nepal · Shop Local',
         'rental'    => 'Adventure Ready · Trusted Gear',
         'wholesale' => 'B2B Marketplace · Verified Suppliers',
     ];
 @endphp
 
+
+@php
+    $carouselConfig = [
+        'wholesale' => [
+            'eyebrow'  => 'Live B2B Marketplace',
+            'headline' => 'Bulk lots in motion.',
+            'subhead'  => 'Hand-picked wholesale inventory moving through the supplier network. Hover to pause and click any card for supplier details.',
+        ],
+        'shop' => [
+            'eyebrow'  => 'From the Workshop',
+            'headline' => 'Handcrafted in Nepal, fresh from the source.',
+            'subhead'  => 'Unique handcrafted treasures from verified Nepali makers and workshops. Hover to pause and explore each piece.',
+        ],
+        'rental' => [
+            'eyebrow'  => 'Adventure Ready',
+            'headline' => 'Gear rotating in real-time.',
+            'subhead'  => 'Adventure-ready equipment moving through our network. Hover to pause and book your next expedition.',
+        ],
+    ];
+    $carousel = $carouselConfig[$type] ?? $carouselConfig['wholesale'];
+@endphp
 @section('title', ($typeTitles[$type] ?? '') . ' | ' . __('messages.app_name'))
 @section('meta_description', $typeSubtitles[$type] ?? '')
 
@@ -188,13 +209,13 @@
     <div class="max-w-7xl mx-auto px-6 md:px-10 mb-8">
         <span class="inline-flex items-center gap-2 text-[11px] font-bold tracking-[1.5px] uppercase text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
             <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-            Live Marketplace
+            {{ $carousel['eyebrow'] }}
         </span>
         <h2 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight leading-tight">
-            Continuously sourcing, <span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">always in motion</span>.
+            {{ $carousel['headline'] }}
         </h2>
         <p class="text-gray-500 text-base mt-3 max-w-2xl">
-            Hand-picked {{ $type }} lots moving through the network. Hover to pause and click any card to view details.
+            {{ $carousel['subhead'] }}
         </p>
     </div>
 
@@ -270,4 +291,48 @@
 @endif
 
 
+
+        {{-- ═══════════ CTA — Features-exact design ═══════════ --}}
+    {{-- ═══════════ CTA — Features-exact design, shop-broader content ═══════════ --}}
+    @php
+        $ctaConfig = [
+            'wholesale' => [
+                'headline' => 'Ready to source at scale?',
+                'subhead'  => 'Request a bulk quote — our team responds within 24 hours.',
+                'btn1' => 'Request Bulk Quote',
+                'btn2' => 'Browse Suppliers',
+                'btn2_href' => url('/wholesale'),
+            ],
+            'shop' => [
+                'headline' => 'Ready to bring home a piece of Nepal?',
+                'subhead'  => 'Discover handcrafted treasures from verified Nepali makers.',
+                'btn1' => 'Explore Handicrafts',
+                'btn2' => 'Shop All Handicrafts',
+                'btn2_href' => url('/shop'),
+            ],
+            'rental' => [
+                'headline' => 'Ready for your next adventure?',
+                'subhead'  => 'Book premium gear — flexible dates, transparent deposits.',
+                'btn1' => 'Book Rental Dates',
+                'btn2' => 'View Available Gear',
+                'btn2_href' => url('/rental'),
+            ],
+        ];
+        $cta = $ctaConfig[$type] ?? $ctaConfig['wholesale'];
+    @endphp
+
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="mt-12 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl">
+            <h2 class="text-2xl md:text-3xl font-bold">{{ $cta['headline'] }}</h2>
+            <p class="text-blue-100 mt-2">{{ $cta['subhead'] }}</p>
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <a href="javascript:alert('{{ $cta['btn1'] }} — coming soon')" class="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl transition shadow-lg">
+                    {{ $cta['btn1'] }}
+                </a>
+                <a href="{{ $cta['btn2_href'] }}" class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold px-8 py-3 rounded-xl transition">
+                    {{ $cta['btn2'] }}
+                </a>
+            </div>
+        </div>
+    </div>
 @endsection

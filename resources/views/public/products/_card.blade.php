@@ -109,10 +109,25 @@
                     <span class="text-xs font-semibold text-gray-400">/ unit</span>
                 @endif
             </div>
-            <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
-                View
-                <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
-            </span>
+            @if($product->product_type === 'wholesale')
+                <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
+                    <i class="fas fa-file-invoice text-[10px]"></i>
+                    Request Quote
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                </span>
+            @elseif($product->product_type === 'rental')
+                <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
+                    <i class="fas fa-calendar-check text-[10px]"></i>
+                    Book Now
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                </span>
+            @else
+                <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
+                    <i class="fas fa-shopping-bag text-[10px]"></i>
+                    Add to Cart
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                </span>
+            @endif
         </div>
     </div>
 </a>
