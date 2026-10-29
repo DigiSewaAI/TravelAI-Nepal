@@ -240,3 +240,42 @@ Next action: SEO fix → Final test → Push (R17 locked)
 
 ═══════════════════════════════════════════════════════════
 
+═══════════════════════════════════════════════════════════
+
+## 🟡 POST-PUSH TICKET — MULTILINGUAL-EXPANSION-01
+
+**Scope (Owner clarified):**
+- **Provider Dashboard:** en/np मात्र (already implemented — DO NOT TOUCH)
+- **Public Pages + Traveler Dashboard:** en, np, hi, zh (current) + **ru, bn, fr, de** (add)
+
+**Files to CREATE (4):**
+- `resources/lang/ru/messages.php` (2403 keys)
+- `resources/lang/bn/messages.php` (2403 keys)
+- `resources/lang/fr/messages.php` (2403 keys)
+- `resources/lang/de/messages.php` (2403 keys)
+
+**Files to MODIFY (3):**
+- `resources/views/layouts/public.blade.php` — dropdown +4 options, icon/label conditions
+- `resources/views/layouts/public.blade.php` — hreflang tags +4
+- `app/Http/Middleware/Localization.php` — Carbon locale match +4
+
+**Files NOT to touch:**
+- `resources/views/layouts/provider.blade.php` (en/np only — by design)
+- `config/app.php` (APP_LOCALE=en unchanged)
+- Existing locales (en/hi/np/zh)
+
+**Translation Strategy:**
+- Phase-wise (RU first → test → BN → FR → DE)
+- AI translation + manual spot-check for critical keys
+- 9,612 total entries (2403 × 4)
+
+**Estimated effort:** 2-3 days per language (AI + review)
+
+**Blocking status:** ❌ Does NOT block push — new feature
+
+**Existing gap (fix before adding):**
+- Hindi (hi): 683 missing keys
+- Chinese (zh): 672 missing keys
+- (English/Nepali: 0 missing)
+
+═══════════════════════════════════════════════════════════
