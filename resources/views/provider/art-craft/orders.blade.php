@@ -30,7 +30,7 @@
             <h3 style="font-size:16px; font-weight:800;">{{ __('messages.orders_management') }}</h3>
             <p style="font-size:12px; color:var(--muted); margin-top:4px;">{{ __('messages.manage_custom_orders_subtitle') }}</p>
         </div>
-        <a href="{{ route('provider.art-craft.dashboard') }}" class="btn-primary" style="background:var(--terracotta); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">Back to Dashboard</a>
+        <a href="{{ route('provider.art-craft.dashboard') }}" class="btn-primary" style="background:var(--terracotta); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
     </div>
     
     <div class="tbl-wrap">
@@ -42,6 +42,7 @@
                     <th>{{ __('messages.budget_col') }}</th>
                     <th>{{ __('messages.deadline_col') }}</th>
                     <th>{{ __('messages.status_col') }}</th>
+                    <th style="text-align:right;">{{ __('messages.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,13 +53,24 @@
                     <td style="font-weight:800">Rs {{ number_format($o->budget) }}</td>
                     <td>{{ $o->deadline->format('M d, Y') }}</td>
                     <td>
-                        <span class="pill {{ $o->status === 'done' ? 'p-paid' : ($o->status === 'progress' ? 'p-pending' : 'p-refund') }}">
-                            {{ ucfirst($o->status) }}
-                        </span>
+                        <form action="{{ route('provider.art-craft.orders.status', $o) }}" method="POST" style="display:inline;margin:0;">
+                            @csrf @method('PATCH')
+                            <select name="status" onchange="this.form.submit()" style="padding:5px 8px;border-radius:6px;border:1px solid var(--line);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;background:var(--card);color:var(--text);">
+                                <option value="pending" {{ $o->status === 'pending' ? 'selected' : '' }}>{{ __('messages.pending') }}</option>
+                                <option value="progress" {{ $o->status === 'progress' ? 'selected' : '' }}>{{ __('messages.in_progress') }}</option>
+                                <option value="done" {{ $o->status === 'done' ? 'selected' : '' }}>{{ __('messages.done') ?? 'Done' }}</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td style="text-align:right;white-space:nowrap;">
+                        <form action="{{ route('provider.art-craft.orders.destroy', $o) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('{{ __('messages.delete_order_confirm') }}')">
+                            @csrf @method('DELETE')
+                            <button type="submit" style="padding:6px 10px;border-radius:7px;border:none;background:var(--red-soft);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;"><i class="fas fa-trash"></i></button>
+                        </form>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center; padding:20px; color:var(--muted);">{{ __('messages.no_custom_orders_found') }}</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">{{ __('messages.no_custom_orders_found') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

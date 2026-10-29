@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-art-craft')
-@section('title', 'Sales')
-@section('page-title', 'Sales')
-@section('page-subtitle', 'Sold artworks and revenue overview')
+@section('title', __('messages.sales_title'))
+@section('page-title', __('messages.sales_title'))
+@section('page-subtitle', __('messages.sales_subtitle'))
 
 @section('content')
 <style>
@@ -30,19 +30,23 @@
   .sal-empty{text-align:center;padding:40px;color:var(--muted,#8a7565);font-size:13px;}
 </style>
 
+<div style="display:flex;justify-content:flex-end;margin-bottom:15px;">
+  <a href="{{ route('provider.art-craft.dashboard') }}" style="background:var(--terracotta); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
+</div>
+
 <div class="sal-hero">
-  <h1>💰 Sales</h1>
-  <p>Sold artworks and revenue overview</p>
+  <h1>💰 {{ __('messages.sales_title') }}</h1>
+  <p>{{ __('messages.sales_subtitle') }}</p>
 </div>
 
 <div class="sal-grid">
-  <div class="sal-stat"><div class="sal-lbl">Total Revenue</div><div class="sal-val accent">Rs {{ number_format($totalRevenue) }}</div></div>
-  <div class="sal-stat"><div class="sal-lbl">Artworks Sold</div><div class="sal-val">{{ $soldCount }}</div></div>
-  <div class="sal-stat"><div class="sal-lbl">Average Price</div><div class="sal-val">Rs {{ number_format($avgPrice) }}</div></div>
+  <div class="sal-stat"><div class="sal-lbl">{{ __('messages.total_revenue') }}</div><div class="sal-val accent">Rs {{ number_format($totalRevenue) }}</div></div>
+  <div class="sal-stat"><div class="sal-lbl">{{ __('messages.artworks_sold') }}</div><div class="sal-val">{{ $soldCount }}</div></div>
+  <div class="sal-stat"><div class="sal-lbl">{{ __('messages.average_price') }}</div><div class="sal-val">Rs {{ number_format($avgPrice) }}</div></div>
 </div>
 
 <div class="sal-card">
-  <h3>📈 Sales — Last 7 Days</h3>
+  <h3>📈 {{ __('messages.sales_last_7_days') }}</h3>
   @php $maxV = collect($chartData)->max('value') ?: 1; @endphp
   <div class="sal-chart">
     @foreach($chartData as $c)
@@ -52,21 +56,21 @@
       </div>
     @endforeach
   </div>
-  <div style="text-align:right;font-size:14px;font-weight:800;color:var(--text,#2b1e16);margin-top:10px;">Total: <span style="color:var(--accent,#c65d3b);">Rs {{ number_format($chartTotal) }}</span></div>
+  <div style="text-align:right;font-size:14px;font-weight:800;color:var(--text,#2b1e16);margin-top:10px;">{{ __('messages.total_label') }}: <span style="color:var(--accent,#c65d3b);">Rs {{ number_format($chartTotal) }}</span></div>
 </div>
 
 <div class="sal-card">
-  <h3>🖼️ Sold Artworks ({{ $soldCount }})</h3>
+  <h3>🖼️ {{ __('messages.sold_artworks') }} ({{ $soldCount }})</h3>
   @if($soldArtworks->count())
     <div style="overflow-x:auto;">
       <table class="sal-table">
         <thead>
           <tr>
-            <th>Artwork</th>
-            <th>Artist</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Sold Date</th>
+            <th>{{ __('messages.artwork_header') }}</th>
+            <th>{{ __('messages.artist_header') }}</th>
+            <th>{{ __('messages.category_header') }}</th>
+            <th>{{ __('messages.price_header') }}</th>
+            <th>{{ __('messages.sold_date') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -83,7 +87,7 @@
       </table>
     </div>
   @else
-    <p class="sal-empty">No sales yet. Mark artworks as "sold" from the gallery to see them here.</p>
+    <p class="sal-empty">{{ __('messages.no_sales_yet') }}</p>
   @endif
 </div>
 @endsection

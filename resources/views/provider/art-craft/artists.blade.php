@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-art-craft')
-@section('title', 'Artists')
-@section('page-title', 'Artists')
-@section('page-subtitle', 'All artists contributing to your gallery')
+@section('title', __('messages.artists_title'))
+@section('page-title', __('messages.artists_title'))
+@section('page-subtitle', __('messages.artists_subtitle'))
 
 @section('content')
 <style>
@@ -31,15 +31,19 @@
   .art-empty h3{font-size:15px;font-weight:800;color:var(--text,#2b1e16);margin:0 0 6px;}
 </style>
 
+<div style="display:flex;justify-content:flex-end;margin-bottom:15px;">
+  <a href="{{ route('provider.art-craft.dashboard') }}" style="background:var(--terracotta); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
+</div>
+
 <div class="art-hero">
-  <h1>🎨 Artists</h1>
-  <p>All artists contributing to your gallery</p>
+  <h1>🎨 {{ __('messages.artists_title') }}</h1>
+  <p>{{ __('messages.artists_subtitle') }}</p>
 </div>
 
 <div class="art-stats">
-  <div class="art-stat"><div class="art-ic">🎨</div><div><div class="art-lbl">Total Artists</div><div class="art-val">{{ $totalArtists }}</div></div></div>
-  <div class="art-stat"><div class="art-ic">🖼️</div><div><div class="art-lbl">Total Artworks</div><div class="art-val">{{ $totalArtworks }}</div></div></div>
-  <div class="art-stat"><div class="art-ic">👥</div><div><div class="art-lbl">Total Clients</div><div class="art-val">{{ $clients }}</div></div></div>
+  <div class="art-stat"><div class="art-ic">🎨</div><div><div class="art-lbl">{{ __('messages.total_artists') }}</div><div class="art-val">{{ $totalArtists }}</div></div></div>
+  <div class="art-stat"><div class="art-ic">🖼️</div><div><div class="art-lbl">{{ __('messages.total_artworks') }}</div><div class="art-val">{{ $totalArtworks }}</div></div></div>
+  <div class="art-stat"><div class="art-ic">👥</div><div><div class="art-lbl">{{ __('messages.total_clients') }}</div><div class="art-val">{{ $clients }}</div></div></div>
 </div>
 
 @if($artists->count())
@@ -48,11 +52,11 @@
       <div class="artist-card">
         <div class="artist-av">{{ strtoupper(substr($a->artist_name, 0, 1)) }}</div>
         <h3 class="artist-name">{{ $a->artist_name }}</h3>
-        <div class="artist-meta">Contributing artist</div>
+        <div class="artist-meta">{{ __('messages.contributing_artist') }}</div>
         <div class="artist-rows">
-          <div class="artist-row"><span class="k">Artworks</span><span class="v">{{ $a->artwork_count }}</span></div>
-          <div class="artist-row"><span class="k">Sold</span><span class="v">{{ $a->sold_count }}</span></div>
-          <div class="artist-row"><span class="k">Revenue</span><span class="v accent">Rs {{ number_format($a->revenue) }}</span></div>
+          <div class="artist-row"><span class="k">{{ __('messages.artworks_count') }}</span><span class="v">{{ $a->artwork_count }}</span></div>
+          <div class="artist-row"><span class="k">{{ __('messages.sold_count') }}</span><span class="v">{{ $a->sold_count }}</span></div>
+          <div class="artist-row"><span class="k">{{ __('messages.revenue') }}</span><span class="v accent">Rs {{ number_format($a->revenue) }}</span></div>
         </div>
       </div>
     @endforeach
@@ -60,8 +64,8 @@
 @else
   <div class="art-empty">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <h3>No artists yet</h3>
-    <p>Add artworks with artist names to see them here.</p>
+    <h3>{{ __('messages.no_artists_yet') }}</h3>
+    <p>{{ __('messages.add_artworks_hint') }}</p>
   </div>
 @endif
 @endsection

@@ -330,6 +330,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/art-craft/custom-orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'ordersPage'])->name('art-craft.orders');
         // Art/Craft CRUD Routes
     Route::post('/art-craft/artworks', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeArtwork'])->name('art-craft.artworks.store');
+    Route::put('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateArtwork'])->name('art-craft.artworks.update');
     Route::delete('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyArtwork'])->name('art-craft.artworks.destroy');
     Route::post('/art-craft/orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeCustomOrder'])->name('art-craft.orders.store');
     Route::delete('/art-craft/orders/{order}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyOrder'])->name('art-craft.orders.destroy');

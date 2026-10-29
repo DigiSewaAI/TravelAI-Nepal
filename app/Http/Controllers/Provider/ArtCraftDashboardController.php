@@ -90,7 +90,11 @@ class ArtCraftDashboardController extends Controller
         $artwork->status = $validated['status'];
         $artwork->save();
 
-        return response()->json(['success' => true, 'status' => $artwork->status]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'status' => $artwork->status]);
+        }
+
+        return redirect()->back()->with('success', __('messages.updated_success'));
     }
 
     public function updateOrderStatus(Request $request, CustomOrder $order)
@@ -105,7 +109,11 @@ class ArtCraftDashboardController extends Controller
         $order->status = $validated['status'];
         $order->save();
 
-        return response()->json(['success' => true, 'status' => $order->status]);
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'status' => $order->status]);
+        }
+
+        return redirect()->back()->with('success', __('messages.updated_success'));
     }
 
     public function storeArtwork(Request $request)
@@ -294,5 +302,24 @@ class ArtCraftDashboardController extends Controller
             'chartData', 'chartTotal',
             'totalArtworks', 'completedWorks', 'artistName', 'rating', 'clients'
         ));
+    }
+
+    public function updateArtwork(Request $request, Artwork $artwork)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $artwork->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:150',
+            'artist_name' => 'nullable|string|max:100',
+            'category' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:available,sold,custom',
+            'emoji' => 'nullable|string|max:10',
+        ]);
+
+        $artwork->update($validated);
+
+        return redirect()->back()->with('success', __('messages.artwork_updated_success'));
     }
 }
