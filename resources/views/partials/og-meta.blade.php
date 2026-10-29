@@ -24,14 +24,15 @@
 
 
     // FIX: decode HTML entities to prevent double-escape
-    $ogDescription = html_entity_decode($ogDescription, ENT_QUOTES, 'UTF-8');
-    $ogTitle       = html_entity_decode($ogTitle, ENT_QUOTES, 'UTF-8');
+    // Double-decode to handle pre-escaped entities + Blade escaping
+    $ogDescription = html_entity_decode(html_entity_decode($ogDescription, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8');
+    $ogTitle       = html_entity_decode(html_entity_decode($ogTitle, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8');
 @endphp
 
 {{-- ================= Open Graph (Facebook, LinkedIn, WhatsApp) ================= --}}
 <meta property="og:site_name" content="{{ __('messages.app_name') }}">
-<meta property="og:title" content="{{ $ogTitle }}">
-<meta property="og:description" content="{{ $ogDescription }}">
+<meta property="og:title" content="{!! e($ogTitle) !!}">
+<meta property="og:description" content="{!! e($ogDescription) !!}">
 <meta property="og:image" content="{{ $ogImage }}">
 <meta property="og:image:secure_url" content="{{ $ogImage }}">
 <meta property="og:image:width" content="1200">
