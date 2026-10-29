@@ -136,6 +136,16 @@ class InventoryDashboardController extends Controller
                 ];
             });
 
+        // PHASE-2: top products by sales (dashboard)
+        $topProducts = \App\Models\OrderItem::join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.provider_id', $provider->id)
+            ->where('orders.status', '!=', 'cancelled')
+            ->selectRaw('order_items.product_name, SUM(order_items.line_total) as total_sales, SUM(order_items.quantity) as total_units')
+            ->groupBy('order_items.product_name')
+            ->orderByDesc('total_sales')
+            ->limit(5)
+            ->get();
+
         return view('provider.inventory.dashboard', [
             'provider'     => $provider,
             'stats'        => [
@@ -150,6 +160,7 @@ class InventoryDashboardController extends Controller
             'lowStockAlerts' => $lowStockAlerts,
             'allProducts'  => $allProducts,
             'recentOrders' => $recentOrders,
+            'topProducts' => $topProducts,
         ]);
     }
 

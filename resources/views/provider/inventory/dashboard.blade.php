@@ -206,7 +206,26 @@
     </div>
   </div>
 
-  <div class="card span-2">
+  {{-- PHASE-2: Top Products by Sales --}}
+<div class="card span-2" style="margin-bottom:18px">
+  <div class="card-head"><div><h3>{{ __('messages.top_products') }}</h3><div class="sub">{{ __('messages.by_sales') }}</div></div></div>
+  @if($topProducts->count())
+  <div style="display:flex;flex-direction:column;gap:8px">
+    @foreach($topProducts as $r)
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px">
+      <div>
+        <div style="font-weight:800;font-size:13px">{{ $r->product_name ?: '—' }}</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600">{{ $r->total_units }}&times;</div>
+      </div>
+      <div style="font-weight:800;color:var(--accent);font-size:14px">Rs {{ number_format($r->total_sales, 0) }}</div>
+    </div>
+    @endforeach
+  </div>
+  @else
+  <p style="text-align:center;padding:20px;color:var(--muted);font-size:12px">{{ __('messages.no_data') }}</p>
+  @endif
+</div>
+<div class="card span-2">
     <div class="card-head">
       <div><h3>{{ __('messages.recent_orders') }}</h3><div class="sub">{{ __('messages.sales_rentals_wholesale') }}</div></div>
       <a href="#" class="link">{{ __('messages.view_all') }} →</a>

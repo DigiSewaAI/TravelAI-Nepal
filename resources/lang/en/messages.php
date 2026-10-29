@@ -2396,4 +2396,10 @@ return array (
   'delete_tx_confirm' => 'Delete this transaction?',
   'service_not_bookable' => 'This service cannot be booked online. Please contact the provider directly.',
   'contact_provider' => 'Contact Provider',
+  'top_rooms' => 'Top Rooms',
+  'top_routes' => 'Top Routes',
+  'top_service_types' => 'Top Service Types',
+  'by_revenue' => 'By revenue',
+  'by_sales' => 'By sales',
+  'by_earnings' => 'By earnings',
 );

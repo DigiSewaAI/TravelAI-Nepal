@@ -73,10 +73,18 @@ class HotelDashboardController extends Controller
             ->where('provider_id', $provider->id)
             ->latest()->limit(6)->get();
 
-        return view('provider.hotel.dashboard', compact(
-            'provider', 'todayRevenue', 'bookingsToday', 'roomsOccupied', 'totalRooms',
-            'guestsInHouse', 'chartData', 'frontDesk', 'rooms', 'tasks', 'recentBookings'
-        ));
+// PHASE-2: topRooms query
+        $topRooms = HotelBooking::where('provider_id', $provider->id)
+            ->where('payment_status', 'paid')
+            ->selectRaw('room_id, SUM(amount) as total_revenue, COUNT(*) as booking_count')
+            ->groupBy('room_id')
+            ->orderByDesc('total_revenue')
+            ->limit(5)
+            ->with('room')
+            ->get();
+
+        return view('provider.hotel.dashboard', compact('provider', 'todayRevenue', 'bookingsToday', 'roomsOccupied', 'totalRooms',
+            'guestsInHouse', 'chartData', 'frontDesk', 'rooms', 'tasks', 'recentBookings', 'topRooms'));
     }
 
     public function updateRoomStatus(Request $request, HotelRoom $room)

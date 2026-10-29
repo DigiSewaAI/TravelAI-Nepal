@@ -174,7 +174,28 @@
 </section>
 
 <section class="grid">
-  <div class="card">
+  
+{{-- PHASE-2: Top Service Types by Earnings --}}
+<div class="card span-2" style="margin-bottom:18px">
+    <div class="card-head"><div><h3>{{ __('messages.top_service_types') }}</h3><div class="sub">{{ __('messages.by_earnings') }}</div></div></div>
+    @if($topServiceTypes->count())
+    <div style="display:flex;flex-direction:column;gap:8px">
+        @foreach($topServiceTypes as $r)
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px">
+            <div>
+                <div style="font-weight:800;font-size:13px;text-transform:capitalize">{{ $r->service_type ?: '—' }}</div>
+                <div style="font-size:11px;color:var(--muted);font-weight:600">{{ $r->booking_count }}&times;</div>
+            </div>
+            <div style="font-weight:800;color:var(--accent);font-size:14px">Rs {{ number_format($r->total_earnings, 0) }}</div>
+        </div>
+        @endforeach
+    </div>
+    @else
+    <p style="text-align:center;padding:20px;color:var(--muted);font-size:12px">{{ __('messages.no_data') }}</p>
+    @endif
+</div>
+
+<div class="card">
     <div class="card-head"><div><h3>{{ __('messages.booking_calendar') }}</h3><div class="sub">{{ __('messages.click_date_filter') }}</div></div></div>
     <div class="cal-nav">
       <button id="calPrev" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" style="width:14px;height:14px;stroke-width:2.5"><path d="m15 18-6-6 6-6"/></svg></button>

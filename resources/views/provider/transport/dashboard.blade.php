@@ -147,7 +147,28 @@
 </section>
 
 <section class="grid">
-  <div class="card" style="grid-column:span 3">
+  
+{{-- PHASE-2: Top Routes by Revenue --}}
+<div class="card span-2" style="margin-bottom:18px">
+    <div class="card-head"><div><h3>{{ __('messages.top_routes') }}</h3><div class="sub">{{ __('messages.by_revenue') }}</div></div></div>
+    @if($topRoutes->count())
+    <div style="display:flex;flex-direction:column;gap:8px">
+        @foreach($topRoutes as $r)
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px">
+            <div>
+                <div style="font-weight:800;font-size:13px">{{ $r->route_name ?: '—' }}</div>
+                <div style="font-size:11px;color:var(--muted);font-weight:600">{{ $r->trip_count }}&times;</div>
+            </div>
+            <div style="font-weight:800;color:var(--accent);font-size:14px">Rs {{ number_format($r->total_revenue, 0) }}</div>
+        </div>
+        @endforeach
+    </div>
+    @else
+    <p style="text-align:center;padding:20px;color:var(--muted);font-size:12px">{{ __('messages.no_data') }}</p>
+    @endif
+</div>
+
+<div class="card" style="grid-column:span 3">
     <div class="card-head"><div><h3>{{ __('messages.recent_bookings') }}</h3><div class="sub">{{ __('messages.latest_reservations') }}</div></div></div>
     <div class="tbl-wrap">
       <table class="tbl">

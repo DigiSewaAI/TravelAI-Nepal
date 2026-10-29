@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
@@ -73,10 +72,23 @@ class IndividualDashboardController extends Controller
                 'dateStr' => $b->start_date->format('M d, Y'),
             ]);
 
-        return view('provider.individual.dashboard', compact(
-            'provider', 'totalEarnings', 'bookingsThisMonth', 'profileViews',
-            'avgRating', 'reviewCount', 'chartData', 'assignments'
-        ));
+                $topServiceTypes = IndividualBooking::where('provider_id', $provider->id)
+
+                    ->whereIn('status', ['completed', 'confirmed'])
+
+                    ->selectRaw('service_type, SUM(amount) as total_earnings, COUNT(*) as booking_count')
+
+                    ->groupBy('service_type')
+
+                    ->orderByDesc('total_earnings')
+
+                    ->limit(5)
+
+                    ->get();
+
+
+        return view('provider.individual.dashboard', compact('provider', 'totalEarnings', 'bookingsThisMonth', 'profileViews',
+            'avgRating', 'reviewCount', 'chartData', 'assignments', 'topServiceTypes'));
     }
 
     public function updateBookingStatus(Request $request, IndividualBooking $booking)

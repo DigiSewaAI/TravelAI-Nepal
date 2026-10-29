@@ -59,8 +59,16 @@ class TransportDashboardController extends Controller
         $vehicles = TransportVehicle::where('provider_id', $provider->id)->orderBy('vehicle_number')->get();
         $recentBookings = TransportBooking::with('vehicle')->where('provider_id', $provider->id)->latest()->limit(6)->get();
 
-        return view('provider.transport.dashboard', compact(
-            'provider',
+// PHASE-2: topRoutes query
+        $topRoutes = TransportBooking::where('provider_id', $provider->id)
+            ->where('status', 'confirmed')
+            ->selectRaw('route_name, SUM(amount) as total_revenue, COUNT(*) as trip_count')
+            ->groupBy('route_name')
+            ->orderByDesc('total_revenue')
+            ->limit(5)
+            ->get();
+
+        return view('provider.transport.dashboard', compact('provider',
             'todayRevenue',
             'totalTripsToday',
             'activeFleet',
@@ -68,8 +76,7 @@ class TransportDashboardController extends Controller
             'pendingBookings',
             'chartData',
             'vehicles',
-            'recentBookings'
-        ));
+            'recentBookings', 'topRoutes'));
     }
 
     public function updateVehicleStatus(Request $request, TransportVehicle $vehicle)
