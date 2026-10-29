@@ -43,6 +43,7 @@ class RentalFeeConfigTest extends TestCase
         $response = $this->actingAs($this->providerUser)->post(route('provider.products.store'), [
             'product_type'         => 'rental',
             'name'                 => 'Fee Test Gear',
+            'stock_quantity'       => 10,
             'price'                => 500,
             'currency'             => 'NPR',
             'status'               => 'active',
@@ -66,6 +67,7 @@ class RentalFeeConfigTest extends TestCase
         $this->actingAs($this->providerUser)->post(route('provider.products.store'), [
             'product_type'         => 'rental',
             'name'                 => 'Damage Test',
+            'stock_quantity'       => 10,
             'price'                => 500,
             'currency'             => 'NPR',
             'status'               => 'active',

@@ -78,7 +78,7 @@
             <tr>
               <td><span class="sal-emoji">{{ $a->emoji ?? '🖼️' }}</span><span class="sal-name">{{ $a->name }}</span></td>
               <td>{{ $a->artist_name ?? '—' }}</td>
-              <td style="text-transform:capitalize;">{{ $a->category }}</td>
+              <td><span style="text-transform:capitalize;">{{ __('messages.' . $a->category) ?? ucfirst($a->category) }}</span></td>
               <td style="font-weight:800;color:var(--accent,#c65d3b);">Rs {{ number_format($a->price) }}</td>
               <td style="color:var(--muted,#8a7565);">{{ $a->updated_at ? $a->updated_at->format('M d, Y') : '—' }}</td>
             </tr>

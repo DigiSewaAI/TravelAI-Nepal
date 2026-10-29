@@ -97,7 +97,7 @@ class ProductTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('provider.products.index'));
+        $response->assertRedirect(route('provider.inventory.products'));
 
         $product = Product::where('name', 'Handmade Murti')->first();
         $this->assertNotNull($product);
@@ -119,6 +119,7 @@ class ProductTest extends TestCase
             $this->basePayload([
                 'product_type'         => 'rental',
                 'name'                 => 'Down Jacket',
+                'stock_quantity'       => 10,
                 'rental_price_per_day' => 50,
                 'rental_deposit'       => 200,
                 'rental_condition'     => 'good',
@@ -127,7 +128,7 @@ class ProductTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('provider.products.index'));
+        $response->assertRedirect(route('provider.inventory.products'));
 
         $product = Product::where('name', 'Down Jacket')->first();
         $this->assertNotNull($product);
@@ -148,11 +149,12 @@ class ProductTest extends TestCase
             $this->basePayload([
                 'product_type'  => 'wholesale',
                 'name'          => 'Bulk Pashmina',
+                'stock_quantity' => 10,
                 'min_order_qty' => 50,
             ])
         );
 
-        $response->assertRedirect(route('provider.products.index'));
+        $response->assertRedirect(route('provider.inventory.products'));
 
         $product = Product::where('name', 'Bulk Pashmina')->first();
         $this->assertNotNull($product);
@@ -264,7 +266,7 @@ class ProductTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('provider.products.index'));
+        $response->assertRedirect(route('provider.inventory.products'));
         $this->assertSame(11, Product::where('provider_id', $this->provider->id)->count());
     }
 
@@ -383,6 +385,7 @@ class ProductTest extends TestCase
             $this->basePayload([
                 'product_type'         => 'rental',
                 'name'                 => 'PRent',
+                'stock_quantity'       => 10,
                 'rental_price_per_day' => 20,
             ])
         );
@@ -391,6 +394,7 @@ class ProductTest extends TestCase
             $this->basePayload([
                 'product_type'  => 'wholesale',
                 'name'          => 'PWhole',
+                'stock_quantity' => 10,
                 'min_order_qty' => 10,
             ])
         );
