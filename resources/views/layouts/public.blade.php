@@ -178,7 +178,7 @@
                 <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_shop') }}</a>
                 <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_rental') }}</a>
                 <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.pricing') }}</a>
-                <a href="{{ url('/how-it-works') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.how_it_works') }}</a>
+                <a href="{{ route('public.wholesale.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.nav_wholesale') }}</a>
                 <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.providers') }}</a>
 
                 <!-- Desktop Language Switcher (hidden on mobile) -->
@@ -290,7 +290,7 @@
                 <a href="{{ route('public.shop.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_shop') }}</a>
                 <a href="{{ route('public.rental.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_rental') }}</a>
                 <a href="{{ route('pages.pricing') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.pricing') }}</a>
-                <a href="{{ url('/how-it-works') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.how_it_works') }}</a>
+                <a href="{{ route('public.wholesale.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_wholesale') }}</a>
                 <a href="{{ route('public.providers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.providers') }}</a>
 
                 <div class="border-t border-gray-200 my-2 pt-2">
@@ -371,7 +371,7 @@
                     <li><a href="{{ route('pages.features') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.features') }}</a></li>
                     <li><a href="{{ route('pages.pricing') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.pricing') }}</a></li>
                     <li><a href="{{ route('public.providers.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.providers') }}</a></li>
-                    <li><a href="{{ route('public.wholesale.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.nav_wholesale') }}</a></li>
+                    <li><a href="{{ url('/how-it-works') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.how_it_works') }}</a></li>
                     <li><a href="{{ route('safety.index') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300"><i class="fas fa-shield-alt mr-1 text-blue-500"></i> {{ __('messages.travel_safety') }}</a></li>
                 </ul>
             </div>

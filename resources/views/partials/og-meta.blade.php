@@ -21,6 +21,11 @@
         'zh' => 'zh_CN',
         default => 'en_US',
     };
+
+
+    // FIX: decode HTML entities to prevent double-escape
+    $ogDescription = html_entity_decode($ogDescription, ENT_QUOTES, 'UTF-8');
+    $ogTitle       = html_entity_decode($ogTitle, ENT_QUOTES, 'UTF-8');
 @endphp
 
 {{-- ================= Open Graph (Facebook, LinkedIn, WhatsApp) ================= --}}

@@ -6,65 +6,51 @@
 
 {{-- ========== JSON-LD: WebSite + FAQPage ========== --}}
 @push('head')
-@verbatim
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "TravelAI Nepal",
-  "url": "http://localhost:8000",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": "http://localhost:8000/explore?search={search_term_string}"
-    },
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
+@php
+    $__webData = [
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => __('messages.app_name'),
+        'url' => url('/'),
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => [
+                '@type' => 'EntryPoint',
+                'urlTemplate' => url('/explore') . '?search={search_term_string}',
+            ],
+            'query-input' => 'required name=search_term_string',
+        ],
+    ];
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is TravelAI Nepal?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "TravelAI Nepal is an AI-powered trekking ecosystem that connects travelers with verified local agencies, guides, and hotels across Nepal. It offers AI-generated itineraries, digital trek passports, and offline emergency SOS."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the AI itinerary planner work?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our AI generates personalized day-by-day itineraries based on your destination, budget, travel duration, fitness level, and interests. It uses a hybrid LLM (Groq/Llama3) and real local pricing data."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is TravelAI Nepal free to use?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-                "text": "Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does it work offline in the mountains?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. TravelAI Nepal is PWA and offline-first. Emergency SOS alerts store your location locally and auto-sync when signal returns. Digital trek passports work without internet."
-      }
-    }
-  ]
-}
-</script>
-@endverbatim
+    $__faqData = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name' => __('messages.faq_q1'),
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => __('messages.faq_a1')],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => __('messages.faq_q2'),
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => __('messages.faq_a2')],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => __('messages.faq_q3'),
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => __('messages.faq_a3')],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => __('messages.faq_q4'),
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => __('messages.faq_a4')],
+            ],
+        ],
+    ];
+@endphp
+<script type="application/ld+json">{!! json_encode($__webData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
+<script type="application/ld+json">{!! json_encode($__faqData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
 {{-- ===== Safety CTA — scoped styles (isolated to .safety-cta) ===== --}}
 @verbatim
 <style>
@@ -1082,41 +1068,24 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-12">
         <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">FAQ</span>
-        <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Frequently Asked Questions</h2>
+        <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900">{{ __('messages.faq_title') }}</h2>
         <p class="text-gray-500 mt-3">Everything you need to know about TravelAI Nepal</p>
       </div>
       <div class="space-y-4">
+        @foreach([
+          ['q' => __('messages.faq_q1'), 'a' => __('messages.faq_a1')],
+          ['q' => __('messages.faq_q2'), 'a' => __('messages.faq_a2')],
+          ['q' => __('messages.faq_q3'), 'a' => __('messages.faq_a3')],
+          ['q' => __('messages.faq_q4'), 'a' => __('messages.faq_a4')],
+        ] as $faq)
         <details class="bg-white rounded-xl border border-gray-200 p-5 group">
           <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
-            What is TravelAI Nepal?
+            {{ $faq['q'] }}
             <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
           </summary>
-          <p class="text-gray-600 mt-3">TravelAI Nepal is an AI-powered trekking ecosystem that connects travelers with verified local agencies, guides, and hotels across Nepal. It offers AI-generated itineraries, digital trek passports, and offline emergency SOS.</p>
+          <p class="text-gray-600 mt-3">{{ $faq['a'] }}</p>
         </details>
-
-        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
-          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
-            How does the AI itinerary planner work?
-            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-          </summary>
-          <p class="text-gray-600 mt-3">Our AI generates personalized day-by-day itineraries based on your destination, budget, travel duration, fitness level, and interests. It uses a hybrid LLM (Groq/Llama3) and real local pricing data.</p>
-        </details>
-
-        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
-          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
-            Is TravelAI Nepal free to use?
-            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-          </summary>
-                    <p class="text-gray-600 mt-3">Yes! Travelers can generate AI itineraries and explore providers for free. Travel agencies can start with a free plan and upgrade anytime.</p>
-        </details>
-
-        <details class="bg-white rounded-xl border border-gray-200 p-5 group">
-          <summary class="font-semibold text-gray-800 cursor-pointer list-none flex justify-between items-center">
-            Does it work offline in the mountains?
-            <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-          </summary>
-          <p class="text-gray-600 mt-3">Yes. TravelAI Nepal is PWA and offline-first. Emergency SOS alerts store your location locally and auto-sync when signal returns. Digital trek passports work without internet.</p>
-        </details>
+        @endforeach
       </div>
     </div>
   </section>
