@@ -78,6 +78,22 @@
 @endpush
 
 @section('content')
+{{-- PHASE-1-WELCOME: Premium gradient banner (Trek parity) --}}
+@php
+    $__vp = auth()->user()->getCurrentProvider();
+    $__isVerified = $__vp && $__vp->verification_status === 'verified';
+@endphp
+<div style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-d, var(--accent)) 100%); border-radius: 16px; padding: 22px 26px; margin-bottom: 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 15px 35px -12px rgba(0,0,0,.25);">
+    <div style="position: relative; z-index: 1;">
+        <h1 style="font-size: 22px; font-weight: 800; margin: 0 0 4px 0; letter-spacing: -0.3px;">
+            {{ __('messages.welcome_back') }}, {{ $greetingName }}! &#128075;
+            @if($__isVerified)
+            <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.22);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;margin-left:10px;vertical-align:middle;">&#10003; {{ __('messages.verified') }}</span>
+            @endif
+        </h1>
+        <p style="font-size: 13px; opacity: 0.92; margin: 0;">{{ $propertyName ?? auth()->user()->getCurrentProvider()?->name ?? '' }}</p>
+    </div>
+</div>
 
 {{-- 🆕 Action Bar --}}
 <div class="action-bar">

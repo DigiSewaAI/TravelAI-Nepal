@@ -82,7 +82,7 @@
     <div style="position: absolute; top: -60%; right: -15%; width: 70%; height: 220%; background: radial-gradient(circle, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 30%, transparent 65%); pointer-events: none;"></div>
     <div style="position: absolute; bottom: -40%; left: 10%; width: 50%; height: 120%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); pointer-events: none;"></div>
     <div style="position: relative; z-index: 1;">
-        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); letter-spacing: -0.3px;">{{ __('messages.welcome_back') }}, {{ auth()->user()->name ?? 'Manager' }}! 👋</h1>
+        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); letter-spacing: -0.3px;">{{ __('messages.welcome_back') }}, {{ auth()->user()->name ?? 'Manager' }}! 👋 {{-- PHASE-1-BADGE --}}@if(auth()->user()->getCurrentProvider()?->verification_status === 'verified')<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.22);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;margin-left:8px;vertical-align:middle;">&#10003; {{ __('messages.verified') }}</span>@endif</h1>
         <p style="font-size: 13px; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.15);">{{ __('messages.transport_welcome_subtitle') }}</p>
     </div>
     <div style="font-size: 48px; opacity: 0.55; position: relative; z-index: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">🚌</div>

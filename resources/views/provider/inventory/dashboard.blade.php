@@ -105,7 +105,7 @@
 {{-- 🆕 Welcome Banner --}}
 <div style="background: linear-gradient(135deg, var(--indigo), var(--indigo-d)); border-radius: 16px; padding: 25px; margin-bottom: 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3);">
     <div>
-        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">{{ __('messages.welcome_back') }}, {{ $greetingName }}! 👋</h1>
+        <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">{{ __('messages.welcome_back') }}, {{ $greetingName }}! 👋 {{-- PHASE-1-BADGE --}}@if(auth()->user()->getCurrentProvider()?->verification_status === 'verified')<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.22);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;margin-left:8px;vertical-align:middle;">&#10003; {{ __('messages.verified') }}</span>@endif</h1>
         <p style="font-size: 13px; opacity: 0.9;">{{ $subtitle }}</p>
     </div>
     <div style="font-size: 45px; opacity: 0.4;">📦</div>
