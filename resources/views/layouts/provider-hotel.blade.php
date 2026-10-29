@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {{-- Occupancy Widget Sync (all pages) --}}
 @php
     if (!isset($occupiedRooms) || !isset($totalRooms)) {
-        $__occP = $provider ?? (auth()->check() ? auth()->user()->ownProvider() : null);
+        $__occP = $provider ?? (auth()->check() ? auth()->user()->getCurrentProvider() : null);
         if ($__occP) {
             $totalRooms = \App\Models\HotelRoom::where('provider_id', $__occP->id)->count();
             $occupiedRooms = \App\Models\HotelRoom::where('provider_id', $__occP->id)->where('status', 'occupied')->count();

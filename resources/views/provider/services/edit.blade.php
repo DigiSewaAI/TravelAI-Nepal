@@ -192,7 +192,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         fieldGroups.forEach(function(group) {
-            var isActive = slug !== '' && group.getAttribute('data-slug') === slug;
+            var __groupSlugs = (group.getAttribute('data-slug') || '').split(',');
+            var isActive = slug !== '' && __groupSlugs.indexOf(slug) !== -1;
             group.classList.toggle('hidden', !isActive);
             group.querySelectorAll('input, select, textarea').forEach(function(input) {
                 if (isActive) {

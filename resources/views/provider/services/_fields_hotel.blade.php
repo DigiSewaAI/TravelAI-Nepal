@@ -1,7 +1,7 @@
 {{-- Phase 4M-2-3+4: Hotel category fields --}}
 @php $detail = $service?->hotelDetail; @endphp
 
-<div id="fields-hotel" class="category-fields hidden space-y-4" data-slug="hotel">
+<div id="fields-hotel" class="category-fields hidden space-y-4" data-slug="hotel,resort,lodge,homestay">
 
     <div>
         <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.room_count') }}</label>
