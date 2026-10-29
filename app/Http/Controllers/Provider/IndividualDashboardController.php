@@ -11,9 +11,10 @@ class IndividualDashboardController extends Controller
 {
     public function index()
     {
-        $provider = Provider::where('user_id', Auth::id())
-            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
-            ->first();
+        $provider = Auth::user()->getCurrentProvider();
+        if (!$provider || $provider->types->whereIn('slug', ['guide', 'porter', 'photographer'])->isEmpty()) {
+            $provider = null;
+        }
 
         abort_unless($provider, 403, 'Individual provider profile not found.');
 
@@ -242,7 +243,7 @@ class IndividualDashboardController extends Controller
 
     public function updateAssignment(Request $request, IndividualBooking $assignment)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $assignment->provider_id === $provider->id, 403);
 
         $validated = $request->validate([

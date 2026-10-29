@@ -12,9 +12,10 @@ class TransportDashboardController extends Controller
 {
     public function index()
     {
-        $provider = \App\Models\Provider::where('user_id', Auth::id())
-            ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
-            ->first();
+        $provider = Auth::user()->getCurrentProvider();
+        if (!$provider || !$provider->types->contains('slug', 'transport-provider')) {
+            $provider = null;
+        }
 
         abort_unless($provider, 403, 'Transport provider profile not found.');
 
@@ -81,7 +82,7 @@ class TransportDashboardController extends Controller
 
     public function updateVehicleStatus(Request $request, TransportVehicle $vehicle)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -96,7 +97,7 @@ class TransportDashboardController extends Controller
 
     public function updateBookingStatus(Request $request, TransportBooking $booking)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -111,7 +112,7 @@ class TransportDashboardController extends Controller
 
     public function storeVehicle(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -137,7 +138,7 @@ class TransportDashboardController extends Controller
 
     public function destroyVehicle(TransportVehicle $vehicle)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
 
         $vehicle->delete();
@@ -146,7 +147,7 @@ class TransportDashboardController extends Controller
 
     public function storeBooking(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -175,7 +176,7 @@ class TransportDashboardController extends Controller
 
     public function destroyBooking(TransportBooking $booking)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
         $booking->delete();
@@ -184,7 +185,8 @@ class TransportDashboardController extends Controller
 
     public function vehiclesPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $vehicles = TransportVehicle::where('provider_id', $provider->id)->orderBy('vehicle_number')->get();
 
         $totalFleet = $vehicles->count();
@@ -195,7 +197,8 @@ class TransportDashboardController extends Controller
 
     public function routesPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
         $routes = $vehicles->whereNotNull('route_name')->groupBy('route_name');
 
@@ -207,7 +210,8 @@ class TransportDashboardController extends Controller
 
     public function driversPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
         $drivers = $vehicles->whereNotNull('driver_name')->sortBy('driver_name');
 
@@ -291,7 +295,7 @@ class TransportDashboardController extends Controller
 
     public function updateVehicle(Request $request, TransportVehicle $vehicle)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $vehicle->provider_id === $provider->id, 403);
 
         $validated = $request->validate([

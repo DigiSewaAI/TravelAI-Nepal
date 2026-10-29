@@ -118,7 +118,7 @@ class ArtCraftDashboardController extends Controller
 
     public function storeArtwork(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -145,7 +145,7 @@ class ArtCraftDashboardController extends Controller
 
     public function destroyArtwork(Artwork $artwork)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $artwork->provider_id === $provider->id, 403);
 
         $artwork->delete();
@@ -154,7 +154,7 @@ class ArtCraftDashboardController extends Controller
 
     public function storeCustomOrder(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -180,7 +180,7 @@ class ArtCraftDashboardController extends Controller
 
     public function destroyOrder(CustomOrder $order)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $order->provider_id === $provider->id, 403);
 
         $order->delete();
@@ -189,7 +189,7 @@ class ArtCraftDashboardController extends Controller
 
     public function galleryPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $artworks = Artwork::where('provider_id', $provider->id)->latest()->get();
@@ -207,7 +207,7 @@ class ArtCraftDashboardController extends Controller
 
     public function ordersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $orders = CustomOrder::where('provider_id', $provider->id)->latest()->get();
@@ -306,7 +306,7 @@ class ArtCraftDashboardController extends Controller
 
     public function updateArtwork(Request $request, Artwork $artwork)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $artwork->provider_id === $provider->id, 403);
 
         $validated = $request->validate([

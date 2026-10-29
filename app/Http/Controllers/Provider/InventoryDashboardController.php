@@ -16,7 +16,7 @@ class InventoryDashboardController extends Controller
 {
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $today = now()->startOfDay();
@@ -166,7 +166,7 @@ class InventoryDashboardController extends Controller
 
     public function updateStock(Request $request, Product $product)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $product->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -212,7 +212,7 @@ class InventoryDashboardController extends Controller
     }
         public function storeProduct(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -245,7 +245,7 @@ class InventoryDashboardController extends Controller
 
     public function destroyProduct(Product $product)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $product->provider_id === $provider->id, 403);
 
         $product->delete();
@@ -253,7 +253,8 @@ class InventoryDashboardController extends Controller
     }
         public function productsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $products = Product::where('provider_id', $provider->id)->orderBy('name')->get();
         
         // Sidebar Health Calculation
@@ -266,7 +267,8 @@ class InventoryDashboardController extends Controller
 
     public function ordersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $orderIds = OrderItem::where('provider_id', $provider->id)->pluck('order_id')->unique();
         $orders = Order::whereIn('id', $orderIds)->with('user')->latest()->get();
 
@@ -279,7 +281,7 @@ class InventoryDashboardController extends Controller
     }
         public function inventoryPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $products = Product::where('provider_id', $provider->id)->orderBy('name')->get();
@@ -297,7 +299,7 @@ class InventoryDashboardController extends Controller
 
     public function suppliersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $totalProducts = Product::where('provider_id', $provider->id)->count();
@@ -311,7 +313,7 @@ class InventoryDashboardController extends Controller
 
     public function reportsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $totalProducts = Product::where('provider_id', $provider->id)->where('status', 'active')->count();
@@ -353,7 +355,7 @@ class InventoryDashboardController extends Controller
 
     public function offersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $totalProducts = Product::where('provider_id', $provider->id)->count();
@@ -371,7 +373,7 @@ class InventoryDashboardController extends Controller
 
     public function updateProduct(Request $request, Product $product)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $product->provider_id === $provider->id, 403);
 
         $validated = $request->validate([

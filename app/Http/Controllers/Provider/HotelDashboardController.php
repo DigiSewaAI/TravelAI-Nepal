@@ -14,7 +14,7 @@ class HotelDashboardController extends Controller
 {
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $today = now()->startOfDay();
@@ -89,7 +89,7 @@ class HotelDashboardController extends Controller
 
     public function updateRoomStatus(Request $request, HotelRoom $room)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $room->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -104,7 +104,7 @@ class HotelDashboardController extends Controller
 
     public function checkInOut(Request $request, HotelBooking $booking)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -126,7 +126,7 @@ class HotelDashboardController extends Controller
 
     public function storeBooking(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -163,7 +163,7 @@ class HotelDashboardController extends Controller
 
     public function destroyBooking(HotelBooking $booking)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
         if ($booking->room) {
@@ -175,28 +175,31 @@ class HotelDashboardController extends Controller
     }
     public function bookingsPage()
 {
-    $provider = Auth::user()->ownProvider();
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403, 'Provider not found.');
     $bookings = HotelBooking::with('room')->where('provider_id', $provider->id)->latest()->get();
     return view('provider.hotel.bookings', compact('provider', 'bookings'));
 }
 
 public function roomsPage()
 {
-    $provider = Auth::user()->ownProvider();
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403, 'Provider not found.');
     $rooms = HotelRoom::where('provider_id', $provider->id)->orderBy('room_number')->get();
     return view('provider.hotel.rooms', compact('provider', 'rooms'));
 }
 
 public function guestsPage()
 {
-    $provider = Auth::user()->ownProvider();
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403, 'Provider not found.');
     $guests = HotelBooking::with('room')->where('provider_id', $provider->id)->where('status', 'checked_in')->get();
     return view('provider.hotel.guests', compact('provider', 'guests'));
 }
 
 public function housekeepingPage()
 {
-    $provider = Auth::user()->ownProvider();
+    $provider = Auth::user()->getCurrentProvider();
     abort_unless($provider, 403);
 
     $tasks = HousekeepingTask::with('room')->where('provider_id', $provider->id)->latest()->get();
@@ -208,7 +211,7 @@ public function housekeepingPage()
 }
     public function reportsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $totalBookings = HotelBooking::where('provider_id', $provider->id)->count();
@@ -262,7 +265,7 @@ public function housekeepingPage()
 
     public function offersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $offers = collect([
@@ -276,7 +279,7 @@ public function housekeepingPage()
 
     public function storeRoom(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -306,7 +309,7 @@ public function housekeepingPage()
 
     public function updateRoom(Request $request, HotelRoom $room)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $room->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -331,7 +334,7 @@ public function housekeepingPage()
 
     public function destroyRoom(HotelRoom $room)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $room->provider_id === $provider->id, 403);
 
         $activeBookings = HotelBooking::where('room_id', $room->id)
@@ -347,7 +350,7 @@ public function housekeepingPage()
 
     public function storeTask(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -370,7 +373,7 @@ public function housekeepingPage()
 
     public function updateTaskStatus(Request $request, HousekeepingTask $task)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $task->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -389,7 +392,7 @@ public function housekeepingPage()
 
     public function destroyTask(HousekeepingTask $task)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $task->provider_id === $provider->id, 403);
 
         $task->delete();

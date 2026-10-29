@@ -13,7 +13,7 @@ class MoneyChangerDashboardController extends Controller
 {
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $mcCatId = ServiceCategory::where('slug', 'money-changer')->value('id');
@@ -120,7 +120,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function storeRate(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -152,7 +152,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function destroyRate(ProviderExchangeRate $rate)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $rate->provider_id === $provider->id, 403);
 
         $rate->delete();
@@ -161,7 +161,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function storeTransaction(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -197,7 +197,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function destroyTransaction(ExchangeTransaction $transaction)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $transaction->provider_id === $provider->id, 403);
 
         $transaction->delete();
@@ -205,7 +205,7 @@ class MoneyChangerDashboardController extends Controller
     }
         public function ratesPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $rates = ProviderExchangeRate::where('provider_id', $provider->id)
@@ -221,7 +221,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function transactionsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $transactions = ExchangeTransaction::where('provider_id', $provider->id)
@@ -238,7 +238,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function customersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $customers = ExchangeTransaction::where('provider_id', $provider->id)
@@ -257,7 +257,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function reportsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $today = now()->startOfDay();
@@ -321,7 +321,7 @@ class MoneyChangerDashboardController extends Controller
 
     public function updateRate(Request $request, ProviderExchangeRate $rate)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $rate->provider_id === $provider->id, 403);
 
         $validated = $request->validate([

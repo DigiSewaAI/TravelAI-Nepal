@@ -25,20 +25,47 @@ use Illuminate\Support\Facades\Log;
 
 class ServiceController extends Controller
 {
+    private function getProviderLayout($provider): string
+    {
+        if (!$provider) return 'layouts.provider';
+        $slug = $provider->types->first()?->slug;
+        $map = [
+            'restaurant' => 'layouts.provider-restaurant',
+            'hotel' => 'layouts.provider-hotel',
+            'resort' => 'layouts.provider-hotel',
+            'lodge' => 'layouts.provider-hotel',
+            'homestay' => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner' => 'layouts.provider-inventory',
+            'rental-provider' => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft' => 'layouts.provider-art-craft',
+            'guide' => 'layouts.provider-individual',
+            'porter' => 'layouts.provider-individual',
+            'photographer' => 'layouts.provider-individual',
+            'money-changer' => 'layouts.provider-money-changer',
+        ];
+        return $map[$slug] ?? 'layouts.provider';
+    }
+
     use AuthorizesRequests;
 
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider_layout = $this->getProviderLayout(Auth::user()->getCurrentProvider());
+
+        $provider = Auth::user()->getCurrentProvider();
         $services = $provider
             ? $provider->services()->withCount('itineraryDays')->get()
             : collect();
-        return view('provider.services.index', compact('services'));
+        return view('provider.services.index', compact('services', 'provider_layout'));
     }
 
     public function create()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider_layout = $this->getProviderLayout(Auth::user()->getCurrentProvider());
+
+        $provider = Auth::user()->getCurrentProvider();
         $providerType = $provider?->types()->first();
 
         // DYNAMIC-UI: Product Provider (Wholesale, Shop, Rental) लाई Service बनाउन नदिने
@@ -62,14 +89,14 @@ class ServiceController extends Controller
         $categories = $allowedCategories;
 
         $locations = Location::whereNotNull('city')->where('city', '!=', '')->orderBy('city')->get(['id', 'city']);
-        return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType', 'locations'));
+        return view('provider.services.create', compact('categories', 'allowedCategories', 'providerType', 'locations', 'provider_layout'));
     }
 
     public function store(Request $request)
     {
         $this->authorize('create', Service::class);
 
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
 
         if (!$provider) {
             abort(403, 'No provider found.');
@@ -316,9 +343,11 @@ class ServiceController extends Controller
 
     public function edit(Service $service)
     {
+        $provider_layout = $this->getProviderLayout(Auth::user()->getCurrentProvider());
+
         $this->authorize('update', $service);
 
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         $providerType = $provider?->types()->first();
         $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 
@@ -340,8 +369,7 @@ class ServiceController extends Controller
 
         return view('provider.services.edit', compact(
             'service', 'categories', 'allowedCategories', 'providerType',
-            'isLegacy', 'currentCategory', 'locations'
-        ));
+            'isLegacy', 'currentCategory', 'locations', 'provider_layout'));
     }
 
     public function update(Request $request, Service $service)
@@ -358,7 +386,7 @@ class ServiceController extends Controller
             'status' => 'nullable|in:active,inactive',
         ]);
 
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         $providerType = $provider?->types()->first();
         $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 

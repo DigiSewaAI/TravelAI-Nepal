@@ -16,7 +16,7 @@ class RestaurantDashboardController extends Controller
 {
     public function index()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $restaurantCatId = ServiceCategory::where('slug', 'restaurant')->value('id');
@@ -166,7 +166,7 @@ class RestaurantDashboardController extends Controller
 
     public function updateOrderStatus(Request $request, RestaurantOrder $order)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $order->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -189,7 +189,7 @@ class RestaurantDashboardController extends Controller
 
     public function updateTableStatus(Request $request, RestaurantTable $table)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $table->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -207,7 +207,7 @@ class RestaurantDashboardController extends Controller
     }
         public function storeMenuItem(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -233,7 +233,7 @@ class RestaurantDashboardController extends Controller
 
     public function destroyMenuItem(MenuItem $menuItem)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $menuItem->provider_id === $provider->id, 403);
         
         $menuItem->delete();
@@ -242,7 +242,7 @@ class RestaurantDashboardController extends Controller
 
     public function storeOrder(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -292,7 +292,7 @@ class RestaurantDashboardController extends Controller
 
     public function destroyOrder(RestaurantOrder $order)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $order->provider_id === $provider->id, 403);
 
         // Free the table
@@ -305,27 +305,31 @@ class RestaurantDashboardController extends Controller
     }
         public function ordersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $orders = RestaurantOrder::where('provider_id', $provider->id)->with('items')->latest()->get();
         return view('provider.restaurant.orders', compact('provider', 'orders'));
     }
 
     public function menuPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $menuItems = MenuItem::where('provider_id', $provider->id)->orderBy('category')->get();
         return view('provider.restaurant.menu', compact('provider', 'menuItems'));
     }
 
     public function tablesPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $tables = RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get();
         return view('provider.restaurant.tables', compact('provider', 'tables'));
     }
         public function reportsPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         $totalSales = RestaurantOrder::where('provider_id', $provider->id)->where('status', '!=', 'cancelled')->sum('total');
         $totalOrders = RestaurantOrder::where('provider_id', $provider->id)->count();
         $avgOrder = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
@@ -336,7 +340,8 @@ class RestaurantDashboardController extends Controller
 
     public function offersPage()
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
         // Dummy offers for UI (No offers table yet in R8 scope)
         $offers = collect([
             (object)['title' => 'Happy Hour (4-6 PM)', 'discount' => '20% Off', 'valid_until' => now()->addDays(7), 'status' => 'active'],
@@ -348,7 +353,7 @@ class RestaurantDashboardController extends Controller
     }
         public function updateMenuItem(Request $request, MenuItem $menuItem)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $menuItem->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -364,7 +369,7 @@ class RestaurantDashboardController extends Controller
 
     public function storeTable(Request $request)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
         $validated = $request->validate([
@@ -397,7 +402,7 @@ class RestaurantDashboardController extends Controller
 
     public function updateTable(Request $request, RestaurantTable $table)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $table->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
@@ -421,7 +426,7 @@ class RestaurantDashboardController extends Controller
 
     public function destroyTable(RestaurantTable $table)
     {
-        $provider = Auth::user()->ownProvider();
+        $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $table->provider_id === $provider->id, 403);
 
         if ($table->currentOrder()->exists()) {
