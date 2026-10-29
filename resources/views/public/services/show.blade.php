@@ -218,12 +218,37 @@
                 </div>
             </div>
 
-            <!-- Booking Button -->
+            <!-- Booking Button (GATED - non-bookable categories show contact fallback) -->
+            @php
+                $__nonBookableSlugs = ['shop', 'rental', 'wholesale', 'restaurant', 'money-changer', 'art-craft'];
+                $__catSlug = optional($service->category)->slug;
+                $__isBookable = !in_array($__catSlug, $__nonBookableSlugs, true)
+                                && $service->price !== null
+                                && (float) $service->price > 0;
+            @endphp
             <div class="mt-6">
-                <a href="{{ route('public.services.book', $service->slug) }}"
-                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg hover:shadow-xl text-center block">
-                    <i class="fas fa-calendar-check mr-2"></i> {{ __('messages.book_this_service') }}
-                </a>
+                @if($__isBookable)
+                    <a href="{{ route('public.services.book', $service->slug) }}"
+                       class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg hover:shadow-xl text-center block">
+                        <i class="fas fa-calendar-check mr-2"></i> {{ __('messages.book_this_service') }}
+                    </a>
+                @else
+                    @php
+                        $__providerEmail = data_get($service, 'provider.user.email')
+                                        ?? data_get($service, 'provider.email')
+                                        ?? null;
+                    @endphp
+                    @if($__providerEmail)
+                        <a href="mailto:{{ $__providerEmail }}?subject={{ urlencode('Inquiry: ' . $service->name) }}"
+                           class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg hover:shadow-xl text-center block">
+                            <i class="fas fa-envelope mr-2"></i> {{ __('messages.contact_provider') }}
+                        </a>
+                    @else
+                        <div class="w-full bg-amber-50 border border-amber-200 text-amber-800 font-semibold py-3 px-6 rounded-xl text-center">
+                            <i class="fas fa-info-circle mr-2"></i> {{ __('messages.service_not_bookable') }}
+                        </div>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

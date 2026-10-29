@@ -46,6 +46,17 @@ class BookingController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
+        // GATING: Prevent bookings for non-bookable categories or price-less services
+        $__nonBookable = ['shop', 'rental', 'wholesale', 'restaurant', 'money-changer', 'art-craft'];
+        $__catSlug = optional($service->category)->slug;
+        if (in_array($__catSlug, $__nonBookable, true)
+            || is_null($service->price)
+            || (float) $service->price <= 0) {
+            return back()
+                ->withErrors(['error' => __('messages.service_not_bookable')])
+                ->withInput();
+        }
+
         // PROVIDER-ITINERARY-09B-04: Departure-scoped validation
         // Determine if this service has eligible departures
         $hasEligibleDepartures = $service->isItineraryPublished()
