@@ -34,7 +34,9 @@ class IndividualDashboardController extends Controller
 
         // Average Rating (Hardcoded for Phase 1, as reviews table uses service_id)
         $avgRating = 4.9;
-        $reviewCount = 127;
+        $reviewCount = \App\Models\Review::whereHas('service', function($q) use ($provider) {
+            $q->where('provider_id', $provider->id);
+        })->count();
 
         // Chart (Last 7 days earnings)
         $days = collect(range(6, 0))->map(fn($d) => now()->subDays($d)->format('Y-m-d'));
@@ -224,5 +226,25 @@ class IndividualDashboardController extends Controller
         });
 
         return view('provider.individual.reviews', compact('provider', 'reviews'));
+    }
+
+    public function updateAssignment(Request $request, IndividualBooking $assignment)
+    {
+        $provider = Auth::user()->ownProvider();
+        abort_unless($provider && $assignment->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'title'        => 'required|string|max:150',
+            'client_name'  => 'required|string|max:100',
+            'service_type' => 'required|in:guide,porter,photographer',
+            'start_date'   => 'required|date',
+            'duration'     => 'required|string|max:50',
+            'amount'       => 'required|numeric|min:0',
+            'status'       => 'required|in:pending,confirmed,completed',
+        ]);
+
+        $assignment->update($validated);
+
+        return redirect()->back()->with('success', __('messages.assignment_updated'));
     }
 }

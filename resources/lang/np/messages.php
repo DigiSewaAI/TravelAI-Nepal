@@ -2381,4 +2381,10 @@ return [
     'updated_success' => 'सफलतापूर्वक अद्यावधिक भयो।',
     'delete_artwork_confirm' => 'यो कलाकृति मेटाउने?',
     'delete_order_confirm' => 'यो अर्डर मेटाउने?',
+    'add_assignment' => 'असाइनमेन्ट थप्नुहोस्',
+    'edit_assignment' => 'असाइनमेन्ट सम्पादन गर्नुहोस्',
+    'update_assignment' => 'असाइनमेन्ट अद्यावधिक गर्नुहोस्',
+    'assignment_updated' => 'असाइनमेन्ट सफलतापूर्वक अद्यावधिक भयो।',
+    'delete_assignment_confirm' => 'यो असाइनमेन्ट मेटाउने?',
+    'in_progress_status' => 'जारी छ',
 ];

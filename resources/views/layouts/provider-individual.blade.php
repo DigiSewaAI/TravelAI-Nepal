@@ -154,7 +154,7 @@
   <div class="rating-card">
     <div class="rc-stars">★★★★★</div>
     <div class="rc-score" id="avgRatingVal">{{ $avgRating ?? '4.9' }}<small>/5</small></div>
-    <div class="rc-meta" id="reviewCountVal">{{ __('messages.n_reviews', ['count' => $reviewCount ?? 127]) }}</div>
+    <div class="rc-meta" id="reviewCountVal">{{ __('messages.n_reviews', ['count' => $reviewCount ?? 0]) }}</div>
   </div>
   <div class="user-box">
     <div class="avatar">{{ $initials }}</div>

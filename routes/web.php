@@ -315,6 +315,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::patch('/individual/bookings/{booking}/status', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateBookingStatus'])->name('individual.bookings.status');
         // Individual CRUD Routes
     Route::post('/individual/assignments', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'storeAssignment'])->name('individual.assignments.store');
+    Route::put('/individual/assignments/{assignment}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateAssignment'])->name('individual.assignments.update');
     Route::delete('/individual/assignments/{booking}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'destroyAssignment'])->name('individual.assignments.destroy');
         // Individual Sidebar Unlocks
     Route::get('/individual/bookings', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'bookingsPage'])->name('individual.bookings.list');

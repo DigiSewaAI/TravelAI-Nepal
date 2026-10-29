@@ -2360,4 +2360,10 @@ return [
     'updated_success' => 'Updated successfully.',
     'delete_artwork_confirm' => 'Delete this artwork?',
     'delete_order_confirm' => 'Delete this order?',
+    'add_assignment' => 'Add Assignment',
+    'edit_assignment' => 'Edit Assignment',
+    'update_assignment' => 'Update Assignment',
+    'assignment_updated' => 'Assignment updated successfully.',
+    'delete_assignment_confirm' => 'Delete this assignment?',
+    'in_progress_status' => 'In Progress',
 ];
