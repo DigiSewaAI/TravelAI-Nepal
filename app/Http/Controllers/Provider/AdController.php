@@ -12,6 +12,29 @@ use Illuminate\Support\Facades\Storage;
 
 class AdController extends Controller
 {
+    /**
+     * Resolve vertical-specific layout based on provider type.
+     */
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
     public function __construct(private AdService $adService) {}
 
     private function getProvider()
@@ -41,7 +64,8 @@ class AdController extends Controller
             'expired'  => Ad::where('provider_id', $provider->id)->where('status', 'expired')->count(),
         ];
 
-        return view('provider.ads.index', compact('ads', 'stats'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.ads.index', compact('ads', 'stats', 'provider_layout'));
     }
 
     /**
@@ -50,7 +74,9 @@ class AdController extends Controller
     public function create()
     {
         $pricing = Ad::PRICING;
-        return view('provider.ads.create', compact('pricing'));
+        $provider = Auth::user()->getCurrentProvider();
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.ads.create', compact('pricing', 'provider_layout'));
     }
 
     /**
@@ -128,6 +154,7 @@ class AdController extends Controller
 
         $ad->load(['payments', 'verifiedBy']);
 
-        return view('provider.ads.show', compact('ad'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.ads.show', compact('ad', 'provider_layout'));
     }
 }

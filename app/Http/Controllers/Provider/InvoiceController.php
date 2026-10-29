@@ -10,6 +10,29 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
+    /**
+     * Resolve vertical-specific layout based on provider type.
+     */
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -42,7 +65,8 @@ class InvoiceController extends Controller
             'overdue' => Invoice::where('provider_id', $provider->id)->where('status', 'overdue')->count(),
         ];
 
-        return view('provider.invoices.index', compact('invoices', 'stats'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.invoices.index', compact('invoices', 'stats', 'provider_layout'));
     }
 
     public function show(Invoice $invoice)
@@ -58,7 +82,8 @@ class InvoiceController extends Controller
             abort(403, 'Unauthorized access to this invoice.');
         }
 
-        return view('provider.invoices.show', compact('invoice'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.invoices.show', compact('invoice', 'provider_layout'));
     }
 
     public function download(Invoice $invoice)

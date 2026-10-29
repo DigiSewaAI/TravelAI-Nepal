@@ -2423,4 +2423,6 @@ return array (
   'by_revenue' => 'आम्दानी अनुसार',
   'by_sales' => 'बिक्री अनुसार',
   'by_earnings' => 'कमाई अनुसार',
+  'resolved' => 'समाधान',
+  'expired' => 'समाप्त',
 );

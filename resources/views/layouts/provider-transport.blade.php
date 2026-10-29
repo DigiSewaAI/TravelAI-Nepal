@@ -128,6 +128,40 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
       {{ __('messages.offers') }}
     </a>
+    {{-- Universal 5 Buttons (Phase 11) --}}
+    @if(auth()->user()->isProviderOwner())
+    <a href="{{ route('provider.sos-alerts.index') }}" class="{{ request()->routeIs('provider.sos-alerts.index.*') ? 'active' : '' }}">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ __('messages.sos_alerts_menu') }}</span>
+    </a>
+    @endif
+
+    <a href="{{ route('provider.ads.index') }}" class="{{ request()->routeIs('provider.ads.index.*') ? 'active' : '' }}">
+      <i class="fas fa-bullhorn"></i>
+      <span>{{ __('messages.ads_menu') }}</span>
+    </a>
+
+    @if(Route::has('provider.settings.payment-methods.index'))
+    <a href="{{ route('provider.settings.payment-methods.index') }}" class="{{ request()->routeIs('provider.settings.payment-methods.index.*') ? 'active' : '' }}">
+      <i class="fas fa-wallet"></i>
+      <span>{{ __('messages.pm_page_title') }}</span>
+    </a>
+    @endif
+
+    @if(Route::has('provider.invoices.index'))
+    <a href="{{ route('provider.invoices.index') }}" class="{{ request()->routeIs('provider.invoices.index.*') ? 'active' : '' }}">
+      <i class="fas fa-file-invoice"></i>
+      <span>{{ __('messages.invoices') }}</span>
+    </a>
+    @endif
+
+    @if(auth()->user()->hasPermission('view_payments'))
+    <a href="{{ route('provider.payments.index') }}" class="{{ request()->routeIs('provider.payments.index.*') ? 'active' : '' }}">
+      <i class="fas fa-credit-card"></i>
+      <span>{{ __('messages.payments') }}</span>
+    </a>
+    @endif
+
     <a href="{{ route('provider.profile') }}" class="{{ request()->routeIs('provider.profile') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       {{ __('messages.profile') }}

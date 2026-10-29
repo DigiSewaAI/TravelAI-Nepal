@@ -10,6 +10,29 @@ use Illuminate\Support\Facades\Storage;
 
 class PaymentMethodController extends Controller
 {
+    /**
+     * Resolve vertical-specific layout based on provider type.
+     */
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
     private const DOMESTIC_TYPES = ['bank', 'esewa', 'khalti', 'cash'];
     private const INTERNATIONAL_TYPES = ['paypal', 'wise', 'international_bank'];
 
@@ -44,10 +67,12 @@ class PaymentMethodController extends Controller
         $provider = $this->provider();
         $methods  = $provider->paymentMethods()->orderBy('sort_order')->orderBy('id')->get();
 
-        return view('provider.settings.payment-methods', [
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.settings.payment-methods', [
             'provider'      => $provider,
             'domestic'      => $methods->whereIn('type', self::DOMESTIC_TYPES),
             'international' => $methods->whereIn('type', self::INTERNATIONAL_TYPES),
+            'provider_layout' => $provider_layout
         ]);
     }
 

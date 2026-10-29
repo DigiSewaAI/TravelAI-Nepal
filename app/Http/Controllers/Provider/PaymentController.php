@@ -16,6 +16,29 @@ use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
+    /**
+     * Resolve vertical-specific layout based on provider type.
+     */
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
     protected $paymentService;
     protected $invoiceService;             // <-- Added
 
@@ -41,7 +64,15 @@ class PaymentController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('provider.payments.history', compact('payments'));
+        $provider_layout = $this->getProviderLayout($provider);
+
+        $stats = [
+            'total' => $payments->count(),
+            'paid' => $payments->whereIn('status', ['completed','paid','success'])->count(),
+            'pending' => $payments->where('status', 'pending')->count(),
+        ];
+
+        return view('provider.payments.history', compact('payments', 'provider_layout', 'stats'));
     }
 
     /**
@@ -55,7 +86,8 @@ class PaymentController extends Controller
             ->where('provider_id', $provider?->id)
             ->findOrFail($id);
 
-        return view('provider.payments.detail', compact('payment'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.payments.detail', compact('payment', 'provider_layout'));
     }
 
         /**
@@ -88,11 +120,10 @@ class PaymentController extends Controller
             ->latest()
             ->first();
 
-        return view('provider.payments.show', compact(
-            'subscription',
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.payments.show', compact('subscription',
             'platformMethods',
-            'pendingPayment'
-        ));
+            'pendingPayment', 'provider_layout'));
     }
 
         /**

@@ -11,6 +11,29 @@ use Illuminate\Support\Facades\Cache;
 class SosAlertController extends Controller
 {
     /**
+     * Resolve vertical-specific layout based on provider type.
+     */
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
+    /**
      * Resolve current provider (with super_admin fallback).
      */
     private function getProvider()
@@ -48,7 +71,15 @@ class SosAlertController extends Controller
             ->whereIn('status', ['pending', 'sent'])
             ->count();
 
-        return view('provider.sos-alerts.index', compact('alerts', 'activeCount', 'status'));
+        $provider_layout = $this->getProviderLayout($provider);
+
+        $stats = [
+            'total' => \App\Models\SosAlert::where('provider_id', $provider->id)->count(),
+            'active' => \App\Models\SosAlert::where('provider_id', $provider->id)->whereIn('status', ['pending','sent'])->count(),
+            'resolved' => \App\Models\SosAlert::where('provider_id', $provider->id)->where('status', 'resolved')->count(),
+        ];
+
+        return view('provider.sos-alerts.index', compact('alerts', 'activeCount', 'status', 'provider_layout', 'stats'));
     }
 
     /**
@@ -64,7 +95,8 @@ class SosAlertController extends Controller
 
         $sos->load(['traveler', 'booking.service']);
 
-        return view('provider.sos-alerts.show', compact('sos'));
+        $provider_layout = $this->getProviderLayout($provider);
+return view('provider.sos-alerts.show', compact('sos', 'provider_layout'));
     }
 
     /**

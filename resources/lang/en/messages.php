@@ -2402,4 +2402,6 @@ return array (
   'by_revenue' => 'By revenue',
   'by_sales' => 'By sales',
   'by_earnings' => 'By earnings',
+  'resolved' => 'Resolved',
+  'expired' => 'Expired',
 );
