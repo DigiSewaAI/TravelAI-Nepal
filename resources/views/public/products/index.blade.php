@@ -13,8 +13,8 @@
     ];
     $typeEyebrows = [
         'shop'      => __('messages.eyebrow_shop'),
-        'rental'    => 'Adventure Ready · Trusted Gear',
-        'wholesale' => 'B2B Marketplace · Verified Suppliers',
+        'rental'    => __('messages.eyebrow_rental'),
+        'wholesale' => __('messages.eyebrow_wholesale'),
     ];
 @endphp
 
@@ -22,9 +22,9 @@
 @php
     $carouselConfig = [
         'wholesale' => [
-            'eyebrow'  => 'Live B2B Marketplace',
-            'headline' => 'Bulk lots in motion.',
-            'subhead'  => 'Hand-picked wholesale inventory moving through the supplier network. Hover to pause and click any card for supplier details.',
+            'eyebrow'  => __('messages.live_b2b_eyebrow'),
+            'headline' => __('messages.bulk_lots_headline'),
+            'subhead'  => __('messages.bulk_lots_subhead'),
         ],
         'shop' => [
             'eyebrow'  => __('messages.from_workshop_title'),
@@ -32,9 +32,9 @@
             'subhead'  => __('messages.from_workshop_subhead'),
         ],
         'rental' => [
-            'eyebrow'  => 'Adventure Ready',
-            'headline' => 'Gear rotating in real-time.',
-            'subhead'  => 'Adventure-ready equipment moving through our network. Hover to pause and book your next expedition.',
+            'eyebrow'  => __('messages.adventure_ready_eyebrow'),
+            'headline' => __('messages.gear_rotating_headline'),
+            'subhead'  => __('messages.gear_rotating_subhead'),
         ],
     ];
     $carousel = $carouselConfig[$type] ?? $carouselConfig['wholesale'];
@@ -296,10 +296,10 @@
     @php
         $ctaConfig = [
             'wholesale' => [
-                'headline' => 'Ready to source at scale?',
-                'subhead'  => 'Request a bulk quote — our team responds within 24 hours.',
-                'btn1' => 'Request Bulk Quote',
-                'btn2' => 'Browse Suppliers',
+                'headline' => __('messages.wholesale_cta_title'),
+                'subhead'  => __('messages.wholesale_cta_subhead'),
+                'btn1' => __('messages.wholesale_cta_btn1'),
+                'btn2' => __('messages.wholesale_cta_btn2'),
                 'btn2_href' => url('/wholesale'),
             ],
             'shop' => [
@@ -310,10 +310,10 @@
                 'btn2_href' => url('/shop'),
             ],
             'rental' => [
-                'headline' => 'Ready for your next adventure?',
-                'subhead'  => 'Book premium gear — flexible dates, transparent deposits.',
-                'btn1' => 'Book Rental Dates',
-                'btn2' => 'View Available Gear',
+                'headline' => __('messages.rental_cta_title'),
+                'subhead'  => __('messages.rental_cta_subhead'),
+                'btn1' => __('messages.rental_cta_btn1'),
+                'btn2' => __('messages.rental_cta_btn2'),
                 'btn2_href' => url('/rental'),
             ],
         ];

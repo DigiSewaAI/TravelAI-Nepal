@@ -13,9 +13,9 @@
     }
 
     $badgeConfig = [
-        'rental'    => ['label' => 'Rental Gear', 'bg' => 'bg-amber-100',   'text' => 'text-amber-800',   'dot' => 'bg-amber-500'],
+        'rental' => ['label' => __('messages.rental_gear_label'), 'bg' => 'bg-amber-100',   'text' => 'text-amber-800',   'dot' => 'bg-amber-500'],
         'shop'      => ['label' => 'Handicraft',  'bg' => 'bg-emerald-100', 'text' => 'text-emerald-800', 'dot' => 'bg-emerald-500'],
-        'wholesale' => ['label' => 'Wholesale',   'bg' => 'bg-blue-100',    'text' => 'text-blue-800',    'dot' => 'bg-blue-500'],
+        'wholesale' => ['label' => __('messages.wholesale_badge_label'),   'bg' => 'bg-blue-100',    'text' => 'text-blue-800',    'dot' => 'bg-blue-500'],
     ];
     $badge = $badgeConfig[$product->product_type] ?? $badgeConfig['wholesale'];
 
@@ -85,12 +85,11 @@
         <div class="flex flex-wrap gap-1.5 mt-3 mb-4">
             @if($product->product_type === 'wholesale' && $product->wholesaleDetail)
                 <span class="inline-flex items-center text-[10.5px] font-bold bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-md">
-                    Min {{ $product->wholesaleDetail->min_order_qty }} units
+                    {{ __("messages.min") }} {{ $product->wholesaleDetail->min_order_qty }} {{ __("messages.units") }}
                 </span>
             @endif
             @if($product->product_type === 'rental' && $product->rentalDetail && $product->rentalDetail->rental_deposit)
-                <span class="inline-flex items-center text-[10.5px] font-semibold bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-md">
-                    Deposit: {{ $currencyService->format((float)$product->rentalDetail->rental_deposit, $baseCurrency) }}
+                <span class="inline-flex items-center text-[10.5px] font-semibold bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-md">{{ __("messages.products_deposit_label") }}: {{ $currencyService->format((float)$product->rentalDetail->rental_deposit, $baseCurrency) }}
                 </span>
             @endif
             @if($product->product_type === 'shop')
@@ -117,9 +116,7 @@
                 </span>
             @elseif($product->product_type === 'rental')
                 <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
-                    <i class="fas fa-calendar-check text-[10px]"></i>
-                    Book Now
-                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                    <i class="fas fa-calendar-check text-[10px]"></i>{{ __("messages.book_now") }}<i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                 </span>
             @else
                 <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
