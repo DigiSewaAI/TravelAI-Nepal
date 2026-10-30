@@ -173,15 +173,16 @@
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
             <div class="flex gap-2 lg:gap-4 xl:gap-6 text-gray-700 font-medium items-center min-w-0">
+                @php $__navPad = session('locale') === 'ru' ? '' : 'lg:px-2'; @endphp
                 <!-- Desktop Navigation Links (hidden on mobile) -->
-                <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.home') }}</a>
-                <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.features') }}</a>
-                <a href="{{ route('public.services.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.explore') }}</a>
-                <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_shop') }}</a>
-                <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.nav_rental') }}</a>
-                <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm hidden lg:inline-block">{{ __('messages.pricing') }}</a>
-                <a href="{{ route('public.wholesale.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.nav_wholesale') }}</a>
-                <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm hidden xl:inline-block">{{ __('messages.providers') }}</a>
+                <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.home') }}</a>
+                <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.features') }}</a>
+                <a href="{{ route('public.services.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.explore') }}</a>
+                <a href="{{ route('public.shop.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.nav_shop') }}</a>
+                <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.nav_rental') }}</a>
+                <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.pricing') }}</a>
+                <a href="{{ route('public.wholesale.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden xl:inline-block">{{ __('messages.nav_wholesale') }}</a>
+                <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden xl:inline-block">{{ __('messages.providers') }}</a>
 
                 <!-- Desktop Language Switcher (hidden on mobile) -->
                 <div class="relative hidden lg:block">

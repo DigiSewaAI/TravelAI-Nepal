@@ -1067,9 +1067,9 @@ document.addEventListener('DOMContentLoaded', function() {
   <section id="faq" class="py-20 px-6 md:px-10 bg-gray-50">
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-12">
-        <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">FAQ</span>
+        <span class="text-blue-600 font-semibold text-sm uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">{{ __('messages.faq') }}</span>
         <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900">{{ __('messages.faq_title') }}</h2>
-        <p class="text-gray-500 mt-3">Everything you need to know about TravelAI Nepal</p>
+        <p class="text-gray-500 mt-3">{{ __('messages.faq_subtitle') }}</p>
       </div>
       <div class="space-y-4">
         @foreach([

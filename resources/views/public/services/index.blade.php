@@ -300,9 +300,9 @@
         </div>
 
         <div class="mt-2 mb-3">
-            <label for="routeSelector" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">🗺️ Explore a Route</label>
+            <label for="routeSelector" class="text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('messages.explore_route_title') }}</label>
             <select id="routeSelector" class="mt-2 w-full md:w-1/2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700">
-                <option value="">— Select a route —</option>
+                <option value="">{{ __("messages.explore_route_select") }}</option>
             </select>
             <div id="routeMeta" class="mt-3 hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"></div>
             <div id="routeError" class="mt-2 hidden text-xs text-red-600"></div>
@@ -316,12 +316,12 @@
                 <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> {{ __('messages.activity') }}</div>
                 <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-pink-500"></span> {{ __('messages.pilgrimage') }}</div>
                 <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> {{ __('messages.wildlife') }}</div>
-                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background-color: #991b1b;"></span> Cities</div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" style="background-color: #991b1b;"></span>{{ __("messages.explore_cities_toggle") }}</div>
                         </div>
             {{-- GLOBE-02: Attribution removed per owner request --}}
                        {{-- GLOBE-03 v2: Hint badge (top-right, auto-hide at zoom >= 9) --}}
             <div id="waypointHint" class="absolute top-2 right-2 z-[500] bg-white/95 backdrop-blur rounded-lg border border-gray-200 shadow-md px-2 py-1 text-[10px] sm:px-3 sm:py-2 sm:text-xs text-gray-700 font-medium leading-tight max-w-[160px] sm:max-w-[240px] transition-opacity duration-300">
-                📍 <span id="waypointCountHint">8</span> mapped cities · zoom in to explore
+                📍 <span id="waypointCountHint">8</span> {{ __("messages.mapped_cities_suffix") }}
             </div>
             {{-- GLOBE-04: District information panel --}}
             <aside id="districtPanel" class="district-panel absolute z-[600] bg-white shadow-2xl border-gray-200 inset-x-0 bottom-0 max-h-[60vh] rounded-t-2xl border-t overflow-y-auto md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-80 md:max-h-full md:rounded-none md:rounded-l-2xl md:border-t-0 md:border-l">
@@ -343,7 +343,7 @@
         {{-- GLOBE-03 v2: Mapped Cities discovery chips --}}
         <div class="mt-4">
             <div class="flex items-center gap-2 mb-2">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">📍 Mapped Cities</span>
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __("messages.explore_mapped_cities") }}</span>
                 <span id="mappedCitiesCount" class="text-[10px] text-gray-400"></span>
             </div>
             <div id="mappedCitiesChips" class="chips-scroll flex gap-2 overflow-x-auto pb-1"></div>
@@ -383,13 +383,11 @@
     <div class="max-w-7xl mx-auto px-6 md:px-10">
         <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
             <div>
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">🗺️ Your Journey</h2>
-                <p class="text-sm text-gray-500 mt-1">Visualize your latest planned route.</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">{{ __('messages.your_journey_title') }}</h2>
+                <p class="text-sm text-gray-500 mt-1">{{ __("messages.your_journey_desc") }}</p>
             </div>
             <button id="viewJourneyBtn" type="button"
-                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">
-                View Journey
-            </button>
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">{{ __("messages.your_journey_btn") }}</button>
         </div>
         <div id="journeyMeta" class="hidden rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700"></div>
         <div id="journeyError" class="hidden mt-2 text-sm text-red-600"></div>
@@ -449,7 +447,7 @@
                    data-category="{{ $cat->slug }}"
                    role="tab"
                    class="category-link chip-pill {{ $categorySlug == $cat->slug ? 'active' : '' }} px-4 py-2 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-700 inline-flex items-center gap-2">
-                    {{ $catIcon }} {{ $cat->name }}
+                    {{ $catIcon }} {{ \App\Support\I18n::serviceCategory($cat->name) }}
                     <span class="text-xs opacity-70 font-normal">({{ number_format($count) }})</span>
                 </a>
             @endforeach
@@ -579,11 +577,11 @@
 
                             <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full {{ $catBadge }} backdrop-blur text-[11px] font-bold shadow-sm">
-                                    {{ $catIcon }} {{ strtoupper($service->category->name ?? 'SERVICE') }}
+                                    {{ $catIcon }} {{ \App\Support\I18n::serviceTypeText($service->category->name ?? 'SERVICE') }}
                                 </span>
                                 @if($difficulty)
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full border {{ $diffClass }} backdrop-blur text-[11px] font-bold shadow-sm">
-                                        {{ ucfirst($difficulty) }}
+                                        {{ \App\Support\I18n::difficulty($difficulty) }}
                                     </span>
                                 @endif
                             </div>

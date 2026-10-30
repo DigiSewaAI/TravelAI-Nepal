@@ -57,7 +57,7 @@
                 <div class="flex flex-wrap gap-2 mt-1">
                     @foreach($provider->types as $type)
                         <span class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-                            {{ $type->name }}
+                            {{ \App\Support\I18n::providerType($type->name) }}
                         </span>
                     @endforeach
                     @if($provider->verification_status === 'verified')

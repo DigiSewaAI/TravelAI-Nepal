@@ -64,7 +64,7 @@
                     <option value="">{{ __('messages.all_types') }}</option>
                     @foreach($providerTypes as $type)
                         <option value="{{ $type->slug }}" {{ request('type') == $type->slug ? 'selected' : '' }}>
-                            {{ $type->name }}
+                            {{ \App\Support\I18n::providerType($type->name) }}
                         </option>
                     @endforeach
                 </select>
@@ -135,7 +135,7 @@
             <div class="flex flex-wrap gap-1 mt-1">
                 @foreach($provider->types as $type)
                     <span class="text-xs bg-white/20 backdrop-blur-sm text-white px-2 py-0.5 rounded-full">
-                        {{ $type->name }}
+                        {{ \App\Support\I18n::providerType($type->name) }}
                     </span>
                 @endforeach
                 @if($provider->verification_status === 'verified')
