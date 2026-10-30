@@ -40,7 +40,11 @@
                     @php
                         $product = $item->product;
                         $baseCurrency = $product->currency ?? 'NPR';
-                        $unitPrice = $currencyService->convert((float) $product->price, $baseCurrency, $displayCurrency);
+                        // Unit price: use rental per-day rate for rentals (product.price is base/legacy)
+            $__unitPriceNpr = $product->isRental() && $product->rentalDetail
+                ? (float) $product->rentalDetail->rental_price_per_day
+                : (float) $product->price;
+            $unitPrice = $currencyService->convert($__unitPriceNpr, $baseCurrency, $displayCurrency);
                         $lineTotal = $currencyService->convert($item->subtotal, $baseCurrency, $displayCurrency);
                     @endphp
 
@@ -90,7 +94,11 @@
 
                         <div class="text-right">
                             <p class="font-bold text-blue-600">{{ $currencyService->format($lineTotal, $displayCurrency) }}</p>
-                            <p class="text-xs text-gray-400">{{ $currencyService->format($unitPrice, $displayCurrency) }} × {{ $item->quantity }}</p>
+                            <p class="text-xs text-gray-400">@if($item->rental_start_date && $item->rental_end_date)
+                    {{ $currencyService->format($unitPrice, $displayCurrency) }} × {{ (int) $item->rental_start_date->startOfDay()->diffInDays($item->rental_end_date->copy()->startOfDay()) }} {{ __("messages.days") }} × {{ $item->quantity }}
+                @else
+                    {{ $currencyService->format($unitPrice, $displayCurrency) }} × {{ $item->quantity }}
+                @endif</p>
                         </div>
                     </div>
                 @endforeach
@@ -108,7 +116,7 @@
 
                     <div class="flex justify-between text-sm mb-2">
                         <span class="text-gray-600">{{ __('messages.cart_subtotal') }}</span>
-                        <span class="font-medium text-gray-900">{{ $currencyService->format($subtotal, $displayCurrency) }}</span>
+                        <span class="font-medium text-gray-900">{{ $currencyService->format($currencyService->convert($subtotal, 'NPR', $displayCurrency), $displayCurrency) }}</span>
                     </div>
 
                     @if($rentalDeposit > 0)
@@ -123,7 +131,7 @@
                     <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-200 mb-6">
                         <span class="text-base font-bold text-gray-900">Total</span>
                         <span class="text-2xl font-black text-blue-600">
-                            {{ $currencyService->format($subtotal + ($rentalDeposit ?? 0), $displayCurrency) }}
+                            {{ $currencyService->format($currencyService->convert($subtotal + ($rentalDeposit ?? 0), 'NPR', $displayCurrency), $displayCurrency) }}
                         </span>
                     </div>
 

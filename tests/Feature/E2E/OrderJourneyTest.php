@@ -199,9 +199,9 @@ class OrderJourneyTest extends TestCase
 
         $this->assertNotNull($item->rental_start_date);
         $this->assertNotNull($item->rental_end_date);
-        $this->assertSame(4, $item->rental_days);
+        $this->assertSame(3, $item->rental_days); // 7-day policy
         // 500/day × 4 days = 2000
-        $this->assertSame('2000.00', (string) $item->line_total);
+        $this->assertSame('1500.00', (string) $item->line_total); // 3 days × 500
     }
 
     public function test_multi_vendor_order_workflow(): void

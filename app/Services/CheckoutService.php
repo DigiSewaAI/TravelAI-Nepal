@@ -38,7 +38,9 @@ class CheckoutService
                     if (!$inventory->isRentalAvailable(
                         $p,
                         $cart->rental_start_date->toDateString(),
-                        $cart->rental_end_date->toDateString()
+                        $cart->rental_end_date->toDateString(),
+                        null,
+                        (int) $cart->quantity
                     )) {
                         throw ValidationException::withMessages([
                             'cart' => __('messages.checkout_rental_unavailable', ['name' => $p->name]),
@@ -73,7 +75,7 @@ class CheckoutService
                     'rental_start_date' => $cart->rental_start_date,
                     'rental_end_date'   => $cart->rental_end_date,
                     'rental_days'       => ($product->isRental() && $cart->rental_start_date && $cart->rental_end_date)
-                        ? $cart->rental_start_date->diffInDays($cart->rental_end_date) + 1
+                        ? $cart->rental_start_date->startOfDay()->diffInDays($cart->rental_end_date->copy()->startOfDay())
                         : null,
                     'rental_deposit'    => $product->isRental()
                         ? ($product->rentalDetail->rental_deposit ?? 0)

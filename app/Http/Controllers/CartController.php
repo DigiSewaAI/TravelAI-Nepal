@@ -32,7 +32,7 @@ class CartController extends Controller
             }
 
             $days = \Carbon\Carbon::parse($validated['rental_start_date'])
-                ->diffInDays($validated['rental_end_date']) + 1;
+                ->startOfDay()->diffInDays(\Carbon\Carbon::parse($validated['rental_end_date'])->startOfDay());
 
             $detail = $product->rentalDetail;
             if ($detail && $detail->rental_min_days && $days < $detail->rental_min_days) {

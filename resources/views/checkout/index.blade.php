@@ -19,6 +19,17 @@
     <form method="POST" action="{{ route('checkout.store') }}">
         @csrf
 
+        @if($errors->any())
+            <div style="background:#fee;border:1px solid #f88;color:#900;padding:12px;border-radius:8px;margin-bottom:16px">
+                <strong>⚠️ Please fix:</strong>
+                <ul style="margin:8px 0 0 20px">
+                    @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-2 space-y-6">
@@ -96,7 +107,7 @@
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">{{ $item->product->name }} × {{ $item->quantity }}</span>
                                 <span class="font-medium">
-                                    {{ $currencyService->format($item->subtotal, $displayCurrency) }}
+                                    {{ $currencyService->format($currencyService->convert($item->subtotal, 'NPR', $displayCurrency), $displayCurrency) }}
                                 </span>
                             </div>
                         @endforeach
@@ -111,7 +122,7 @@
                         <div class="flex justify-between text-sm mt-2 pt-2 border-t text-gray-600">
                             <span>{{ __('messages.checkout_deposit_refundable') }}</span>
                             <span class="font-medium">
-                                {{ $currencyService->format($depositTotal, $displayCurrency) }}
+                                {{ $currencyService->format($currencyService->convert($depositTotal, 'NPR', $displayCurrency), $displayCurrency) }}
                             </span>
                         </div>
                     @endif
@@ -119,7 +130,7 @@
                     <div class="border-t pt-3 flex justify-between text-lg font-bold">
                         <span>{{ __('messages.checkout_total') ?? 'Total' }}</span>
                         <span class="text-blue-600">
-                            {{ $currencyService->format($subtotal + $depositTotal, $displayCurrency) }}
+                            {{ $currencyService->format($currencyService->convert($subtotal + $depositTotal, 'NPR', $displayCurrency), $displayCurrency) }}
                         </span>
                     </div>
 

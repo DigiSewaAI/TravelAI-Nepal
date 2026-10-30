@@ -87,9 +87,9 @@ class DepositHandlingTest extends TestCase
         $order = $this->checkout();
 
         // rental = 500 × 3 = 1500; deposit = 2000
-        $this->assertSame('1500.00', (string) $order->subtotal);
+        $this->assertSame('1000.00', (string) $order->subtotal); // 2 days (was 3)
         $this->assertSame('2000.00', (string) $order->deposit_total);
-        $this->assertSame('3500.00', (string) $order->total);
+        $this->assertSame('3000.00', (string) $order->total); // 1000+2000
     }
 
     public function test_deposit_total_zero_for_non_rental_orders(): void
@@ -145,9 +145,9 @@ class DepositHandlingTest extends TestCase
         $order = $this->checkout();
 
         // rental = 500 × 3 × 2 = 3000; deposit = 2000 × 2 = 4000; total = 7000
-        $this->assertSame('3000.00', (string) $order->subtotal);
+        $this->assertSame('2000.00', (string) $order->subtotal); // 2 days (was 3)
         $this->assertSame('4000.00', (string) $order->deposit_total);
-        $this->assertSame('7000.00', (string) $order->total);
+        $this->assertSame('6000.00', (string) $order->total); // 2000+4000
     }
 
     public function test_cart_shows_deposit_line(): void

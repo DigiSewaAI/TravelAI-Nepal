@@ -59,11 +59,35 @@ class InventoryService
     /**
      * Check rental availability for date range (no overlap).
      */
-    public function isRentalAvailable(Product $product, string $startDate, string $endDate, ?int $excludeOrderId = null): bool
+    public function isRentalAvailable(Product $product, string $startDate, string $endDate, ?int $excludeOrderId = null, int $requestedQty = 1): bool
     {
         if (!$product->isRental()) return true;
 
-        $query = DB::table('order_items')
+        // Total stock (rental uses stock_quantity as physical units available)
+        $totalStock = (int) ($product->stock_quantity ?? 0);
+
+        // Strict mode: if stock is 0 or unset, treat as "no stock configured" → allow (legacy behavior)
+        if ($totalStock <= 0) {
+            // Fallback: legacy boolean check
+            $query = DB::table('order_items')
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->where('order_items.product_id', $product->id)
+                ->whereIn('orders.status', ['pending', 'confirmed', 'processing', 'picked_up'])
+                ->whereNull('order_items.return_confirmed_at')
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->where('order_items.rental_start_date', '<=', $endDate)
+                      ->where('order_items.rental_end_date', '>=', $startDate);
+                });
+
+            if ($excludeOrderId) {
+                $query->where('orders.id', '!=', $excludeOrderId);
+            }
+
+            return $query->count() === 0;
+        }
+
+        // Stock-aware: sum quantities held in overlapping active rentals
+        $heldQty = (int) DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('order_items.product_id', $product->id)
             ->whereIn('orders.status', ['pending', 'confirmed', 'processing', 'picked_up'])
@@ -71,12 +95,11 @@ class InventoryService
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->where('order_items.rental_start_date', '<=', $endDate)
                   ->where('order_items.rental_end_date', '>=', $startDate);
-            });
+            })
+            ->when($excludeOrderId, fn($q) => $q->where('orders.id', '!=', $excludeOrderId))
+            ->sum('order_items.quantity');
 
-        if ($excludeOrderId) {
-            $query->where('orders.id', '!=', $excludeOrderId);
-        }
-
-        return $query->count() === 0;
+        $available = $totalStock - $heldQty;
+        return $available >= $requestedQty;
     }
 }

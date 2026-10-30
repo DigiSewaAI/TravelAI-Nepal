@@ -191,6 +191,6 @@ class CheckoutTest extends TestCase
         ]);
 
         $item = Order::first()->items()->first();
-        $this->assertSame(4, $item->rental_days);
+        $this->assertSame(3, $item->rental_days); // 7-day policy: diff (no +1)
     }
 }
