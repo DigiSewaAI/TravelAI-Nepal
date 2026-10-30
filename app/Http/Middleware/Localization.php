@@ -37,6 +37,7 @@ class Localization
             'np' => 'ne',      // Nepali
             'hi' => 'hi',      // Hindi
             'zh' => 'zh_CN',   // Chinese Simplified
+            'ru' => 'ru',       // Russian
             default => 'en',
         };
         \Carbon\Carbon::setLocale($carbonLocale);

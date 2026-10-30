@@ -3,6 +3,7 @@
     $htmlLang = match(app()->getLocale()) {
         'np' => 'ne',
         'zh' => 'zh-Hans',
+        'ru' => 'ru',
         default => app()->getLocale(),
     };
 @endphp
@@ -41,6 +42,7 @@
 <link rel="alternate" hreflang="en" href="{{ url()->current() }}">
 <link rel="alternate" hreflang="ne" href="{{ route('lang.switch', 'np') }}">
 <link rel="alternate" hreflang="hi" href="{{ route('lang.switch', 'hi') }}">
+<link rel="alternate" hreflang="ru" href="{{ route('lang.switch', 'ru') }}">
 <link rel="alternate" hreflang="zh-Hans" href="{{ route('lang.switch', 'zh') }}">
 <link rel="alternate" hreflang="x-default" href="{{ url()->current() }}">
 
@@ -123,7 +125,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/sw.js?v=3')
                     .then(function(registration) {
                         console.log('ServiceWorker registered successfully');
                     })
@@ -160,11 +162,11 @@
 
     <!-- ======================= HEADER ======================= -->
     <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/70 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-10 py-2 flex justify-between items-center gap-2">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2 flex justify-between items-center gap-2">
             <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center space-x-0 group flex-shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-10 sm:h-14 lg:h-16 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl sm:text-2xl text-blue-600\'></i>'">
-                <span class="font-extrabold text-sm sm:text-xl lg:text-2xl tracking-tight text-gray-800 whitespace-nowrap">
+                <img src="{{ asset('images/logo.png') }}" alt="{{ __('messages.app_name') }}" class="h-9 sm:h-12 lg:h-14 w-auto -mr-1" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-mountain text-xl sm:text-2xl text-blue-600\'></i>'">
+                <span class="font-extrabold text-sm sm:text-lg lg:text-xl tracking-tight text-gray-800 whitespace-nowrap">
                     {{ __('messages.app_name_short') }} <span class="text-blue-600">{{ __('messages.nepal') }}</span>
                 </span>
             </a>
@@ -188,6 +190,7 @@
                             @if(session('locale') == 'hi') 🇮🇳
                             @elseif(session('locale') == 'zh') 🇨🇳
                             @elseif(session('locale') == 'np') 🇳🇵
+                            @elseif(session('locale') == 'ru') 🇷🇺
                             @else 🇬🇧
                             @endif
                         </span>
@@ -195,6 +198,7 @@
                             @if(session('locale') == 'hi') हिन्दी
                             @elseif(session('locale') == 'zh') 中文
                             @elseif(session('locale') == 'np') नेपाली
+                            @elseif(session('locale') == 'ru') Русский
                             @else English
                             @endif
                         </span>
@@ -205,6 +209,7 @@
                     <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50 hidden" id="languageMenu">
                         <a href="{{ route('lang.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇬🇧 English</a>
                         <a href="{{ route('lang.switch', 'hi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇮🇳 हिन्दी</a>
+                        <a href="{{ route('lang.switch', 'ru') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇷🇺 Русский</a>
                         <a href="{{ route('lang.switch', 'zh') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇨🇳 中文</a>
                         <a href="{{ route('lang.switch', 'np') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">🇳🇵 नेपाली</a>
                     </div>
@@ -299,6 +304,7 @@
                         <select onchange="window.location.href='{{ url('/lang') }}/' + this.value" class="bg-gray-100 border border-gray-300 rounded-lg px-2 py-1 text-xs">
                             <option value="en" {{ session('locale') == 'en' || !session('locale') ? 'selected' : '' }}>🇬🇧 English</option>
                             <option value="hi" {{ session('locale') == 'hi' ? 'selected' : '' }}>🇮🇳 हिन्दी</option>
+                            <option value="ru" {{ session('locale') == 'ru' ? 'selected' : '' }}>🇷🇺 Русский</option>
                             <option value="zh" {{ session('locale') == 'zh' ? 'selected' : '' }}>🇨🇳 中文</option>
                             <option value="np" {{ session('locale') == 'np' ? 'selected' : '' }}>🇳🇵 नेपाली</option>
                         </select>

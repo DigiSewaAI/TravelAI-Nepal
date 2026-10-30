@@ -726,7 +726,7 @@ Route::get('/currency/switch', function (Illuminate\Http\Request $request) {
 // LANGUAGE SWITCH (Multi-Language Display)
 // =======================================
 Route::get('/lang/{locale}', function ($locale) {
-    $allowed = ['en', 'hi', 'zh', 'np'];
+    $allowed = ['en', 'hi', 'zh', 'np', 'ru'];
     if (in_array($locale, $allowed)) {
         session(['locale' => $locale]);
         Log::info('🔍 [Language Switch] Set session locale', ['locale' => $locale]);
