@@ -61,6 +61,7 @@ $segments = $segments->sortBy('sequence');
         // BUILD SEGMENTS WITH OVERNIGHT STOP FILTER
         // ============================================================
         $overnightSegments = [];
+        $roundTripBaseMap = []; // waypoint_id => index in $overnightSegments (round-trip days only)
         $dayNumber = 1;
         $mergedSegment = null;
         $mergedWaypoints = [];
@@ -72,11 +73,31 @@ $segments = $segments->sortBy('sequence');
             if ($isOvernight) {
                 if ($mergedSegment) {
                     $merged = $this->mergeSegments($mergedSegment, $segment);
-                    $overnightSegments[] = [
-                        'sequence' => $dayNumber++,
-                        'segment' => $merged,
-                        'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
-                    ];
+                    // Phase 4R-fix-19: Detect round-trip to same base (day-hike like GS→EBC→GS).
+                    // If an identical round-trip base already exists (e.g. GS→KP→GS after GS→EBC→GS),
+                    // merge the intermediate waypoints into the earlier day instead of creating
+                    // an orphan day at the end of the itinerary.
+                    $isRoundTripToBase = ($merged->fromWaypoint && $merged->toWaypoint
+                        && $merged->fromWaypoint->id === $merged->toWaypoint->id);
+
+                    if ($isRoundTripToBase && isset($roundTripBaseMap[$toWaypoint->id])) {
+                        $existingIdx = $roundTripBaseMap[$toWaypoint->id];
+                        foreach ($mergedWaypoints as $wpName) {
+                            if (!in_array($wpName, $overnightSegments[$existingIdx]['merged_waypoints'], true)) {
+                                $overnightSegments[$existingIdx]['merged_waypoints'][] = $wpName;
+                            }
+                        }
+                        Log::info("🔁 Merged round-trip into Day {$overnightSegments[$existingIdx]['sequence']} (base={$toWaypoint->name}, via=[" . implode(', ', $mergedWaypoints) . "])");
+                    } else {
+                        $overnightSegments[] = [
+                            'sequence' => $dayNumber++,
+                            'segment' => $merged,
+                            'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
+                        ];
+                        if ($isRoundTripToBase) {
+                            $roundTripBaseMap[$toWaypoint->id] = count($overnightSegments) - 1;
+                        }
+                    }
                     $mergedSegment = null;
                     $mergedWaypoints = [];
                 } else {
@@ -97,11 +118,41 @@ $segments = $segments->sortBy('sequence');
         }
 
         if ($mergedSegment) {
-            $overnightSegments[] = [
-                'sequence' => $dayNumber++,
-                'segment' => $mergedSegment,
-                'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
-            ];
+            $isRoundTripToBase = ($mergedSegment->fromWaypoint && $mergedSegment->toWaypoint
+                && $mergedSegment->fromWaypoint->id === $mergedSegment->toWaypoint->id);
+            if ($isRoundTripToBase && isset($roundTripBaseMap[$mergedSegment->toWaypoint->id])) {
+                $existingIdx = $roundTripBaseMap[$mergedSegment->toWaypoint->id];
+                foreach ($mergedWaypoints as $wpName) {
+                    if (!in_array($wpName, $overnightSegments[$existingIdx]['merged_waypoints'], true)) {
+                        $overnightSegments[$existingIdx]['merged_waypoints'][] = $wpName;
+                    }
+                }
+            } else {
+                $overnightSegments[] = [
+                    'sequence' => $dayNumber++,
+                    'segment' => $mergedSegment,
+                    'merged_waypoints' => array_values(array_unique($mergedWaypoints)),
+                ];
+            }
+        }
+
+        // Phase 4R-fix-19b: Trim if real days exceed requested (never cut the highest-altitude day).
+        $requestedDays = (int) ($input['days'] ?? 0);
+        if ($requestedDays > 0 && count($overnightSegments) > $requestedDays) {
+            $peakIdx = 0; $peakAlt = -1;
+            foreach ($overnightSegments as $idx => $item) {
+                $alt = (int) ($item['segment']->toWaypoint->altitude ?? 0);
+                if ($alt > $peakAlt) { $peakAlt = $alt; $peakIdx = $idx; }
+            }
+            if ($peakIdx < $requestedDays - 1) {
+                $excess = count($overnightSegments) - $requestedDays;
+                $overnightSegments = array_slice($overnightSegments, 0, $requestedDays);
+                foreach ($overnightSegments as $idx => &$item) { $item['sequence'] = $idx + 1; }
+                unset($item);
+                Log::info("✂️ Trimmed {$excess} excess day(s) to match requested {$requestedDays}");
+            } else {
+                Log::warning("⚠️ Requested {$requestedDays} < route {$realDays} — kept all (peak would be cut)");
+            }
         }
 
         Log::info("📊 Total overnight segments: " . count($overnightSegments));
@@ -844,7 +895,7 @@ $serviceName = $service
             'day_number' => $dayNumber,
             'title' => $title,
             'description' => $desc,
-            'overnight_waypoint_id' => $targetWaypoint->id,
+            'overnight_waypoint_id' => $isRoundTrip ? $to->id : $targetWaypoint->id,
 'distance_km' => $isRoundTrip ? ($distance * 2) : $distance,
 'estimated_time_hours' => (float) $seg->estimated_time_hours,
 'altitude_m' => $targetWaypoint->altitude,

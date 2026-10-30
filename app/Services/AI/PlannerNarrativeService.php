@@ -48,11 +48,11 @@ class PlannerNarrativeService
                 return $days;
             }
 
-            $this->applyNarratives($days, $narratives);
+            $originals = $this->applyNarratives($days, $narratives);
 
             // E1: post-narrative place validation (log only, non-blocking)
             try {
-                $this->validateNarratives($days, $routeName);
+                $this->validateNarratives($days, $routeName, $originals);
             } catch (\Throwable $e) {
                 Log::warning('E1: Narrative validation failed (non-blocking)', [
                     'error' => $e->getMessage(),
@@ -147,7 +147,7 @@ PROMPT;
     /**
      * E1: Validate narratives for hallucinated place names (log only).
      */
-    protected function validateNarratives(Collection $days, ?string $routeName): void
+    protected function validateNarratives(Collection $days, ?string $routeName, array $originals = []): void
     {
         $allText = $days->pluck('description')->filter()->implode(' ');
         if (trim($allText) === '') {
@@ -169,6 +169,89 @@ PROMPT;
                 'unknown_sample' => array_slice($unknowns, 0, 3),
             ]);
         }
+
+        // Bug 2 fix: repair narratives that mention places outside their day's route.
+        if (empty($originals)) {
+            return;
+        }
+
+        $allWpNames = \App\Models\Waypoint::whereNotNull('name')
+            ->pluck('name')
+            ->filter(fn($n) => mb_strlen((string) $n) >= 4)
+            ->values()
+            ->toArray();
+
+        $repaired = 0;
+        foreach ($days as $day) {
+            $n = (int) ($day->day_number ?? 0);
+            if (!isset($originals[$n])) {
+                continue;
+            }
+            $desc = (string) ($day->description ?? '');
+            if ($desc === '') {
+                continue;
+            }
+
+            $allowed = $this->extractTitlePlaces((string) ($day->title ?? ''));
+            $hallucinated = $this->findHallucinatedPlaces($desc, $allowed, $allWpNames, $unknowns);
+
+            if (!empty($hallucinated)) {
+                $day->description = $originals[$n];
+                $repaired++;
+                Log::warning('Bug 2 fix: narrative repaired', [
+                    'day'                 => $n,
+                    'hallucinated_places' => $hallucinated,
+                ]);
+            }
+        }
+
+        if ($repaired > 0) {
+            Log::info('Bug 2 fix: narratives repaired', [
+                'count' => $repaired,
+                'route' => $routeName ?? 'unknown',
+            ]);
+        }
+    }
+
+    protected function extractTitlePlaces(string $title): array
+    {
+        $t = preg_replace('/^\s*Day\s+\d+\s*[:\-–]\s*/iu', '', $title);
+        $parts = preg_split('/\s*(?:→|->|–)\s*/u', (string) $t);
+        return array_values(array_filter(array_map('trim', $parts ?? [])));
+    }
+
+    protected function findHallucinatedPlaces(string $desc, array $allowed, array $allWp, array $unknowns): array
+    {
+        $hallucinated = [];
+        $allowedLower = array_map(fn($a) => strtolower(trim($a)), $allowed);
+        $descLower = strtolower($desc);
+
+        // Check 1: unknown places (typos, variants like "Kala Pattar" for "Kala Patthar")
+        foreach ($unknowns as $u) {
+            if ($u !== '' && stripos($desc, $u) !== false) {
+                $hallucinated[] = 'unknown:' . $u;
+            }
+        }
+
+        // Check 2: known places that don't belong to this day's route
+        foreach ($allWp as $wp) {
+            $wpLower = strtolower((string) $wp);
+            if ($wpLower === '' || strpos($descLower, $wpLower) === false) {
+                continue;
+            }
+            $isAllowed = false;
+            foreach ($allowedLower as $a) {
+                if ($a === $wpLower || strpos($a, $wpLower) !== false || strpos($wpLower, $a) !== false) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            if (!$isAllowed) {
+                $hallucinated[] = 'wrong-day:' . $wp;
+            }
+        }
+
+        return array_values(array_unique($hallucinated));
     }
 
     /**
@@ -203,13 +286,16 @@ PROMPT;
         return $out;
     }
 
-    protected function applyNarratives(Collection $days, array $narratives): void
+    protected function applyNarratives(Collection $days, array $narratives): array
     {
+        $originals = [];
         foreach ($days as $day) {
             $n = (int) ($day->day_number ?? 0);
             if (isset($narratives[$n])) {
+                $originals[$n] = $day->description;
                 $day->description = $narratives[$n];
             }
         }
+        return $originals;
     }
 }
