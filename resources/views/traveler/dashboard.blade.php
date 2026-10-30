@@ -467,7 +467,11 @@
                             <option value="{{ $wp->name }}">{{ $wp->name }}</option>
                         @endforeach
                     </select>
-                    <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="w-full sm:flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700" required>
+                    <input type="file" name="media" id="fileInput" accept="image/*,video/*" class="hidden" required>
+                    <label for="fileInput" class="w-full sm:flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center gap-2">
+                        <i class="fas fa-folder-open text-blue-600"></i>
+                        <span id="fileInputLabel">{{ __('messages.choose_file') }}</span>
+                    </label>
                     <button type="submit" id="uploadBtn" class="w-full sm:w-auto whitespace-nowrap bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">
                         <i class="fas fa-upload"></i> {{ __('messages.traveler_upload_btn') }}
                     </button>
@@ -869,3 +873,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+{{-- File input filename display --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('fileInput');
+    const label = document.getElementById('fileInputLabel');
+    if (input && label) {
+        input.addEventListener('change', function(e) {
+            label.textContent = (e.target.files && e.target.files.length > 0)
+                ? e.target.files[0].name
+                : '{{ __("messages.no_file_chosen") }}';
+        });
+    }
+});
+</script>

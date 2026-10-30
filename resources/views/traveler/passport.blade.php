@@ -32,7 +32,7 @@
                             ⭐ {{ $xp ?? 0 }} XP
                         </span>
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                            📅 {{ __('messages.passport_member_since') }} {{ $user->created_at->format('M Y') }}
+                            📅 {{ __('messages.passport_member_since') }} {{ $user->created_at->translatedFormat('M Y') }}
                         </span>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                     </h2>
                     <h3 class="text-2xl font-bold text-gray-900">{{ $passportData['active_journey']['name'] }}</h3>
                     <p class="text-gray-600 text-sm">
-                        {{ __('messages.passport_member_since') }}: {{ $passportData['active_journey']['start_date']?->format('M d, Y') ?? 'N/A' }}
+                        {{ __('messages.passport_member_since') }}: {{ $passportData['active_journey']['start_date']?->translatedFormat('M d, Y') ?? 'N/A' }}
                         • {{ $passportData['active_journey']['checkins'] }} {{ __('messages.passport_stats_checkins') }}
                         • {{ $passportData['active_journey']['unique_waypoints'] }} {{ __('messages.passport_stats_unique_places') }}
                     </p>
@@ -134,7 +134,7 @@
                         <div class="font-semibold text-sm text-gray-800 truncate" title="{{ $stamp['location'] }}">
                             {{ $stamp['location'] }}
                         </div>
-                        <div class="text-xs text-gray-500">{{ $stamp['date']->format('M d, Y') }}</div>
+                        <div class="text-xs text-gray-500">{{ $stamp['date']->translatedFormat('M d, Y') }}</div>
                         @if($stamp['altitude'])
                             <div class="text-xs text-blue-600 font-medium">{{ number_format($stamp['altitude']) }}m</div>
                         @endif
@@ -169,7 +169,7 @@
     @endif
 </div>
                         <div class="font-semibold text-sm text-gray-800">{{ $item->achievement->name }}</div>
-                        <div class="text-[10px] text-gray-500">{{ $item->earned_at->format('M d, Y') }}</div>
+                        <div class="text-[10px] text-gray-500">{{ $item->earned_at->translatedFormat('M d, Y') }}</div>
                         <div class="text-xs text-amber-600 font-medium">+{{ $item->achievement->points }} XP</div>
                         @if($item->achievement->rarity)
                             <div class="mt-1">
@@ -178,7 +178,7 @@
                                     @elseif($item->achievement->rarity === 'epic') bg-indigo-200 text-indigo-800
                                     @elseif($item->achievement->rarity === 'rare') bg-blue-200 text-blue-800
                                     @else bg-gray-200 text-gray-700 @endif">
-                                    {{ $item->achievement->rarity }}
+                                    {{ \App\Support\I18n::rarity($item->achievement->rarity) }}
                                 </span>
                             </div>
                         @endif
@@ -196,7 +196,7 @@
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
         <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
             {{ __('messages.passport_trek_history_title') }}
-            <span class="text-sm font-normal text-gray-400">({{ $passportData['journeys']->count() }} treks)</span>
+            <span class="text-sm font-normal text-gray-400">({{ $passportData['journeys']->count() }} {{ __('messages.traveler_quick_treks') }})</span>
         </h2>
         @if($passportData['journeys']->count() > 0)
             <div class="space-y-3">
@@ -205,9 +205,9 @@
                         <div>
                             <div class="font-semibold text-gray-800">{{ $journey['name'] }}</div>
                             <div class="text-sm text-gray-500 flex items-center gap-3 flex-wrap">
-                                <span>{{ $journey['start_date']?->format('M d, Y') ?? 'N/A' }}</span>
-                                <span>• {{ $journey['checkins'] }} check-ins</span>
-                                <span>• {{ $journey['unique_waypoints'] }} unique places</span>
+                                <span>{{ $journey['start_date']?->translatedFormat('M d, Y') ?? 'N/A' }}</span>
+                                <span>• {{ $journey['checkins'] }} {{ __('messages.checkins') }}</span>
+                                <span>• {{ $journey['unique_waypoints'] }} {{ __('messages.unique_places') }}</span>
                             </div>
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold mt-2 sm:mt-0
@@ -233,7 +233,7 @@
             {{ __('messages.passport_back_to_dashboard') }}
         </a>
         <div class="text-xs text-gray-400">
-            {{ __('messages.passport_last_updated') }} {{ now()->format('M d, Y H:i') }}
+            {{ __('messages.passport_last_updated') }} {{ now()->translatedFormat('M d, Y H:i') }}
         </div>
     </div>
 </div>

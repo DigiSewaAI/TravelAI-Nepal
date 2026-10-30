@@ -2596,4 +2596,7 @@ return array (
   'rarity_common' => 'обычный',
   'choose_file' => 'Выбрать файл',
   'no_file_chosen' => 'Файл не выбран',
+  'rarity_legendary' => 'легендарный',
+  'shop_type_badge_label' => 'Ремесло',
+  'legal_updated_date' => 'Август 2026',
 );

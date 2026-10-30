@@ -56,7 +56,7 @@
 
 <div class="max-w-4xl mx-auto px-4 py-12">
     <div class="bg-white rounded-xl shadow-md border p-8 space-y-6">
-        <p class="text-gray-500 text-sm">{{ __('messages.privacy_last_updated', ['date' => 'August 2026']) }}</p>
+        <p class="text-gray-500 text-sm">{{ __('messages.privacy_last_updated', ['date' => __('messages.legal_updated_date')]) }}</p>
 
         <div>
             <h2 class="text-xl font-bold text-gray-800">{{ __('messages.privacy_section1_title') }}</h2>

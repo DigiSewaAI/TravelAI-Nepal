@@ -2002,4 +2002,7 @@ return array (
   'traveler_group_tools' => '工具和快捷方式',
   'choose_file' => '选择文件',
   'no_file_chosen' => '未选择文件',
+  'rarity_legendary' => '传奇',
+  'shop_type_badge_label' => '手工艺',
+  'legal_updated_date' => '2026年8月',
 );

@@ -1991,4 +1991,7 @@ return array (
   'rarity_common' => 'सामान्य',
   'choose_file' => 'फ़ाइल चुनें',
   'no_file_chosen' => 'कोई फ़ाइल नहीं चुनी गई',
+  'rarity_legendary' => 'पौराणिक',
+  'shop_type_badge_label' => 'हस्तशिल्प',
+  'legal_updated_date' => 'अगस्ट 2026',
 );

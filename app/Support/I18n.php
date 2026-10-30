@@ -79,4 +79,10 @@ class I18n {
         }
         return strtoupper($name);
     }
+
+    public static function rarity(?string $r): string {
+        if (!$r) return '';
+        $key = 'messages.rarity_' . strtolower(trim($r));
+        return Lang::has($key) ? __($key) : $r;
+    }
 }

@@ -37,7 +37,7 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
                         <div class="max-w-4xl mx-auto">
-                            <div class="text-sm uppercase tracking-widest text-blue-300">Checkpoint {{ $scene['index'] }}</div>
+                            <div class="text-sm uppercase tracking-widest text-blue-300">{{ __('messages.checkpoint') }} {{ $scene['index'] }}</div>
                             <h2 class="text-3xl md:text-5xl font-bold">{{ $scene['checkpoint'] }}</h2>
                             <div class="mt-2 flex flex-wrap gap-4 text-sm text-gray-300">
                                 @if($scene['scanned_at'])

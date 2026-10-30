@@ -2617,4 +2617,7 @@ return array (
   'rarity_common' => 'सामान्य',
   'choose_file' => 'फाइल छान्नुहोस्',
   'no_file_chosen' => 'कुनै फाइल छानिएको छैन',
+  'rarity_legendary' => 'पौराणिक',
+  'shop_type_badge_label' => 'हस्तशिल्प',
+  'legal_updated_date' => 'अगस्ट 2026',
 );

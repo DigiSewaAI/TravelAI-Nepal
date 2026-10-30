@@ -2596,4 +2596,7 @@ return array (
   'rarity_common' => 'common',
   'choose_file' => 'Choose File',
   'no_file_chosen' => 'No file chosen',
+  'rarity_legendary' => 'legendary',
+  'shop_type_badge_label' => 'Handicraft',
+  'legal_updated_date' => 'August 2026',
 );
