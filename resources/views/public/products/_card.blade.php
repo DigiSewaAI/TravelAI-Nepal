@@ -95,7 +95,7 @@
             @endif
             @if($product->product_type === 'shop')
                 <span class="inline-flex items-center text-[10.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-md">
-                    Handcrafted
+                    {{ __('messages.handcrafted') }}
                 </span>
             @endif
         </div>
@@ -104,15 +104,15 @@
             <div class="flex items-baseline gap-1">
                 <span class="text-xl font-extrabold text-gray-900">{{ $formattedPrice }}</span>
                 @if($product->product_type === 'rental')
-                    <span class="text-xs font-semibold text-gray-400">/ day</span>
+                    <span class="text-xs font-semibold text-gray-400">{{ __('messages.day') }}</span>
                 @else
-                    <span class="text-xs font-semibold text-gray-400">/ unit</span>
+                    <span class="text-xs font-semibold text-gray-400">{{ __('messages.unit') }}</span>
                 @endif
             </div>
             @if($product->product_type === 'wholesale')
                 <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
                     <i class="fas fa-file-invoice text-[10px]"></i>
-                    Request Quote
+                    {{ __('messages.request_quote') }}
                     <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                 </span>
             @elseif($product->product_type === 'rental')
@@ -123,9 +123,7 @@
                 </span>
             @else
                 <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition-all">
-                    <i class="fas fa-shopping-bag text-[10px]"></i>
-                    Add to Cart
-                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                    <i class="fas fa-shopping-bag text-[10px]"></i>{{ __('messages.add_to_cart') }}<i class="fas fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                 </span>
             @endif
         </div>

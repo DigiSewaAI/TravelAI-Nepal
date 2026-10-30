@@ -5,10 +5,10 @@
             <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                 <i class="fas fa-sliders-h text-xs"></i>
             </span>
-            Filters
+            {{ __('messages.filters') }}
         </h3>
         <a href="{{ url()->current() }}" class="text-xs font-semibold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-1">
-            <i class="fas fa-undo text-[10px]"></i> Reset
+            <i class="fas fa-undo text-[10px]"></i> {{ __('messages.reset') }}
         </a>
     </div>
 
@@ -20,7 +20,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <i class="fas fa-search text-gray-400 text-xs group-focus-within:text-blue-600 transition-colors"></i>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('messages.search_products') }}"
                        class="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium transition-all">
             </div>
         </div>
@@ -46,17 +46,17 @@
         </div>
 
         <div>
-            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Price Range</label>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('messages.price_range') }}</label>
             <div class="flex items-center gap-2">
                 <div class="relative w-full">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs font-bold pointer-events-none">$</span>
-                    <input type="number" name="min_price" step="0.01" min="0" value="{{ request('min_price') }}" placeholder="Min"
+                    <input type="number" name="min_price" step="0.01" min="0" value="{{ request('min_price') }}" placeholder="{{ __("messages.min") }}"
                            class="w-full pl-6 pr-2 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium transition-all">
                 </div>
                 <span class="text-gray-300 font-bold">—</span>
                 <div class="relative w-full">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs font-bold pointer-events-none">$</span>
-                    <input type="number" name="max_price" step="0.01" min="0" value="{{ request('max_price') }}" placeholder="Max"
+                    <input type="number" name="max_price" step="0.01" min="0" value="{{ request('max_price') }}" placeholder="{{ __("messages.max") }}"
                            class="w-full pl-6 pr-2 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium transition-all">
                 </div>
             </div>

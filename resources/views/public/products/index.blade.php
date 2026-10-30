@@ -12,7 +12,7 @@
         'wholesale' => __('messages.wholesale_index_subtitle'),
     ];
     $typeEyebrows = [
-        'shop'      => 'Handcrafted in Nepal · Shop Local',
+        'shop'      => __('messages.eyebrow_shop'),
         'rental'    => 'Adventure Ready · Trusted Gear',
         'wholesale' => 'B2B Marketplace · Verified Suppliers',
     ];
@@ -27,9 +27,9 @@
             'subhead'  => 'Hand-picked wholesale inventory moving through the supplier network. Hover to pause and click any card for supplier details.',
         ],
         'shop' => [
-            'eyebrow'  => 'From the Workshop',
-            'headline' => 'Handcrafted in Nepal, fresh from the source.',
-            'subhead'  => 'Unique handcrafted treasures from verified Nepali makers and workshops. Hover to pause and explore each piece.',
+            'eyebrow'  => __('messages.from_workshop_title'),
+            'headline' => __('messages.from_workshop_headline'),
+            'subhead'  => __('messages.from_workshop_subhead'),
         ],
         'rental' => [
             'eyebrow'  => 'Adventure Ready',
@@ -62,11 +62,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 max-w-3xl">
             <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg transition-all">
                 <div class="text-2xl font-black text-blue-600">{{ $products->total() }}</div>
-                <div class="text-[10.5px] text-gray-500 uppercase tracking-wider font-bold mt-1">Products</div>
+                <div class="text-[10.5px] text-gray-500 uppercase tracking-wider font-bold mt-1">{{ __('messages.products_count') }}</div>
             </div>
             <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg transition-all">
                 <div class="text-2xl font-black text-blue-600">{{ $locations->count() }}</div>
-                <div class="text-[10.5px] text-gray-500 uppercase tracking-wider font-bold mt-1">Locations</div>
+                <div class="text-[10.5px] text-gray-500 uppercase tracking-wider font-bold mt-1">{{ __('messages.locations_count') }}</div>
             </div>
         </div>
     </div>
@@ -86,8 +86,7 @@
 
                     <div class="flex items-center justify-between mb-6 mt-2 bg-white rounded-xl border border-gray-100 px-6 py-4 shadow-sm">
                         <span class="text-sm font-semibold text-gray-600">
-                            Showing <span class="text-blue-600 font-bold">{{ $products->firstItem() }}-{{ $products->lastItem() }}</span>
-                            of <span class="text-blue-600 font-bold">{{ $products->total() }}</span> results
+                            {{ __('messages.showing') }} <span class="text-blue-600 font-bold">{{ $products->firstItem() }}-{{ $products->lastItem() }}</span> {{ __("messages.of") }} <span class="text-blue-600 font-bold">{{ $products->total() }}</span> {{ __('messages.results') }}
                         </span>
                     </div>
 
@@ -171,17 +170,17 @@
 {{-- ========== VIEW MORE PRODUCTS (Premium) ========== --}}
 <div class="mt-12 flex flex-col items-center gap-3">
     <button type="button"
-            onclick="alert('Full catalogue coming soon — 24+ new SKUs weekly')"
+            onclick='alert({!! json_encode(__('messages.catalogue_soon')) !!})'
             class="btn-vm-premium">
         <span class="btn-vm-shine"></span>
-        <span class="btn-vm-text">View More Products</span>
+        <span class="btn-vm-text">{{ __('messages.view_more_products') }}</span>
         <span class="btn-vm-count">+6</span>
         <svg class="btn-vm-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14M13 6l6 6-6 6"/>
         </svg>
     </button>
     <p class="text-[11.5px] font-semibold text-gray-400 text-center">
-        Full catalogue coming soon · <span class="text-blue-600 font-bold">24+ new SKUs</span> added weekly
+        {{ __('messages.catalogue_soon') }}
     </p>
 </div>
 
@@ -190,10 +189,10 @@
                         <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5">
                             <i class="fas fa-search text-3xl text-blue-400"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('messages.no_products_found') }}</h3>
                         <p class="text-gray-500 text-sm max-w-md text-center mb-6">{{ __('messages.products_no_items') }} Try adjusting your filters or search terms.</p>
                         <a href="{{ url()->current() }}" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-md">
-                            Clear all filters
+                            {{ __('messages.clear_all_filters') }}
                         </a>
                     </div>
                 @endif
@@ -304,10 +303,10 @@
                 'btn2_href' => url('/wholesale'),
             ],
             'shop' => [
-                'headline' => 'Ready to bring home a piece of Nepal?',
-                'subhead'  => 'Discover handcrafted treasures from verified Nepali makers.',
-                'btn1' => 'Explore Handicrafts',
-                'btn2' => 'Shop All Handicrafts',
+                'headline' => __('messages.bottom_cta_title'),
+                'subhead'  => __('messages.bottom_cta_subhead'),
+                'btn1' => __('messages.explore_handicrafts'),
+                'btn2' => __('messages.shop_all_handicrafts'),
                 'btn2_href' => url('/shop'),
             ],
             'rental' => [
