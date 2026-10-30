@@ -56,7 +56,7 @@
                     @endif
                     @if($replayData['stats']['journey_start'] && $replayData['stats']['journey_end'])
                         <span class="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/5">
-                            {{ $replayData['stats']['journey_start']->format('M d') }} – {{ $replayData['stats']['journey_end']->format('M d, Y') }}
+                            {{ $replayData['stats']['journey_start']->translatedFormat('M d') }} – {{ $replayData['stats']['journey_end']->translatedFormat('M d, Y') }}
                         </span>
                     @endif
                 </div>
@@ -257,7 +257,7 @@
                                         </div>
 
                                         <div class="text-right text-sm text-gray-500 flex-shrink-0">
-                                            <div>{{ $event['start_date'] ? $event['start_date']->format('M d, Y') : 'N/A' }}</div>
+                                            <div>{{ $event['start_date'] ? $event['start_date']->translatedFormat('M d, Y') : 'N/A' }}</div>
                                             @if($event['duration'])
                                                 <div class="text-xs text-gray-400">{{ $event['duration'] }} {{ __('messages.journey_replay_days') }}</div>
                                             @endif

@@ -41,7 +41,7 @@
                             <h2 class="text-3xl md:text-5xl font-bold">{{ $scene['checkpoint'] }}</h2>
                             <div class="mt-2 flex flex-wrap gap-4 text-sm text-gray-300">
                                 @if($scene['scanned_at'])
-                                    <span>{{ $scene['scanned_at']->format('F j, Y') }}</span>
+                                    <span>{{ $scene['scanned_at']->translatedFormat('F j, Y') }}</span>
                                     <span>{{ $scene['scanned_at']->format('g:i A') }}</span>
                                 @endif
                                 @if($scene['altitude'])
@@ -57,7 +57,7 @@
             @endforeach
         @else
             <div class="w-full h-full flex items-center justify-center bg-black text-white">
-                <p>No journey data found.</p>
+                <p>{{ __("messages.cinematic_no_data") }}</p>
             </div>
         @endif
     </div>

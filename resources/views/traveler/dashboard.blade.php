@@ -64,21 +64,21 @@
             class="bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/20 transition-all duration-200 cursor-pointer">
         <i class="fas fa-bell text-2xl text-yellow-300"></i>
         <div class="leading-tight text-left">
-            <p class="text-[10px] uppercase tracking-wider text-blue-100/80">Notifications</p>
+            <p class="text-[10px] uppercase tracking-wider text-blue-100/80">{{ __('messages.notifications_widget_title') }}</p>
             <p class="text-lg font-bold">
     <span id="dashNotifBadge" class="text-white">0</span> 
-    <span id="dashNotifLabel" class="text-blue-100/80">unread</span>
+    <span id="dashNotifLabel" class="text-blue-100/80">{{ __("messages.notif_unread") }}</span>
 </p>
         </div>
     </button>
     <div id="dashNotifPanel" 
          class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
         <div class="px-4 py-3 border-b flex justify-between items-center">
-            <h3 class="font-semibold text-gray-800">Notifications</h3>
-            <a href="#" id="dashNotifMarkAll" class="text-xs text-blue-600 hover:underline">Mark all read</a>
+            <h3 class="font-semibold text-gray-800">{{ __('messages.notifications_widget_title') }}</h3>
+            <a href="#" id="dashNotifMarkAll" class="text-xs text-blue-600 hover:underline">{{ __('messages.notifications_mark_all_read') }}</a>
         </div>
         <div id="dashNotifList">
-            <p class="p-4 text-sm text-gray-500 text-center">No notifications</p>
+            <p class="p-4 text-sm text-gray-500 text-center">{{ __('messages.notifications_empty') }}</p>
         </div>
     </div>
 </div>
@@ -231,7 +231,7 @@
                         <h4 class="text-xl font-semibold text-gray-900">{{ $activeTrip->service->name ?? __('messages.na') }}</h4>
                         <p class="text-sm text-gray-500 mt-1">
                             <i class="far fa-calendar-alt mr-1"></i>
-                            {{ $activeTrip->start_date ? $activeTrip->start_date->format('M d, Y') : __('messages.tbd') }}
+                            {{ $activeTrip->start_date ? $activeTrip->start_date->translatedFormat('M d, Y') : __('messages.tbd') }}
                         </p>
                         <div class="flex flex-wrap items-center gap-3 mt-3">
                             <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
@@ -279,7 +279,7 @@
                                     <p class="font-medium text-gray-800">{{ $booking->service->name ?? __('messages.na') }}</p>
                                     <p class="text-xs text-gray-400">
                                         <i class="far fa-calendar-alt mr-1"></i>
-                                        {{ $booking->start_date ? $booking->start_date->format('M d, Y') : __('messages.tbd') }}
+                                        {{ $booking->start_date ? $booking->start_date->translatedFormat('M d, Y') : __('messages.tbd') }}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-3">
@@ -374,7 +374,7 @@
                                     <span class="text-xs font-medium text-green-600">
                                         <i class="fas fa-check-circle mr-1"></i> {{ __('messages.traveler_checked_in') }}
                                     </span>
-                                    <p class="text-[10px] text-gray-400">{{ $scan->scanned_at ? $scan->scanned_at->format('M d, Y H:i') : __('messages.na') }}</p>
+                                    <p class="text-[10px] text-gray-400">{{ $scan->scanned_at ? $scan->scanned_at->translatedFormat('M d, Y H:i') : __('messages.na') }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -495,7 +495,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="id" value="{{ $media->id }}">
-                                <button type="submit" onclick="return confirm('{{ __('messages.traveler_delete_memory_confirm') }}')" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
+                                <button type="submit" onclick="return confirm(__('messages.traveler_delete_memory_confirm'))" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
                             </form>
                         </div>
                     @endforeach
@@ -799,7 +799,7 @@ if (count > 0) {
 }
 
             if (data.notifications.length === 0) {
-                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No notifications</p>';
+                list.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">{{ __('messages.notifications_empty') }}</p>';
             } else {
                 list.innerHTML = data.notifications.map(n => `
                     <a href="${n.url}" data-id="${n.id}" class="dash-notif-item block px-4 py-3 border-b hover:bg-gray-50 ${n.read ? 'bg-white' : 'bg-blue-50'}">

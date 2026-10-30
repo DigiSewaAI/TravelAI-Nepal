@@ -48,7 +48,7 @@
                 b.textContent = i < selected ? '★' : '☆';
                 b.style.color = i < selected ? '#f59e0b' : '#d1d5db';
             });
-            ratingLabel.textContent = '{{ __('messages.traveler_review_rating_selected') }}' + selected + ' / 5';
+            ratingLabel.textContent = __('messages.traveler_review_rating_selected') + selected + ' / 5';
         });
     });
 </script>

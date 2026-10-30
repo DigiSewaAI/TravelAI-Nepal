@@ -311,23 +311,23 @@
     <!-- Quotation Request Modal -->
   <div id="quotationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-start justify-center z-50 overflow-y-auto py-8">
     <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-      <h3 class="text-xl font-bold mb-4">Request Quotation</h3>
-      <p class="text-sm text-gray-600 mb-4">Select a provider to send your itinerary for a quotation.</p>
+      <h3 class="text-xl font-bold mb-4">{{ __('messages.quotation_modal_title') }}</h3>
+      <p class="text-sm text-gray-600 mb-4">{{ __('messages.quotation_modal_desc') }}</p>
       <form id="quotationRequestForm">
         <input type="hidden" name="planner_result_id" id="plannerResultId">
         <div class="mb-4">
-    <label class="block font-medium mb-1">Select Provider *</label>
+    <label class="block font-medium mb-1">{{ __('messages.quotation_select_provider') }}</label>
 
     {{-- Search Box --}}
     <input type="text"
            id="providerSearch"
-           placeholder="Search provider by name..."
+           placeholder="{{ __('messages.quotation_search_provider') }}"
            class="w-full border rounded-lg px-4 py-2 mb-2"
            autocomplete="off">
 
     {{-- Provider Dropdown --}}
     <select name="provider_id" id="providerSelect" class="w-full border rounded-lg px-4 py-2" required size="1">
-        <option value="">Loading providers...</option>
+        <option value="">{{ __('messages.quotation_loading_providers') }}</option>
     </select>
 
     {{-- Selected Provider Display --}}
@@ -335,32 +335,32 @@
 </div>
 
         <div class="mb-4">
-    <label class="block font-medium mb-1">Your Full Name *</label>
+    <label class="block font-medium mb-1">{{ __('messages.quotation_your_name') }}</label>
     <input type="text" name="traveler_name" id="travelerName"
            class="w-full border rounded-lg px-4 py-2" required
-           placeholder="Enter your full name">
+           placeholder="{{ __('messages.quotation_your_name_placeholder') }}">
 </div>
 
 <div class="mb-4">
-    <label class="block font-medium mb-1">Your Email *</label>
+    <label class="block font-medium mb-1">{{ __('messages.quotation_your_email') }}</label>
     <input type="email" name="traveler_email" id="travelerEmail"
            class="w-full border rounded-lg px-4 py-2" required
            placeholder="your@email.com">
 </div>
 
 <div class="mb-4">
-    <label class="block font-medium mb-1">Your Phone (optional)</label>
+    <label class="block font-medium mb-1">{{ __('messages.quotation_your_phone') }}</label>
     <input type="text" name="traveler_phone" id="travelerPhone"
            class="w-full border rounded-lg px-4 py-2"
            placeholder="+977 98XXXXXXXX">
 </div>
 
         <div class="mb-4">
-          <label class="block font-medium mb-1">Message (optional)</label>
-          <textarea name="message" id="quotationMessage" rows="3" class="w-full border rounded-lg px-4 py-2" placeholder="Any special requests..."></textarea>
+          <label class="block font-medium mb-1">{{ __('messages.quotation_message_label') }}</label>
+          <textarea name="message" id="quotationMessage" rows="3" class="w-full border rounded-lg px-4 py-2" placeholder="{{ __('messages.quotation_message_placeholder') }}"></textarea>
         </div>
         <div class="flex gap-3">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex-1">Send Request</button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex-1">{{ __('messages.quotation_send_request') }}</button>
           <button type="button" onclick="closeQuotationModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">Cancel</button>
         </div>
       </form>
@@ -903,7 +903,7 @@ function loadProviders() {
             renderProviderOptions(allProviders);
         })
         .catch(() => {
-            select.innerHTML = '<option value="">Error loading providers</option>';
+            select.innerHTML = '<option value="">{{ __('messages.quotation_js_error') }}</option>';
         });
 }
 
@@ -912,7 +912,7 @@ function renderProviderOptions(providers) {
     select.innerHTML = '';
 
     if (providers.length === 0) {
-        select.innerHTML = '<option value="">No providers found</option>';
+        select.innerHTML = '<option value="">{{ __('messages.quotation_js_no_providers') }}</option>';
         return;
     }
 

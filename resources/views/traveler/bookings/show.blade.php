@@ -31,11 +31,11 @@
         <div class="grid grid-cols-2 gap-4 mt-6 border-t pt-4">
             <div>
                 <p class="text-sm text-gray-500">{{ __('messages.traveler_booking_start_date') }}</p>
-                <p class="font-medium">{{ $booking->start_date ? $booking->start_date->format('M d, Y') : __('messages.tbd') }}</p>
+                <p class="font-medium">{{ $booking->start_date ? $booking->start_date->translatedFormat('M d, Y') : __('messages.tbd') }}</p>
             </div>
             <div>
                 <p class="text-sm text-gray-500">{{ __('messages.traveler_booking_date') }}</p>
-                <p class="font-medium">{{ $booking->created_at->format('M d, Y H:i') }}</p>
+                <p class="font-medium">{{ $booking->created_at->translatedFormat('M d, Y H:i') }}</p>
             </div>
             <div class="col-span-2">
                 <p class="text-sm text-gray-500">{{ __('messages.traveler_booking_provider') }}</p>

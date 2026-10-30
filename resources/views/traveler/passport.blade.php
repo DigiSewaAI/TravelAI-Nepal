@@ -26,7 +26,7 @@
                     <p class="text-blue-100 text-lg">{{ $user->name }}</p>
                     <div class="flex items-center gap-3 mt-2 flex-wrap">
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                            🏅 Level {{ $level ?? 0 }}
+                            🏅 {{ __("messages.passport_level") }} {{ $level ?? 0 }}
                         </span>
                         <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
                             ⭐ {{ $xp ?? 0 }} XP
@@ -40,7 +40,7 @@
             <div class="mt-4 md:mt-0 text-right">
                 <span class="text-sm text-blue-200 block">{{ __('messages.passport_public_id_label') }}</span>
                 <span class="font-mono text-xs bg-black/20 px-3 py-1 rounded-lg backdrop-blur-sm">
-                    {{ $user->passport_public_id ? substr($user->passport_public_id, 0, 8) . '...' : 'Not Set' }}
+                    {{ $user->passport_public_id ? substr($user->passport_public_id, 0, 8) . '...' : __('messages.passport_not_set') }}
                 </span>
                 @if($user->passport_privacy === 'public')
                     <span class="ml-2 text-xs bg-green-500/30 px-2 py-0.5 rounded-full border border-green-400">{{ __('messages.passport_privacy_public') }}</span>

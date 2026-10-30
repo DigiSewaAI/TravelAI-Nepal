@@ -28,7 +28,7 @@
     @if($booking->isShareable())
         <div class="mt-3 flex flex-wrap gap-2">
             <input type="text" readonly value="{{ $booking->share_url }}" class="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]" id="shareUrlInput">
-            <button onclick="navigator.clipboard.writeText(document.getElementById('shareUrlInput').value).then(()=>alert('{{ __('messages.share_copy_alert') }}'))" class="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800">{{ __('messages.share_copy_btn') }}</button>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('shareUrlInput').value).then(()=>alert(__('messages.share_copy_alert')))" class="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800">{{ __('messages.share_copy_btn') }}</button>
             <form action="{{ route('traveler.share.revoke', $booking) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">{{ __('messages.share_revoke_btn') }}</button>

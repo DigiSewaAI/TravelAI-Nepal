@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        \Carbon\Carbon::setLocale(app()->getLocale());
         // F8-03: Force HTTPS scheme in production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');

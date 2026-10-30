@@ -97,7 +97,7 @@
                             <p class="text-sm text-gray-500 mt-1 flex flex-wrap items-center gap-3">
                                 <span>
                                     <i class="far fa-calendar-alt mr-1 text-gray-400"></i>
-                                    {{ $booking->start_date ? $booking->start_date->format('M d, Y') : __('messages.tbd') }}
+                                    {{ $booking->start_date ? $booking->start_date->translatedFormat('M d, Y') : __('messages.tbd') }}
                                 </span>
                                 @if($booking->service->provider)
                                     <span>
