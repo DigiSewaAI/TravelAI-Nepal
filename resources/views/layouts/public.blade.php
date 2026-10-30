@@ -182,8 +182,6 @@
                 <a href="{{ route('public.rental.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.nav_rental') }}</a>
                 <a href="{{ route('pages.pricing') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.pricing') }}</a>
                 <a href="{{ route('public.wholesale.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden xl:inline-block">{{ __('messages.nav_wholesale') }}</a>
-                <a href="{{ route('public.providers.index') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden xl:inline-block">{{ __('messages.providers') }}</a>
-
                 <!-- Desktop Language Switcher (hidden on mobile) -->
                 <div class="relative hidden lg:block">
                     <button type="button" class="flex items-center text-gray-700 hover:text-gray-900 text-sm font-medium" id="languageDropdown">
@@ -297,8 +295,6 @@
                 <a href="{{ route('public.rental.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_rental') }}</a>
                 <a href="{{ route('pages.pricing') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.pricing') }}</a>
                 <a href="{{ route('public.wholesale.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.nav_wholesale') }}</a>
-                <a href="{{ route('public.providers.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">{{ __('messages.providers') }}</a>
-
                 <div class="border-t border-gray-200 my-2 pt-2">
                     <div class="flex items-center justify-between px-3 py-2">
                         <span class="text-xs font-semibold text-gray-500 uppercase">{{ __('messages.language') ?? 'Language' }}</span>
