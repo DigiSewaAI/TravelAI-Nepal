@@ -172,8 +172,8 @@
             </a>
 
             <!-- Right side: Navigation + Currency + Language Switcher + Auth -->
-            <div class="flex gap-2 lg:gap-4 xl:gap-6 text-gray-700 font-medium items-center min-w-0">
-                @php $__navPad = session('locale') === 'ru' ? '' : 'lg:px-2'; @endphp
+            <div class="flex gap-1 lg:gap-2 xl:gap-4 text-gray-700 font-medium items-center min-w-0">
+                @php $__navPad = session('locale') === 'ru' ? '' : 'lg:px-1'; @endphp
                 <!-- Desktop Navigation Links (hidden on mobile) -->
                 <a href="{{ url('/') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.home') }}</a>
                 <a href="{{ url('/features') }}" class="nav-link text-xs lg:text-sm {{ $__navPad ?? '' }} hidden lg:inline-block">{{ __('messages.features') }}</a>
@@ -235,7 +235,7 @@
                 </script>
 
                                 <!-- Desktop Auth Buttons (hidden on mobile) -->
-                <div class="hidden lg:flex items-center gap-3">
+                <div class="hidden lg:flex items-center gap-2">
                     @auth
 
     @if(auth()->user()->isSuperAdmin())
@@ -257,7 +257,7 @@
                     @endauth
 
                     <!-- 🛒 Cart Icon (Compact) -->
-                    <a href="{{ route('cart.index') }}" class="relative text-gray-700 hover:text-blue-600 transition-colors p-2 ml-1">
+                    <a href="{{ route('cart.index') }}" class="relative flex-shrink-0 text-gray-700 hover:text-blue-600 transition-colors p-2 ml-1">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         @php $cartCount = app(\App\Services\CartService::class)->count(); @endphp
                         @if($cartCount > 0)
