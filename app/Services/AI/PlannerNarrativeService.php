@@ -175,7 +175,10 @@ PROMPT;
             return;
         }
 
+        // Option B: only landmark waypoints (peak/viewpoint/pass/lake) trigger repair.
+        // Villages, rivers, valleys, forests = allowed as contextual mentions.
         $allWpNames = \App\Models\Waypoint::whereNotNull('name')
+            ->whereIn('type', ['peak', 'viewpoint', 'pass', 'lake'])
             ->pluck('name')
             ->filter(fn($n) => mb_strlen((string) $n) >= 4)
             ->values()
@@ -226,14 +229,35 @@ PROMPT;
         $allowedLower = array_map(fn($a) => strtolower(trim($a)), $allowed);
         $descLower = strtolower($desc);
 
-        // Check 1: unknown places (typos, variants like "Kala Pattar" for "Kala Patthar")
-        foreach ($unknowns as $u) {
-            if ($u !== '' && stripos($desc, $u) !== false) {
-                $hallucinated[] = 'unknown:' . $u;
+        // Option B: $unknowns are logged in validateNarratives() but NOT used as
+        // repair triggers. Legitimate geographic mentions (Bhote Koshi, Thame Valley,
+        // rhododendron forests) that aren't in the waypoints table won't force repair.
+
+        // Check: known typo aliases (catches "Kala Pattar" typo variants)
+        // These are common misspellings that AI generates from training data.
+        $typoAliases = [
+            'kala pattar' => 'Kala Patthar',
+            'kala patar'  => 'Kala Patthar',
+            'khumbu icefal' => 'Khumbu Icefall',
+        ];
+        foreach ($typoAliases as $typo => $canonical) {
+            if (stripos($desc, $typo) === false) continue;
+            $canonicalLower = strtolower($canonical);
+            $isAllowed = false;
+            foreach ($allowedLower as $a) {
+                if ($canonicalLower === $a
+                    || strpos($a, $canonicalLower) !== false
+                    || strpos($canonicalLower, $a) !== false) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            if (!$isAllowed) {
+                $hallucinated[] = 'typo:' . $canonical;
             }
         }
 
-        // Check 2: known places that don't belong to this day's route
+        // Check: landmark places that don't belong to this day's route
         foreach ($allWp as $wp) {
             $wpLower = strtolower((string) $wp);
             if ($wpLower === '' || strpos($descLower, $wpLower) === false) {
