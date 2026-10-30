@@ -40,6 +40,33 @@ class CheckoutController extends Controller
 
         $order = $this->checkout->createOrder(auth()->user(), $validated);
 
+        $providerIds = [];
+        foreach ($order->items()->get() as $__it) {
+            $__pid = \App\Models\Product::where('id', $__it->product_id)->value('provider_id');
+            if ($__pid) $providerIds[] = (int)$__pid;
+        }
+        $providerIds = array_values(array_unique($providerIds));
+        $__orderNum = $order->order_number ?? $order->id;
+        $__orderTotal = $order->total ?? 0;
+        try {
+            if (!empty($providerIds)) {
+                foreach ($providerIds as $pid) {
+                    $ownerId = \App\Models\Provider::where('id', $pid)->value('user_id');
+                    if (!$ownerId) continue;
+                    $owner = \App\Models\User::find($ownerId);
+                    if ($owner && method_exists($owner, 'notify')) {
+                        $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                            title: 'New Order Received',
+                            message: 'Order ' . $__orderNum . ' — NPR ' . number_format($__orderTotal),
+                            category: 'product_order'
+                        ));
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'product_order', 'e' => $e->getMessage()]);
+        }
+
         return redirect()->route('orders.show', $order)
             ->with('success', __('messages.order_created'));
     }

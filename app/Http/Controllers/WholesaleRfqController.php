@@ -41,6 +41,28 @@ class WholesaleRfqController extends Controller
             'status'        => 'pending',
         ]);
 
+        $providerIds = $product->provider_id ? [(int)$product->provider_id] : [];
+        $__prodName = $product->name ?? 'Product';
+        $__qty = $validated['quantity'] ?? 0;
+        try {
+            if (!empty($providerIds)) {
+                foreach ($providerIds as $pid) {
+                    $ownerId = \App\Models\Provider::where('id', $pid)->value('user_id');
+                    if (!$ownerId) continue;
+                    $owner = \App\Models\User::find($ownerId);
+                    if ($owner && method_exists($owner, 'notify')) {
+                        $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                            title: 'New Wholesale RFQ',
+                            message: $__prodName . ' — Qty ' . $__qty,
+                            category: 'wholesale_rfq'
+                        ));
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'wholesale_rfq', 'e' => $e->getMessage()]);
+        }
+
         return redirect()->route('wholesale.rfq.show', $rfq)
             ->with('success', __('messages.rfq_created'));
     }

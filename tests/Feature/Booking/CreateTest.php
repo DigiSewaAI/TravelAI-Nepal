@@ -340,7 +340,10 @@ class CreateTest extends TestCase
         DB::disableQueryLog();
 
         // Reasonable threshold — no N+1 in create flow
-        $this->assertLessThanOrEqual(20, $count, "Create used $count queries");
+        // T17: +3 fixed queries from provider notification (deferred but runs sync in tests).
+        // Fixed cost (Provider lookup + User lookup + notifications INSERT), NOT N+1.
+        // Baseline was 20 (pre-notification). Adjusted to 25 (20 + 3 fixed + 2 margin).
+        $this->assertLessThanOrEqual(25, $count, "Create used $count queries (baseline 20 + 3 notification overhead)");
     }
 
     // T19 — 4 locales i18n keys resolve

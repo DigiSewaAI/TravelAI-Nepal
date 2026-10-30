@@ -169,6 +169,28 @@ class BookingController extends Controller
             ['booking' => $booking->id]
         );
 
+        $providerIds = $service->provider_id ? [(int)$service->provider_id] : [];
+        $__svcName = $service->name ?? 'Service';
+        $__travelerName = $validated['name'] ?? 'Guest';
+        try {
+            if (!empty($providerIds)) {
+                foreach ($providerIds as $pid) {
+                    $ownerId = \App\Models\Provider::where('id', $pid)->value('user_id');
+                    if (!$ownerId) continue;
+                    $owner = \App\Models\User::find($ownerId);
+                    if ($owner && method_exists($owner, 'notify')) {
+                        $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                            title: 'New Booking Received',
+                            message: $__svcName . ' — ' . $__travelerName,
+                            category: 'service_booking'
+                        ));
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'service_booking', 'e' => $e->getMessage()]);
+        }
+
         return redirect($signedUrl)->with('success', 'Booking created successfully!');
     }
 
