@@ -18,14 +18,21 @@
 @endpush
 
 @section('content')
-<div class="card">
-    <div class="card-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <div>
-            <h3 style="font-size:16px; font-weight:800;">{{ __('messages.order_history') }}</h3>
-            <p style="font-size:12px; color:var(--muted); margin-top:4px;">{{ __('messages.manage_orders_subtitle') }}</p>
+<div style="background:linear-gradient(135deg,var(--indigo) 0%,var(--indigo-d) 100%);border-radius:var(--radius);padding:26px 28px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:20px;box-shadow:0 10px 30px rgba(99,102,241,.25)">
+    <div style="min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h2 style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin:0;color:#fff">{{ __('messages.order_history') }}</h2>
+            <span style="background:rgba(255,255,255,.22);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase">{{ $orders->count() }} {{ __('orders') }}</span>
         </div>
-        <a href="{{ route('provider.inventory.dashboard') }}" class="btn-primary" style="background:var(--indigo); color:#fff; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">Back to Dashboard</a>
+        <p style="font-size:13px;opacity:.88;margin-top:6px;font-weight:500;margin-bottom:0">{{ __('messages.manage_orders_subtitle') }}</p>
     </div>
+    <a href="{{ route('provider.inventory.dashboard') }}" style="background:rgba(255,255,255,.2);color:#fff;padding:10px 18px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:800;border:1px solid rgba(255,255,255,.3);display:inline-flex;align-items:center;gap:6px;white-space:nowrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        {{ __('Back to Dashboard') }}
+    </a>
+</div>
+
+<div class="card">
     
     <div class="tbl-wrap">
         <table class="tbl">
@@ -36,11 +43,12 @@
                     <th>{{ __('messages.date') }}</th>
                     <th>{{ __('messages.amount') }}</th>
                     <th>{{ __('messages.status') }}</th>
+                    <th style="text-align:right">{{ __('Action') }}</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($orders as $o)
-                <tr>
+                                @forelse($orders as $o)
+                <tr onclick="window.location='{{ route('provider.inventory.orders.show', $o) }}'" style="cursor:pointer" onmouseover="this.style.background='var(--indigo-soft)'" onmouseout="this.style.background=''">
                     <td><span style="font-weight:800; font-family:monospace; color:var(--indigo-d);">{{ $o->order_number }}</span></td>
                     <td>
                         <div class="customer-cell">
@@ -63,9 +71,15 @@
                             <span class="pill" style="background:var(--indigo-soft); color:var(--indigo-d);">{{ ucfirst($o->status) }}</span>
                         @endif
                     </td>
+                    <td style="text-align:right" onclick="event.stopPropagation()">
+                        <a href="{{ route('provider.inventory.orders.show', $o) }}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:var(--indigo-soft);color:var(--indigo-d);font-size:12px;font-weight:800;text-decoration:none">
+                            {{ __('View') }}
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                        </a>
+                    </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center; padding:30px; color:var(--muted);">{{ __('messages.no_orders_found') }}</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:30px; color:var(--muted);">{{ __('messages.no_orders_found') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

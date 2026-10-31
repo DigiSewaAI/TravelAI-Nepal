@@ -16,13 +16,10 @@ class CheckoutController extends Controller
     public function index()
     {
         $items = $this->cart->items();
-
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', __('messages.cart_empty'));
         }
-
         $subtotal = $this->cart->subtotal();
-
         return view('checkout.index', compact('items', 'subtotal'));
     }
 
@@ -48,20 +45,25 @@ class CheckoutController extends Controller
         $providerIds = array_values(array_unique($providerIds));
         $__orderNum = $order->order_number ?? $order->id;
         $__orderTotal = $order->total ?? 0;
+
         try {
-            if (!empty($providerIds)) {
-                foreach ($providerIds as $pid) {
-                    $ownerId = \App\Models\Provider::where('id', $pid)->value('user_id');
-                    if (!$ownerId) continue;
-                    $owner = \App\Models\User::find($ownerId);
-                    if ($owner && method_exists($owner, 'notify')) {
-                        $owner->notify(new \App\Notifications\ProviderAlertNotification(
-                            title: 'New Order Received',
-                            message: 'Order ' . $__orderNum . ' — NPR ' . number_format($__orderTotal),
-                            category: 'product_order'
-                        ));
-                    }
-                }
+            foreach ($providerIds as $pid) {
+                $ownerId = \App\Models\Provider::where('id', $pid)->value('user_id');
+                if (!$ownerId) continue;
+                $owner = \App\Models\User::find($ownerId);
+                if (!$owner || !method_exists($owner, 'notify')) continue;
+
+                $__firstItem = $order->items->firstWhere('provider_id', $pid);
+                $__url = $__firstItem
+                    ? $__firstItem->providerNotificationUrl()
+                    : route('provider.dashboard');
+
+                $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                    title: 'New Order Received',
+                    message: 'Order ' . $__orderNum . ' — NPR ' . number_format($__orderTotal),
+                    category: 'product_order',
+                    url: $__url
+                ));
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'product_order', 'e' => $e->getMessage()]);

@@ -271,6 +271,13 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
         // Inventory Sidebar Unlocks
     Route::get('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'productsPage'])->name('inventory.products');
     Route::get('/inventory/orders', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'ordersPage'])->name('inventory.orders');
+    Route::get('/inventory/orders/{order}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'showOrder'])
+    ->name('inventory.orders.show');
+    Route::patch('/inventory/orders/{order}/status', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateOrderStatus'])
+    ->name('inventory.orders.updateStatus');
+
+Route::patch('/inventory/orders/{order}/verify-payment', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'verifyPayment'])
+    ->name('inventory.orders.verifyPayment');
         Route::get('/inventory/inventory', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'inventoryPage'])->name('inventory.inventory');
     Route::get('/inventory/suppliers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'suppliersPage'])->name('inventory.suppliers');
     Route::get('/inventory/reports', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'reportsPage'])->name('inventory.reports');

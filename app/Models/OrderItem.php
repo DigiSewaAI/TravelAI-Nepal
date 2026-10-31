@@ -42,7 +42,14 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Provider::class);
     }
-
+public function providerNotificationUrl(string $category = 'order'): string
+{
+    $isInventory = in_array($this->product_type, ['shop', 'rental', 'wholesale'], true);
+    if ($isInventory) {
+        return route('provider.inventory.orders.show', $this->order_id);
+    }
+    return route('provider.orders.show', $this->order_id);
+}
     public function scopeForProvider($q, $pid)
     {
         return $q->where('provider_id', $pid);
@@ -63,7 +70,7 @@ class OrderItem extends Model
                         'New Order Received',
                         'New order ' . ($item->order->order_number ?? '#' . $item->order_id) . ' — ' . $item->product_name . ' (Qty: ' . $item->quantity . ')',
                         'order',
-                        route('provider.orders.show', $item->order_id)
+                        $item->providerNotificationUrl()
                     ));
                 }
             } catch (\Throwable $e) {

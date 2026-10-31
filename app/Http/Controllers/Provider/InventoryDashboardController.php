@@ -279,6 +279,112 @@ class InventoryDashboardController extends Controller
 
         return view('provider.inventory.orders', compact('provider', 'orders', 'stockHealth'));
     }
+public function showOrder(\App\Models\Order $order)
+{
+    $provider = \Auth::user()->getCurrentProvider();
+    if (!$provider) abort(403);
+
+    $order->load([
+        'items' => function ($q) use ($provider) {
+            $q->where('provider_id', $provider->id);
+        },
+        'items.product',
+        'statusHistory.changedByUser',
+    ]);
+
+    if ($order->items->isEmpty()) abort(404);
+
+    $provider_layout = 'layouts.provider-inventory';
+    return view('provider.inventory.orders.show', compact('order', 'provider_layout'));
+}
+public function updateOrderStatus(\Illuminate\Http\Request $request, \App\Models\Order $order)
+{
+    $provider = \Auth::user()->getCurrentProvider();
+    if (!$provider) abort(403);
+
+    if ($order->items()->where('provider_id', $provider->id)->doesntExist()) {
+        abort(403);
+    }
+
+    $validated = $request->validate([
+        'status' => 'required|in:pending,confirmed,processing,completed,cancelled',
+    ]);
+
+    $currentStatuses = \App\Models\OrderItem::where('order_id', $order->id)
+        ->where('provider_id', $provider->id)
+        ->pluck('provider_status')
+        ->unique();
+
+    if ($currentStatuses->count() === 1 && $currentStatuses->first() === $validated['status']) {
+        return back()->with('info', 'Status is already ' . $validated['status'] . '. No change made.');
+    }
+
+    $oldStatus = $order->status;
+
+    \DB::transaction(function () use ($order, $provider, $validated, $oldStatus) {
+        \App\Models\OrderItem::where('order_id', $order->id)
+            ->where('provider_id', $provider->id)
+            ->update([
+                'provider_status' => $validated['status'],
+                'provider_status_updated_at' => now(),
+            ]);
+
+        $allStatuses = \App\Models\OrderItem::where('order_id', $order->id)
+            ->pluck('provider_status')
+            ->unique();
+
+        if ($allStatuses->count() === 1) {
+            $order->update(['status' => $allStatuses->first()]);
+        }
+
+        \App\Models\OrderStatusHistory::record(
+            $order,
+            $validated['status'],
+            $oldStatus,
+            null,
+            \Auth::id(),
+            'provider',
+            'Status updated by provider'
+        );
+    });
+
+    return back()->with('success', 'Order status updated to ' . $validated['status'] . '.');
+}
+
+public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Order $order)
+{
+    $provider = \Auth::user()->getCurrentProvider();
+    if (!$provider) abort(403);
+
+    if ($order->items()->where('provider_id', $provider->id)->doesntExist()) {
+        abort(403);
+    }
+
+    if ($order->payment_status !== 'pending') {
+        return back()->with('info', 'Payment already ' . $order->payment_status . '.');
+    }
+
+    \DB::transaction(function () use ($order) {
+        $order->update([
+            'payment_status'      => 'paid',
+            'paid_at'             => now(),
+            'payment_verified_at' => now(),
+            'payment_verified_by' => \Auth::id(),
+        ]);
+
+        \App\Models\OrderStatusHistory::record(
+            $order,
+            $order->status,
+            $order->status,
+            null,
+            \Auth::id(),
+            'provider',
+            'Payment verified by provider'
+        );
+    });
+
+    return back()->with('success', 'Payment verified.');
+}
         public function inventoryPage()
     {
         $provider = Auth::user()->getCurrentProvider();

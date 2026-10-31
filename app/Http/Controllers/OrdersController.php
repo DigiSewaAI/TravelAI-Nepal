@@ -59,11 +59,16 @@ class OrdersController extends Controller
             $providers = \App\Models\Provider::whereIn('id', $providerIds)->with('user')->get();
             foreach ($providers as $prov) {
                 if ($prov->user) {
+                    $__item = $order->items->first();
+                    $__url = ($__item && in_array($__item->product_type, ['shop','rental','wholesale'], true))
+                        ? route('provider.inventory.orders.show', $order->id)
+                        : route('provider.orders.show', $order->id);
+
                     $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
                         'Payment Notice Received',
                         'Traveler sent payment for order ' . $order->order_number . ' (Ref: ' . $validated['payment_reference'] . ')',
                         'payment',
-                        route('provider.orders.show', $order->id)
+                        $__url
                     ));
                 }
             }
