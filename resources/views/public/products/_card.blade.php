@@ -2,7 +2,11 @@
     $currencyService = app(\App\Services\CurrencyService::class);
     $displayCurrency = $currencyService->getDisplayCurrency();
     $baseCurrency = $product->currency ?? 'NPR';
-    $displayPrice = $currencyService->convert((float) $product->price, $baseCurrency, $displayCurrency);
+    $__source = ($product->isRental() && $product->rentalDetail)
+        ? (float) $product->rentalDetail->rental_price_per_day
+        : (float) $product->price;
+    $__base = $product->isRental() ? 'NPR' : $baseCurrency;
+    $displayPrice = $currencyService->convert($__source, $__base, $displayCurrency);
     $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
 
     $imgUrl = null;

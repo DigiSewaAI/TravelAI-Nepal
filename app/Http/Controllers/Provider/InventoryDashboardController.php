@@ -294,8 +294,13 @@ public function showOrder(\App\Models\Order $order)
 
     if ($order->items->isEmpty()) abort(404);
 
+    // Sidebar Health Calculation
+    $totalProducts = Product::where('provider_id', $provider->id)->count();
+    $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
+    $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
+
     $provider_layout = 'layouts.provider-inventory';
-    return view('provider.inventory.orders.show', compact('order', 'provider_layout'));
+    return view('provider.inventory.orders.show', compact('order', 'provider_layout', 'stockHealth'));
 }
 public function updateOrderStatus(\Illuminate\Http\Request $request, \App\Models\Order $order)
 {
@@ -309,6 +314,17 @@ public function updateOrderStatus(\Illuminate\Http\Request $request, \App\Models
     $validated = $request->validate([
         'status' => 'required|in:confirmed,shipped,delivered,cancelled',
     ]);
+
+    // Guard: return flow सुरु भएपछि status change नगर्ने (item-based check)
+    $hasReturnFlow = $order->items()->whereNotNull('return_requested_at')->exists();
+    if ($hasReturnFlow) {
+        return back()->with('error', 'Status cannot be changed after return flow has started.');
+    }
+
+    // Guard: payment paid नभएसम्म ship/deliver नगर्ने
+    if (in_array($validated['status'], ['shipped', 'delivered'], true) && $order->payment_status !== 'paid') {
+        return back()->with('error', 'Payment must be verified before shipping or delivering.');
+    }
 
     $currentStatuses = \App\Models\OrderItem::where('order_id', $order->id)
         ->where('provider_id', $provider->id)
@@ -491,6 +507,11 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
             return back()->with('info', __('messages.return_not_requested'));
         }
 
+        // Guard: payment verified भए मात्र return confirm गर्ने (refund financial safety)
+        if ($order->payment_status !== 'paid') {
+            return back()->with('error', 'Payment must be verified before confirming return and processing refund.');
+        }
+
         $validated = $request->validate([
             'return_condition' => 'required|in:good,damaged,lost',
             'return_notes'     => 'nullable|string|max:1000',
@@ -513,6 +534,7 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
             ->whereNotNull('deposit_refunded_at')
             ->sum('deposit_refund_amount');
         $order->deposit_refunded_at = now();
+        $order->status = 'returned';
         $order->save();
 
         try {

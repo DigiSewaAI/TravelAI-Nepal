@@ -70,12 +70,12 @@ class CurrencyService
     public function format(float $amount, string $currency): string
     {
         if ($currency === 'USD') {
-            return '$' . number_format($amount, 0);
+            return '$' . number_format($amount, 2);
         }
         if ($currency === 'NPR') {
             return 'Rs. ' . number_format($amount, 0);
         }
-        return number_format($amount, 0);
+        return number_format($amount, 2);
     }
 
     public function getSymbol(string $currency): string

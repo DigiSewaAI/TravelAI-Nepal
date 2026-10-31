@@ -178,7 +178,12 @@
       {{ __('Actions') }}
     </h3>
 
-    <form method="POST" action="{{ route('provider.inventory.orders.updateStatus', $order) }}" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+    @if($order->items->contains(fn($i) => $i->return_requested_at !== null))
+      <div style="background:var(--amber-soft,#fef4e2);border:1px solid var(--amber,#f59e0b);color:#b45309;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:700">
+        {{ __('Status locked — return flow in progress') }}
+      </div>
+    @else
+        <form method="POST" action="{{ route('provider.inventory.orders.updateStatus', $order) }}" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
       @csrf @method('PATCH')
       <select name="status" style="padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:700;background:#fff;color:var(--text)">
         @foreach(['confirmed','shipped','delivered','cancelled'] as $s)
@@ -187,6 +192,7 @@
       </select>
       <button type="submit" class="btn-primary">{{ __('Update Status') }}</button>
     </form>
+    @endif
 
     @if($order->payment_status === 'pending' && $order->payment_reference)
       <div style="padding-top:14px;border-top:1px solid var(--line)">
@@ -202,4 +208,14 @@
   </div>
 
 </div>
+{{-- Stock Health widget sync --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const SH = {{ (int)($stockHealth ?? 0) }};
+    const el = document.getElementById('scVal');
+    const bar = document.getElementById('scBar');
+    if (el) el.innerHTML = SH + '% <small>{{ __('messages.in_stock_label') }}</small>';
+    if (bar) bar.style.width = SH + '%';
+});
+</script>
 @endsection

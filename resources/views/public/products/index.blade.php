@@ -242,7 +242,14 @@
                         <h4 class="font-bold text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[2.5rem]">{{ $product->name }}</h4>
                         <p class="text-[11px] text-gray-400 font-semibold mt-1 truncate">{{ $product->provider->name ?? '' }}</p>
                         <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                            <span class="text-sm font-extrabold text-blue-600">{{ $product->currency ?? 'NPR' }} {{ number_format($product->price) }}</span>
+                            <span class="text-sm font-extrabold text-blue-600">@php
+                                $__cs = app(\App\Services\CurrencyService::class);
+                                $__dc = $__cs->getDisplayCurrency();
+                                $__rental = $product->isRental() && $product->rentalDetail;
+                                $__src = $__rental ? (float)$product->rentalDetail->rental_price_per_day : (float)$product->price;
+                                $__base = $__rental ? 'NPR' : ($product->currency ?? 'NPR');
+                            @endphp
+                            {{ $__cs->format($__cs->convert($__src, $__base, $__dc), $__dc) }}</span>
                             <i class="fas fa-arrow-right text-xs text-blue-400 group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </div>
@@ -259,7 +266,14 @@
                         <h4 class="font-bold text-sm text-gray-900 line-clamp-2 min-h-[2.5rem]">{{ $product->name }}</h4>
                         <p class="text-[11px] text-gray-400 font-semibold mt-1 truncate">{{ $product->provider->name ?? '' }}</p>
                         <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                            <span class="text-sm font-extrabold text-blue-600">{{ $product->currency ?? 'NPR' }} {{ number_format($product->price) }}</span>
+                            <span class="text-sm font-extrabold text-blue-600">@php
+                                $__cs = app(\App\Services\CurrencyService::class);
+                                $__dc = $__cs->getDisplayCurrency();
+                                $__rental = $product->isRental() && $product->rentalDetail;
+                                $__src = $__rental ? (float)$product->rentalDetail->rental_price_per_day : (float)$product->price;
+                                $__base = $__rental ? 'NPR' : ($product->currency ?? 'NPR');
+                            @endphp
+                            {{ $__cs->format($__cs->convert($__src, $__base, $__dc), $__dc) }}</span>
                             <i class="fas fa-arrow-right text-xs text-blue-400"></i>
                         </div>
                     </div>

@@ -43,7 +43,10 @@
     $currencyService = app(\App\Services\CurrencyService::class);
     $displayCurrency = $currencyService->getDisplayCurrency();
     $baseCurrency = $product->currency ?? 'NPR';
-    $displayPrice = $currencyService->convert((float) $product->price, $baseCurrency, $displayCurrency);
+    $__sourcePrice = ($product->isRental() && $product->rentalDetail)
+        ? (float) $product->rentalDetail->rental_price_per_day
+        : (float) $product->price;
+    $displayPrice = $currencyService->convert($__sourcePrice, $baseCurrency, $displayCurrency);
     $formattedPrice = $currencyService->format($displayPrice, $displayCurrency);
     
     // Fix Image URL logic (Handle both local and external)

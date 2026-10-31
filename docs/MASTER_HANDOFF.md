@@ -1,273 +1,266 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER HANDOFF — SESSION 11 (POST-PUSH STATE)
-FROM: Co-Assistant
+👑 MASTER HANDOFF — SESSION 12 (LOCAL, NOT PUSHED)
+FROM: Session 12 Assistant
 TO:   Master / Future Reference
-DATE: 2026-10-30 (Session 11)
-HEAD: main @ f95b96a (PRODUCTION — deployed to Laravel Cloud)
-STATUS: 🟢 Batch 1-17 i18n + AI Planner Complete | 🟢 Live | 🟡 New Scope Defined
+DATE: 2026-10-31
+HEAD: main @ 87ea702 (LOCAL — 4 commits ahead of origin/main f95b96a)
+STATUS: 🟢 Rental lifecycle COMPLETE | 🟡 Notification/UI work in progress | ⚠️ NOT PUSHED
 ═══════════════════════════════════════════════════════════
 
-## 🎉 MILESTONE — PRODUCTION LIVE (Session 11)
+## 🚨 CRITICAL — PUSH STATUS
 
-f95b96a deployed to https://travelainepal.com
-Laravel Cloud shows: "Deployed just now" ✅
+**Production is STILL at f95b96a. Session 12 work is LOCAL ONLY.**
 
-### Session 11 Commits (2 pushed)
+| Item | Value |
+|------|-------|
+| origin/main | `f95b96a` (production — Live) |
+| Local HEAD | `87ea702` |
+| Commits ahead | **4 (NOT pushed)** |
+| Push trigger | Owner "push" GO only (R17) |
 
-| Commit | Message | Impact |
-|--------|---------|--------|
-| `87957c3` | fix(planner): Day 8 cost + narrative hallucination repair | Day 8 lodge NPR 3990 + Kala Patthar Day 8 |
-| `f95b96a` | fix(narrative): landmark-only validator + typo aliases | Zero hallucinations, 13/14 AI narrative |
+## 📊 SESSION 12 — 4 COMMITS (LOCAL)
 
-### Session 11 — Batches (all committed + deployed)
+| # | Hash | Message | Files |
+|---|------|---------|-------|
+| 1 | `685afec` | feat(notifications): inventory-aware bell + order detail page | 8 |
+| 2 | `22d1ca1` | feat(rental+purchases): return flow close + bell notification + traveler/provider nav + my purchases page | 11 |
+| 3 | *(hash pending)* | feat(purchases): My Purchases in all 8 provider layouts + theme-aware colors | 8 |
+| 4 | `87ea702` | feat(analytics): Google Analytics integration | 3 |
 
-| Batch | Scope | Commit / File |
-|-------|-------|---------------|
-| 1 | Shop products (5 locales) | `7beec3a` |
-| 2 | Rental + wholesale (5 locales) | `182f5ce` |
-| 3+4 | Providers + Explore + Home + Layout + Pagination | `f2bc146` |
-| 5+6+7fix | Traveler pages + quotation modal + Carbon + 500 fix | committed |
-| 7b+8+11 | Passport dates, rarity, file input, shop badge, legal months | committed |
-| 13 | Kala Patthar day dedup (15→14 days) | `87957c3` |
-| 14 | Day 8 lodge cost fix | `87957c3` |
-| 15 | Narrative hallucination validator | `87957c3` |
-| 16 | Landmark-only relax (AI narrative restored) | `f95b96a` |
-| 17 | Typo alias (Kala Pattar caught) | `f95b96a` |
-| — | Kala Patthar waypoint migration | `2026_10_30_042113` |
-
-### Production Verified (post-deploy)
-
-| Check | Result |
-|-------|--------|
-| `/` → Plan with AI → EBC 14 days | Day 8 = EBC+KP (narrative), 14 days, NPR 118,155 ✅ |
-| Day 7 narrative | DET (EBC hallucination caught) ✅ |
-| Day 8 narrative | AI "Early morning... pre-dawn hike to Kala Patthar" ✅ |
-| Kala Patthar cost | Gorak Shep Lodge NPR 3990 ✅ |
-| Zero hallucination | 13/14 AI narrative, 1 repaired (Day 7) ✅ |
-| 186/186 tests | ✅ |
-| Shop/Rental/Wholesale `?lang=zh` | 手工艺, 购物车 ✅ |
-| Legal pages `?lang=ru` | Август 2026 ✅ |
-| Traveler dashboard `?lang=zh` | 未读, 选择文件 ✅ |
-| Providers `?lang=zh` | 显示 1 至 12 / 30 条结果 ✅ |
+**⚠️ Commit 3 hash unverified** — verify: `git log --oneline f95b96a..HEAD`
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 OWNER DECISIONS (Session 11 — LOCKED)
+## ✅ COMPLETED THIS SESSION (Evidence-based)
 
-### ❌ SKIP (confirmed by Owner)
-
-| Item | Reason |
+### Rental Lifecycle (Inventory) — END-TO-END
+| Step | Status |
 |------|--------|
-| **Provider Dashboard i18n** | EN/NP enough — never touch |
-| **bn/fr/de languages** | Post-push MULTILINGUAL-EXPANSION-01 |
-| **Admin panel i18n** | Future |
-| **Error pages (404/500) i18n** | Future |
-| **Payment gate middleware** | Post-launch feature |
-| **Pricing feature gating** | Post-launch feature |
+| Order placed → provider notified (bell + DB) | ✅ |
+| Payment notice sent → provider notified | ✅ |
+| Provider confirms order (status update) | ✅ |
+| Provider verifies payment | ✅ |
+| Traveler requests return | ✅ |
+| Provider confirms return (condition: good/damaged/lost) | ✅ |
+| Deposit refund calculated + recorded | ✅ |
+| Traveler sees refund breakdown | ✅ |
+| History timeline records all transitions | ✅ |
 
-### 🟡 PRIORITY — Owner's New 6-Item List
+**Verified DB values (ORD-26-00005):**
+- `return_confirmed_at` = 2026-10-31 04:33:30
+- `return_condition` = good
+- `deposit_refund_amount` = 3000.00
+- `order.deposit_refunded_amount` = 3000.00
 
-| # | Task | Size |
-|---|------|------|
-| 1 | **Pricing page/plan verify → decisive action** | 🟢 Small (10-15 min) |
-| 2 | **7 categories notification enable** | 🟢 Small (15-20 min) |
-| 3 | **CSS-HARMONIZE-01** | 🟡 Medium (hours) |
-| 4 | **Admin panel full notification enable** | 🟡 Medium (1-2 hr) |
-| 5 | **VERTICAL-AI-FEATURES-01** | 🔴 Large (weeks — 7 verticals × AI) |
-| 6 | **ADVANCED-HOTEL-FOLIO-01** (future note) | 🔴 Large (months) |
+### Bell UI (Inventory + Trekking)
+| Layout | Bell | Dropdown | Badge | My Purchases |
+|--------|------|----------|-------|--------------|
+| Inventory | ✅ | ✅ | ✅ | ✅ |
+| Trekking | ✅ (existing) | ✅ | ✅ | ✅ (added this session) |
+| Hotel | ❌ | ❌ | ❌ | ✅ |
+| Restaurant | ❌ | ❌ | ❌ | ✅ |
+| Transport | ❌ | ❌ | ❌ | ✅ |
+| Individual | ❌ | ❌ | ❌ | ✅ |
+| Money Changer | ❌ | ❌ | ❌ | ✅ |
+| Art Craft | ❌ | ❌ | ❌ | ✅ |
 
-### 🔍 P1 — i18n Implementation Status (VERIFY FIRST, then decide)
+### Navigation UI
+- **Traveler dashboard**: "My Orders" card (product orders) + "My Bookings" (treks) — दुवै visible ✅
+- **Header nav**: "My Orders" link (auth area) ✅
+- **Provider sidebar (all 8)**: "My Purchases" link above Logout ✅
+- **My Purchases page**: `/provider/my-purchases` — styled list, theme-aware, empty-state with Rental/Shop/Wholesale buttons ✅
 
-**Owner's rule:** "i18n implemented छ भने skip, छैन भने priority"
+### Notifications — Fixed
+- Vertical-aware URL routing (`OrderItem::providerNotificationUrl()`)
+- Backfill: 5 existing notifications updated
+- Return request notification (bell) — added to `OrdersController::notifyProviderReturnRequested`
+- Translation keys: `return_not_requested`, `order_status_returned`, `return_requested`, `product_orders`, `my_purchases`, `items_count` (en + np)
 
-| # | Page | Status |
-|---|------|--------|
-| 1 | Service detail (`/explore/service/{slug}`) | ⏳ verify_p1.php pending |
-| 2 | Booking form (`/explore/service/{slug}/book`) | ⏳ verify |
-| 3 | Booking confirmation | ⏳ verify |
-| 4 | Emails (booking, invoice, SOS, order) | ⏳ verify (likely ❌ NO) |
-| 5 | Show Premium (SOS/Ads/Invoices/Payments detail) | ⏳ verify (likely ❌ NO) |
+### Bug Fixes
+- **Status update enum mismatch**: `provider_status` ENUM = `('pending','confirmed','shipped','delivered','cancelled')` — dropdown values fixed (removed `processing`/`completed` which caused 500)
+- **Double prefix route bug**: `provider.provider.inventory.orders.*` → `provider.inventory.orders.*` (route group `provider` prefix conflicts)
+- **Data truncation 500**: root cause = wrong enum values submitted
 
-**Next action:** run `verify_p1.php` → accurate SKIP/PRIORITY decisions
-
-═══════════════════════════════════════════════════════════
-
-## 📊 CURRENT STATE SUMMARY
-
-| Item | Status |
-|------|--------|
-| **HEAD** | `f95b96a` (production live) |
-| **Remote** | In sync — 0 commits ahead |
-| **Tests** | **186/186 passing** |
-| **i18n (5 locales)** | ✅ Public + Traveler + Legal |
-| **AI Planner** | ✅ EBC 14-day perfect |
-| **7 Vertical Dashboards** | ✅ 7/7 complete (Session 10) |
-| **QA** | ✅ 7/7 PASSED |
-| **Booking Gating** | ✅ Complete (`692cf04`) |
-| **Push (R17)** | ✅ **PUSHED** — production live |
-| **New P1 verify** | ⏳ Not started |
-| **New P2 priority** | ⏳ Not started |
+### Analytics
+- GA integration committed (composer + config/google-analytics.php) — Live verify: owner confirmed working on production
 
 ═══════════════════════════════════════════════════════════
 
-## 📋 UPDATED PRIORITY QUEUE
+## 🔴 BUGS DISCOVERED (New Tickets Queued)
 
-### 🔴 NEXT SESSION — Start Here
-
-**1. P1 i18n Verify (15 min)**
-- Run `verify_p1.php` (already provided)
-- Output: 4 categories × per-file verdict
-- Decision: SKIP (if full) / PRIORITY (if missing)
-
-**2. P2 Priority — Owner's 6 items (in order)**
-- Pricing page verify → decisive action
-- 7 categories notification enable
-- CSS-HARMONIZE-01
-- Admin panel notification enable
-- VERTICAL-AI-FEATURES-01 (per vertical, days)
-- ADVANCED-HOTEL-FOLIO-01 (future — Marriott style)
-
-### 🟡 POST-PUSH BACKLOG
-
-| Ticket | Priority |
-|--------|----------|
-| MULTILINGUAL-EXPANSION-01 (bn/fr/de) | 🟡 |
-| VERTICAL-BOOKING-BRIDGE-01 | 🟡 |
-| VERTICAL-INVOICE-SYSTEM-01 | 🟡 |
-| ROOM-IMAGE-GALLERY-01 | 🟡 |
-| ARTWORK-IMAGE-GALLERY-01 | 🟡 |
-| STAFF-PERMISSION-01 (RBAC) | 🟡 |
-| HOMESTAY-SERVICE-DATA-AUDIT-01 | 🟡 |
-| GUIDE-SERVICE-CLEANUP-01 | 🟡 |
-| TRANSPORT-BOOKINGS-LIST-01 | 🟡 |
-| INDIVIDUAL-RECENT-01 | 🟡 |
-| SHOW-PAGES-PREMIUM-01 (detail pages) | 🟢 |
-| PAYMENT-GATE-MIDDLEWARE-01 | 🟢 |
-| PRICING-FEATURE-GATING-01 | 🟢 |
-| TRANSPORT-RELATIONAL-REFACTOR-01 | 🟢 |
-| TRANSPORT-MULTI-MODAL-01 | 🟢 |
+| Ticket | Severity | Description |
+|--------|----------|-------------|
+| `BELL-5-LAYOUTS` | 🟡 High | Hotel, Restaurant, Transport, Individual, Money-changer, Art-craft layouts मा bell icon missing |
+| `TRAVELER-NOTIFICATION-TRIGGERS-01` | 🟡 High | Traveler ले provider action (confirm/verify/return) को notification पाउँदैन — trigger code नै छैन |
+| `TRAVELER-UNIFIED-BOOKINGS-01` | 🟡 Medium | `/my-bookings` — 7 tabs (Trek/Hotel/Transport/Individual/Shop/Rental/Wholesale) |
+| `SHOW-PAGES-5-VERTICALS` | 🟡 Medium | Hotel/Restaurant/Transport/Individual/Art-craft order show pages missing |
+| `SELF-NOTIFICATION-GUARD-01` | 🟢 Low | Provider आफ्नै action को notification skip (system-wide) |
+| `EXPLORE-PAGE-PERFORMANCE-01` | 🟡 Medium | Explore page slow production मा |
+| `PROVIDER-TRAVELER-SWITCH-01` | 🟢 Low | Dual-role account — provider dashboard बाट traveler orders पहुँच UX |
+| `SUPPLIER-CRUD-01` | 🟢 Low | `alert('coming soon')` — full CRUD missing |
+| `RENTAL-ENUM-01` | 🟢 Low | `picked_up`, `returned`, `overdue` enum मा थप्ने |
+| `PAYMENTS-UNIFIED-01` | 🟡 Medium | Payments page — subscription + order payments tabs |
+| `TREKKING-MY-PURCHASES-THEME` | 🟢 Low | Trekking purchases page uses indigo fallback (no --accent variable) |
 
 ═══════════════════════════════════════════════════════════
 
-## 🚨 CROSS-VERIFY STATUS
+## 🚨 CRITICAL — Known Architecture Issues
 
-### C1: Booking Flow — ✅ PASS
-- Trekking/Tour: Book → confirmation → QR
-- Non-bookable: Gated (Session 9C)
-- Hotel/Transport/Individual: Dashboard modal
+### 1. Provider Dashboard Lock Deviation
+**Original lock:** `provider.blade.php` — "Never touch"
+**This session:** Added "My Purchases" sidebar link (Owner-authorized for all 8 layouts)
+**Recommendation:** Update lock to "Trekking content locked — sidebar link additions allowed with Owner GO"
 
-### C2: Invoice — ✅ Trekking only
-- Trekking: download + email ✅
-- 6 other verticals: `VERTICAL-INVOICE-SYSTEM-01` backlog
+### 2. Enum Mismatch (RENTAL-ENUM-01)
+- `order_items.provider_status` ENUM = `('pending','confirmed','shipped','delivered','cancelled')`
+- Rental semantic flow would use `picked_up`/`returned`/`overdue` — NOT in enum
+- Current workaround: `shipped`/`delivered` = "picked up" semantics
+- Fix requires additive migration (R8-safe)
 
-### C3: QR/Check-in — ✅ Trekking only
-- Generic routes work
-- Other verticals: `ADVANCED-HOTEL-FOLIO-01` backlog
-
-### C4: Image Gallery — ✅ Services only
-- Services: `cover_image` + `gallery` ✅
-- Rooms/Artworks: Backlog
+### 3. Notification Self-Loop Risk
+- `findstr '->notify('` empty in `app\Http`, `Observers`, `Listeners` — dispatch scattered
+- Provider self-notification guard **NOT verified** — potential spam
+- Requires `SELF-NOTIFICATION-GUARD-01` ticket
 
 ═══════════════════════════════════════════════════════════
 
-## 🔒 LOCKED ITEMS (Owner's Orders)
+## 📋 MASTER'S 4 ANSWERS (Session 12, LOCKED)
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | `confirmReturn` admin notification? | **ना** — Inventory = buyer↔provider only |
+| 2 | Suppliers `alert('coming soon')`? | **Separate ticket** `SUPPLIER-CRUD-01` |
+| 3 | Backfill code? | **नै चाहिन्छ** — one-time tinker |
+| 4 | GA files in notification commit? | **अलग राख्ने** — `GA-INTEGRATION-01` (DONE this session) |
+
+═══════════════════════════════════════════════════════════
+
+## 🔒 LOCKED ITEMS (Owner's Orders — still active)
 
 | Item | Status |
 |------|--------|
 | Provider Dashboard languages | 🔒 EN/NP only (never touch) |
-| Trekking Views | 🔒 Byte-for-byte untouched |
-| `provider.blade.php` | 🔒 Never touch |
+| Trekking Views content | 🔒 Byte-for-byte untouched (**except sidebar My Purchases link added this session — Owner GO**) |
 | `provider-restaurant.blade.php` `:root` | 🔒 Never touch |
+| Admin panel i18n | 🔒 Future |
+| Error pages (404/500) i18n | 🔒 Future |
 
 ═══════════════════════════════════════════════════════════
 
-## 📋 RULES STATUS
+## 📊 Rules Status (R1-R17)
 
-- R3 (Evidence) ✅ — Verify before implement
-- R4 (Scope) ✅ — No scope creep
-- R8 (Additive migrations) ✅
-- R13 (Individual git add) ✅ — Never `git add .` or `git add -A`
-- R16 (186+ tests) ✅ — After every commit
-- R17 (Push) ✅ — Push complete Session 11 (Master GO given)
+| Rule | Status |
+|------|--------|
+| R3 (Evidence) | ✅ Verified with discovery each step |
+| R4 (Scope) | ✅ Rental close before unified page |
+| R8 (Additive migrations) | ✅ |
+| R13 (`git add` explicit) | ✅ — Never `git add .` |
+| R16 (186/186 tests) | ✅ — Verified after each commit |
+| R17 (Push) | ⚠️ **NOT PUSHED** — 4 commits local, awaiting Owner GO |
 
 ═══════════════════════════════════════════════════════════
 
-## 📝 TECHNICAL NOTES (Preserved from Session 10)
+## 🎯 NEXT SESSION PRIORITY QUEUE
 
-### Safe Fix Script Pattern (Proven)
-1. **Discovery** (read-only): locate anchor, show context, count tags, verify
-2. **Fix** (PHP heredoc, `php -l` before save)
-3. **Verify** (`php -l` + tests + git diff)
-4. **Cleanup** (delete scripts immediately)
+### 🔴 Immediate (Owner GO required)
+1. **Push** — 4 commits to production (`f95b96a` → `87ea702`)
+2. **Bell 5 layouts** — Batch script (per-file guard, theme-aware)
+3. **TRAVELER-NOTIFICATION-TRIGGERS-01** — Traveler bell currently never fires (no trigger code)
 
-### Translation File Edit Pattern (CRITICAL)
-**NEVER** use `strpos`/regex to insert keys. Use `require` + `array_merge` + `var_export`:
+### 🟡 Next
+4. **TRAVELER-UNIFIED-BOOKINGS-01** — `/my-bookings` 7 tabs
+5. **SHOW-PAGES-5-VERTICALS** — 5 detail pages
+6. **CSS-HARMONIZE-01** (from Session 11 backlog)
+7. **Admin notification enable** (from Session 11)
+
+### 🟢 Backlog (Session 11 + Session 12)
+- `SELF-NOTIFICATION-GUARD-01`
+- `EXPLORE-PAGE-PERFORMANCE-01`
+- `PROVIDER-TRAVELER-SWITCH-01`
+- `SUPPLIER-CRUD-01`
+- `RENTAL-ENUM-01`
+- `PAYMENTS-UNIFIED-01`
+- `TREKKING-MY-PURCHASES-THEME`
+- All Session 11 backlog tickets (MULTILINGUAL-EXPANSION, VERTICAL-AI-FEATURES, etc.)
+
+═══════════════════════════════════════════════════════════
+
+## 🛠️ PROVEN PATTERNS (Session 12)
+
+### One-Shot Batch Fix Script
 ```php
+// Pattern:
+1. require bootstrap/app.php
+2. patch() function: file_get_contents → anchor uniqueness check
+   → backup (.bak) → replace → php -l → revert on fail → save
+3. Per-file independent (fail isolated)
+4. Report: ✅ / • (already) / ⚠ (anchor) / ❌ (syntax)
+5. Delete script after run
+6. Hard refresh browser
+Anchor Uniqueness Guarantee
+php
+$cnt = substr_count($content, $anchor);
+if ($cnt === 0) → anchor not found
+if ($cnt > 1)   → anchor not unique
+if ($cnt === 1) → safe to patch
+Translation File Edit
+Use require + var_export (proven pattern from Session 11 — batch11 lesson):
+
+php
 $data = require $file;
 $data[$k] = $v;
 file_put_contents($file, "<?php\n\nreturn " . var_export($data, true) . ";\n");
-```
+Never str_replace on language files (accidental deletion risk).
 
-### Windows Encoding
-- Never write Nepali via PowerShell (ANSI corruption)
-- Use VS Code for Nepali/emoji
-- Commit messages: ASCII hyphen only (em dash breaks CMD)
-- CRLF warnings = harmless
+CMD Gotchas
+Multi-line -m breaks CMD → use single line or amend
 
-### Safe Fix Invariants (batch13-17 learned)
-- Brace balance: `substr_count('{') === substr_count('}')`
-- Line count unchanged (except additive)
-- `php -l` pass
-- Auto-revert on fail
+--execute with $ escaping fails → use interactive php artisan tinker
 
-### batch1c Lesson (avoid)
-- Broad regex replacement → structural damage
-- Always validate invariants post-replace
+for %f in (...) fails with }} escaping → use PHP script instead
 
-### batch15-17 Lesson (narrative validator)
-- Too strict = false positives (rivers, valleys flagged)
-- Landmark-only filter (peak/viewpoint/pass/lake)
-- Typo aliases needed (Kala Pattar → Kala Patthar)
-- Log-only unknowns, not repair triggers
+echo. fails as "not recognized" — CMD quirk, harmless
 
 ═══════════════════════════════════════════════════════════
 
-## 🎯 NEXT STEPS (STRICT ORDER)
+💡 KEY CONTEXT FOR NEW ASSISTANT
+Owner = "दाइ" (never "Bhai")
 
-### Session 12 (Next)
-1. ⏳ Run `verify_p1.php` → 4 categories i18n status
-2. ⏳ Based on output — SKIP or add to priority
-3. ⏳ Start Owner's P2 list (Pricing verify → 7 categories)
+Production = f95b96a (Live) — Session 12 work is LOCAL ONLY
 
-### Session 12+ (P2 Priority)
-4. Pricing page verify → decisive action
-5. 7 categories notification enable
-6. CSS-HARMONIZE-01
-7. Admin notification enable
+Local HEAD = 87ea702 — 4 commits ahead
 
-### Future Sessions (Large scope)
-8. VERTICAL-AI-FEATURES-01 (per vertical)
-9. ADVANCED-HOTEL-FOLIO-01 (Marriott style)
+Tests = 186/186 passing (verified multiple times this session)
 
-### Backlog
-10. All 🟡 tickets post-priority
+i18n = 5 locales (en/np/hi/zh/ru) — Provider = EN/NP only
+
+Dual-role accounts exist: David Miller (user 27) = Traveler + Trekking provider. Login lands on provider dashboard by default → traveler orders accessible via /orders URL or new links.
+
+Test accounts:
+
+regmiashish629@gmail.com / password123 — David Miller (user 27, dual-role, TREKKING + Inventory customer)
+
+shresthaxok@gmail.com — John Adreson (user 28, Traveler)
+
+rent@himalayangear.com / password123 — Himalayan Gear provider (user 35, Ang Dorje)
+
+Never git add . — always explicit paths (R13)
+
+Junk files from CMD (e.g., data.PHP_EOL, notifiable_id.PHP_EOL) — delete, never commit
 
 ═══════════════════════════════════════════════════════════
 
-## 💡 KEY CONTEXT FOR NEW ASSISTANT
+## 📝 IMMEDIATE ACTION FOR NEXT SESSION
 
-- **Owner = "दाइ"** (never "Bhai")
-- **Production = LIVE** (f95b96a deployed to travelainepal.com)
-- **Tests = 186/186 passing** (verified after every commit)
-- **i18n = 5 locales** (en/np/hi/zh/ru) — Provider dashboard excludes hi/zh/ru by design
-- **AI = Gemini + Llama3** via `LlmService` (narrative working, 13/14 days)
-- **Kala Patthar = fixed** (Day 8 with EBC, migration `2026_10_30_042113`)
-- **Never `git add .`** — always explicit paths (R13)
-- **Owner rule for i18n:** implemented = skip, missing = priority
-- **Provider Dashboard = EN/NP only** (locked, never touch)
+1. **Delete junk files**: `del data.PHP_EOL notifiable_id.PHP_EOL`
+2. **Verify commits**: `git log --oneline f95b96a..HEAD` (should show 4)
+3. **Run tests**: `php artisan test` → verify 186/186
+4. **Await Owner "push" GO** OR continue with Bell 5 layouts
+5. **Read this handoff fully** — especially "Known Architecture Issues" and "Bugs Discovered"
 
-Report prepared by: Co-Assistant (Session 11)
-Verified against: `git log` @ f95b96a + 186/186 tests + production deploy confirmed
-Next action: Run `verify_p1.php` → accurate SKIP/PRIORITY decisions → start Owner's P2 list
+Report prepared by: Session 12 Assistant
+Verified against: 186/186 tests + production builds + owner screenshots
+Production status: NOT PUSHED (4 commits local)
+Next action: Delete junk + verify commits + await push GO OR continue Bell work
 
 ═══════════════════════════════════════════════════════════

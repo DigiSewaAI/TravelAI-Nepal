@@ -95,7 +95,21 @@
                         <div class="text-right">
                             <p class="font-bold text-blue-600">{{ $currencyService->format($lineTotal, $displayCurrency) }}</p>
                             <p class="text-xs text-gray-400">@if($item->rental_start_date && $item->rental_end_date)
-                    {{ $currencyService->format($unitPrice, $displayCurrency) }} × {{ (int) $item->rental_start_date->startOfDay()->diffInDays($item->rental_end_date->copy()->startOfDay()) }} {{ __("messages.days") }} × {{ $item->quantity }}
+                    @php
+                        $__days = (int) $item->rental_start_date->startOfDay()->diffInDays($item->rental_end_date->copy()->startOfDay());
+                        // Use exact NPR rate from source (avoid round-trip USD error)
+                        if ($item->product && $item->product->isRental() && $item->product->rentalDetail) {
+                            $__nprUnit = (float) $item->product->rentalDetail->rental_price_per_day;
+                        } elseif ($item->product) {
+                            $__nprUnit = (float) $item->product->price;
+                        } else {
+                            $__nprUnit = $displayCurrency === 'NPR' ? $unitPrice : $currencyService->convert($unitPrice, $displayCurrency, 'NPR');
+                        }
+                    @endphp
+                    Rs {{ number_format($__nprUnit, 0) }} × {{ $__days }} {{ __("messages.days") }} × {{ $item->quantity }}
+                    @if($displayCurrency !== 'NPR')
+                        <span style="color:#9ca3af">(≈ {{ $currencyService->format($lineTotal, $displayCurrency) }})</span>
+                    @endif
                 @else
                     {{ $currencyService->format($unitPrice, $displayCurrency) }} × {{ $item->quantity }}
                 @endif</p>

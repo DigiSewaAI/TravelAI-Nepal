@@ -42,11 +42,19 @@ class ProductController extends Controller
         }
 
         if ($request->filled('min_price') && is_numeric($request->min_price)) {
-            $query->where('price', '>=', (float) $request->min_price);
+            if ($type === 'rental') {
+                $query->whereHas('rentalDetail', fn($q) => $q->where('rental_price_per_day', '>=', (float) $request->min_price));
+            } else {
+                $query->where('price', '>=', (float) $request->min_price);
+            }
         }
 
         if ($request->filled('max_price') && is_numeric($request->max_price)) {
-            $query->where('price', '<=', (float) $request->max_price);
+            if ($type === 'rental') {
+                $query->whereHas('rentalDetail', fn($q) => $q->where('rental_price_per_day', '<=', (float) $request->max_price));
+            } else {
+                $query->where('price', '<=', (float) $request->max_price);
+            }
         }
 
         if ($request->filled('search')) {
