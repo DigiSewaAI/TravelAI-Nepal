@@ -223,6 +223,12 @@
                 </a>
             </nav>
 
+            <!-- My Purchases -->
+            <a href="{{ route('provider.my-purchases') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                <i class="fas fa-shopping-bag w-5"></i>
+                <span>{{ __('messages.my_purchases') }}</span>
+            </a>
+
             <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                 @csrf
@@ -304,7 +310,11 @@
                                 <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email ?? '' }}</p>
                             </div>
                             <!-- Logout -->
-                            <form method="POST" action="{{ route('logout') }}">
+                                <a href="{{ route('provider.my-purchases') }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      {{ __('messages.my_purchases') }}
+    </a>
+<form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
                                     <i class="fas fa-sign-out-alt"></i>
