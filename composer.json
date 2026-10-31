@@ -14,6 +14,7 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.35",
         "php-ffmpeg/php-ffmpeg": "^1.4",
+        "quadcompanies/google-analytics": "^1.1",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {

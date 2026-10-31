@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27380361623daa53651589c3399d8674",
+    "content-hash": "1c3428760c912918cbb114fba71a81c1",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -4191,6 +4191,53 @@
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.23"
             },
             "time": "2026-05-23T13:41:31+00:00"
+        },
+        {
+            "name": "quadcompanies/google-analytics",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quadcompanies/google-analytics.git",
+                "reference": "ae7f0f6b1456ace5c650e19391badd346b52439d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quadcompanies/google-analytics/zipball/ae7f0f6b1456ace5c650e19391badd346b52439d",
+                "reference": "ae7f0f6b1456ace5c650e19391badd346b52439d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuadCompanies\\GoogleAnalytics\\GoogleAnalyticsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuadCompanies\\GoogleAnalytics\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hans Bacares",
+                    "email": "hans@quadcompanies.com"
+                }
+            ],
+            "description": "A simple Laravel package to integrate Google Analytics gtag.js",
+            "support": {
+                "issues": "https://github.com/quadcompanies/google-analytics/issues",
+                "source": "https://github.com/quadcompanies/google-analytics/tree/v1.1.0"
+            },
+            "time": "2026-02-11T14:57:47+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -10210,5 +10257,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
