@@ -317,6 +317,62 @@
                 @endif
             </div>
 
+            {{-- My Orders (Product Orders: rental, shop, wholesale) --}}
+            @php
+                $myOrders = \App\Models\Order::where('user_id', auth()->id())->with('items')->latest()->take(5)->get();
+                $myOrdersCount = \App\Models\Order::where('user_id', auth()->id())->count();
+            @endphp
+            <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-indigo-500 p-6 hover:shadow-lg transition-all duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-shopping-bag text-indigo-600"></i> {{ __('messages.product_orders') }}
+                    </h3>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400">{{ $myOrdersCount }} {{ __('messages.traveler_total') }}</span>
+                        @if($myOrdersCount > 0)
+                            <a href="{{ route('orders.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold transition-colors flex items-center gap-1">
+                                {{ __('messages.traveler_view_all_bookings_short') }} <i class="fas fa-arrow-right text-[10px]"></i>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+                @if($myOrders->count() > 0)
+                    <div class="divide-y divide-gray-100">
+                        @foreach($myOrders as $porder)
+                            @php
+                                $sc = match($porder->status) {
+                                    'pending'   => 'bg-yellow-100 text-yellow-800',
+                                    'confirmed' => 'bg-blue-100 text-blue-800',
+                                    'shipped'   => 'bg-purple-100 text-purple-800',
+                                    'delivered' => 'bg-green-100 text-green-800',
+                                    'returned'  => 'bg-gray-100 text-gray-800',
+                                    'cancelled' => 'bg-red-100 text-red-800',
+                                    default     => 'bg-gray-100 text-gray-800',
+                                };
+                            @endphp
+                            <a href="{{ route('orders.show', $porder) }}" class="py-3 flex flex-wrap justify-between items-center gap-2 hover:bg-gray-50/60 -mx-2 px-2 rounded-lg transition-colors duration-200 no-underline">
+                                <div class="min-w-0">
+                                    <p class="font-medium text-gray-800 truncate">{{ $porder->order_number }}</p>
+                                    <p class="text-xs text-gray-400">
+                                        <i class="far fa-calendar-alt mr-1"></i>
+                                        {{ $porder->created_at->translatedFormat('M d, Y') }} · {{ $porder->items->count() }} {{ __('messages.items_count') }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-3 flex-shrink-0">
+                                    <span class="px-2 py-1 text-xs rounded-full {{ $sc }}">{{ ucfirst($porder->status) }}</span>
+                                    <span class="text-sm font-semibold text-indigo-600">Rs {{ number_format($porder->total, 2) }}</span>
+                                    <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500 text-center py-6 text-sm">{{ __('messages.traveler_no_bookings_yet') }}</p>
+                    <div class="text-center">
+                        <a href="{{ route('public.rental.index') }}" class="text-indigo-600 hover:underline text-sm">{{ __('messages.nav_rental') }} &rarr;</a>
+                    </div>
+                @endif
+            </div>
             {{-- Ads: Featured for You (Phase 1 MVP - left column, below bookings) --}}
             @include('partials.ad-carousel', ['featuredAds' => $featuredAds ?? collect()])
 

@@ -307,7 +307,7 @@ public function updateOrderStatus(\Illuminate\Http\Request $request, \App\Models
     }
 
     $validated = $request->validate([
-        'status' => 'required|in:pending,confirmed,processing,completed,cancelled',
+        'status' => 'required|in:confirmed,shipped,delivered,cancelled',
     ]);
 
     $currentStatuses = \App\Models\OrderItem::where('order_id', $order->id)
@@ -477,6 +477,60 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
         return view('provider.inventory.offers', compact('provider', 'offers', 'stockHealth'));
     }
 
+    public function confirmReturn(Request $request, Order $order, OrderItem $item)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        if (!$provider) abort(403);
+        if ($order->items()->where('provider_id', $provider->id)->doesntExist()) abort(403);
+        if ($item->provider_id !== $provider->id) abort(403);
+        if (!$item->isRental()) abort(403);
+        if ($item->isReturnConfirmed()) {
+            return back()->with('info', __('messages.return_already_confirmed'));
+        }
+        if (!$item->hasReturnRequest()) {
+            return back()->with('info', __('messages.return_not_requested'));
+        }
+
+        $validated = $request->validate([
+            'return_condition' => 'required|in:good,damaged,lost',
+            'return_notes'     => 'nullable|string|max:1000',
+        ]);
+
+        $item->return_condition = $validated['return_condition'];
+        $refundAmount = $item->calculateDepositRefund();
+        $lateFee      = $item->calculateLateFee();
+        $finalRefund  = max(0, $refundAmount - $lateFee);
+
+        $item->update([
+            'return_confirmed_at'   => now(),
+            'return_condition'      => $validated['return_condition'],
+            'return_notes'          => $validated['return_notes'] ?? null,
+            'deposit_refund_amount' => $finalRefund,
+            'deposit_refunded_at'   => now(),
+        ]);
+
+        $order->deposit_refunded_amount = $order->items()
+            ->whereNotNull('deposit_refunded_at')
+            ->sum('deposit_refund_amount');
+        $order->deposit_refunded_at = now();
+        $order->save();
+
+        try {
+            if ($order->user && $order->user->email) {
+                \Mail::to($order->user->email)
+                    ->send(new \App\Mail\ReturnConfirmedMail($order, $item, $finalRefund));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('ReturnConfirmedMail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        \App\Models\OrderStatusHistory::record(
+            $order, 'returned', $order->status, null, Auth::id(), 'provider',
+            'Return confirmed: ' . $validated['return_condition']
+        );
+
+        return back()->with('success', __('messages.return_confirmed'));
+    }
     public function updateProduct(Request $request, Product $product)
     {
         $provider = Auth::user()->getCurrentProvider();

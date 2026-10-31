@@ -244,6 +244,7 @@
                             <a href="{{ route('provider.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
                         @elseif(auth()->user()->isTraveler())
                             <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                            <a href="{{ route('orders.index') }}" class="border border-green-500 text-green-600 hover:bg-green-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.product_orders') }}</a>
                         @else
                             <a href="{{ route('home') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.home') }}</a>
                         @endif

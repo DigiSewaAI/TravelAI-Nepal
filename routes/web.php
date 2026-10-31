@@ -263,6 +263,8 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::get('/money-changer/reports', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'reportsPage'])->name('money-changer.reports');
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
     Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
+    Route::get('/my-purchases', [\App\Http\Controllers\Provider\PurchaseController::class, 'index'])->name('my-purchases');
+
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');
         // Inventory CRUD Routes
     Route::post('/inventory/products', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'storeProduct'])->name('inventory.products.store');
@@ -278,6 +280,9 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
 
 Route::patch('/inventory/orders/{order}/verify-payment', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'verifyPayment'])
     ->name('inventory.orders.verifyPayment');
+
+Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'confirmReturn'])
+    ->name('inventory.orders.items.confirm-return');
         Route::get('/inventory/inventory', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'inventoryPage'])->name('inventory.inventory');
     Route::get('/inventory/suppliers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'suppliersPage'])->name('inventory.suppliers');
     Route::get('/inventory/reports', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'reportsPage'])->name('inventory.reports');

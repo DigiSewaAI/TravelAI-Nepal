@@ -97,6 +97,11 @@ class OrdersController extends Controller
 
         $item->update(['return_requested_at' => now()]);
 
+        \App\Models\OrderStatusHistory::record(
+            $order, 'return_requested', $order->status, $item, auth()->id(), 'buyer',
+            'Return requested for ' . $item->product_name
+        );
+
         $this->syncOrderRentalStatus($order);
         $this->notifyProviderReturnRequested($order, $item);
 
@@ -129,6 +134,21 @@ class OrdersController extends Controller
             }
         } catch (\Throwable $e) {
             \Log::warning('ReturnRequestedMail failed', ['order' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        // 🔔 Bell notification to provider
+        try {
+            $providerUser = $item->provider?->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
+                    'Return Requested',
+                    'Traveler requested return for ' . ($order->order_number ?? '#'.$order->id) . ' — ' . $item->product_name,
+                    'return',
+                    $item->providerNotificationUrl('return')
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Return requested bell notification failed', ['order' => $order->id, 'error' => $e->getMessage()]);
         }
     }
 }

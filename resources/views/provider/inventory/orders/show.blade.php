@@ -137,6 +137,40 @@
   </div>
   @endif
 
+  {{-- Return Confirmation (Rental) --}}
+  @php
+    $pendingReturns = $order->items->filter(fn($i) => $i->isRental() && $i->hasReturnRequest() && !$i->isReturnConfirmed());
+  @endphp
+  @if($pendingReturns->count() > 0)
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px">
+    <h3 style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      {{ __('Return Confirmation') }}
+    </h3>
+    @foreach($pendingReturns as $item)
+      <div style="padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--amber-soft)">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">{{ $item->product_name }}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ __('Traveler requested return') }} · {{ $item->return_requested_at?->diffForHumans() }}</div>
+      </div>
+      <form method="POST" action="{{ route('provider.inventory.orders.items.confirm-return', [$order, $item]) }}" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        @csrf @method('PATCH')
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">{{ __('Condition') }}</label>
+          <select name="return_condition" required style="width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:700;background:#fff;color:var(--text)">
+            <option value="good">{{ __('Good — full refund') }}</option>
+            <option value="damaged">{{ __('Damaged — partial refund') }}</option>
+            <option value="lost">{{ __('Lost — no refund') }}</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">{{ __('Notes (optional)') }}</label>
+          <textarea name="return_notes" maxlength="1000" rows="2" style="width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:#fff;color:var(--text);font-family:inherit"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="align-self:flex-start">{{ __('Confirm Return') }}</button>
+      </form>
+    @endforeach
+  </div>
+  @endif
   {{-- Actions --}}
   <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px">
     <h3 style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text)">
@@ -147,7 +181,7 @@
     <form method="POST" action="{{ route('provider.inventory.orders.updateStatus', $order) }}" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
       @csrf @method('PATCH')
       <select name="status" style="padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:700;background:#fff;color:var(--text)">
-        @foreach(['pending','confirmed','processing','completed','cancelled'] as $s)
+        @foreach(['confirmed','shipped','delivered','cancelled'] as $s)
           <option value="{{ $s }}" @selected($order->status === $s)>{{ ucfirst($s) }}</option>
         @endforeach
       </select>
