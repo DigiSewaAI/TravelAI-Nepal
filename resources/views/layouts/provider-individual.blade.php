@@ -220,7 +220,69 @@
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>
-      <button class="icon-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot-notif"></span></button>
+      <div id="invNotifWrapper" style="position:relative">
+  <button class="icon-btn" type="button" id="invNotifToggle" aria-label="Notifications">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span id="invNotifBadge" style="display:none;position:absolute;top:-3px;right:-3px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;border-radius:10px;padding:1px 5px;min-width:18px;text-align:center;line-height:16px"></span>
+  </button>
+  <div id="invNotifPanel" style="display:none;position:absolute;right:0;top:calc(100% + 8px);width:340px;max-height:420px;overflow-y:auto;background:var(--card,#fff);border:1px solid var(--line,#e7eaf3);border-radius:14px;box-shadow:0 20px 50px rgba(20,26,46,.18);z-index:200">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line,#e7eaf3)">
+      <strong style="font-size:14px;color:var(--text,#111827)">Notifications</strong>
+      <a href="#" id="invNotifMarkAll" style="font-size:12px;color:var(--accent,#6366f1);font-weight:700;text-decoration:none">Mark all read</a>
+    </div>
+    <div id="invNotifList"><p style="padding:20px;text-align:center;color:var(--muted,#6b7280);font-size:13px">Loading…</p></div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+  const wrapper = document.getElementById('invNotifWrapper');
+  const toggle = document.getElementById('invNotifToggle');
+  const panel = document.getElementById('invNotifPanel');
+  const badge = document.getElementById('invNotifBadge');
+  const list = document.getElementById('invNotifList');
+  const markAll = document.getElementById('invNotifMarkAll');
+  if(!wrapper || !toggle || !panel) return;
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function fetchNotifs(){
+    try{
+      const res = await fetch('{{ route("provider.notifications.index") }}', { headers:{'Accept':'application/json'} });
+      if(!res.ok) return;
+      const data = await res.json();
+      if(data.unread_count > 0){ badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count; badge.style.display = 'inline-block'; }
+      else { badge.style.display = 'none'; }
+      if(!data.notifications || data.notifications.length === 0){
+        list.innerHTML = '<p style="padding:20px;text-align:center;color:var(--muted,#6b7280);font-size:13px">No notifications</p>';
+        return;
+      }
+      list.innerHTML = data.notifications.map(n =>
+        '<a href="'+esc(n.url || '#')+'" data-id="'+esc(n.id)+'" class="inv-notif-item" style="display:block;padding:12px 16px;border-bottom:1px solid var(--line,#f1f3f9);text-decoration:none;'+(n.read ? 'background:var(--card,#fff)' : 'background:var(--accent-soft,#eef0fe)')+'">'
+        + '<div style="font-size:13px;font-weight:700;color:var(--text,#111827)">'+esc(n.title)+'</div>'
+        + '<div style="font-size:12px;color:var(--muted,#6b7280);margin-top:2px">'+esc(n.message)+'</div>'
+        + '<div style="font-size:11px;color:var(--muted,#9ca3af);margin-top:4px">'+esc(n.created_at)+'</div>'
+        + '</a>'
+      ).join('');
+      list.querySelectorAll('.inv-notif-item').forEach(function(el){
+        el.addEventListener('click', async function(){
+          try{ await fetch('{{ url("provider/notifications") }}/'+this.dataset.id+'/read', { method:'POST', headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'} }); }catch(e){}
+        });
+      });
+    }catch(e){}
+  }
+  toggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    const open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : 'block';
+    if(!open) fetchNotifs();
+  });
+  document.addEventListener('click', function(e){ if(!wrapper.contains(e.target)) panel.style.display = 'none'; });
+  if(markAll) markAll.addEventListener('click', async function(e){
+    e.preventDefault();
+    try{ await fetch('{{ route("provider.notifications.mark-all-read") }}', { method:'POST', headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'} }); fetchNotifs(); }catch(err){}
+  });
+  fetchNotifs();
+});
+</script>
       {{-- 🆕 Duplicate "New Booking" button हटाइयो — dashboard action bar मा functional "New Assignment" छ --}}
     </div>
   </header>

@@ -1,3 +1,6 @@
+@php
+    $__cs = app(\App\Services\CurrencyService::class);
+@endphp
 <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-6 sticky top-24">
 
     <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
@@ -47,17 +50,16 @@
 
         <div>
             <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{{ __('messages.price_range') }}</label>
-            <div class="flex items-center gap-2">
-                <div class="relative w-full">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs font-bold pointer-events-none">$</span>
+            <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+                <div style="display:flex;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:0 14px;height:44px;width:100%;box-sizing:border-box">
+                    <span style="color:#9ca3af;font-size:12px;font-weight:700;white-space:nowrap;margin-right:10px;flex-shrink:0">{{ $__cs->getSymbol($__cs->getDisplayCurrency()) }}</span>
                     <input type="number" name="min_price" step="0.01" min="0" value="{{ request('min_price') }}" placeholder="{{ __("messages.min") }}"
-                           class="w-full pl-6 pr-2 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium transition-all">
+                           style="flex:1 1 0;min-width:0;border:0;background:transparent;outline:none;font-size:14px;font-weight:600;padding:0;width:100%">
                 </div>
-                <span class="text-gray-300 font-bold">—</span>
-                <div class="relative w-full">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-xs font-bold pointer-events-none">$</span>
+                <div style="display:flex;align-items:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:0 14px;height:44px;width:100%;box-sizing:border-box">
+                    <span style="color:#9ca3af;font-size:12px;font-weight:700;white-space:nowrap;margin-right:10px;flex-shrink:0">{{ $__cs->getSymbol($__cs->getDisplayCurrency()) }}</span>
                     <input type="number" name="max_price" step="0.01" min="0" value="{{ request('max_price') }}" placeholder="{{ __("messages.max") }}"
-                           class="w-full pl-6 pr-2 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium transition-all">
+                           style="flex:1 1 0;min-width:0;border:0;background:transparent;outline:none;font-size:14px;font-weight:600;padding:0;width:100%">
                 </div>
             </div>
         </div>
