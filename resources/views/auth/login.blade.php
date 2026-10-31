@@ -34,6 +34,9 @@
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
+                @if(request('redirect'))
+                    <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+                @endif
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.email') }}</label>
                     <input type="email" name="email" value="{{ old('email') }}" required

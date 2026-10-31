@@ -173,6 +173,18 @@
                             {{ __('messages.product_out_of_stock') }}
                         </button>
                     </div>
+                @elseif($product->product_type === 'wholesale')
+                    @auth
+                        <a href="{{ route('wholesale.rfq.create', $product) }}"
+                           class="block mt-2 bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-file-invoice"></i> {{ __('messages.rfq_request_quote_btn') }}
+                        </a>
+                    @else
+                        <a href="{{ route('login', ['redirect' => url()->current()]) }}"
+                           class="block mt-2 bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-sign-in-alt"></i> Login to Request Quote
+                        </a>
+                    @endauth
                 @else
                 <form method="POST" action="{{ route('cart.add', $product) }}" class="mt-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
                     @csrf
@@ -239,12 +251,7 @@
                 </form>
                 @endif
 
-                @if($product->product_type === 'wholesale' && auth()->check())
-                    <a href="{{ route('wholesale.rfq.create', $product) }}"
-                       class="block mt-4 text-center bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 py-3.5 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-file-invoice"></i> {{ __('messages.rfq_request_quote_btn') }}
-                    </a>
-                @endif
+                {{-- Wholesale RFQ button moved above (in @elseif branch) --}}
 
             </div>
         </div>

@@ -152,6 +152,10 @@ class DashboardController extends Controller
      */
     public function getLiveAlertCounts()
     {
+        // Guard: only respond to AJAX/JSON requests (prevent browser landing on JSON)
+        if (!request()->expectsJson() && !request()->ajax()) {
+            return redirect()->route('provider.dashboard');
+        }
         $user = Auth::user();
         $provider = $user->getCurrentProvider();
 

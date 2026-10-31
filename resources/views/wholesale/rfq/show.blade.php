@@ -43,6 +43,15 @@
             </div>
             <div class="bg-gray-50 rounded-lg p-4">
                 <h3 class="font-semibold text-sm mb-2">{{ __('messages.provider_order_customer') }}</h3>
+                <p class="text-sm font-medium text-gray-900">{{ $rfq->buyer->name ?? 'N/A' }}</p>
+                @if($rfq->buyer_company)
+                    <p class="text-xs text-gray-600 mt-0.5">{{ $rfq->buyer_company }}</p>
+                @endif
+                @if($rfq->buyer_phone)
+                    <p class="text-xs text-gray-500">{{ $rfq->buyer_phone }}</p>
+                @endif
+                <p class="text-xs text-gray-500">{{ $rfq->buyer->email ?? '' }}</p>
+                <h3 class="font-semibold text-sm mb-2 mt-4">{{ __('messages.rfq_provider_label') ?? 'Provider' }}</h3>
                 <p class="text-sm">{{ $rfq->provider->name ?? 'N/A' }}</p>
             </div>
         </div>

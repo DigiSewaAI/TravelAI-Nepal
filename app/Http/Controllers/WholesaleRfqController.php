@@ -23,6 +23,12 @@ class WholesaleRfqController extends Controller
 
         $minQty = $product->wholesaleDetail->min_order_qty ?? 1;
 
+        // Self-RFQ guard: provider cannot request quote on own product
+        $__authProvider = auth()->user()->getCurrentProvider();
+        if ($__authProvider && (int)$__authProvider->id === (int)$product->provider_id) {
+            return back()->with('error', 'You cannot request a quote for your own product.');
+        }
+
         $validated = $request->validate([
             'quantity'      => "required|integer|min:{$minQty}",
             'message'       => 'nullable|string|max:2000',
