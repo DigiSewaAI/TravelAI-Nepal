@@ -1900,6 +1900,7 @@ return array (
   'rfq_no_messages' => 'अझै कुनै सन्देश छैन।',
   'rfq_send' => 'पठाउनुहोस्',
   'rfq_product' => 'उत्पादन',
+  'my_rfqs' => 'मेरा RFQहरू',
   'provider_rfq_title' => 'थोक RFQ हरू',
   'provider_rfq_empty' => 'अझै कुनै RFQ छैन।',
   'provider_rfq_respond' => 'RFQ लाई जवाफ दिनुहोस्',

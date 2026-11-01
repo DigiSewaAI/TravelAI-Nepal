@@ -60,7 +60,8 @@ class WholesaleRfqController extends Controller
                         $owner->notify(new \App\Notifications\ProviderAlertNotification(
                             title: 'New Wholesale RFQ',
                             message: $__prodName . ' — Qty ' . $__qty,
-                            category: 'wholesale_rfq'
+                            category: 'wholesale_rfq',
+                            url: route('provider.wholesale-rfq.show', $rfq)
                         ));
                     }
                 }
@@ -106,6 +107,24 @@ class WholesaleRfqController extends Controller
             'message'     => $validated['message'],
         ]);
 
+        // Notify provider (bell + email)
+        try {
+            $providerUser = $rfq->provider?->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
+                    title: 'New RFQ Message',
+                    message: 'New message on ' . $rfq->rfq_number . ': ' . \Illuminate\Support\Str::limit($validated['message'], 100),
+                    category: 'wholesale_rfq',
+                    url: route('provider.wholesale-rfq.show', $rfq)
+                ));
+                if ($providerUser->email) {
+                    \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'message', 'provider', $validated['message']));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('RFQ message notification failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]);
+        }
+
         return back()->with('success', __('messages.rfq_message_sent'));
     }
 
@@ -116,6 +135,16 @@ class WholesaleRfqController extends Controller
 
         $rfq->update(['status' => 'accepted', 'accepted_at' => now()]);
 
+        try {
+            $providerUser = $rfq->provider?->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Accepted', 'Buyer accepted your quote for '.$rfq->rfq_number.' (NPR '.number_format($rfq->quoted_total, 2).')', 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+                if ($providerUser->email) {
+                    \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'accepted', 'provider'));
+                }
+            }
+        } catch (\Throwable $e) { \Log::warning('RFQ accept notification failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]); }
+
         return back()->with('success', __('messages.rfq_accepted'));
     }
 
@@ -125,6 +154,16 @@ class WholesaleRfqController extends Controller
         if (!$rfq->isQuoted()) abort(403);
 
         $rfq->update(['status' => 'rejected', 'rejected_at' => now()]);
+
+        try {
+            $providerUser = $rfq->provider?->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Rejected', 'Buyer rejected your quote for '.$rfq->rfq_number, 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+                if ($providerUser->email) {
+                    \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'rejected', 'provider'));
+                }
+            }
+        } catch (\Throwable $e) { \Log::warning('RFQ reject notification failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]); }
 
         return back()->with('success', __('messages.rfq_rejected'));
     }

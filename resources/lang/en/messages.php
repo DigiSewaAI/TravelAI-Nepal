@@ -1853,6 +1853,7 @@ return array (
   'rfq_no_messages' => 'No messages yet.',
   'rfq_send' => 'Send',
   'rfq_product' => 'Product',
+  'my_rfqs' => 'My RFQs',
   'provider_rfq_title' => 'Wholesale RFQs',
   'provider_rfq_empty' => 'No RFQs yet.',
   'provider_rfq_respond' => 'Respond to RFQ',

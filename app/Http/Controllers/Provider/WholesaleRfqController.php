@@ -67,6 +67,24 @@ class WholesaleRfqController extends Controller
             'responded_at'      => now(),
         ]);
 
+        // Notify buyer (bell + email)
+        try {
+            $buyer = $rfq->buyer;
+            if ($buyer) {
+                $buyer->notify(new \App\Notifications\UserAlertNotification(
+                    'Quote Received',
+                    'Provider sent a quote for ' . $rfq->rfq_number . ' (NPR ' . number_format($rfq->quoted_total, 2) . ')',
+                    'rfq',
+                    route('wholesale.rfq.show', $rfq)
+                ));
+                if ($buyer->email) {
+                    \Mail::to($buyer->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'quoted', 'buyer'));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('RFQ quote notification failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]);
+        }
+
         return back()->with('success', __('messages.rfq_quoted'));
     }
 
@@ -83,6 +101,24 @@ class WholesaleRfqController extends Controller
             'sender_role' => 'provider',
             'message'     => $validated['message'],
         ]);
+
+        // Notify buyer (bell + email)
+        try {
+            $buyer = $rfq->buyer;
+            if ($buyer) {
+                $buyer->notify(new \App\Notifications\UserAlertNotification(
+                    'New RFQ Message',
+                    'Provider replied on ' . $rfq->rfq_number . ': ' . \Illuminate\Support\Str::limit($validated['message'], 100),
+                    'rfq',
+                    route('wholesale.rfq.show', $rfq)
+                ));
+                if ($buyer->email) {
+                    \Mail::to($buyer->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'message', 'buyer', $validated['message']));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Provider RFQ message notification failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]);
+        }
 
         return back()->with('success', __('messages.rfq_message_sent'));
     }
