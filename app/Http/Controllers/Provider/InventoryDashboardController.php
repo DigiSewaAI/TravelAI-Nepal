@@ -14,6 +14,8 @@ use Illuminate\Support\Str;
 
 class InventoryDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -214,6 +216,10 @@ class InventoryDashboardController extends Controller
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_products', \App\Models\Product::class, 'products')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',

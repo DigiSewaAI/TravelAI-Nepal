@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class ArtCraftDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
+
     public function index()
     {
         $provider = Provider::where('user_id', Auth::id())
@@ -120,6 +123,10 @@ class ArtCraftDashboardController extends Controller
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_artworks', \App\Models\Artwork::class, 'artworks')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:150',

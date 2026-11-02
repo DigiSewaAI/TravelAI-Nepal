@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TransportDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -114,6 +116,10 @@ class TransportDashboardController extends Controller
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_vehicles', \App\Models\TransportVehicle::class, 'vehicles')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'vehicle_number' => 'required|string|max:50',

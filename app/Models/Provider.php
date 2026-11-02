@@ -325,6 +325,110 @@ class Provider extends Model
         };
     }
 
+    // ─────────────────────────────────────────────────────────────────
+    // Phase 2C — Per-Vertical Plan Limits (Session 15)
+    // ─────────────────────────────────────────────────────────────────
+    /**
+     * Shared helper to resolve a plan limit by key.
+     * Returns -1 for unlimited (Enterprise).
+     */
+    protected function planLimit(string $key, int $freeDefault, int $proDefault, int $bizDefault): int
+    {
+        $plan = $this->getActivePlanAttribute();
+        if (!$plan) {
+            return $freeDefault;
+        }
+
+        $limits = is_array($plan->limits)
+            ? $plan->limits
+            : (json_decode($plan->limits, true) ?? []);
+
+        if (isset($limits[$key])) {
+            return (int) $limits[$key];
+        }
+
+        return match ($plan->slug) {
+            'free'         => $freeDefault,
+            'professional' => $proDefault,
+            'business'     => $bizDefault,
+            'enterprise'   => -1,
+            default        => $freeDefault,
+        };
+    }
+
+    // Trekking
+    public function getMaxTreksAttribute(): int
+    {
+        return $this->planLimit('max_treks', 3, 20, 100);
+    }
+
+    public function getMaxItineraryDaysAttribute(): int
+    {
+        return $this->planLimit('max_itinerary_days', 10, 30, 100);
+    }
+
+    // Hotel
+    public function getMaxHotelsAttribute(): int
+    {
+        return $this->planLimit('max_hotels', 1, 5, 20);
+    }
+
+    public function getMaxRoomsAttribute(): int
+    {
+        return $this->planLimit('max_rooms', 5, 30, 200);
+    }
+
+    // Restaurant
+    public function getMaxMenuItemsAttribute(): int
+    {
+        return $this->planLimit('max_menu_items', 5, 30, 200);
+    }
+
+    public function getMaxTablesAttribute(): int
+    {
+        return $this->planLimit('max_tables', 3, 10, 30);
+    }
+
+    // Transport
+    public function getMaxVehiclesAttribute(): int
+    {
+        return $this->planLimit('max_vehicles', 5, 30, 200);
+    }
+
+    public function getMaxRoutesAttribute(): int
+    {
+        return $this->planLimit('max_routes', 3, 15, 50);
+    }
+
+    // Individual
+    public function getMaxGuidesAttribute(): int
+    {
+        return $this->planLimit('max_guides', 3, 20, 100);
+    }
+
+    // Money Changer
+    public function getMaxCurrenciesAttribute(): int
+    {
+        return $this->planLimit('max_currencies', 5, 20, 50);
+    }
+
+    // Art Craft
+    public function getMaxArtworksAttribute(): int
+    {
+        return $this->planLimit('max_artworks', 5, 30, 200);
+    }
+
+    // Shared (missing — pre-existing bug)
+    public function getMaxBookingsAttribute(): int
+    {
+        return $this->planLimit('max_bookings', 10, 100, 1000);
+    }
+
+    public function getMaxAiRequestsAttribute(): int
+    {
+        return $this->planLimit('max_ai_requests', 5, 50, 500);
+    }
+
     public function supportsStyle(string $styleSlug): bool
     {
         return $this->styles()->where('style_slug', $styleSlug)->exists();

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 class HotelDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -291,6 +293,10 @@ public function housekeepingPage()
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_rooms', \App\Models\HotelRoom::class, 'rooms')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'room_number' => 'required|string|max:20',

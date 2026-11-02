@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class IndividualDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
+
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -113,6 +116,10 @@ class IndividualDashboardController extends Controller
             ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
             ->first();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_guides', \App\Models\IndividualBooking::class, 'assignments')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:150',

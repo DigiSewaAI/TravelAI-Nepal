@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class RestaurantDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
+
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -210,6 +213,10 @@ class RestaurantDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
+        if ($redirect = $this->checkPlanLimit($provider, 'max_menu_items', \App\Models\MenuItem::class, 'menu items')) {
+            return $redirect;
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
@@ -381,6 +388,10 @@ class RestaurantDashboardController extends Controller
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
+
+        if ($redirect = $this->checkPlanLimit($provider, 'max_tables', \App\Models\RestaurantTable::class, 'tables')) {
+            return $redirect;
+        }
 
         $validated = $request->validate([
             'table_number' => 'required|string|max:20',

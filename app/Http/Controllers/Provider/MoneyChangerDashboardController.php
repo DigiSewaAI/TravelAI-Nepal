@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class MoneyChangerDashboardController extends Controller
 {
+
+    use \App\Traits\EnforcesPlanLimits;
+
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -130,6 +133,16 @@ class MoneyChangerDashboardController extends Controller
             'sell_rate' => 'required|numeric|min:0',
             'flag_emoji' => 'nullable|string|max:10',
         ]);
+
+        // Plan limit: count distinct currencies, exclude same currency if updating
+        $__existing = \App\Models\ProviderExchangeRate::where('provider_id', $provider->id)
+            ->where('currency_code', strtoupper($validated['currency_code']))
+            ->exists();
+        if (!$__existing) {
+            if ($redirect = $this->checkPlanLimit($provider, 'max_currencies', \App\Models\ProviderExchangeRate::class, 'currencies')) {
+                return $redirect;
+            }
+        }
 
         ProviderExchangeRate::updateOrCreate(
             [
