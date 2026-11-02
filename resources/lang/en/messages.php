@@ -956,6 +956,47 @@ return array (
   'checkout_place_order' => 'Place Order',
   'pricing_page_title' => 'Pricing | TravelAI Nepal',
   'pricing_hero_title' => 'Power Your Tourism Business with AI',
+  'plans' => 
+  array (
+    'free' => 
+    array (
+      'description' => 'Start your tourism business for free',
+    ),
+    'professional' => 
+    array (
+      'description' => 'Grow your agency with advanced tools',
+    ),
+    'business' => 
+    array (
+      'description' => 'Scale with analytics and automation',
+    ),
+    'enterprise' => 
+    array (
+      'description' => 'Custom solutions for large organizations',
+    ),
+    'features' => 
+    array (
+      'basic_dashboard' => 'Basic Dashboard',
+      '3_listings' => '3 Listings',
+      '5_ai_requests_mo' => '5 AI Requests/mo',
+      '10_bookings_mo' => '10 Bookings/mo',
+      'advanced_dashboard' => 'Advanced Dashboard',
+      '20_listings' => '20 Listings',
+      '50_ai_requests_mo' => '50 AI Requests/mo',
+      '100_bookings_mo' => '100 Bookings/mo',
+      'custom_logo' => 'Custom Logo',
+      'full_analytics' => 'Full Analytics',
+      '100_listings' => '100 Listings',
+      '500_ai_requests_mo' => '500 AI Requests/mo',
+      '1000_bookings_mo' => '1000 Bookings/mo',
+      'white_label' => 'White-label',
+      'unlimited_listings' => 'Unlimited Listings',
+      'unlimited_staff' => 'Unlimited Staff',
+      'unlimited_ai' => 'Unlimited AI',
+      'unlimited_bookings' => 'Unlimited Bookings',
+      'priority_support' => 'Priority Support',
+    ),
+  ),
   'pricing_hero_subtitle' => 'Choose the right TravelAI Nepal plan for your business — from getting started for free to scaling with advanced AI-powered tools, analytics, bookings, and more.',
   'billing_interval' => 'Billing interval',
   'yearly' => 'Yearly',
@@ -1890,7 +1931,6 @@ return array (
   'order_status_return_requested' => 'Return Requested',
   'order_status_picked_up' => 'Picked Up',
   'order_status_overdue' => 'Overdue',
-  'return_requested' => 'Return requested',
   'return_not_requested' => 'Return not requested yet.',
   'product_orders' => 'My Orders',
   'my_purchases' => 'My Purchases',
@@ -2613,4 +2653,39 @@ return array (
   'rarity_legendary' => 'legendary',
   'shop_type_badge_label' => 'Handicraft',
   'legal_updated_date' => 'August 2026',
+  'verticals' => 
+  array (
+    'trekking' => 'Trekking',
+    'hotel' => 'Hotel',
+    'restaurant' => 'Restaurant',
+    'transport' => 'Transport',
+    'individual' => 'Individual Guides',
+    'money_changer' => 'Money Changer',
+    'art_craft' => 'Art Craft',
+    'inventory' => 'Inventory',
+  ),
+  'limit_labels' => 
+  array (
+    'treks' => 'Treks',
+    'itinerary_days' => 'Itinerary Days',
+    'hotels' => 'Hotels',
+    'rooms' => 'Rooms',
+    'menu_items' => 'Menu Items',
+    'tables' => 'Tables',
+    'vehicles' => 'Vehicles',
+    'routes' => 'Routes',
+    'guides' => 'Guides/Porters',
+    'currencies' => 'Currencies',
+    'artworks' => 'Artworks',
+    'products' => 'Products',
+  ),
+  'pricing_8_verticals_title' => 'One Platform. Eight Tourism Verticals.',
+  'pricing_8_verticals_subtitle' => 'Plans tailored to your business — Trekking, Hotel, Restaurant, Transport, Individual Guides, Money Changer, Art Craft & Inventory. Each with vertical-specific limits.',
+  'per_vertical_limits' => 'Per-Vertical Limits',
+  'shared_limits' => 'Shared Limits',
+  'coming_soon' => 'Coming Soon',
+  'forever' => 'forever',
+  'plan_features' => 'Feature',
+  'plan_price' => 'Price',
+  'custom_logo_feature' => 'Custom Logo',
 );

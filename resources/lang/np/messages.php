@@ -1345,6 +1345,47 @@ return array (
   'checkout_place_order' => 'अर्डर गर्नुहोस्',
   'pricing_page_title' => 'मूल्य निर्धारण | TravelAI नेपाल',
   'pricing_hero_title' => 'एआईको साथ आफ्नो पर्यटन व्यवसायलाई सशक्त बनाउनुहोस्',
+  'plans' => 
+  array (
+    'free' => 
+    array (
+      'description' => 'नि:शुल्क रूपमा आफ्नो पर्यटन व्यवसाय सुरु गर्नुहोस्',
+    ),
+    'professional' => 
+    array (
+      'description' => 'उन्नत उपकरणहरूसँग आफ्नो एजेन्सी बढाउनुहोस्',
+    ),
+    'business' => 
+    array (
+      'description' => 'विश्लेषण र स्वचालनसँग स्केल गर्नुहोस्',
+    ),
+    'enterprise' => 
+    array (
+      'description' => 'ठूला संस्थाहरूको लागि अनुकूलित समाधानहरू',
+    ),
+    'features' => 
+    array (
+      'basic_dashboard' => 'आधारभूत ड्यासबोर्ड',
+      '3_listings' => '३ लिस्टिङ',
+      '5_ai_requests_mo' => '५ AI अनुरोध/महिना',
+      '10_bookings_mo' => '१० बुकिङ/महिना',
+      'advanced_dashboard' => 'उन्नत ड्यासबोर्ड',
+      '20_listings' => '२० लिस्टिङ',
+      '50_ai_requests_mo' => '५० AI अनुरोध/महिना',
+      '100_bookings_mo' => '१०० बुकिङ/महिना',
+      'custom_logo' => 'कस्टम लोगो',
+      'full_analytics' => 'पूर्ण विश्लेषण',
+      '100_listings' => '१०० लिस्टिङ',
+      '500_ai_requests_mo' => '५०० AI अनुरोध/महिना',
+      '1000_bookings_mo' => '१००० बुकिङ/महिना',
+      'white_label' => 'सेतो-लेबल',
+      'unlimited_listings' => 'असीमित लिस्टिङ',
+      'unlimited_staff' => 'असीमित स्टाफ',
+      'unlimited_ai' => 'असीमित AI',
+      'unlimited_bookings' => 'असीमित बुकिङ',
+      'priority_support' => 'प्राथमिकता समर्थन',
+    ),
+  ),
   'pricing_hero_subtitle' => 'आफ्नो व्यवसायको लागि सही TravelAI नेपाल योजना छान्नुहोस् — निःशुल्क सुरु गर्नेदेखि उन्नत एआई-संचालित उपकरण, विश्लेषण, बुकिङ र थपका साथ विस्तार गर्नसम्म।',
   'billing_interval' => 'बिलिङ अन्तराल',
   'yearly' => 'वार्षिक',
@@ -1930,14 +1971,13 @@ return array (
   'order_deposit_hint' => 'वस्तु सुरक्षित रूपमा फिर्ता भएपछि धरौटी फिर्ता गरिन्छ।',
   'provider_order_deposit' => 'ग्राहक धरौटी',
   'return_request_btn' => 'फिर्ता भएको चिन्ह लगाउनुहोस्',
-  'return_requested' => 'फिर्ता अनुरोध गरियो',
+  'return_requested' => 'फिर्ता अनुरोध गरिएको',
   'return_already_requested' => 'फिर्ता अनुरोध पहिले नै गरिएको छ।',
   'return_confirmed' => 'फिर्ता पुष्टि भयो',
   'order_status_returned' => 'फिर्ता भयो',
   'order_status_return_requested' => 'फिर्ता अनुरोध गरिएको',
   'order_status_picked_up' => 'उठाइयो',
   'order_status_overdue' => 'म्याद नाघेको',
-  'return_requested' => 'फिर्ता अनुरोध गरिएको',
   'return_not_requested' => 'फिर्ता अनुरोध गरिएको छैन।',
   'product_orders' => 'मेरा अर्डरहरू',
   'my_purchases' => 'मेरा खरिदहरू',
@@ -2634,4 +2674,39 @@ return array (
   'rarity_legendary' => 'पौराणिक',
   'shop_type_badge_label' => 'हस्तशिल्प',
   'legal_updated_date' => 'अगस्ट 2026',
+  'verticals' => 
+  array (
+    'trekking' => 'ट्रेकिङ',
+    'hotel' => 'होटल',
+    'restaurant' => 'रेस्टुरेन्ट',
+    'transport' => 'यातायात',
+    'individual' => 'व्यक्तिगत गाइड',
+    'money_changer' => 'मनी चेन्जर',
+    'art_craft' => 'कला शिल्प',
+    'inventory' => 'इन्भेन्टरी',
+  ),
+  'limit_labels' => 
+  array (
+    'treks' => 'ट्रेकहरू',
+    'itinerary_days' => 'यात्रा दिनहरू',
+    'hotels' => 'होटलहरू',
+    'rooms' => 'कोठाहरू',
+    'menu_items' => 'मेनु वस्तुहरू',
+    'tables' => 'टेबलहरू',
+    'vehicles' => 'सवारीहरू',
+    'routes' => 'मार्गहरू',
+    'guides' => 'गाइड/पोर्टरहरू',
+    'currencies' => 'मुद्राहरू',
+    'artworks' => 'कलाकृतिहरू',
+    'products' => 'उत्पादनहरू',
+  ),
+  'pricing_8_verticals_title' => 'एउटै प्लेटफर्म। आठ पर्यटन ठाडो।',
+  'pricing_8_verticals_subtitle' => 'तपाईंको व्यवसाय अनुसार योजनाहरू — ट्रेकिङ, होटल, रेस्टुरेन्ट, यातायात, व्यक्तिगत गाइड, मनी चेन्जर, कला शिल्प र इन्भेन्टरी। प्रत्येकमा ठाडो-विशिष्ट सीमाहरू।',
+  'per_vertical_limits' => 'प्रति-ठाडो सीमाहरू',
+  'shared_limits' => 'साझा सीमाहरू',
+  'coming_soon' => 'चाँडै आउँदैछ',
+  'forever' => 'सधैंको लागि',
+  'plan_features' => 'सुविधा',
+  'plan_price' => 'मूल्य',
+  'custom_logo_feature' => 'कस्टम लोगो',
 );
