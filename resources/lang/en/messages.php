@@ -2691,4 +2691,12 @@ return array (
   'trekking_bookings_mo' => 'Trekking Bookings/mo',
   'ai_features_note' => 'AI Features currently available for Trekking. More vertical-specific AI capabilities are planned.',
   'ai_coming_soon' => 'More coming',
+  'hotel_ai_forecast_title' => 'AI Occupancy Forecast',
+  'hotel_ai_forecast_sub' => 'Predict next 7 days from last 30 days history.',
+  'hotel_ai_run_forecast' => 'Generate forecast',
+  'hotel_ai_pricing_title' => 'AI Room Pricing Assistant',
+  'hotel_ai_pricing_sub' => 'Suggested rates based on booking performance.',
+  'hotel_ai_run_pricing' => 'Suggest pricing',
+  'hotel_ai_loading' => 'Analyzing…',
+
 );

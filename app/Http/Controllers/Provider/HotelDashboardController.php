@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HotelBooking;
 use App\Models\HotelRoom;
 use App\Models\HousekeepingTask;
+use App\Services\HotelAiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,8 @@ class HotelDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected HotelAiService $hotelAi) {}
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -30,7 +33,11 @@ class HotelDashboardController extends Controller
         $bookingsToday = HotelBooking::where('provider_id', $provider->id)
             ->where('created_at', '>=', $today)->count();
 
-        $roomsOccupied = HotelRoom::where('provider_id', $provider->id)->where('status', 'occupied')->count();
+        $roomsOccupied = HotelBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->where('check_in_date', '<=', now()->format('Y-m-d'))
+            ->where('check_out_date', '>=', now()->format('Y-m-d'))
+            ->distinct()->pluck('room_id')->count();
         $totalRooms = HotelRoom::where('provider_id', $provider->id)->count();
 
         $guestsInHouse = HotelBooking::where('provider_id', $provider->id)
@@ -221,6 +228,25 @@ public function housekeepingPage()
 
     return view('provider.hotel.housekeeping', compact('provider', 'tasks', 'rooms', 'totalRooms', 'occupiedRooms'));
 }
+    public function aiOccupancyForecast(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $result = $this->hotelAi->occupancyForecast($provider, 7);
+
+        return response()->json($result);
+    }
+
+    public function aiPricingSuggestions(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $result = $this->hotelAi->pricingSuggestions($provider);
+
+        return response()->json($result);
+    }
     public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -230,7 +256,11 @@ public function housekeepingPage()
         $totalRevenue = (float) HotelBooking::where('provider_id', $provider->id)->sum('amount');
 
         $totalRooms = HotelRoom::where('provider_id', $provider->id)->count();
-        $occupiedRooms = HotelRoom::where('provider_id', $provider->id)->where('status', 'occupied')->count();
+        $occupiedRooms = HotelBooking::where('provider_id', $provider->id)
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->where('check_in_date', '<=', now()->format('Y-m-d'))
+            ->where('check_out_date', '>=', now()->format('Y-m-d'))
+            ->distinct()->pluck('room_id')->count();
         $occupancyRate = $totalRooms > 0 ? (int) round(($occupiedRooms / $totalRooms) * 100) : 0;
 
         // 7-day booking chart

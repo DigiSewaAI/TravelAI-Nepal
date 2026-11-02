@@ -334,6 +334,81 @@ class LlmService
         return (string) ($data['choices'][0]['message']['content'] ?? '');
     }
 
+    /**
+     * Pool-aware raw text generation (Hotel AI etc).
+     * Iterates all configured providers × keys × models (same pattern as generateItinerary),
+     * but returns raw text instead of extracted JSON.
+     * Leaves generateRawText() untouched for backward compatibility.
+     */
+    public function generateRawTextPooled(
+        string $prompt,
+        string $systemPrompt = 'You are a helpful assistant.',
+        ?string $model = null,
+        int $maxTokens = 1500,
+        float $temperature = 0.7,
+        bool $jsonMode = false
+    ): string {
+        $errors = [];
+        $fallbackEnabled = (bool) config('services.ai.fallback_enabled', true);
+
+        foreach ($this->providers as $provider) {
+            if (empty($provider['api_keys'])) continue;
+
+            $modelsToTry = $model !== null
+                ? [$model]
+                : (!empty($provider['models']) ? $provider['models'] : [$provider['model']]);
+
+            foreach ($provider['api_keys'] as $keyIdx => $apiKey) {
+                foreach ($modelsToTry as $modelToUse) {
+                    $label = $provider['name'] . '#' . ($keyIdx + 1);
+                    try {
+                        $payload = [
+                            'model' => $modelToUse,
+                            'messages' => [
+                                ['role' => 'system', 'content' => $systemPrompt],
+                                ['role' => 'user', 'content' => $prompt],
+                            ],
+                            'temperature' => $temperature,
+                            'max_tokens' => $maxTokens,
+                        ];
+                        if ($jsonMode) {
+                            $payload['response_format'] = ['type' => 'json_object'];
+                        }
+
+                        Log::info('generateRawTextPooled: try', [
+                            'provider' => $provider['name'],
+                            'key' => $label,
+                            'model' => $modelToUse,
+                        ]);
+
+                        $result = $this->callProvider($provider['base_url'], $apiKey, $payload);
+
+                        if ($result['status'] === 200) {
+                            $content = (string) ($result['content'] ?? '');
+                            if (trim($content) !== '') {
+                                Log::info('generateRawTextPooled: success', [
+                                    'provider' => $provider['name'],
+                                    'key' => $label,
+                                    'length' => strlen($content),
+                                ]);
+                                return $content;
+                            }
+                            $errors[] = "{$label}: empty response";
+                            continue;
+                        }
+
+                        $errors[] = "{$label}: HTTP {$result['status']}";
+                    } catch (\Throwable $e) {
+                        $errors[] = "{$label}: " . $e->getMessage();
+                    }
+
+                    if (!$fallbackEnabled) break 3;
+                }
+            }
+        }
+
+        throw new \Exception('generateRawTextPooled: All providers failed. ' . implode(' | ', $errors));
+    }
     protected function extractJson(string $content): array
     {
                 Log::info('LlmService: LLM response received', [

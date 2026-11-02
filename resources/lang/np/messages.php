@@ -2712,4 +2712,12 @@ return array (
   'trekking_bookings_mo' => 'ट्रेकिङ बुकिङ/महिना',
   'ai_features_note' => 'AI सुविधाहरू हाल ट्रेकिङका लागि मात्र। थप ठाडो-विशिष्ट AI क्षमताहरू योजना गरिएको छ।',
   'ai_coming_soon' => 'थप आउँदैछ',
+  'hotel_ai_forecast_title' => 'AI अक्युपेन्सी पूर्वानुमान',
+  'hotel_ai_forecast_sub' => 'पछिल्लो ३० दिनको इतिहासबाट आगामी ७ दिनको अनुमान।',
+  'hotel_ai_run_forecast' => 'पूर्वानुमान बनाउनु',
+  'hotel_ai_pricing_title' => 'AI कोठा मूल्य सहायक',
+  'hotel_ai_pricing_sub' => 'बुकिङ प्रदर्शनमा आधारित सुझाव दर।',
+  'hotel_ai_run_pricing' => 'मूल्य सुझाव',
+  'hotel_ai_loading' => 'विश्लेषण हुँदै…',
+
 );

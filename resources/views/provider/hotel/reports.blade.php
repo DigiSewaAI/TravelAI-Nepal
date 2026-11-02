@@ -85,4 +85,49 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bar) bar.style.width = pct + '%';
 });
 </script>
+
+{{-- ═══ AI Features ═══ --}}
+<div class="rep-card" style="margin-top:20px;">
+  <h3>🤖 {{ __('messages.hotel_ai_forecast_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted,#6b7a90);margin:0 0 14px;">{{ __('messages.hotel_ai_forecast_sub') }}</p>
+  <button id="hotelAiForecastBtn" onclick="loadHotelAiForecast()" style="background:var(--accent,#c9a227);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.hotel_ai_run_forecast') }}</button>
+  <div id="hotelAiForecastOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<div class="rep-card" style="margin-top:20px;">
+  <h3>💡 {{ __('messages.hotel_ai_pricing_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted,#6b7a90);margin:0 0 14px;">{{ __('messages.hotel_ai_pricing_sub') }}</p>
+  <button id="hotelAiPricingBtn" onclick="loadHotelAiPricing()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.hotel_ai_run_pricing') }}</button>
+  <div id="hotelAiPricingOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<script>
+async function hotelAiPost(url){
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:'{}' });
+  return await r.json();
+}
+function hotelAiError(el,msg){ el.innerHTML='<div style="padding:10px;border-radius:8px;background:#fee;color:#900;font-weight:700;">'+msg+'</div>'; }
+async function loadHotelAiForecast(){
+  const btn=document.getElementById('hotelAiForecastBtn'), out=document.getElementById('hotelAiForecastOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.hotel_ai_loading") }}';
+  try{
+    const data=await hotelAiPost('{{ route("provider.hotel.ai.occupancy") }}');
+    if(data.error){ hotelAiError(out, data.message||data.error); return; }
+    let html='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    (data.days||[]).forEach(d=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+'</span><strong>'+d.predicted_bookings+' ('+d.confidence+')</strong></div>'; });
+    out.innerHTML=html;
+  }catch(e){ hotelAiError(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+async function loadHotelAiPricing(){
+  const btn=document.getElementById('hotelAiPricingBtn'), out=document.getElementById('hotelAiPricingOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.hotel_ai_loading") }}';
+  try{
+    const data=await hotelAiPost('{{ route("provider.hotel.ai.pricing") }}');
+    if(data.error){ hotelAiError(out, data.message||data.error); return; }
+    let html='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    (data.rooms||[]).forEach(r=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>Room '+r.room_number+'</span><strong>Rs '+(r.suggested_rate||0).toLocaleString()+' / night</strong></div>'; });
+    out.innerHTML=html;
+  }catch(e){ hotelAiError(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+</script>
 @endsection

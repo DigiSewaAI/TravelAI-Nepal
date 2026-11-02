@@ -310,6 +310,8 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::get('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');
         Route::get('/hotel/reports', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'reportsPage'])->name('hotel.reports');
     Route::get('/hotel/offers', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'offersPage'])->name('hotel.offers');
+Route::post('/hotel/ai/occupancy-forecast', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiOccupancyForecast'])->name('hotel.ai.occupancy');
+Route::post('/hotel/ai/pricing-suggestions', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiPricingSuggestions'])->name('hotel.ai.pricing');
         // 🆕 Transport vertical dashboard routes
     Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');
