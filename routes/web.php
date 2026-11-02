@@ -189,6 +189,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders', [App\Http\Controllers\OrdersController::class, 'index'])->name('orders.index');
+    Route::get('/my-bookings', [\App\Http\Controllers\Traveler\UnifiedBookingController::class, 'index'])->name('traveler.my-bookings');
     Route::get('/orders/{order}', [App\Http\Controllers\OrdersController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/notify-payment', [App\Http\Controllers\OrdersController::class, 'notifyPayment'])->name('orders.notifyPayment');
     // PATH-3C C2: Buyer requests rental return
