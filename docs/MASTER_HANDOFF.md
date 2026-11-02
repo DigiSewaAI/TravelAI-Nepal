@@ -1,376 +1,367 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER HANDOFF — SESSION 15 FINAL (LOCAL, NOT PUSHED)
-FROM: Session 15 Assistant
+👑 MASTER HANDOFF — SESSION 16 (LOCAL, NOT PUSHED)
+FROM: Session 16 Assistant
 TO:   Master / Future Reference
 DATE: 2026-11-02
-HEAD: main @ [pending commit] (LOCAL — 25+ commits ahead of origin/main 93fb085)
-STATUS: 🟢 Pricing Phase 1+2A+2B+2C(7/7) COMPLETE | 🟡 max_bookings + max_ai_requests pending
+HEAD: main @ d762895 (2 commits ahead of origin/main 9cf1958)
+STATUS: 🟢 Hotel AI COMPLETE | 🟡 Improve #1-3 pending | 🔴 NOT pushed
 ═══════════════════════════════════════════════════════════
 
 ## 🚨 CRITICAL — PUSH STATUS
 
-**Production is STILL at 93fb085. Sessions 12-15 work is LOCAL ONLY.**
-
 | Item | Value |
 |------|-------|
-| origin/main | `93fb085` (production — Live) |
-| Local HEAD | `c66c79a` (last commit; new work uncommitted) |
-| Commits ahead (before new commit) | **22** |
-| Commits ahead (after commit) | **25+** |
+| origin/main | `9cf1958` (production — Live) |
+| Local HEAD | `d762895` |
+| Commits ahead | **2** (`fc37ec0`, `d762895`) |
 | Push trigger | Owner "push" GO only — **HOLD** |
 
+**⚠️ Correction (Session 16):** Earlier handoff referenced `93fb085` (stale). Actual origin/main = `9cf1958`. The Session 15 pricing work (`9cf1958`) **IS already pushed**.
+
 ═══════════════════════════════════════════════════════════
 
-## 📊 SESSION 15 — PRICING PAGE OVERHAUL
+## 📊 SESSION 16 — HOTEL AI (COMPLETE ✅)
 
-### ✅ Phase 1 — Translation + View Fixes (COMPLETE)
+### ✅ Features Implemented
 
-**Files:**
-- `resources/lang/en/messages.php`
-- `resources/lang/np/messages.php`
-- `resources/views/public/pricing.blade.php`
+**1. AI Occupancy Forecast**
+- 7-day prediction from last 30 days history
+- Includes future confirmed bookings + weekday pattern
+- Outputs: date, predicted_bookings, predicted_occupancy_pct, confidence
+- Dates anchored to tomorrow (today +1)
+- Occupancy % = distinct occupied room_ids / total_rooms
 
-**Fixes:**
-1. `messages.plans.{free/professional/business/enterprise}.description` keys added
-2. `messages.plans.features.*` — 20+ keys (basic_dashboard, 3_listings, etc.)
-3. `messages.verticals.*` — 8 vertical keys (trekking, hotel, restaurant, transport, individual, money_changer, art_craft, inventory)
-4. `messages.limit_labels.*` — 12 labels (treks, itinerary_days, hotels, rooms, menu_items, tables, vehicles, routes, guides, currencies, artworks, products)
-5. `messages.forever`, `plan_features`, `plan_price`, `custom_logo_feature` added
-6. Feature slug normalization: `hyphen → underscore` (white-label → white_label)
-7. Duplicate 📊 removed (moved to lang key)
-8. 🎁 duplicate removed (view emoji only)
-9. Title + meta 8-vertical aware
-10. USD dual display (`Rs 4,499 ≈$29.50`)
-11. Hero title + subtitle from lang keys
+**2. AI Room Pricing Assistant**
+- Per-room suggested nightly rate (0.8x–1.5x base_price)
+- Reason text quotes actual per_night (not total revenue)
+- Accept/Apply button → updates `hotel_rooms.base_price`
+- Baseline fallback if AI unavailable
 
-### ✅ Phase 2A — DB Plans `limits` JSON Update (COMPLETE)
+**3. Shared Infrastructure Reuse**
+- `AiLimitService` quota (Business plan = 500/month)
+- `generateRawTextPooled()` — pool-aware (4 providers × keys)
+- Existing `generateRawText()` untouched (ItineraryGenerator unaffected)
 
-**No migration needed** (existing `limits` JSON column extended)
+### ✅ Files Changed
 
-**11 per-vertical limits added to all 4 plans:**
-- `max_treks`, `max_itinerary_days`
-- `max_hotels`, `max_rooms`
-- `max_menu_items`, `max_tables`
-- `max_vehicles`, `max_routes`
-- `max_guides`
-- `max_currencies`
-- `max_artworks`
+**Modified:**
+- `app/Services/HotelAiService.php` — occupancyForecast + pricingSuggestions + fallbacks
+- `app/Services/LlmService.php` — new `generateRawTextPooled()` method
+- `app/Http/Controllers/Provider/HotelDashboardController.php` — 2 AI methods + applyPricing + active-booking occupancy
+- `routes/web.php` — 3 AI routes (occupancy, pricing, apply)
+- `resources/views/provider/hotel/reports.blade.php` — 2 AI cards + JS + Apply buttons
+- `resources/lang/en/messages.php` — 7 hotel_ai_* keys
+- `resources/lang/np/messages.php` — 7 hotel_ai_* keys
+- `database/seeders/PlanSeeder.php` — (already had max_ai_requests)
 
-**Existing limits preserved:**
-- `max_staff`, `max_bookings`, `max_listings`, `max_products`, `max_ai_requests`
+**New:**
+- `app/Services/HotelAiService.php` (created)
+- `database/migrations/2026_11_02_102255_add_base_price_to_hotel_rooms.php`
+- `docs/users.md` (test account reference)
 
-**Plan matrix (16 keys each):**
-| Limit | Free | Pro | Business | Enterprise |
-|---|---|---|---|---|
-| max_treks | 3 | 20 | 100 | -1 |
-| max_itinerary_days | 10 | 30 | 100 | -1 |
-| max_hotels | 1 | 5 | 20 | -1 |
-| max_rooms | 5 | 30 | 200 | -1 |
-| max_menu_items | 5 | 30 | 200 | -1 |
-| max_tables | 3 | 10 | 30 | -1 |
-| max_vehicles | 5 | 30 | 200 | -1 |
-| max_routes | 3 | 15 | 50 | -1 |
-| max_guides | 3 | 20 | 100 | -1 |
-| max_currencies | 5 | 20 | 50 | -1 |
-| max_artworks | 5 | 30 | 200 | -1 |
-| max_products | 5 | 30 | 200 | -1 |
-| max_staff | 1 | 5 | 20 | -1 |
-| max_bookings | 10 | 100 | 1000 | -1 |
-| max_ai_requests | 5 | 50 | 500 | -1 |
+### ✅ Data State (verified)
 
-### ✅ Phase 2B — Pricing View Rewrite (COMPLETE)
+```
+users: 11 | providers: 8 | hotel_rooms: 22 | hotel_bookings: 16
+base_price: Standard=45k, Deluxe=60k, Suite=75k
+Total revenue: Rs 2,730,000
+```
 
-**File:** `resources/views/public/pricing.blade.php`
+### ✅ Plans Limits (updated in DB)
 
-**Changes:**
-1. 8-vertical overview cards at top (icon + label per vertical)
-2. Plan cards — per-vertical limits grouped by section (🏔️ Trekking, 🏨 Hotel, ...)
-3. Shared limits section (staff/bookings/AI)
-4. Comparison table — 8 sections + shared (20+ rows)
-5. Yearly view — proper `Rs 44,999/year ≈ Rs 3,750/month` display
-6. Billing toggle JS — monthly/yearly switch
-7. FAQ updated for per-vertical model
-8. No "Departures" (feature not built — no 0-record misleading)
-9. No "Coming soon" (removed for consistency)
+| Plan | max_ai_requests |
+|---|---|
+| Free | 5 |
+| Professional | 50 |
+| Business | 500 |
+| Enterprise | 5000 |
 
-### ✅ Phase 2C — Limit Enforcement (7/7 verticals COMPLETE)
+⚠️ **Note:** `PlanSeeder.php` already contains `max_ai_requests` — no patch needed. If future re-seed runs, DB values should survive (seeder uses updateOrCreate pattern).
 
-**New file:** `app/Traits/EnforcesPlanLimits.php`
-- `checkPlanLimit(Provider, attributeKey, modelClass, modelLabel)` helper
-- Returns `RedirectResponse` with error if limit reached, `null` if OK
-- `-1` = unlimited (Enterprise), `null` = no limit set
+═══════════════════════════════════════════════════════════
 
-**Provider Model — 13 new accessors added:**
-- `getMaxTreksAttribute()`, `getMaxItineraryDaysAttribute()`
-- `getMaxHotelsAttribute()`, `getMaxRoomsAttribute()`
-- `getMaxMenuItemsAttribute()`, `getMaxTablesAttribute()`
-- `getMaxVehiclesAttribute()`, `getMaxRoutesAttribute()`
-- `getMaxGuidesAttribute()`
-- `getMaxCurrenciesAttribute()`
-- `getMaxArtworksAttribute()`
-- `getMaxBookingsAttribute()` **(was missing — pre-existing bug)**
-- `getMaxAiRequestsAttribute()` **(was missing — pre-existing bug)**
+## 🟡 SESSION 16 — IMPROVE #1-3 (PENDING)
 
-**Helper:** `planLimit($key, $freeDefault, $proDefault, $bizDefault)` — resolves from active subscription, falls back to plan slug defaults
+ChatGPT audit identified 3 minor improvements (all valid):
 
-**Enforcement injected (7 controllers):**
+| # | Fix | Effort |
+|---|---|---|
+| **1** | Occupancy UI — add "1 booking = 1 room" label | 🟢 5 min |
+| **2** | AI confidence — force "low" if <10 bookings in 30 days | 🟢 10 min |
+| **3** | Reports controller — filter `status != cancelled` in queries | 🟢 10 min |
 
-| Controller | Method | Limit | Status |
+### Additional known limitations (defer to future ticket)
+
+| Issue | Severity |
+|---|---|
+| Multi-night bookings counted on 1 day (check_in_date groupBy) | 🟡 Forecast accuracy |
+| AI confidence self-reported, not data-driven | 🟡 Trust |
+| No demand signals (occupancy %, seasonality) in pricing prompt | 🟡 Dynamic pricing not achieved — intelligent base-rate only |
+
+═══════════════════════════════════════════════════════════
+
+## 🎯 VERTICAL AI ROADMAP (7 Verticals)
+
+**Vision:** TravelAI Nepal = vertical-specific business intelligence, not generic chatbot.
+
+**Shared infrastructure (do NOT create new quota tables):**
+- `AiLimitService` — quota check per provider
+- `AiReservationService` — crash-safe reserve/finalize/release
+- `ai_usage` table — monthly count (provider_id, month, count)
+- `ai_reservations` table — in-flight tracking
+- `LlmService` — pool-aware (Groq + OpenRouter + Cerebras + Gemini)
+
+### Vertical Progress
+
+| # | Vertical | Status | Features Planned |
 |---|---|---|---|
-| HotelDashboardController | storeRoom | max_rooms | ✅ |
-| RestaurantDashboardController | storeMenuItem | max_menu_items | ✅ |
-| RestaurantDashboardController | storeTable | max_tables | ✅ |
-| TransportDashboardController | storeVehicle | max_vehicles | ✅ |
-| IndividualDashboardController | storeAssignment | max_guides | ✅ |
-| MoneyChangerDashboardController | storeRate | max_currencies (create-only) | ✅ |
-| ArtCraftDashboardController | storeArtwork | max_artworks | ✅ |
-| InventoryDashboardController | storeProduct | max_products | ✅ |
+| 1 | 🏨 **Hotel** | ✅ **DONE (Session 16)** | Occupancy Forecast, Room Pricing |
+| 2 | 🍜 **Restaurant** | 🔴 **Next** | Menu Recommendations, Demand Forecast |
+| 3 | 🚐 **Transport** | 🟡 Pending | Vehicle Assignment, Cost Estimator |
+| 4 | 🧑‍✈️ **Individual** | 🟡 Pending (needs fields: skills, languages, experience_years, availability, bio) | Guide Matching, Profile Builder |
+| 5 | 💱 **Money Changer** | 🟡 Pending (⚠️ NRB compliance: no rate prediction) | Daily Business Summary only (Cash Flow deferred) |
+| 6 | 🎨 **Art Craft** | 🟡 Pending (needs fields: material_cost, labor_hours, labor_cost) | Product Description, Pricing |
+| 7 | 📦 **Inventory** | 🟡 Pending | Stock Forecast, Reorder Assistant |
 
-**Trait imported (7 controllers):**
-- Hotel, Restaurant, Transport, Individual, MoneyChanger, ArtCraft, Inventory
+### Per-Vertical Data Sources
 
-**Pattern used (per injection):**
-```php
-if ($redirect = $this->checkPlanLimit($provider, 'max_rooms', \App\Models\HotelRoom::class, 'rooms')) {
-    return $redirect;
-}
-Error message: "Plan limit reached: max {N} {label}. Please upgrade your plan." (in errors.limit bag)
+| Vertical | Tables |
+|---|---|
+| Hotel | `hotel_bookings`, `hotel_rooms` |
+| Restaurant | `restaurant_orders`, `restaurant_order_items`, `menu_items`, `restaurant_tables` |
+| Transport | `transport_bookings`, `transport_vehicles` |
+| Individual | `individual_bookings`, `provider_staff` |
+| Money Changer | `provider_exchange_rates`, `exchange_transactions` |
+| Art Craft | `artworks`, `custom_orders` |
+| Inventory | `products`, `inventory_movements`, `orders`, `order_items` |
 
-🟡 Phase 2C — PENDING (2 remaining)
-Limit	Reason Pending
-max_bookings	7 different paths (Trek bookings + Product orders + Hotel + Restaurant + Transport + Individual + ArtCraft + Wholesale) — monthly count aggregation needed
-max_ai_requests	3 AI endpoints (Planner, AiItineraryDraft, Quotation) — monthly quota tracking needed
-Estimated: 2-3 hours total
-Strategy: Option A (implement both) — "कोई pending नै" owner directive
+### Data Truth Policy (MANDATORY)
 
-═══════════════════════════════════════════════════════════
+- **No fake forecasts** — insufficient data → "Data insufficient" message
+- **AI suggests, operator decides** — no automated price changes
+- **Compliance** — Money Changer = strict (no rate guarantees per NRB)
+- **Tenant isolation** — all queries scoped by `provider_id`
 
-📊 ALL LOCAL COMMITS (22 + new Session 15)
-Session 15 (Pricing — new commits pending)
-#	Hash	Message
-TBD	feat(pricing): phase 1+2A+2B+2C(7/7) — translation + DB limits + view rewrite + enforcement	
-Session 14 (Explore perf + Unified bookings + Dynamic layout — 3 commits)
-#	Hash	Message	Files
-1	c66c79a	perf(explore): eager-load 9 details (N+1 fix) + lazy-init globe/map	2
-2	a2934cb	feat(bookings): unified /my-bookings + inline-styled views	5
-3	fa7c8b0	feat(nav): ctx=provider dynamic layout — 8 provider layouts	9
-Session 13 (Verticals + Payment UX + Transport — 5 commits)
-#	Hash	Message	Files
-4	fc23d57	fix(notif): vertical-aware URL for order notifications	1
-5	0cc580a	fix(payment+notif): auto-confirm after payment + dual-role URL	1
-6	6b34b20	feat(payment-ux): pending banner + auto-scroll + notified state	1
-7	cde1cb0	feat(transport): bookings list + show detail (6/6 verticals)	5
-8	a486b3f	docs: update MASTER_HANDOFF to session 13	1
-9	2ad9829	feat(verticals): show pages for restaurant/individual/art-craft	5
-10	7dca3ed	fix(verticals): individual duration + restaurant customer	2
-11	7a74fa8	feat(verticals): View buttons restaurant/individual/art-craft	3
-12	e5e3756	feat(hotel): booking detail page + view button	4
-Session 12 (Notifications + RFQ + Pricing — 10 commits)
-#	Hash	Message	Files
-13	651a18f	docs: update MASTER_HANDOFF to session 12	1
-14	f8ad301	feat(notifications): traveler bell for inventory lifecycle	2
-15	54682af	feat(rfq-complete): bell + email for all RFQ events	11
-16	1c72489	fix(auth+rfq): login AJAX filter + redirect param	9
-17	ef23fbb	feat(bell+filter): bell in 6 remaining layouts	7
-18	3d8c181	fix(pricing+guards): rental pricing + payment/return guards	11
-19	87ea702	feat(analytics): Google Analytics integration	3
-20	43e6687	feat(purchases): My Purchases in all 8 provider layouts	8
-21	22d1ca1	feat(rental+purchases): return flow + bell + nav	11
-22	685afec	feat(notifications): inventory-aware bell + order detail	8
-Verify: git log --oneline 93fb085..HEAD
+### Plan Tier Mapping (proposal)
+
+| Feature Class | Plan |
+|---|---|
+| Simple (Guide Matching, Menu Recs) | Free+ (limited quota) |
+| Standard (Hotel Pricing, Restaurant Forecast) | Pro+ |
+| Advanced (Financial Insights, Revenue) | Business+ |
+| Enterprise | Unlimited |
+
+### Migration Prerequisites (before those verticals)
+
+- `GUIDE-FIELDS-01` — add skills/languages/experience_years/availability/bio to `provider_staff`
+- `ARTWORK-COST-FIELDS-01` — add material_cost/labor_hours/labor_cost to `artworks`
+
+### Discovery Required Per Vertical
+
+1. Existing database schema (verified, not assumed)
+2. Which AI feature → which data (mapping)
+3. Feasibility (sufficient data?)
+4. New DB fields needed?
+5. LLM pool compatibility
+6. Testing strategy
+7. Existing quota reuse
 
 ═══════════════════════════════════════════════════════════
 
-🔴 REMAINING TICKETS (Priority Order)
-🔴 Immediate (Session 15 continue)
-#	Ticket	Description
-1	max_bookings enforcement	7 paths — monthly count aggregation
-2	max_ai_requests enforcement	3 AI endpoints — monthly quota
-🟡 Next (post-pricing)
-#	Ticket	Description
-3	CHECKOUT-PAYMENT-PREVIEW	Checkout मा payment methods preview
-4	RFQ-DELIVERY-CHARGE	Quote form मा delivery charge
-5	SECURITY-ROTATE-PASSWORDS-01	Production deploy पछि strong passwords
-6	EXPLORE-VIEW-SPLIT	1865-line view → partials
-7	Ground testing (Owner)	6 verticals + unified + RFQ + Explore + Pricing
-🟢 Backlog
-SELF-NOTIFICATION-GUARD-01
+## 📊 SESSION 15 — PRICING OVERHAUL (COMPLETE, PUSHED as 9cf1958)
 
-RENTAL-ENUM-01
+- Phase 1: Translation + view fixes (`plans.*` keys, 8 verticals, limit_labels)
+- Phase 2A: DB Plans `limits` JSON — 11 per-vertical limits × 4 plans
+- Phase 2B: Pricing view rewrite (8-vertical overview + comparison table + yearly toggle)
+- Phase 2C: Limit enforcement (7/7 verticals) via `EnforcesPlanLimits` trait
 
-PAYMENTS-UNIFIED-01
-
-PROVIDER-TRAVELER-SWITCH-01
-
-SUPPLIER-CRUD-01
-
-TREKKING-MY-PURCHASES-THEME
-
-RFQ-CLOSED-CTA-01
-
-RFQ-MESSAGE-TEMPLATE-01
-
-HOTEL/RESTAURANT/INDIVIDUAL-TRAVELER-BOOKING
-
-Session 11 backlog (MULTILINGUAL, VERTICAL-AI, ADVANCED-HOTEL-FOLIO)
+⚠️ **Pending from Session 15:** `max_bookings` enforcement (7 paths), `max_ai_requests` enforcement (3 AI endpoints).
 
 ═══════════════════════════════════════════════════════════
 
-🚨 CRITICAL — Known Architecture Issues
-1. Provider Dashboard Lock Deviation
-Lock = "Trekking content locked — sidebar/user-menu additions allowed with Owner GO"
+## 📊 SESSION 14 — Perf + Unified Bookings (3 commits)
 
-2. Enum Mismatch (RENTAL-ENUM-01)
-order_items.provider_status = ('pending','confirmed','shipped','delivered','cancelled'). Rental picked_up/returned/overdue NOT in enum.
+- `c66c79a` — perf(explore): eager-load 9 details (N+1 fix) + lazy-init globe/map
+- `a2934cb` — feat(bookings): unified /my-bookings + inline-styled views
+- `fa7c8b0` — feat(nav): ctx=provider dynamic layout — 8 provider layouts
 
-3. Test Account Passwords
-All 53 users = Himalayan@1980 (Owner order). Production = different (ticket SECURITY-ROTATE-PASSWORDS-01).
+## 📊 SESSION 13 — Verticals + Payment UX (5 commits)
 
-4. SMTP Verified Working
-Brevo relay working. "SMTP down" = testing env only.
+- `fc23d57` — fix(notif): vertical-aware URL
+- `0cc580a` — fix(payment+notif): auto-confirm after payment
+- `6b34b20` — feat(payment-ux): pending banner + auto-scroll
+- `cde1cb0` — feat(transport): bookings list + detail
+- `2ad9829` — feat(verticals): show pages (restaurant/individual/art-craft)
 
-5. Pricing View Path
-PageController@pricing line 48 → return view('public.pricing', compact('plans')) — confirmed path resources/views/public/pricing.blade.php
+## 📊 SESSION 12 — Notifications + RFQ (10 commits)
 
-6. Restaurant Customer Default
-restaurant_orders.customer_name nullable. Show page default = "Walk-in Customer".
-
-7. Phase 2C remaining
-max_bookings + max_ai_requests accessors exist, but enforcement not yet injected. Currently advisory only.
+- Inventory bell, traveler bell, RFQ complete, login redirect fix, pricing guards
 
 ═══════════════════════════════════════════════════════════
 
-🔒 LOCKED ITEMS (Owner's Orders)
-Item	Status
-Provider Dashboard languages	🔒 EN/NP only
-Trekking Views content	🔒 Byte-for-byte (except sidebar links — Owner GO)
-provider-restaurant.blade.php :root	🔒 Never touch
-Admin panel i18n	🔒 Future
-Push	🔒 HOLD — Owner GO only
-═══════════════════════════════════════════════════════════
+## 🔴 REMAINING TICKETS
 
-📊 Rules Status (R1-R17)
-Rule	Status
-R3 (Evidence)	✅ Discovery before every fix
-R4 (Scope)	✅ Pricing → Enforcement → Push
-R8 (Additive)	✅ No migration — JSON column extension
-R13 (git add explicit)	✅
-R16 (186/186)	✅ — verified each checkpoint
-R17 (Push)	⚠️ NOT PUSHED — HOLD per Owner
-═══════════════════════════════════════════════════════════
+### Immediate (Session 16 continue)
+| # | Ticket | Effort |
+|---|---|---|
+| 1 | Hotel AI Improve #1-3 (ChatGPT concerns) | 30 min |
+| 2 | `max_bookings` enforcement (7 paths) | 1-2 hr |
+| 3 | `max_ai_requests` enforcement (3 AI endpoints) | 1 hr |
 
-🎯 NEXT SESSION PRIORITY
-🔴 Immediate (Session 15 continue)
-max_bookings enforcement (7 paths)
+### Next (priority order)
+| # | Ticket |
+|---|---|
+| 4 | **Restaurant AI** (Menu Recommendations + Demand Forecast) |
+| 5 | `CHECKOUT-PAYMENT-PREVIEW` |
+| 6 | `RFQ-DELIVERY-CHARGE` |
+| 7 | `EXPLORE-VIEW-SPLIT` |
+| 8 | `SECURITY-ROTATE-PASSWORDS-01` (post-deploy) |
+| 9 | Ground testing (Owner) |
 
-max_ai_requests enforcement (3 AI endpoints)
-
-Final commit + tests 186/186
-
-Push (Owner GO)
-
-🟡 Next
-CHECKOUT-PAYMENT-PREVIEW
-
-Ground testing (Owner)
-
-EXPLORE-VIEW-SPLIT
+### Backlog
+- Transport AI, Individual AI (needs migration), Money Changer AI (NRB), Art Craft AI (needs migration), Inventory AI
+- `SELF-NOTIFICATION-GUARD-01`, `RENTAL-ENUM-01`, `PAYMENTS-UNIFIED-01`
+- `PROVIDER-TRAVELER-SWITCH-01`, `SUPPLIER-CRUD-01`
+- `TREKKING-MY-PURCHASES-THEME`, `RFQ-CLOSED-CTA-01`, `RFQ-MESSAGE-TEMPLATE-01`
+- Hotel AI: multi-night booking weighting, demand signals, dynamic pricing
+- Session 11: MULTILINGUAL, ADVANCED-HOTEL-FOLIO
 
 ═══════════════════════════════════════════════════════════
 
-🛠️ PROVEN PATTERNS
-One-Shot Batch Fix Script
-php
-require bootstrap/app.php
-patch(): anchor uniqueness → backup (.bak) → replace → php -l → revert on fail
-Per-file independent (fail isolated)
-Delete script after run
-Anchor Uniqueness
-php
-$cnt = substr_count($content, $anchor);
-if ($cnt === 1) → safe
-Language File Edit (R11)
-Use require + var_export — NEVER str_replace/regex on lang files:
+## 🚨 KNOWN ISSUES
 
-php
-$data = require $path;
-$data[$key] = $value;
-file_put_contents($path, "<?php\n\nreturn " . var_export($data, true) . ";\n");
-Session 15 lesson: str_replace on lang files caused verticals misplaced inside plans array — require+var_export fixed it (Session 11 rule R11).
-
-Method-Aware Injection
-When anchor appears in multiple methods (store and update), locate method signature first, then inject only after abort_unless($provider, 403); within that method's scope.
-
-Trait-Based Enforcement Pattern
-php
-use App\Traits\EnforcesPlanLimits;
-
-if ($redirect = $this->checkPlanLimit($provider, 'max_rooms', HotelRoom::class, 'rooms')) {
-    return $redirect;
-}
-Blade Gotchas
-Nested @if inside @elseif chain → separate @if blocks
-
-Inline styles + var() fallbacks = safe across layouts
-
-!empty($provider_layout) required for dynamic @extends
-
-CMD Gotchas
---execute with $ → interactive php artisan tinker
-
-Multi-line -m → git commit --amend
-
-Junk files → delete
-
-PowerShell }} → PHP script
-
-Unicode × after variable in double quotes → use ($cnt . 'x')
+1. **Multi-night bookings count on check_in_date only** (forecast undercounts multi-night stays)
+2. **AI confidence self-reported** (LLM says "med"/"high" without data backing)
+3. **No demand signals in pricing** (no occupancy/seasonality input → "intelligent base rate" not "dynamic pricing")
+4. **`max_bookings` + `max_ai_requests` accessors exist but enforcement not injected** (advisory only)
+5. **RENTAL-ENUM-01** — `order_items.provider_status` missing `picked_up`/`returned`/`overdue`
+6. **Test accounts** — all `Himalayan@1980` (production needs rotation — `SECURITY-ROTATE-PASSWORDS-01`)
 
 ═══════════════════════════════════════════════════════════
 
-💡 KEY CONTEXT FOR NEW ASSISTANT
-Owner = "दाइ" (never "Bhai")
+## 🔒 LOCKED ITEMS (Owner's Orders)
 
-Production = 93fb085 (Live) — Session 12-15 LOCAL ONLY
-
-Local HEAD = c66c79a (before Session 15 commit)
-
-Tests = 186/186 passing
-
-i18n = 5 locales (en/np/hi/zh/ru) — Provider = EN/NP only
-
-Test Accounts (all passwords: Himalayan@1980)
-Role	Email
-Buyer (David — dual-role: Traveler + Trekking)	regmiashish629@gmail.com
-Buyer (John)	shresthaxok@gmail.com
-Inventory provider (Ang Dorje)	rent@himalayangear.com
-Wholesale provider (SAI/Makalu)	makalu@test.com
-Super Admin	parasharregmi@gmail.com
-Hotel (Kanchenjunga)	kanchenjunga-providers@travelainepal.com
-Hotel (Himalayan View)	book@himalayanviewhotel.com
-Restaurant (Everest Spice)	suman.thapa.restaurant@gmail.com
-Individual (Pro Guides)	professional.guides.nepal@travelainepal.com
-Art-craft (Patan Handicraft)	bikash.artcraft@gmail.com
-Transport (Besisahar)	transport.only@test.com (verify)
-Never git add . — explicit paths (R13)
-
-Push HOLD — Owner GO only
+| Item | Status |
+|------|--------|
+| Provider Dashboard languages | 🔒 EN/NP only |
+| Trekking Views content | 🔒 Byte-for-byte (except sidebar links — Owner GO) |
+| `provider-restaurant.blade.php` `:root` | 🔒 Never touch |
+| Admin panel i18n | 🔒 Future |
+| Push | 🔒 HOLD — Owner GO only |
 
 ═══════════════════════════════════════════════════════════
 
-📝 IMMEDIATE ACTION FOR NEXT SESSION
-Verify HEAD: git log --oneline 93fb085..HEAD
+## 📊 Rules Status (R1-R17)
 
-Run tests: php artisan test → 186/186
+| Rule | Status |
+|------|--------|
+| R3 (Evidence) | ✅ Discovery before every fix |
+| R4 (Scope) | ✅ Hotel AI → docs → next vertical |
+| R8 (Additive) | ✅ `base_price` migration additive |
+| R13 (git add explicit) | ✅ — 6 files, no `git add .` |
+| R16 (186/186 tests) | 🟡 **Needs re-verification** (last green: Session 15) |
+| R17 (Push) | ⚠️ NOT PUSHED — HOLD per Owner |
+| **Z1 (NO destructive)** | ✅ — zero `migrate:fresh`/`db:wipe` this session |
+| **Z2 (Backup before action)** | ✅ — `.bak` used for all edits |
 
-Continue: max_bookings + max_ai_requests enforcement
+### 🚨 Safety learnings (Session 16 critical)
 
-Push HOLD — do NOT push unless Owner explicitly says "push"
-
-Report prepared by: Session 15 Assistant
-Verified against: 186/186 tests + Owner screenshots
-Production status: NOT PUSHED (24+ commits local — HOLD)
-Next action: max_bookings + max_ai_requests enforcement
+- ❌ **NEVER auto-run `php artisan test` inside a fix script** — caused DB wipe once (main DB)
+- ✅ `phpunit.xml` currently: `DB_DATABASE=travelai_test` (separate DB, safe) — verify before any test run
+- ✅ Always backup before edit: `.bak` + `php -l` + auto-revert on fail
+- ✅ `generateRawTextPooled()` is additive — `generateRawText()` untouched
 
 ═══════════════════════════════════════════════════════════
 
+## 🎯 NEXT SESSION PRIORITY
+
+1. **Hotel AI Improve #1-3** — 30 min, one-shot script
+2. **Commit** improve changes
+3. **Restaurant AI** — Menu Recommendations + Demand Forecast (next vertical)
+4. Push — **only** when Owner says "push"
+
+═══════════════════════════════════════════════════════════
+
+## 🛠️ PROVEN PATTERNS
+
+### One-Shot Fix Script
+- `require bootstrap/app.php` + `patch()` function
+- Anchor uniqueness check (`substr_count($content, $anchor) === 1`)
+- Backup `.bak` → replace → `php -l` → auto-revert on fail
+- Per-file independent (fail isolated)
+- **NEVER include `artisan test`** in fix script
+- Delete script after run
+
+### Language File Edit
+- `require` + `var_export` — NEVER str_replace on lang files
+- Anchor: `strrpos("\n);")` for `return array(...)` syntax
+
+### Pool-Aware LLM
+- `generateRawTextPooled()` iterates all providers × keys × models
+- JSON mode: `response_format = ['type' => 'json_object']`
+- Leaves `generateRawText()` untouched (backward compatibility)
+
+### Blade Gotchas
+- `@extends($provider_layout ?? 'layouts.provider-hotel')` — dynamic
+- Inline styles + `var()` fallbacks safe across layouts
+- Nested `@if` inside `@elseif` chain → separate `@if` blocks
+
+### CMD Gotchas
+- `--execute` with `$` → use interactive `php artisan tinker`
+- Multi-line `-m` → `git commit --amend`
+- PowerShell `}}` → use PHP script file
+- Unicode `×` after `$variable` in `"..."` → use concatenation
+
+═══════════════════════════════════════════════════════════
+
+## 💡 KEY CONTEXT
+
+- Owner = **"दाइ"** (never "Bhai")
+- Production = `9cf1958` (Live)
+- Local = `d762895` (2 commits ahead)
+- Tests = last verified 186/186 (Session 15); needs re-run
+- i18n = 5 locales (en/np/hi/zh/ru) — Provider = EN/NP only
+
+### Test Accounts (all passwords: `Himalayan@1980`)
+
+| Role | Email |
+|---|---|
+| Super Admin | parasharregmi@gmail.com |
+| Trekking Provider | anjuregmimesh@gmail.com |
+| Traveller | shresthaxok@gmail.com |
+| Hotel Provider | regmiashish629@gmail.com |
+| Foreign Traveller | hostelhub.nep@gmail.com (John Anderson) |
+| Restaurant | restaurant@travelai.test |
+| Transport | transport@travelai.test |
+| Inventory | inventory@travelai.test |
+| Art Craft | artcraft@travelai.test |
+| Guide | guide@travelai.test |
+| Money Changer | forex@travelai.test |
+
+⚠️ `docs/users.md` contains this list — do not commit if passwords change.
+
+### AI Pool (verified Session 16)
+```
+Providers: groq (2 keys), openrouter, cerebras, gemini
+Model: qwen/qwen3.8-27b (groq default)
+Fallback: enabled (services.ai.fallback_enabled = true)
+```
+
+═══════════════════════════════════════════════════════════
+
+## 📝 IMMEDIATE ACTION FOR NEXT SESSION
+
+1. `git log -3 --oneline` — verify HEAD `d762895`
+2. **Improve #1-3** (ChatGPT concerns) — 30 min
+3. `php artisan test` (verify `phpunit.xml` first — `travelai_test` separate DB)
+4. Restaurant AI — next vertical
+5. Push — **HOLD** unless Owner explicitly says "push"
+
+---
+
+Report prepared by: Session 16 Assistant
+Verified against: Owner screenshots + git log + browser test
+Production status: NOT PUSHED (2 commits local — HOLD)
+Next action: Hotel AI Improve #1-3 → Restaurant AI
+
+═══════════════════════════════════════════════════════════
