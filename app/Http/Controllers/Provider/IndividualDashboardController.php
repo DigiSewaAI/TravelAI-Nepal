@@ -161,6 +161,18 @@ class IndividualDashboardController extends Controller
         return view('provider.individual.bookings', compact('provider', 'bookings'));
     }
 
+    public function showBooking(IndividualBooking $booking)
+    {
+        $provider = Provider::where('user_id', Auth::id())
+            ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
+            ->first();
+        abort_unless($provider, 403);
+        abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
+        $booking->load('provider');
+        $provider_layout = 'layouts.provider-individual';
+        return view('provider.individual.bookings.show', compact('booking', 'provider', 'provider_layout'));
+    }
+
     public function calendarPage()
     {
         $provider = Provider::where('user_id', Auth::id())

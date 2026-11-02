@@ -222,6 +222,16 @@ class ArtCraftDashboardController extends Controller
             'provider', 'orders', 'completedWorks', 'rating', 'clients'
         ));
     }
+
+    public function showOrder(CustomOrder $order)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        abort_unless((int)$order->provider_id === (int)$provider->id, 403);
+        $order->load('provider');
+        $provider_layout = 'layouts.provider-art-craft';
+        return view('provider.art-craft.orders.show', compact('order', 'provider', 'provider_layout'));
+    }
         public function artistsPage()
     {
         $provider = Provider::where('user_id', Auth::id())

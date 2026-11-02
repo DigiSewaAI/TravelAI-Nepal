@@ -244,6 +244,7 @@ Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(functi
     Route::delete('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'destroyOrder'])->name('restaurant.orders.destroy');
         // Restaurant Sidebar Unlocks
     Route::get('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'ordersPage'])->name('restaurant.orders.list');
+    Route::get('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'showOrder'])->name('restaurant.orders.show');
     Route::get('/restaurant/menu', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'menuPage'])->name('restaurant.menu.list');
     Route::get('/restaurant/tables', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'tablesPage'])->name('restaurant.tables.list');
         // Restaurant Reports & Offers
@@ -333,6 +334,7 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::delete('/individual/assignments/{booking}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'destroyAssignment'])->name('individual.assignments.destroy');
         // Individual Sidebar Unlocks
     Route::get('/individual/bookings', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'bookingsPage'])->name('individual.bookings.list');
+    Route::get('/individual/bookings/{booking}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'showBooking'])->name('individual.bookings.show');
     Route::get('/individual/calendar', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'calendarPage'])->name('individual.calendar');
     Route::get('/individual/earnings', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'earningsPage'])->name('individual.earnings');
     Route::get('/individual/reviews', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'reviewsPage'])->name('individual.reviews');
@@ -343,6 +345,7 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
         // Art/Craft Sidebar Unlocks
     Route::get('/art-craft/gallery', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'galleryPage'])->name('art-craft.gallery');
     Route::get('/art-craft/custom-orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'ordersPage'])->name('art-craft.orders');
+    Route::get('/art-craft/custom-orders/{order}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'showOrder'])->name('art-craft.orders.show');
         // Art/Craft CRUD Routes
     Route::post('/art-craft/artworks', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeArtwork'])->name('art-craft.artworks.store');
     Route::put('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateArtwork'])->name('art-craft.artworks.update');

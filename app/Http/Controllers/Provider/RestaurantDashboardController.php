@@ -311,6 +311,16 @@ class RestaurantDashboardController extends Controller
         return view('provider.restaurant.orders', compact('provider', 'orders'));
     }
 
+    public function showOrder(RestaurantOrder $order)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        abort_unless((int)$order->provider_id === (int)$provider->id, 403);
+        $order->load('items');
+        $provider_layout = 'layouts.provider-restaurant';
+        return view('provider.restaurant.orders.show', compact('order', 'provider', 'provider_layout'));
+    }
+
     public function menuPage()
     {
         $provider = Auth::user()->getCurrentProvider();
