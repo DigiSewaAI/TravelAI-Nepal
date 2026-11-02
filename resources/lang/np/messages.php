@@ -2709,4 +2709,7 @@ return array (
   'plan_features' => 'सुविधा',
   'plan_price' => 'मूल्य',
   'custom_logo_feature' => 'कस्टम लोगो',
+  'trekking_bookings_mo' => 'ट्रेकिङ बुकिङ/महिना',
+  'ai_features_note' => 'AI सुविधाहरू हाल ट्रेकिङका लागि मात्र। थप ठाडो-विशिष्ट AI क्षमताहरू योजना गरिएको छ।',
+  'ai_coming_soon' => 'थप आउँदैछ',
 );

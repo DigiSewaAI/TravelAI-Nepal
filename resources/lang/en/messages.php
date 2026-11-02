@@ -2688,4 +2688,7 @@ return array (
   'plan_features' => 'Feature',
   'plan_price' => 'Price',
   'custom_logo_feature' => 'Custom Logo',
+  'trekking_bookings_mo' => 'Trekking Bookings/mo',
+  'ai_features_note' => 'AI Features currently available for Trekking. More vertical-specific AI capabilities are planned.',
+  'ai_coming_soon' => 'More coming',
 );
