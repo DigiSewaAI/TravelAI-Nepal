@@ -181,6 +181,16 @@ class HotelDashboardController extends Controller
     return view('provider.hotel.bookings', compact('provider', 'bookings'));
 }
 
+public function showBooking(HotelBooking $booking)
+{
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403, 'Provider not found.');
+    abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
+    $booking->load('room', 'provider');
+    $provider_layout = 'layouts.provider-hotel';
+    return view('provider.hotel.bookings.show', compact('booking', 'provider', 'provider_layout'));
+}
+
 public function roomsPage()
 {
     $provider = Auth::user()->getCurrentProvider();

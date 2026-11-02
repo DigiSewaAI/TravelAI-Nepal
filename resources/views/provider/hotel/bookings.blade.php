@@ -89,6 +89,7 @@
             <td style="font-weight:800">Rs {{ number_format($b->amount) }}</td>
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
             <td style="text-align:right;white-space:nowrap;">
+              <a href="{{ route('provider.hotel.bookings.show', $b) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;"><i class="fas fa-eye"></i> View</a>
               @if($b->status === 'pending')
                 <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
                   @csrf @method('PATCH')
