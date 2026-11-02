@@ -174,7 +174,7 @@
                         <div class="flex justify-between py-0.5 text-gray-600"><span>👥 {{ __('messages.staff') }}</span><span class="font-semibold">{{ $limits['max_staff'] == -1 ? __('messages.unlimited') : $limits['max_staff'] }}</span></div>
                     @endif
                     @if(isset($limits['max_bookings']))
-                        <div class="flex justify-between py-0.5 text-gray-600"><span>📅 {{ __('messages.bookings') }}</span><span class="font-semibold">{{ $limits['max_bookings'] == -1 ? __('messages.unlimited') : $limits['max_bookings'] }}</span></div>
+                        <div class="flex justify-between py-0.5 text-gray-600"><span>📅 {{ __('messages.trekking_bookings_mo') }}</span><span class="font-semibold">{{ $limits['max_bookings'] == -1 ? __('messages.unlimited') : $limits['max_bookings'] }}</span></div>
                     @endif
                     @if(isset($limits['max_ai_requests']))
                         <div class="flex justify-between py-0.5 text-gray-600"><span>🤖 {{ __('messages.ai_requests') }}</span><span class="font-semibold">{{ $limits['max_ai_requests'] == -1 ? __('messages.unlimited') : $limits['max_ai_requests'] }}</span></div>
@@ -307,7 +307,7 @@
                     <tr class="bg-gray-100">
                         <td colspan="{{ count($plans) + 1 }}" class="py-2 px-3 font-bold text-gray-800 text-sm">🔧 {{ __('messages.shared_limits') }}</td>
                     </tr>
-                    @foreach([['max_staff', 'Staff Users'], ['max_bookings', 'Bookings/mo'], ['max_ai_requests', 'AI Requests/mo']] as [$key, $label])
+                    @foreach([['max_staff', 'Staff Users'], ['max_bookings', __('messages.trekking_bookings_mo')], ['max_ai_requests', 'AI Requests/mo']] as [$key, $label])
                         <tr class="border-b border-gray-100 hover:bg-gray-50">
                             <td class="py-2 px-3 pl-6">{{ $label }}</td>
                             @foreach($plans as $plan)
@@ -335,6 +335,10 @@
                 </tbody>
             </table>
         </div>
+        {{-- AI Features Note --}}
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:16px 20px;margin-top:16px;font-size:13px;color:#075985">
+        <strong>ℹ️ AI Features:</strong> {{ __('messages.ai_features_note') }}
+    </div>
     </div>
 
     {{-- ========== FAQ ========== --}}
