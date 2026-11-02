@@ -247,6 +247,22 @@ public function housekeepingPage()
 
         return response()->json($result);
     }
+    public function applyPricing(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $v = $request->validate([
+            'room_number' => 'required|string|max:50',
+            'suggested_rate' => 'required|numeric|min:1000',
+        ]);
+
+        $n = DB::table('hotel_rooms')->where('provider_id', $provider->id)
+            ->where('room_number', $v['room_number'])->update(['base_price' => $v['suggested_rate']]);
+
+        if ($n === 0) return back()->with('error', "Room {$v['room_number']} not found.");
+        return back()->with('success', "Room {$v['room_number']} base price updated to Rs " . number_format($v['suggested_rate']) . "/night.");
+    }
     public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();

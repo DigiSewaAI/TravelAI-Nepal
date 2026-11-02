@@ -114,7 +114,7 @@ async function loadHotelAiForecast(){
     const data=await hotelAiPost('{{ route("provider.hotel.ai.occupancy") }}');
     if(data.error){ hotelAiError(out, data.message||data.error); return; }
     let html='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
-    (data.days||[]).forEach(d=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+'</span><strong>'+d.predicted_bookings+' ('+d.confidence+')</strong></div>'; });
+    if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>'; if(data.current_occupancy_pct!==undefined) html+='<div style="font-size:12px;margin-bottom:8px;">Current: <strong>'+data.current_occupancy_pct+'%</strong> ('+data.total_rooms+' rooms)</div>'; (data.days||[]).forEach(d=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+'</span><strong>'+d.predicted_bookings+' bk · '+(d.predicted_occupancy_pct||0)+'% · '+d.confidence+'</strong></div>'; });
     out.innerHTML=html;
   }catch(e){ hotelAiError(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
 }
@@ -125,7 +125,7 @@ async function loadHotelAiPricing(){
     const data=await hotelAiPost('{{ route("provider.hotel.ai.pricing") }}');
     if(data.error){ hotelAiError(out, data.message||data.error); return; }
     let html='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
-    (data.rooms||[]).forEach(r=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>Room '+r.room_number+'</span><strong>Rs '+(r.suggested_rate||0).toLocaleString()+' / night</strong></div>'; });
+    if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>'; var csrf='{{ csrf_token() }}'; (data.rooms||[]).forEach(r=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;align-items:center;"><div><span>Room '+r.room_number+'</span>'+(r.reason?'<div style="font-size:10px;color:var(--muted,#6b7a90)">'+r.reason+'</div>':'')+'</div><div style="text-align:right;white-space:nowrap;"><strong>Rs '+(r.suggested_rate||0).toLocaleString()+'</strong> /night <form method="POST" action="{{ route('provider.hotel.ai.apply-pricing') }}" style="display:inline;margin-left:6px;"><input type="hidden" name="_token" value="'+csrf+'"><input type="hidden" name="room_number" value="'+r.room_number+'"><input type="hidden" name="suggested_rate" value="'+r.suggested_rate+'"><button type="submit" style="font-size:10px;padding:2px 8px;background:#10b981;color:#fff;border:0;border-radius:4px;cursor:pointer;">Apply</button></form></div></div>'; });
     out.innerHTML=html;
   }catch(e){ hotelAiError(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
 }
