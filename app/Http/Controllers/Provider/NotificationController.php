@@ -31,7 +31,15 @@ class NotificationController extends Controller
                     $category = 'quotation';
                 } elseif (isset($data['order_id'])) {
                     $title = $title ?? 'Order Update';
-                    $url = $url ?? route('provider.orders.show', $data['order_id']);
+                    // Vertical-aware: rental/shop/wholesale → inventory route; else trekking
+                    if (!$url || str_contains($url, '/orders/')) {
+                        $__order = \App\Models\Order::with('items')->find($data['order_id']);
+                        $__isInventory = $__order && $__order->items->first()
+                            && in_array($__order->items->first()->product_type, ['rental','shop','wholesale'], true);
+                        $url = $__isInventory
+                            ? route('provider.inventory.orders.show', $data['order_id'])
+                            : route('provider.orders.show', $data['order_id']);
+                    }
                     $category = 'order';
                 } elseif (isset($data['booking_id'])) {
                     $title = $title ?? 'Booking Update';
