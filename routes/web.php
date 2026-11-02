@@ -267,6 +267,8 @@ Route::post('/restaurant/ai/demand-forecast', [\App\Http\Controllers\Provider\Re
     Route::get('/money-changer/reports', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'reportsPage'])->name('money-changer.reports');
         // 🆕 Inventory vertical dashboard routes (shop/rental/wholesale)
     Route::get('/inventory/dashboard', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'index'])->name('inventory.dashboard');
+Route::post('/inventory/ai/stock-forecast', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'aiStockForecast'])->name('inventory.ai.stock');
+Route::post('/inventory/ai/reorder-assistant', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'aiReorderAssistant'])->name('inventory.ai.reorder');
     Route::get('/my-purchases', [\App\Http\Controllers\Provider\PurchaseController::class, 'index'])->name('my-purchases');
 
     Route::patch('/inventory/products/{product}/stock', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateStock'])->name('inventory.products.stock');

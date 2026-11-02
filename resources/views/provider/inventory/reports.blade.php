@@ -74,4 +74,63 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bar) bar.style.width = SH + '%';
 });
 </script>
+
+{{-- ═══ Inventory AI ═══ --}}
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">📦 {{ __('messages.inventory_ai_stock_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.inventory_ai_stock_sub') }}</p>
+  <button id="inventoryAiStockBtn" onclick="loadStockForecast()" style="background:var(--accent,#c9a227);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.inventory_ai_run_stock') }}</button>
+  <div id="inventoryAiStockOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">🔄 {{ __('messages.inventory_ai_reorder_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.inventory_ai_reorder_sub') }}</p>
+  <button id="inventoryAiReorderBtn" onclick="loadReorderAssistant()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.inventory_ai_run_reorder') }}</button>
+  <div id="inventoryAiReorderOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<script>
+async function invAiPost(url){
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:'{}' });
+  return await r.json();
+}
+function invAiErr(el,msg){ el.innerHTML='<div style="padding:10px;border-radius:8px;background:#fee;color:#900;font-weight:700;">'+msg+'</div>'; }
+async function loadStockForecast(){
+  const btn=document.getElementById('inventoryAiStockBtn'), out=document.getElementById('inventoryAiStockOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.inventory_ai_loading") }}';
+  try{
+    const data=await invAiPost('{{ route("provider.inventory.ai.stock") }}');
+    if(data.error){ invAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>';
+    html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    (data.items||[]).forEach(i=>{
+      var _st = i.risk || i.status || 'unknown';
+      var _color = {out_of_stock:'#ef4444',low_stock:'#f59e0b',restock_soon:'#f59e0b',ok:'#10b981',healthy:'#10b981',critical:'#ef4444',high:'#f59e0b',medium:'#3b82f6'}[_st]||'#6b7a90';
+      var _pred = i.predicted_units_next_7d !== undefined ? i.predicted_units_next_7d : (i.predicted_units_next_days||'—');
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;align-items:center;"><div><strong>'+i.name+'</strong><div style="font-size:10px;color:var(--muted)">'+(i.reason||('Stock: '+(i.stock||0)+', Sold: '+(i.units_sold_30d||0)))+'</div></div><div style="text-align:right;white-space:nowrap;"><span style="background:'+_color+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+_st+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px;">Next 7d: '+_pred+' units</div></div></div>';
+    });
+    out.innerHTML=html;
+  }catch(e){ invAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+async function loadReorderAssistant(){
+  const btn=document.getElementById('inventoryAiReorderBtn'), out=document.getElementById('inventoryAiReorderOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.inventory_ai_loading") }}';
+  try{
+    const data=await invAiPost('{{ route("provider.inventory.ai.reorder") }}');
+    if(data.error){ invAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.data_warning) html+='<div style="background:#f0fdf4;border:1px solid #10b981;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">✅ '+data.data_warning+'</div>';
+    html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    (data.items||[]).forEach(i=>{
+      var _urg = i.urgency || 'ok';
+      var _color = {critical:'#ef4444',high:'#f59e0b',medium:'#3b82f6',ok:'#10b981'}[_urg]||'#6b7a90';
+      var _qty = i.suggested_reorder_qty || 0;
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;align-items:center;"><div><strong>'+i.name+'</strong><div style="font-size:10px;color:var(--muted)">'+(i.reason||'')+'</div></div><div style="text-align:right;white-space:nowrap;"><span style="background:'+_color+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+_urg+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px;">Stock: '+(i.current_stock||0)+' · Reorder: <strong>'+_qty+'</strong></div></div></div>';
+    });
+    out.innerHTML=html;
+  }catch(e){ invAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+</script>
 @endsection

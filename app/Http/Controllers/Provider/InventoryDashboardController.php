@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Services\InventoryAiService;
 use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -16,6 +17,8 @@ class InventoryDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected InventoryAiService $inventoryAi) {}
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -466,6 +469,19 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
         return view('provider.inventory.suppliers', compact('provider', 'suppliers', 'stockHealth'));
     }
 
+    public function aiStockForecast(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->inventoryAi->stockForecast($provider, 7));
+    }
+
+    public function aiReorderAssistant(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->inventoryAi->reorderAssistant($provider));
+    }
     public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();
