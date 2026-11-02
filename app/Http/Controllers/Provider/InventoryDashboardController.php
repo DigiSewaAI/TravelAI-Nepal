@@ -389,6 +389,7 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
     }
 
     \DB::transaction(function () use ($order) {
+        $oldStatus = $order->status;
         $order->update([
             'payment_status'      => 'paid',
             'paid_at'             => now(),
@@ -396,10 +397,15 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
             'payment_verified_by' => \Auth::id(),
         ]);
 
+        // Auto-confirm if still pending after payment verified
+        if ($order->status === 'pending') {
+            $order->update(['status' => 'confirmed']);
+        }
+
         \App\Models\OrderStatusHistory::record(
             $order,
             $order->status,
-            $order->status,
+            $oldStatus,
             null,
             \Auth::id(),
             'provider',
