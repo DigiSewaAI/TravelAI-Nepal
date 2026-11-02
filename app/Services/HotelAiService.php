@@ -77,9 +77,18 @@ class HotelAiService
             }
             $this->aiLimit->finalize($reservation);
 
+            // FIX #2 — enforce low confidence if insufficient data
+            if ($totalBookings < 10) {
+                foreach (($data['days'] ?? []) as &$d) {
+                    $d['confidence'] = 'low';
+                }
+                unset($d);
+            }
+
             return ['days'=>$data['days']??[], 'summary'=>(string)($data['summary']??''),
                 'data_warning'=>$warn, 'total_rooms'=>$totalRooms,
-                'current_occupancy_pct'=>$totalRooms>0?(int)round($todayOcc/$totalRooms*100):0];
+                'current_occupancy_pct'=>$totalRooms>0?(int)round($todayOcc/$totalRooms*100):0,
+                'booking_semantics'=>'1 booking = 1 room (multi-room bookings not supported)'];
         } catch (Throwable $e) {
             if ($reservation) { try { $this->aiLimit->release($reservation); } catch (Throwable) {} }
             Log::warning('occupancyForecast failed', ['pid'=>$provider->id,'err'=>$e->getMessage()]);

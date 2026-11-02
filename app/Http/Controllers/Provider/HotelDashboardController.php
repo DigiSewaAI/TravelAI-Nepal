@@ -268,8 +268,8 @@ public function housekeepingPage()
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
-        $totalBookings = HotelBooking::where('provider_id', $provider->id)->count();
-        $totalRevenue = (float) HotelBooking::where('provider_id', $provider->id)->sum('amount');
+        $totalBookings = HotelBooking::where('provider_id', $provider->id)->where('status', '!=', 'cancelled')->count();
+        $totalRevenue = (float) HotelBooking::where('provider_id', $provider->id)->where('status', '!=', 'cancelled')->sum('amount');
 
         $totalRooms = HotelRoom::where('provider_id', $provider->id)->count();
         $occupiedRooms = HotelBooking::where('provider_id', $provider->id)
@@ -297,6 +297,7 @@ public function housekeepingPage()
 
         // Top 5 rooms by revenue — use relationship (safe, no FK guessing)
         $topRooms = HotelBooking::where('provider_id', $provider->id)
+            ->where('status', '!=', 'cancelled')
             ->with('room')
             ->get()
             ->groupBy(fn($b) => $b->room->id ?? null)
