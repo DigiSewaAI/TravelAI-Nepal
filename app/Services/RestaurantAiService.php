@@ -75,7 +75,7 @@ class RestaurantAiService
                 . "For each item, return:\n"
                 . "  - name\n"
                 . "  - status (popular|steady|slow|dead)\n"
-                . "  - suggestion (1 short sentence — e.g., 'Keep', 'Promote', 'Rebrand', 'Remove')\n"
+                . "  - suggestion (1 short sentence — choose from: 'Keep', 'Promote', 'Improve visibility', 'Keep monitoring'. NEVER use 'Review pricing', 'Rebrand', or 'Remove' unless strong evidence exists — 3 orders or less is INSUFFICIENT evidence for price conclusions)\n"
                 . "  - reason (quote actual orders/revenue)\n"
                 . "Do NOT invent data. If times_ordered=0, classify as 'dead'.\n"
                 . "Return JSON: {\"items\":[...],\"summary\":\"1 sentence\"}";
@@ -118,8 +118,12 @@ class RestaurantAiService
                 return ['error' => 'no_history', 'message' => 'Not enough order history to forecast.'];
             }
 
-            $avgOrders = round(array_sum(array_column($last30, 'orders')) / 30, 2);
-            $avgRev = round(array_sum(array_column($last30, 'revenue')) / 30, 2);
+            $totalOrders = array_sum(array_column($last30, 'orders'));
+            $totalRevenue = array_sum(array_column($last30, 'revenue'));
+            $avgOrders = round($totalOrders / 30, 2);
+            $avgRev = round($totalRevenue / 30, 2);
+            // AOV = TOTAL revenue / TOTAL orders (no double-rounding)
+            $trueAvgOrderValue = $totalOrders > 0 ? ($totalRevenue / $totalOrders) : 0;
 
             $reservation = $this->aiLimit->reserve($provider, 'restaurant.demand_forecast', ['days' => $days]);
             if (!$reservation) {
@@ -143,11 +147,47 @@ class RestaurantAiService
             }
 
             $this->aiLimit->finalize($reservation);
+
+            // AOV = totalRevenue / totalOrders (verified, no double-round)
+            $avgOrderValue = $trueAvgOrderValue;
+            $days = $data['days'] ?? [];
+            $minOrders = max(0, (int) floor($avgOrders * 0.5));
+            $maxOrders = max(2, (int) ceil($avgOrders * 1.5));
+            $totalOrdersForecast = 0; $totalRevenueForecast = 0;
+
+            foreach ($days as $idx => $d) {
+                $po = (int) ($d['predicted_orders'] ?? 0);
+                $po = max($minOrders, min($maxOrders, $po ?: (int) round($avgOrders)));
+                $days[$idx]['predicted_orders'] = $po;
+                // revenue STRICTLY = orders × avgOrderValue (never historical avg)
+                $days[$idx]['predicted_revenue'] = (int) round($po * $avgOrderValue);
+                $totalOrdersForecast += $po;
+                $totalRevenueForecast += $days[$idx]['predicted_revenue'];
+            }
+
+            $summary = (string) ($data['summary'] ?? '');
+            if ($avgOrders < 1) {
+                $summary = sprintf(
+                    'Baseline estimate only: avg %.2f orders/day historical. Forecast shows %d-%d orders/day × Rs %d/order = %d-%d revenue/day. Low confidence — insufficient history.',
+                    $avgOrders, $minOrders, $maxOrders,
+                    (int) round($avgOrderValue),
+                    (int) round($minOrders * round($avgOrderValue)),
+                    (int) round($maxOrders * round($avgOrderValue))
+                );
+            }
+
             return [
-                'days' => $data['days'] ?? [],
-                'summary' => (string)($data['summary'] ?? ''),
+                'days' => $days,
+                'summary' => $summary,
                 'avg_orders_per_day' => $avgOrders,
-                'avg_revenue_per_day' => (int) $avgRev,
+                'avg_revenue_per_day' => (int) round($avgRev),
+                'avg_order_value' => (int) round($avgOrderValue),
+                'forecast_total_orders' => $totalOrdersForecast,
+                'forecast_total_revenue' => $totalRevenueForecast,
+                'range_min_revenue' => (int) round($minOrders * round($avgOrderValue)),
+                'range_max_revenue' => (int) round($maxOrders * round($avgOrderValue)),
+                'data_quality' => $avgOrders < 1 ? 'insufficient' : ($avgOrders < 3 ? 'sparse' : 'ok'),
+                'is_baseline' => true, // all daily values are baseline estimates, not date-specific
             ];
         } catch (Throwable $e) {
             if ($reservation) { try { $this->aiLimit->release($reservation); } catch (Throwable) {} }
@@ -160,19 +200,25 @@ class RestaurantAiService
     {
         $out = [];
         foreach ($items as $i) {
-            $status = 'dead';
-            $suggestion = 'Promote or remove';
-            if ($i['times_ordered'] >= 5) { $status = 'popular'; $suggestion = 'Keep + feature prominently'; }
-            elseif ($i['times_ordered'] >= 2) { $status = 'steady'; $suggestion = 'Keep'; }
-            elseif ($i['times_ordered'] >= 1) { $status = 'slow'; $suggestion = 'Promote'; }
-            $out[] = [
-                'name' => $i['name'],
-                'status' => $status,
-                'suggestion' => $suggestion,
-                'reason' => $i['times_ordered'] > 0
-                    ? "Ordered {$i['times_ordered']}x, Rs " . number_format($i['revenue']) . " revenue"
-                    : 'No orders in 30d — consider promoting or remove',
-            ];
+            // If order_items tracking exists but this item has 0 → "slow"
+            // If NO order_items tracked at all (system-level) → "insufficient"
+            $status = 'insufficient_data';
+            $suggestion = 'Item-level sales tracking unavailable';
+            $reason = 'Item-level order tracking not yet enabled — cannot classify';
+
+            if ($i['times_ordered'] >= 5) {
+                $status = 'popular'; $suggestion = 'Keep + feature prominently';
+                $reason = "Ordered {$i['times_ordered']}x, Rs " . number_format($i['revenue']) . ' revenue';
+            } elseif ($i['times_ordered'] >= 2) {
+                $status = 'steady'; $suggestion = 'Keep';
+                $reason = "Ordered {$i['times_ordered']}x, Rs " . number_format($i['revenue']) . ' revenue';
+            } elseif ($i['times_ordered'] >= 1) {
+                $status = 'slow'; $suggestion = 'Promote';
+                $reason = "Ordered {$i['times_ordered']}x, Rs " . number_format($i['revenue']) . ' revenue';
+            }
+            // times_ordered = 0 → stays "insufficient_data" (not "dead")
+
+            $out[] = ['name' => $i['name'], 'status' => $status, 'suggestion' => $suggestion, 'reason' => $reason];
         }
         return $out;
     }

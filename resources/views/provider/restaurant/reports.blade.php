@@ -68,7 +68,7 @@ async function loadMenuIntelligence(){
     let html='';
     if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>';
     html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
-    (data.items||[]).forEach(i=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;align-items:center;"><div><strong>'+i.name+'</strong><div style="font-size:10px;color:var(--muted)">'+i.reason+'</div></div><div style="text-align:right;white-space:nowrap;"><span style="background:'+({popular:'#10b981',steady:'#3b82f6',slow:'#f59e0b',dead:'#ef4444'}[i.status]||'#6b7a90')+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+i.status+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+i.suggestion+'</div></div></div>'; });
+    (data.items||[]).forEach(i=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;align-items:center;"><div><strong>'+i.name+'</strong><div style="font-size:10px;color:var(--muted)">'+i.reason+'</div></div><div style="text-align:right;white-space:nowrap;"><span style="background:'+({popular:'#10b981',steady:'#3b82f6',slow:'#f59e0b',dead:'#ef4444',insufficient_data:'#9ca3af'}[i.status]||'#6b7a90')+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+i.status+'</span><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+i.suggestion+'</div></div></div>'; });
     out.innerHTML=html;
   }catch(e){ rAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
 }
@@ -79,9 +79,9 @@ async function loadRestaurantForecast(){
     const data=await restaurantAiPost('{{ route("provider.restaurant.ai.forecast") }}');
     if(data.error){ rAiErr(out, data.message||data.error); return; }
     let html='';
-    if(data.avg_orders_per_day !== undefined) html+='<div style="font-size:12px;margin-bottom:8px;">Avg: <strong>'+data.avg_orders_per_day+' orders/day</strong> · Rs '+data.avg_revenue_per_day+'/day</div>';
+    if(data.avg_orders_per_day !== undefined) html+='<div style="font-size:11px;margin-bottom:8px;padding:8px;background:var(--bg,#f5f7fb);border-radius:8px;"><strong>Historical avg:</strong> '+data.avg_orders_per_day+' orders/day · Rs '+data.avg_revenue_per_day+'/day'+(data.avg_order_value?' · Rs '+data.avg_order_value+' avg order value':'')+(data.data_quality==='insufficient'?' <span style="background:#9ca3af;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">INSUFFICIENT</span>':(data.data_quality==='sparse'?' <span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">SPARSE</span>':''))+'</div>';
     html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
-    (data.days||[]).forEach(d=>{ html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+'</span><strong>'+d.predicted_orders+' orders · Rs '+d.predicted_revenue+' · '+({low:'Low',med:'Medium',high:'High'}[d.confidence]||d.confidence)+'</strong></div>'; });
+    (data.days||[]).forEach(d=>{ var _baseline = data.is_baseline?' <span style="background:#9ca3af;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;">BASELINE</span>':''; html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+_baseline+'</span><strong>'+d.predicted_orders+' orders · Rs '+d.predicted_revenue+' · '+({low:'Low',med:'Medium',high:'High'}[d.confidence]||d.confidence)+'</strong></div>'; });
     out.innerHTML=html;
   }catch(e){ rAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
 }
