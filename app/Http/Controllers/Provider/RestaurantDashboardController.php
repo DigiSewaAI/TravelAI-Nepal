@@ -8,6 +8,7 @@ use App\Models\RestaurantOrder;
 use App\Models\RestaurantOrderItem;
 use App\Models\RestaurantTable;
 use App\Models\ServiceCategory;
+use App\Services\RestaurantAiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,8 @@ class RestaurantDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected RestaurantAiService $restaurantAi) {}
 
     public function index()
     {
@@ -343,7 +346,20 @@ class RestaurantDashboardController extends Controller
         $tables = RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get();
         return view('provider.restaurant.tables', compact('provider', 'tables'));
     }
-        public function reportsPage()
+        public function aiMenuIntelligence(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->restaurantAi->menuIntelligence($provider));
+    }
+
+    public function aiDemandForecast(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->restaurantAi->demandForecast($provider, 7));
+    }
+    public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403, 'Provider not found.');

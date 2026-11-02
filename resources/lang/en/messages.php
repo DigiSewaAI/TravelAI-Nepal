@@ -2698,5 +2698,12 @@ return array (
   'hotel_ai_pricing_sub' => 'Suggested rates based on booking performance.',
   'hotel_ai_run_pricing' => 'Suggest pricing',
   'hotel_ai_loading' => 'Analyzing…',
-
+  'no_sales_data' => 'No sales data yet',
+  'restaurant_ai_menu_title' => 'AI Menu Intelligence',
+  'restaurant_ai_menu_sub' => 'Analyze popular/slow items to optimize your menu.',
+  'restaurant_ai_run_menu' => 'Analyze menu',
+  'restaurant_ai_forecast_title' => 'AI Demand Forecast',
+  'restaurant_ai_forecast_sub' => 'Predict next 7 days orders + revenue.',
+  'restaurant_ai_run_forecast' => 'Generate forecast',
+  'restaurant_ai_loading' => 'Analyzing…',
 );

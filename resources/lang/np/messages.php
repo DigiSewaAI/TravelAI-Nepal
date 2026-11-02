@@ -2719,5 +2719,12 @@ return array (
   'hotel_ai_pricing_sub' => 'बुकिङ प्रदर्शनमा आधारित सुझाव दर।',
   'hotel_ai_run_pricing' => 'मूल्य सुझाव',
   'hotel_ai_loading' => 'विश्लेषण हुँदै…',
-
+  'no_sales_data' => 'अझै बिक्री डेटा छैन',
+  'restaurant_ai_menu_title' => 'AI मेनु बुद्धिमत्ता',
+  'restaurant_ai_menu_sub' => 'लोकप्रिय/ढिलो परिकार विश्लेषण गरेर मेनु अनुकूलन।',
+  'restaurant_ai_run_menu' => 'मेनु विश्लेषण',
+  'restaurant_ai_forecast_title' => 'AI माग पूर्वानुमान',
+  'restaurant_ai_forecast_sub' => 'आगामी ७ दिनको अर्डर र आम्दानी अनुमान।',
+  'restaurant_ai_run_forecast' => 'पूर्वानुमान बनाउनु',
+  'restaurant_ai_loading' => 'विश्लेषण हुँदै…',
 );
