@@ -216,10 +216,18 @@
                         <td class="py-2 px-3 font-semibold">{{ __('messages.plan_price') }}</td>
                         @foreach($plans as $plan)
                             <td class="text-center py-2 px-2">
-                                @if($plan->price_monthly === null) {{ __('messages.custom') }}
-                                @elseif($plan->price_monthly == 0) {{ __('messages.free') }}
-                                @else Rs. {{ number_format($plan->price_monthly, 0) }}/mo
-                                @endif
+                                <span class="price-amount" data-interval="monthly">
+                                    @if($plan->price_monthly === null) {{ __('messages.custom') }}
+                                    @elseif($plan->price_monthly == 0) {{ __('messages.free') }}
+                                    @else Rs. {{ number_format($plan->price_monthly, 0) }}/mo
+                                    @endif
+                                </span>
+                                <span class="price-amount hidden" data-interval="yearly">
+                                    @if($plan->price_yearly === null) {{ __('messages.custom') }}
+                                    @elseif($plan->price_yearly == 0) {{ __('messages.free') }}
+                                    @else Rs. {{ number_format($plan->price_yearly, 0) }}/yr
+                                    @endif
+                                </span>
                             </td>
                         @endforeach
                     </tr>
@@ -327,7 +335,12 @@
                         <td class="py-2 px-3">{{ __('messages.custom_logo_feature') }}</td>
                         @foreach($plans as $plan)
                             @php
-                                $hasLogo = collect($plan->features ?? [])->contains(fn($f) => stripos($f, 'logo') !== false);
+                                $hasLogo = collect($plan->features ?? [])->contains(function($f) {
+                                    $lower = strtolower((string) $f);
+                                    return str_contains($lower, 'logo')
+                                        || str_contains($lower, 'white-label')
+                                        || str_contains($lower, 'white_label');
+                                });
                             @endphp
                             <td class="text-center py-2 px-2">{{ $hasLogo ? '✅' : '—' }}</td>
                         @endforeach
