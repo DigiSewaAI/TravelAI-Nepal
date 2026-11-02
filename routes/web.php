@@ -318,6 +318,8 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::put('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicle'])->name('transport.vehicles.update');
     Route::delete('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyVehicle'])->name('transport.vehicles.destroy');
     Route::post('/transport/bookings', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeBooking'])->name('transport.bookings.store');
+    Route::get('/transport/bookings', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'bookingsIndex'])->name('transport.bookings.index');
+    Route::get('/transport/bookings/{booking}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'showBooking'])->name('transport.bookings.show');
     Route::delete('/transport/bookings/{booking}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyBooking'])->name('transport.bookings.destroy');
             // Transport Sidebar Unlocks (Read-Only Views)
     Route::get('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'vehiclesPage'])->name('transport.vehicles');

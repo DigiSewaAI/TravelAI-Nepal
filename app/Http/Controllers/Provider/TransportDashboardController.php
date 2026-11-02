@@ -183,6 +183,25 @@ class TransportDashboardController extends Controller
         return back()->with('success', __('messages.booking_deleted_success'));
     }
 
+    public function bookingsIndex()
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
+        $bookings = TransportBooking::where('provider_id', $provider->id)
+            ->with('vehicle')->latest()->paginate(20);
+        return view('provider.transport.bookings.index', compact('provider', 'bookings'));
+    }
+
+    public function showBooking(TransportBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
+        $booking->load('vehicle', 'provider');
+        $provider_layout = 'layouts.provider-transport';
+        return view('provider.transport.bookings.show', compact('booking', 'provider', 'provider_layout'));
+    }
+
     public function vehiclesPage()
     {
         $provider = Auth::user()->getCurrentProvider();
