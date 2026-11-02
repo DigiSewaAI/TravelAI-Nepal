@@ -1,344 +1,339 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER HANDOFF — SESSION 13 FINAL (LOCAL, NOT PUSHED)
-FROM: Session 13 Assistant
+👑 MASTER HANDOFF — SESSION 15 FINAL (LOCAL, NOT PUSHED)
+FROM: Session 15 Assistant
 TO:   Master / Future Reference
 DATE: 2026-11-02
-HEAD: main @ 2ad9829 (LOCAL — 14 commits ahead of origin/main 93fb085)
-STATUS: 🟢 5/5 Verticals Show Pages COMPLETE | ⚠️ NOT PUSHED
+HEAD: main @ [pending commit] (LOCAL — 25+ commits ahead of origin/main 93fb085)
+STATUS: 🟢 Pricing Phase 1+2A+2B+2C(7/7) COMPLETE | 🟡 max_bookings + max_ai_requests pending
 ═══════════════════════════════════════════════════════════
 
 ## 🚨 CRITICAL — PUSH STATUS
 
-**Production is STILL at 93fb085. Session 12 + 13 work is LOCAL ONLY.**
+**Production is STILL at 93fb085. Sessions 12-15 work is LOCAL ONLY.**
 
 | Item | Value |
 |------|-------|
 | origin/main | `93fb085` (production — Live) |
-| Local HEAD | `2ad9829` |
-| Commits ahead | **14 (NOT pushed)** |
-| Push trigger | Owner "push" GO only (R17) — **currently HOLD** |
+| Local HEAD | `c66c79a` (last commit; new work uncommitted) |
+| Commits ahead (before new commit) | **22** |
+| Commits ahead (after commit) | **25+** |
+| Push trigger | Owner "push" GO only — **HOLD** |
 
 ═══════════════════════════════════════════════════════════
 
-## 📊 ALL LOCAL COMMITS (14) — Session 12 + 13
+## 📊 SESSION 15 — PRICING PAGE OVERHAUL
 
-### Session 13 (Verticals — 4 new commits)
+### ✅ Phase 1 — Translation + View Fixes (COMPLETE)
 
-| # | Hash | Message | Files |
-|---|------|---------|-------|
-| 1 | `2ad9829` | feat(verticals): show pages for restaurant/individual/art-craft — routes + controllers + art-craft view | 5 |
-| 2 | `7dca3ed` | fix(verticals): individual duration text + restaurant customer default | 2 |
-| 3 | `7a74fa8` | feat(verticals): View buttons for restaurant/individual/art-craft index | 3 |
-| 4 | `e5e3756` | feat(hotel): booking detail page + view button (Inventory pattern) | 4 |
+**Files:**
+- `resources/lang/en/messages.php`
+- `resources/lang/np/messages.php`
+- `resources/views/public/pricing.blade.php`
 
-### Session 12 (Notifications + RFQ + Pricing — 10 new commits)
+**Fixes:**
+1. `messages.plans.{free/professional/business/enterprise}.description` keys added
+2. `messages.plans.features.*` — 20+ keys (basic_dashboard, 3_listings, etc.)
+3. `messages.verticals.*` — 8 vertical keys (trekking, hotel, restaurant, transport, individual, money_changer, art_craft, inventory)
+4. `messages.limit_labels.*` — 12 labels (treks, itinerary_days, hotels, rooms, menu_items, tables, vehicles, routes, guides, currencies, artworks, products)
+5. `messages.forever`, `plan_features`, `plan_price`, `custom_logo_feature` added
+6. Feature slug normalization: `hyphen → underscore` (white-label → white_label)
+7. Duplicate 📊 removed (moved to lang key)
+8. 🎁 duplicate removed (view emoji only)
+9. Title + meta 8-vertical aware
+10. USD dual display (`Rs 4,499 ≈$29.50`)
+11. Hero title + subtitle from lang keys
 
-| # | Hash | Message | Files |
-|---|------|---------|-------|
-| 5 | `651a18f` | docs: update MASTER_HANDOFF to session 12 final state | 1 |
-| 6 | `f8ad301` | feat(notifications): traveler bell for inventory lifecycle + trekking return | 2 |
-| 7 | `54682af` | feat(rfq-complete): bell + email for all RFQ events + styled views + nav | 11 |
-| 8 | `1c72489` | fix(auth+rfq): login AJAX filter + redirect param + hidden field + RFQ display + self-RFQ guard | 9 |
-| 9 | `ef23fbb` | feat(bell+filter): bell in all 6 remaining layouts + currency-aware filter | 7 |
-| 10 | `3d8c181` | fix(pricing+guards): rental pricing + payment/return guards + stock health detail | 11 |
-| 11 | `87ea702` | feat(analytics): Google Analytics integration | 3 |
-| 12 | `43e6687` | feat(purchases): My Purchases in all 8 provider layouts + theme-aware colors | 8 |
-| 13 | `22d1ca1` | feat(rental+purchases): return flow + bell + nav + my purchases page | 11 |
-| 14 | `685afec` | feat(notifications): inventory-aware bell + order detail page | 8 |
+### ✅ Phase 2A — DB Plans `limits` JSON Update (COMPLETE)
 
-**Verify:** `git log --oneline 93fb085..HEAD` (14 commits)
+**No migration needed** (existing `limits` JSON column extended)
 
-═══════════════════════════════════════════════════════════
+**11 per-vertical limits added to all 4 plans:**
+- `max_treks`, `max_itinerary_days`
+- `max_hotels`, `max_rooms`
+- `max_menu_items`, `max_tables`
+- `max_vehicles`, `max_routes`
+- `max_guides`
+- `max_currencies`
+- `max_artworks`
 
-## ✅ COMPLETED — Session 13 (Verticals Show Pages)
+**Existing limits preserved:**
+- `max_staff`, `max_bookings`, `max_listings`, `max_products`, `max_ai_requests`
 
-### 5/5 Provider Verticals — Show Pages + View Buttons ✅
+**Plan matrix (16 keys each):**
+| Limit | Free | Pro | Business | Enterprise |
+|---|---|---|---|---|
+| max_treks | 3 | 20 | 100 | -1 |
+| max_itinerary_days | 10 | 30 | 100 | -1 |
+| max_hotels | 1 | 5 | 20 | -1 |
+| max_rooms | 5 | 30 | 200 | -1 |
+| max_menu_items | 5 | 30 | 200 | -1 |
+| max_tables | 3 | 10 | 30 | -1 |
+| max_vehicles | 5 | 30 | 200 | -1 |
+| max_routes | 3 | 15 | 50 | -1 |
+| max_guides | 3 | 20 | 100 | -1 |
+| max_currencies | 5 | 20 | 50 | -1 |
+| max_artworks | 5 | 30 | 200 | -1 |
+| max_products | 5 | 30 | 200 | -1 |
+| max_staff | 1 | 5 | 20 | -1 |
+| max_bookings | 10 | 100 | 1000 | -1 |
+| max_ai_requests | 5 | 50 | 500 | -1 |
 
-| Vertical | Show Page | View Button | Notes |
-|----------|-----------|-------------|-------|
-| **Inventory** | ✅ | ✅ | (Session 12 built) |
-| **Hotel** | ✅ | ✅ | Guest, Room, Dates, Actions |
-| **Restaurant** | ✅ | ✅ | Customer, Items, Tax, Total |
-| **Individual** | ✅ | ✅ | Client, Service, Duration, Pax, Amount |
-| **Art-craft** | ✅ | ✅ | Client, Type, Deadline, Budget |
-| **Transport** | ❌ | ❌ | **Ticket: TRANSPORT-BOOKINGS-INDEX-01** (index route नै छैन) |
+### ✅ Phase 2B — Pricing View Rewrite (COMPLETE)
 
-### Implementation (Session 13)
+**File:** `resources/views/public/pricing.blade.php`
 
-**Hotel:**
-- Route: `provider.hotel.bookings.show` → `HotelDashboardController@showBooking`
-- View: `resources/views/provider/hotel/bookings/show.blade.php`
-- View button in `bookings.blade.php` table (blue eye icon)
-- Ownership check: `$booking->provider_id === $provider->id`
-- Actions: Check In / Check Out / Delete
+**Changes:**
+1. 8-vertical overview cards at top (icon + label per vertical)
+2. Plan cards — per-vertical limits grouped by section (🏔️ Trekking, 🏨 Hotel, ...)
+3. Shared limits section (staff/bookings/AI)
+4. Comparison table — 8 sections + shared (20+ rows)
+5. Yearly view — proper `Rs 44,999/year ≈ Rs 3,750/month` display
+6. Billing toggle JS — monthly/yearly switch
+7. FAQ updated for per-vertical model
+8. No "Departures" (feature not built — no 0-record misleading)
+9. No "Coming soon" (removed for consistency)
 
-**Restaurant:**
-- Route: `provider.restaurant.orders.show` → `RestaurantDashboardController@showOrder`
-- View: `resources/views/provider/restaurant/orders/show.blade.php`
-- View button (blue)
-- Items loop + subtotal/tax/total + customer (default: "Walk-in Customer")
+### ✅ Phase 2C — Limit Enforcement (7/7 verticals COMPLETE)
 
-**Individual:**
-- Route: `provider.individual.bookings.show` → `IndividualDashboardController@showBooking`
-- View: `resources/views/provider/individual/bookings/show.blade.php`
-- View button (green)
-- Client, Service Type, Start Date, Duration (single "days"), Pax, Amount
+**New file:** `app/Traits/EnforcesPlanLimits.php`
+- `checkPlanLimit(Provider, attributeKey, modelClass, modelLabel)` helper
+- Returns `RedirectResponse` with error if limit reached, `null` if OK
+- `-1` = unlimited (Enterprise), `null` = no limit set
 
-**Art-craft:**
-- Route: `art-craft.orders.show` → `ArtCraftDashboardController@showOrder`
-- View: `resources/views/provider/art-craft/orders/show.blade.php`
-- View button (terracotta)
-- Client, Type, Deadline, Budget
+**Provider Model — 13 new accessors added:**
+- `getMaxTreksAttribute()`, `getMaxItineraryDaysAttribute()`
+- `getMaxHotelsAttribute()`, `getMaxRoomsAttribute()`
+- `getMaxMenuItemsAttribute()`, `getMaxTablesAttribute()`
+- `getMaxVehiclesAttribute()`, `getMaxRoutesAttribute()`
+- `getMaxGuidesAttribute()`
+- `getMaxCurrenciesAttribute()`
+- `getMaxArtworksAttribute()`
+- `getMaxBookingsAttribute()` **(was missing — pre-existing bug)**
+- `getMaxAiRequestsAttribute()` **(was missing — pre-existing bug)**
 
-**Minor fixes:**
-- Individual duration: "9 days days" → "9 days"
-- Restaurant customer: N/A → "Walk-in Customer"
+**Helper:** `planLimit($key, $freeDefault, $proDefault, $bizDefault)` — resolves from active subscription, falls back to plan slug defaults
 
-### Pattern used
+**Enforcement injected (7 controllers):**
 
-All 5 show pages use **Inventory order detail pattern**:
-- Gradient hero (theme-aware `var(--accent)`)
-- 2-column cards (Customer/Client + Details)
-- Secondary card (Items/Dates/Amount)
-- Optional actions (Check In/Out, Delete)
-- Back link (`← All Bookings/Orders`)
+| Controller | Method | Limit | Status |
+|---|---|---|---|
+| HotelDashboardController | storeRoom | max_rooms | ✅ |
+| RestaurantDashboardController | storeMenuItem | max_menu_items | ✅ |
+| RestaurantDashboardController | storeTable | max_tables | ✅ |
+| TransportDashboardController | storeVehicle | max_vehicles | ✅ |
+| IndividualDashboardController | storeAssignment | max_guides | ✅ |
+| MoneyChangerDashboardController | storeRate | max_currencies (create-only) | ✅ |
+| ArtCraftDashboardController | storeArtwork | max_artworks | ✅ |
+| InventoryDashboardController | storeProduct | max_products | ✅ |
 
-═══════════════════════════════════════════════════════════
+**Trait imported (7 controllers):**
+- Hotel, Restaurant, Transport, Individual, MoneyChanger, ArtCraft, Inventory
 
-## ✅ COMPLETED — Session 12 (Full History)
-
-### Rental Lifecycle (Inventory) — END-TO-END ✅
-Full flow verified (ORD-26-00010):
-Order placed → Confirmed → Payment Notice → Payment Verified → Return Requested → Returned + Refund Rs 3,000
-
-### Bell UI (All 8 layouts) ✅
-| Layout | Bell | My Purchases |
-|--------|------|--------------|
-| Inventory | ✅ | ✅ |
-| Trekking | ✅ | ✅ |
-| Hotel | ✅ | ✅ |
-| Restaurant | ✅ | ✅ |
-| Transport | ✅ | ✅ |
-| Individual | ✅ | ✅ |
-| Money Changer | ✅ | ✅ |
-| Art Craft | ✅ | ✅ |
-
-**All bells theme-aware** (`var(--accent)` per layout).
-
-### Traveler Notification Triggers ✅
-| Trigger | Notification | Verified |
-|---------|--------------|----------|
-| Provider confirms order | OrderStatusChanged | ✅ |
-| Provider verifies payment | UserAlertNotification | ✅ |
-| Provider confirms return + refund | UserAlertNotification | ✅ |
-| Provider status (trekking) | OrderStatusChanged | ✅ |
-| Provider booking status | BookingStatusUpdated | ✅ |
-| Quote provided (wholesale) | UserAlertNotification | ✅ |
-| Quote accepted/rejected | ProviderAlertNotification | ✅ |
-| RFQ message (both ways) | UserAlertNotification | ✅ |
-
-### RFQ (Wholesale) — Complete ✅
-- Listing "Request Quote" (no Add to Cart bypass)
-- Detail RFQ-only (B2B standard)
-- Accept/Reject flows + buyer→order guard
-- Bell + email notifications (all events: submitted, quoted, accepted, rejected, message)
-- Buyer/Provider views styled (theme-aware)
-- Self-RFQ guard (provider cannot quote own product)
-- Company auto-fill
-- Message history read-only after accept/reject
-
-### Login & Auth ✅
-- `?redirect=` param respected (safe URL check)
-- Hidden redirect field in login form
-- AJAX endpoints filtered from `url.intended`
-
-### Pricing Consistency ✅
-- Rental: `rental_price_per_day` everywhere
-- USD 2 decimals, NPR 0 decimals
-- Filter currency symbol + vertical stack
-- Cart NPR round-trip fixed
-
-### Payment & Return Guards ✅
-- Payment paid required before ship/deliver
-- Payment paid required before return confirm
-- Status locked after return flow starts
-- Item-based guard
-
-### Stock Health Widget ✅
-- Detail page shows `67% in stock` (was `—`)
-
-### Navigation ✅
-- Traveler header: "My RFQs" + "My Orders"
-- Provider header: "My RFQs" (dual-role)
-- Sidebar (all 8): "Wholesale RFQs" + "My Purchases"
-- Traveler dashboard: "My Orders" card
-
-### Translation Keys Added
-en + np: `return_not_requested`, `order_status_returned`, `return_requested`, `product_orders`, `my_purchases`, `items_count`, `my_rfqs`, `rfq_provider_label`, `order_status_return_requested`, `order_status_picked_up`, `order_status_overdue`
-
-═══════════════════════════════════════════════════════════
-
-## 🔴 REMAINING TICKETS (Priority Order)
-
-### 🔴 Immediate
-| # | Ticket | Description |
-|---|--------|-------------|
-| 1 | **PUSH** (Owner GO) | 14 commits to production — **HOLD** until Owner says "push" |
-| 2 | `TRANSPORT-BOOKINGS-INDEX-01` | Transport vertical — bookings index + show pages (routes missing) |
-
-### 🟡 Next
-| # | Ticket | Description |
-|---|--------|-------------|
-| 3 | `PAYMENT-UX-01/02` | Pending payment → prominent CTA + section reposition |
-| 4 | `CHECKOUT-PAYMENT-PREVIEW` | Checkout मा payment methods preview |
-| 5 | `TRAVELER-UNIFIED-BOOKINGS` | `/my-bookings` — 7 tabs |
-| 6 | `EXPLORE-PERFORMANCE` | Slow page optimization |
-| 7 | `RFQ-DELIVERY-CHARGE` | Quote form मा delivery charge field |
-| 8 | `SECURITY-ROTATE-PASSWORDS-01` | Production deploy पछि strong passwords |
-
-### 🟢 Backlog
-- `SELF-NOTIFICATION-GUARD-01` (provider self-action skip)
-- `RENTAL-ENUM-01` (`picked_up`/`returned`/`overdue` enum)
-- `PAYMENTS-UNIFIED-01` (Payments page tabs)
-- `PROVIDER-TRAVELER-SWITCH-01` (role switch UX)
-- `SUPPLIER-CRUD-01`
-- `TREKKING-MY-PURCHASES-THEME` (indigo fallback)
-- `RFQ-CLOSED-CTA-01` (rejected RFQ → "Start new RFQ")
-- `RFQ-MESSAGE-TEMPLATE-01` (auto-fill correct RFQ number)
-- `ARTCRAFT-SIDEBAR-STATS` (Works/Clients count — partially resolved)
-- `WHOLESALE-PRICE-BUG-01` — verified NOT a bug (correct USD→NPR conversion)
-- Session 11 backlog (MULTILINGUAL, VERTICAL-AI, ADVANCED-HOTEL-FOLIO)
-
-═══════════════════════════════════════════════════════════
-
-## 🚨 CRITICAL — Known Architecture Issues
-
-### 1. Provider Dashboard Lock Deviation
-**Original lock:** `provider.blade.php` — "Never touch"
-**Sessions 12-13:** Added "My Purchases" + "Wholesale RFQs" sidebar links (Owner-authorized)
-**Recommendation:** Lock = "Trekking content locked — sidebar link additions allowed with Owner GO"
-
-### 2. Enum Mismatch (RENTAL-ENUM-01)
-- `order_items.provider_status` ENUM = `('pending','confirmed','shipped','delivered','cancelled')`
-- Rental semantic: `picked_up`/`returned`/`overdue` NOT in enum
-- Current: `shipped`/`delivered` = "picked up"; `returned` tracked via `return_confirmed_at`
-- Fix: additive migration (R8-safe)
-
-### 3. Test Account Passwords Reset
-**All 53 users reset to `Himalayan@1980`** (Owner order, Session 12).
-- Production deploy पछि different strong password (Ticket `SECURITY-ROTATE-PASSWORDS-01`)
-
-### 4. SMTP Verified Working
-- `.env` uses Brevo relay (`smtp-relay.brevo.com`)
-- Interactive tinker test: **`MAIL OK`** ✅
-- "SMTP down" log entries = **testing environment only**, not production
-- **Ticket SMTP-VERIFY-01 → CLOSED (not a bug)**
-
-### 5. Transport Vertical — Missing Foundation
-- No bookings index route
-- No bookings page view
-- Routes present: POST/DELETE/PATCH (mutations) but no GET list
-- **Ticket: TRANSPORT-BOOKINGS-INDEX-01**
-
-### 6. Restaurant Customer Default
-- `restaurant_orders.customer_name` nullable
-- Show page default = "Walk-in Customer"
-- **Option:** migration to make NOT NULL with default "Walk-in"
-
-═══════════════════════════════════════════════════════════
-
-## 🔒 LOCKED ITEMS (Owner's Orders)
-
-| Item | Status |
-|------|--------|
-| Provider Dashboard languages | 🔒 EN/NP only (never touch) |
-| Trekking Views content | 🔒 Byte-for-byte (except sidebar links — Owner GO) |
-| `provider-restaurant.blade.php` `:root` | 🔒 Never touch |
-| Admin panel i18n | 🔒 Future |
-| Error pages (404/500) i18n | 🔒 Future |
-| **Push** | 🔒 **HOLD** — Owner GO only |
-
-═══════════════════════════════════════════════════════════
-
-## 📊 Rules Status (R1-R17)
-
-| Rule | Status |
-|------|--------|
-| R3 (Evidence) | ✅ Discovery before every fix |
-| R4 (Scope) | ✅ Rental → RFQ → Traveler → Verticals |
-| R8 (Additive) | ✅ |
-| R13 (`git add` explicit) | ✅ — junk files excluded |
-| R16 (186/186) | ✅ — verified each commit |
-| R17 (Push) | ⚠️ **NOT PUSHED** — 14 commits local, **HOLD per Owner** |
-
-═══════════════════════════════════════════════════════════
-
-## 🎯 NEXT SESSION PRIORITY
-
-### 🔴 Immediate
-1. **TRANSPORT-BOOKINGS-INDEX-01** — Transport bookings list + show (foundation)
-2. **PAYMENT-UX-01/02** — Pending payment prominent CTA
-3. **TRAVELER-UNIFIED-BOOKINGS** — `/my-bookings` 7 tabs
-
-### 🟡 Deferred
-- `CHECKOUT-PAYMENT-PREVIEW`
-- `EXPLORE-PERFORMANCE`
-- `RFQ-DELIVERY-CHARGE`
-- Backlog items
-
-### 🔴 Push Trigger
-- **Owner "push" GO** only (R17)
-- 14 commits ready, safe to push when Owner approves
-
-═══════════════════════════════════════════════════════════
-
-## 🛠️ PROVEN PATTERNS (Sessions 12-13)
-
-### One-Shot Batch Fix Script
+**Pattern used (per injection):**
 ```php
+if ($redirect = $this->checkPlanLimit($provider, 'max_rooms', \App\Models\HotelRoom::class, 'rooms')) {
+    return $redirect;
+}
+Error message: "Plan limit reached: max {N} {label}. Please upgrade your plan." (in errors.limit bag)
+
+🟡 Phase 2C — PENDING (2 remaining)
+Limit	Reason Pending
+max_bookings	7 different paths (Trek bookings + Product orders + Hotel + Restaurant + Transport + Individual + ArtCraft + Wholesale) — monthly count aggregation needed
+max_ai_requests	3 AI endpoints (Planner, AiItineraryDraft, Quotation) — monthly quota tracking needed
+Estimated: 2-3 hours total
+Strategy: Option A (implement both) — "कोई pending नै" owner directive
+
+═══════════════════════════════════════════════════════════
+
+📊 ALL LOCAL COMMITS (22 + new Session 15)
+Session 15 (Pricing — new commits pending)
+#	Hash	Message
+TBD	feat(pricing): phase 1+2A+2B+2C(7/7) — translation + DB limits + view rewrite + enforcement	
+Session 14 (Explore perf + Unified bookings + Dynamic layout — 3 commits)
+#	Hash	Message	Files
+1	c66c79a	perf(explore): eager-load 9 details (N+1 fix) + lazy-init globe/map	2
+2	a2934cb	feat(bookings): unified /my-bookings + inline-styled views	5
+3	fa7c8b0	feat(nav): ctx=provider dynamic layout — 8 provider layouts	9
+Session 13 (Verticals + Payment UX + Transport — 5 commits)
+#	Hash	Message	Files
+4	fc23d57	fix(notif): vertical-aware URL for order notifications	1
+5	0cc580a	fix(payment+notif): auto-confirm after payment + dual-role URL	1
+6	6b34b20	feat(payment-ux): pending banner + auto-scroll + notified state	1
+7	cde1cb0	feat(transport): bookings list + show detail (6/6 verticals)	5
+8	a486b3f	docs: update MASTER_HANDOFF to session 13	1
+9	2ad9829	feat(verticals): show pages for restaurant/individual/art-craft	5
+10	7dca3ed	fix(verticals): individual duration + restaurant customer	2
+11	7a74fa8	feat(verticals): View buttons restaurant/individual/art-craft	3
+12	e5e3756	feat(hotel): booking detail page + view button	4
+Session 12 (Notifications + RFQ + Pricing — 10 commits)
+#	Hash	Message	Files
+13	651a18f	docs: update MASTER_HANDOFF to session 12	1
+14	f8ad301	feat(notifications): traveler bell for inventory lifecycle	2
+15	54682af	feat(rfq-complete): bell + email for all RFQ events	11
+16	1c72489	fix(auth+rfq): login AJAX filter + redirect param	9
+17	ef23fbb	feat(bell+filter): bell in 6 remaining layouts	7
+18	3d8c181	fix(pricing+guards): rental pricing + payment/return guards	11
+19	87ea702	feat(analytics): Google Analytics integration	3
+20	43e6687	feat(purchases): My Purchases in all 8 provider layouts	8
+21	22d1ca1	feat(rental+purchases): return flow + bell + nav	11
+22	685afec	feat(notifications): inventory-aware bell + order detail	8
+Verify: git log --oneline 93fb085..HEAD
+
+═══════════════════════════════════════════════════════════
+
+🔴 REMAINING TICKETS (Priority Order)
+🔴 Immediate (Session 15 continue)
+#	Ticket	Description
+1	max_bookings enforcement	7 paths — monthly count aggregation
+2	max_ai_requests enforcement	3 AI endpoints — monthly quota
+🟡 Next (post-pricing)
+#	Ticket	Description
+3	CHECKOUT-PAYMENT-PREVIEW	Checkout मा payment methods preview
+4	RFQ-DELIVERY-CHARGE	Quote form मा delivery charge
+5	SECURITY-ROTATE-PASSWORDS-01	Production deploy पछि strong passwords
+6	EXPLORE-VIEW-SPLIT	1865-line view → partials
+7	Ground testing (Owner)	6 verticals + unified + RFQ + Explore + Pricing
+🟢 Backlog
+SELF-NOTIFICATION-GUARD-01
+
+RENTAL-ENUM-01
+
+PAYMENTS-UNIFIED-01
+
+PROVIDER-TRAVELER-SWITCH-01
+
+SUPPLIER-CRUD-01
+
+TREKKING-MY-PURCHASES-THEME
+
+RFQ-CLOSED-CTA-01
+
+RFQ-MESSAGE-TEMPLATE-01
+
+HOTEL/RESTAURANT/INDIVIDUAL-TRAVELER-BOOKING
+
+Session 11 backlog (MULTILINGUAL, VERTICAL-AI, ADVANCED-HOTEL-FOLIO)
+
+═══════════════════════════════════════════════════════════
+
+🚨 CRITICAL — Known Architecture Issues
+1. Provider Dashboard Lock Deviation
+Lock = "Trekking content locked — sidebar/user-menu additions allowed with Owner GO"
+
+2. Enum Mismatch (RENTAL-ENUM-01)
+order_items.provider_status = ('pending','confirmed','shipped','delivered','cancelled'). Rental picked_up/returned/overdue NOT in enum.
+
+3. Test Account Passwords
+All 53 users = Himalayan@1980 (Owner order). Production = different (ticket SECURITY-ROTATE-PASSWORDS-01).
+
+4. SMTP Verified Working
+Brevo relay working. "SMTP down" = testing env only.
+
+5. Pricing View Path
+PageController@pricing line 48 → return view('public.pricing', compact('plans')) — confirmed path resources/views/public/pricing.blade.php
+
+6. Restaurant Customer Default
+restaurant_orders.customer_name nullable. Show page default = "Walk-in Customer".
+
+7. Phase 2C remaining
+max_bookings + max_ai_requests accessors exist, but enforcement not yet injected. Currently advisory only.
+
+═══════════════════════════════════════════════════════════
+
+🔒 LOCKED ITEMS (Owner's Orders)
+Item	Status
+Provider Dashboard languages	🔒 EN/NP only
+Trekking Views content	🔒 Byte-for-byte (except sidebar links — Owner GO)
+provider-restaurant.blade.php :root	🔒 Never touch
+Admin panel i18n	🔒 Future
+Push	🔒 HOLD — Owner GO only
+═══════════════════════════════════════════════════════════
+
+📊 Rules Status (R1-R17)
+Rule	Status
+R3 (Evidence)	✅ Discovery before every fix
+R4 (Scope)	✅ Pricing → Enforcement → Push
+R8 (Additive)	✅ No migration — JSON column extension
+R13 (git add explicit)	✅
+R16 (186/186)	✅ — verified each checkpoint
+R17 (Push)	⚠️ NOT PUSHED — HOLD per Owner
+═══════════════════════════════════════════════════════════
+
+🎯 NEXT SESSION PRIORITY
+🔴 Immediate (Session 15 continue)
+max_bookings enforcement (7 paths)
+
+max_ai_requests enforcement (3 AI endpoints)
+
+Final commit + tests 186/186
+
+Push (Owner GO)
+
+🟡 Next
+CHECKOUT-PAYMENT-PREVIEW
+
+Ground testing (Owner)
+
+EXPLORE-VIEW-SPLIT
+
+═══════════════════════════════════════════════════════════
+
+🛠️ PROVEN PATTERNS
+One-Shot Batch Fix Script
+php
 require bootstrap/app.php
 patch(): anchor uniqueness → backup (.bak) → replace → php -l → revert on fail
 Per-file independent (fail isolated)
 Delete script after run
-
 Anchor Uniqueness
 php
 $cnt = substr_count($content, $anchor);
 if ($cnt === 1) → safe
+Language File Edit (R11)
+Use require + var_export — NEVER str_replace/regex on lang files:
+
+php
+$data = require $path;
+$data[$key] = $value;
+file_put_contents($path, "<?php\n\nreturn " . var_export($data, true) . ";\n");
+Session 15 lesson: str_replace on lang files caused verticals misplaced inside plans array — require+var_export fixed it (Session 11 rule R11).
+
+Method-Aware Injection
+When anchor appears in multiple methods (store and update), locate method signature first, then inject only after abort_unless($provider, 403); within that method's scope.
+
+Trait-Based Enforcement Pattern
+php
+use App\Traits\EnforcesPlanLimits;
+
+if ($redirect = $this->checkPlanLimit($provider, 'max_rooms', HotelRoom::class, 'rooms')) {
+    return $redirect;
+}
 Blade Gotchas
-Nested @if inside @elseif chain breaks Blade parser → use separate @if blocks
+Nested @if inside @elseif chain → separate @if blocks
 
-Multiline @elseif + @if + @endif + @elseif chain → unexpected end of file
+Inline styles + var() fallbacks = safe across layouts
 
-Safe: after each @if...@endif, start new @if
+!empty($provider_layout) required for dynamic @extends
 
-Show Page Pattern (5 verticals)
-text
-@extends($provider_layout ?? 'layouts.provider-{vertical}')
-Hero (theme gradient + status badge)
-2-column grid (Customer/Client + Details)
-Secondary card (Items/Dates/Amount)
-Actions (Check In/Out, Delete)
-Back link
 CMD Gotchas
---execute with $ escaping fails → interactive php artisan tinker
+--execute with $ → interactive php artisan tinker
 
-Multi-line -m breaks CMD → use git commit --amend
+Multi-line -m → git commit --amend
 
-Junk files (del, php, data.PHP_EOL) — delete, never commit
+Junk files → delete
 
-PowerShell -Command with }} fails → use PHP script
+PowerShell }} → PHP script
 
-t status typo → git status
+Unicode × after variable in double quotes → use ($cnt . 'x')
 
 ═══════════════════════════════════════════════════════════
 
 💡 KEY CONTEXT FOR NEW ASSISTANT
 Owner = "दाइ" (never "Bhai")
 
-Production = 93fb085 (Live) — Session 12+13 work LOCAL ONLY
+Production = 93fb085 (Live) — Session 12-15 LOCAL ONLY
 
-Local HEAD = 2ad9829 — 14 commits ahead
+Local HEAD = c66c79a (before Session 15 commit)
 
 Tests = 186/186 passing
 
@@ -349,38 +344,33 @@ Role	Email
 Buyer (David — dual-role: Traveler + Trekking)	regmiashish629@gmail.com
 Buyer (John)	shresthaxok@gmail.com
 Inventory provider (Ang Dorje)	rent@himalayangear.com
-Wholesale provider (SAI/Makalu)	makalu@test.com (reset from test@gmail)
+Wholesale provider (SAI/Makalu)	makalu@test.com
 Super Admin	parasharregmi@gmail.com
 Hotel (Kanchenjunga)	kanchenjunga-providers@travelainepal.com
 Hotel (Himalayan View)	book@himalayanviewhotel.com
 Restaurant (Everest Spice)	suman.thapa.restaurant@gmail.com
 Individual (Pro Guides)	professional.guides.nepal@travelainepal.com
 Art-craft (Patan Handicraft)	bikash.artcraft@gmail.com
-Dual-role accounts exist — David = Traveler + Trekking provider
-
+Transport (Besisahar)	transport.only@test.com (verify)
 Never git add . — explicit paths (R13)
-
-Junk files — delete, never commit
 
 Push HOLD — Owner GO only
 
 ═══════════════════════════════════════════════════════════
 
 📝 IMMEDIATE ACTION FOR NEXT SESSION
-Verify HEAD: git log --oneline 93fb085..HEAD (should show 14)
+Verify HEAD: git log --oneline 93fb085..HEAD
 
 Run tests: php artisan test → 186/186
 
-Read this handoff fully — especially Session 13 verticals + remaining tickets
-
-Next work: TRANSPORT-BOOKINGS-INDEX-01 (only vertical with missing foundation)
+Continue: max_bookings + max_ai_requests enforcement
 
 Push HOLD — do NOT push unless Owner explicitly says "push"
 
-Report prepared by: Session 13 Assistant
-Verified against: 186/186 tests + owner screenshots + end-to-end flow (5/5 verticals)
-Production status: NOT PUSHED (14 commits local — HOLD)
-Next action: Transport vertical foundation + Payment UX
+Report prepared by: Session 15 Assistant
+Verified against: 186/186 tests + Owner screenshots
+Production status: NOT PUSHED (24+ commits local — HOLD)
+Next action: max_bookings + max_ai_requests enforcement
 
 ═══════════════════════════════════════════════════════════
 
