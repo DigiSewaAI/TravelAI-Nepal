@@ -429,7 +429,7 @@
                 ✨ {{ __('messages.all') }}
                 <span class="text-xs opacity-70 font-normal">({{ number_format($totalCount) }})</span>
             </a>
-            @foreach($categories as $cat)
+            @foreach($categories->reject(fn($__c) => in_array($__c->slug, ['shop','rental','wholesale'], true)) as $cat)
                 @php
                     $catIcon = '📍';
                     $slug = strtolower($cat->slug ?? '');

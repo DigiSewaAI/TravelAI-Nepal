@@ -181,7 +181,7 @@
 
                 <!-- === PERMISSION GATED MENUS === -->
                 @if(!$isProductProvider && auth()->user()->hasPermission('view_bookings'))
-                <a href="{{ route('provider.bookings.index') }}" ...>
+                <a href="{{ route('provider.bookings.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.bookings.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>{{ __('messages.bookings') }}</span>
                 </a>
@@ -195,7 +195,7 @@
                 @endif
 
                 @if(!$isProductProvider && auth()->user()->hasPermission('manage_checkins'))
-                <a href="{{ route('provider.checkins.index') }}" ...>
+                <a href="{{ route('provider.checkins.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
                     <i class="fas fa-qrcode w-5"></i>
                     <span>{{ __('messages.checkins') }}</span>
                 </a>
