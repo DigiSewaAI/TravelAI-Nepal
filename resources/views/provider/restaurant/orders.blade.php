@@ -66,6 +66,7 @@
                         <span class="pill" style="background:{{ $c }};">{{ ucfirst($o->status) }}</span>
                     </td>
                     <td style="text-align:right;">
+                        <a href="{{ route('provider.restaurant.orders.show', $o) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:800;margin-right:4px;"><i class="fas fa-eye"></i> View</a>
                         <form action="{{ route('provider.restaurant.orders.status', $o) }}" method="POST" style="display:inline;margin:0;">
                             @csrf @method('PATCH')
                             <select name="status" class="status-select" onchange="this.form.submit()">

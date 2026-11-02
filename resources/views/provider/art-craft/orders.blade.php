@@ -63,6 +63,7 @@
                         </form>
                     </td>
                     <td style="text-align:right;white-space:nowrap;">
+                        <a href="{{ route('provider.art-craft.orders.show', $o) }}" style="padding:6px 10px;border-radius:7px;border:none;background:var(--terracotta-soft);color:#a8492b;font-size:11px;font-weight:800;text-decoration:none;display:inline-block;margin-right:4px;"><i class="fas fa-eye"></i> View</a>
                         <form action="{{ route('provider.art-craft.orders.destroy', $o) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('{{ __('messages.delete_order_confirm') }}')">
                             @csrf @method('DELETE')
                             <button type="submit" style="padding:6px 10px;border-radius:7px;border:none;background:var(--red-soft);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;"><i class="fas fa-trash"></i></button>
