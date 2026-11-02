@@ -277,6 +277,19 @@ class OrderController extends Controller
         } catch (\Throwable $e) {
             \Log::warning('Admin return notification failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
+        try {
+            if ($order->user) {
+                $order->user->notify(new \App\Notifications\UserAlertNotification(
+                    'Return Confirmed',
+                    'Return confirmed for order ' . $order->order_number . '. Refund: NPR ' . number_format($finalRefund, 2),
+                    'return',
+                    route('orders.show', $order->id)
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Trekking return notify failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+        }
+
         return back()->with('success', __('messages.return_confirmed'));
     }
 }

@@ -364,6 +364,14 @@ public function updateOrderStatus(\Illuminate\Http\Request $request, \App\Models
         );
     });
 
+    try {
+        if ($order->user) {
+            $order->user->notify(new \App\Notifications\OrderStatusChanged($order, $oldStatus, $validated['status']));
+        }
+    } catch (\Throwable $e) {
+        \Log::warning('Inventory order status notify failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+    }
+
     return back()->with('success', 'Order status updated to ' . $validated['status'] . '.');
 }
 
@@ -398,6 +406,19 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
             'Payment verified by provider'
         );
     });
+
+    try {
+        if ($order->user) {
+            $order->user->notify(new \App\Notifications\UserAlertNotification(
+                'Payment Verified',
+                'Payment for order ' . $order->order_number . ' has been verified.',
+                'payment',
+                route('orders.show', $order->id)
+            ));
+        }
+    } catch (\Throwable $e) {
+        \Log::warning('Inventory payment notify failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+    }
 
     return back()->with('success', 'Payment verified.');
 }
@@ -550,6 +571,19 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
             $order, 'returned', $order->status, null, Auth::id(), 'provider',
             'Return confirmed: ' . $validated['return_condition']
         );
+
+        try {
+            if ($order->user) {
+                $order->user->notify(new \App\Notifications\UserAlertNotification(
+                    'Return Confirmed',
+                    'Return confirmed for order ' . $order->order_number . '. Refund: NPR ' . number_format($finalRefund, 2),
+                    'return',
+                    route('orders.show', $order->id)
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Inventory return notify failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+        }
 
         return back()->with('success', __('messages.return_confirmed'));
     }
