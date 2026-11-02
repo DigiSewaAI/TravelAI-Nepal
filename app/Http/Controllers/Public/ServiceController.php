@@ -28,6 +28,14 @@ class ServiceController extends Controller
                 'provider:id,name,slug',
                 'category:id,name,slug',
                 'trekDetail',
+                'tourDetail',
+                'hotelDetail',
+                'transportDetail',
+                'restaurantDetail',
+                'artCraftDetail',
+                'activityDetail',
+                'experienceDetail',
+                'moneyChangerDetail',
             ])
             ->where('services.status', 'active');
 

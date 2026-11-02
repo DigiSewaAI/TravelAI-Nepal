@@ -57,10 +57,10 @@
     #globeViz:active { cursor: grabbing; }
     .globe-btn {
         width: 40px; height: 40px; border-radius: 50%;
-        background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+        background: rgba(255,255,255,.95); backdrop-filter: blur(4px);
         border: 1px solid rgba(0,0,0,.08);
         display: grid; place-items: center; color: #4b5563;
-        transition: all .25s ease; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        transition: transform .25s ease, box-shadow .25s ease; box-shadow: 0 4px 12px rgba(0,0,0,.08);
     }
     .globe-btn:hover, .globe-btn.active {
         background: #2563eb; color: #fff; border-color: #2563eb;
@@ -73,7 +73,7 @@
         width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid; background: #fff;
         display: grid; place-items: center; font-size: 13px;
         box-shadow: 0 4px 12px rgba(0,0,0,.15), 0 0 0 6px rgba(59,130,246,.08);
-        transition: all .25s ease; cursor: pointer;
+        transition: transform .25s ease, box-shadow .25s ease; cursor: pointer;
     }
     .custom-pin:hover { transform: scale(1.25); box-shadow: 0 8px 24px rgba(0,0,0,.25), 0 0 0 10px rgba(59,130,246,.15); }
     .custom-pin.trek { border-color:#2563eb; color:#2563eb; }
@@ -95,7 +95,7 @@
     .premium-img { transition: transform 1s cubic-bezier(.16,1,.3,1); }
     .premium-card:hover .premium-title { color: #2563eb; }
 
-    .premium-fav { opacity: 0; transform: scale(.85); transition: all .25s ease; }
+    .premium-fav { opacity: 0; transform: scale(.85); transition: transform .25s ease, box-shadow .25s ease; }
     .premium-card:hover .premium-fav { opacity: 1; transform: scale(1); }
 
     /* ═══════════════ CHIPS ═══════════════ */
@@ -154,7 +154,7 @@
 
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 mb-6">
                 <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
                 <span class="text-xs font-semibold text-blue-700">
@@ -221,7 +221,7 @@
             <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-blue-200 mb-6">
                     <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                     </span>
                     <span class="text-xs font-semibold text-blue-700">{{ __('messages.live') }} · {{ number_format($services->total()) }}+ {{ __('messages.services_mapped') }}</span>
@@ -997,6 +997,7 @@ function initGlobe() {
         .atmosphereAltitude(0.18)
         .width(el.clientWidth).height(el.clientHeight);
     __globeInstance = globe;
+
     const NEPAL = { lat: 28.3949, lng: 84.1240 };
     const pins = [
         { lat: 27.9881, lng: 86.9250, name: 'Everest Base Camp', category: 'trek' },
@@ -1741,8 +1742,30 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') closeDistrictPanel();
     });
 
-    initGlobe();
-    initMap();
+    // ═══ PERF: Lazy-init Globe + Map via IntersectionObserver ═══
+    (function() {
+        let globeLoaded = false, mapLoaded = false;
+
+        const lazyInit = (elId, initFn, flag) => {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !flag.value) {
+                        flag.value = true;
+                        try { initFn(); } catch (e) { console.warn('Lazy init failed:', elId, e); }
+                    }
+                });
+            }, { rootMargin: '200px', threshold: 0.05 });
+            observer.observe(el);
+        };
+
+        const globeFlag = { value: false };
+        const mapFlag = { value: false };
+
+        lazyInit('globeViz', initGlobe, globeFlag);
+        lazyInit('nepalMap', initMap, mapFlag);
+    })();
     initRouteSelector();  // GLOBE-06
     initJourneyViewer();  // GLOBE-07
 
