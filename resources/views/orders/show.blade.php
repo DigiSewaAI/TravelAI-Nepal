@@ -10,6 +10,21 @@
 
 <section class="max-w-4xl mx-auto px-6 md:px-10 py-8">
 
+    @if(!$order->isPaymentVerified() && !$order->isPaymentNotified())
+        <div style="background:#fef4e2;border:2px solid #f59e0b;border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 18px rgba(245,158,11,.15)">
+            <div style="min-width:0">
+                <div style="font-weight:800;color:#92400e;font-size:15px;margin-bottom:4px">&#9203; Payment Pending &mdash; NPR {{ number_format($order->total, 2) }}</div>
+                <div style="font-size:13px;color:#78350f">Complete your payment to proceed. Add transaction reference after payment.</div>
+            </div>
+            <a href="#payment-section" style="background:#f59e0b;color:#fff;padding:11px 22px;border-radius:10px;text-decoration:none;font-weight:800;font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(245,158,11,.35)">Complete Payment &darr;</a>
+        </div>
+    @elseif(!$order->isPaymentVerified() && $order->isPaymentNotified())
+        <div style="background:#e9f1fe;border:2px solid #3b82f6;border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:20px">&#128336;</span>
+            <div style="font-size:13px;color:#1e40af;font-weight:600">Payment notice sent &mdash; awaiting provider verification. You&rsquo;ll be notified once verified.</div>
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg">{{ session('success') }}</div>
     @endif
@@ -240,7 +255,7 @@
         </div>
 
         {{-- PATH-3B B5: Payment Section --}}
-        <div class="mt-6 border-t pt-6">
+        <div id="payment-section" class="mt-6 border-t pt-6">
             <h3 class="text-lg font-semibold mb-3">
                 {{ __('messages.order_payment_section') }}
             </h3>
