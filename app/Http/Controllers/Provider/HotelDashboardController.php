@@ -257,8 +257,19 @@ public function housekeepingPage()
             'suggested_rate' => 'required|numeric|min:1000',
         ]);
 
+        // ChatGPT fix — server-side min/max clamp
+        $room = DB::table('hotel_rooms')->where('provider_id', $provider->id)
+            ->where('room_number', $v['room_number'])->first();
+        if (!$room) return back()->with('error', "Room {$v['room_number']} not found.");
+        $rate = (float) $v['suggested_rate'];
+        if ($room->min_price && $rate < $room->min_price) {
+            return back()->with('error', "Suggested Rs " . number_format($rate) . " below min Rs " . number_format($room->min_price) . " for room {$v['room_number']}.");
+        }
+        if ($room->max_price && $rate > $room->max_price) {
+            return back()->with('error', "Suggested Rs " . number_format($rate) . " above max Rs " . number_format($room->max_price) . " for room {$v['room_number']}.");
+        }
         $n = DB::table('hotel_rooms')->where('provider_id', $provider->id)
-            ->where('room_number', $v['room_number'])->update(['base_price' => $v['suggested_rate']]);
+            ->where('room_number', $v['room_number'])->update(['base_price' => $rate]);
 
         if ($n === 0) return back()->with('error', "Room {$v['room_number']} not found.");
         return back()->with('success', "Room {$v['room_number']} base price updated to Rs " . number_format($v['suggested_rate']) . "/night.");
@@ -350,6 +361,10 @@ public function housekeepingPage()
             'room_type'   => 'required|string|max:50',
             'floor'       => 'required|integer|min:1',
             'status'      => 'nullable|in:available,occupied,reserved,dirty,maintenance',
+            'base_price'  => 'nullable|numeric|min:0',
+            'min_price'   => 'nullable|numeric|min:0',
+            'max_price'   => 'nullable|numeric|min:0',
+            'base_price'  => 'nullable|numeric|min:0',
         ]);
 
         $exists = HotelRoom::where('provider_id', $provider->id)
@@ -365,6 +380,7 @@ public function housekeepingPage()
             'room_type'   => $validated['room_type'],
             'floor'       => $validated['floor'],
             'status'      => $validated['status'] ?? 'available',
+                    'base_price' => $validated['base_price'] ?? null,
         ]);
 
         return redirect()->back()->with('success', 'Room added successfully.');
@@ -380,6 +396,10 @@ public function housekeepingPage()
             'room_type'   => 'required|string|max:50',
             'floor'       => 'required|integer|min:1',
             'status'      => 'required|in:available,occupied,reserved,dirty,maintenance',
+            'base_price'  => 'nullable|numeric|min:0',
+            'min_price'   => 'nullable|numeric|min:0',
+            'max_price'   => 'nullable|numeric|min:0',
+            'base_price'  => 'nullable|numeric|min:0',
         ]);
 
         $exists = HotelRoom::where('provider_id', $provider->id)

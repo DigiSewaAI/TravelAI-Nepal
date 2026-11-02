@@ -58,7 +58,8 @@
           <th>{{ __('messages.type') }}</th>
           <th>{{ __('messages.floor_label') }}</th>
           <th>{{ __('messages.status') }}</th>
-          <th style="text-align:right;">{{ __('messages.actions') }}</th>
+          <th>Price/Night</th>
+                            <th style="text-align:right;">{{ __('messages.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -86,8 +87,9 @@
             <td style="font-weight:700">{{ $typeLabel }}</td>
             <td>{{ __('messages.floor_label') }} {{ $room->floor }}</td>
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
-            <td style="text-align:right;">
-              <button type="button" class="act-btn act-edit" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ $room->status }}')"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
+            <td><strong>Rs {{ number_format($room->base_price ?? 0) }}</strong></td>
+                            <td style="text-align:right;">
+              <button type="button" class="act-btn act-edit" data-price="{{ $room->base_price ?? 0 }}" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ $room->status }}')"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
               <form action="{{ route('provider.hotel.rooms.destroy', $room) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete room {{ $room->room_number }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="act-btn act-del"><i class="fas fa-trash"></i></button>
@@ -136,7 +138,11 @@
         </div>
       </div>
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Price/Night (Rs)</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Base Price /Night (Rs)</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Min Price /Night</label><input type="number" name="min_price" min="0" step="1" placeholder="e.g. 3000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Max Price /Night</label><input type="number" name="max_price" min="0" step="1" placeholder="e.g. 8000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
         <select name="status" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
           <option value="available">Available</option>
           <option value="occupied">Occupied</option>
@@ -180,7 +186,8 @@
         </div>
       </div>
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Price/Night (Rs)</label><input type="number" name="base_price" id="edit_room_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
         <select name="status" id="edit_room_status" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
           <option value="available">Available</option>
           <option value="occupied">Occupied</option>
@@ -219,6 +226,7 @@ function closeAddRoomModal() { document.getElementById('addRoomModal').style.dis
 document.getElementById('addRoomModal').addEventListener('click', function(e) { if (e.target === this) closeAddRoomModal(); });
 
 function openEditRoomModal(id, number, type, floor, status) {
+        var _p = document.getElementById('edit_room_price'); if (_p) _p.value = (event && event.currentTarget && event.currentTarget.dataset.price) || 0;
     document.getElementById('editRoomForm').action = '/provider/hotel/rooms/' + id;
     document.getElementById('edit_room_number').value = number;
     document.getElementById('edit_room_type').value = type;

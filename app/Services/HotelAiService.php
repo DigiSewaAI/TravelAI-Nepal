@@ -77,6 +77,63 @@ class HotelAiService
             }
             $this->aiLimit->finalize($reservation);
 
+            // ChatGPT fix v2 — robust confirmed-booked marking (direct array index)
+            if (!empty($data['days']) && is_array($data['days'])) {
+                $confirmedDates = DB::table('hotel_bookings')
+                    ->where('provider_id', $provider->id)
+                    ->whereIn('status', ['confirmed', 'checked_in'])
+                    ->where('check_in_date', '>', now()->format('Y-m-d'))
+                    ->pluck('check_in_date')
+                    ->map(fn($dt) => substr((string) $dt, 0, 10))
+                    ->toArray();
+                foreach ($data['days'] as $idx => $dayRow) {
+                    $dayDate = substr((string) ($dayRow['date'] ?? ''), 0, 10);
+                    $data['days'][$idx]['is_confirmed'] = in_array($dayDate, $confirmedDates, true);
+                }
+            }
+
+            // v4: recalc occupancy from confirmed overlap + forecast, add day names
+            if (!empty($data['days']) && is_array($data['days'])) {
+                $totalRooms2 = DB::table('hotel_rooms')->where('provider_id', $provider->id)->count();
+                $conf2 = DB::table('hotel_bookings')
+                    ->where('provider_id', $provider->id)
+                    ->whereIn('status', ['confirmed', 'checked_in'])
+                    ->where('check_out_date', '>=', now()->format('Y-m-d'))
+                    ->get(['check_in_date', 'check_out_date']);
+                foreach ($data['days'] as $idx => $dayRow) {
+                    $dd = substr((string) ($dayRow['date'] ?? ''), 0, 10);
+                    if (!$dd) continue;
+                    $occConf = 0;
+                    foreach ($conf2 as $b) {
+                        $ci = substr((string)$b->check_in_date, 0, 10);
+                        $co = substr((string)$b->check_out_date, 0, 10);
+                        if ($ci <= $dd && $co >= $dd) $occConf++;
+                    }
+                    $aiBk = (int) ($dayRow['predicted_bookings'] ?? 0);
+                    $extra = max(0, $aiBk - $occConf);
+                    $tot = $occConf + $extra;
+                    $data['days'][$idx]['confirmed_occupied'] = $occConf;
+                    $data['days'][$idx]['predicted_extra'] = $extra;
+                    $data['days'][$idx]['predicted_occupancy_pct'] = $totalRooms2 > 0 ? (int) round($tot / $totalRooms2 * 100) : 0;
+                    $data['days'][$idx]['day_name'] = \Carbon\Carbon::parse($dd)->format('D');
+                }
+                // Override AI summary with server-generated (correct day names)
+                $confDays = 0;
+                $peak = null;
+                foreach ($data['days'] as $d2) {
+                    if (!empty($d2['is_confirmed'])) $confDays++;
+                    if ($peak === null || ($d2['predicted_occupancy_pct'] ?? 0) > ($peak['predicted_occupancy_pct'] ?? 0)) $peak = $d2;
+                }
+                if ($peak) {
+                    $peakDay = \Carbon\Carbon::parse($peak['date'])->format('D, M j');
+                    $data['summary'] = sprintf(
+                        'Next 7 days: peak occupancy %d%% on %s. %s',
+                        $peak['predicted_occupancy_pct'] ?? 0,
+                        $peakDay,
+                        $confDays > 0 ? "Confirmed bookings on {$confDays} day(s)." : 'All days forecast.'
+                    );
+                }
+            }
             // FIX #2 — enforce low confidence if insufficient data
             if ($totalBookings < 10) {
                 foreach (($data['days'] ?? []) as &$d) {
@@ -109,43 +166,123 @@ class HotelAiService
         $reservation = null;
         try {
             $rooms = DB::table('hotel_rooms')->where('provider_id', $provider->id)
-                ->select('id','room_number','room_type','base_price')->get();
+                ->select('id','room_number','room_type','base_price','min_price','max_price')->get();
             if ($rooms->isEmpty()) return ['error'=>'no_rooms','message'=>'Add rooms first.'];
 
             $stats = [];
             foreach ($rooms as $room) {
-                $b = DB::table('hotel_bookings')->where('provider_id', $provider->id)->where('room_id', $room->id)
+                $b = DB::table('hotel_bookings')->where('provider_id', $provider->id)
+                    ->where('room_id', $room->id)->where('status','!=','cancelled')
                     ->select(DB::raw('COUNT(*) total'), DB::raw('SUM(amount) revenue'), DB::raw('SUM(nights) nights_sum'))->first();
-                $stats[] = ['room_number'=>(string)$room->room_number,'room_type'=>(string)$room->room_type,
-                    'base_price'=>(float)($room->base_price??0),'total_bookings'=>(int)($b->total??0),
-                    'revenue'=>(float)($b->revenue??0),'nights_sum'=>(int)($b->nights_sum??0),'per_night'=>($b->nights_sum??0)>0?(int)round(($b->revenue??0)/($b->nights_sum??1)):(int)($room->base_price??0)];
+                $total = (int)($b->total ?? 0);
+                $nights = (int)($b->nights_sum ?? 0);
+                $revenue = (float)($b->revenue ?? 0);
+                $perNight = $nights > 0 ? (int)round($revenue / $nights) : (int)($room->base_price ?? 0);
+                $occ = $nights > 0 ? (int)round(($nights/30)*100) : 0;
+                $base = (float)($room->base_price ?? 0);
+                $minP = $room->min_price ? (float)$room->min_price : null;
+                $maxP = $room->max_price ? (float)$room->max_price : null;
+
+                $det = $this->deterministicPricing($base, $total, $nights, $perNight, (string)$room->room_type);
+                if ($minP && $det['suggested'] < $minP) { $det['suggested'] = $minP; $det['reason'] .= ' [clamped min]'; }
+                if ($maxP && $det['suggested'] > $maxP) { $det['suggested'] = $maxP; $det['reason'] .= ' [clamped max]'; }
+
+                $stats[] = [
+                    'room_number'=>(string)$room->room_number,'room_type'=>(string)$room->room_type,
+                    'base_price'=>$base,'min_price'=>$minP,'max_price'=>$maxP,
+                    'total_bookings'=>$total,'nights_sold'=>$nights,'occupancy_pct'=>$occ,
+                    'per_night'=>$perNight,'det_suggested'=>(int)$det['suggested'],'det_reason'=>$det['reason'],
+                ];
             }
 
-            $warn = count(array_filter(array_column($stats,'total_bookings'))) === 0
-                ? 'No booking history — suggestions based on base_price + room_type only.' : null;
+            $warn = array_sum(array_column($stats,'total_bookings')) < 5
+                ? 'Very low booking data — AI refinement limited to ±10%; deterministic baseline shown.' : null;
 
             $reservation = $this->aiLimit->reserve($provider, 'hotel.pricing_suggestions', []);
-            if (!$reservation) return ['error'=>'quota_exceeded','message'=>'AI quota reached.'];
-
-            $prompt = "Hotel revenue manager. Rooms with base_price + stats:\n" . json_encode($stats) . "\n\n"
-                . "CRITICAL: revenue=total booking amount across all nights. per_night=revenue/nights_sum (actual per-night rate). Rooms with 0 bookings have per_night=base_price. " . "Per room return: room_number, suggested_rate(NPR/night between 0.8x-1.5x base_price, anchor to per_night if bookings exist), reason(1 short sentence quoting ACTUAL per_night value, NOT total revenue). "
-                . "Respect tiers: Suite>Premium>Deluxe>Superior>Standard. "
-                . "Return JSON: {\"rooms\":[...],\"summary\":\"1 sentence\"}";
-
-            $raw = $this->llm->generateRawTextPooled($prompt, 'Return ONLY valid JSON.', null, 3000, 0.4, true);
-            $data = $this->parseJson($raw);
-            if (!$data) {
-                $this->aiLimit->release($reservation);
-                return $this->fallbackPricing($provider, $warn);
+            if (!$reservation) {
+                return ['rooms'=>$this->pricingMerge($stats, null), 'summary'=>'Deterministic baseline (AI quota reached).', 'data_warning'=>$warn];
             }
-            $this->aiLimit->finalize($reservation);
 
-            return ['rooms'=>$data['rooms']??[],'summary'=>(string)($data['summary']??''),'data_warning'=>$warn];
+            $prompt = "You are a hotel revenue manager. Each room has a DETERMINISTIC suggested rate from data.\n"
+                . "Your job: confirm or refine within ±10% of det_suggested. Do NOT force change if justified.\n"
+                . "Respect min_price/max_price. Respect tier: Suite>Deluxe>Standard.\n"
+                . "Reason must quote actual data (bookings, occupancy%).\n\n"
+                . json_encode($stats) . "\n\n"
+                . "Return JSON: {\"rooms\":[{\"room_number\":\"..\",\"suggested_rate\":N,\"reason\":\"short\"}],\"summary\":\"1 sentence\"}";
+
+            $raw = $this->llm->generateRawTextPooled($prompt, 'Return ONLY valid JSON.', null, 4000, 0.3, true);
+            $data = $this->parseJson($raw);
+
+            if (!$data || empty($data['rooms'])) {
+                $this->aiLimit->release($reservation);
+                return ['rooms'=>$this->pricingMerge($stats, null), 'summary'=>'Deterministic baseline (AI refinement skipped — baseline rates shown).', 'data_warning'=>$warn];
+            }
+
+            $this->aiLimit->finalize($reservation);
+            return ['rooms'=>$this->pricingMerge($stats, $data['rooms']), 'summary'=>(string)($data['summary']??'Pricing ready.'), 'data_warning'=>$warn];
         } catch (Throwable $e) {
             if ($reservation) { try { $this->aiLimit->release($reservation); } catch (Throwable) {} }
-            Log::warning('pricingSuggestions failed', ['pid'=>$provider->id,'err'=>$e->getMessage()]);
-            return $this->fallbackPricing($provider, 'AI unavailable — baseline.');
+            Log::warning('pricingSuggestions v2 failed', ['pid'=>$provider->id,'err'=>$e->getMessage()]);
+            return $this->fallbackPricing($provider, 'AI unavailable — deterministic baseline.');
         }
+    }
+
+    protected function deterministicPricing(float $base, int $bookings, int $nights, float $perNight, string $type): array
+    {
+        // v4: base_price already reflects room type — NO tier multiplier
+        $occ = $nights / 30;
+        $tierNote = $type !== 'Standard' ? " ({$type})" : '';
+
+        if ($bookings === 0) {
+            $sug = $base * 0.90;
+            return ['suggested'=>$sug, 'reason'=>sprintf('No bookings 30d — 10%% discount%s → Rs %s', $tierNote, number_format($sug))];
+        }
+        if ($occ > 0.5) {
+            $sug = $base * 1.20;
+            return ['suggested'=>$sug, 'reason'=>sprintf('High occ %.0f%% (%d n) +20%%%s → Rs %s', $occ*100, $nights, $tierNote, number_format($sug))];
+        }
+        if ($occ > 0.25) {
+            $sug = $base * 1.10;
+            return ['suggested'=>$sug, 'reason'=>sprintf('Moderate occ %.0f%% (%d n) +10%%%s → Rs %s', $occ*100, $nights, $tierNote, number_format($sug))];
+        }
+        if ($perNight > $base * 1.05) {
+            $sug = $base * 1.05;
+            return ['suggested'=>$sug, 'reason'=>sprintf('Per-night Rs %s > base +5%% → Rs %s', number_format($perNight), number_format($sug))];
+        }
+        if ($perNight < $base * 0.85) {
+            $sug = $base * 0.95;
+            return ['suggested'=>$sug, 'reason'=>sprintf('Per-night Rs %s < base −5%% → Rs %s', number_format($perNight), number_format($sug))];
+        }
+        return ['suggested'=>$base, 'reason'=>'Per-night matches base — hold rate (no change recommended)'];
+    }
+
+    protected function pricingMerge(array $stats, ?array $aiRooms): array
+    {
+        $aiByNum = [];
+        if ($aiRooms) foreach ($aiRooms as $ar) $aiByNum[(string)($ar['room_number']??'')] = $ar;
+        $out = [];
+        foreach ($stats as $s) {
+            $final = (int)$s['det_suggested'];
+            $reason = $s['det_reason'];
+            $refined = false;
+            if (isset($aiByNum[$s['room_number']]) && isset($aiByNum[$s['room_number']]['suggested_rate'])) {
+                $aiRate = (float)$aiByNum[$s['room_number']]['suggested_rate'];
+                $low = $s['det_suggested'] * 0.9; $high = $s['det_suggested'] * 1.1;
+                $aiRate = max($low, min($high, $aiRate));
+                if ($s['min_price']) $aiRate = max($s['min_price'], $aiRate);
+                if ($s['max_price']) $aiRate = min($s['max_price'], $aiRate);
+                if ((int)round($aiRate) !== (int)$s['det_suggested']) {
+                    $final = (int)round($aiRate);
+                    $reason = (string)($aiByNum[$s['room_number']]['reason'] ?? $reason);
+                    $refined = true;
+                }
+            }
+            $out[] = ['room_number'=>$s['room_number'],'room_type'=>$s['room_type'],
+                'current_rate'=>(int)$s['base_price'],'suggested_rate'=>$final,
+                'deterministic_rate'=>(int)$s['det_suggested'],'reason'=>$reason,
+                'ai_refined'=>$refined,'min_price'=>$s['min_price'],'max_price'=>$s['max_price']];
+        }
+        return $out;
     }
 
     protected function parseJson(string $raw): ?array
