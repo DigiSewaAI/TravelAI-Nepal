@@ -518,6 +518,7 @@ Route::prefix('services/{service}/itinerary/departures')
 
     // Staff
     Route::resource('staff', \App\Http\Controllers\Provider\StaffController::class)->except(['show']);
+    Route::resource('suppliers', \App\Http\Controllers\Provider\SupplierController::class)->except(['show']);
 
     // AI Quotation
     Route::get('/quotation/create', [App\Http\Controllers\Provider\QuotationController::class, 'create'])->name('quotation.create');

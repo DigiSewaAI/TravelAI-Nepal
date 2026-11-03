@@ -223,6 +223,13 @@
                     <span>Team</span>
                 </a>
                 @endif
+                <!-- Suppliers (Owner Only) -->
+                @if(auth()->user()->isProviderOwner())
+                <a href="{{ route('provider.suppliers.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.suppliers.*') ? 'active' : '' }}">
+                    <i class="fas fa-truck w-5"></i>
+                    <span>{{ __('messages.suppliers') }}</span>
+                </a>
+                @endif
 
                 <!-- Safety (सबैले देख्ने) -->
                 <a href="{{ route('safety.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">

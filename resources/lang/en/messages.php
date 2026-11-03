@@ -2745,4 +2745,5 @@ return array (
   'ai_quota_exceeded' => 'AI quota reached. Please upgrade your plan.',
   'booking_limit_reached' => 'Booking limit reached for this month. Please upgrade your plan.',
   'nrb_convertible_buy_only' => 'NRB: Convertible currencies (USD/EUR/GBP/AUD/CNY) are buy-only. INR allows buy/sell.',
+  'suppliers' => 'Suppliers',
 );
