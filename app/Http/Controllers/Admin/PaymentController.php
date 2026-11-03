@@ -19,13 +19,28 @@ class PaymentController extends Controller
     /**
      * Display a listing of all payments.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $payments = Payment::with(['provider', 'user', 'payable'])
-            ->latest()
-            ->paginate(20);
+        $status = $request->query('status');
 
-        return view('admin.payments.index', compact('payments'));
+        $query = Payment::with(['provider', 'user', 'payable'])->latest();
+
+        if (in_array($status, ['pending', 'success', 'failed', 'refunded'], true)) {
+            $query->where('status', $status);
+        }
+
+        $payments = $query->paginate(20)->appends($request->only('status'));
+
+        // Counts for tabs
+        $tabCounts = [
+            'all'      => Payment::count(),
+            'pending'  => Payment::where('status', 'pending')->count(),
+            'success'  => Payment::where('status', 'success')->count(),
+            'failed'   => Payment::where('status', 'failed')->count(),
+            'refunded' => Payment::where('status', 'refunded')->count(),
+        ];
+
+        return view('admin.payments.index', compact('payments', 'status', 'tabCounts'));
     }
 
     /**

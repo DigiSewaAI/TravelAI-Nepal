@@ -6,7 +6,33 @@
 
 @section('content')
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">All Payments</h2>
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Payments</h2>
+
+    @php
+        $tabs = [
+            'all'      => ['label' => 'All',      'status' => null,       'count' => $tabCounts['all']      ?? 0],
+            'pending'  => ['label' => 'Pending',  'status' => 'pending',  'count' => $tabCounts['pending']  ?? 0],
+            'success'  => ['label' => 'Verified', 'status' => 'success',  'count' => $tabCounts['success']  ?? 0],
+            'failed'   => ['label' => 'Failed',   'status' => 'failed',   'count' => $tabCounts['failed']   ?? 0],
+            'refunded' => ['label' => 'Refunded', 'status' => 'refunded', 'count' => $tabCounts['refunded'] ?? 0],
+        ];
+        $active = $status ?? 'all';
+    @endphp
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid #e5e7eb;padding-bottom:12px;">
+        @foreach($tabs as $key => $tab)
+            <a href="{{ route('admin.payments.index', $tab['status'] ? ['status' => $tab['status']] : []) }}"
+               style="padding:8px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700;
+                      {{ $active === $key
+                         ? 'background:#2563eb;color:#fff;border:1px solid #2563eb;'
+                         : 'background:#f9fafb;color:#374151;border:1px solid #e5e7eb;' }}">
+                {{ $tab['label'] }}
+                <span style="margin-left:6px;font-size:11px;{{ $active === $key ? 'color:#bfdbfe;' : 'color:#9ca3af;' }}">
+                    ({{ $tab['count'] }})
+                </span>
+            </a>
+        @endforeach
+    </div>
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
