@@ -2689,7 +2689,7 @@ return array (
   'plan_price' => 'Price',
   'custom_logo_feature' => 'Custom Logo',
   'trekking_bookings_mo' => 'Trekking Bookings/mo',
-  'ai_features_note' => 'AI Features currently available for Trekking. More vertical-specific AI capabilities are planned.',
+  'ai_features_note' => 'AI Features available across all 8 verticals: Trekking, Hotel, Restaurant, Transport, Individual, Money Changer, Art Craft, and Inventory.',
   'ai_coming_soon' => 'More coming',
   'hotel_ai_forecast_title' => 'AI Occupancy Forecast',
   'hotel_ai_forecast_sub' => 'Predict next 7 days from last 30 days history.',
