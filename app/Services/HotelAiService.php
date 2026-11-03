@@ -31,10 +31,26 @@ class HotelAiService
     {
         $reservation = null;
         try {
-            $history = DB::table('hotel_bookings')->where('provider_id', $provider->id)
-                ->where('created_at', '>=', now()->subDays(30))
-                ->select('check_in_date', DB::raw('COUNT(*) cnt'))->groupBy('check_in_date')
-                ->get()->map(fn($r) => ['date' => $r->check_in_date, 'count' => (int) $r->cnt])->toArray();
+                        // MULTI-NIGHT FIX: spread occupancy across all stay days
+            $allBookings = DB::table('hotel_bookings')->where('provider_id', $provider->id)
+                ->where('created_at', '>= ', now()->subDays(30))
+                ->whereIn('status', ['confirmed', 'checked_in', 'checked_out'])
+                ->get(['check_in_date', 'check_out_date', 'nights']);
+
+            $dailyCounts = [];
+            foreach ($allBookings as $bk) {
+                $ci = \Carbon\Carbon::parse($bk->check_in_date);
+                $nights = max(1, (int) ($bk->nights ?? 1));
+                for ($i = 0; $i < $nights; $i++) {
+                    $d = $ci->copy()->addDays($i)->format('Y-m-d');
+                    $dailyCounts[$d] = ($dailyCounts[$d] ?? 0) + 1;
+                }
+            }
+            $history = [];
+            foreach ($dailyCounts as $date => $count) {
+                $history[] = ['date' => $date, 'count' => (int) $count];
+            }
+            ksort($history);
 
             $future = DB::table('hotel_bookings')->where('provider_id', $provider->id)
                 ->where('check_in_date', '>', now()->format('Y-m-d'))
