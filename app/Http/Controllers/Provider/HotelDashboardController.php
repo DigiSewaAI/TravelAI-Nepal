@@ -295,6 +295,31 @@ public function housekeepingPage()
         if ($n === 0) return back()->with('error', "Room {$v['room_number']} not found.");
         return back()->with('success', "Room {$v['room_number']} base price updated to Rs " . number_format($v['suggested_rate']) . "/night.");
     }
+    public function priceHistoryPage()
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $history = \DB::table('hotel_room_price_history')
+            ->join('hotel_rooms', 'hotel_rooms.id', '=', 'hotel_room_price_history.room_id')
+            ->where('hotel_room_price_history.provider_id', $provider->id)
+            ->leftJoin('users', 'users.id', '=', 'hotel_room_price_history.changed_by')
+            ->select(
+                'hotel_room_price_history.id',
+                'hotel_room_price_history.old_price',
+                'hotel_room_price_history.new_price',
+                'hotel_room_price_history.reason',
+                'hotel_room_price_history.created_at',
+                'hotel_rooms.room_number',
+                'hotel_rooms.room_type',
+                'users.name as changed_by_name'
+            )
+            ->orderByDesc('hotel_room_price_history.created_at')
+            ->limit(100)
+            ->get();
+
+        return view('provider.hotel.price-history', compact('provider', 'history'));
+    }
     public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();

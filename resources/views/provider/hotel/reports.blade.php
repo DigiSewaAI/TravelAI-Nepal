@@ -95,7 +95,10 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <div class="rep-card" style="margin-top:20px;">
-  <h3>💡 {{ __('messages.hotel_ai_pricing_title') }}</h3>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+  <h3 style="margin:0;">💡 {{ __('messages.hotel_ai_pricing_title') }}</h3>
+  <a href="{{ route('provider.hotel.price-history') }}" style="background:var(--accent,#c9a227);color:#fff;padding:6px 12px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:800;">📋 History</a>
+</div>
   <p style="font-size:13px;color:var(--muted,#6b7a90);margin:0 0 14px;">{{ __('messages.hotel_ai_pricing_sub') }}</p>
   <button id="hotelAiPricingBtn" onclick="loadHotelAiPricing()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.hotel_ai_run_pricing') }}</button>
   <div id="hotelAiPricingOut" style="margin-top:14px;font-size:13px;"></div>

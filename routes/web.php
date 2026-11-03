@@ -315,6 +315,7 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::get('/hotel/guests', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'guestsPage'])->name('hotel.guests');
     Route::get('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');
         Route::get('/hotel/reports', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'reportsPage'])->name('hotel.reports');
+Route::get('/hotel/price-history', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'priceHistoryPage'])->name('hotel.price-history');
     Route::get('/hotel/offers', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'offersPage'])->name('hotel.offers');
 Route::post('/hotel/ai/occupancy-forecast', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiOccupancyForecast'])->name('hotel.ai.occupancy');
 Route::post('/hotel/ai/pricing-suggestions', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiPricingSuggestions'])->name('hotel.ai.pricing');
