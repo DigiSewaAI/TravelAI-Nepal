@@ -278,6 +278,20 @@ public function housekeepingPage()
         $n = DB::table('hotel_rooms')->where('provider_id', $provider->id)
             ->where('room_number', $v['room_number'])->update(['base_price' => $rate]);
 
+        // PRICE-HISTORY-TABLE: log change if successful
+        if ($n > 0 && $room) {
+            DB::table('hotel_room_price_history')->insert([
+                'room_id' => $room->id,
+                'provider_id' => $provider->id,
+                'old_price' => $room->base_price,
+                'new_price' => $rate,
+                'changed_by' => Auth::id(),
+                'reason' => 'AI suggested rate applied',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
         if ($n === 0) return back()->with('error', "Room {$v['room_number']} not found.");
         return back()->with('success', "Room {$v['room_number']} base price updated to Rs " . number_format($v['suggested_rate']) . "/night.");
     }

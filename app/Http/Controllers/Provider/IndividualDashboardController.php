@@ -179,6 +179,19 @@ class IndividualDashboardController extends Controller
     }
     public function bookingsPage()
     {
+
+        $provider = $provider ?? \Auth::user()->getCurrentProvider();
+        $reviewStats = $provider
+            ? \DB::table('reviews')
+                ->where('provider_id', $provider->id)
+                ->where('status', 'approved')
+                ->orWhere('status', '!=', 'rejected')
+                ->selectRaw('AVG(rating) as avg, COUNT(*) as cnt')
+                ->first()
+            : null;
+        $avgRating = $reviewStats && $reviewStats->avg ? round($reviewStats->avg, 1) : null;
+        $reviewCount = $reviewStats->cnt ?? 0;
+
         $provider = Provider::where('user_id', Auth::id())
             ->whereHas('types', fn($q) => $q->whereIn('slug', ['guide', 'porter', 'photographer']))
             ->first();
@@ -188,7 +201,7 @@ class IndividualDashboardController extends Controller
             ->orderByDesc('start_date')
             ->get();
 
-        return view('provider.individual.bookings', compact('provider', 'bookings'));
+        return view('provider.individual.bookings', compact('provider', 'bookings', 'avgRating', 'reviewCount'));
     }
 
     public function showBooking(IndividualBooking $booking)
