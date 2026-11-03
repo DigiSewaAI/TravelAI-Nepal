@@ -5,6 +5,11 @@
 @section('page-subtitle', 'Audit trail of all room price changes')
 
 @section('content')
+
+@if (session('success'))
+<div style="background:#f0fdf4;border:2px solid #10b981;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#065f46;font-weight:600;">✅ {{ session('success') }}</div>
+@endif
+
 <div style="padding:24px;max-width:1200px;margin:0 auto;">
     <div style="background:var(--card,#fff);border:1px solid var(--line,#e6ecf4);border-radius:16px;padding:22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
         <div>

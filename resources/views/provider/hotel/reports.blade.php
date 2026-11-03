@@ -4,6 +4,25 @@
 @section('page-subtitle', __('messages.reports_subtitle'))
 
 @section('content')
+
+@if (session('success'))
+<div style="background:#f0fdf4;border:2px solid #10b981;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#065f46;font-weight:600;">
+    ✅ {{ session('success') }}
+</div>
+@endif
+@if (session('error'))
+<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#991b1b;font-weight:600;">
+    ⚠️ {{ session('error') }}
+</div>
+@endif
+@if ($errors->any())
+<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#991b1b;font-weight:600;">
+    @foreach ($errors->all() as $e)
+        <div>⚠️ {{ $e }}</div>
+    @endforeach
+</div>
+@endif
+
 <style>
   .rep-hero{background:linear-gradient(135deg,var(--accent,#c9a227),var(--accent-d,#a8861c));border-radius:18px;padding:26px 28px;color:#fff;margin-bottom:22px;position:relative;overflow:hidden;box-shadow:0 18px 40px -18px rgba(0,0,0,.35);}
   .rep-hero::before{content:'';position:absolute;top:-60%;right:-10%;width:60%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 60%);pointer-events:none;}
