@@ -366,6 +366,8 @@ Route::post('/transport/ai/cost-estimator', [\App\Http\Controllers\Provider\Tran
     Route::delete('/art-craft/orders/{order}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'destroyOrder'])->name('art-craft.orders.destroy');
         Route::get('/art-craft/artists', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'artistsPage'])->name('art-craft.artists');
     Route::get('/art-craft/sales', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'salesPage'])->name('art-craft.sales');
+Route::post('/art-craft/ai/description', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'aiProductDescription'])->name('art-craft.ai.description');
+Route::post('/art-craft/ai/pricing', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'aiPricingAssistant'])->name('art-craft.ai.pricing');
 
     // 🆕 Provider notifications (in-app bell)
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');

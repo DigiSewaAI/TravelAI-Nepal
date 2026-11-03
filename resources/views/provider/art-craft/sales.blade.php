@@ -90,4 +90,58 @@
     <p class="sal-empty">{{ __('messages.no_sales_yet') }}</p>
   @endif
 </div>
+
+{{-- ═══ ArtCraft AI ═══ --}}
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">🎨 {{ __('messages.artcraft_ai_desc_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.artcraft_ai_desc_sub') }}</p>
+  <button id="artcraftAiDescBtn" onclick="loadArtcraftDesc()" style="background:var(--accent,#c9a227);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.artcraft_ai_run_desc') }}</button>
+  <div id="artcraftAiDescOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">💰 {{ __('messages.artcraft_ai_pricing_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.artcraft_ai_pricing_sub') }}</p>
+  <button id="artcraftAiPricingBtn" onclick="loadArtcraftPricing()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.artcraft_ai_run_pricing') }}</button>
+  <div id="artcraftAiPricingOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<script>
+async function acAiPost(url){
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:'{}' });
+  return await r.json();
+}
+function acAiErr(el,msg){ el.innerHTML='<div style="padding:10px;border-radius:8px;background:#fee;color:#900;font-weight:700;">'+msg+'</div>'; }
+async function loadArtcraftDesc(){
+  const btn=document.getElementById('artcraftAiDescBtn'), out=document.getElementById('artcraftAiDescOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.artcraft_ai_loading") }}';
+  try{
+    const data=await acAiPost('{{ route("provider.art-craft.ai.description") }}');
+    if(data.error){ acAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.summary) html+='<div style="font-weight:800;margin-bottom:8px;">'+data.summary+'</div>';
+    (data.items||[]).forEach(i=>{
+      html+='<div style="padding:8px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><strong>'+i.name+'</strong><div style="font-size:12px;color:var(--muted);margin-top:4px;">'+(i.description||'')+'</div></div>';
+    });
+    out.innerHTML=html;
+  }catch(e){ acAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+async function loadArtcraftPricing(){
+  const btn=document.getElementById('artcraftAiPricingBtn'), out=document.getElementById('artcraftAiPricingOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.artcraft_ai_loading") }}';
+  try{
+    const data=await acAiPost('{{ route("provider.art-craft.ai.pricing") }}');
+    if(data.error){ acAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.data_warning) html+='<div style="background:#f0fdf4;border:1px solid #10b981;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">✅ '+data.data_warning+'</div>';
+    if(data.summary) html+='<div style="font-weight:800;margin-bottom:8px;">'+data.summary+'</div>';
+    (data.items||[]).forEach(i=>{
+      var _c = {ok:'#10b981',underpriced:'#3b82f6',overpriced:'#f59e0b'}[i.status]||'#6b7a90';
+      html+='<div style="padding:8px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+i.name+'</strong> <span style="font-size:10px;color:var(--muted)">'+i.category+' · '+i.craftsmanship+'</span></div><span style="background:'+_c+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+i.status+'</span></div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Current: Rs '+i.current_price.toLocaleString()+' → Suggested: <strong>Rs '+i.suggested_price.toLocaleString()+'</strong> ('+i.delta_pct+'%)</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+i.reason+'</div></div>';
+    });
+    if(data.assumptions) html+='<div style="margin-top:8px;padding:6px 10px;background:#fef3c7;border-radius:6px;font-size:10px;color:#92400e;">📋 Formula: '+data.assumptions.formula+' · '+data.assumptions.markup+'</div>';
+    out.innerHTML=html;
+  }catch(e){ acAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+</script>
 @endsection

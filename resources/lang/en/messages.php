@@ -2720,4 +2720,11 @@ return array (
   'transport_ai_cost_sub' => 'Per-trip cost vs full-capacity revenue per vehicle.',
   'transport_ai_run_cost' => 'Estimate costs',
   'transport_ai_loading' => 'Analyzing…',
+  'artcraft_ai_desc_title' => 'AI Product Description',
+  'artcraft_ai_desc_sub' => 'Generate professional artwork descriptions.',
+  'artcraft_ai_run_desc' => 'Generate descriptions',
+  'artcraft_ai_pricing_title' => 'AI Artwork Pricing',
+  'artcraft_ai_pricing_sub' => 'Material + labor + craftsmanship → suggested price.',
+  'artcraft_ai_run_pricing' => 'Suggest pricing',
+  'artcraft_ai_loading' => 'Analyzing…',
 );

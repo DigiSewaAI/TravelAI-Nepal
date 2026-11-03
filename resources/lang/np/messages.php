@@ -2741,4 +2741,11 @@ return array (
   'transport_ai_cost_sub' => 'प्रति सवारी यात्रा लागत vs पूर्ण क्षमता आम्दानी।',
   'transport_ai_run_cost' => 'लागत अनुमान',
   'transport_ai_loading' => 'विश्लेषण हुँदै…',
+  'artcraft_ai_desc_title' => 'AI उत्पादन विवरण',
+  'artcraft_ai_desc_sub' => 'व्यावसायिक कलाकृति विवरण बनाउनु।',
+  'artcraft_ai_run_desc' => 'विवरण बनाउनु',
+  'artcraft_ai_pricing_title' => 'AI कलाकृति मूल्य',
+  'artcraft_ai_pricing_sub' => 'सामग्री + श्रम + कौशल → सुझाव मूल्य।',
+  'artcraft_ai_run_pricing' => 'मूल्य सुझाव',
+  'artcraft_ai_loading' => 'विश्लेषण हुँदै…',
 );

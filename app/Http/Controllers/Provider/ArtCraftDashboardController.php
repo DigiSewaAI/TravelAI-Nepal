@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Services\ArtCraftAiService;
 use App\Models\Artwork;
 use App\Models\CustomOrder;
 use App\Models\Provider;
@@ -13,6 +14,8 @@ class ArtCraftDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected ArtCraftAiService $artcraftAi) {}
 
     public function index()
     {
@@ -271,6 +274,19 @@ class ArtCraftDashboardController extends Controller
         ));
     }
 
+    public function aiProductDescription(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->artcraftAi->productDescription($provider));
+    }
+
+    public function aiPricingAssistant(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->artcraftAi->pricingAssistant($provider));
+    }
     public function salesPage()
     {
         $provider = Provider::where('user_id', Auth::id())
