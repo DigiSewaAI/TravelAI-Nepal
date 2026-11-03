@@ -133,12 +133,12 @@
                     @if(!$isProductProvider)
                     <a href="{{ route('provider.quotation.create') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation.*') ? 'active' : '' }}">
                         <i class="fas fa-file-invoice-dollar w-5"></i>
-                        <span>AI Quotation</span>
+                        <span>{{ __('messages.ai_quotation') }}</span>
                     </a>
 
                     <a href="{{ route('provider.quotation-requests.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.quotation-requests.*') ? 'active' : '' }}">
                         <i class="fas fa-inbox w-5"></i>
-                        <span>Quotation Requests</span>
+                        <span>{{ __('messages.quotation_requests') }}</span>
                         @php
                             $pendingCount = 0;
                             if (Auth::check() && Auth::user()->getCurrentProvider()) {
@@ -220,7 +220,7 @@
                 @if(auth()->user()->isProviderOwner())
                 <a href="{{ route('provider.staff.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.staff.*') ? 'active' : '' }}">
                     <i class="fas fa-users w-5"></i>
-                    <span>Team</span>
+                    <span>{{ __('messages.team') }}</span>
                 </a>
                 @endif
                 <!-- Suppliers (Owner Only) -->
@@ -278,7 +278,7 @@
                             <div id="providerNotifPanel" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                                 <div class="px-4 py-3 border-b flex justify-between items-center">
                                     <h3 class="font-semibold text-gray-800">Notifications</h3>
-                                    <a href="#" id="providerNotifMarkAll" class="text-xs text-blue-600 hover:underline">Mark all read</a>
+                                    <a href="#" id="providerNotifMarkAll" class="text-xs text-blue-600 hover:underline">{{ __('messages.mark_all_read') }}</a>
                                 </div>
                                 <div id="providerNotifList">
                                     <p class="p-4 text-sm text-gray-500 text-center">No notifications</p>
@@ -326,17 +326,11 @@
                             </div>
                             <!-- Logout -->
                                 <a href="{{ route('traveler.my-bookings', ['ctx' => 'provider']) }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#374151;background:#eff6ff;border:1px solid #bfdbfe;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-      My Bookings
-    </a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>{{ __('messages.my_bookings') }}</a>
     <a href="{{ route('orders.index', ['ctx' => 'provider']) }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#374151;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      My Orders
-    </a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>{{ __('messages.my_orders') }}</a>
     <a href="{{ route('wholesale.rfq.index', ['ctx' => 'provider']) }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#374151;background:#fffbeb;border:1px solid #fde68a;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 21V9"/></svg>
-      My RFQs
-    </a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 21V9"/></svg>{{ __('messages.my_rfqs') }}</a>
 <a href="{{ route('provider.my-purchases') }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#5b21b6;background:#f5f3ff;border:1px solid #ddd6fe;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       {{ __('messages.my_purchases') }}

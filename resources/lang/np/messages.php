@@ -2767,4 +2767,9 @@ return array (
   'booking_limit_reached' => 'यो महिनाको बुकिङ सीमा सकियो। कृपया प्लान अपग्रेड गर्नुहोस्।',
   'nrb_convertible_buy_only' => 'NRB: परिवर्तनीय मुद्रा (USD/EUR/GBP/AUD/CNY) खरिद मात्र। INR खरिद/बिक्री दुवै।',
   'suppliers' => 'आपूर्तिकर्ताहरू',
+  'my_orders' => 'मेरा अर्डरहरू',
+  'mark_all_read' => 'सबै पढिएको चिन्ह लगाउनुहोस्',
+  'ai_quotation' => 'AI कोटेशन',
+  'quotation_requests' => 'कोटेशन अनुरोधहरू',
+  'team' => 'टोली',
 );

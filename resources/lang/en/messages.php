@@ -2746,4 +2746,9 @@ return array (
   'booking_limit_reached' => 'Booking limit reached for this month. Please upgrade your plan.',
   'nrb_convertible_buy_only' => 'NRB: Convertible currencies (USD/EUR/GBP/AUD/CNY) are buy-only. INR allows buy/sell.',
   'suppliers' => 'Suppliers',
+  'my_orders' => 'My Orders',
+  'mark_all_read' => 'Mark all read',
+  'ai_quotation' => 'AI Quotation',
+  'quotation_requests' => 'Quotation Requests',
+  'team' => 'Team',
 );
