@@ -56,6 +56,22 @@ class SosController extends Controller
             'status'      => 'pending',
         ]);
 
+        // Notify admins: SOS alert (safety-critical)
+        try {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    '🚨 SOS ALERT',
+                    ($user->name ?? 'Traveler') . ' triggered SOS' . (!empty($validated['message']) ? ': ' . $validated['message'] : ''),
+                    'sos',
+                    url('/admin/dashboard'),
+                    $sos->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin SOS notify failed', ['sos_id' => $sos->id, 'error' => $e->getMessage()]);
+        }
+
         // Dispatch notification (queue)
         try {
             SendSosNotification::dispatch($sos);

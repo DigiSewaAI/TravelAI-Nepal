@@ -37,6 +37,22 @@ class RegisterController extends Controller
 
         Auth::guard('agency')->login($agency);
 
+        // Notify admins: new agency registered
+        try {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'New Agency Registered',
+                    $agency->name . ' (' . $agency->email . ')',
+                    'agency',
+                    url('/admin/dashboard'),
+                    $agency->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin agency-reg notify failed', ['agency_id' => $agency->id, 'error' => $e->getMessage()]);
+        }
+
         return redirect()->route('agency.dashboard');
     }
 }

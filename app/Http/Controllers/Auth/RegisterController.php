@@ -158,6 +158,25 @@ class RegisterController extends Controller
                 Auth::login($user);
                 app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
 
+                // Notify admins: new provider registered
+                try {
+                    $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.providers.show')
+                        ? route('admin.providers.show', $provider->id)
+                        : url('/admin/dashboard');
+                    $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+                    foreach ($admins as $admin) {
+                        $admin->notify(new \App\Notifications\AdminAlertNotification(
+                            'New Provider Registered',
+                            $user->name . ' (' . $user->email . ') - ' . ($provider->name ?? 'Business'),
+                            'provider',
+                            $__adminUrl,
+                            $provider->id
+                        ));
+                    }
+                } catch (\Throwable $e) {
+                    \Log::warning('Admin provider-reg notify failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+                }
+
                 // Redirect based on plan
                 if ($isFree) {
                     return redirect()->route('provider.dashboard')
@@ -176,6 +195,25 @@ class RegisterController extends Controller
             $oldSessionId = session()->getId();
             Auth::login($user);
             app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
+
+            // Notify admins: new traveler registered
+            try {
+                $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.users.show')
+                    ? route('admin.users.show', $user->id)
+                    : url('/admin/dashboard');
+                $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new \App\Notifications\AdminAlertNotification(
+                        'New Traveler Registered',
+                        $user->name . ' (' . $user->email . ')',
+                        'user',
+                        $__adminUrl,
+                        $user->id
+                    ));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Admin traveler-reg notify failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            }
 
             // ✅ Redirect intended checkout or dashboard
             return redirect()->intended(route('traveler.dashboard'))

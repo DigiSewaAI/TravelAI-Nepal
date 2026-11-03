@@ -46,6 +46,25 @@ class VerificationController extends Controller
             'status' => 'pending',
         ]);
 
+        // Notify admins: verification document submitted
+        try {
+            $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.providers.show')
+                ? route('admin.providers.show', $provider->id)
+                : url('/admin/dashboard');
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'Verification Document Submitted',
+                    $provider->name . ' uploaded ' . $request->type,
+                    'verification',
+                    $__adminUrl,
+                    $provider->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin verification notify failed', ['provider_id' => $provider->id, 'error' => $e->getMessage()]);
+        }
+
         return back()->with('success', 'Document uploaded successfully. It will be reviewed shortly.');
     }
 

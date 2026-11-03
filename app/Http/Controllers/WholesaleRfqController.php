@@ -47,6 +47,25 @@ class WholesaleRfqController extends Controller
             'status'        => 'pending',
         ]);
 
+        // Notify admins: new RFQ
+        try {
+            $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.providers.show')
+                ? route('admin.providers.show', $product->provider_id)
+                : url('/admin/dashboard');
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'New Wholesale RFQ',
+                    (auth()->user()->name ?? 'Buyer') . ' requested quote for ' . ($product->name ?? 'Product') . ' (Qty ' . ($validated['quantity'] ?? 0) . ')',
+                    'rfq',
+                    $__adminUrl,
+                    $rfq->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin RFQ notify failed', ['rfq_id' => $rfq->id, 'error' => $e->getMessage()]);
+        }
+
         $providerIds = $product->provider_id ? [(int)$product->provider_id] : [];
         $__prodName = $product->name ?? 'Product';
         $__qty = $validated['quantity'] ?? 0;

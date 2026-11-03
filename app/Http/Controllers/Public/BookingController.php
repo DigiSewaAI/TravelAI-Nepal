@@ -169,6 +169,25 @@ class BookingController extends Controller
             ['booking' => $booking->id]
         );
 
+        // Notify admins: new booking
+        try {
+            $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.bookings.show')
+                ? route('admin.bookings.show', $booking->id)
+                : url('/admin/dashboard');
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    'New Booking',
+                    ($validated['name'] ?? 'Traveler') . ' booked ' . ($service->name ?? 'service'),
+                    'booking',
+                    $__adminUrl,
+                    $booking->id
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin booking notify failed', ['booking_id' => $booking->id, 'error' => $e->getMessage()]);
+        }
+
         $providerIds = $service->provider_id ? [(int)$service->provider_id] : [];
         $__svcName = $service->name ?? 'Service';
         $__travelerName = $validated['name'] ?? 'Guest';
