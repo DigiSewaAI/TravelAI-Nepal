@@ -54,12 +54,14 @@ class WholesaleRfqController extends Controller
 
         $validated = $request->validate([
             'quoted_price'      => 'required|numeric|min:0',
+                'delivery_charge' => 'nullable|numeric|min:0',
             'provider_response' => 'nullable|string|max:2000',
             'valid_until'       => 'nullable|date|after:today',
         ]);
 
         $rfq->update([
             'quoted_price'      => $validated['quoted_price'],
+            'delivery_charge' => $validated['delivery_charge'] ?? null,
             'quoted_total'      => $validated['quoted_price'] * $rfq->quantity,
             'provider_response' => $validated['provider_response'] ?? null,
             'valid_until'       => $validated['valid_until'] ?? now()->addDays(7)->toDateString(),

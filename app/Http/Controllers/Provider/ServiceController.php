@@ -102,6 +102,21 @@ class ServiceController extends Controller
             abort(403, 'No provider found.');
         }
 
+        // Pricing limits — check category-based
+        $categoryId = $request->input('service_category_id');
+        $category = $categoryId ? \App\Models\ServiceCategory::find($categoryId) : null;
+        if ($category) {
+            if ($category->slug === 'trekking') {
+                if ($redirect = $this->checkPlanLimit($provider, 'max_treks', \App\Models\Service::class, 'treks')) {
+                    return $redirect;
+                }
+            } elseif (in_array($category->slug, ['hotel', 'resort', 'lodge', 'homestay'])) {
+                if ($redirect = $this->checkPlanLimit($provider, 'max_hotels', \App\Models\Service::class, 'hotels')) {
+                    return $redirect;
+                }
+            }
+        }
+
         // DYNAMIC-UI: Product Provider ले सिधै URL बाट पनि Service बनाउन नपाउने
         $providerTypeSlug = $provider->types()->first()?->slug;
         if (in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider'])) {

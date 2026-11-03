@@ -134,7 +134,33 @@
                         </span>
                     </div>
 
-                    <button type="submit"
+                    
+
+{{-- payment_preview_section --}}
+@php
+    $previewMethods = \Illuminate\Support\Facades\Schema::hasTable("platform_payment_methods")
+        ? \Illuminate\Support\Facades\DB::table("platform_payment_methods")->where("is_active", 1)->get()
+        : collect();
+    if ($previewMethods->isEmpty()) {
+        $previewMethods = collect([
+            (object)["name" => "Cash on Delivery", "icon" => "💵"],
+            (object)["name" => "eSewa", "icon" => "📱"],
+            (object)["name" => "Khalti", "icon" => "💳"],
+            (object)["name" => "Bank Transfer", "icon" => "🏦"],
+        ]);
+    }
+@endphp
+<div style="background:#f0f9ff;border:1px solid #3b82f6;border-radius:10px;padding:14px;margin:16px 0;">
+    <div style="font-weight:800;color:#1e40af;margin-bottom:8px;font-size:13px;">💳 Payment Methods Available</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        @foreach ($previewMethods as $pm)
+            <span style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;">{{ $pm->icon ?? "💳" }} {{ $pm->name ?? "Method" }}</span>
+        @endforeach
+    </div>
+    <div style="font-size:11px;color:#64748b;margin-top:8px;">Final payment method selected after order placement.</div>
+</div>
+
+<button type="submit"
                             class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition">
                         <i class="fas fa-check mr-2"></i> {{ __('messages.checkout_place_order') }}
                     </button>

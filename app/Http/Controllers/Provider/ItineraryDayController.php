@@ -40,6 +40,16 @@ class ItineraryDayController extends Controller
     {
         $this->authorize('update', $service);
 
+        // Pricing limit — max_itinerary_days
+        $provider = $service->provider ?? Auth::user()->getCurrentProvider();
+        if ($provider) {
+            $existingDays = \App\Models\ServiceItineraryDay::where('service_id', $service->id)->count();
+            $maxDays = (int) $provider->getMaxItineraryDaysAttribute();
+            if ($maxDays !== -1 && $maxDays > 0 && $existingDays >= $maxDays) {
+                return back()->withErrors(['limit' => 'Itinerary day limit reached (' . $maxDays . ' days). Please upgrade your plan.']);
+            }
+        }
+
         $validated = $request->validate([
             'title'                  => 'required|string|max:255',
             'description'            => 'nullable|string',

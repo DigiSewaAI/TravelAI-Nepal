@@ -84,6 +84,7 @@
                         <label style="display:block;font-size:12px;font-weight:700;color:var(--muted,#6b7280);margin-bottom:5px">{{ __('messages.rfq_quote_price') }} (NPR/unit) *</label>
                         <input type="number" name="quoted_price" step="0.01" min="0" required
                                style="width:100%;padding:10px 14px;border:1px solid var(--line,#e7eaf3);border-radius:10px;font-size:13px;font-weight:600;background:#fff;color:var(--text,#111827)">
+            <input type="number" step="0.01" name="delivery_charge" placeholder="Delivery charge (Rs, optional)" style="width:100%;padding:10px;margin-top:6px;border:1px solid var(--line);border-radius:10px;font-size:13px;">
                     </div>
                     <div>
                         <label style="display:block;font-size:12px;font-weight:700;color:var(--muted,#6b7280);margin-bottom:5px">{{ __('messages.rfq_valid_until') }}</label>

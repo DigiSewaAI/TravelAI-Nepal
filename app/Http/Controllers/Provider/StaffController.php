@@ -61,6 +61,11 @@ class StaffController extends Controller
 
         $provider = $this->resolveProvider();
 
+        // Pricing limit — max_staff
+        if ($redirect = $this->checkPlanLimit($provider, 'max_staff', \App\Models\ProviderStaff::class, 'staff')) {
+            return $redirect;
+        }
+
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
