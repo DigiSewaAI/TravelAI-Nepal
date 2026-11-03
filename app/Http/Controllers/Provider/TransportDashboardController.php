@@ -175,6 +175,20 @@ class TransportDashboardController extends Controller
             'amount' => 'required|numeric|min:0',
         ]);
 
+        // TRANSPORT-TIME-OVERLAP: prevent double-booking same vehicle at same time
+        $conflict = DB::table('transport_bookings')
+            ->where('provider_id', $provider->id)
+            ->where('vehicle_id', $validated['vehicle_id'])
+            ->where('travel_date', $validated['travel_date'])
+            ->where('status', '!=', 'cancelled')
+            ->whereNotNull('travel_time')
+            ->where('travel_time', $validated['travel_time'] ?? null)
+            ->exists();
+        if ($conflict) {
+            return back()->withErrors(['vehicle_id' => 'This vehicle is already booked for the selected date and time.'])->withInput();
+        }
+
+
         TransportBooking::create([
             'provider_id' => $provider->id,
             'vehicle_id' => $validated['vehicle_id'],
