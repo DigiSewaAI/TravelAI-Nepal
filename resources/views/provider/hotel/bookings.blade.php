@@ -57,7 +57,7 @@
           <th>{{ __('messages.nights') }}</th>
           <th>{{ __('messages.amount') }}</th>
           <th>{{ __('messages.status') }}</th>
-          <th style="text-align:right;">Actions</th>
+          <th style="text-align:right;">{{ __('messages.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -89,18 +89,18 @@
             <td style="font-weight:800">Rs {{ number_format($b->amount) }}</td>
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
             <td style="text-align:right;white-space:nowrap;">
-              <a href="{{ route('provider.hotel.bookings.show', $b) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;"><i class="fas fa-eye"></i> View</a>
+              <a href="{{ route('provider.hotel.bookings.show', $b) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;"><i class="fas fa-eye"></i> {{ __('messages.view') }}</a>
               @if($b->status === 'pending')
                 <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
                   @csrf @method('PATCH')
                   <input type="hidden" name="action" value="check_in">
-                  <button type="submit" class="act-btn act-in">Check In</button>
+                  <button type="submit" class="act-btn act-in">{{ __('messages.check_in') }}</button>
                 </form>
               @elseif($b->status === 'checked_in')
                 <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
                   @csrf @method('PATCH')
                   <input type="hidden" name="action" value="check_out">
-                  <button type="submit" class="act-btn act-out">Check Out</button>
+                  <button type="submit" class="act-btn act-out">{{ __('messages.check_out') }}</button>
                 </form>
               @endif
               <form action="{{ route('provider.hotel.bookings.destroy', $b) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete this booking?')">

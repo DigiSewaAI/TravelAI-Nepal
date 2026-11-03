@@ -94,10 +94,10 @@
         <div>
           <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.category') }}</label>
           <select name="category" id="ea_category" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-            <option value="painting">Painting</option>
-            <option value="sculpture">Sculpture</option>
-            <option value="handicraft">Handicraft</option>
-            <option value="mural">Mural</option>
+            <option value="painting">{{ __('messages.painting') }}</option>
+            <option value="sculpture">{{ __('messages.sculpture') }}</option>
+            <option value="handicraft">{{ __('messages.handicraft') }}</option>
+            <option value="mural">{{ __('messages.mural') }}</option>
           </select>
         </div>
       </div>
@@ -109,9 +109,9 @@
         <div>
           <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
           <select name="status" id="ea_status" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-            <option value="available">Available</option>
-            <option value="sold">Sold</option>
-            <option value="custom">Custom</option>
+            <option value="available">{{ __('messages.available') }}</option>
+            <option value="sold">{{ __('messages.sold') }}</option>
+            <option value="custom">{{ __('messages.custom') }}</option>
           </select>
         </div>
       </div>

@@ -148,7 +148,7 @@
     </div>
 
     <div class="svcf-card">
-      <div class="svcf-card-title">Additional Details</div>
+      <div class="svcf-card-title">{{ __('messages.additional_details') }}</div>
       @include('provider.services._fields_trek', ['service' => $service])
       @include('provider.services._fields_tour', ['service' => $service])
       @include('provider.services._fields_hotel', ['service' => $service])

@@ -102,7 +102,7 @@
     </div>
 
     <div class="pcf-card">
-      <div class="pcf-card-title">Media & Status</div>
+      <div class="pcf-card-title">{{ __('messages.media_status') }}</div>
       <div style="margin-bottom:16px;">
         <label>{{ __('messages.product_cover_image') }}</label>
         @if($product->cover_image)
@@ -121,7 +121,7 @@
     </div>
 
     <div class="pcf-card">
-      <div class="pcf-card-title">Type-Specific Details</div>
+      <div class="pcf-card-title">{{ __('messages.type_specific_details') }}</div>
       @if($type === 'shop')
         @include('provider.products._fields_shop', ['product' => $product])
       @elseif($type === 'rental')

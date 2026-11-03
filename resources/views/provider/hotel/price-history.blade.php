@@ -22,7 +22,7 @@
     @if($history->isEmpty())
         <div style="background:var(--card,#fff);border:1px solid var(--line,#e6ecf4);border-radius:16px;padding:40px;text-align:center;">
             <div style="font-size:48px;margin-bottom:12px;">📋</div>
-            <h3 style="font-size:16px;font-weight:800;margin:0 0 6px;">No price changes yet</h3>
+            <h3 style="font-size:16px;font-weight:800;margin:0 0 6px;">{{ __('messages.no_price_changes_yet') }}</h3>
             <p style="font-size:13px;color:var(--muted,#6b7a90);margin:0;">Changes will appear here after applying AI pricing suggestions.</p>
         </div>
     @else
@@ -31,10 +31,10 @@
                 <thead>
                     <tr style="background:var(--bg,#f5f7fb);">
                         <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Room</th>
-                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Change</th>
-                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Reason</th>
-                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Changed By</th>
-                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Date</th>
+                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.change') }}</th>
+                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.reason') }}</th>
+                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.changed_by') }}</th>
+                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.date') }}</th>
                     </tr>
                 </thead>
                 <tbody>

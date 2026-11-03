@@ -162,14 +162,14 @@
                                 {{ ucfirst($order->status) }}
                             </span>
                             <a href="{{ route('provider.orders.show', $order) }}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 font-bold text-xs transition-colors flex items-center gap-1.5" title="View Order">
-                                <i class="fas fa-eye"></i> View
+                                <i class="fas fa-eye"></i> {{ __('messages.view') }}
                             </a>
                         </div>
                     </div>
                 @empty
                     <div class="flex flex-col items-center justify-center py-10">
                         <i class="fas fa-shopping-bag text-4xl text-gray-200 mb-3"></i>
-                        <p class="text-gray-500 font-medium">No orders yet.</p>
+                        <p class="text-gray-500 font-medium">{{ __('messages.no_orders_yet') }}</p>
                     </div>
                 @endforelse
             @else
@@ -187,7 +187,7 @@
                         </div>
                         <div class="flex items-center gap-2 sm:gap-3">
                             <a href="{{ route('provider.bookings.show', $booking) }}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 font-bold text-xs transition-colors flex items-center gap-1.5" title="View Booking">
-                                <i class="fas fa-eye"></i> View
+                                <i class="fas fa-eye"></i> {{ __('messages.view') }}
                             </a>
                         </div>
                     </div>

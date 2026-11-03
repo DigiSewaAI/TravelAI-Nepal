@@ -47,9 +47,9 @@
                     <td style="font-weight:800;">Rs {{ number_format($item->price) }}</td>
                     <td>
                         @if($item->is_available)
-                            <span class="pill" style="background:var(--green-soft);color:#047857;">Available</span>
+                            <span class="pill" style="background:var(--green-soft);color:#047857;">{{ __('messages.available') }}</span>
                         @else
-                            <span class="pill" style="background:var(--red-soft);color:#b91c1c;">Unavailable</span>
+                            <span class="pill" style="background:var(--red-soft);color:#b91c1c;">{{ __('messages.unavailable') }}</span>
                         @endif
                     </td>
                     <td style="text-align:right;">
@@ -104,7 +104,7 @@
 <div id="editMenuModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
     <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Edit Menu Item</h3>
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_menu_item') }}</h3>
             <button type="button" onclick="closeEditMenuModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
         <form id="editMenuForm" method="POST">
@@ -125,7 +125,7 @@
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.emoji') }}</label>
                 <input type="text" name="emoji" id="edit_menu_emoji" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
-            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">Update Menu Item</button>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_menu_item') }}</button>
         </form>
     </div>
 </div>

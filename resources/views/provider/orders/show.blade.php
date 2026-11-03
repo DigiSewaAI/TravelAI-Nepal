@@ -230,8 +230,8 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.provider_order_status_label') }}</label>
                 <select name="status" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     <option value="confirmed" {{ $currentStatus === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                    <option value="shipped"   {{ $currentStatus === 'shipped'   ? 'selected' : '' }}>Shipped</option>
-                    <option value="delivered" {{ $currentStatus === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                    <option value="shipped"   {{ $currentStatus === 'shipped'   ? 'selected' : '' }}>{{ __('messages.shipped') }}</option>
+                    <option value="delivered" {{ $currentStatus === 'delivered' ? 'selected' : '' }}>{{ __('messages.delivered') }}</option>
                     <option value="cancelled" {{ $currentStatus === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                 </select>
             </div>

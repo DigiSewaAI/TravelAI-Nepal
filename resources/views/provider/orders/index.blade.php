@@ -29,12 +29,12 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b">
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Order</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Customer</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Items</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Total</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Status</th>
-                        <th class="text-left py-3 text-sm font-semibold text-gray-600">Actions</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.order') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.customer') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.items') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.total') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.status') }}</th>
+                        <th class="text-left py-3 text-sm font-semibold text-gray-600">{{ __('messages.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +65,7 @@
                             <td class="py-3 text-sm">
                                 <a href="{{ route('provider.orders.show', $order) }}"
                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium">
-                                    View
+                                    {{ __('messages.view') }}
                                 </a>
                             </td>
                         </tr>

@@ -10,8 +10,8 @@
            class="text-xs flex-1">
 
     <select name="media_type" required class="px-2 py-1 border rounded text-xs">
-        <option value="image">Image</option>
-        <option value="video">Video</option>
+        <option value="image">{{ __('messages.image') }}</option>
+        <option value="video">{{ __('messages.video') }}</option>
     </select>
 
     <input type="text" name="alt_text" placeholder="Alt text (optional)" maxlength="255"

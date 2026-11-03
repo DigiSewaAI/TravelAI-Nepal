@@ -14,7 +14,7 @@
     {{-- Header --}}
     <div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Complete Your Payment</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">{{ __('messages.complete_your_payment') }}</h1>
             <p class="text-gray-500 mt-1">
                 {{ $subscription->plan->name }} Plan ·
                 Rs. {{ number_format($subscription->plan->price_monthly ?? 0, 2) }} / month
@@ -120,11 +120,11 @@
                                     <p class="text-sm font-medium text-gray-800 mb-1">{{ $method->bank_name }}</p>
                                 @endif
                                 @if($method->account_name)
-                                    <p class="text-xs text-gray-500">Account Name</p>
+                                    <p class="text-xs text-gray-500">{{ __('messages.account_name') }}</p>
                                     <p class="text-sm font-medium text-gray-800 mb-1">{{ $method->account_name }}</p>
                                 @endif
                                 @if($method->account_number)
-                                    <p class="text-xs text-gray-500">Account Number</p>
+                                    <p class="text-xs text-gray-500">{{ __('messages.account_number') }}</p>
                                     <p class="text-sm font-mono font-medium text-gray-800 mb-1">{{ $method->account_number }}</p>
                                 @endif
                                 @if($method->identifier)
@@ -158,7 +158,7 @@
                     <div class="flex items-start gap-3">
                         <i class="fas fa-hourglass-half text-orange-500 text-2xl mt-1"></i>
                         <div>
-                            <h3 class="font-bold text-orange-800">Awaiting Verification</h3>
+                            <h3 class="font-bold text-orange-800">{{ __('messages.awaiting_verification') }}</h3>
                             <p class="text-sm text-orange-700 mt-1">
                                 Your payment proof was submitted on
                                 {{ $pendingPayment->created_at->format('M d, Y g:i A') }}.
@@ -185,7 +185,7 @@
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Reference Number <span class="text-red-500">*</span>
+                                {{ __('messages.reference_number') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="reference_number" required
                                    value="{{ old('reference_number') }}"
@@ -198,7 +198,7 @@
 
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">
-                                Upload Receipt <span class="text-red-500">*</span>
+                                {{ __('messages.upload_receipt') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="file" name="receipt" accept="image/*,application/pdf" required
                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('receipt') border-red-500 @enderror">
@@ -227,15 +227,15 @@
                 </h4>
                 <dl class="space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">Plan</dt>
+                        <dt class="text-gray-500">{{ __('messages.plan') }}</dt>
                         <dd class="font-semibold text-gray-800">{{ $subscription->plan->name }}</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">Amount</dt>
+                        <dt class="text-gray-500">{{ __('messages.amount') }}</dt>
                         <dd class="font-semibold text-gray-800">Rs. {{ number_format($subscription->plan->price_monthly ?? 0, 2) }} / mo</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">Billing</dt>
+                        <dt class="text-gray-500">{{ __('messages.billing') }}</dt>
                         <dd class="font-semibold text-gray-800">{{ ucfirst($subscription->billing_interval ?? 'monthly') }}</dd>
                     </div>
                 </dl>

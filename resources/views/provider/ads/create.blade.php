@@ -59,8 +59,8 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_link_target_label') }}</label>
                     <select name="link_target" class="w-full border rounded-lg px-3 py-2">
-                        <option value="_blank">New Tab</option>
-                        <option value="_self">Same Tab</option>
+                        <option value="_blank">{{ __('messages.new_tab') }}</option>
+                        <option value="_self">{{ __('messages.same_tab') }}</option>
                     </select>
                 </div>
             </div>
@@ -121,9 +121,9 @@
                         <select name="payment_method" required class="w-full border rounded-lg px-3 py-2">
                             <option value="">— Select —</option>
                             <option value="eSewa">eSewa</option>
-                            <option value="Khalti">Khalti</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="IME Pay">IME Pay</option>
+                            <option value="Khalti">{{ __('messages.khalti') }}</option>
+                            <option value="Bank Transfer">{{ __('messages.bank_transfer') }}</option>
+                            <option value="IME Pay">{{ __('messages.ime_pay') }}</option>
                         </select>
                     </div>
                     <div>

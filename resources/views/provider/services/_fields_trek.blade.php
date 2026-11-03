@@ -16,9 +16,9 @@
         <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.difficulty') }} *</label>
         <select name="difficulty" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('difficulty') border-red-500 @enderror">
             <option value="">-- {{ __('messages.difficulty') }} --</option>
-            <option value="easy" {{ old('difficulty', $detail?->difficulty ?? '') == 'easy' ? 'selected' : '' }}>Easy</option>
-            <option value="moderate" {{ old('difficulty', $detail?->difficulty ?? '') == 'moderate' ? 'selected' : '' }}>Moderate</option>
-            <option value="hard" {{ old('difficulty', $detail?->difficulty ?? '') == 'hard' ? 'selected' : '' }}>Hard</option>
+            <option value="easy" {{ old('difficulty', $detail?->difficulty ?? '') == 'easy' ? 'selected' : '' }}>{{ __('messages.easy') }}</option>
+            <option value="moderate" {{ old('difficulty', $detail?->difficulty ?? '') == 'moderate' ? 'selected' : '' }}>{{ __('messages.moderate') }}</option>
+            <option value="hard" {{ old('difficulty', $detail?->difficulty ?? '') == 'hard' ? 'selected' : '' }}>{{ __('messages.hard') }}</option>
         </select>
         @error('difficulty')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

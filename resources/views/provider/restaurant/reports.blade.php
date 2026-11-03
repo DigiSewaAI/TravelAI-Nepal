@@ -27,7 +27,7 @@
 <div class="card" style="background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px;">
     <h3 style="font-size:16px; font-weight:800; margin-bottom:15px;">{{ __('messages.recent_orders') }}</h3>
     <table style="width:100%; border-collapse:collapse;">
-        <thead><tr><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">Order #</th><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">Amount</th><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">Status</th></tr></thead>
+        <thead><tr><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">Order #</th><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">{{ __('messages.amount') }}</th><th style="text-align:left; padding:10px; border-bottom:1px solid var(--line);">{{ __('messages.status') }}</th></tr></thead>
         <tbody>
             @forelse($orders as $o)
             <tr><td style="padding:10px; border-bottom:1px solid var(--line);">#{{ $o->order_number }}</td><td style="padding:10px; border-bottom:1px solid var(--line);">Rs {{ number_format($o->total) }}</td><td style="padding:10px; border-bottom:1px solid var(--line);">{{ ucfirst($o->status) }}</td></tr>
@@ -79,9 +79,9 @@ async function loadRestaurantForecast(){
     const data=await restaurantAiPost('{{ route("provider.restaurant.ai.forecast") }}');
     if(data.error){ rAiErr(out, data.message||data.error); return; }
     let html='';
-    if(data.avg_orders_per_day !== undefined) html+='<div style="font-size:11px;margin-bottom:8px;padding:8px;background:var(--bg,#f5f7fb);border-radius:8px;"><strong>Historical avg:</strong> '+data.avg_orders_per_day+' orders/day · Rs '+data.avg_revenue_per_day+'/day'+(data.avg_order_value?' · Rs '+data.avg_order_value+' avg order value':'')+(data.data_quality==='insufficient'?' <span style="background:#9ca3af;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">INSUFFICIENT</span>':(data.data_quality==='sparse'?' <span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">SPARSE</span>':''))+'</div>';
+    if(data.avg_orders_per_day !== undefined) html+='<div style="font-size:11px;margin-bottom:8px;padding:8px;background:var(--bg,#f5f7fb);border-radius:8px;"><strong>Historical avg:</strong> '+data.avg_orders_per_day+' orders/day · Rs '+data.avg_revenue_per_day+'/day'+(data.avg_order_value?' · Rs '+data.avg_order_value+' avg order value':'')+(data.data_quality==='insufficient'?' <span style="background:#9ca3af;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">{{ __('messages.insufficient') }}</span>':(data.data_quality==='sparse'?' <span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">{{ __('messages.sparse') }}</span>':''))+'</div>';
     html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
-    (data.days||[]).forEach(d=>{ var _baseline = data.is_baseline?' <span style="background:#9ca3af;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;">BASELINE</span>':''; html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+_baseline+'</span><strong>'+d.predicted_orders+' orders · Rs '+d.predicted_revenue+' · '+({low:'Low',med:'Medium',high:'High'}[d.confidence]||d.confidence)+'</strong></div>'; });
+    (data.days||[]).forEach(d=>{ var _baseline = data.is_baseline?' <span style="background:#9ca3af;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;">{{ __('messages.baseline') }}</span>':''; html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span>'+d.date+_baseline+'</span><strong>'+d.predicted_orders+' orders · Rs '+d.predicted_revenue+' · '+({low:'Low',med:'Medium',high:'High'}[d.confidence]||d.confidence)+'</strong></div>'; });
     out.innerHTML=html;
   }catch(e){ rAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
 }

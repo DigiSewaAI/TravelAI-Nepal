@@ -162,7 +162,7 @@
             @endif
 
             <div>
-                <div class="brand-name">TravelAI Nepal</div>
+                <div class="brand-name">{{ __('messages.travelai_nepal') }}</div>
                 
             </div>
         </div>

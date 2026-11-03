@@ -21,15 +21,15 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
         <div style="background:var(--card,#fff);border:1px solid var(--line,#ede1d3);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#2b1e16)">Client</h3>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#2b1e16)">{{ __('messages.client') }}</h3>
             <div style="font-size:14px;font-weight:700">{{ $order->client_name }}</div>
             @if($order->client_email)<div style="font-size:13px;color:var(--muted,#8a7565);margin-top:4px">{{ $order->client_email }}</div>@endif
         </div>
         <div style="background:var(--card,#fff);border:1px solid var(--line,#ede1d3);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#2b1e16)">Details</h3>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#8a7565)">Type</span><span style="font-weight:700">{{ ucfirst($order->type) }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#8a7565)">Deadline</span><span style="font-weight:700">{{ $order->deadline ? \Carbon\Carbon::parse($order->deadline)->format('M d, Y') : 'N/A' }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#ede1d3)"><span>Budget</span><span style="color:var(--accent,#c65d3b)">NPR {{ number_format($order->budget, 2) }}</span></div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#2b1e16)">{{ __('messages.details') }}</h3>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#8a7565)">{{ __('messages.type') }}</span><span style="font-weight:700">{{ ucfirst($order->type) }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#8a7565)">{{ __('messages.deadline') }}</span><span style="font-weight:700">{{ $order->deadline ? \Carbon\Carbon::parse($order->deadline)->format('M d, Y') : 'N/A' }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#ede1d3)"><span>{{ __('messages.budget') }}</span><span style="color:var(--accent,#c65d3b)">NPR {{ number_format($order->budget, 2) }}</span></div>
         </div>
     </div>
 </div>

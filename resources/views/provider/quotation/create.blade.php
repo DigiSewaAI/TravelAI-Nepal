@@ -6,7 +6,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-bold mb-4">Generate AI Quotation</h2>
+        <h2 class="text-2xl font-bold mb-4">{{ __('messages.generate_ai_quotation') }}</h2>
 
         @if(session('error'))
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
@@ -46,13 +46,13 @@
             </div>
 
             <div>
-                <label class="block font-medium mb-1">Customer Email</label>
+                <label class="block font-medium mb-1">{{ __('messages.customer_email') }}</label>
                 <input type="email" name="customer_email" id="customer_email"
                        class="w-full border rounded-lg px-4 py-2">
             </div>
 
             <div>
-                <label class="block font-medium mb-1">Customer Phone</label>
+                <label class="block font-medium mb-1">{{ __('messages.customer_phone') }}</label>
                 <input type="text" name="customer_phone" id="customer_phone"
                        class="w-full border rounded-lg px-4 py-2">
             </div>
@@ -60,7 +60,7 @@
             <div>
                 <label class="block font-medium mb-1">Service *</label>
                 <select name="service_id" id="service_id" required class="w-full border rounded-lg px-4 py-2">
-                    <option value="">Select a service...</option>
+                    <option value="">{{ __('messages.select_a_service') }}</option>
                     @foreach($services as $service)
                         <option value="{{ $service->id }}"
                                 data-days="{{ $service->trekDetail?->duration_days ?? $service->tourDetail?->duration_days ?? '' }}">
@@ -104,7 +104,7 @@
             </div>
 
             <div>
-                <label class="block font-medium mb-1">Additional Notes</label>
+                <label class="block font-medium mb-1">{{ __('messages.additional_notes') }}</label>
                 <textarea name="notes" id="notes" rows="3"
                           class="w-full border rounded-lg px-4 py-2"
                           placeholder="e.g., Special requests, travel dates, group size..."></textarea>
@@ -112,19 +112,19 @@
 
             <button type="submit" id="generateBtn"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
-                <i class="fas fa-magic"></i> Generate Quotation
+                <i class="fas fa-magic"></i> {{ __('messages.generate_quotation') }}
             </button>
         </form>
 
         <div id="result" class="mt-6 hidden">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xl font-bold text-gray-800">Generated Quotation</h3>
+                <h3 class="text-xl font-bold text-gray-800">{{ __('messages.generated_quotation') }}</h3>
                 <div class="flex gap-2">
                     <button onclick="copyQuotation()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1">
-                        <i class="fas fa-copy"></i> Copy
+                        <i class="fas fa-copy"></i> {{ __('messages.copy') }}
                     </button>
                     <button onclick="downloadQuotation()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-1">
-                        <i class="fas fa-download"></i> Download
+                        <i class="fas fa-download"></i> {{ __('messages.download') }}
                     </button>
                 </div>
             </div>

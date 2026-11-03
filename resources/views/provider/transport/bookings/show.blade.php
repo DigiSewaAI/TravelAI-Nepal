@@ -21,18 +21,18 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
         <div style="background:var(--card,#fff);border:1px solid var(--line,#e4ecf6);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">Passenger</h3>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">{{ __('messages.passenger') }}</h3>
             <div style="font-size:14px;font-weight:700">{{ $booking->passenger_name ?? 'N/A' }}</div>
             @if($booking->passenger_email)<div style="font-size:13px;color:var(--muted,#6b7f96);margin-top:4px">{{ $booking->passenger_email }}</div>@endif
         </div>
         <div style="background:var(--card,#fff);border:1px solid var(--line,#e4ecf6);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">Trip Details</h3>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">Route</span><span style="font-weight:700">{{ $booking->route_name ?? 'N/A' }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">Travel Date</span><span style="font-weight:700">{{ $booking->travel_date ? \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') : 'N/A' }}</span></div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">{{ __('messages.trip_details') }}</h3>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">{{ __('messages.route') }}</span><span style="font-weight:700">{{ $booking->route_name ?? 'N/A' }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">{{ __('messages.travel_date') }}</span><span style="font-weight:700">{{ $booking->travel_date ? \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') : 'N/A' }}</span></div>
             @if($booking->vehicle)
-                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">Vehicle</span><span style="font-weight:700">{{ $booking->vehicle->vehicle_number ?? $booking->vehicle->name ?? 'N/A' }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#6b7f96)">{{ __('messages.vehicle') }}</span><span style="font-weight:700">{{ $booking->vehicle->vehicle_number ?? $booking->vehicle->name ?? 'N/A' }}</span></div>
             @endif
-            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#e4ecf6)"><span>Amount</span><span style="color:var(--accent,#0ea5e9)">Rs {{ number_format($booking->amount, 2) }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#e4ecf6)"><span>{{ __('messages.amount') }}</span><span style="color:var(--accent,#0ea5e9)">Rs {{ number_format($booking->amount, 2) }}</span></div>
         </div>
     </div>
 </div>

@@ -26,19 +26,19 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
         <div style="background:var(--card,#fff);border:1px solid var(--line,#efe7de);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#1c1917)">Customer</h3>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#1c1917)">{{ __('messages.customer') }}</h3>
             <div style="font-size:14px;font-weight:700">{{ $order->customer_name ?? 'Walk-in Customer' }}</div>
             @if($order->customer_phone)<div style="font-size:13px;color:var(--muted,#78716c);margin-top:4px">{{ $order->customer_phone }}</div>@endif
         </div>
         <div style="background:var(--card,#fff);border:1px solid var(--line,#efe7de);border-radius:var(--radius,18px);padding:22px">
-            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#1c1917)">Order Details</h3>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#78716c)">Subtotal</span><span style="font-weight:700">NPR {{ number_format($order->subtotal, 2) }}</span></div>
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#1c1917)">{{ __('messages.order_details') }}</h3>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#78716c)">{{ __('messages.subtotal') }}</span><span style="font-weight:700">NPR {{ number_format($order->subtotal, 2) }}</span></div>
             <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--muted,#78716c)">Tax</span><span style="font-weight:700">NPR {{ number_format($order->tax, 2) }}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#efe7de)"><span>Total</span><span style="color:var(--accent,#f97316)">NPR {{ number_format($order->total, 2) }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#efe7de)"><span>{{ __('messages.total') }}</span><span style="color:var(--accent,#f97316)">NPR {{ number_format($order->total, 2) }}</span></div>
         </div>
     </div>
     <div style="background:var(--card,#fff);border:1px solid var(--line,#efe7de);border-radius:var(--radius,18px);padding:22px">
-        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px">Items</h3>
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px">{{ __('messages.items') }}</h3>
         @foreach($order->items as $item)
             <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line,#efe7de)">
                 <div>
@@ -51,7 +51,7 @@
     </div>
     @if($order->notes)
     <div style="background:var(--card,#fff);border:1px solid var(--line,#efe7de);border-radius:var(--radius,18px);padding:22px">
-        <h3 style="font-size:14px;font-weight:800;margin-bottom:10px">Notes</h3>
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:10px">{{ __('messages.notes') }}</h3>
         <p style="font-size:13px;color:var(--text,#1c1917);white-space:pre-line">{{ $order->notes }}</p>
     </div>
     @endif

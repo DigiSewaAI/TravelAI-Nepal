@@ -22,9 +22,9 @@
 
         <select name="time_of_day" class="px-2 py-1 border rounded text-sm">
             <option value="">—</option>
-            <option value="morning" {{ $item->time_of_day === 'morning' ? 'selected' : '' }}>Morning</option>
-            <option value="afternoon" {{ $item->time_of_day === 'afternoon' ? 'selected' : '' }}>Afternoon</option>
-            <option value="evening" {{ $item->time_of_day === 'evening' ? 'selected' : '' }}>Evening</option>
+            <option value="morning" {{ $item->time_of_day === 'morning' ? 'selected' : '' }}>{{ __('messages.morning') }}</option>
+            <option value="afternoon" {{ $item->time_of_day === 'afternoon' ? 'selected' : '' }}>{{ __('messages.afternoon') }}</option>
+            <option value="evening" {{ $item->time_of_day === 'evening' ? 'selected' : '' }}>{{ __('messages.evening') }}</option>
         </select>
 
         <label class="flex items-center text-xs text-gray-600">
@@ -33,7 +33,7 @@
                    {{ $item->is_optional ? 'checked' : '' }} class="mr-1"> Opt
         </label>
 
-        <button type="submit" class="text-blue-600 hover:text-blue-800 text-xs px-2">Save</button>
+        <button type="submit" class="text-blue-600 hover:text-blue-800 text-xs px-2">{{ __('messages.save') }}</button>
     </form>
 
     {{-- Delete form --}}

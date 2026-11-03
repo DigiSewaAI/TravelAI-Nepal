@@ -127,7 +127,7 @@
     </div>
 
     <div class="pcf-card">
-      <div class="pcf-card-title">Media & Status</div>
+      <div class="pcf-card-title">{{ __('messages.media_status') }}</div>
       <div style="margin-bottom:16px;">
         <label>{{ __('messages.product_cover_image') }}</label>
         <input type="file" name="cover_image" accept="image/*">
@@ -143,7 +143,7 @@
     </div>
 
     <div class="pcf-card">
-      <div class="pcf-card-title">Type-Specific Details</div>
+      <div class="pcf-card-title">{{ __('messages.type_specific_details') }}</div>
       <div data-type-section="shop" style="display:none;">
         @include('provider.products._fields_shop', ['product' => null])
       </div>

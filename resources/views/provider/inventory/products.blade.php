@@ -32,7 +32,7 @@
         </div>
         <div style="display:flex; gap:8px;">
             <a href="{{ route('provider.products.create') }}" style="background:var(--indigo); color:#fff; padding:8px 15px; border-radius:8px; border:none; cursor:pointer; font-family:inherit; font-size:12px; font-weight:700; text-decoration:none;">+ Add Product</a>
-            <a href="{{ route('provider.inventory.dashboard') }}" class="btn-primary" style="background:var(--card); color:var(--text); border:1px solid var(--line); padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">Back to Dashboard</a>
+            <a href="{{ route('provider.inventory.dashboard') }}" class="btn-primary" style="background:var(--card); color:var(--text); border:1px solid var(--line); padding:8px 15px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:700;">{{ __('messages.back_to_dashboard') }}</a>
         </div>
     </div>
 
@@ -45,7 +45,7 @@
                     <th>{{ __('messages.price_col') }}</th>
                     <th>{{ __('messages.stock_col') }}</th>
                     <th>{{ __('messages.type_col') }}</th>
-                    <th style="text-align:right;">Actions</th>
+                    <th style="text-align:right;">{{ __('messages.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,7 +58,7 @@
                         @if($p->stock_quantity > 0)
                             <span class="stock-in">{{ $p->stock_quantity }} in stock</span>
                         @else
-                            <span class="stock-out">Out of Stock</span>
+                            <span class="stock-out">{{ __('messages.out_of_stock') }}</span>
                         @endif
                     </td>
                     <td><span class="pill type-badge">{{ ucfirst($p->product_type) }}</span></td>
@@ -82,40 +82,40 @@
 <div id="addProductModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
     <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Add New Product</h3>
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_new_product') }}</h3>
             <button type="button" onclick="closeAddProductModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
         <form action="{{ route('provider.inventory.products.store') }}" method="POST">
             @csrf
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Product Name</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.product_name') }}</label>
                 <input type="text" name="name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Down Jacket">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Price (Rs)</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.price_rs') }}</label>
                     <input type="number" name="price" step="0.01" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="2500">
                 </div>
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Type</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
                     <select name="product_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-                        <option value="shop">Shop</option>
-                        <option value="rental">Rental</option>
-                        <option value="wholesale">Wholesale</option>
+                        <option value="shop">{{ __('messages.shop') }}</option>
+                        <option value="rental">{{ __('messages.rental') }}</option>
+                        <option value="wholesale">{{ __('messages.wholesale') }}</option>
                     </select>
                 </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Stock Quantity</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.stock_quantity') }}</label>
                     <input type="number" name="stock_quantity" required min="0" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="50">
                 </div>
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Low Stock Threshold</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.low_stock_threshold') }}</label>
                     <input type="number" name="low_stock_threshold" required min="0" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="5">
                 </div>
             </div>
-            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--indigo,#6366f1),var(--indigo-d,#4f46e5));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">Add Product</button>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--indigo,#6366f1),var(--indigo-d,#4f46e5));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.add_product') }}</button>
         </form>
     </div>
 </div>
@@ -124,40 +124,40 @@
 <div id="editProductModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
     <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:500px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Edit Product</h3>
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_product') }}</h3>
             <button type="button" onclick="closeEditProductModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
         <form id="editProductForm" method="POST">
             @csrf @method('PUT')
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Product Name</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.product_name') }}</label>
                 <input type="text" name="name" id="edit_prod_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Price (Rs)</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.price_rs') }}</label>
                     <input type="number" name="price" id="edit_prod_price" step="0.01" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
                 </div>
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Type</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
                     <select name="product_type" id="edit_prod_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-                        <option value="shop">Shop</option>
-                        <option value="rental">Rental</option>
-                        <option value="wholesale">Wholesale</option>
+                        <option value="shop">{{ __('messages.shop') }}</option>
+                        <option value="rental">{{ __('messages.rental') }}</option>
+                        <option value="wholesale">{{ __('messages.wholesale') }}</option>
                     </select>
                 </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Stock Quantity</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.stock_quantity') }}</label>
                     <input type="number" name="stock_quantity" id="edit_prod_stock" required min="0" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
                 </div>
                 <div>
-                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Low Stock Threshold</label>
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.low_stock_threshold') }}</label>
                     <input type="number" name="low_stock_threshold" id="edit_prod_low" required min="0" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
                 </div>
             </div>
-            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--indigo,#6366f1),var(--indigo-d,#4f46e5));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">Update Product</button>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--indigo,#6366f1),var(--indigo-d,#4f46e5));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_product') }}</button>
         </form>
     </div>
 </div>

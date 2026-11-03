@@ -223,7 +223,7 @@
                             @else
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: var(--muted); margin-bottom: 8px;"></i>
                             @endif
-                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">Click to upload new logo</p>
+                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">{{ __('messages.click_to_upload_new_logo') }}</p>
                             <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Max 2MB</p>
                             <input type="file" name="logo" accept="image/*">
                         </div>
@@ -239,7 +239,7 @@
                             @else
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: var(--muted); margin-bottom: 8px;"></i>
                             @endif
-                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">Click to upload new cover</p>
+                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">{{ __('messages.click_to_upload_new_cover') }}</p>
                             <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Max 5MB</p>
                             <input type="file" name="cover_image" accept="image/*">
                         </div>

@@ -19,13 +19,13 @@
                 <table style="width:100%;border-collapse:collapse">
                     <thead>
                         <tr style="border-bottom:2px solid var(--line,#e4ecf6)">
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Booking</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Passenger</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Route</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Travel Date</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Amount</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Status</th>
-                            <th style="text-align:right;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">Actions</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.booking') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.passenger') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.route') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.travel_date') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.amount') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.status') }}</th>
+                            <th style="text-align:right;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted,#6b7f96)">{{ __('messages.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,7 +45,7 @@
                                 </td>
                                 <td style="padding:14px 8px;text-align:right">
                                     <a href="{{ route('provider.transport.bookings.show', $b) }}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:var(--sky-soft,#e0f2fe);color:var(--accent-d,#0284c7);font-size:12px;font-weight:800;text-decoration:none">
-                                        View
+                                        {{ __('messages.view') }}
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                                     </a>
                                 </td>
@@ -57,8 +57,8 @@
             <div style="margin-top:16px">{{ $bookings->links() }}</div>
         @else
             <div style="text-align:center;padding:60px 20px;color:var(--muted,#6b7f96)">
-                <h3 style="font-size:16px;font-weight:800;color:var(--text,#0c1e33);margin:0 0 6px">No bookings yet</h3>
-                <p style="font-size:13px;margin:0">New bookings will appear here.</p>
+                <h3 style="font-size:16px;font-weight:800;color:var(--text,#0c1e33);margin:0 0 6px">{{ __('messages.no_bookings_yet') }}</h3>
+                <p style="font-size:13px;margin:0">{{ __('messages.new_bookings_will_appear_here') }}</p>
             </div>
         @endif
     </div>

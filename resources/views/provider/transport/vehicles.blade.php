@@ -115,10 +115,10 @@
         <div>
           <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_type_col') }}</label>
           <select name="vehicle_type" id="ev_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-            <option value="Bus">Bus</option><option value="Deluxe Bus">Deluxe Bus</option>
-            <option value="Van">Van</option><option value="Hiace">Hiace</option>
+            <option value="Bus">Bus</option><option value="Deluxe Bus">{{ __('messages.deluxe_bus') }}</option>
+            <option value="Van">Van</option><option value="Hiace">{{ __('messages.hiace') }}</option>
             <option value="Car">Car</option><option value="SUV">SUV</option>
-            <option value="Jeep">Jeep</option><option value="Bike">Bike</option>
+            <option value="Jeep">{{ __('messages.jeep') }}</option><option value="Bike">{{ __('messages.bike') }}</option>
           </select>
         </div>
         <div>

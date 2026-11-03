@@ -25,7 +25,7 @@
                 <h2 style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin:0;color:#fff">{{ __('messages.provider_rfq_title') }}</h2>
                 <span style="background:rgba(255,255,255,.22);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.4px">{{ $rfqs->total() }} TOTAL</span>
             </div>
-            <p style="font-size:13px;opacity:.88;margin-top:6px;font-weight:500">Wholesale quote requests from buyers</p>
+            <p style="font-size:13px;opacity:.88;margin-top:6px;font-weight:500">{{ __('messages.wholesale_quote_requests_from_buyers') }}</p>
         </div>
     </div>
 
@@ -48,11 +48,11 @@
                     <thead>
                         <tr style="border-bottom:2px solid var(--line,#e7eaf3)">
                             <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">RFQ</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">Buyer</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">Product</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">Qty</th>
-                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">Status</th>
-                            <th style="text-align:right;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">Actions</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">{{ __('messages.buyer') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">{{ __('messages.product') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">{{ __('messages.qty') }}</th>
+                            <th style="text-align:left;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">{{ __('messages.status') }}</th>
+                            <th style="text-align:right;padding:12px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7280)">{{ __('messages.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,7 +69,7 @@
                                 <td style="padding:14px 8px;text-align:right">
                                     <a href="{{ route('provider.wholesale-rfq.show', $rfq) }}"
                                        style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:var(--accent-soft,#eef0fe);color:var(--accent-d,#4f46e5);font-size:12px;font-weight:800;text-decoration:none">
-                                        View
+                                        {{ __('messages.view') }}
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                                     </a>
                                 </td>
@@ -83,7 +83,7 @@
             <div style="text-align:center;padding:60px 20px;color:var(--muted,#6b7280)">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35;margin:0 auto 14px;display:block"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 21V9"/></svg>
                 <h3 style="font-size:16px;font-weight:800;color:var(--text,#111827);margin:0 0 6px">{{ __('messages.provider_rfq_empty') }}</h3>
-                <p style="font-size:13px;margin:0">New wholesale requests will appear here.</p>
+                <p style="font-size:13px;margin:0">{{ __('messages.new_wholesale_requests_will_appear_here') }}</p>
             </div>
         @endif
     </div>

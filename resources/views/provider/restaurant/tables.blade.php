@@ -77,29 +77,29 @@
 <div id="addTableModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
     <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Add New Table</h3>
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_new_table') }}</h3>
             <button type="button" onclick="closeAddTableModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
         <form action="{{ route('provider.restaurant.tables.store') }}" method="POST">
             @csrf
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Table Number</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.table_number') }}</label>
                 <input type="text" name="table_number" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="T-15">
             </div>
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Seats</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.seats') }}</label>
                 <input type="number" name="seats" required min="1" value="4" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
                 <select name="status" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-                    <option value="free">Free</option>
-                    <option value="occupied">Occupied</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="cleaning">Cleaning</option>
+                    <option value="free">{{ __('messages.free') }}</option>
+                    <option value="occupied">{{ __('messages.occupied') }}</option>
+                    <option value="reserved">{{ __('messages.reserved') }}</option>
+                    <option value="cleaning">{{ __('messages.cleaning') }}</option>
                 </select>
             </div>
-            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">Add Table</button>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.add_table') }}</button>
         </form>
     </div>
 </div>
@@ -108,29 +108,29 @@
 <div id="editTableModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
     <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Edit Table</h3>
+            <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_table') }}</h3>
             <button type="button" onclick="closeEditTableModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
         <form id="editTableForm" method="POST">
             @csrf @method('PUT')
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Table Number</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.table_number') }}</label>
                 <input type="text" name="table_number" id="edit_tbl_number" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Seats</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.seats') }}</label>
                 <input type="number" name="seats" id="edit_tbl_seats" required min="1" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
             <div style="margin-bottom:14px">
-                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
                 <select name="status" id="edit_tbl_status" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-                    <option value="free">Free</option>
-                    <option value="occupied">Occupied</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="cleaning">Cleaning</option>
+                    <option value="free">{{ __('messages.free') }}</option>
+                    <option value="occupied">{{ __('messages.occupied') }}</option>
+                    <option value="reserved">{{ __('messages.reserved') }}</option>
+                    <option value="cleaning">{{ __('messages.cleaning') }}</option>
                 </select>
             </div>
-            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">Update Table</button>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_table') }}</button>
         </form>
     </div>
 </div>

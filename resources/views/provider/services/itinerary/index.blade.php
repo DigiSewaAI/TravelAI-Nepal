@@ -94,7 +94,7 @@
 
     {{-- Add Day Panel (hidden by default) --}}
     <div id="add-day-panel" class="hidden bg-white rounded-xl shadow-sm border p-5">
-        <h3 class="font-semibold text-gray-800 mb-3">New Day</h3>
+        <h3 class="font-semibold text-gray-800 mb-3">{{ __('messages.new_day') }}</h3>
         <form method="POST" action="{{ route('provider.services.itinerary.days.store', $service) }}">
             @csrf
             <div class="space-y-3">
@@ -104,7 +104,7 @@
                            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('messages.description') }}</label>
                     <textarea name="description" rows="3"
                               class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
@@ -124,7 +124,7 @@
     {{-- Days list --}}
     @if($service->itineraryDays->isEmpty())
         <div class="bg-white rounded-xl shadow-sm border p-8 text-center text-gray-500">
-            No itinerary days yet. Click <strong>Add Day</strong> to start.
+            No itinerary days yet. Click <strong>{{ __('messages.add_day') }}</strong> to start.
         </div>
     @else
         <div id="days-container">

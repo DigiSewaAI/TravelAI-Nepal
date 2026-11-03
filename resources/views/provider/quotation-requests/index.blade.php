@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold">Quotation Requests</h2>
+    <h2 class="text-2xl font-bold">{{ __('messages.quotation_requests') }}</h2>
     <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
         Pending: {{ $pendingCount ?? 0 }}
     </span>
@@ -23,13 +23,13 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Traveler</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destination</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Days</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Received</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.traveler') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.destination') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.days') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.budget') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.status') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.received') }}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('messages.actions') }}</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -51,14 +51,14 @@
                     </td>
                     <td class="px-6 py-4">{{ $req->created_at->diffForHumans() }}</td>
                     <td class="px-6 py-4">
-                        <a href="{{ route('provider.quotation-requests.show', $req) }}" class="text-blue-600 hover:underline">View</a>
+                        <a href="{{ route('provider.quotation-requests.show', $req) }}" class="text-blue-600 hover:underline">{{ __('messages.view') }}</a>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
     @else
-        <div class="p-6 text-center text-gray-500">No quotation requests yet.</div>
+        <div class="p-6 text-center text-gray-500">{{ __('messages.no_quotation_requests_yet') }}</div>
     @endif
 </div>
 @endsection

@@ -21,7 +21,7 @@
 
 <div class="off-hero">
   <h1>🎁 {{ __('messages.offers_management') }}</h1>
-  <p>Manage discounts and promotional offers</p>
+  <p>{{ __('messages.manage_discounts_and_promotional_offers') }}</p>
 </div>
 
 <div class="off-table">

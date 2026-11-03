@@ -81,7 +81,7 @@
 
     {{-- Traveler Input --}}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 class="text-lg font-bold mb-4">Traveler's Request</h3>
+        <h3 class="text-lg font-bold mb-4">{{ __('messages.traveler_s_request') }}</h3>
         <div class="grid grid-cols-2 gap-4">
             <div><strong>Destination:</strong> {{ $quotationRequest->traveler_input['destination'] ?? 'N/A' }}</div>
             <div><strong>Days:</strong> {{ $quotationRequest->traveler_input['days'] ?? 'N/A' }}</div>
@@ -95,7 +95,7 @@
 
     {{-- Itinerary --}}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 class="text-lg font-bold mb-4">Itinerary</h3>
+        <h3 class="text-lg font-bold mb-4">{{ __('messages.itinerary') }}</h3>
         @if(isset($quotationRequest->itinerary_data['days']))
     @foreach($quotationRequest->itinerary_data['days'] as $day)
         @php
@@ -127,7 +127,7 @@
         </div>
     @endforeach
 @else
-    <p class="text-gray-500">No itinerary data available.</p>
+    <p class="text-gray-500">{{ __('messages.no_itinerary_data_available') }}</p>
 @endif
     </div>
 
@@ -174,7 +174,7 @@
                 <div class="flex gap-3 flex-wrap">
                     <a href="{{ route('provider.quotation-requests.edit', $quotationRequest) }}" 
                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2">
-                        <i class="fas fa-edit"></i> Edit Quotation
+                        <i class="fas fa-edit"></i> {{ __('messages.edit_quotation') }}
                     </a>
                     <a href="{{ route('provider.quotation-requests.preview', $quotationRequest) }}" 
                        target="_blank"
@@ -198,25 +198,25 @@
     @else
         {{-- No Quotation Generated Yet --}}
         <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-bold mb-4">Generate Quotation</h3>
+            <h3 class="text-lg font-bold mb-4">{{ __('messages.generate_quotation') }}</h3>
             <p class="text-sm text-gray-500 mb-4">AI will use the itinerary above to generate a professional quotation.</p>
             <button onclick="generateQuotation()" id="generateBtn" 
                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
-                <i class="fas fa-magic"></i> Generate AI Quotation
+                <i class="fas fa-magic"></i> {{ __('messages.generate_ai_quotation') }}
             </button>
             <div id="quotationResult" class="mt-4 hidden">
                 <div class="flex justify-between items-center mb-3">
-                    <h4 class="font-bold">Generated Quotation</h4>
+                    <h4 class="font-bold">{{ __('messages.generated_quotation') }}</h4>
                     <div class="flex gap-2">
-                        <button onclick="copyQuotation()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">Copy</button>
-                        <button onclick="downloadQuotation()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">Download</button>
+                        <button onclick="copyQuotation()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">{{ __('messages.copy') }}</button>
+                        <button onclick="downloadQuotation()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">{{ __('messages.download') }}</button>
                     </div>
                 </div>
                 <div id="quotationContent" class="bg-gray-50 p-4 rounded border border-gray-200 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm font-mono"></div>
             </div>
             <div id="quotationLoading" class="hidden text-center py-4">
                 <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
-                <p class="mt-2 text-gray-500">Generating quotation... Please wait.</p>
+                <p class="mt-2 text-gray-500">{{ __('messages.generating_quotation_please_wait') }}</p>
             </div>
         </div>
     @endif

@@ -9,7 +9,7 @@
     <div class="bg-white rounded-lg shadow p-6 mb-4">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="text-2xl font-bold">Edit Quotation</h2>
+                <h2 class="text-2xl font-bold">{{ __('messages.edit_quotation') }}</h2>
                 <p class="text-gray-500">Request #{{ $quotationRequest->id }} – {{ $quotationRequest->traveler_name ?? 'Guest' }}</p>
             </div>
             <span class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
@@ -31,7 +31,7 @@
                     </div>
                 @endforeach
                 <div class="flex justify-between font-bold pt-2 border-t-2 border-gray-300">
-                    <span>Total</span>
+                    <span>{{ __('messages.total') }}</span>
                     <span>${{ number_format($draft['cost_breakdown']['grand_total'] ?? 0, 2) }}</span>
                 </div>
             </div>
@@ -50,13 +50,13 @@
                     @foreach($final['cost_breakdown']['items'] ?? [] as $index => $item)
                         <div class="item-row grid grid-cols-12 gap-2 items-center p-2 bg-gray-50 rounded border border-gray-100">
                             <div class="col-span-5">
-                                <label class="text-xs text-gray-600">Description</label>
+                                <label class="text-xs text-gray-600">{{ __('messages.description') }}</label>
                                 <input type="text" name="items[{{ $index }}][description]" 
                                        value="{{ $item['description'] ?? '' }}" 
                                        class="w-full border rounded px-2 py-1 text-sm" required>
                             </div>
                             <div class="col-span-3">
-                                <label class="text-xs text-gray-600">Price per Person (USD)</label>
+                                <label class="text-xs text-gray-600">{{ __('messages.price_per_person_usd') }}</label>
                                 <input type="number" name="items[{{ $index }}][per_person]" 
                                        value="{{ $item['per_person'] ?? 0 }}" 
                                        step="0.01" min="0"
@@ -64,7 +64,7 @@
                             </div>
                             <div class="col-span-2">
                                 <label class="text-xs text-gray-600">
-                                    Qty 
+                                    {{ __('messages.qty') }} 
                                     <span class="text-gray-400 text-[10px]">(units)</span>
                                 </label>
                                 <input type="number" name="items[{{ $index }}][quantity]" 
@@ -95,7 +95,7 @@
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-4">
                     <div class="flex flex-wrap items-center gap-6">
                         <div>
-                            <label class="text-xs text-gray-600">Discount (USD)</label>
+                            <label class="text-xs text-gray-600">{{ __('messages.discount_usd') }}</label>
                             <input type="number" name="discount" id="discountInput" 
                                    value="{{ $final['discount'] ?? 0 }}" 
                                    step="0.01" min="0"
@@ -118,7 +118,7 @@
 
                 {{-- Terms & Conditions --}}
                 <div class="mt-4">
-                    <label class="text-xs text-gray-600">Terms & Conditions <span class="text-gray-400">(one per line)</span></label>
+                    <label class="text-xs text-gray-600">{{ __('messages.terms_conditions') }} <span class="text-gray-400">(one per line)</span></label>
                     <textarea name="terms" id="termsInput" rows="4" 
                               class="w-full border rounded px-3 py-2 text-sm"
                               placeholder="Enter each term on a new line">{{ implode("\n", $final['terms_and_conditions'] ?? []) }}</textarea>
@@ -126,7 +126,7 @@
 
                 {{-- Special Notes --}}
                 <div class="mt-4">
-                    <label class="text-xs text-gray-600">Special Notes</label>
+                    <label class="text-xs text-gray-600">{{ __('messages.special_notes') }}</label>
                     <textarea name="special_notes" id="specialNotesInput" rows="2" 
                               class="w-full border rounded px-3 py-2 text-sm"
                               placeholder="Any special instructions for the traveler">{{ $final['special_notes'] ?? '' }}</textarea>
@@ -170,7 +170,7 @@
     {{-- Loading/Result --}}
     <div id="loading" class="hidden text-center py-4">
         <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
-        <p class="mt-2 text-gray-500">Processing...</p>
+        <p class="mt-2 text-gray-500">{{ __('messages.processing') }}</p>
     </div>
     <div id="resultMessage" class="hidden p-4 rounded-lg mt-4"></div>
 </div>
@@ -230,18 +230,18 @@ document.addEventListener('DOMContentLoaded', function() {
         row.className = 'item-row grid grid-cols-12 gap-2 items-center p-2 bg-gray-50 rounded border border-gray-100';
         row.innerHTML = `
             <div class="col-span-5">
-                <label class="text-xs text-gray-600">Description</label>
+                <label class="text-xs text-gray-600">{{ __('messages.description') }}</label>
                 <input type="text" name="items[${index}][description]" 
                        value="New Service" class="w-full border rounded px-2 py-1 text-sm" required>
             </div>
             <div class="col-span-3">
-                <label class="text-xs text-gray-600">Price per Person (USD)</label>
+                <label class="text-xs text-gray-600">{{ __('messages.price_per_person_usd') }}</label>
                 <input type="number" name="items[${index}][per_person]" 
                        value="0" step="0.01" min="0"
                        class="w-full border rounded px-2 py-1 text-sm price-input" required>
             </div>
             <div class="col-span-2">
-                <label class="text-xs text-gray-600">Qty <span class="text-gray-400">(units)</span></label>
+                <label class="text-xs text-gray-600">{{ __('messages.qty') }} <span class="text-gray-400">(units)</span></label>
                 <input type="number" name="items[${index}][quantity]" 
                        value="1" min="1"
                        class="w-full border rounded px-2 py-1 text-sm qty-input">

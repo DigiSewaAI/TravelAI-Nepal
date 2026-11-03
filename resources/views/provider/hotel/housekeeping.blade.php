@@ -111,17 +111,17 @@
 <div id="addTaskModal" style="display:none;position:fixed;inset:0;background:rgba(14,23,38,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
   <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Add New Task</h3>
+      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_new_task') }}</h3>
       <button type="button" onclick="closeAddTaskModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
     </div>
     <form action="{{ route('provider.hotel.housekeeping.store') }}" method="POST">
       @csrf
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Task Name</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.task_name') }}</label>
         <input type="text" name="task_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Clean Room">
       </div>
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Room (Optional)</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.room_optional') }}</label>
         <select name="room_id" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
           <option value="">— No specific room —</option>
           @foreach($rooms as $r)
@@ -130,18 +130,18 @@
         </select>
       </div>
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Assigned To (Optional)</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.assigned_to_optional') }}</label>
         <input type="text" name="assigned_to" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Sita">
       </div>
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
         <select name="status" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
           <option value="queue">Queue</option>
-          <option value="in_progress">In Progress</option>
-          <option value="done">Done</option>
+          <option value="in_progress">{{ __('messages.in_progress') }}</option>
+          <option value="done">{{ __('messages.done') }}</option>
         </select>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">Add Task</button>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.add_task') }}</button>
     </form>
   </div>
 </div>

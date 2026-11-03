@@ -58,7 +58,7 @@
           <th>{{ __('messages.type') }}</th>
           <th>{{ __('messages.floor_label') }}</th>
           <th>{{ __('messages.status') }}</th>
-          <th>Price/Night</th>
+          <th>{{ __('messages.price_night') }}</th>
                             <th style="text-align:right;">{{ __('messages.actions') }}</th>
         </tr>
       </thead>
@@ -112,46 +112,46 @@
 <div id="addRoomModal" style="display:none;position:fixed;inset:0;background:rgba(14,23,38,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
   <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Add New Room</h3>
+      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_new_room') }}</h3>
       <button type="button" onclick="closeAddRoomModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
     </div>
     <form action="{{ route('provider.hotel.rooms.store') }}" method="POST">
       @csrf
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Room Number</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.room_number') }}</label>
         <input type="text" name="room_number" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="101">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div>
-          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Type</label>
+          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
           <select name="room_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             <option value="Standard">Standard</option>
             <option value="Deluxe">Deluxe</option>
             <option value="Suite">Suite</option>
             <option value="Superior">Superior</option>
-            <option value="Premium">Premium</option>
+            <option value="Premium">{{ __('messages.premium') }}</option>
           </select>
         </div>
         <div>
-          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Floor</label>
+          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.floor') }}</label>
           <input type="number" name="floor" required min="1" value="1" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
         </div>
       </div>
       <div style="margin-bottom:14px">
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Price/Night (Rs)</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
-                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Base Price /Night (Rs)</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
-                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Min Price /Night</label><input type="number" name="min_price" min="0" step="1" placeholder="e.g. 3000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
-                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Max Price /Night</label><input type="number" name="max_price" min="0" step="1" placeholder="e.g. 8000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
-                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">{{ __('messages.price_night_rs') }}</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">{{ __('messages.base_price_night_rs') }}</label><input type="number" name="base_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">{{ __('messages.min_price_night') }}</label><input type="number" name="min_price" min="0" step="1" placeholder="e.g. 3000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">{{ __('messages.max_price_night') }}</label><input type="number" name="max_price" min="0" step="1" placeholder="e.g. 8000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
         <select name="status" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-          <option value="available">Available</option>
-          <option value="occupied">Occupied</option>
-          <option value="reserved">Reserved</option>
-          <option value="dirty">Dirty</option>
-          <option value="maintenance">Maintenance</option>
+          <option value="available">{{ __('messages.available') }}</option>
+          <option value="occupied">{{ __('messages.occupied') }}</option>
+          <option value="reserved">{{ __('messages.reserved') }}</option>
+          <option value="dirty">{{ __('messages.dirty') }}</option>
+          <option value="maintenance">{{ __('messages.maintenance') }}</option>
         </select>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">Add Room</button>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.add_room') }}</button>
     </form>
   </div>
 </div>
@@ -160,43 +160,43 @@
 <div id="editRoomModal" style="display:none;position:fixed;inset:0;background:rgba(14,23,38,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
   <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">Edit Room</h3>
+      <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_room') }}</h3>
       <button type="button" onclick="closeEditRoomModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
     </div>
     <form id="editRoomForm" method="POST">
       @csrf @method('PUT')
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Room Number</label>
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.room_number') }}</label>
         <input type="text" name="room_number" id="edit_room_number" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
         <div>
-          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Type</label>
+          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
           <select name="room_type" id="edit_room_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             <option value="Standard">Standard</option>
             <option value="Deluxe">Deluxe</option>
             <option value="Suite">Suite</option>
             <option value="Superior">Superior</option>
-            <option value="Premium">Premium</option>
+            <option value="Premium">{{ __('messages.premium') }}</option>
           </select>
         </div>
         <div>
-          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Floor</label>
+          <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.floor') }}</label>
           <input type="number" name="floor" id="edit_room_floor" required min="1" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
         </div>
       </div>
       <div style="margin-bottom:14px">
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">Price/Night (Rs)</label><input type="number" name="base_price" id="edit_room_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
-                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Status</label>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px;">{{ __('messages.price_night_rs') }}</label><input type="number" name="base_price" id="edit_room_price" min="0" step="1" placeholder="e.g. 5000" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px"></div>
+                            <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
         <select name="status" id="edit_room_status" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-          <option value="available">Available</option>
-          <option value="occupied">Occupied</option>
-          <option value="reserved">Reserved</option>
-          <option value="dirty">Dirty</option>
-          <option value="maintenance">Maintenance</option>
+          <option value="available">{{ __('messages.available') }}</option>
+          <option value="occupied">{{ __('messages.occupied') }}</option>
+          <option value="reserved">{{ __('messages.reserved') }}</option>
+          <option value="dirty">{{ __('messages.dirty') }}</option>
+          <option value="maintenance">{{ __('messages.maintenance') }}</option>
         </select>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">Update Room</button>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.update_room') }}</button>
     </form>
   </div>
 </div>

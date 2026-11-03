@@ -10,7 +10,7 @@
     <div class="flex justify-between items-center flex-wrap gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
         <div class="flex items-center gap-2">
             <i class="fas fa-eye text-yellow-600"></i>
-            <span class="text-sm font-semibold text-yellow-800">Preview Mode</span>
+            <span class="text-sm font-semibold text-yellow-800">{{ __('messages.preview_mode') }}</span>
             <span class="text-xs text-yellow-700">
                 @if($service->isItineraryPublished())
                     (Currently published — this is a private preview)
@@ -28,7 +28,7 @@
     {{-- Public-style rendering --}}
     @if($service->itineraryDays->isNotEmpty())
         <div class="mt-4">
-            <h2 class="text-2xl font-bold text-gray-900">Itinerary</h2>
+            <h2 class="text-2xl font-bold text-gray-900">{{ __('messages.itinerary') }}</h2>
             <p class="text-sm text-gray-500 mt-1">{{ $service->itineraryDays->count() }} days</p>
 
             <div class="space-y-3 mt-6">
@@ -86,7 +86,7 @@
 
                             @if($day->items->isNotEmpty())
                                 <div>
-                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Activities</h4>
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{{ __('messages.activities') }}</h4>
                                     <ul class="space-y-1.5">
                                         @foreach($day->items as $item)
                                             <li class="text-sm text-gray-700">

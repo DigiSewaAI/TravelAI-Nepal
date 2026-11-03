@@ -27,7 +27,7 @@
                value="{{ old('amenities', is_array($detail?->amenities) ? implode(', ', $detail->amenities) : '') }}"
                placeholder="WiFi, Parking, Pool"
                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('amenities') border-red-500 @enderror">
-        <p class="text-xs text-gray-400 mt-1">Separate with commas</p>
+        <p class="text-xs text-gray-400 mt-1">{{ __('messages.separate_with_commas') }}</p>
         @error('amenities')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
         @enderror

@@ -40,7 +40,7 @@
     <div class="sup-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
       <h3>{{ __('messages.no_suppliers_found') }}</h3>
-      <p>Supplier management will be available after DB migration.</p>
+      <p>{{ __('messages.supplier_management_will_be_available_after_db_migration') }}</p>
       <a href="#" onclick="alert('Supplier form coming soon — DB migration required');return false;">+ {{ __('messages.add_supplier') }}</a>
     </div>
   @endif

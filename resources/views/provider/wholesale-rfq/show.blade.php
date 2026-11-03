@@ -59,7 +59,7 @@
         <div style="background:var(--card,#fff);border:1px solid var(--line,#e7eaf3);border-radius:var(--radius,18px);padding:22px">
             <h3 style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#111827)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-                Product
+                {{ __('messages.product') }}
             </h3>
             <div style="font-size:14px;font-weight:700;color:var(--text,#111827)">{{ $rfq->product->name ?? 'N/A' }}</div>
             <div style="font-size:13px;color:var(--muted,#6b7280);margin-top:4px">{{ __('messages.rfq_quantity') }}: <strong style="color:var(--text,#111827)">{{ $rfq->quantity }}</strong></div>
@@ -127,14 +127,14 @@
                     <div style="font-size:13px;color:var(--text,#111827);white-space:pre-line">{{ $msg->message }}</div>
                 </div>
             @empty
-                <p style="font-size:13px;color:var(--muted,#6b7280);text-align:center;padding:20px 0">No messages yet.</p>
+                <p style="font-size:13px;color:var(--muted,#6b7280);text-align:center;padding:20px 0">{{ __('messages.no_messages_yet') }}</p>
             @endforelse
         </div>
 
         
 @if(in_array($rfq->status, ['rejected', 'expired', 'cancelled']))
     <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-top:16px;text-align:center;">
-        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">This RFQ is closed.</p>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">{{ __('messages.this_rfq_is_closed') }}</p>
     </div>
 @endif
 

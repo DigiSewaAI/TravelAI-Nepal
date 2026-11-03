@@ -3,8 +3,8 @@
 @section('content')
 @if($activeCount > 0)
 <div id="sosEnableBanner" onclick="enableSosAudio()" style="position:fixed;top:80px;right:20px;background:#dc2626;color:#fff;padding:14px 20px;border-radius:12px;font-weight:800;z-index:99999;cursor:pointer;font-size:13px;max-width:320px;box-shadow:0 6px 20px rgba(220,38,38,.5);">
-    <div style="font-size:15px;margin-bottom:4px;">Active SOS Alert</div>
-    <div style="font-size:11px;">Click anywhere to enable sound</div>
+    <div style="font-size:15px;margin-bottom:4px;">{{ __('messages.active_sos_alert') }}</div>
+    <div style="font-size:11px;">{{ __('messages.click_anywhere_to_enable_sound') }}</div>
 </div>
 @endif
 
@@ -68,8 +68,8 @@
         @else
             <div class="p-10 text-center">
                 <i class="fas fa-check-circle text-5xl text-green-400 mb-4"></i>
-                <h2 class="text-xl font-bold text-gray-900">No SOS alerts</h2>
-                <p class="text-sm text-gray-500 mt-2">You have no emergency alerts at this time.</p>
+                <h2 class="text-xl font-bold text-gray-900">{{ __('messages.no_sos_alerts') }}</h2>
+                <p class="text-sm text-gray-500 mt-2">{{ __('messages.you_have_no_emergency_alerts_at_this_time') }}</p>
             </div>
         @endif
     </div>

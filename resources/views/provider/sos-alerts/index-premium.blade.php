@@ -8,8 +8,8 @@
     <div style="display:flex;align-items:center;gap:10px;">
         <span style="font-size:22px;">🔔</span>
         <div style="flex:1;">
-            <div style="font-size:14px;margin-bottom:2px;">Active SOS Alert</div>
-            <div id="sosHint" style="font-size:11px;opacity:.95;">Click anywhere to enable siren</div>
+            <div style="font-size:14px;margin-bottom:2px;">{{ __('messages.active_sos_alert') }}</div>
+            <div id="sosHint" style="font-size:11px;opacity:.95;">{{ __('messages.click_anywhere_to_enable_siren') }}</div>
         </div>
     </div>
     <button id="sosAckBtn" type="button" onclick="acknowledgeSos(event)" style="display:none;width:100%;margin-top:10px;background:#fff;color:#dc2626;padding:8px;border:0;border-radius:8px;font-weight:900;cursor:pointer;font-size:12px;">🔕 Silence & Acknowledge</button>
@@ -86,17 +86,17 @@
   <div class="ps-stats">
     <div class="ps-stat total">
       <div class="ic"><i class="fas fa-bell"></i></div>
-      <div class="lbl">Total</div>
+      <div class="lbl">{{ __('messages.total') }}</div>
       <div class="val">{{ $stats['total'] ?? 0 }}</div>
     </div>
     <div class="ps-stat active">
       <div class="ic"><i class="fas fa-exclamation-circle"></i></div>
-      <div class="lbl">Active</div>
+      <div class="lbl">{{ __('messages.active') }}</div>
       <div class="val">{{ $stats['active'] ?? $activeCount }}</div>
     </div>
     <div class="ps-stat resolved">
       <div class="ic"><i class="fas fa-check-circle"></i></div>
-      <div class="lbl">Resolved</div>
+      <div class="lbl">{{ __('messages.resolved') }}</div>
       <div class="val">{{ $stats['resolved'] ?? 0 }}</div>
     </div>
   </div>
