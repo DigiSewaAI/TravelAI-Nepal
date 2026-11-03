@@ -34,6 +34,15 @@
   .mc-empty{text-align:center;padding:48px 20px;color:var(--muted,#64748b);}
 </style>
 
+@if ($errors->any())
+<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:12px;padding:16px;margin:0 0 20px;">
+    <div style="font-weight:800;color:#991b1b;margin-bottom:8px;font-size:14px;">⚠️ Validation Error</div>
+    @foreach ($errors->all() as $error)
+        <div style="font-size:13px;color:#991b1b;padding:4px 0;font-weight:600;">• {{ $error }}</div>
+    @endforeach
+</div>
+@endif
+
 <div class="mc-hero">
   <div>
     <h1>📊 {{ __('messages.nav_transactions') }}</h1>
@@ -110,6 +119,18 @@
             <button type="button" onclick="closeTxModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted,#64748b);line-height:1">&times;</button>
         </div>
         <form action="{{ route('provider.money-changer.transactions.store') }}" method="POST">
+
+                @if ($errors->any())
+                <div class="modal-error-alert" style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:14px;margin:0 0 16px;">
+                    <div style="font-weight:900;color:#991b1b;margin-bottom:8px;font-size:14px;">❌ Cannot Save</div>
+                    @foreach ($errors->all() as $error)
+                        <div style="font-size:13px;color:#991b1b;padding:6px 0;line-height:1.5;">{{ $error }}</div>
+                    @endforeach
+                </div>
+                @endif
+
+
+            
             @csrf
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div style="grid-column:span 2">
@@ -148,4 +169,18 @@ document.getElementById('transactionModal').addEventListener('click', function(e
     if (e.target === this) closeTxModal();
 });
 </script>
+
+{{-- Auto-open Add Transaction modal if validation failed --}}
+@if ($errors->any())
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modals = document.querySelectorAll('[id*="modal"], [id*="Modal"]');
+    modals.forEach(function(m) {
+        if (m.id && m.id.toLowerCase().includes('transaction')) {
+            m.style.display = 'flex';
+        }
+    });
+});
+</script>
+@endif
 @endsection
