@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Services\MoneyChangerAiService;
 use App\Models\ExchangeTransaction;
 use App\Models\ProviderExchangeRate;
 use App\Models\ServiceCategory;
@@ -13,6 +14,8 @@ class MoneyChangerDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected MoneyChangerAiService $moneychangerAi) {}
 
     public function index()
     {
@@ -268,6 +271,19 @@ class MoneyChangerDashboardController extends Controller
         return view('provider.money-changer.customers', compact('provider', 'customers', 'totalCustomers', 'repeatCustomers', 'totalVolume'));
     }
 
+    public function aiDailySummary(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->moneychangerAi->dailySummary($provider));
+    }
+
+    public function aiInsights(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->moneychangerAi->transactionInsights($provider));
+    }
     public function reportsPage()
     {
         $provider = Auth::user()->getCurrentProvider();

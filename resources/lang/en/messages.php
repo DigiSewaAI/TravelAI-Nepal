@@ -2735,4 +2735,11 @@ return array (
   'individual_ai_run_profile' => 'Generate profiles',
   'individual_ai_loading' => 'Analyzing…',
   'Trekking Guide' => 'Trekking Guide',
+  'moneychanger_ai_daily_title' => 'AI Daily Business Summary',
+  'moneychanger_ai_daily_sub' => 'Analyze today\'s transactions (NRB rates unchanged).',
+  'moneychanger_ai_run_daily' => 'View today\'s summary',
+  'moneychanger_ai_insights_title' => 'AI Transaction Insights',
+  'moneychanger_ai_insights_sub' => '30-day currency + profit trends (no rate predictions).',
+  'moneychanger_ai_run_insights' => 'View insights',
+  'moneychanger_ai_loading' => 'Analyzing…',
 );

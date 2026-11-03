@@ -88,4 +88,64 @@
     <p class="mc-empty">No customer data yet.</p>
   @endforelse
 </div>
+
+{{-- ═══ MoneyChanger AI ═══ --}}
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">📊 {{ __('messages.moneychanger_ai_daily_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.moneychanger_ai_daily_sub') }}</p>
+  <button id="moneychangerAiDailyBtn" onclick="loadMcDaily()" style="background:var(--accent,#c9a227);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.moneychanger_ai_run_daily') }}</button>
+  <div id="moneychangerAiDailyOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">💡 {{ __('messages.moneychanger_ai_insights_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.moneychanger_ai_insights_sub') }}</p>
+  <button id="moneychangerAiInsightsBtn" onclick="loadMcInsights()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.moneychanger_ai_run_insights') }}</button>
+  <div id="moneychangerAiInsightsOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<script>
+async function mcAiPost(url){
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:'{}' });
+  return await r.json();
+}
+function mcAiErr(el,msg){ el.innerHTML='<div style="padding:10px;border-radius:8px;background:#fee;color:#900;font-weight:700;">'+msg+'</div>'; }
+async function loadMcDaily(){
+  const btn=document.getElementById('moneychangerAiDailyBtn'), out=document.getElementById('moneychangerAiDailyOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.moneychanger_ai_loading") }}';
+  try{
+    const data=await mcAiPost('{{ route("provider.money-changer.ai.daily") }}');
+    if(data.error){ mcAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>';
+    if(data.summary) html+='<div style="font-weight:800;margin-bottom:8px;">'+data.summary+'</div>';
+    if(data.transactions_count!==undefined) html+='<div style="font-size:12px;margin-bottom:8px;">Transactions: <strong>'+data.transactions_count+'</strong> · Volume: Rs '+((data.total_npr||0).toLocaleString())+' · Profit: Rs '+((data.total_profit||0).toLocaleString())+'</div>';
+    var byc = data.by_currency||{};
+    Object.keys(byc).forEach(function(cur){
+      var c = byc[cur];
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span><strong>'+cur+'</strong> · '+c.count+' txns</span><strong>Rs '+((c.profit||0).toLocaleString())+'</strong></div>';
+    });
+    if(data.assumptions&&data.assumptions.nrb_note) html+='<div style="margin-top:8px;padding:6px 10px;background:#eff6ff;border-radius:6px;font-size:10px;color:#1e40af;">📋 '+data.assumptions.nrb_note+'</div>';
+    out.innerHTML=html;
+  }catch(e){ mcAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+async function loadMcInsights(){
+  const btn=document.getElementById('moneychangerAiInsightsBtn'), out=document.getElementById('moneychangerAiInsightsOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.moneychanger_ai_loading") }}';
+  try{
+    const data=await mcAiPost('{{ route("provider.money-changer.ai.insights") }}');
+    if(data.error){ mcAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.summary) html+='<div style="font-weight:800;margin-bottom:8px;">'+data.summary+'</div>';
+    if(data.top_profit_currency) html+='<div style="font-size:12px;margin-bottom:8px;">🏆 Top profit: <strong>'+data.top_profit_currency+'</strong> · Top volume: <strong>'+data.top_volume_currency+'</strong></div>';
+    var byc = data.by_currency||{};
+    Object.keys(byc).forEach(function(cur){
+      var c = byc[cur];
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><span><strong>'+cur+'</strong> · Buy '+c.buy_count+' / Sell '+c.sell_count+'</span><strong>Rs '+((c.profit||0).toLocaleString())+'</strong></div>';
+    });
+    if(data.assumptions&&data.assumptions.nrb_note) html+='<div style="margin-top:8px;padding:6px 10px;background:#eff6ff;border-radius:6px;font-size:10px;color:#1e40af;">📋 '+data.assumptions.nrb_note+' · '+data.assumptions.period+'</div>';
+    out.innerHTML=html;
+  }catch(e){ mcAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+</script>
 @endsection

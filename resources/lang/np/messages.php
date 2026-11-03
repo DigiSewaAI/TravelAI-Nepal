@@ -2756,4 +2756,11 @@ return array (
   'individual_ai_run_profile' => 'प्रोफाइल बनाउनु',
   'individual_ai_loading' => 'विश्लेषण हुँदै…',
   'Trekking Guide' => 'ट्रेकिङ गाइड',
+  'moneychanger_ai_daily_title' => 'AI दैनिक व्यवसाय सारांश',
+  'moneychanger_ai_daily_sub' => 'आजको कारोबार विश्लेषण (NRB दर अपरिवर्तित)।',
+  'moneychanger_ai_run_daily' => 'आजको सारांश',
+  'moneychanger_ai_insights_title' => 'AI कारोबार अंतर्दृष्टि',
+  'moneychanger_ai_insights_sub' => '३० दिनको मुद्रा र नाफा प्रवृत्ति (दर पूर्वानुमान नै)।',
+  'moneychanger_ai_run_insights' => 'अंतर्दृष्टि',
+  'moneychanger_ai_loading' => 'विश्लेषण हुँदै…',
 );
