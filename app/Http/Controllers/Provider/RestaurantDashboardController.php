@@ -25,6 +25,13 @@ class RestaurantDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
+        // Booking quota check (monthly limit)
+        try {
+            app(\App\Services\BookingLimitService::class)->reserve($provider);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['limit' => __('messages.booking_limit_reached')])->withInput();
+        }
+
         $restaurantCatId = ServiceCategory::where('slug', 'restaurant')->value('id');
         $service = $provider->services()
             ->where('service_category_id', $restaurantCatId)

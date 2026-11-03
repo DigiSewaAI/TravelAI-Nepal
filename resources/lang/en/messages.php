@@ -2742,4 +2742,7 @@ return array (
   'moneychanger_ai_insights_sub' => '30-day currency + profit trends (no rate predictions).',
   'moneychanger_ai_run_insights' => 'View insights',
   'moneychanger_ai_loading' => 'Analyzing…',
+  'ai_quota_exceeded' => 'AI quota reached. Please upgrade your plan.',
+  'booking_limit_reached' => 'Booking limit reached for this month. Please upgrade your plan.',
+  'nrb_convertible_buy_only' => 'NRB: Convertible currencies (USD/EUR/GBP/AUD/CNY) are buy-only. INR allows buy/sell.',
 );

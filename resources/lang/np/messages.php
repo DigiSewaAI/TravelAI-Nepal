@@ -2763,4 +2763,7 @@ return array (
   'moneychanger_ai_insights_sub' => '३० दिनको मुद्रा र नाफा प्रवृत्ति (दर पूर्वानुमान नै)।',
   'moneychanger_ai_run_insights' => 'अंतर्दृष्टि',
   'moneychanger_ai_loading' => 'विश्लेषण हुँदै…',
+  'ai_quota_exceeded' => 'AI कोटा सकियो। कृपया प्लान अपग्रेड गर्नुहोस्।',
+  'booking_limit_reached' => 'यो महिनाको बुकिङ सीमा सकियो। कृपया प्लान अपग्रेड गर्नुहोस्।',
+  'nrb_convertible_buy_only' => 'NRB: परिवर्तनीय मुद्रा (USD/EUR/GBP/AUD/CNY) खरिद मात्र। INR खरिद/बिक्री दुवै।',
 );

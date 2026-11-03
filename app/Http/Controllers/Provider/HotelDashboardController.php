@@ -22,6 +22,13 @@ class HotelDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
+        // Booking quota check (monthly limit)
+        try {
+            app(\App\Services\BookingLimitService::class)->reserve($provider);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['limit' => __('messages.booking_limit_reached')])->withInput();
+        }
+
         $today = now()->startOfDay();
 
         // KPIs

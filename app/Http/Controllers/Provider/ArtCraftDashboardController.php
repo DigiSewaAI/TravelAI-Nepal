@@ -127,6 +127,13 @@ class ArtCraftDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
+        // Booking quota check (monthly limit)
+        try {
+            app(\App\Services\BookingLimitService::class)->reserve($provider);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['limit' => __('messages.booking_limit_reached')])->withInput();
+        }
+
         if ($redirect = $this->checkPlanLimit($provider, 'max_artworks', \App\Models\Artwork::class, 'artworks')) {
             return $redirect;
         }

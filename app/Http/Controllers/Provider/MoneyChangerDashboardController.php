@@ -188,6 +188,14 @@ class MoneyChangerDashboardController extends Controller
             'rate' => 'required|numeric|min:0.0001',
         ]);
 
+        // NRB compliance — convertible currencies are buy-only
+        $convertible = ['USD', 'EUR', 'GBP', 'AUD', 'CNY'];
+        if (in_array(strtoupper($validated['currency_code']), $convertible) && $validated['type'] === 'sell') {
+            return back()->withErrors([
+                'type' => __('messages.nrb_convertible_buy_only'),
+            ])->withInput();
+        }
+
         $nprAmount = $validated['amount_foreign'] * $validated['rate'];
 
         // Simple profit calculation (Assuming 2% margin if exact spread isn't known)
