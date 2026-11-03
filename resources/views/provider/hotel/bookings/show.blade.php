@@ -133,7 +133,7 @@
         @endif
 
         {{-- Add form (hidden by default) --}}
-        <form id="folioForm" method="POST" action="{{ route('hotel.bookings.folio.add', $booking) }}"
+        <form id="folioForm" method="POST" action="{{ route('provider.hotel.bookings.folio.add', $booking) }}"
               style="display:none;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:16px">
             @csrf
             <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
@@ -177,7 +177,7 @@
                         <td style="padding:10px 12px;color:#374151;text-align:right">{{ $fc->quantity }}</td>
                         <td style="padding:10px 12px;color:#111827;font-weight:700;text-align:right">Rs {{ number_format($fc->total, 2) }}</td>
                         <td style="padding:10px 12px;text-align:right">
-                            <form method="POST" action="{{ route('hotel.bookings.folio.remove', [$booking, $fc]) }}" style="display:inline" onsubmit="return confirm('Remove this charge?')">
+                            <form method="POST" action="{{ route('provider.hotel.bookings.folio.remove', [$booking, $fc]) }}" style="display:inline" onsubmit="return confirm('Remove this charge?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" style="background:none;border:0;color:#dc2626;font-size:12px;font-weight:600;cursor:pointer">Remove</button>
                             </form>
