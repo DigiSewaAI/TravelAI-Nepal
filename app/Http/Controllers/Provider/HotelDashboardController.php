@@ -137,7 +137,16 @@ class HotelDashboardController extends Controller
             }
         });
 
-        return response()->json(['success' => true]);
+        // AJAX request → JSON; normal form → redirect with message
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        $message = $validated['action'] === 'check_in'
+            ? 'Guest checked in successfully.'
+            : 'Guest checked out successfully.';
+
+        return back()->with('success', $message);
     }
 
     public function storeBooking(Request $request)
