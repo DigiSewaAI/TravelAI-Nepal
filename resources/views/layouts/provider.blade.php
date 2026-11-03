@@ -330,7 +330,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 21V9"/></svg>
       My RFQs
     </a>
-<a href="{{ route('provider.my-purchases') }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
+<a href="{{ route('provider.my-purchases') }}" style="display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:#5b21b6;background:#f5f3ff;border:1px solid #ddd6fe;font-size:13.5px;font-weight:700;text-decoration:none;margin-bottom:8px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       {{ __('messages.my_purchases') }}
     </a>

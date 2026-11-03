@@ -1,80 +1,153 @@
 ═══════════════════════════════════════════════════════════
-👑 MASTER HANDOFF — SESSION 16 FINAL (18 COMMITS, HOLD PUSH)
-FROM: Session 16 Assistant
+👑 MASTER HANDOFF — SESSION 17 IN PROGRESS (6 COMMITS, HOLD PUSH)
+FROM: Session 17 Assistant (takeover from Session 16)
 TO:   Master / Future Reference
 DATE: 2026-11-03
-HEAD: main @ df87d21 (18 commits ahead of origin/main 9cf1958)
-STATUS: 🟢 7/7 AI + Phase A/B/C | 🔴 3 defer tickets | HOLD push (Owner evening)
+HEAD: main @ 2064ed8
+ORIGIN: cb127ab (6 commits ahead)
+STATUS: 🟢 Admin+Provider+Traveler notifications complete | 🔴 Batch B/C pending | HOLD push
 ═══════════════════════════════════════════════════════════
 
 ## 🚨 PUSH STATUS
 
 | Item | Value |
 |------|-------|
-| origin/main | `9cf1958` (production — Live) |
-| Local HEAD | `df87d21` |
-| Commits ahead | **18** |
-| Push trigger | Owner "push" GO — **HOLD (evening)** |
+| origin/main | `cb127ab` (production — Live) |
+| Local HEAD | `2064ed8` |
+| Commits ahead | **6** (post-Session 16 + new notifications work) |
+| Push trigger | Owner "push" GO — **HOLD** |
+
+## ⚠️ SESSION 16 → 17 RECONCILIATION
+
+Session 16 handoff said: HEAD `df87d21`, origin `9cf1958`, 18 ahead.
+**Reality now (fresh fetch):** origin moved to `cb127ab` (17+ commits pushed somewhere between sessions), local at `2064ed8`, **6 ahead**.
+
+No code loss confirmed via `git fetch` + `rev-list --count`. All Session 16 commits intact.
 
 ═══════════════════════════════════════════════════════════
 
-## 🎉 SESSION 16 — COMPLETE DELIVERY
-
-### ✅ 7/7 AI VERTICALS (14 features)
-
-| # | Vertical | Features |
-|---|----------|----------|
-| 1 | 🏨 Hotel | Occupancy Forecast + Room Pricing |
-| 2 | 🍜 Restaurant | Menu Intelligence + Demand Forecast |
-| 3 | 📦 Inventory | Stock Forecast + Reorder Assistant |
-| 4 | 🚐 Transport | Vehicle Assignment + Cost Estimator |
-| 5 | 🎨 ArtCraft | Product Description + Artwork Pricing |
-| 6 | 🧑‍✈️ Individual | Guide Matching + Profile Builder |
-| 7 | 💱 MoneyChanger | Daily Summary + Transaction Insights (NRB-safe) |
-
-### ✅ PHASE A — Enforcement (2 commits)
-
-- AI quota enforcement (7 verticals — service level)
-- Booking quota 5 paths (Hotel, Restaurant, Transport, Individual, ArtCraft)
-- MoneyChanger NRB validation (convertible sell rejected + UI visible)
-- Lang keys (ai_quota_exceeded, booking_limit_reached, nrb_convertible_buy_only)
-
-### ✅ PHASE B — Backlog (1 commit)
-
-- T1: PRICE-HISTORY-TABLE ✅ (migration + inject)
-- T2: INDIVIDUAL-RATING-REVIEWS-01 ✅ (migration + controller)
-- T3: RENTAL-ENUM-01 ✅ (3 enum values added)
-- T4: SELF-NOTIFICATION-GUARD-01 🟡 (helper ready, integration pending)
-
-### ✅ PHASE C — T8 Only (1 commit)
-
-- T8: TRANSPORT-TIME-OVERLAP ✅ (migration + guard)
-- T5/T6/T7 deferred (see P2 backlog)
-
-═══════════════════════════════════════════════════════════
-
-## 📊 SESSION 16 COMMITS (18 total ahead)
+## 📊 COMMITS AHEAD OF origin/main (6)
 
 | # | Hash | Message |
 |---|------|---------|
-| 18 | `df87d21` | feat(phase-c): transport time overlap prevention |
-| 17 | `7101dba` | feat(phase-b): price history + individual rating + rental enum + notification guard helper |
-| 16 | `b192532` | fix(moneychanger-ui): error visible in banner + modal |
-| 15 | `adc3b5b` | docs: session 16 handoff - 7/7 verticals + Phase A enforcement |
-| 14 | `157b4cd` | feat(phase-a): max_bookings enforcement (5 paths) + NRB + lang keys |
-| 13 | `c9b4d27` | feat(moneychanger-ai): daily summary + transaction insights - NRB-safe |
-| 12 | `d73467c` | feat(individual-ai): guide matching + profile builder - date-aware + load-balanced |
-| 11 | `75cb144` | feat(artcraft-ai): product description + artwork pricing |
-| 10 | `0a4c07c` | feat(transport-ai): vehicle assignment + cost estimator |
-| 9 | `69631d4` | fix(restaurant-ai): Buff Sekuwa keep monitoring + BASELINE badges |
-| 8 | `9de7877` | feat(restaurant-ai): menu intelligence + demand forecast |
-| 7 | `d3ce0e6` | feat(inventory-ai): stock forecast + reorder assistant |
-| 6 | `770943f` | chore: remove accidentally committed .bak files |
-| 5 | `4670ae7` | feat(hotel-ai): final - tier-mult + occupancy recalc + day names |
-| 4 | `018f65c` | fix(hotel-ai): ChatGPT audit concerns |
-| 3 | `885b762` | docs: consolidate handoff |
-| 2 | `d762895` | feat(hotel-ai): production-ready |
-| 1 | `fc37ec0` | feat(hotel-ai): occupancy forecast + pricing assistant |
+| 6 | `2064ed8` | feat(notifications): critical-only email (Option A) - 4 classes |
+| 5 | `ddbdace` | feat(admin-notif): register/verify/SOS/booking/RFQ (7 sites) |
+| 4 | `d379c77` | feat(admin-notif): subscription events (7 sites) + PaymentController fix |
+| 3 | `7d10929` | feat(admin): notification page - dual-mode controller + index blade |
+| 2 | `06b2ae6` | SOS siren global + active-count route fix + batch1 |
+| 1 | `6562857` | fix(hotel): flash success + history page (T2 complete) |
+
+═══════════════════════════════════════════════════════════
+
+## ✅ SESSION 17 — COMPLETE DELIVERY
+
+### 🔔 Notification System (FULL)
+
+**Admin bell — 15+ sites:**
+- Order: cancelled, payment verified, return confirmed (3)
+- Subscription: store (3 branches), upgrade (3), cancel (1) — 7 sites
+- Payment proof: silent-fail fixed → DB admins loop
+- Register: provider + traveler + agency (3)
+- Verification document submitted (1)
+- SOS alert (1)
+- New booking (1)
+- New RFQ (1)
+
+**Email channels — Option A (critical-only):**
+| Class | via() | Email triggers |
+|-------|-------|---------------|
+| `OrderStatusChanged` | database + mail | cancelled, delivered |
+| `ProviderAlertNotification` | database + mail | order, booking, wholesale_rfq, rfq, payment |
+| `UserAlertNotification` | database + mail | ✅ ALL events |
+| `AdminAlertNotification` | database + mail | sos, payment, verification |
+| `BookingStatusUpdated` | database + mail | (already from Phase 10) |
+
+**Guard:** `if (empty($notifiable->email))` → no mail channel (silent safe).
+
+### 🚨 SOS Siren
+- Global JS script `public/js/sos-siren-global.js` (4.7KB)
+- Route double-prefix bug fixed (`/active-count` group-relative)
+- `route:list` verified: `provider.sos-alerts.active-count` correct
+- Runtime browser test: pending (Batch B)
+
+### 🎛️ Admin Notification Page
+- Controller `Admin\NotificationController::index()` — dual-mode (JSON for bell, Blade for page)
+- View `resources/views/admin/notifications/index.blade.php` created
+- Routes intact: index / mark-read / mark-all-read
+
+═══════════════════════════════════════════════════════════
+
+## 📊 REAL DELIVERY STATUS (honest)
+
+### ✅ Completed (verified via git log)
+- 7/7 AI verticals (14 features) — Session 16
+- 14/14 plan limits enforced — Session 16
+- Phase A (quota + NRB) — Session 16
+- Phase B (T1-T3, T4 helper) — Session 16
+- Phase C (T8 transport overlap) — Session 16
+- Hotel price history UI — `6562857`
+- Multi-night booking spread — `cb127ab` (pushed by origin)
+- Self-notify guard 7 callsites — `8d89c69` (pushed)
+- SOS siren infrastructure — `06b2ae6`
+- Admin notification page — `7d10929`
+- Admin notif sites (15+) — `d379c77`, `ddbdace`
+- Critical email channels (4 classes) — `2064ed8`
+
+### 🔴 Pending — Batch B (~75 min)
+| # | Ticket | Scope | Effort |
+|---|--------|-------|--------|
+| 1 | `RFQ-CLOSED-CTA-01` | Rejected RFQ → "Start new RFQ" button | 30 min |
+| 2 | `TREKKING-MY-PURCHASES-THEME` | `--accent` define in provider.blade | 15 min |
+| 3 | `RFQ-MESSAGE-TEMPLATE-01` | RFQ number auto-fill in template | 30 min |
+
+### 🔴 Pending — Batch C (~9-10 hr, 2 sessions)
+| # | Ticket | Scope | Effort |
+|---|--------|-------|--------|
+| 4 | `SUPPLIER-CRUD-01` | Migration + CRUD | 2 hr |
+| 5 | `ADVANCED-HOTEL-FOLIO-01` | Migration + folio system | 2 hr |
+| 6 | `MULTILINGUAL-EXPANSION-01` | bn/fr/de locales (5 existing: en/np/hi/zh/ru) | 2-3 hr |
+| 7 | `PAYMENTS-UNIFIED-01` (T5) | Payments tabs UI | 2 hr |
+| 8 | `TEST-FLAKY-ORDERMGMT-01` | Flaky test isolate + fix | 1 hr |
+
+### 🔴 Pending — Verify (blocking push decision)
+| # | Item | Status |
+|---|------|--------|
+| V1 | Booking paths 5 vs 7 (commit `157b4cd` says "5 paths") | grep verify |
+| V2 | SOS siren browser runtime (fetch + beep + ring) | manual test |
+| V3 | Tests 186/186 | run |
+
+### ⚫ Skipped / Deferred (Owner decision)
+- `SECURITY-ROTATE-PASSWORDS-01` — dummy data, skip
+- `EXPLORE-VIEW-SPLIT` (1865-line) — backlog
+- `AI-PREDICTION-VARIANCE` — backlog
+- `PROVIDER-TRAVELER-SWITCH-01` — backlog
+
+═══════════════════════════════════════════════════════════
+
+## 🚨 PRODUCTION TODOs (master file update requirement)
+
+### TODO-01 — Queue Migration
+Current: `QUEUE_CONNECTION=database` (testing/local — **deliberately set, free**)
+Production TODO: **Scale हुँदा `redis` वा `SQS` मा migrate गर्नुपर्ने।**
+Reason: database queue + high volume = slow workers, DB lock contention.
+**Not urgent** — testing/local सँग database queue ठीक छ।
+
+### TODO-02 — Brevo Rate Limit
+Current: Brevo SMTP, **free tier = 300 emails/day**
+Status: **अहिले पर्याप्त** (testing traffic कम)
+Production TODO: Traffic बढे upgrade वा alternative SMTP (Mailgun, SES)।
+Monitor: Brevo dashboard → daily send count
+
+### TODO-03 — Email Preference System
+Current: No opt-out mechanism — critical events सबैलाई जान्छ
+Production TODO: User email preferences page (subscribe/unsubscribe by category)
+Reason: Compliance + user experience
+**Not blocking** — Option A critical-only = कम spam, low risk
+
+### TODO-04 — Admin Email Reply-to
+Current: `MAIL_REPLY_TO_ADDRESS=admin@travelainepal.com`
+Status: Access confirmed? (Owner जान्नुहुन्छ)
+Production TODO: Real monitored inbox बनाउने वा noreply राख्ने
 
 ═══════════════════════════════════════════════════════════
 
@@ -82,176 +155,36 @@ STATUS: 🟢 7/7 AI + Phase A/B/C | 🔴 3 defer tickets | HOLD push (Owner even
 
 | Session | Tests |
 |---------|-------|
-| Session 16 final | ✅ **186/186 passing** |
-| phpunit.xml | `DB_DATABASE=travelai_test` (safe separate DB) |
+| Session 16 final | ✅ 186/186 passing |
+| Session 17 (pending) | 🔴 not run (Batch B/C changes pending) |
 
-### Test command
+Test command (after Batch B/C):
 ```cmd
 php artisan test 2>&1 | findstr /C:"Tests:" /C:"FAIL"
+⚠️ NEVER run php artisan test in fix scripts (Session 16 lesson: caused DB wipe)
+
 ═══════════════════════════════════════════════════════════
 
-🛡️ SAFETY LEARNINGS (Session 16 critical)
+🛡️ SAFETY LEARNINGS (accumulated)
 Rule	Status
 Z1 (NO destructive)	✅ Zero migrate:fresh / db:wipe
-Z2 (Backup before action)	✅ .bak on all edits
+Z2 (Backup before action)	✅ .bak_* on all edits
 php -l before save	✅ Every script
 Auto-revert on fail	✅ Every script
-Tenant isolation	✅ All queries provider_id scoped
-NO artisan test in fix scripts	✅ (caused DB wipe once — never again)
-phpunit.xml WARNING
-text
-DB_DATABASE=travelai_test  ← safe (separate DB)
-⚠️ But still do not run php artisan test in fix scripts — main DB hit गर्न सक्छ if config changed।
-
+Tenant isolation	✅ provider_id scoped
+NO artisan test in fix scripts	✅
+phpunit.xml safe	DB_DATABASE=travelai_test (separate DB)
+Cleanup after fix	✅ Script + .bak deleted post-commit
 ═══════════════════════════════════════════════════════════
 
-📊 ChatGPT Audit Loop — Session 16 Summary
-Vertical	Rounds	Findings	Fixed
-Hotel	4	16	✅
-Restaurant	4	14	✅
-Inventory	6	18	✅
-Transport	7	22	✅
-ArtCraft	2	6	✅
-Individual	7	15	✅
-MoneyChanger	2	7	✅
-Total	32	98	✅
-Pattern: ChatGPT कहिल्यै "perfect" भन्दैन — functional 100% भएपछि loop बन्द गर्नु।
-
-═══════════════════════════════════════════════════════════
-
-🔴 REMAINING BACKLOG (Post-Push)
-🟡 P1 — Deferred from Phase C (post-push)
-#	Ticket	Scope	Effort
-1	PAYMENTS-UNIFIED-01	PaymentsController location unknown — discovery needed	2 hr
-2	CHECKOUT-PAYMENT-PREVIEW	checkout/index.blade.php + payment methods section	1 hr
-3	RFQ-DELIVERY-CHARGE	rfqs table नाम verify + delivery_charge migration	1.5 hr
-4	SELF-NOTIFICATION-INTEGRATION-01	T4 helper apply to 10 notification classes	1 hr
-🟡 P2 — Feature backlog (future)
-#	Ticket	Effort
-5	PRICE-HISTORY-VIEW (Hotel history UI)	1 hr
-6	EXPLORE-VIEW-SPLIT (1865-line → partials)	2-3 hr
-7	INDIVIDUAL-RATING-DYNAMIC (real reviews)	1 hr
-8	MULTI-NIGHT-BOOKING-FORECAST (Hotel)	2 hr
-9	AI-PREDICTION-VARIANCE (Hotel flat)	1 hr
-🟢 P3 — Post-deploy
-#	Ticket
-10	SECURITY-ROTATE-PASSWORDS-01
-11	MULTILINGUAL-EXPANSION-01 (bn/fr/de)
-12	ADVANCED-HOTEL-FOLIO-01
-13	PROVIDER-TRAVELER-SWITCH-01
-14	SUPPLIER-CRUD-01
-15	TREKKING-MY-PURCHASES-THEME
-16	RFQ-CLOSED-CTA-01
-17	RFQ-MESSAGE-TEMPLATE-01
-18	PAYMENTS-UNIFIED-INTEGRATION
-═══════════════════════════════════════════════════════════
-
-📁 FILES CHANGED (Session 16 — 18 commits)
-New Services (7)
-app/Services/HotelAiService.php
-
-app/Services/RestaurantAiService.php
-
-app/Services/InventoryAiService.php
-
-app/Services/TransportAiService.php
-
-app/Services/ArtCraftAiService.php
-
-app/Services/IndividualAiService.php
-
-app/Services/MoneyChangerAiService.php
-
-app/Services/NotificationGuardService.php (Phase B T4)
-
-New Migrations (7)
-2026_11_02_*_add_base_price_to_hotel_rooms.php
-
-2026_11_02_*_add_price_limits_to_hotel_rooms.php
-
-2026_11_03_*_add_cost_fields_to_artworks.php
-
-2026_11_03_*_add_guide_fields_to_provider_staff.php
-
-2026_11_03_*_create_hotel_room_price_history.php
-
-2026_11_03_*_add_provider_staff_to_reviews.php
-
-2026_11_03_*_expand_order_items_provider_status_enum.php
-
-2026_11_03_*_add_travel_time_to_transport_bookings.php
-
-Controllers Modified (8)
-All 7 provider *DashboardController.php (AI methods + Phase A enforcement)
-
-HotelDashboardController (price history inject)
-
-IndividualDashboardController (rating inject)
-
-TransportDashboardController (overlap guard)
-
-MoneyChangerDashboardController (NRB validation)
-
-Routes Added (14)
-2 per vertical ({vertical}/ai/{feature-1}, {vertical}/ai/{feature-2})
-
-Hotel extra: /hotel/ai/apply-pricing
-
-Views Modified (8)
-7 reports.blade.php (AI cards + JS)
-
-money-changer/transactions.blade.php (error banner + modal)
-
-Lang Keys Added (~30)
-Hotel AI: 7 keys
-
-Restaurant AI: 7 keys
-
-Inventory AI: 7 keys
-
-Transport AI: 7 keys
-
-ArtCraft AI: 7 keys
-
-Individual AI: 7 keys
-
-MoneyChanger AI: 7 keys
-
-Phase A: 3 keys (ai_quota_exceeded, booking_limit_reached, nrb_convertible_buy_only)
-
-═══════════════════════════════════════════════════════════
-
-🎯 SESSION 17 PRIORITY (Post-Push)
-Step 1 — Push (Owner evening GO)
-cmd
-git push origin main
-Step 2 — Verify production
-Laravel Cloud dashboard → deployment status
-
-Test accounts login
-
-7 verticals AI features
-
-Step 3 — Post-push backlog (P1)
-PAYMENTS-UNIFIED-01 (discovery first)
-
-CHECKOUT-PAYMENT-PREVIEW
-
-RFQ-DELIVERY-CHARGE
-
-SELF-NOTIFICATION-INTEGRATION-01
-
-Step 4 — P2/P3 backlog (next sessions)
-═══════════════════════════════════════════════════════════
-
-💡 KEY CONTEXT
+🔑 KEY CONTEXT
 Owner = "दाइ" (never "Bhai")
 
-Production = 9cf1958 (Live)
+Production = cb127ab (Live)
 
-Local = df87d21 (18 commits ahead)
+Local = 2064ed8 (6 commits ahead)
 
-Tests = 186/186 passing (phpunit.xml safe)
+Tests = 186/186 (baseline from Session 16)
 
 i18n = 5 locales (en/np/hi/zh/ru) — Provider = EN/NP only
 
@@ -260,6 +193,12 @@ AI pool: groq (2 keys), openrouter, cerebras, gemini
 Model: qwen/qwen3.8-27b (groq default)
 
 Fallback: enabled
+
+Queue: database (free, testing)
+
+Mail: Brevo SMTP (300/day free tier)
+
+Admin email: parasharregmi@gmail.com (only super_admin)
 
 Test Accounts (all passwords: Himalayan@1980)
 Role	Email
@@ -282,76 +221,73 @@ Provider Dashboard languages	🔒 EN/NP only
 Trekking Views content	🔒 Byte-for-byte
 provider-restaurant.blade.php :root	🔒 Never touch
 Admin panel i18n	🔒 Future
-Push	🔒 HOLD — Owner evening GO
+Push	🔒 HOLD — Owner GO
 ═══════════════════════════════════════════════════════════
 
-📊 Rules Status (R1-R17 + Z1/Z2)
-Rule	Status
-R3 (Evidence)	✅ Discovery before fix
-R4 (Scope)	✅ Phase-by-phase
-R8 (Additive)	✅ All migrations additive
-R13 (git add explicit)	✅
-R16 (186/186)	✅ Verified each commit
-R17 (Push)	⚠️ NOT PUSHED — HOLD per Owner
-Z1 (NO destructive)	✅
-Z2 (Backup before action)	✅
-═══════════════════════════════════════════════════════════
-
-🛠️ PROVEN PATTERNS (Session 16)
+🛠️ PROVEN PATTERNS (Session 16 + 17)
 One-Shot Fix Script
+php
 require bootstrap/app.php + patch() function
-
-Anchor uniqueness (substr_count($content, $anchor) === 1)
-
+Anchor uniqueness check (substr_count === 1)
 Backup .bak → replace → php -l → auto-revert on fail
-
 Per-file independent (fail isolated)
-
 NEVER include artisan test in fix script
-
 Delete script after run
-
 Language File Edit (R11)
 require + var_export — NEVER str_replace on lang files
 
-Pool-Aware LLM
-generateRawTextPooled() iterates all providers
-
-JSON mode: response_format = ['type' => 'json_object']
-
-generateRawText() untouched
-
+Notification Class Pattern (Session 17)
+php
+public function via($notifiable): array {
+    $channels = ['database'];
+    if (empty($notifiable->email)) return $channels;
+    if (in_array($this->category, [/* triggers */], true)) $channels[] = 'mail';
+    return $channels;
+}
+public function toMail($notifiable) { /* MailMessage */ }
 Vertical AI Pattern (7x proven)
-Deterministic-first + AI-refine + graceful fallback
-
-Server-side clamps (min/max)
-
-Assumptions footer (transparency)
-
-BASELINE/INSUFFICIENT badges
-
-Tenant isolation + quota reuse
-
-Blade Gotchas
-@extends($provider_layout ?? 'layouts.provider-X') — dynamic
-
-@if(!empty($var)) null-safe (NOT @if($var) — PHP 8 ErrorException)
-
-Nested @if inside @elseif chain → separate @if blocks
+Deterministic-first + AI-refine + graceful fallback + server-side clamps
 
 CMD Gotchas
 --execute with $ → use interactive php artisan tinker
 
 PHP 8 str_replace 4th arg (count) — reference required
 
-Double-quote string interpolation in PHP scripts — escape $
+PowerShell nested quotes → use separate commands, not chained
+
+findstr /C:"..." /C:"..." — multiple /C needs separate args
 
 ═══════════════════════════════════════════════════════════
 
-Report prepared by: Session 16 Assistant
-Verified: 7/7 verticals + Phase A/B/C + 186/186 tests + 18 commits
-Production status: NOT PUSHED (HOLD per Owner evening)
-Next: Push GO → P1 backlog (Payments/RFQ/Checkout)
+🎯 SESSION 17 CONTINUATION PLAN
+Step 1 — Batch B (75 min)
+RFQ CTA + Trekking accent + RFQ template
+
+Step 2 — Batch C (2 sessions)
+Supplier CRUD + Hotel Folio + Multilingual + Payments tabs + Flaky test
+
+Step 3 — Verify (V1-V3)
+Booking paths grep + SOS runtime + 186/186 tests
+
+Step 4 — Push (Owner GO)
+git push origin main → verify Laravel Cloud deploy
+
+Step 5 — Testing (register-flow)
+6 rounds: provider signup → verification → traveler signup → booking → subscription payment → SOS
+
+Step 6 — Master file update
+Mark this session complete, carry forward PRODUCTION TODOs
+
+═══════════════════════════════════════════════════════════
+
+Report prepared by: Session 17 Assistant
+Verified: 6 commits ahead, working tree clean, admin notif complete
+Production status: NOT PUSHED (HOLD)
+Next: Batch B — 3 items pending
+  1. RFQ-CLOSED-CTA-01 (30 min) — rejected → "Start new RFQ" button
+  2. TREKKING-MY-PURCHASES-THEME (15 min) — --accent in provider.blade
+  3. RFQ-MESSAGE-TEMPLATE-01 (30 min) — RFQ number auto-fill in template
+Discovery bundle → fix script → tests → commit
 
 ═══════════════════════════════════════════════════════════
 
