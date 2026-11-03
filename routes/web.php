@@ -383,6 +383,7 @@ Route::post('/art-craft/ai/pricing', [\App\Http\Controllers\Provider\ArtCraftDas
     Route::get('/alerts/live-counts', [ProviderDashboardController::class, 'getLiveAlertCounts'])->name('alerts.live-counts');
     // SOS Alerts (Phase 2 — provider notifications)
     Route::prefix('sos-alerts')->name('sos-alerts.')->group(function () {
+Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::class, 'activeCountJson'])->name('active-count');
         Route::get('/', [\App\Http\Controllers\Provider\SosAlertController::class, 'index'])->name('index');
         Route::get('/{sos}', [\App\Http\Controllers\Provider\SosAlertController::class, 'show'])->name('show');
         Route::patch('/{sos}/resolve', [\App\Http\Controllers\Provider\SosAlertController::class, 'resolve'])->name('resolve');

@@ -131,7 +131,14 @@
             @endforelse
         </div>
 
-        @if(!in_array($rfq->status, ['expired', 'cancelled', 'rejected', 'accepted']))
+        
+@if(in_array($rfq->status, ['rejected', 'expired', 'cancelled']))
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-top:16px;text-align:center;">
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">This RFQ is closed.</p>
+    </div>
+@endif
+
+@if(!in_array($rfq->status, ['expired', 'cancelled', 'rejected', 'accepted']))
             <form method="POST" action="{{ route('provider.wholesale-rfq.message', $rfq) }}" style="display:flex;flex-direction:column;gap:10px">
                 @csrf
                 <textarea name="message" required rows="2" maxlength="2000"

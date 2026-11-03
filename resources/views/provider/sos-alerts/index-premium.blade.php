@@ -1,6 +1,29 @@
 @extends($provider_layout ?? 'layouts.provider')
 @section('title', __('messages.sos_alerts_title'))
 @section('content')
+
+{{-- SOS Siren Banner — loops until acknowledge --}}
+@if($activeCount > 0)
+<div id="sosEnableBanner" onclick="enableSosAudio()" style="position:fixed;top:80px;right:20px;background:#dc2626;color:#fff;padding:14px 20px;border-radius:12px;font-weight:800;z-index:99999;cursor:pointer;font-size:13px;max-width:340px;box-shadow:0 6px 24px rgba(220,38,38,.6);border:2px solid #fff;animation:sosPulse 1.5s infinite;">
+    <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">🔔</span>
+        <div style="flex:1;">
+            <div style="font-size:14px;margin-bottom:2px;">Active SOS Alert</div>
+            <div id="sosHint" style="font-size:11px;opacity:.95;">Click anywhere to enable siren</div>
+        </div>
+    </div>
+    <button id="sosAckBtn" type="button" onclick="acknowledgeSos(event)" style="display:none;width:100%;margin-top:10px;background:#fff;color:#dc2626;padding:8px;border:0;border-radius:8px;font-weight:900;cursor:pointer;font-size:12px;">🔕 Silence & Acknowledge</button>
+</div>
+<style>
+@keyframes sosPulse {
+    0%,100% { box-shadow:0 6px 24px rgba(220,38,38,.6), 0 0 0 0 rgba(220,38,38,.7); }
+    50% { box-shadow:0 6px 24px rgba(220,38,38,.6), 0 0 0 16px rgba(220,38,38,0); }
+}
+</style>
+@endif
+
+
+
 <style>
 .ps-hero{background:linear-gradient(135deg,var(--accent,#2563eb) 0%,var(--accent-d,#1d4ed8) 100%);border-radius:18px;padding:26px 30px;margin-bottom:22px;color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 40px -14px rgba(0,0,0,.3)}
 .ps-hero::before{content:'';position:absolute;top:-50%;right:-10%;width:55%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 60%);pointer-events:none}
@@ -131,4 +154,105 @@
     @endif
   </div>
 </div>
+
+
+
+{{-- SOS Siren — loop until acknowledge --}}
+<script>
+(function() {
+    var audioCtx = null;
+    var enabled = localStorage.getItem('sos_audio_enabled') === 'true';
+    var acknowledged = sessionStorage.getItem('sos_acknowledged') === 'true';
+    var ringing = false;
+    var ringInterval = null;
+    var activeCount = {{ $activeCount ?? 0 }};
+
+    function playSiren() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            var t = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(600, t);
+            gain.gain.setValueAtTime(0.35, t);
+            for (var i = 0; i < 4; i++) {
+                osc.frequency.linearRampToValueAtTime(1100, t + 0.3 + i*0.6);
+                osc.frequency.linearRampToValueAtTime(600, t + 0.6 + i*0.6);
+            }
+            gain.gain.linearRampToValueAtTime(0.01, t + 2.4);
+            osc.start(t); osc.stop(t + 2.5);
+        } catch (e) { console.warn('Siren:', e); }
+    }
+
+    function startRinging() {
+        if (ringing) return;
+        ringing = true;
+        playSiren();
+        ringInterval = setInterval(playSiren, 5000);
+        var ackBtn = document.getElementById('sosAckBtn');
+        if (ackBtn) ackBtn.style.display = 'block';
+        var hint = document.getElementById('sosHint');
+        if (hint) hint.textContent = '🔊 Siren active — click Silence to stop';
+    }
+
+    function stopRinging() {
+        ringing = false;
+        if (ringInterval) { clearInterval(ringInterval); ringInterval = null; }
+    }
+
+    window.enableSosAudio = function() {
+        if (enabled) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx.resume().then(function() {
+                enabled = true;
+                localStorage.setItem('sos_audio_enabled', 'true');
+                startRinging();
+            });
+        } catch (e) { console.warn('Enable:', e); }
+    };
+
+    window.acknowledgeSos = function(e) {
+        if (e) e.stopPropagation();
+        acknowledged = true;
+        sessionStorage.setItem('sos_acknowledged', 'true');
+        stopRinging();
+        var b = document.getElementById('sosEnableBanner');
+        if (b) b.remove();
+    };
+
+    // On load:
+    if (activeCount > 0) {
+        if (enabled && !acknowledged) {
+            startRinging();
+        } else if (!enabled) {
+            ['click', 'keydown', 'touchstart'].forEach(function(evt) {
+                document.addEventListener(evt, enableSosAudio, { once: true, passive: true });
+            });
+        }
+    }
+
+    // Poll for new alerts (every 15s) — if enabled, ring on change
+    if (enabled) {
+        var lastCount = activeCount;
+        setInterval(function() {
+            fetch(window.location.href, { credentials: 'same-origin', cache: 'no-store' })
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    var matches = html.match(/ps-pill active/g);
+                    var count = matches ? matches.length : 0;
+                    if (count > lastCount) {
+                        sessionStorage.removeItem('sos_acknowledged');
+                        acknowledged = false;
+                        startRinging();
+                    }
+                    lastCount = count;
+                }).catch(function() {});
+        }, 15000);
+    }
+})();
+</script>
 @endsection

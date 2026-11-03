@@ -314,5 +314,7 @@ document.addEventListener('DOMContentLoaded', function(){
   overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('show')});
 </script>
 @stack('mc-scripts')
+
+<script src="{{ asset('js/sos-siren-global.js') }}"></script>
 </body>
 </html>

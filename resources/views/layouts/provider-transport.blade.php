@@ -334,5 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @stack('transport-scripts')
+
+<script src="{{ asset('js/sos-siren-global.js') }}"></script>
 </body>
 </html>

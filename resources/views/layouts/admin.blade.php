@@ -337,5 +337,55 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     @stack('scripts')
+
+<script>
+function playAlertSiren() {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        var now = ctx.currentTime;
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.25, now);
+        for (var i = 0; i < 4; i++) {
+            osc.frequency.linearRampToValueAtTime(1100, now + 0.3 + i * 0.6);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.6 + i * 0.6);
+        }
+        gain.gain.linearRampToValueAtTime(0.01, now + 2.4);
+        osc.start(now);
+        osc.stop(now + 2.5);
+    } catch (e) { console.warn('Siren unavailable:', e); }
+}
+function playAdminNotificationSound() {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
+}
+// Track unread count — play sound on new
+var lastAdminUnread = null;
+setInterval(function() {
+    fetch('{{ route('admin.notifications.index') }}', {headers: {'Accept': 'application/json'}})
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (lastAdminUnread !== null && data.unread_count > lastAdminUnread) {
+                playAdminNotificationSound();
+            }
+            lastAdminUnread = data.unread_count;
+        }).catch(function() {});
+}, 15000);
+</script>
 </body>
 </html>

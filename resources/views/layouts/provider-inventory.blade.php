@@ -335,5 +335,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 @stack('inv-scripts')
+
+<script src="{{ asset('js/sos-siren-global.js') }}"></script>
 </body>
 </html>

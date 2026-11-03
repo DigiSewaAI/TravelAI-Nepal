@@ -21,6 +21,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
+:root {
+    --accent: #7c3aed;
+    --accent-d: #6d28d9;
+    --accent-soft: #ede9fe;
+    --accent-fg: #ffffff;
+    --green: #10b981;
+}
+
         body { font-family: 'Inter', sans-serif; background: #f9fafb; }
         .sidebar-link { transition: all 0.2s ease; }
         .sidebar-link:hover { background: #f3f4f6; }
@@ -613,5 +621,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
     @stack('scripts')
+
+<script>
+function playAlertSiren() {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        var now = ctx.currentTime;
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.25, now);
+        for (var i = 0; i < 4; i++) {
+            osc.frequency.linearRampToValueAtTime(1100, now + 0.3 + i * 0.6);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.6 + i * 0.6);
+        }
+        gain.gain.linearRampToValueAtTime(0.01, now + 2.4);
+        osc.start(now);
+        osc.stop(now + 2.5);
+    } catch (e) { console.warn('Siren unavailable:', e); }
+}
+</script>
+
+<script src="{{ asset('js/sos-siren-global.js') }}"></script>
 </body>
 </html>

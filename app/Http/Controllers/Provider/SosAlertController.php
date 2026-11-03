@@ -120,4 +120,22 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.sos-alerts.sho
 
         return back()->with('success', __('messages.sos_alerts_resolved_msg'));
     }
+
+    /**
+     * JSON endpoint for global siren polling.
+     * Returns active SOS count + latest ID.
+     */
+    public function activeCountJson()
+    {
+        $provider = $this->getProvider();
+        if (!$provider) {
+            return response()->json(['count' => 0, 'latest_id' => 0]);
+        }
+        $q = \App\Models\SosAlert::where('provider_id', $provider->id)
+            ->whereIn('status', ['pending', 'sent']);
+        return response()->json([
+            'count' => (int) $q->count(),
+            'latest_id' => (int) ($q->max('id') ?? 0),
+        ]);
+    }
 }
