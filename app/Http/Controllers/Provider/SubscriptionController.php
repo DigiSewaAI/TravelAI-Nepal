@@ -11,6 +11,27 @@ use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
+
+    /**
+     * Notify all admins about a subscription event (in-app bell).
+     */
+    private function notifyAdminsSubscription(string $title, string $message, string $url): void
+    {
+        try {
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
+                    $title,
+                    $message,
+                    'subscription',
+                    $url
+                ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Admin subscription notification failed', ['error' => $e->getMessage()]);
+        }
+    }
+
     /**
      * Display subscription management page.
      */
@@ -86,6 +107,12 @@ class SubscriptionController extends Controller
                 'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
             ]);
 
+            $this->notifyAdminsSubscription(
+                'New Subscription',
+                'Provider ' . $provider->name . ' subscribed to ' . $plan->name . ' (' . $billingInterval . ')',
+                route('admin.providers.show', $provider->id)
+            );
+
             return redirect()->route('provider.subscriptions.index')
                 ->with('success', $plan->name . ' plan activated successfully!');
         } else {
@@ -108,9 +135,21 @@ class SubscriptionController extends Controller
                 $subscription->end_date = now()->addYear();
                 $subscription->save();
 
+                $this->notifyAdminsSubscription(
+                    'New Subscription (Free)',
+                    'Provider ' . $provider->name . ' subscribed to ' . $plan->name . ' (' . $billingInterval . ')',
+                    route('admin.providers.show', $provider->id)
+                );
+
                 return redirect()->route('provider.subscriptions.index')
                     ->with('success', $plan->name . ' plan activated successfully!');
             }
+
+            $this->notifyAdminsSubscription(
+                'Pending Subscription Payment',
+                'Provider ' . $provider->name . ' selected ' . $plan->name . ' (' . $billingInterval . ') - awaiting payment',
+                route('admin.providers.show', $provider->id)
+            );
 
             return redirect()->route('provider.payments.show', $subscription->id)
                 ->with('info', 'Please complete the payment to activate your subscription.');
@@ -182,6 +221,12 @@ class SubscriptionController extends Controller
                 'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
             ]);
 
+            $this->notifyAdminsSubscription(
+                'Plan Upgraded',
+                'Provider ' . $provider->name . ' upgraded to ' . $plan->name . ' (' . $billingInterval . ')',
+                route('admin.providers.show', $provider->id)
+            );
+
             return redirect()->route('provider.subscriptions.index')
                 ->with('success', 'Plan upgraded to ' . $plan->name . ' successfully!');
         }
@@ -208,6 +253,12 @@ class SubscriptionController extends Controller
                 ]);
             });
 
+            $this->notifyAdminsSubscription(
+                'Plan Upgraded (Free)',
+                'Provider ' . $provider->name . ' upgraded to ' . $plan->name . ' (Free)',
+                route('admin.providers.show', $provider->id)
+            );
+
             return redirect()->route('provider.subscriptions.index')
                 ->with('success', 'Plan upgraded to ' . $plan->name . ' (Free) successfully!');
         }
@@ -222,6 +273,12 @@ class SubscriptionController extends Controller
             'start_date' => now(),
             'end_date' => $billingInterval === 'yearly' ? now()->addYear() : now()->addMonth(),
         ]);
+
+        $this->notifyAdminsSubscription(
+            'Pending Plan Upgrade Payment',
+            'Provider ' . $provider->name . ' upgrading to ' . $plan->name . ' (' . $billingInterval . ') - awaiting payment',
+            route('admin.providers.show', $provider->id)
+        );
 
         return redirect()->route('provider.payments.show', $subscription->id)
             ->with('info', 'Please complete the payment to activate your new plan.');
@@ -250,6 +307,12 @@ class SubscriptionController extends Controller
         $subscription->status = 'cancelled';
         $subscription->end_date = now();
         $subscription->save();
+
+        $this->notifyAdminsSubscription(
+            'Subscription Cancelled',
+            'Provider ' . $provider->name . ' cancelled ' . ($subscription->plan->name ?? 'their subscription'),
+            route('admin.providers.show', $provider->id)
+        );
 
         return back()->with('success', 'Subscription cancelled successfully.');
     }

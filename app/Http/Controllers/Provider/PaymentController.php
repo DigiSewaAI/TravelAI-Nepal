@@ -185,15 +185,19 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.payments.show'
             'subscription_id' => $subscription->id,
         ]);
 
-                // NOTIFICATION-PRIORITY-01: Notify Admin about Payment Proof
+                // NOTIFICATION-PRIORITY-01: Notify Admins about Payment Proof (in-app bell)
         try {
-            \Illuminate\Support\Facades\Notification::route('mail', env('ADMIN_EMAIL', 'admin@travelainepal.com'))
-                ->notify(new \App\Notifications\AdminAlertNotification(
+            $admins = \App\Models\User::whereIn('role', ['admin', 'super_admin'])->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\AdminAlertNotification(
                     'New Payment Proof Submitted',
-                    'Provider **' . $provider->name . '** has submitted payment proof for the **' . ($subscription->plan->name ?? 'Plan') . '** plan. Amount: NPR ' . number_format($payment->amount, 2) . '. Reference: ' . $payment->reference_number,
-                    route('admin.payments.verify') // ✅ Verified from route:list
+                    'Provider ' . $provider->name . ' has submitted payment proof for ' . ($subscription->plan->name ?? 'Plan') . ' plan. Amount: NPR ' . number_format($payment->amount, 2) . '. Reference: ' . $payment->reference_number,
+                    'payment',
+                    route('admin.payments.verify'),
+                    $payment->id
                 ));
-        } catch (\Exception $e) {
+            }
+        } catch (\Throwable $e) {
             Log::error('Failed to send Admin Payment Notification: ' . $e->getMessage());
         }
 
