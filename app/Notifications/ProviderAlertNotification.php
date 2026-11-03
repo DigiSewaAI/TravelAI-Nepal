@@ -18,7 +18,26 @@ class ProviderAlertNotification extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if (empty($notifiable->email)) {
+            return $channels;
+        }
+        if (in_array($this->category, ['order', 'booking', 'wholesale_rfq', 'rfq', 'payment'], true)) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable): \Illuminate\Notifications\Messages\MailMessage
+    {
+        $mail = (new \Illuminate\Notifications\Messages\MailMessage)
+            ->subject('[TravelAI] ' . $this->title)
+            ->greeting('Hello ' . ($notifiable->name ?? 'Provider'))
+            ->line($this->message);
+        if (!empty($this->url)) {
+            $mail->action('View Details', $this->url);
+        }
+        return $mail->line('Thank you for using TravelAI Nepal!');
     }
 
     public function toArray($notifiable): array

@@ -19,7 +19,26 @@ class AdminAlertNotification extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if (empty($notifiable->email)) {
+            return $channels;
+        }
+        if (in_array($this->category, ['sos', 'payment', 'verification'], true)) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable): \Illuminate\Notifications\Messages\MailMessage
+    {
+        $mail = (new \Illuminate\Notifications\Messages\MailMessage)
+            ->subject('[Admin] ' . $this->title)
+            ->greeting('Hello ' . ($notifiable->name ?? 'Admin'))
+            ->line($this->message);
+        if (!empty($this->url)) {
+            $mail->action('View in Admin', $this->url);
+        }
+        return $mail->line('TravelAI Nepal — Admin Alert');
     }
 
     public function toArray($notifiable): array
