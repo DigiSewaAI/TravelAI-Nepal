@@ -117,8 +117,8 @@
                     <div class="pad-field">
                         <label>{{ __('messages.ads_link_target_label') }}</label>
                         <select name="link_target">
-                            <option value="_blank">New Tab</option>
-                            <option value="_self">Same Tab</option>
+                            <option value="_blank">{{ __('messages.new_tab') }}</option>
+                            <option value="_self">{{ __('messages.same_tab') }}</option>
                         </select>
                     </div>
                 </div>

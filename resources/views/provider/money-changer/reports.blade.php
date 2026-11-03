@@ -38,10 +38,10 @@
 </div>
 
 <div class="mc-grid">
-  <div class="mc-stat"><div class="mc-lbl">All-Time Volume</div><div class="mc-val accent">Rs {{ number_format($allTimeVolume) }}</div></div>
-  <div class="mc-stat"><div class="mc-lbl">All-Time Profit</div><div class="mc-val" style="color:var(--green,#10b981);">Rs {{ number_format($allTimeProfit) }}</div></div>
-  <div class="mc-stat"><div class="mc-lbl">Transactions</div><div class="mc-val">{{ $totalTxCount }}</div></div>
-  <div class="mc-stat"><div class="mc-lbl">Today Volume</div><div class="mc-val">Rs {{ number_format($todayVolume) }}</div></div>
+  <div class="mc-stat"><div class="mc-lbl">{{ __('messages.all_time_volume') }}</div><div class="mc-val accent">Rs {{ number_format($allTimeVolume) }}</div></div>
+  <div class="mc-stat"><div class="mc-lbl">{{ __('messages.all_time_profit') }}</div><div class="mc-val" style="color:var(--green,#10b981);">Rs {{ number_format($allTimeProfit) }}</div></div>
+  <div class="mc-stat"><div class="mc-lbl">{{ __('messages.transactions') }}</div><div class="mc-val">{{ $totalTxCount }}</div></div>
+  <div class="mc-stat"><div class="mc-lbl">{{ __('messages.today_volume') }}</div><div class="mc-val">Rs {{ number_format($todayVolume) }}</div></div>
 </div>
 
 <div class="mc-card">
@@ -73,7 +73,7 @@
       <span class="val">Rs {{ number_format($c->total_volume) }}</span>
     </div>
   @empty
-    <p class="mc-empty">No currency data yet.</p>
+    <p class="mc-empty">{{ __('messages.no_currency_data_yet') }}</p>
   @endforelse
 </div>
 
@@ -85,7 +85,7 @@
       <span class="val">Rs {{ number_format($c->total_volume) }}</span>
     </div>
   @empty
-    <p class="mc-empty">No customer data yet.</p>
+    <p class="mc-empty">{{ __('messages.no_customer_data_yet') }}</p>
   @endforelse
 </div>
 

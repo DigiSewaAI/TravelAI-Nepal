@@ -157,11 +157,11 @@
                                         <div style="font-size:13px;font-weight:700;color:var(--text)">{{ $method->bank_name }}</div>
                                     @endif
                                     @if($method->account_name)
-                                        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:6px">Account Name</div>
+                                        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:6px">{{ __('messages.account_name') }}</div>
                                         <div style="font-size:13px;font-weight:700;color:var(--text)">{{ $method->account_name }}</div>
                                     @endif
                                     @if($method->account_number)
-                                        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:6px">Account Number</div>
+                                        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-top:6px">{{ __('messages.account_number') }}</div>
                                         <div style="font-size:13px;font-weight:700;color:var(--text);font-family:'Courier New',monospace">{{ $method->account_number }}</div>
                                     @endif
                                     @if($method->identifier)
@@ -192,7 +192,7 @@
                         <div class="ps-alert warn" style="margin:0">
                             <i class="fas fa-hourglass-half" style="font-size:20px"></i>
                             <div>
-                                <div style="font-size:14px;font-weight:800">Awaiting Verification</div>
+                                <div style="font-size:14px;font-weight:800">{{ __('messages.awaiting_verification') }}</div>
                                 <div style="font-size:13px;margin-top:4px;font-weight:600">Your payment proof was submitted on {{ $pendingPayment->created_at->format('M d, Y g:i A') }}. Reference: <strong>{{ $pendingPayment->reference_number }}</strong></div>
                                 <div style="font-size:11.5px;margin-top:6px">We verify payments within 24 hours. You'll be notified once approved.</div>
                             </div>
@@ -208,14 +208,14 @@
                     <div class="ps-card-body">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="ps-two-col">
                             <div class="ps-field">
-                                <label>Reference Number <span style="color:var(--red)">*</span></label>
+                                <label>{{ __('messages.reference_number') }} <span style="color:var(--red)">*</span></label>
                                 <input type="text" name="reference_number" required value="{{ old('reference_number') }}" placeholder="e.g., TXN-1234567890">
                                 @error('reference_number')
                                     <p class="ps-error-text">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div class="ps-field">
-                                <label>Upload Receipt <span style="color:var(--red)">*</span></label>
+                                <label>{{ __('messages.upload_receipt') }} <span style="color:var(--red)">*</span></label>
                                 <input type="file" name="receipt" accept="image/*,application/pdf" required>
                                 <p style="font-size:11px;color:var(--muted);margin-top:4px">JPG, PNG, or PDF — Max 5 MB</p>
                                 @error('receipt')
@@ -240,15 +240,15 @@
                 <div class="ps-card-body">
                     <dl style="margin:0">
                         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
-                            <dt style="font-size:13px;color:var(--muted)">Plan</dt>
+                            <dt style="font-size:13px;color:var(--muted)">{{ __('messages.plan') }}</dt>
                             <dd style="font-size:13px;font-weight:700;color:var(--text);margin:0">{{ $subscription->plan->name }}</dd>
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
-                            <dt style="font-size:13px;color:var(--muted)">Amount</dt>
+                            <dt style="font-size:13px;color:var(--muted)">{{ __('messages.amount') }}</dt>
                             <dd style="font-size:13px;font-weight:700;color:var(--text);margin:0">Rs. {{ number_format($subscription->plan->price_monthly ?? 0, 2) }} / mo</dd>
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:8px 0">
-                            <dt style="font-size:13px;color:var(--muted)">Billing</dt>
+                            <dt style="font-size:13px;color:var(--muted)">{{ __('messages.billing') }}</dt>
                             <dd style="font-size:13px;font-weight:700;color:var(--text);margin:0">{{ ucfirst($subscription->billing_interval ?? 'monthly') }}</dd>
                         </div>
                     </dl>

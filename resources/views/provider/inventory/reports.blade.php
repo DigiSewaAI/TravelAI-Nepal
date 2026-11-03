@@ -33,10 +33,10 @@
 </div>
 
 <div class="rep-grid">
-  <div class="rep-stat"><div class="rep-lbl">Total Stock Value</div><div class="rep-val accent">Rs {{ number_format($stockValue) }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.total_stock_value') }}</div><div class="rep-val accent">Rs {{ number_format($stockValue) }}</div></div>
   <div class="rep-stat"><div class="rep-lbl">{{ __('messages.total_products') }}</div><div class="rep-val">{{ $totalProducts }}</div></div>
-  <div class="rep-stat"><div class="rep-lbl">Low Stock</div><div class="rep-val" style="color:var(--amber,#f59e0b);">{{ $lowStockCount }}</div></div>
-  <div class="rep-stat"><div class="rep-lbl">Orders Today</div><div class="rep-val">{{ $ordersToday }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.low_stock') }}</div><div class="rep-val" style="color:var(--amber,#f59e0b);">{{ $lowStockCount }}</div></div>
+  <div class="rep-stat"><div class="rep-lbl">{{ __('messages.orders_today') }}</div><div class="rep-val">{{ $ordersToday }}</div></div>
 </div>
 
 <div class="rep-card">
@@ -61,7 +61,7 @@
       <span class="val">Rs {{ number_format($p->total_value) }}</span>
     </div>
   @empty
-    <p style="text-align:center;color:var(--muted,#6b7280);padding:20px;">No products yet.</p>
+    <p style="text-align:center;color:var(--muted,#6b7280);padding:20px;">{{ __('messages.no_products_yet') }}</p>
   @endforelse
 </div>
 

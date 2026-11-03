@@ -32,7 +32,7 @@
 
 <div class="mc-hero">
   <h1>👥 {{ __('messages.nav_customers') }}</h1>
-  <p>Your regular customers and their volume</p>
+  <p>{{ __('messages.your_regular_customers_and_their_volume') }}</p>
 </div>
 
 <div class="mc-stats">
@@ -53,9 +53,9 @@
           </div>
         </div>
         <div class="cust-rows">
-          <div class="cust-row"><span class="k">Transactions</span><span class="v">{{ $c->tx_count }}</span></div>
+          <div class="cust-row"><span class="k">{{ __('messages.transactions') }}</span><span class="v">{{ $c->tx_count }}</span></div>
           <div class="cust-row"><span class="k">{{ __('messages.total_volume') }}</span><span class="v accent">Rs {{ number_format($c->total_volume) }}</span></div>
-          <div class="cust-row"><span class="k">Profit</span><span class="v">Rs {{ number_format($c->total_profit) }}</span></div>
+          <div class="cust-row"><span class="k">{{ __('messages.profit') }}</span><span class="v">Rs {{ number_format($c->total_profit) }}</span></div>
         </div>
       </div>
     @endforeach

@@ -62,7 +62,7 @@
       <span class="val">Rs {{ number_format($r->revenue) }}</span>
     </div>
   @empty
-    <p class="rep-empty">No route revenue data yet.</p>
+    <p class="rep-empty">{{ __('messages.no_route_revenue_data_yet') }}</p>
   @endforelse
 </div>
 
