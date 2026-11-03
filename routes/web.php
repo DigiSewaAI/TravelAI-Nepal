@@ -311,6 +311,8 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
         // Hotel Sidebar Unlocks (Read-Only Views)
     Route::get('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'bookingsPage'])->name('hotel.bookings');
     Route::get('/hotel/bookings/{booking}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'showBooking'])->name('hotel.bookings.show');
+    Route::post('/hotel/bookings/{booking}/folio', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'addFolioCharge'])->name('hotel.bookings.folio.add');
+    Route::delete('/hotel/bookings/{booking}/folio/{charge}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'removeFolioCharge'])->name('hotel.bookings.folio.remove');
     Route::get('/hotel/rooms', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'roomsPage'])->name('hotel.rooms');
     Route::get('/hotel/guests', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'guestsPage'])->name('hotel.guests');
     Route::get('/hotel/housekeeping', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'housekeepingPage'])->name('hotel.housekeeping');

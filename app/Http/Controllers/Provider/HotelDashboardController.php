@@ -202,9 +202,49 @@ public function showBooking(HotelBooking $booking)
     $provider = Auth::user()->getCurrentProvider();
     abort_unless($provider, 403, 'Provider not found.');
     abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
-    $booking->load('room', 'provider');
+    $booking->load('room', 'provider', 'folioCharges');
     $provider_layout = 'layouts.provider-hotel';
     return view('provider.hotel.bookings.show', compact('booking', 'provider', 'provider_layout'));
+}
+
+public function addFolioCharge(Request $request, HotelBooking $booking)
+{
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403);
+    abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
+
+    $validated = $request->validate([
+        'description' => 'required|string|max:255',
+        'category'    => 'required|in:room,food,laundry,extra,other',
+        'amount'      => 'required|numeric|min:0',
+        'quantity'    => 'nullable|integer|min:1|max:999',
+        'notes'       => 'nullable|string|max:1000',
+    ]);
+
+    $qty = (int) ($validated['quantity'] ?? 1);
+    \App\Models\FolioCharge::create([
+        'hotel_booking_id' => $booking->id,
+        'description'      => $validated['description'],
+        'category'         => $validated['category'],
+        'amount'           => $validated['amount'],
+        'quantity'         => $qty,
+        'total'            => $validated['amount'] * $qty,
+        'notes'            => $validated['notes'] ?? null,
+        'added_by'         => Auth::id(),
+    ]);
+
+    return back()->with('success', 'Charge added to folio.');
+}
+
+public function removeFolioCharge(HotelBooking $booking, \App\Models\FolioCharge $charge)
+{
+    $provider = Auth::user()->getCurrentProvider();
+    abort_unless($provider, 403);
+    abort_unless((int)$booking->provider_id === (int)$provider->id, 403);
+    abort_unless((int)$charge->hotel_booking_id === (int)$booking->id, 403);
+
+    $charge->delete();
+    return back()->with('success', 'Charge removed.');
 }
 
 public function roomsPage()

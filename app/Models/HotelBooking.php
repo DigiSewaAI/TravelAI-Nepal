@@ -20,4 +20,14 @@ class HotelBooking extends Model
 
     public function provider() { return $this->belongsTo(Provider::class); }
     public function room()     { return $this->belongsTo(HotelRoom::class, 'room_id'); }
+
+    public function folioCharges()
+    {
+        return $this->hasMany(FolioCharge::class)->orderBy('id');
+    }
+
+    public function folioTotal()
+    {
+        return $this->folioCharges()->sum('total');
+    }
 }
