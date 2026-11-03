@@ -198,7 +198,7 @@
     <div class="artist-stars">★★★★★</div>
     <div class="artist-meta">
       <div><b>{{ $completedWorks ?? 0 }}</b><span>{{ __('messages.works_label') }}</span></div>
-      <div><b>{{ $rating ?? '4.9' }}</b><span>{{ __('messages.rating_label') }}</span></div>
+      <div><b>{{ $rating ?? 'No reviews' }}</b><span>{{ __('messages.rating_label') }}</span></div>
       <div><b>{{ $clients ?? 0 }}</b><span>{{ __('messages.clients_label') }}</span></div>
     </div>
   </div>

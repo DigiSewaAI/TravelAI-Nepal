@@ -2727,4 +2727,12 @@ return array (
   'artcraft_ai_pricing_sub' => 'Material + labor + craftsmanship → suggested price.',
   'artcraft_ai_run_pricing' => 'Suggest pricing',
   'artcraft_ai_loading' => 'Analyzing…',
+  'individual_ai_matching_title' => 'AI Guide Matching',
+  'individual_ai_matching_sub' => 'Match upcoming bookings with best-fit guide.',
+  'individual_ai_run_matching' => 'Analyze matching',
+  'individual_ai_profile_title' => 'AI Profile Builder',
+  'individual_ai_profile_sub' => 'Generate professional guide bios.',
+  'individual_ai_run_profile' => 'Generate profiles',
+  'individual_ai_loading' => 'Analyzing…',
+  'Trekking Guide' => 'Trekking Guide',
 );

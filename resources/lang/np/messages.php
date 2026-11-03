@@ -2748,4 +2748,12 @@ return array (
   'artcraft_ai_pricing_sub' => 'सामग्री + श्रम + कौशल → सुझाव मूल्य।',
   'artcraft_ai_run_pricing' => 'मूल्य सुझाव',
   'artcraft_ai_loading' => 'विश्लेषण हुँदै…',
+  'individual_ai_matching_title' => 'AI गाइड मिलान',
+  'individual_ai_matching_sub' => 'आगामी बुकिङलाई उत्तम गाइडसँग मिलाउनु।',
+  'individual_ai_run_matching' => 'मिलान विश्लेषण',
+  'individual_ai_profile_title' => 'AI प्रोफाइल निर्माता',
+  'individual_ai_profile_sub' => 'व्यावसायिक गाइड बायो बनाउनु।',
+  'individual_ai_run_profile' => 'प्रोफाइल बनाउनु',
+  'individual_ai_loading' => 'विश्लेषण हुँदै…',
+  'Trekking Guide' => 'ट्रेकिङ गाइड',
 );

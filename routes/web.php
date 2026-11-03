@@ -347,6 +347,8 @@ Route::post('/transport/ai/cost-estimator', [\App\Http\Controllers\Provider\Tran
         // Individual Sidebar Unlocks
     Route::get('/individual/bookings', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'bookingsPage'])->name('individual.bookings.list');
     Route::get('/individual/bookings/{booking}', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'showBooking'])->name('individual.bookings.show');
+Route::post('/individual/ai/guide-matching', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'aiGuideMatching'])->name('individual.ai.matching');
+Route::post('/individual/ai/profile-builder', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'aiProfileBuilder'])->name('individual.ai.profile');
     Route::get('/individual/calendar', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'calendarPage'])->name('individual.calendar');
     Route::get('/individual/earnings', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'earningsPage'])->name('individual.earnings');
     Route::get('/individual/reviews', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'reviewsPage'])->name('individual.reviews');

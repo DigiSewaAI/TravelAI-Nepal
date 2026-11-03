@@ -178,4 +178,63 @@ function openEditAssignmentModal(id, title, client, type, start, duration, amoun
 function closeEditAssignmentModal() { document.getElementById('editAssignmentModal').style.display = 'none'; }
 document.getElementById('editAssignmentModal').addEventListener('click', function(e) { if (e.target === this) closeEditAssignmentModal(); });
 </script>
+
+{{-- ═══ Individual AI ═══ --}}
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">🎯 {{ __('messages.individual_ai_matching_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.individual_ai_matching_sub') }}</p>
+  <button id="individualAiMatchingBtn" onclick="loadGuideMatching()" style="background:var(--accent,#c9a227);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.individual_ai_run_matching') }}</button>
+  <div id="individualAiMatchingOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;">
+  <h3 style="font-size:16px;font-weight:800;margin:0 0 12px;">👤 {{ __('messages.individual_ai_profile_title') }}</h3>
+  <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">{{ __('messages.individual_ai_profile_sub') }}</p>
+  <button id="individualAiProfileBtn" onclick="loadProfileBuilder()" style="background:var(--accent,#9b6dff);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer;font-size:13px;">{{ __('messages.individual_ai_run_profile') }}</button>
+  <div id="individualAiProfileOut" style="margin-top:14px;font-size:13px;"></div>
+</div>
+
+<script>
+async function indAiPost(url){
+  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:'{}' });
+  return await r.json();
+}
+function indAiErr(el,msg){ el.innerHTML='<div style="padding:10px;border-radius:8px;background:#fee;color:#900;font-weight:700;">'+msg+'</div>'; }
+async function loadGuideMatching(){
+  const btn=document.getElementById('individualAiMatchingBtn'), out=document.getElementById('individualAiMatchingOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.individual_ai_loading") }}';
+  try{
+    const data=await indAiPost('{{ route("provider.individual.ai.matching") }}');
+    if(data.error){ indAiErr(out, data.message||data.error); return; }
+    let html='';
+    if(data.data_warning) html+='<div style="background:#fef3c7;border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;">⚠️ '+data.data_warning+'</div>';
+    html+='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    html+='<div style="font-size:11px;margin:10px 0 6px;font-weight:700;">Guides:</div>';
+    (data.guides||[]).forEach(g=>{
+      var _avail = g.availability==='available';
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><div><strong>Guide #'+g.user_id+'</strong><div style="font-size:10px;color:var(--muted)">'+g.skills+' · '+g.languages+'</div></div><div style="text-align:right;"><span style="background:'+(_avail?'#10b981':'#f59e0b')+';color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;">'+g.availability+'</span><div style="font-size:10px;color:var(--muted)">'+g.experience_years+'y exp</div></div></div>';
+    });
+    if(data.matches && data.matches.length){
+      html+='<div style="font-size:11px;margin:10px 0 6px;font-weight:700;">Upcoming Assignments:</div>'; if(data.assumptions&&data.assumptions.match_rule) html+='<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">📋 '+data.assumptions.match_rule+' · '+data.assumptions.availability+'</div>';
+      data.matches.forEach(m=>{
+        var _sugg = m.suggested_guide_user_id || '—'; var _conf = (m.date_overlap_conflicts&&m.date_overlap_conflicts.length)?' <span style="color:#f59e0b;font-size:10px;">('+m.date_overlap_conflicts.length+' alternative guide(s) skipped (date conflict)</span>':''; html+='<div style="padding:6px 10px;background:#eff6ff;border:1px solid #3b82f6;border-radius:8px;margin-bottom:6px;font-size:12px;"><strong>'+m.client+'</strong> → Guide #'+_sugg+_conf+'<div style="font-size:10px;color:var(--muted)">'+m.booking+' · '+m.start_date+' to '+m.end_date+' ('+m.duration_days+'d, '+m.pax+' pax)</div></div>';
+      });
+    }
+    out.innerHTML=html;
+  }catch(e){ indAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+async function loadProfileBuilder(){
+  const btn=document.getElementById('individualAiProfileBtn'), out=document.getElementById('individualAiProfileOut');
+  btn.disabled=true; btn.style.opacity=.6; out.innerHTML='⏳ {{ __("messages.individual_ai_loading") }}';
+  try{
+    const data=await indAiPost('{{ route("provider.individual.ai.profile") }}');
+    if(data.error){ indAiErr(out, data.message||data.error); return; }
+    let html='<div style="font-weight:800;margin-bottom:8px;">'+(data.summary||'')+'</div>';
+    (data.profiles||[]).forEach(p=>{
+      html+='<div style="padding:8px 10px;background:var(--bg,#f5f7fb);border-radius:8px;margin-bottom:6px;"><strong>'+p.name+'</strong><div style="font-size:12px;color:var(--muted);margin-top:4px;">'+(p.bio||'')+'</div></div>';
+    });
+    out.innerHTML=html;
+  }catch(e){ indAiErr(out,e.message); } finally{ btn.disabled=false; btn.style.opacity=1; }
+}
+</script>
 @endsection

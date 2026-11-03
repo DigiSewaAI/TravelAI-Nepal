@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Services\IndividualAiService;
 use App\Models\IndividualBooking;
 use App\Models\Provider;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ class IndividualDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected IndividualAiService $individualAi) {}
 
     public function index()
     {
@@ -154,6 +157,19 @@ class IndividualDashboardController extends Controller
         return back()->with('success', __('messages.assignment_deleted_success'));
     }
 
+    public function aiGuideMatching(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->individualAi->guideMatching($provider));
+    }
+
+    public function aiProfileBuilder(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->individualAi->profileBuilder($provider));
+    }
     public function bookingsPage()
     {
         $provider = Provider::where('user_id', Auth::id())

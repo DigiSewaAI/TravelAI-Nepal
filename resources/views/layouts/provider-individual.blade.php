@@ -194,7 +194,7 @@
   </nav>
   <div class="rating-card">
     <div class="rc-stars">★★★★★</div>
-    <div class="rc-score" id="avgRatingVal">{{ $avgRating ?? '4.9' }}<small>/5</small></div>
+    <div class="rc-score" id="avgRatingVal">@if(!empty($avgRating)){{ $avgRating }}<small>/5</small>@else<small style="font-size:12px;font-weight:600;">No ratings yet</small>@endif</div>
     <div class="rc-meta" id="reviewCountVal">{{ __('messages.n_reviews', ['count' => $reviewCount ?? 0]) }}</div>
   </div>
   <div class="user-box">
