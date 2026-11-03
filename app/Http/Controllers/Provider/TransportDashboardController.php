@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Services\TransportAiService;
 use App\Models\TransportBooking;
 use App\Models\TransportVehicle;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ class TransportDashboardController extends Controller
 {
 
     use \App\Traits\EnforcesPlanLimits;
+
+    public function __construct(protected TransportAiService $transportAi) {}
     public function index()
     {
         $provider = Auth::user()->getCurrentProvider();
@@ -245,7 +248,20 @@ class TransportDashboardController extends Controller
 
         return view('provider.transport.drivers', compact('provider', 'drivers', 'activeFleet', 'totalFleet'));
     }
-        public function reportsPage()
+        public function aiVehicleAssignment(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->transportAi->vehicleAssignment($provider));
+    }
+
+    public function aiCostEstimator(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        return response()->json($this->transportAi->costEstimator($provider));
+    }
+    public function reportsPage()
     {
         $provider = \App\Models\Provider::where('user_id', Auth::id())
             ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))

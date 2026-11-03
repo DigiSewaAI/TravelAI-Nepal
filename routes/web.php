@@ -334,6 +334,8 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
     Route::get('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'routesPage'])->name('transport.routes');
     Route::get('/transport/drivers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'driversPage'])->name('transport.drivers');
         Route::get('/transport/reports', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'reportsPage'])->name('transport.reports');
+Route::post('/transport/ai/vehicle-assignment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiVehicleAssignment'])->name('transport.ai.vehicle');
+Route::post('/transport/ai/cost-estimator', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiCostEstimator'])->name('transport.ai.cost');
     Route::get('/transport/offers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'offersPage'])->name('transport.offers');
         // 🆕 Individual Services vertical dashboard routes
     Route::get('/individual/dashboard', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'index'])->name('individual.dashboard');

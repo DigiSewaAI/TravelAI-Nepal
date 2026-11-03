@@ -2713,4 +2713,11 @@ return array (
   'inventory_ai_reorder_sub' => 'When and how much to reorder per product.',
   'inventory_ai_run_reorder' => 'Suggest reorders',
   'inventory_ai_loading' => 'Analyzing…',
+  'transport_ai_vehicle_title' => 'AI Vehicle Assignment',
+  'transport_ai_vehicle_sub' => 'Fleet utilization + smart assignment for upcoming bookings.',
+  'transport_ai_run_vehicle' => 'Analyze fleet',
+  'transport_ai_cost_title' => 'AI Trip Cost Estimator',
+  'transport_ai_cost_sub' => 'Per-trip cost vs full-capacity revenue per vehicle.',
+  'transport_ai_run_cost' => 'Estimate costs',
+  'transport_ai_loading' => 'Analyzing…',
 );

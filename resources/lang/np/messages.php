@@ -2734,4 +2734,11 @@ return array (
   'inventory_ai_reorder_sub' => 'प्रत्येक उत्पादनको पुनःअर्डर मात्रा र समय।',
   'inventory_ai_run_reorder' => 'पुनःअर्डर सुझाव',
   'inventory_ai_loading' => 'विश्लेषण हुँदै…',
+  'transport_ai_vehicle_title' => 'AI सवारी असाइनमेन्ट',
+  'transport_ai_vehicle_sub' => 'फ्लीट उपयोग + आगामी बुकिङका लागि स्मार्ट असाइनमेन्ट।',
+  'transport_ai_run_vehicle' => 'फ्लीट विश्लेषण',
+  'transport_ai_cost_title' => 'AI यात्रा लागत अनुमान',
+  'transport_ai_cost_sub' => 'प्रति सवारी यात्रा लागत vs पूर्ण क्षमता आम्दानी।',
+  'transport_ai_run_cost' => 'लागत अनुमान',
+  'transport_ai_loading' => 'विश्लेषण हुँदै…',
 );
