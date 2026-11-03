@@ -9,21 +9,29 @@ class NotificationController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $notifications = $user->notifications()->latest()->take(10)->get();
         $unreadCount = $user->unreadNotifications()->count();
 
-        return response()->json([
-            'notifications' => $notifications->map(fn($n) => [
-                'id' => $n->id,
-                'title' => $n->data['title'] ?? 'Alert',
-                'message' => $n->data['message'] ?? '',
-                'category' => $n->data['category'] ?? 'info',
-                'url' => $n->data['url'] ?? '#',
-                'read' => $n->read_at !== null,
-                'created_at' => $n->created_at->diffForHumans(),
-            ]),
-            'unread_count' => $unreadCount,
-        ]);
+        // AJAX (bell dropdown) → JSON; browser → Blade page
+        if (request()->wantsJson() || request()->ajax()) {
+            $notifications = $user->notifications()->latest()->take(10)->get();
+
+            return response()->json([
+                'notifications' => $notifications->map(fn($n) => [
+                    'id' => $n->id,
+                    'title' => $n->data['title'] ?? 'Alert',
+                    'message' => $n->data['message'] ?? '',
+                    'category' => $n->data['category'] ?? 'info',
+                    'url' => $n->data['url'] ?? '#',
+                    'read' => $n->read_at !== null,
+                    'created_at' => $n->created_at->diffForHumans(),
+                ]),
+                'unread_count' => $unreadCount,
+            ]);
+        }
+
+        $notifications = $user->notifications()->latest()->paginate(20);
+
+        return view('admin.notifications.index', compact('notifications', 'unreadCount'));
     }
 
     public function markAsRead($id)
