@@ -64,12 +64,15 @@ class OrdersController extends Controller
                         ? route('provider.inventory.orders.show', $order->id)
                         : route('provider.orders.show', $order->id);
 
-                    $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
+                    // Self-notify guard
+        if ($prov->user && $prov->user->id !== auth()->id()) {
+            $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
                         'Payment Notice Received',
                         'Traveler sent payment for order ' . $order->order_number . ' (Ref: ' . $validated['payment_reference'] . ')',
                         'payment',
                         $__url
                     ));
+        }
                 }
             }
         } catch (\Throwable $e) {
@@ -140,12 +143,15 @@ class OrdersController extends Controller
         try {
             $providerUser = $item->provider?->user;
             if ($providerUser) {
-                $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
+                // Self-notify guard
+        if ($providerUser && $providerUser->id !== auth()->id()) {
+            $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
                     'Return Requested',
                     'Traveler requested return for ' . ($order->order_number ?? '#'.$order->id) . ' — ' . $item->product_name,
                     'return',
                     $item->providerNotificationUrl('return')
                 ));
+        }
             }
         } catch (\Throwable $e) {
             \Log::warning('Return requested bell notification failed', ['order' => $order->id, 'error' => $e->getMessage()]);

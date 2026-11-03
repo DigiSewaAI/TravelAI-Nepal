@@ -58,12 +58,15 @@ class CheckoutController extends Controller
                     ? $__firstItem->providerNotificationUrl()
                     : route('provider.dashboard');
 
-                $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                // Self-notify guard
+        if ($owner && $owner->id !== auth()->id()) {
+            $owner->notify(new \App\Notifications\ProviderAlertNotification(
                     title: 'New Order Received',
                     message: 'Order ' . $__orderNum . ' — NPR ' . number_format($__orderTotal),
                     category: 'product_order',
                     url: $__url
                 ));
+        }
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'product_order', 'e' => $e->getMessage()]);

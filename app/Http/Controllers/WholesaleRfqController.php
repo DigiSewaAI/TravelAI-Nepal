@@ -57,12 +57,15 @@ class WholesaleRfqController extends Controller
                     if (!$ownerId) continue;
                     $owner = \App\Models\User::find($ownerId);
                     if ($owner && method_exists($owner, 'notify')) {
-                        $owner->notify(new \App\Notifications\ProviderAlertNotification(
+                        // Self-notify guard
+        if ($owner && $owner->id !== auth()->id()) {
+            $owner->notify(new \App\Notifications\ProviderAlertNotification(
                             title: 'New Wholesale RFQ',
                             message: $__prodName . ' — Qty ' . $__qty,
                             category: 'wholesale_rfq',
                             url: route('provider.wholesale-rfq.show', $rfq)
                         ));
+        }
                     }
                 }
             }
@@ -111,12 +114,15 @@ class WholesaleRfqController extends Controller
         try {
             $providerUser = $rfq->provider?->user;
             if ($providerUser) {
-                $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
+                // Self-notify guard
+        if ($providerUser && $providerUser->id !== auth()->id()) {
+            $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
                     title: 'New RFQ Message',
                     message: 'New message on ' . $rfq->rfq_number . ': ' . \Illuminate\Support\Str::limit($validated['message'], 100),
                     category: 'wholesale_rfq',
                     url: route('provider.wholesale-rfq.show', $rfq)
                 ));
+        }
                 if ($providerUser->email) {
                     \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'message', 'provider', $validated['message']));
                 }
@@ -138,7 +144,10 @@ class WholesaleRfqController extends Controller
         try {
             $providerUser = $rfq->provider?->user;
             if ($providerUser) {
-                $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Accepted', 'Buyer accepted your quote for '.$rfq->rfq_number.' (NPR '.number_format($rfq->quoted_total, 2).')', 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+                // Self-notify guard
+        if ($providerUser && $providerUser->id !== auth()->id()) {
+            $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Accepted', 'Buyer accepted your quote for '.$rfq->rfq_number.' (NPR '.number_format($rfq->quoted_total, 2).')', 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+        }
                 if ($providerUser->email) {
                     \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'accepted', 'provider'));
                 }
@@ -158,7 +167,10 @@ class WholesaleRfqController extends Controller
         try {
             $providerUser = $rfq->provider?->user;
             if ($providerUser) {
-                $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Rejected', 'Buyer rejected your quote for '.$rfq->rfq_number, 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+                // Self-notify guard
+        if ($providerUser && $providerUser->id !== auth()->id()) {
+            $providerUser->notify(new \App\Notifications\ProviderAlertNotification('Quote Rejected', 'Buyer rejected your quote for '.$rfq->rfq_number, 'rfq', route('provider.wholesale-rfq.show', $rfq)));
+        }
                 if ($providerUser->email) {
                     \Mail::to($providerUser->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'rejected', 'provider'));
                 }
