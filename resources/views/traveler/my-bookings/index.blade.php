@@ -13,7 +13,7 @@
 
     {{-- Tabs --}}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-        @foreach(['all'=>'All','treks'=>'Treks','shop'=>'Shop','rental'=>'Rental','wholesale'=>'Wholesale','rfqs'=>'RFQs'] as $key => $label)
+        @foreach(['all'=>__('messages.tab_all'),'treks'=>__('messages.tab_treks'),'shop'=>__('messages.tab_shop'),'rental'=>__('messages.tab_rental'),'wholesale'=>__('messages.tab_wholesale'),'rfqs'=>__('messages.tab_rfqs')] as $key => $label)
             @php $active = ($tab === $key); @endphp
             <a href="{{ route('traveler.my-bookings', array_merge(['tab'=>$key], request('ctx') ? ['ctx'=>request('ctx')] : [])) }}"
                style="padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;transition:.2s;{{ $active ? 'background:var(--accent,#6366f1);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.12)' : 'background:var(--card,#fff);color:var(--muted,#6b7280);border:1px solid var(--line,#e5e7eb)' }}">
@@ -36,10 +36,10 @@
                                 <span style="padding:3px 9px;border-radius:6px;background:#e7f8f1;color:#059669;font-size:10px;font-weight:800;letter-spacing:.4px">{{ __('messages.trek_category') }}</span>
                                 <span style="font-weight:800;font-size:14px;color:var(--text,#111827)">{{ $b->service->name ?? $b->booking_number }}</span>
                             </div>
-                            <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $b->created_at->format('M d, Y') }}</div>
+                            <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $b->created_at->translatedFormat('M d, Y') }}</div>
                         </div>
                         @php $st = ['confirmed'=>['#e7f8f1','#059669'],'pending'=>['#fef4e2','#b45309'],'completed'=>['#f3f4f6','#6b7280'],'cancelled'=>['#fdecec','#dc2626']][$b->status] ?? ['#f3f4f6','#6b7280']; @endphp
-                        <span style="padding:5px 12px;border-radius:8px;background:{{ $st[0] }};color:{{ $st[1] }};font-size:11px;font-weight:800;text-transform:uppercase;flex-shrink:0">{{ $b->status }}</span>
+                        <span style="padding:5px 12px;border-radius:8px;background:{{ $st[0] }};color:{{ $st[1] }};font-size:11px;font-weight:800;text-transform:uppercase;flex-shrink:0">{{ __('messages.st_' . strtolower($b->status)) }}</span>
                     </div>
                 </a>
             @endforeach
@@ -65,13 +65,13 @@
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
                     <div style="min-width:0;flex:1">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-                            <span style="padding:3px 9px;border-radius:6px;background:{{ $typeColor[0] }};color:{{ $typeColor[1] }};font-size:10px;font-weight:800;letter-spacing:.4px">{{ strtoupper($type) }}</span>
+                            <span style="padding:3px 9px;border-radius:6px;background:{{ $typeColor[0] }};color:{{ $typeColor[1] }};font-size:10px;font-weight:800;letter-spacing:.4px">{{ __('messages.tab_' . strtolower($type)) }}</span>
                             <span style="font-weight:800;font-size:14px;color:var(--text,#111827);font-family:monospace">{{ $o->order_number }}</span>
                         </div>
-                        <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $o->created_at->format('M d, Y') }} · {{ $o->items->count() }} items</div>
+                        <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $o->created_at->translatedFormat('M d, Y') }} · {{ $o->items->count() }} {{ __('messages.items_count') }}</div>
                     </div>
                     <div style="text-align:right;flex-shrink:0">
-                        <span style="padding:5px 12px;border-radius:8px;background:{{ $statusColor[0] }};color:{{ $statusColor[1] }};font-size:11px;font-weight:800;text-transform:uppercase;display:inline-block">{{ $o->status }}</span>
+                        <span style="padding:5px 12px;border-radius:8px;background:{{ $statusColor[0] }};color:{{ $statusColor[1] }};font-size:11px;font-weight:800;text-transform:uppercase;display:inline-block">{{ __('messages.st_' . strtolower($o->status)) }}</span>
                         <div style="font-weight:800;color:var(--accent,#6366f1);margin-top:6px;font-size:14px">Rs {{ number_format($o->total, 2) }}</div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                             </div>
                             <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $r->product->name ?? 'N/A' }} · Qty {{ $r->quantity }}</div>
                         </div>
-                        <span style="padding:5px 12px;border-radius:8px;background:{{ $rStatus[0] }};color:{{ $rStatus[1] }};font-size:11px;font-weight:800;text-transform:uppercase;flex-shrink:0">{{ $r->status }}</span>
+                        <span style="padding:5px 12px;border-radius:8px;background:{{ $rStatus[0] }};color:{{ $rStatus[1] }};font-size:11px;font-weight:800;text-transform:uppercase;flex-shrink:0">{{ __('messages.st_' . strtolower($r->status)) }}</span>
                     </div>
                 </a>
             @endforeach

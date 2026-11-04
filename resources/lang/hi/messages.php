@@ -2065,4 +2065,9 @@ return array (
   'wholesale_rfq_desc' => 'आपके सभी थोक कोटेशन अनुरोध',
   'quote_requests_count' => 'कोटेशन अनुरोध',
   'bank_transfer' => 'बैंक ट्रांसफर',
+  'product_orders' => 'मेरे ऑर्डर',
+  'my_orders' => 'मेरे ऑर्डर',
+  'items' => 'आइटम',
+  'items_count' => 'आइटम',
+  'st_completed' => 'पूर्ण हुआ',
 );

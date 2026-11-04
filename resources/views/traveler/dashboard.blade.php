@@ -120,7 +120,39 @@
 
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-    {{-- ========== STATS CARDS ========== --}}
+    {{-- ========== QUICK ACTIONS (moved from header) ========== --}}
+<div class="max-w-7xl mx-auto px-4 py-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <a href="{{ route('traveler.my-bookings') }}" class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-blue-100 hover:border-blue-500 hover:shadow-md transition-all group">
+            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition">
+                <i class="fas fa-calendar-check text-xl text-blue-600"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="font-bold text-gray-800 truncate">{{ __('messages.my_bookings_page_title') }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ __('messages.view_all') ?? 'View all' }}</div>
+            </div>
+        </a>
+        <a href="{{ route('orders.index') }}" class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-green-100 hover:border-green-500 hover:shadow-md transition-all group">
+            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition">
+                <i class="fas fa-shopping-bag text-xl text-green-600"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="font-bold text-gray-800 truncate">{{ __('messages.product_orders') }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ __('messages.view_all') ?? 'View all' }}</div>
+            </div>
+        </a>
+        <a href="{{ route('wholesale.rfq.index') }}" class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-amber-100 hover:border-amber-500 hover:shadow-md transition-all group">
+            <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition">
+                <i class="fas fa-file-invoice text-xl text-amber-600"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="font-bold text-gray-800 truncate">{{ __('messages.my_wholesale_rfqs') }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ __('messages.view_all') ?? 'View all' }}</div>
+            </div>
+        </a>
+    </div>
+</div>
+{{-- ========== STATS CARDS ========== --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div class="flex items-center gap-3">

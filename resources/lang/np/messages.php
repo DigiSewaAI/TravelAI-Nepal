@@ -3054,4 +3054,5 @@ return array (
   'room_label' => 'कोठा',
   'wholesale_rfq_desc' => 'तपाईंका सबै थोक कोटेशन अनुरोधहरू',
   'quote_requests_count' => 'कोटेशन अनुरोधहरू',
+  'st_completed' => 'सम्पन्न भयो',
 );

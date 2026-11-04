@@ -2076,4 +2076,9 @@ return array (
   'wholesale_rfq_desc' => '您的所有批发报价请求',
   'quote_requests_count' => '报价请求',
   'bank_transfer' => '银行转账',
+  'product_orders' => '我的订单',
+  'my_orders' => '我的订单',
+  'items' => '商品',
+  'items_count' => '件',
+  'st_completed' => '已完成',
 );

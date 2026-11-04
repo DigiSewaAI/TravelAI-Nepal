@@ -2663,4 +2663,9 @@ return array (
   'wholesale_rfq_desc' => 'Все ваши оптовые запросы',
   'quote_requests_count' => 'запросов котировок',
   'bank_transfer' => 'Банковский перевод',
+  'product_orders' => 'Мои заказы',
+  'my_orders' => 'Мои заказы',
+  'items' => 'товаров',
+  'items_count' => 'шт.',
+  'st_completed' => 'Завершено',
 );

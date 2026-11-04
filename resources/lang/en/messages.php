@@ -3033,4 +3033,5 @@ return array (
   'room_label' => 'Room',
   'wholesale_rfq_desc' => 'All your wholesale quote requests',
   'quote_requests_count' => 'quote requests',
+  'st_completed' => 'Completed',
 );

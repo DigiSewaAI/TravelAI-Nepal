@@ -13,7 +13,7 @@
 
     <div style="background:linear-gradient(135deg,var(--accent,#6366f1) 0%,var(--accent-d,#4f46e5) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.15)">
         <h2 style="font-size:22px;font-weight:800;margin:0;color:#fff">{{ __('messages.orders_title') }}</h2>
-        <p style="font-size:13px;opacity:.88;margin-top:6px">{{ $__total }} orders</p>
+        <p style="font-size:13px;opacity:.88;margin-top:6px">{{ $__total }} {{ __('messages.orders') }}</p>
     </div>
 
     @if($orders->isEmpty())
@@ -45,7 +45,7 @@
                             <div style="font-size:12px;color:var(--muted,#6b7280);margin-top:4px">{{ $order->created_at->format('M d, Y') }} · {{ $order->items->count() }} items</div>
                         </div>
                         <div style="text-align:right;flex-shrink:0">
-                            <span style="display:inline-block;padding:5px 12px;border-radius:8px;background:{{ $sc[0] }};color:{{ $sc[1] }};font-size:11px;font-weight:800;text-transform:uppercase">{{ $order->status }}</span>
+                            <span style="display:inline-block;padding:5px 12px;border-radius:8px;background:{{ $sc[0] }};color:{{ $sc[1] }};font-size:11px;font-weight:800;text-transform:uppercase">{{ __('messages.st_' . strtolower($order->status)) }}</span>
                             <div style="font-weight:800;color:var(--accent,#6366f1);margin-top:6px;font-size:14px">{{ $currencyService->format($currencyService->convert((float)$order->total, $order->currency ?? 'NPR', $displayCurrency), $displayCurrency) }}</div>
                         </div>
                     </div>
