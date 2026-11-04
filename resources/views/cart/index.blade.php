@@ -120,7 +120,7 @@
 
                         <aside class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-sm border p-5 sticky top-4">
-                    <h2 class="font-semibold text-gray-900 mb-4 text-lg">Order Summary</h2>
+                    <h2 class="font-semibold text-gray-900 mb-4 text-lg">{{ __('messages.order_summary') }}</h2>
 
                     {{-- PATH-3C C1: Deposit calculation --}}
                     @php
@@ -143,7 +143,7 @@
                     @endif
 
                     <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-200 mb-6">
-                        <span class="text-base font-bold text-gray-900">Total</span>
+                        <span class="text-base font-bold text-gray-900">{{ __('messages.total') }}</span>
                         <span class="text-2xl font-black text-blue-600">
                             {{ $currencyService->format($currencyService->convert($subtotal + ($rentalDeposit ?? 0), 'NPR', $displayCurrency), $displayCurrency) }}
                         </span>

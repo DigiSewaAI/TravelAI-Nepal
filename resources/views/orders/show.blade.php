@@ -55,7 +55,7 @@
 
         {{-- Items --}}
         <div class="border-t pt-4">
-            <h2 class="font-semibold text-gray-900 mb-3">Items</h2>
+            <h2 class="font-semibold text-gray-900 mb-3">{{ __('messages.items') }}</h2>
             <div class="space-y-3">
                 @foreach($order->items as $item)
                     <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
@@ -148,7 +148,7 @@
         {{-- Contact + Shipping --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 border-t pt-4">
             <div>
-                <h3 class="font-semibold text-gray-900 mb-2">Contact</h3>
+                <h3 class="font-semibold text-gray-900 mb-2">{{ __('messages.contact') }}</h3>
                 <p class="text-sm text-gray-700">{{ $order->contact_name }}</p>
                 <p class="text-sm text-gray-500">{{ $order->contact_email }}</p>
                 @if($order->contact_phone)
@@ -157,7 +157,7 @@
             </div>
             @if($order->shipping_address || $order->shipping_city)
                 <div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Shipping</h3>
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ __('messages.shipping') }}</h3>
                     @if($order->shipping_address)
                         <p class="text-sm text-gray-700">{{ $order->shipping_address }}</p>
                     @endif
@@ -176,7 +176,7 @@
             </div>
             @if($order->shipping_fee > 0)
                 <div class="flex justify-between text-sm mt-1">
-                    <span class="text-gray-600">Shipping</span>
+                    <span class="text-gray-600">{{ __('messages.shipping') }}</span>
                     <span>{{ $currencyService->format($currencyService->convert((float)$order->shipping_fee, $order->currency, $displayCurrency), $displayCurrency) }}</span>
                 </div>
             @endif
@@ -187,7 +187,7 @@
                 </div>
             @endif
             <div class="flex justify-between text-lg font-bold mt-3 pt-3 border-t">
-                <span>Total</span>
+                <span>{{ __('messages.total') }}</span>
                 <span class="text-blue-600">
                     {{ $currencyService->format($currencyService->convert((float)$order->total, $order->currency, $displayCurrency), $displayCurrency) }}
                 </span>
@@ -196,7 +196,7 @@
 
         @if($order->notes)
             <div class="border-t mt-6 pt-4">
-                <h3 class="font-semibold text-gray-900 mb-2">Notes</h3>
+                <h3 class="font-semibold text-gray-900 mb-2">{{ __('messages.notes') }}</h3>
                 <p class="text-sm text-gray-700 whitespace-pre-line">{{ $order->notes }}</p>
             </div>
         @endif

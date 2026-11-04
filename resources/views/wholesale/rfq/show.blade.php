@@ -119,7 +119,7 @@
             
 @if(in_array($rfq->status, ['rejected', 'expired', 'cancelled']))
     <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-top:16px;text-align:center;">
-        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">This RFQ is no longer active.</p>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px;">{{ __('messages.rfq_no_longer_active') }}</p>
         <a href="{{ route('wholesale.rfq.create') }}" style="display:inline-block;background:#2563eb;color:#fff;padding:10px 24px;border-radius:10px;text-decoration:none;font-weight:800;font-size:13px;">+ Start New RFQ</a>
     </div>
 @endif

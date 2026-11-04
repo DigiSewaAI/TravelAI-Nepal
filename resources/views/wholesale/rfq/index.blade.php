@@ -16,14 +16,14 @@
 <div style="display:flex;flex-direction:column;gap:18px;color:var(--text,#111827)">
 
     <div style="background:linear-gradient(135deg,var(--accent,#6366f1) 0%,var(--accent-d,#4f46e5) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.15)">
-        <h2 style="font-size:22px;font-weight:800;margin:0;color:#fff">My Wholesale RFQs</h2>
+        <h2 style="font-size:22px;font-weight:800;margin:0;color:#fff">{{ __('messages.my_wholesale_rfqs') }}</h2>
         <p style="font-size:13px;opacity:.88;margin-top:6px">{{ $__total }} quote requests</p>
     </div>
 
     @if($rfqs->isEmpty())
         <div style="text-align:center;padding:60px 20px;background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:var(--radius,18px);color:var(--muted,#6b7280)">
-            <p style="margin:0 0 16px;font-size:14px">No RFQs yet.</p>
-            <a href="{{ route('public.wholesale.index') }}" style="display:inline-block;background:var(--accent,#6366f1);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">Browse Wholesale</a>
+            <p style="margin:0 0 16px;font-size:14px">{{ __('messages.no_rfqs_yet') }}</p>
+            <a href="{{ route('public.wholesale.index') }}" style="display:inline-block;background:var(--accent,#6366f1);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">{{ __('messages.browse_wholesale') }}</a>
         </div>
     @else
         <div style="display:flex;flex-direction:column;gap:12px">

@@ -157,7 +157,7 @@
             <span style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;">{{ $pm->icon ?? "💳" }} {{ $pm->name ?? "Method" }}</span>
         @endforeach
     </div>
-    <div style="font-size:11px;color:#64748b;margin-top:8px;">Final payment method selected after order placement.</div>
+    <div style="font-size:11px;color:#64748b;margin-top:8px;">{{ __('messages.final_payment_method_note') }}</div>
 </div>
 
 <button type="submit"

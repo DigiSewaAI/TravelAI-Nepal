@@ -7,8 +7,8 @@
 
     {{-- Hero --}}
     <div style="background:linear-gradient(135deg,var(--accent,#6366f1) 0%,var(--accent-d,#4f46e5) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.15)">
-        <h2 style="font-size:22px;font-weight:800;margin:0;color:#fff">My Bookings</h2>
-        <p style="font-size:13px;opacity:.88;margin-top:6px">All your activity across TravelAI Nepal</p>
+        <h2 style="font-size:22px;font-weight:800;margin:0;color:#fff">{{ __('messages.my_bookings_title') }}</h2>
+        <p style="font-size:13px;opacity:.88;margin-top:6px">{{ __('messages.all_your_activity_across_travelai') }}</p>
     </div>
 
     {{-- Tabs --}}
@@ -33,7 +33,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
                         <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-                                <span style="padding:3px 9px;border-radius:6px;background:#e7f8f1;color:#059669;font-size:10px;font-weight:800;letter-spacing:.4px">TREK</span>
+                                <span style="padding:3px 9px;border-radius:6px;background:#e7f8f1;color:#059669;font-size:10px;font-weight:800;letter-spacing:.4px">{{ __('messages.trek_category') }}</span>
                                 <span style="font-weight:800;font-size:14px;color:var(--text,#111827)">{{ $b->service->name ?? $b->booking_number }}</span>
                             </div>
                             <div style="font-size:12px;color:var(--muted,#6b7280)">{{ $b->created_at->format('M d, Y') }}</div>
@@ -108,8 +108,8 @@
             ($tab === 'rfqs' && $counts['rfqs'] === 0)
         )
             <div style="text-align:center;padding:60px 20px;background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:var(--radius,18px);color:var(--muted,#6b7280)">
-                <p style="margin:0 0 16px;font-size:14px">No bookings in this category yet.</p>
-                <a href="{{ route('public.services.index') }}" style="display:inline-block;background:var(--accent,#6366f1);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">Explore Services</a>
+                <p style="margin:0 0 16px;font-size:14px">{{ __('messages.no_bookings_category_yet') }}</p>
+                <a href="{{ route('public.services.index') }}" style="display:inline-block;background:var(--accent,#6366f1);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">{{ __('messages.explore_services') }}</a>
             </div>
         @endif
     </div>
