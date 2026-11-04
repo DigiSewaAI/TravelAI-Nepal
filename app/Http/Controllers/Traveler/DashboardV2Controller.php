@@ -86,6 +86,20 @@ class DashboardV2Controller extends Controller
             $data['checkinCount'] = 0;
         }
 
+        
+        // [AUTO-INJECTED] 6 Gaps Data
+        $data['statusCounts'] = [
+            'upcoming' => \App\Models\Booking::where('traveler_id', $user->id)->whereIn('status', ['pending', 'confirmed'])->count(),
+            'active' => \App\Models\Booking::where('traveler_id', $user->id)->whereIn('status', ['checked_in', 'active', 'in_progress'])->count(),
+            'completed' => \App\Models\Booking::where('traveler_id', $user->id)->whereIn('status', ['completed', 'checked_out'])->count(),
+            'reviews' => $data['counts']['reviews'] ?? 0,
+        ];
+        $data['qr_scans'] = \App\Models\QrScan::whereHas('booking', function ($q) use ($user) {
+            $q->where('traveler_id', $user->id);
+        })->count();
+        $data['user_media_count'] = \Illuminate\Support\Facades\DB::table('user_media')->where('user_id', $user->id)->count();
+        $data['wholesale_count'] = \Illuminate\Support\Facades\DB::table('wholesale_rfqs')->where('buyer_id', $user->id)->count();
+
         return view('traveler.dashboard-v2', $data);
     }
 }

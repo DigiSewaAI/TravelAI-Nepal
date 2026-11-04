@@ -18,7 +18,7 @@
             </div>
             <div style="background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 18px;">📅</span>
-                <span style="font-size: 14px; font-weight: 600;">{{ $counts['all_orders'] ?? 0 }} {{ __('messages.traveler_quick_bookings') ?? 'Orders' }}</span>
+                <span style="font-size: 14px; font-weight: 600;">{{ $counts['trekking'] ?? 0 }} {{ __('messages.traveler_quick_bookings') ?? 'Bookings' }}</span>
             </div>
             <div style="background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 18px;">⭐</span>

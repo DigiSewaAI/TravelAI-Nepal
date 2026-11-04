@@ -111,4 +111,108 @@
     <div style="margin-bottom: 24px;">
         @include('traveler._partials.tools')
     </div>
+
+
+<!-- [AUTO-INJECTED] 6 GAPS SECTIONS (PREMIUM UI) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 px-4">
+    <!-- Status Counters -->
+    <div class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl shadow-soft border border-blue-100 hover:-translate-y-1 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-blue-600 font-bold uppercase tracking-wider">Upcoming</p>
+            <i class="fa-regular fa-calendar-alt text-blue-400"></i>
+        </div>
+        <h4 class="text-3xl font-extrabold text-blue-900 mt-2">{{ $statusCounts['upcoming'] ?? 0 }}</h4>
+    </div>
+    <div class="bg-gradient-to-br from-green-50 to-white p-5 rounded-2xl shadow-soft border border-green-100 hover:-translate-y-1 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-green-600 font-bold uppercase tracking-wider">Active</p>
+            <i class="fa-solid fa-plane-departure text-green-400"></i>
+        </div>
+        <h4 class="text-3xl font-extrabold text-green-900 mt-2">{{ $statusCounts['active'] ?? 0 }}</h4>
+    </div>
+    <div class="bg-gradient-to-br from-purple-50 to-white p-5 rounded-2xl shadow-soft border border-purple-100 hover:-translate-y-1 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-purple-600 font-bold uppercase tracking-wider">Completed</p>
+            <i class="fa-solid fa-check-circle text-purple-400"></i>
+        </div>
+        <h4 class="text-3xl font-extrabold text-purple-900 mt-2">{{ $statusCounts['completed'] ?? 0 }}</h4>
+    </div>
+    <div class="bg-gradient-to-br from-yellow-50 to-white p-5 rounded-2xl shadow-soft border border-yellow-100 hover:-translate-y-1 transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-yellow-600 font-bold uppercase tracking-wider">Reviews</p>
+            <i class="fa-solid fa-star text-yellow-400"></i>
+        </div>
+        <h4 class="text-3xl font-extrabold text-yellow-900 mt-2">{{ $statusCounts['reviews'] ?? 0 }}</h4>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 px-4">
+    <!-- Wholesale -->
+    <div class="bg-white rounded-3xl p-6 shadow-float border border-slate-100 flex items-center justify-between group hover:border-purple-200 transition-colors">
+        <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-900 text-sm">Wholesale RFQs</h3>
+                <p class="text-sm text-slate-500 font-medium">{{ $wholesale_count ?? 0 }} total</p>
+            </div>
+        </div>
+        <a href="#" class="text-white font-bold text-xs bg-slate-900 px-4 py-2 rounded-xl hover:bg-slate-800 transition shadow-md">View</a>
+    </div>
+
+    <!-- Trek History -->
+    <div class="bg-white rounded-3xl p-6 shadow-float border border-slate-100 flex flex-col justify-between">
+        <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
+            <i class="fa-solid fa-qrcode text-blue-500 mr-2 text-lg"></i>Trek History
+        </h2>
+        @if(($qr_scans ?? 0) > 0)
+            <p class="text-sm text-slate-600 font-medium">You have {{ $qr_scans }} check-ins.</p>
+        @else
+            <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 text-center">
+                <p class="text-slate-500 text-xs mb-3 font-medium">No trek history yet.</p>
+                <a href="#" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md shadow-blue-500/30 hover:bg-blue-700 transition">Scan Checkpoint</a>
+            </div>
+        @endif
+    </div>
+
+    <!-- Travel Memories -->
+    <div class="bg-white rounded-3xl p-6 shadow-float border border-slate-100">
+        <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
+            <i class="fa-solid fa-images text-purple-500 mr-2 text-lg"></i>Memories
+        </h2>
+        @if(($user_media_count ?? 0) > 0)
+            <p class="text-sm text-slate-600 font-medium">You have {{ $user_media_count }} memories.</p>
+        @else
+            <form action="{{ route('traveler.checkpoint.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col space-y-3">
+                @csrf
+                <div class="relative w-full">
+                    <input type="file" name="media" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                    <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-3 text-center hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-cloud-upload-alt text-slate-400 mb-1"></i>
+                        <p class="text-[10px] text-slate-500 font-bold">Choose File to Upload</p>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-xl font-bold text-xs shadow-md shadow-purple-500/30 hover:opacity-90 transition">Upload Memory</button>
+            </form>
+        @endif
+    </div>
+</div>
+
+<!-- Safety Alerts -->
+<div class="mt-8 px-4 mb-10">
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-6 shadow-soft border border-green-100 flex flex-col md:flex-row items-center justify-between">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm animate-pulse">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </div>
+            <div>
+                <h2 class="text-md font-bold text-green-900">Safety Alerts</h2>
+                <p class="text-sm text-green-700 font-medium mt-0.5">No active safety alerts in your area. You are safe to travel!</p>
+            </div>
+        </div>
+        <a href="{{ route('safety.index') ?? '#' }}" class="bg-white text-green-700 font-bold text-sm px-6 py-2.5 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">View Safety Map</a>
+    </div>
+</div>
+<!-- [END AUTO-INJECTED] -->
 @endsection
