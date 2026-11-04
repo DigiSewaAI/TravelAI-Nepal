@@ -44,11 +44,7 @@ class DashboardV2Controller extends Controller
         $data['weatherData'] = null;
         try {
             $wmo = app(\App\Services\OpenMeteoService::class);
-            if (method_exists($wmo, 'getCurrentWeather')) {
-                $data['weatherData'] = $wmo->getCurrentWeather(27.7172, 85.3240);
-            } elseif (method_exists($wmo, 'fetch')) {
-                $data['weatherData'] = $wmo->fetch(27.7172, 85.3240);
-            }
+            $data['weatherData'] = $wmo->getWeatherForCoords(27.7172, 85.3240);
         } catch (\Throwable $e) {
             $data['weatherData'] = null;
         }
@@ -58,6 +54,36 @@ class DashboardV2Controller extends Controller
             $data['reviewsCount'] = DB::table('reviews')->where('user_id', $user->id)->count();
         } catch (\Throwable $e) {
             $data['reviewsCount'] = 0;
+        }
+
+        // Passport data
+        try {
+            $passportService = app(\App\Services\Passport\DigitalTrekPassportService::class);
+            $data['passportData'] = $passportService->getPassportData($user);
+        } catch (\Throwable $e) {
+            $data['passportData'] = null;
+        }
+
+        // Active booking (for "My Travels" summary)
+        try {
+            $data['activeBooking'] = \App\Models\Booking::where('traveler_id', $user->id)
+                ->whereIn('status', ['confirmed', 'active'])
+                ->with('service')
+                ->latest()
+                ->first();
+        } catch (\Throwable $e) {
+            $data['activeBooking'] = null;
+        }
+
+        // Passport stats
+        try {
+            $data['trekCount'] = \App\Models\Booking::where('traveler_id', $user->id)->count();
+            $data['checkinCount'] = \App\Models\QrScan::whereHas('booking', function ($q) use ($user) {
+                $q->where('traveler_id', $user->id);
+            })->count();
+        } catch (\Throwable $e) {
+            $data['trekCount'] = 0;
+            $data['checkinCount'] = 0;
         }
 
         return view('traveler.dashboard-v2', $data);

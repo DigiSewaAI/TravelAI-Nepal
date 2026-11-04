@@ -279,8 +279,7 @@
 {{-- ═══ HEADER ═══ --}}
 <header class="tv2-header">
     <a href="{{ route('traveler.dashboard-v2') }}" class="tv2-header-logo">
-        <i class="fas fa-mountain"></i>
-        <span>TravelAI Nepal</span>
+        <img src="{{ asset('images/logo.png') }}" alt="TravelAI Nepal" style="height: 36px; width: auto; object-fit: contain;">
     </a>
 
     <form action="{{ route('public.services.index') }}" method="GET" class="tv2-header-search">

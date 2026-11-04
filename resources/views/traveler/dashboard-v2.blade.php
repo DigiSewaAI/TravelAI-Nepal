@@ -37,14 +37,13 @@
     {{-- Exchange Rates anchor --}}
     <div id="exchange-rates" style="scroll-margin-top: 100px;"></div>
 
-    {{-- Passport banner --}}
-    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 18px; padding: 24px; margin-bottom: 24px; border: 1px solid #fcd34d;">
-        <h3 style="font-size: 18px; font-weight: 700; color: #78350f; margin: 0 0 8px;">🎒 {{ __('messages.my_digital_trek_passport') ?? 'My Digital Trek Passport' }}</h3>
-        <p style="color: #92400e; font-size: 13px; margin: 0 0 12px;">{{ __('messages.your_trekking_achievements') ?? 'Your trekking achievements in one place.' }}</p>
-        <a href="{{ route('traveler.passport') }}" style="display: inline-block; background: #78350f; color: #fff; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px;">
-            {{ __('messages.view_full_passport') ?? 'View Full Passport' }} →
-        </a>
-    </div>
+        {{-- Passport --}}
+    @include('traveler._partials.passport', [
+        'passportData' => $passportData ?? null,
+        'activeBooking' => $activeBooking ?? null,
+        'trekCount' => $trekCount ?? 0,
+        'checkinCount' => $checkinCount ?? 0,
+    ])
 
     {{-- Travel Memories anchor --}}
     <div id="memories" style="scroll-margin-top: 100px;"></div>
@@ -80,4 +79,36 @@
         </button>
     </div>
 
+
+    {{-- My Bookings (separate card) --}}
+    <div id="my-bookings-section" class="tv2-my-bookings-section" style="background: #fff; border-radius: 18px; padding: 20px; margin-bottom: 24px; border: 1px solid #e5e7eb;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: #111827; margin: 0;">📅 {{ __('messages.nav_my_bookings') ?? 'My Bookings' }}</h3>
+            <a href="{{ route('traveler.my-bookings') }}" style="color: #2563eb; font-size: 12px; font-weight: 600; text-decoration: none;">{{ __('messages.see_all') ?? 'See All' }} →</a>
+        </div>
+        @if($treks && $treks->count() > 0)
+            @foreach($treks->take(3) as $trek)
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 13px; color: #111827;">{{ $trek->service->name ?? 'Trek' }}</div>
+                        <div style="font-size: 12px; color: #6b7280;">{{ $trek->created_at->translatedFormat('M d, Y') }}</div>
+                    </div>
+                    <a href="{{ route('traveler.bookings.show', $trek) }}" style="padding: 6px 14px; border: 1px solid #2563eb; color: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none;">{{ __('messages.view') ?? 'View' }}</a>
+                </div>
+            @endforeach
+        @else
+            <p style="font-size: 13px; color: #9ca3af; margin: 0;">{{ __('messages.no_trips_yet') ?? 'No bookings yet' }}</p>
+        @endif
+    </div>
+
+    {{-- Reviews + Tools + Exchange rates grid --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        @include('traveler._partials.reviews', ['reviewsCount' => $reviewsCount ?? 0])
+        @include('traveler._partials.exchange-rates', ['exchangeRates' => $exchangeRates ?? collect()])
+    </div>
+
+    {{-- Tools & Shortcuts --}}
+    <div style="margin-bottom: 24px;">
+        @include('traveler._partials.tools')
+    </div>
 @endsection
