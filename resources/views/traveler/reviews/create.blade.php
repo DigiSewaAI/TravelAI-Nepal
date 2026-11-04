@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', __('messages.traveler_review_create_title'))
 @section('content')
@@ -29,7 +29,7 @@
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
                 {{ __('messages.traveler_review_submit') }}
             </button>
-            <a href="{{ route('traveler.dashboard') }}" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">{{ __('messages.cancel') }}</a>
+            <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">{{ __('messages.cancel') }}</a>
         </form>
     </div>
 </div>

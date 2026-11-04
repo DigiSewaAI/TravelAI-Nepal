@@ -247,7 +247,7 @@
 @if(false){{-- moved to traveler dashboard --}}                            <a href="{{ route('orders.index') }}" class="border border-green-500 text-green-600 hover:bg-green-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">My Orders</a>@endif
 @if(false){{-- moved to traveler dashboard --}}                            <a href="{{ route('wholesale.rfq.index') }}" class="border border-amber-500 text-amber-600 hover:bg-amber-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.my_rfqs') }}</a>@endif
                         @elseif(auth()->user()->isTraveler())
-                            <a href="{{ route('traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
+                            <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.dashboard') }}</a>
 @if(false){{-- moved to traveler dashboard --}}                            <a href="{{ route('traveler.my-bookings') }}" class="border border-blue-500 text-blue-600 hover:bg-blue-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">My Bookings</a>@endif
 @if(false){{-- moved to traveler dashboard --}}                            <a href="{{ route('wholesale.rfq.index') }}" class="border border-amber-500 text-amber-600 hover:bg-amber-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.my_rfqs') }}</a>@endif
 @if(false){{-- moved to traveler dashboard --}}                            <a href="{{ route('orders.index') }}" class="border border-green-500 text-green-600 hover:bg-green-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap">{{ __('messages.product_orders') }}</a>@endif
@@ -279,7 +279,7 @@
                 <div class="flex lg:hidden items-center gap-1">
     @auth
 
-<a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner() || auth()->user()->isStaff()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route('traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
+<a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner() || auth()->user()->isStaff()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
                     @else
                         <a href="{{ route('login') }}" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.login') }}</a>
                     @endauth

@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', __('messages.traveler_my_reviews'))
 
@@ -7,7 +7,7 @@
 
     {{-- Breadcrumb --}}
     <nav class="text-sm text-gray-500 mb-4">
-        <a href="{{ route('traveler.dashboard') }}" class="hover:text-blue-600">{{ __('messages.traveler_dashboard') }}</a>
+        <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="hover:text-blue-600">{{ __('messages.traveler_dashboard') }}</a>
         <span class="mx-2">/</span>
         <span>{{ __('messages.traveler_my_reviews') }}</span>
     </nav>
@@ -100,7 +100,7 @@
 
     {{-- Back to Dashboard --}}
     <div class="mt-8 text-center">
-        <a href="{{ route('traveler.dashboard') }}"
+        <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}"
            class="inline-block text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
             ← {{ __('messages.traveler_back_dashboard') }}
         </a>

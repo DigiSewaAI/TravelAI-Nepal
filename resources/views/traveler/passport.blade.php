@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', __('messages.passport_title') . ' - TravelAI Nepal')
 
@@ -229,7 +229,7 @@
         SECTION 7: BACK TO DASHBOARD
         ========================================== --}}
     <div class="flex justify-between items-center flex-wrap gap-4">
-        <a href="{{ route('traveler.dashboard') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+        <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
             {{ __('messages.passport_back_to_dashboard') }}
         </a>
         <div class="text-xs text-gray-400">

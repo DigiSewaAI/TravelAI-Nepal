@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', $incident->title . ' — Safety Incident | TravelAI Nepal')
 @section('meta_description', 'Safety incident report: ' . Str::limit(strip_tags($incident->description ?? $incident->title), 150))

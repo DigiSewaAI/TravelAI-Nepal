@@ -216,7 +216,7 @@ class RegisterController extends Controller
             }
 
             // ✅ Redirect intended checkout or dashboard
-            return redirect()->intended(route('traveler.dashboard'))
+            return redirect()->intended(route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard'))
                 ->with('success', '🎉 Account created successfully! Welcome to TravelAI Nepal.');
 
         } catch (\Exception $e) {

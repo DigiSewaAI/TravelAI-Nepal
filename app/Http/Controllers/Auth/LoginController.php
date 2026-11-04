@@ -79,7 +79,7 @@ class LoginController extends Controller
                 }
                 return redirect()->intended(route('provider.dashboard'));
             } else {
-                return redirect()->intended(route('traveler.dashboard'));
+                return redirect()->intended(route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard'));
             }
         }
 

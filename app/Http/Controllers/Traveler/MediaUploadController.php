@@ -108,12 +108,12 @@ class MediaUploadController extends Controller
 
             $media->delete();
 
-            return redirect()->route('traveler.dashboard')
+            return redirect()->route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard')
                              ->with('upload_success', '✅ Memory deleted successfully!');
 
                 } catch (\Exception $e) {
             Log::error('Delete error: ' . $e->getMessage());
-            return redirect()->route('traveler.dashboard')
+            return redirect()->route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard')
                              ->with('upload_error', '❌ Delete failed. Please try again.');
         }
     }

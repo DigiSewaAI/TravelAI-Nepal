@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traveler;
 use App\Http\Controllers\Controller;
 use App\Services\Traveler\UnifiedDashboardService;
 use Illuminate\Support\Facades\DB;
+use App\Services\AdService;
 
 class DashboardV2Controller extends Controller
 {
@@ -99,6 +100,8 @@ class DashboardV2Controller extends Controller
         })->count();
         $data['user_media_count'] = \Illuminate\Support\Facades\DB::table('user_media')->where('user_id', $user->id)->count();
         $data['wholesale_count'] = \Illuminate\Support\Facades\DB::table('wholesale_rfqs')->where('buyer_id', $user->id)->count();
+
+                $data['featuredAds'] = app(AdService::class)->getFeaturedAds();
 
         return view('traveler.dashboard-v2', $data);
     }

@@ -26,7 +26,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background-image: url('https://images.unsplash.com/photo-1512100356356-de1b84283e18?q=80&w=1600&auto=format&fit=crop');
+        background-image: url('{{ asset('images/passport-bg.jpg') }}');
         background-size: cover;
         background-position: center;
         opacity: 0.90;

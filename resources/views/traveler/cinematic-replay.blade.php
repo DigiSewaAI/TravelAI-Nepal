@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', 'Cinematic Journey Replay - TravelAI Nepal')
 

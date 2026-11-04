@@ -5,7 +5,7 @@
     if (!isset($counts) || !is_array($counts)) $counts = [];
 @endphp
 
-<div class="tv2-hero" style="background: linear-gradient(135deg, rgba(30,64,175,0.45) 0%, rgba(37,99,235,0.35) 100%), url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1600&auto=format&fit=crop') center/cover; border-radius: 18px; padding: 40px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden;">
+<div class="tv2-hero" style="background: linear-gradient(to right, rgba(15,23,42,0.75) 0%, rgba(15,23,42,0.35) 50%, rgba(15,23,42,0.10) 100%), url('{{ asset('images/hero-bg.jpg') }}') center/cover; border-radius: 18px; padding: 52px 44px; min-height: 420px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden;">
     <div style="position: absolute; top: -40px; right: -40px; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
     <div style="position: relative; z-index: 1;">
         <h1 style="font-size: 32px; font-weight: 800; margin: 0 0 8px;">{{ $greeting ?? 'Hello' }}, {{ $user->name ?? 'Traveler' }} 👋</h1>

@@ -50,7 +50,7 @@
 
     {{-- Travel Memories + Journey Replay (grid) --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <a href="{{ route('traveler.dashboard') }}#memories" style="background: #fff; border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; border: 1px solid #e5e7eb;">
+        <a href="{{ route('traveler.dashboard-v2') }}#memories" style="background: #fff; border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; border: 1px solid #e5e7eb;">
             <div style="font-size: 32px; margin-bottom: 8px;">📸</div>
             <h4 style="font-weight: 700; color: #111827; margin: 0 0 6px;">{{ __('messages.travel_memories') ?? 'Travel Memories' }}</h4>
             <p style="font-size: 13px; color: #6b7280; margin: 0;">{{ __('messages.upload_photos') ?? 'Upload photos from your journey checkpoints.' }}</p>
@@ -74,7 +74,7 @@
     <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 18px; padding: 24px; margin-bottom: 24px;">
         <h3 style="font-size: 18px; font-weight: 700; color: #991b1b; margin: 0 0 8px;">🚨 {{ __('messages.emergency_sos') ?? 'Emergency SOS' }}</h3>
         <p style="color: #b91c1c; font-size: 13px; margin: 0 0 12px;">{{ __('messages.sos_help_text') ?? 'Need help in Nepal? Get immediate assistance.' }}</p>
-        <button type="button" onclick="alert('SOS workflow — will be wired in a future commit')" style="background: #dc2626; color: #fff; border: 0; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">
+        <button type="button" onclick="openSosModal()" style="background: #dc2626; color: #fff; border: 0; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;">
             📞 {{ __('messages.call_sos') ?? 'Call SOS' }}
         </button>
     </div>
@@ -103,7 +103,10 @@
 
     {{-- Reviews + Tools + Exchange rates grid --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        @include('traveler._partials.reviews', ['reviewsCount' => $reviewsCount ?? 0])
+        {{-- Ads: Featured for You (ported from legacy) --}}
+@include('partials.ad-carousel', ['featuredAds' => $featuredAds ?? collect()])
+
+@include('traveler._partials.reviews', ['reviewsCount' => $reviewsCount ?? 0])
         @include('traveler._partials.exchange-rates', ['exchangeRates' => $exchangeRates ?? collect()])
     </div>
 
@@ -158,7 +161,7 @@
                 <p class="text-sm text-slate-500 font-medium">{{ $wholesale_count ?? 0 }} total</p>
             </div>
         </div>
-        <a href="#" class="text-white font-bold text-xs bg-slate-900 px-4 py-2 rounded-xl hover:bg-slate-800 transition shadow-md">View</a>
+        <a href="{{ route('wholesale.rfq.index') }}" class="text-white font-bold text-xs bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-2 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300">View</a>
     </div>
 
     <!-- Trek History -->
@@ -171,7 +174,7 @@
         @else
             <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 text-center">
                 <p class="text-slate-500 text-xs mb-3 font-medium">No trek history yet.</p>
-                <a href="#" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md shadow-blue-500/30 hover:bg-blue-700 transition">Scan Checkpoint</a>
+                <a href="{{ route('traveler.bookings.index') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md shadow-blue-500/30 hover:bg-blue-700 transition">Scan Checkpoint</a>
             </div>
         @endif
     </div>
