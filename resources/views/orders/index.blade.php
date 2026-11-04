@@ -1,7 +1,7 @@
 @extends((request('ctx') === 'provider' && !empty($provider_layout)) ? $provider_layout : 'layouts.public')
 @section('title', __('messages.orders_title') . ' | TravelAI Nepal')
 @section('page-title', __('messages.orders_title'))
-@section('page-subtitle', 'All your product orders')
+@section('page-subtitle', __('messages.my_orders_desc'))
 @section('content')
 @php
     $currencyService = app(\App\Services\CurrencyService::class);

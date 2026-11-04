@@ -118,7 +118,7 @@
       @csrf
       <div style="margin-bottom:14px">
         <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.task_name') }}</label>
-        <input type="text" name="task_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="Clean Room">
+        <input type="text" name="task_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="{{ __('messages.clean_room') }}">
       </div>
       <div style="margin-bottom:14px">
         <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.room_optional') }}</label>
@@ -136,7 +136,7 @@
       <div style="margin-bottom:14px">
         <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.status') }}</label>
         <select name="status" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-          <option value="queue">Queue</option>
+          <option value="queue">{{ __('messages.st_queue') }}</option>
           <option value="in_progress">{{ __('messages.in_progress') }}</option>
           <option value="done">{{ __('messages.done') }}</option>
         </select>

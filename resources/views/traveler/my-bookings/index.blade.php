@@ -1,7 +1,7 @@
 @extends((request('ctx') === 'provider' && !empty($provider_layout)) ? $provider_layout : 'layouts.public')
-@section('title', 'My Bookings | TravelAI Nepal')
-@section('page-title', 'My Bookings')
-@section('page-subtitle', 'All your activity across TravelAI Nepal')
+@section('title', __('messages.my_bookings_page_title') . ' | TravelAI Nepal')
+@section('page-title', __('messages.my_bookings_page_title'))
+@section('page-subtitle', __('messages.my_bookings_page_desc'))
 @section('content')
 <div style="display:flex;flex-direction:column;gap:18px;color:var(--text,#111827)">
 

@@ -2659,4 +2659,8 @@ return array (
   'my_orders_desc' => 'Все ваши заказы',
   'no_orders_count' => '0 заказов',
   'adjust_filters_msg' => 'Измените фильтры или поисковые запросы.',
+  'room_label' => 'Номер',
+  'wholesale_rfq_desc' => 'Все ваши оптовые запросы',
+  'quote_requests_count' => 'запросов котировок',
+  'bank_transfer' => 'Банковский перевод',
 );

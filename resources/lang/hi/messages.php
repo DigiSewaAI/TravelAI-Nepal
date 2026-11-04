@@ -2061,4 +2061,8 @@ return array (
   'my_orders_desc' => 'आपके सभी उत्पाद ऑर्डर',
   'no_orders_count' => '० ऑर्डर',
   'adjust_filters_msg' => 'अपने फ़िल्टर या खोज शब्दों को समायोजित करें।',
+  'room_label' => 'कमरा',
+  'wholesale_rfq_desc' => 'आपके सभी थोक कोटेशन अनुरोध',
+  'quote_requests_count' => 'कोटेशन अनुरोध',
+  'bank_transfer' => 'बैंक ट्रांसफर',
 );

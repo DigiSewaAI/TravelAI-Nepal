@@ -1,7 +1,7 @@
 @extends((request('ctx') === 'provider' && !empty($provider_layout)) ? $provider_layout : 'layouts.public')
-@section('title', 'My Wholesale RFQs | TravelAI Nepal')
-@section('page-title', 'My Wholesale RFQs')
-@section('page-subtitle', 'All your wholesale quote requests')
+@section('title', __('messages.my_wholesale_rfqs') . ' | TravelAI Nepal')
+@section('page-title', __('messages.my_wholesale_rfqs'))
+@section('page-subtitle', __('messages.wholesale_rfq_desc'))
 @section('content')
 @php
     $__total = method_exists($rfqs, 'total') ? $rfqs->total() : $rfqs->count();

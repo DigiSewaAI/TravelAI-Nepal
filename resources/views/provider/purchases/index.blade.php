@@ -2,7 +2,7 @@
 
 @section('title', __('messages.my_purchases'))
 @section('page-title', __('messages.my_purchases'))
-@section('page-subtitle', 'Orders you placed as a customer')
+@section('page-subtitle', __('messages.orders_you_placed_as_a_customer'))
 
 @section('content')
 <div style="display:flex;flex-direction:column;gap:18px;color:var(--text,#111827)">

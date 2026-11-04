@@ -89,7 +89,7 @@
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
             <td><strong>Rs {{ number_format($room->base_price ?? 0) }}</strong></td>
                             <td style="text-align:right;">
-              <button type="button" class="act-btn act-edit" data-price="{{ $room->base_price ?? 0 }}" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ $room->status }}')"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
+              <button type="button" class="act-btn act-edit" data-price="{{ $room->base_price ?? 0 }}" onclick="openEditRoomModal({{ $room->id }}, '{{ addslashes($room->room_number) }}', '{{ addslashes($room->room_type) }}', {{ $room->floor }}, '{{ __('messages.st_' . $room->status) }}')"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
               <form action="{{ route('provider.hotel.rooms.destroy', $room) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete room {{ $room->room_number }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="act-btn act-del"><i class="fas fa-trash"></i></button>
@@ -125,10 +125,10 @@
         <div>
           <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
           <select name="room_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-            <option value="Standard">Standard</option>
-            <option value="Deluxe">Deluxe</option>
-            <option value="Suite">Suite</option>
-            <option value="Superior">Superior</option>
+            <option value="Standard">{{ __('messages.rt_standard') }}</option>
+            <option value="Deluxe">{{ __('messages.rt_deluxe') }}</option>
+            <option value="Suite">{{ __('messages.rt_suite') }}</option>
+            <option value="Superior">{{ __('messages.rt_superior') }}</option>
             <option value="Premium">{{ __('messages.premium') }}</option>
           </select>
         </div>
@@ -173,10 +173,10 @@
         <div>
           <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.type') }}</label>
           <select name="room_type" id="edit_room_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
-            <option value="Standard">Standard</option>
-            <option value="Deluxe">Deluxe</option>
-            <option value="Suite">Suite</option>
-            <option value="Superior">Superior</option>
+            <option value="Standard">{{ __('messages.rt_standard') }}</option>
+            <option value="Deluxe">{{ __('messages.rt_deluxe') }}</option>
+            <option value="Suite">{{ __('messages.rt_suite') }}</option>
+            <option value="Superior">{{ __('messages.rt_superior') }}</option>
             <option value="Premium">{{ __('messages.premium') }}</option>
           </select>
         </div>

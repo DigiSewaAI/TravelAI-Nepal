@@ -3051,4 +3051,7 @@ return array (
   'my_orders_desc' => 'तपाईंका सबै उत्पादन अर्डरहरू',
   'no_orders_count' => '० अर्डरहरू',
   'adjust_filters_msg' => 'तपाईंका फिल्टर वा खोज शब्दहरू समायोजन गर्नुहोस्।',
+  'room_label' => 'कोठा',
+  'wholesale_rfq_desc' => 'तपाईंका सबै थोक कोटेशन अनुरोधहरू',
+  'quote_requests_count' => 'कोटेशन अनुरोधहरू',
 );

@@ -3030,4 +3030,7 @@ return array (
   'my_orders_desc' => 'All your product orders',
   'no_orders_count' => '0 orders',
   'adjust_filters_msg' => 'Try adjusting your filters or search terms.',
+  'room_label' => 'Room',
+  'wholesale_rfq_desc' => 'All your wholesale quote requests',
+  'quote_requests_count' => 'quote requests',
 );

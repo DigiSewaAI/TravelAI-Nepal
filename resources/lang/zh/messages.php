@@ -2072,4 +2072,8 @@ return array (
   'my_orders_desc' => '您的所有产品订单',
   'no_orders_count' => '0 订单',
   'adjust_filters_msg' => '请调整筛选条件或搜索词。',
+  'room_label' => '房间',
+  'wholesale_rfq_desc' => '您的所有批发报价请求',
+  'quote_requests_count' => '报价请求',
+  'bank_transfer' => '银行转账',
 );

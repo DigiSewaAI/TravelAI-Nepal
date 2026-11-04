@@ -1,8 +1,8 @@
 @extends($provider_layout ?? 'layouts.provider-hotel')
 
-@section('title', 'Price History')
-@section('page-title', 'Price History')
-@section('page-subtitle', 'Audit trail of all room price changes')
+@section('title', __('messages.price_history_title'))
+@section('page-title', __('messages.price_history_title'))
+@section('page-subtitle', __('messages.price_history_desc'))
 
 @section('content')
 
@@ -30,7 +30,7 @@
             <table style="width:100%;border-collapse:collapse;">
                 <thead>
                     <tr style="background:var(--bg,#f5f7fb);">
-                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">Room</th>
+                        <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.room_label') }}</th>
                         <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.change') }}</th>
                         <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.reason') }}</th>
                         <th style="text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#6b7a90);font-weight:800;">{{ __('messages.changed_by') }}</th>
