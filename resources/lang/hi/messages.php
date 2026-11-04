@@ -2070,4 +2070,6 @@ return array (
   'items' => 'आइटम',
   'items_count' => 'आइटम',
   'st_completed' => 'पूर्ण हुआ',
+  'request_quotation_from_providers' => 'प्रदाताओं से कोटेशन का अनुरोध करें',
+  'quotation_cancel_btn' => 'रद्द करें',
 );

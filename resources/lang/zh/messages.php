@@ -2081,4 +2081,6 @@ return array (
   'items' => '商品',
   'items_count' => '件',
   'st_completed' => '已完成',
+  'request_quotation_from_providers' => '向供应商请求报价',
+  'quotation_cancel_btn' => '取消',
 );

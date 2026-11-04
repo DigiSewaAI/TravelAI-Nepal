@@ -3034,4 +3034,6 @@ return array (
   'wholesale_rfq_desc' => 'All your wholesale quote requests',
   'quote_requests_count' => 'quote requests',
   'st_completed' => 'Completed',
+  'request_quotation_from_providers' => 'Request Quotation from Providers',
+  'quotation_cancel_btn' => 'Cancel',
 );

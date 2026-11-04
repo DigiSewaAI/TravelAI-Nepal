@@ -107,6 +107,7 @@ class PlannerNarrativeService
             'np'    => 'Write ALL descriptions in Nepali (Devanagari script).',
             'hi'    => 'Write ALL descriptions in Hindi (Devanagari script).',
             'zh'    => 'Write ALL descriptions in Simplified Chinese.',
+            'ru'    => 'Write ALL descriptions in Russian (Cyrillic script).',
             default => 'Write ALL descriptions in English.',
         };
 

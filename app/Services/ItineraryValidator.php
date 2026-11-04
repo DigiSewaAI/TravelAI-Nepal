@@ -108,12 +108,15 @@ if ($segments->isNotEmpty()) {
                 $title = match($locale) {
                     'hi' => ($altitude >= 3000 && !$isTour) ? "{$to->name} में अनुकूलन दिवस" : "आराम दिन",
                     'zh' => ($altitude >= 3000 && !$isTour) ? "{$to->name} 适应日" : "休息日",
+                    'ru' => ($altitude >= 3000 && !$isTour) ? "{$to->name} 适应日" : "День отдыха",
+                    'ru' => ($altitude >= 3000 && !$isTour) ? "День акклиматизации в {$to->name}" : "休息日",
                     'np' => ($altitude >= 3000 && !$isTour) ? "{$to->name} मा अनुकूलन दिन" : "आराम दिन",
                     default => ($altitude >= 3000 && !$isTour) ? "Acclimatization Day at {$to->name}" : "Rest Day",
                 };
                 $desc = match($locale) {
                     'hi' => ($altitude >= 3000 && !$isTour) ? "आज कोई ट्रेकिंग नहीं। {$to->name} में आराम और अनुकूलन।" : "आजको दिन आराम गर्नुहोस्।",
                     'zh' => ($altitude >= 3000 && !$isTour) ? "今天不徒步。在 {$to->name} 休息和适应。" : "今天休息。",
+                    'ru' => ($altitude >= 3000 && !$isTour) ? "Сегодня без треккинга. Отдых и акклиматизация в {$to->name}." : "今天休息。",
                     'np' => ($altitude >= 3000 && !$isTour) ? "आज कुनै ट्रेकिङ छैन। {$to->name} मा आराम र अनुकूलन।" : "आजको दिन आराम गर्नुहोस्।",
                     default => ($altitude >= 3000 && !$isTour) ? "No trekking today. Rest and acclimatize at {$to->name}." : "Rest today.",
                 };
@@ -121,11 +124,13 @@ if ($segments->isNotEmpty()) {
                 $title = match($locale) {
                     'hi' => "दिन " . ($i + 1) . ": {$from->name} → {$to->name}",
                     'zh' => "第 " . ($i + 1) . " 天: {$from->name} → {$to->name}",
+                    'ru' => "День " . ($i + 1) . ": {$from->name} → {$to->name}",
                     default => "Day " . ($i + 1) . ": {$from->name} → {$to->name}",
                 };
                 $desc = match($locale) {
                     'hi' => "{$from->name} ({$from->altitude}मी) से {$to->name} ({$to->altitude}मी) तक ट्रेक। दूरी: {$segment->distance_km} किमी, अनुमानित समय: {$segment->estimated_time_hours} घंटे।",
                     'zh' => "从 {$from->name}（{$from->altitude}米）徒步到 {$to->name}（{$to->altitude}米）。距离：{$segment->distance_km}公里，预计时间：{$segment->estimated_time_hours}小时。",
+                    'ru' => "Треккинг из {$from->name} ({$from->altitude} м) в {$to->name} ({$to->altitude} м). Расстояние: {$segment->distance_km} км, примерное время: {$segment->estimated_time_hours} ч.",
                     default => "Trek from {$from->name} ({$from->altitude}m) to {$to->name} ({$to->altitude}m). Distance: {$segment->distance_km} km, estimated time: {$segment->estimated_time_hours} hrs.",
                 };
             }
@@ -177,6 +182,7 @@ if ($segments->isNotEmpty()) {
                                     $titleRest = match($locale) {
                 'hi' => $isTour ? "{$waypointName} में आराम दिन" : "{$waypointName} में अनुकूलन दिवस",
                 'zh' => $isTour ? "在{$waypointName}休息" : "{$waypointName} 适应日",
+                'ru' => $isTour ? "Отдых в {$waypointName}" : "День акклиматизации в {$waypointName}",
                 'np' => $isTour ? "{$waypointName} मा आराम दिन" : "{$waypointName} मा अनुकूलन दिन",
                 default => $isTour ? "Rest Day at {$waypointName}" : "Acclimatization Day at {$waypointName}",
             };
@@ -217,12 +223,14 @@ if ($segments->isNotEmpty()) {
                 'title' => match($locale) {
                     'hi' => "दिन {$dayNumber}: कोई यात्रा डेटा नहीं",
                     'zh' => "第 {$dayNumber} 天: 无行程数据",
+                    'ru' => "День {$dayNumber}: нет данных маршрута",
                     'np' => "दिन {$dayNumber}: यात्रा डेटा छैन",
                     default => "Day {$dayNumber}: No Itinerary Data",
                 },
                 'description' => match($locale) {
                     'hi' => "AI ने इस दिन के लिए डेटा उत्पन्न नहीं किया।",
                     'zh' => "AI 没有为此天生成数据。",
+                    'ru' => "ИИ не сгенерировал данные для этого дня.",
                     'np' => "AI ले यस दिनको लागि डेटा उत्पन्न गरेन।",
                     default => "The AI did not generate data for this day.",
                 },
@@ -359,9 +367,10 @@ if ($segments->isNotEmpty()) {
                 'np' => "दिन {$dayNumber}: ",
                 'hi' => "दिन {$dayNumber}: ",
                 'zh' => "第 {$dayNumber} 天: ",
+                'ru' => "День {$dayNumber}: ",
                 default => "Day {$dayNumber}: ",
             };
-            $hasLocalePrefix = preg_match('/^(Day|दिन|第)\s*\d+/u', $originalTitle);
+            $hasLocalePrefix = preg_match('/^(Day|दिन|第|День)\s*\d+/u', $originalTitle);
             if ($hasLocalePrefix) {
                 $newTitle = preg_replace($patterns, $localePrefix, $originalTitle);
             } else {
@@ -405,6 +414,7 @@ if ($segments->isNotEmpty()) {
                     'np' => "दिन {$dayNum}: ",
                     'hi' => "दिन {$dayNum}: ",
                     'zh' => "第 {$dayNum} 天: ",
+                    'ru' => "День {$dayNum}: ",
                     default => "Day {$dayNum}: ",
                 };
 
@@ -412,12 +422,14 @@ if ($segments->isNotEmpty()) {
                     $normalizedDay['title'] = $prefixStr . match($locale) {
                         'hi' => "{$waypoint->name} में अनुकूलन दिवस",
                         'zh' => "{$waypoint->name} 适应日",
+                        'ru' => "День акклиматизации в {$waypoint->name}",
                         'np' => "{$waypoint->name} मा अनुकूलन दिन",
                         default => "Acclimatization Day at {$waypoint->name}",
                     };
                     $normalizedDay['description'] = match($locale) {
                         'hi' => "आज कोई ट्रेकिंग नहीं। {$waypoint->name} में आराम और अनुकूलन।",
                         'zh' => "今天不徒步。在 {$waypoint->name} 休息和适应。",
+                        'ru' => "Сегодня без треккинга. Отдых и акклиматизация в {$waypoint->name}.",
                         'np' => "आज कुनै ट्रेकिङ छैन। {$waypoint->name} मा आराम र अनुकूलन।",
                         default => "No trekking today. Rest and acclimatize at {$waypoint->name}.",
                     };
@@ -425,12 +437,14 @@ if ($segments->isNotEmpty()) {
                     $normalizedDay['title'] = $prefixStr . match($locale) {
                         'hi' => "{$waypoint->name} में आराम दिन",
                         'zh' => "在{$waypoint->name}休息",
+                        'ru' => "Отдых в {$waypoint->name}",
                         'np' => "{$waypoint->name}मा आराम दिन",
                         default => "Rest Day at {$waypoint->name}",
                     };
                     $normalizedDay['description'] = match($locale) {
                         'hi' => "आजको दिन आराम गर्नुहोस्।",
                         'zh' => "今天休息。",
+                        'ru' => "Сегодня отдых.",
                         'np' => "आजको दिन आराम गर्नुहोस्।",
                         default => "Rest today.",
                     };
@@ -461,12 +475,14 @@ if ($segments->isNotEmpty()) {
                 'title' => match($locale) {
                     'hi' => "कोई यात्रा उत्पन्न नहीं हुई",
                     'zh' => "未生成行程",
+                    'ru' => "Маршрут не создан",
                     'np' => "कुनै यात्रा उत्पन्न भएन",
                     default => "No Itinerary Generated",
                 },
                 'description' => match($locale) {
                     'hi' => "यात्रा उत्पन्न करने में असमर्थ। कृपया भिन्न पैरामीटर के साथ पुनः प्रयास करें।",
                     'zh' => "无法生成行程。请尝试使用不同的参数。",
+                    'ru' => "Невозможно создать маршрут. Пожалуйста, попробуйте с другими параметрами.",
                     'np' => "यात्रा उत्पन्न गर्न असमर्थ। कृपया फरक प्यारामिटरको साथ पुनः प्रयास गर्नुहोस्।",
                     default => "Unable to generate an itinerary. Please try again with different parameters.",
                 },

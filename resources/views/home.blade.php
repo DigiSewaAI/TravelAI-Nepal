@@ -361,7 +361,7 @@
         </div>
         <div class="flex gap-3">
           <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex-1">{{ __('messages.quotation_send_request') }}</button>
-          <button type="button" onclick="closeQuotationModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">Cancel</button>
+          <button type="button" onclick="closeQuotationModal()" class="bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-lg">{{ __('messages.quotation_cancel_btn') }}</button>
         </div>
       </form>
       <div id="quotationRequestStatus" class="mt-3 hidden text-center"></div>
@@ -726,11 +726,11 @@
       // ------ Days Rendering ------
       days.forEach(day => {
     // ✅ Strip duplicate "Day X:" prefix
-    const cleanTitle = (day.title || '').replace(/^(Day|दिन|第)\s*\d+\s*(天)?\s*[:：]\s*/u, '').trim();
+    const cleanTitle = (day.title || '').replace(/^(Day|День|दिन|第)\s*\d+\s*(天)?\s*[:：]\s*/u, '').trim();
 
     html += `<div class="mb-6 border-b border-gray-200 pb-4 last:border-0">`;
     const _locale = '{{ app()->getLocale() }}';
-const _dayPrefix = {np:'दिन', hi:'दिन', zh:'第', en:'Day'}[_locale] || 'Day';
+const _dayPrefix = {np:'दिन', hi:'दिन', zh:'第', ru:'День', en:'Day'}[_locale] || 'Day';
 const _daySuffix = _locale === 'zh' ? ' 天' : '';
 html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_number}${_daySuffix}: ${cleanTitle}</h3>`;
     html += `<p class="text-gray-600 text-sm mt-1">${day.description || ''}</p>`;
@@ -775,7 +775,7 @@ html += `<h3 class="text-lg font-bold text-blue-700">${_dayPrefix} ${day.day_num
       html += `<div class="mt-6 border-t pt-4 text-center">
                 <button onclick="openQuotationModal()"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto">
-                    <i class="fas fa-paper-plane"></i> Request Quotation from Providers
+                    <i class="fas fa-paper-plane"></i> {{ __('messages.request_quotation_from_providers') }}
                 </button>
               </div>`;
 
@@ -917,7 +917,7 @@ function renderProviderOptions(providers) {
     }
 
     // Add default option
-    select.innerHTML = '<option value="">-- Select a provider --</option>';
+    select.innerHTML = '<option value="">{{ __("messages.quotation_select_provider") }}</option>';
 
     providers.forEach(p => {
         select.innerHTML += `<option value="${p.id}">${p.name}</option>`;

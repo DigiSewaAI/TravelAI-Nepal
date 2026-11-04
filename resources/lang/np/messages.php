@@ -3055,4 +3055,6 @@ return array (
   'wholesale_rfq_desc' => 'तपाईंका सबै थोक कोटेशन अनुरोधहरू',
   'quote_requests_count' => 'कोटेशन अनुरोधहरू',
   'st_completed' => 'सम्पन्न भयो',
+  'request_quotation_from_providers' => 'प्रदायकहरूबाट कोटेशन अनुरोध गर्नुहोस्',
+  'quotation_cancel_btn' => 'रद्द गर्नुहोस्',
 );

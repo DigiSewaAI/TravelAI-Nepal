@@ -2668,4 +2668,6 @@ return array (
   'items' => 'товаров',
   'items_count' => 'шт.',
   'st_completed' => 'Завершено',
+  'request_quotation_from_providers' => 'Запросить расценки у поставщиков',
+  'quotation_cancel_btn' => 'Отмена',
 );
