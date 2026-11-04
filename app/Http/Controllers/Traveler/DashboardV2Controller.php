@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Traveler;
 
 use App\Http\Controllers\Controller;
+use App\Services\Traveler\UnifiedDashboardService;
 
 class DashboardV2Controller extends Controller
 {
     /**
      * Display the V2 traveler dashboard.
-     *
-     * NOTE: Data service will be wired in Commit 2.
-     * View will be created in Commit 4.
      * Feature flag gate applied via route middleware.
      */
     public function index()
     {
-        // Stub: Data service + view wired in subsequent commits
-        return response('Traveler Dashboard V2 — Commit 1 stub', 200);
+        $user = auth()->user();
+
+        if (!$user || !$user->isTraveler()) {
+            abort(403);
+        }
+
+        $data = app(UnifiedDashboardService::class)->getData($user->id);
+
+        return view('traveler.dashboard-v2', $data);
     }
 }
