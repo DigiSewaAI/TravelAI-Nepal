@@ -546,6 +546,11 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
 // 4. TRAVELER ROUTES (Phase 10 + Passport)
 // =======================================
     Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+        Route::get('/dashboard-v2', [\App\Http\Controllers\Traveler\DashboardV2Controller::class, 'index'])
+            ->name('dashboard-v2')
+            ->middleware('feature.flag:traveler_dashboard_v2');
+
+
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
         // 🆕 Traveler notifications (in-app bell)

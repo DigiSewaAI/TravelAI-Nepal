@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'localize' => \App\Http\Middleware\Localization::class,
             'feature' => \App\Http\Middleware\EnsureFeatureAccess::class,
+            'feature.flag' => \App\Http\Middleware\FeatureFlagMiddleware::class,
         ]);
 
         // ✅ WEB GROUP मा Localization Middleware थप्नुहोस् (सबै web routes मा apply हुन्छ)
