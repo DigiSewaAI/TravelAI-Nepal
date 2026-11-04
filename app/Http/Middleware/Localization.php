@@ -14,20 +14,13 @@ class Localization
         $locale = session('locale', 'en');
         Log::info('🔍 [Localization Middleware] Step 1: Session locale', ['locale' => $locale]);
 
-        // 2. यदि Provider Guard ले Login गरेको छ भने Default Nepali राख्ने
-        if (auth()->guard('provider')->check()) {
-            Log::info('🔍 [Localization Middleware] Provider guard is active');
-
-            // यदि Session मा locale छैन भने 'np' सेट गर्ने
-            if (!session()->has('locale')) {
-                $locale = 'np';
-                session(['locale' => $locale]);
-                Log::info('🔍 [Localization Middleware] Step 2: Provider guard set locale to np', ['locale' => $locale]);
-            } else {
-                Log::info('🔍 [Localization Middleware] Step 2: Session has locale, keeping it', ['locale' => $locale]);
-            }
+        // 2. Provider routes मा English force, अरूमा session locale (public/traveler/admin)
+        if ($request->is('provider') || $request->is('provider/*')) {
+            $locale = 'en';
+            Log::info('🔍 [Localization Middleware] Provider route — forcing English', ['locale' => $locale]);
         } else {
-            Log::info('🔍 [Localization Middleware] Provider guard not active, using session locale');
+            $locale = session('locale', 'en');
+            Log::info('🔍 [Localization Middleware] Non-provider route — using session locale', ['locale' => $locale]);
         }
         // 3. Laravel को App Locale सेट गर्ने
         app()->setLocale($locale);

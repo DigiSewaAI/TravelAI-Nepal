@@ -8,7 +8,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <div>
             <h1 style="font-size:22px;font-weight:800;margin:0;color:#111827;">{{ __('messages.suppliers') }}</h1>
-            <p style="font-size:13px;color:#6b7280;margin:4px 0 0;">Manage your suppliers (stock, materials, vendors).</p>
+            <p style="font-size:13px;color:#6b7280;margin:4px 0 0;">{{ __('messages.suppliers_desc') }}</p>
         </div>
         <a href="{{ route('provider.suppliers.create') }}"
            style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--accent,#6366f1);color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700;">

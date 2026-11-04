@@ -48,7 +48,7 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_link_label') }} *</label>
                     <input type="text" name="link_url" required value="{{ old('link_url') }}"
-                           placeholder="/explore/service/your-trek-slug"
+                           placeholder="{{ __('messages.placehold_slug') }}"
                            class="w-full border rounded-lg px-3 py-2">
                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
                         <i class="fas fa-lightbulb text-amber-500"></i>
@@ -67,7 +67,7 @@
 
             <div>
                 <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_cta_label') }}</label>
-                <input type="text" name="cta_text" value="{{ old('cta_text', 'Learn More') }}"
+                <input type="text" name="cta_text" value="{{ old('cta_text', __('messages.common_learn_more')) }}"
                        maxlength="50"
                        class="w-full border rounded-lg px-3 py-2">
             </div>
@@ -95,7 +95,7 @@
                 <div>
                     <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_target_destination_label') }}</label>
                     <input type="text" name="target_destination" value="{{ old('target_destination') }}"
-                           placeholder="e.g. Everest Base Camp"
+                           placeholder="{{ __('messages.placehold_ebc') }}"
                            class="w-full border rounded-lg px-3 py-2">
                 </div>
                 <div>
@@ -119,7 +119,7 @@
                     <div>
                         <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_payment_method_label') }} *</label>
                         <select name="payment_method" required class="w-full border rounded-lg px-3 py-2">
-                            <option value="">— Select —</option>
+                            <option value="">{{ __('messages.common_select') }}</option>
                             <option value="eSewa">eSewa</option>
                             <option value="Khalti">{{ __('messages.khalti') }}</option>
                             <option value="Bank Transfer">{{ __('messages.bank_transfer') }}</option>
@@ -129,7 +129,7 @@
                     <div>
                         <label class="block text-sm font-semibold mb-1">{{ __('messages.ads_payment_ref_label') }}</label>
                         <input type="text" name="payment_reference" value="{{ old('payment_reference') }}"
-                               placeholder="Transaction ID (optional)"
+                               placeholder="{{ __('messages.transaction_id_opt') }}"
                                class="w-full border rounded-lg px-3 py-2">
                     </div>
                 </div>

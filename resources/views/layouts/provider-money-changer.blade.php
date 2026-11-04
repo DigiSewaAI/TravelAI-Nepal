@@ -235,7 +235,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input type="text" placeholder="{{ __('messages.search_transactions') }}">
       </div>
-      <select class="lang-select" onchange="window.location.href='/lang/' + this.value">
+      <select class="lang-select" onchange="window.location.href='/lang/' + this.value" style="display:none;">
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>

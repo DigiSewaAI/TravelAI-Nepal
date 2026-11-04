@@ -288,7 +288,7 @@
 
                     <!-- Language Switcher -->
                     <div class="relative">
-                        <button type="button" class="flex items-center gap-1 px-2 lg:px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-sm font-medium transition" id="languageDropdown" aria-haspopup="true">
+                        <button type="button" class="flex items-center gap-1 px-2 lg:px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-sm font-medium transition" id="languageDropdown" aria-haspopup="true" style="display:none;">
                             <span>
                                 @if(session('locale') == 'np') 🇳🇵
                                 @else 🇬🇧

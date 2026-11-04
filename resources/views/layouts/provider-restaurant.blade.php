@@ -219,7 +219,7 @@
         <input type="text" placeholder="{{ __('messages.search_orders_dishes') }}">
       </div>
 
-      <select class="lang-select" onchange="window.location.href='/lang/' + this.value">
+      <select class="lang-select" onchange="window.location.href='/lang/' + this.value" style="display:none;">
         <option value="en" {{ app()->getLocale() === 'en' ? 'selected' : '' }}>🇬🇧 EN</option>
         <option value="np" {{ app()->getLocale() === 'np' ? 'selected' : '' }}>🇳🇵 NP</option>
       </select>

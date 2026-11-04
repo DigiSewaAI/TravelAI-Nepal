@@ -105,7 +105,7 @@
                 <div class="pad-row">
                     <div class="pad-field">
                         <label>{{ __('messages.ads_link_label') }} <span class="req">*</span></label>
-                        <input type="text" name="link_url" required value="{{ old('link_url') }}" placeholder="/explore/service/your-trek-slug">
+                        <input type="text" name="link_url" required value="{{ old('link_url') }}" placeholder="{{ __('messages.placehold_slug') }}">
                         <p class="pad-hint">
                             <i class="fas fa-lightbulb"></i>
                             <span>
@@ -159,7 +159,7 @@
                 <div class="pad-row">
                     <div class="pad-field">
                         <label>{{ __('messages.ads_target_destination_label') }}</label>
-                        <input type="text" name="target_destination" value="{{ old('target_destination') }}" placeholder="e.g. Everest Base Camp">
+                        <input type="text" name="target_destination" value="{{ old('target_destination') }}" placeholder="{{ __('messages.placehold_ebc') }}">
                     </div>
                     <div class="pad-field">
                         <label>{{ __('messages.ads_target_category_label') }}</label>
@@ -189,13 +189,13 @@
                             <option value="">— Select —</option>
                             <option value="eSewa">eSewa</option>
                             <option value="Khalti">Khalti</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Bank Transfer">{{ __('messages.bank_transfer') }}</option>
                             <option value="IME Pay">IME Pay</option>
                         </select>
                     </div>
                     <div class="pad-field">
                         <label>{{ __('messages.ads_payment_ref_label') }}</label>
-                        <input type="text" name="payment_reference" value="{{ old('payment_reference') }}" placeholder="Transaction ID (optional)">
+                        <input type="text" name="payment_reference" value="{{ old('payment_reference') }}" placeholder="{{ __('messages.transaction_id_opt') }}">
                     </div>
                 </div>
                 <div class="pad-field">
