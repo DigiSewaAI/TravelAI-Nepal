@@ -220,6 +220,37 @@
                     @endforeach
                 </select>
             </div>
+        {{-- Customer Details (Phase 4.2B — flag-gated) --}}
+        @if(config('claim.restaurant_enabled'))
+        <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;">
+            <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px;">
+                👤 Customer Details (optional — for order claiming)
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div>
+                    <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:2px;">Name</label>
+                    <input type="text" name="customer_name" maxlength="100"
+                           value="{{ old('customer_name') }}"
+                           placeholder="Walk-in Customer"
+                           style="width:100%;padding:6px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;">
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:2px;">Phone</label>
+                    <input type="text" name="customer_phone" maxlength="20"
+                           value="{{ old('customer_phone') }}"
+                           placeholder="+977-..."
+                           style="width:100%;padding:6px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;">
+                </div>
+            </div>
+            <div style="margin-top:8px;">
+                <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:2px;">Email (for OTP claim)</label>
+                <input type="email" name="customer_email" maxlength="190"
+                       value="{{ old('customer_email') }}"
+                       placeholder="customer@example.com (optional)"
+                       style="width:100%;padding:6px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;">
+            </div>
+        </div>
+        @endif
 
             <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:8px">{{ __('messages.select_menu_items') }}</label>
             <div style="max-height:250px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:20px" id="menuItemsList">

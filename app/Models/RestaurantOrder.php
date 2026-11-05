@@ -11,6 +11,12 @@ class RestaurantOrder extends Model
         'customer_name', 'customer_phone', 'status',
         'subtotal', 'tax', 'total', 'currency',
         'payment_status', 'paid_at', 'notes',
+    
+        'customer_email',
+        'receipt_code_hash',
+        'receipt_code_issued_at',
+        'receipt_code_used_at',
+        'receipt_code_reissue_count',
     ];
 
     protected $casts = [
