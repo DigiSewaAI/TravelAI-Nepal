@@ -812,3 +812,18 @@ Route::prefix('admin/safety')->name('admin.safety.')->middleware(['auth', 'admin
     Route::post('/sources/{id}/toggle', [App\Http\Controllers\Admin\SafetyController::class, 'toggleSource'])->name('sources.toggle');
     Route::get('/audit', [App\Http\Controllers\Admin\SafetyController::class, 'audit'])->name('audit');
 });
+// ═══════════════════════════════════════════════════════
+// PHASE 4.2C — RESTAURANT CLAIM ROUTES (flag-gated)
+// ═══════════════════════════════════════════════════════
+if (config('claim.restaurant_enabled')) {
+    Route::middleware(['auth'])->prefix('traveler/restaurant')->name('traveler.restaurant.')->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'showForm'])
+            ->name('claim.form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'initiate'])
+            ->name('claim.initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'showVerify'])
+            ->name('claim.verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'verify'])
+            ->name('claim.verify');
+    });
+}
