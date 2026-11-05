@@ -14,15 +14,15 @@
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
             <div style="background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 18px;">🏔️</span>
-                <span style="font-size: 14px; font-weight: 600;">{{ $counts['trekking'] ?? 0 }} {{ __('messages.traveler_quick_treks') ?? 'Treks' }}</span>
+                <span style="font-size: 14px; font-weight: 600;">{{ $counts['trekking'] ?? 0 }} {{ ($counts['trekking'] ?? 0) == 1 ? __('messages.trek_singular') : __('messages.trek_plural') }}</span>
             </div>
             <div style="background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 18px;">📅</span>
-                <span style="font-size: 14px; font-weight: 600;">{{ $counts['trekking'] ?? 0 }} {{ __('messages.traveler_quick_bookings') ?? 'Bookings' }}</span>
+                <span style="font-size: 14px; font-weight: 600;">{{ $counts['trekking'] ?? 0 }} {{ ($counts['trekking'] ?? 0) == 1 ? __('messages.booking_singular') : __('messages.booking_plural') }}</span>
             </div>
             <div style="background: rgba(255,255,255,0.18); padding: 10px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 18px;">⭐</span>
-                <span style="font-size: 14px; font-weight: 600;">0 {{ __('messages.traveler_quick_reviews') ?? 'Reviews' }}</span>
+                <span style="font-size: 14px; font-weight: 600;">{{ $counts['reviews'] ?? 0 }} {{ ($counts['reviews'] ?? 0) == 1 ? __('messages.review_singular') : __('messages.review_plural') }}</span>
             </div>
         </div>
 

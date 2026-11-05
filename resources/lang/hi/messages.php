@@ -2157,4 +2157,14 @@ return array (
     'claim_success_verified' => 'ऑर्डर सफलतापूर्वक दावा किया गया! यह अब आपके डैशबोर्ड में दिखाई देता है।',
     'claim_info_otp_sent' => '6-अंकीय कोड आपके ईमेल पर भेजा गया है।',
     'claim_info_already_claimed' => 'आपने यह ऑर्डर पहले ही दावा कर लिया है।',
+
+    // ═══ Dashboard V2 Polish (Phase 4.2) ═══
+    'individual_card_title' => 'व्यक्तिगत / गाइड',
+    'individual_card_hint' => 'लिंक करने के लिए प्रदाता से संपर्क करें',
+    'trek_singular' => 'ट्रेक',
+    'trek_plural' => 'ट्रेक',
+    'booking_singular' => 'बुकिंग',
+    'booking_plural' => 'बुकिंग',
+    'review_singular' => 'समीक्षा',
+    'review_plural' => 'समीक्षाएं',
 );

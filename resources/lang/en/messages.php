@@ -3119,4 +3119,14 @@ return array (
     'claim_success_verified' => 'Order successfully claimed! It now appears in your dashboard.',
     'claim_info_otp_sent' => 'A 6-digit code has been sent to your email.',
     'claim_info_already_claimed' => 'You have already claimed this order.',
+
+    // ═══ Dashboard V2 Polish (Phase 4.2) ═══
+    'individual_card_title' => 'Individual / Guide',
+    'individual_card_hint' => 'Contact provider to link',
+    'trek_singular' => 'Trek',
+    'trek_plural' => 'Treks',
+    'booking_singular' => 'Booking',
+    'booking_plural' => 'Bookings',
+    'review_singular' => 'Review',
+    'review_plural' => 'Reviews',
 );

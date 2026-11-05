@@ -24,7 +24,7 @@
             🔗 {{ __('messages.coming_soon_personal_access') ?? 'Personal booking access coming soon' }}
         </h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
-            @foreach(['Hotel', 'Restaurant', 'Transport', 'ArtCraft', 'MoneyChanger'] as $cat)
+            @foreach(['Hotel', 'Restaurant', 'Transport', 'ArtCraft', 'MoneyChanger', 'Individual / Guide'] as $cat)
                 <div style="border: 1px dashed #e5e7eb; border-radius: 10px; padding: 16px; text-align: center; color: #9ca3af;">
                     <div style="font-size: 28px; margin-bottom: 6px;">📦</div>
                     <div style="font-weight: 600; font-size: 13px;">{{ $cat }}</div>

@@ -2168,4 +2168,14 @@ return array (
     'claim_success_verified' => '订单认领成功！现在显示在您的仪表板中।',
     'claim_info_otp_sent' => '6 位验证码已发送到您的邮箱।',
     'claim_info_already_claimed' => '您已认领此订单।',
+
+    // ═══ Dashboard V2 Polish (Phase 4.2) ═══
+    'individual_card_title' => '个人 / 导游',
+    'individual_card_hint' => '联系服务商进行链接',
+    'trek_singular' => '徒步',
+    'trek_plural' => '徒步',
+    'booking_singular' => '预订',
+    'booking_plural' => '预订',
+    'review_singular' => '评论',
+    'review_plural' => '评论',
 );

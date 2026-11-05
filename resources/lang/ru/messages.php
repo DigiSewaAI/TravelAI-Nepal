@@ -2754,4 +2754,14 @@ return array (
     'claim_success_verified' => 'Заказ успешно подтвержден! Он отображается на панели.',
     'claim_info_otp_sent' => '6-значный код отправлен на ваш email.',
     'claim_info_already_claimed' => 'Вы уже подтвердили этот заказ.',
+
+    // ═══ Dashboard V2 Polish (Phase 4.2) ═══
+    'individual_card_title' => 'Индивидуальный / Гид',
+    'individual_card_hint' => 'Свяжитесь с поставщиком для связи',
+    'trek_singular' => 'Трек',
+    'trek_plural' => 'Треки',
+    'booking_singular' => 'Бронирование',
+    'booking_plural' => 'Бронирования',
+    'review_singular' => 'Отзыв',
+    'review_plural' => 'Отзывы',
 );

@@ -3140,4 +3140,14 @@ return array (
     'claim_success_verified' => 'अर्डर सफलतापूर्वक दावी गरियो! यो अब तपाईंको ड्यासबोर्डमा देखिन्छ।',
     'claim_info_otp_sent' => '6-अंकको कोड तपाईंको इमेलमा पठाइएको छ।',
     'claim_info_already_claimed' => 'तपाईंले यो अर्डर पहिले नै दावी गर्नुभयो।',
+
+    // ═══ Dashboard V2 Polish (Phase 4.2) ═══
+    'individual_card_title' => 'व्यक्तिगत / गाइड',
+    'individual_card_hint' => 'लिङ्क गर्न प्रदायकलाई सम्पर्क गर्नुहोस्',
+    'trek_singular' => 'ट्रेक',
+    'trek_plural' => 'ट्रेकहरू',
+    'booking_singular' => 'बुकिङ',
+    'booking_plural' => 'बुकिङहरू',
+    'review_singular' => 'समीक्षा',
+    'review_plural' => 'समीक्षाहरू',
 );
