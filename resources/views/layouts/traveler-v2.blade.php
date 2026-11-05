@@ -490,6 +490,49 @@
                 white-space: normal !important;
             }
         }
+    
+        /* ROUND3_PASSPORT — one-line title on mobile */
+        @media (max-width: 767px) {
+            /* Narrower book + tighter gap = wider title column */
+            .tv2-passport-inner {
+                grid-template-columns: 1fr 70px !important;
+                gap: 10px !important;
+                padding: 16px 12px !important;
+            }
+            .tv2-passport-title {
+                gap: 4px !important;
+                margin-bottom: 6px !important;
+            }
+            .tv2-passport-title > span {
+                font-size: 16px !important;
+                line-height: 1 !important;
+            }
+            .tv2-passport-title h3 {
+                font-size: 13px !important;
+                line-height: 1.1 !important;
+                white-space: nowrap !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                letter-spacing: -0.2px !important;
+            }
+            /* Shrink book — keeps aspect + all internals visible */
+            .tv2-passport-book {
+                width: 65px !important;
+                height: 88px !important;
+            }
+            .tv2-passport-label,
+            .tv2-passport-country,
+            .tv2-passport-subtitle {
+                font-size: 6px !important;
+                letter-spacing: 0.3px !important;
+            }
+            .tv2-passport-emblem {
+                font-size: 14px !important;
+            }
+            .tv2-passport-cover {
+                border-radius: 4px !important;
+            }
+        }
     </style>
     @stack('head')
 </head>
