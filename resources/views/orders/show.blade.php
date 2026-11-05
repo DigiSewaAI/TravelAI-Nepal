@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', $order->order_number . ' | ' . __('messages.app_name'))
 

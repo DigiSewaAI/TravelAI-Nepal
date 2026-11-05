@@ -1,11 +1,11 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', __('messages.traveler_booking_detail_title', ['id' => $booking->booking_number ?? $booking->id]))
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
     <nav class="text-sm text-gray-500 mb-4">
-        <a href="{{ route('traveler.dashboard') }}" class="hover:text-blue-600">{{ __('messages.traveler_dashboard') }}</a>
+        <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="hover:text-blue-600">{{ __('messages.traveler_dashboard') }}</a>
         <span class="mx-2">/</span>
         <span>{{ __('messages.traveler_booking_hash', ['id' => $booking->booking_number ?? $booking->id]) }}</span>
     </nav>
@@ -236,7 +236,7 @@
         @endif
 
         <div class="mt-6 border-t pt-4">
-            <a href="{{ route('traveler.dashboard') }}" class="text-blue-600 hover:text-blue-800 text-sm">
+            <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}" class="text-blue-600 hover:text-blue-800 text-sm">
                 ← {{ __('messages.traveler_booking_back_to_dashboard') }}
             </a>
         </div>

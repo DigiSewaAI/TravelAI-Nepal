@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', $entity->name . ' — Travel Safety & Weather | TravelAI Nepal')
 @section('meta_description', 'Real-time safety status, weather, and incident updates for ' . $entity->name . ' in Nepal. Check advisory level, risk score, and trekking safety tips.')

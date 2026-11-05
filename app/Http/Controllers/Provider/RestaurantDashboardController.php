@@ -262,12 +262,21 @@ class RestaurantDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);
 
-        $validated = $request->validate([
+        // Build validation rules (customer fields only when claim enabled)
+        $rules = [
             'table_id' => 'required|exists:restaurant_tables,id',
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|exists:menu_items,id',
             'items.*.qty' => 'required|integer|min:1',
-        ]);
+        ];
+
+        if (config('claim.restaurant_enabled')) {
+            $rules['customer_name'] = 'nullable|string|max:100';
+            $rules['customer_phone'] = 'nullable|string|max:20';
+            $rules['customer_email'] = 'nullable|email|max:190';
+        }
+
+        $validated = $request->validate($rules);
 
         $total = 0;
         $orderItemsData = [];
@@ -286,7 +295,7 @@ class RestaurantDashboardController extends Controller
             ];
         }
 
-        $order = RestaurantOrder::create([
+        $orderData = [
             'order_number' => 'ORD-' . strtoupper(uniqid()),
             'provider_id' => $provider->id,
             'service_id' => $provider->services()->first()->id,
@@ -297,12 +306,68 @@ class RestaurantDashboardController extends Controller
             'total' => $total,
             'currency' => 'NPR',
             'payment_status' => 'unpaid',
-        ]);
+        ];
 
-        $order->items()->createMany($orderItemsData);
+        // Add customer fields if claim enabled
+        if (config('claim.restaurant_enabled')) {
+            $orderData['customer_name'] = $validated['customer_name'] ?? null;
+            $orderData['customer_phone'] = $validated['customer_phone'] ?? null;
+            $orderData['customer_email'] = $validated['customer_email'] ?? null;
+        }
 
-        // Mark table as occupied
-        RestaurantTable::where('id', $validated['table_id'])->update(['status' => 'occupied']);
+        $plainCode = null;
+        $order = \DB::transaction(function () use ($orderData, $orderItemsData, $validated, &$plainCode) {
+            $order = RestaurantOrder::create($orderData);
+            $order->items()->createMany($orderItemsData);
+            RestaurantTable::where('id', $validated['table_id'])->update(['status' => 'occupied']);
+
+            if (config('claim.restaurant_enabled')) {
+                try {
+                    $service = app(\App\Services\Claim\ReceiptCodeService::class);
+                    $plainCode = $service->generate();
+                    $order->receipt_code_hash = $service->hash($plainCode);
+                    $order->receipt_code_issued_at = now();
+                    $order->receipt_code_reissue_count = 0;
+                    $order->save();
+                } catch (\RuntimeException $e) {
+                    \Log::warning('Receipt code generation skipped', [
+                        'order_id' => $order->id,
+                        'reason' => 'CLAIM_CODE_SECRET not configured',
+                    ]);
+                    $plainCode = null;
+                }
+            }
+
+            return $order;
+        });
+
+        // If receipt code generated, stream PDF
+        if ($plainCode !== null) {
+            try {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.restaurant.receipt-pdf', [
+                    'order' => $order,
+                    'plainCode' => $plainCode,
+                    'provider' => $provider,
+                ]);
+                return response()->streamDownload(function () use ($pdf) {
+                    echo $pdf->output();
+                }, 'receipt-' . $order->order_number . '.pdf', [
+                    'Content-Type' => 'application/pdf',
+                ]);
+            } catch (\Exception $e) {
+                // PDF failed — null the receipt fields so admin can reissue
+                $order->receipt_code_hash = null;
+                $order->receipt_code_issued_at = null;
+                $order->save();
+                \Log::error('Receipt PDF generation failed', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+                return back()
+                    ->with('success', __('messages.order_created_success'))
+                    ->with('warning', 'Receipt PDF failed. Admin reissue required.');
+            }
+        }
 
         return back()->with('success', __('messages.order_created_success'));
     }

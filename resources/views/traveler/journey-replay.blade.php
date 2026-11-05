@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', __('messages.journey_replay_page_title'))
 @section('meta_description', __('messages.journey_replay_meta_desc', ['name' => auth()->user()->name ?? 'Traveler']))
@@ -336,7 +336,7 @@
 </div>
         {{-- Back to Dashboard --}}
         <div class="mt-10 text-center">
-            <a href="{{ route('traveler.dashboard') }}"
+            <a href="{{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}"
                class="inline-block text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors duration-300">
                 ← {{ __('messages.journey_replay_back_dashboard') }}
             </a>

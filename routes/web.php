@@ -546,6 +546,11 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
 // 4. TRAVELER ROUTES (Phase 10 + Passport)
 // =======================================
     Route::middleware(['auth'])->prefix('traveler')->name('traveler.')->group(function () {
+        Route::get('/dashboard-v2', [\App\Http\Controllers\Traveler\DashboardV2Controller::class, 'index'])
+            ->name('dashboard-v2')
+            ->middleware('feature.flag:traveler_dashboard_v2');
+
+
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
         // 🆕 Traveler notifications (in-app bell)
@@ -807,3 +812,62 @@ Route::prefix('admin/safety')->name('admin.safety.')->middleware(['auth', 'admin
     Route::post('/sources/{id}/toggle', [App\Http\Controllers\Admin\SafetyController::class, 'toggleSource'])->name('sources.toggle');
     Route::get('/audit', [App\Http\Controllers\Admin\SafetyController::class, 'audit'])->name('audit');
 });
+// ═══════════════════════════════════════════════════════
+// PHASE 4.2C — RESTAURANT CLAIM ROUTES
+// Registered always; feature flag enforced via middleware
+// (allows flag toggle without route cache rebuild)
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth', 'feature.flag:claim.restaurant_enabled'])
+    ->prefix('traveler/restaurant')
+    ->name('traveler.restaurant.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'showForm'])
+            ->name('claim.form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'initiate'])
+            ->name('claim.initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'showVerify'])
+            ->name('claim.verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'verify'])
+            ->name('claim.verify');
+    });
+// ═══════════════════════════════════════════════════════
+// PHASE 4.2D — ADMIN RESTAURANT REISSUE
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth', 'admin'])->prefix('admin/restaurant/orders')->name('admin.restaurant.orders.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'index'])
+        ->name('index');
+    Route::get('/{order}/reissue', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'showReissue'])
+        ->name('reissue.form');
+    Route::post('/{order}/reissue', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'reissue'])
+        ->name('reissue');
+});
+// ═══════════════════════════════════════════════════════
+// PHASE 4.3 — TRANSPORT CLAIM ROUTES
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth', 'feature.flag:claim.transport_enabled'])
+    ->prefix('traveler/transport')
+    ->name('traveler.transport.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'showForm'])->name('claim.form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'initiate'])->name('claim.initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'showVerify'])->name('claim.verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'verify'])->name('claim.verify');
+    });
+// ═══ PHASE 4.4 — HOTEL CLAIM ROUTES ═══
+Route::middleware(['auth', 'feature.flag:claim.hotel_enabled'])
+    ->prefix('traveler/hotel')->name('traveler.hotel.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'showForm'])->name('claim.form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'initiate'])->name('claim.initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'showVerify'])->name('claim.verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'verify'])->name('claim.verify');
+    });
+// ═══ PHASE 4.5 — ARTCRAFT CLAIM ROUTES ═══
+Route::middleware(['auth', 'feature.flag:claim.artcraft_enabled'])
+    ->prefix('traveler/artcraft')->name('traveler.artcraft.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'showForm'])->name('claim.form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'initiate'])->name('claim.initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'showVerify'])->name('claim.verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'verify'])->name('claim.verify');
+    });

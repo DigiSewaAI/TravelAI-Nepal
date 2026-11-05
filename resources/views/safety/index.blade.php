@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.traveler-v2')
 
 @section('title', 'Travel Safety — Nepal | Real-Time Updates & Weather | TravelAI Nepal')
 @section('meta_description', 'Real-time safety updates, weather intelligence, and live incident tracking across Nepal. Check destination safety status, advisory level, and trek safety tips.')

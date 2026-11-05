@@ -70,6 +70,6 @@ class ReviewController extends Controller
         // 🔥 Notification is now sent from Admin/ReviewController@approve
         // No notifications sent here - admin will approve/reject first
 
-        return redirect()->route('traveler.dashboard')->with('success', 'Your review has been submitted for admin approval.');
+        return redirect()->route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard')->with('success', 'Your review has been submitted for admin approval.');
     }
 }
