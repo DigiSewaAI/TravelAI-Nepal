@@ -348,14 +348,12 @@
             
             /* Reserve horizontal space for widget — narrow greeting text */
             .tv2-hero h1 {
-                max-width: 62% !important;
                 font-size: 22px !important;
                 line-height: 1.15 !important;
                 word-wrap: break-word !important;
             }
             
             .tv2-hero h1 + p {
-                max-width: 58% !important;
                 font-size: 12px !important;
                 line-height: 1.4 !important;
             }
@@ -412,6 +410,28 @@
                 transform: scale(0.42);
                 margin-top: 4px !important;
                 margin-right: -20px !important;
+            }
+        }
+    
+        /* ═══ ROUND 1: Greeting line layout ═══ */
+        .tv2-greeting-line {
+            display: inline;
+        }
+        .tv2-name-line {
+            display: inline;
+        }
+
+        @media (max-width: 767px) {
+            .tv2-hero h1 {
+                word-break: keep-all !important;
+                overflow-wrap: normal !important;
+            }
+            .tv2-greeting-line {
+                display: block !important;
+            }
+            .tv2-name-line {
+                display: block !important;
+                margin-top: 4px;
             }
         }
     </style>

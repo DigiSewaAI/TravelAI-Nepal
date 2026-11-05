@@ -8,7 +8,7 @@
 <div class="tv2-hero" style="background: linear-gradient(to right, rgba(15,23,42,0.75) 0%, rgba(15,23,42,0.35) 50%, rgba(15,23,42,0.10) 100%), url('{{ asset('images/hero-bg.jpg') }}') center/cover; border-radius: 18px; padding: 52px 44px; min-height: 420px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden;">
     <div style="position: absolute; top: -40px; right: -40px; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
     <div style="position: relative; z-index: 1;">
-        <h1 style="font-size: 32px; font-weight: 800; margin: 0 0 8px;">{{ $greeting ?? 'Hello' }}, {{ $user->name ?? 'Traveler' }} 👋</h1>
+        <h1 style="font-size: 32px; font-weight: 800; margin: 0 0 8px;"><span class="tv2-greeting-line">{{ $greeting ?? 'Hello' }},</span> <span class="tv2-name-line">{{ $user->name ?? 'Traveler' }} 👋</span></h1>
         <p style="font-size: 15px; opacity: 0.9; margin: 0 0 24px;">{{ __('messages.traveler_ready_for_adventure') ?? 'Ready for your next Nepal adventure?' }}</p>
 
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
