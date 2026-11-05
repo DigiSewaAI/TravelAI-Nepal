@@ -2102,7 +2102,7 @@ return array (
     'nav_my_orders' => '我的订单',
     'my_trips' => '我的旅行',
     'no_trips_yet' => '暂无旅行。探索尼泊尔吧！',
-    'coming_soon_personal_access' => '个人预订访问即将推出',
+    'coming_soon_personal_access' => '认领您的预订',
     'not_linked_yet' => '尚未关联到您的账户',
     'my_digital_trek_passport' => '我的数字徒步护照',
     'your_trekking_achievements' => '您的徒步成就在一个地方',

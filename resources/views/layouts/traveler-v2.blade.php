@@ -275,6 +275,118 @@
             .tv2-header-btn span:not(.badge) { display: none; }
             .tv2-drawer { display: block; }
         }
+    
+        /* ═══════════════════════════════════════════════════════ */
+        /* MOBILE RESPONSIVE FIXES — 2026-11-05 (max-width: 767px) */
+        /* ═══════════════════════════════════════════════════════ */
+        @media (max-width: 767px) {
+            /* ─── 1. GLOBAL: Prevent horizontal scroll ─── */
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+                width: 100% !important;
+            }
+            
+            .tv2-dashboard-wrap {
+                overflow-x: hidden !important;
+                max-width: 100% !important;
+            }
+            
+            /* ─── 2. WORD WRAP: Russian text overflow ─── */
+            .tv2-dashboard-wrap, .tv2-dashboard-wrap * {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                word-break: break-word !important;
+            }
+            
+            /* ─── 3. FLEX ITEMS: Allow shrinking ─── */
+            .tv2-dashboard-wrap [style*="display: flex"] > * {
+                min-width: 0 !important;
+            }
+            
+            /* ─── 4. TOOLS & SHORTCUTS: Force 5-col to auto-fit ─── */
+            .tv2-dashboard-wrap [style*="grid-template-columns"][style*="repeat(5"],
+            .tv2-dashboard-wrap [style*="grid-template-columns"][style*="repeat(6"],
+            .tv2-dashboard-wrap [style*="grid"][style*="minmax(180px"],
+            .tv2-dashboard-wrap [style*="grid"][style*="minmax(200px"] {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+                gap: 8px !important;
+            }
+            
+            /* Reduce tool card padding on mobile */
+            .tv2-dashboard-wrap [style*="grid-template-columns"] > button,
+            .tv2-dashboard-wrap [style*="grid-template-columns"] > a {
+                padding: 6px 4px !important;
+                font-size: 10px !important;
+            }
+            
+            /* ─── 5. WEATHER WIDGET: Shrink on mobile ─── */
+            .tv2-weather-inline {
+                transform: scale(0.75);
+                transform-origin: top right;
+                margin-top: -10px !important;
+                margin-right: -10px !important;
+            }
+            
+            .tv2-weather-inline * {
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+            }
+            
+            .tv2-weather-inline img,
+            .tv2-weather-inline i {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 20px !important;
+            }
+            
+            /* ─── 6. HERO ACTIONS: Full width on mobile ─── */
+            .tv2-dashboard-wrap a[href*="#ai-planner"],
+            .tv2-dashboard-wrap a[href*="services"] {
+                flex: 1 1 100% !important;
+                max-width: 100% !important;
+                padding: 10px 14px !important;
+                font-size: 13px !important;
+                justify-content: center !important;
+            }
+            
+            /* Hero stats badges */
+            .tv2-dashboard-wrap [style*="display: flex"][style*="gap: 12px"] {
+                flex-wrap: wrap !important;
+            }
+            
+            /* ─── 7. CARD IMAGES: Reduce height ─── */
+            .tv2-dashboard-wrap [style*="height: 260px"] {
+                height: 200px !important;
+            }
+            
+            /* ─── 8. SOS BUTTON: Full width ─── */
+            .tv2-dashboard-wrap button[onclick*="SOS"],
+            .tv2-dashboard-wrap button[onclick*="sos"],
+            .tv2-dashboard-wrap a[href*="sos"] {
+                width: 100% !important;
+            }
+            
+            /* ─── 9. GRID LAYOUTS: Stack on mobile ─── */
+            .tv2-dashboard-wrap [style*="grid-template-columns: repeat(auto-fill"] {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+            }
+            
+            .tv2-dashboard-wrap [style*="grid-template-columns: repeat(auto-fit"] {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            }
+        }
+        
+        /* ─── EXTRA SMALL (< 480px) ─── */
+        @media (max-width: 480px) {
+            .tv2-dashboard-wrap [style*="grid"][style*="minmax(180px"] {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            }
+            
+            .tv2-weather-inline {
+                transform: scale(0.65);
+            }
+        }
     </style>
     @stack('head')
 </head>

@@ -3054,7 +3054,7 @@ return array (
     'nav_my_orders' => 'My Orders',
     'my_trips' => 'My Trips',
     'no_trips_yet' => 'No trips yet. Start exploring Nepal!',
-    'coming_soon_personal_access' => 'Personal booking access coming soon',
+    'coming_soon_personal_access' => 'Claim your bookings',
     'not_linked_yet' => 'Not linked to your account yet',
     'my_digital_trek_passport' => 'My Digital Trek Passport',
     'your_trekking_achievements' => 'Your trekking achievements in one place',

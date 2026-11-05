@@ -100,7 +100,7 @@ class UnifiedDashboardService
             'shop' => $this->pureOrdersQuery($userId, 'shop')->count(),
             'rental' => $this->pureOrdersQuery($userId, 'rental')->count(),
             'wholesale' => WholesaleRfq::where('buyer_id', $userId)->count(),
-            'all_orders' => Order::where('user_id', $userId)->count(),
+            'all_orders' => Order::where('user_id', $userId)->count() + Booking::where('traveler_id', $userId)->count(),
         ];
     }
 

@@ -3075,7 +3075,7 @@ return array (
     'nav_my_orders' => 'मेरा अर्डरहरू',
     'my_trips' => 'मेरा यात्राहरू',
     'no_trips_yet' => 'अझै कुनै यात्रा छैन। नेपाल अन्वेषण गर्नुहोस्!',
-    'coming_soon_personal_access' => 'व्यक्तिगत बुकिङ पहुँच चाँडै आउँदैछ',
+    'coming_soon_personal_access' => 'तपाईंका बुकिङहरू दावी गर्नुहोस्',
     'not_linked_yet' => 'अझै तपाईंको खातासँग लिङ्क भएको छैन',
     'my_digital_trek_passport' => 'मेरो डिजिटल ट्रेक पासपोर्ट',
     'your_trekking_achievements' => 'तपाईंका ट्रेकिङ उपलब्धिहरू एउटै ठाउँमा',

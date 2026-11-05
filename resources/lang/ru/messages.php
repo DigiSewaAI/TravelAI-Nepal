@@ -2688,7 +2688,7 @@ return array (
     'nav_my_orders' => 'Мои заказы',
     'my_trips' => 'Мои поездки',
     'no_trips_yet' => 'Пока поездок нет. Начните исследовать Непал!',
-    'coming_soon_personal_access' => 'Персональный доступ к бронированиям скоро',
+    'coming_soon_personal_access' => 'Подтвердите свои бронирования',
     'not_linked_yet' => 'Еще не связано с вашим аккаунтом',
     'my_digital_trek_passport' => 'Мой цифровой трек-паспорт',
     'your_trekking_achievements' => 'Ваши достижения в треккинге в одном месте',
