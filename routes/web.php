@@ -827,3 +827,14 @@ if (config('claim.restaurant_enabled')) {
             ->name('claim.verify');
     });
 }
+// ═══════════════════════════════════════════════════════
+// PHASE 4.2D — ADMIN RESTAURANT REISSUE
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth', 'admin'])->prefix('admin/restaurant/orders')->name('admin.restaurant.orders.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'index'])
+        ->name('index');
+    Route::get('/{order}/reissue', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'showReissue'])
+        ->name('reissue.form');
+    Route::post('/{order}/reissue', [\App\Http\Controllers\Admin\RestaurantAdminController::class, 'reissue'])
+        ->name('reissue');
+});

@@ -2764,4 +2764,23 @@ return array (
     'booking_plural' => 'Бронирования',
     'review_singular' => 'Отзыв',
     'review_plural' => 'Отзывы',
+
+    // ═══ Phase 4.2D — Admin Restaurant Reissue ═══
+    'admin_restaurant_orders_title' => 'Заказы ресторана',
+    'admin_restaurant_search_placeholder' => 'Номер заказа или email клиента...',
+    'admin_restaurant_search_btn' => 'Поиск',
+    'admin_restaurant_order_number' => 'Номер заказа',
+    'admin_restaurant_customer' => 'Клиент',
+    'admin_restaurant_receipt_status' => 'Статус чека',
+    'admin_restaurant_status_issued' => 'Выдан',
+    'admin_restaurant_status_used' => 'Использован (подтвержден)',
+    'admin_restaurant_status_none' => 'Не выдан',
+    'admin_restaurant_reissue_btn' => 'Переиздать чек',
+    'admin_restaurant_reissue_title' => 'Переиздать чек',
+    'admin_restaurant_reissue_warning' => 'Будет сгенерирован новый код чека. Предыдущий код немедленно станет недействительным. Поставщик увидит новый код один раз.',
+    'admin_restaurant_reissue_confirm' => 'Подтвердить переиздание',
+    'admin_restaurant_reissue_success' => 'Чек успешно переиздан. PDF загружен.',
+    'admin_restaurant_reissue_max' => 'Достигнут лимит переизданий.',
+    'admin_restaurant_reissue_claimed' => 'Невозможно переиздать - заказ уже подтвержден путешественником.',
+    'admin_restaurant_reissue_config' => 'Система подтверждения не настроена. Установите CLAIM_CODE_SECRET.',
 );

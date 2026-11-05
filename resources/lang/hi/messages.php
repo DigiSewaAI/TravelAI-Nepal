@@ -2167,4 +2167,23 @@ return array (
     'booking_plural' => 'बुकिंग',
     'review_singular' => 'समीक्षा',
     'review_plural' => 'समीक्षाएं',
+
+    // ═══ Phase 4.2D — Admin Restaurant Reissue ═══
+    'admin_restaurant_orders_title' => 'रेस्टोरेंट ऑर्डर',
+    'admin_restaurant_search_placeholder' => 'ऑर्डर नंबर या ग्राहक ईमेल...',
+    'admin_restaurant_search_btn' => 'खोजें',
+    'admin_restaurant_order_number' => 'ऑर्डर नंबर',
+    'admin_restaurant_customer' => 'ग्राहक',
+    'admin_restaurant_receipt_status' => 'रसीद स्थिति',
+    'admin_restaurant_status_issued' => 'जारी',
+    'admin_restaurant_status_used' => 'उपयोग किया (दावा)',
+    'admin_restaurant_status_none' => 'जारी नहीं',
+    'admin_restaurant_reissue_btn' => 'रसीद पुनः जारी करें',
+    'admin_restaurant_reissue_title' => 'रसीद पुनः जारी करें',
+    'admin_restaurant_reissue_warning' => 'एक नई रसीद कोड उत्पन्न होगी। पिछला कोड तुरंत अमान्य हो जाएगा। प्रदाता नया कोड एक बार देखेंगे।',
+    'admin_restaurant_reissue_confirm' => 'पुनः जारी करने की पुष्टि करें',
+    'admin_restaurant_reissue_success' => 'रसीद सफलतापूर्वक पुनः जारी की गई। PDF डाउनलोड हुआ।',
+    'admin_restaurant_reissue_max' => 'अधिकतम पुनः जारी सीमा तक पहुँच गया।',
+    'admin_restaurant_reissue_claimed' => 'पुनः जारी नहीं किया जा सकता - ऑर्डर पहले ही यात्री द्वारा दावा किया जा चुका है।',
+    'admin_restaurant_reissue_config' => 'दावा प्रणाली कॉन्फ़िगर नहीं है। CLAIM_CODE_SECRET सेट करें।',
 );

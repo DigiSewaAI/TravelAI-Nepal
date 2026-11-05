@@ -2178,4 +2178,23 @@ return array (
     'booking_plural' => '预订',
     'review_singular' => '评论',
     'review_plural' => '评论',
+
+    // ═══ Phase 4.2D — Admin Restaurant Reissue ═══
+    'admin_restaurant_orders_title' => '餐厅订单',
+    'admin_restaurant_search_placeholder' => '订单号或客户邮箱...',
+    'admin_restaurant_search_btn' => '搜索',
+    'admin_restaurant_order_number' => '订单号',
+    'admin_restaurant_customer' => '客户',
+    'admin_restaurant_receipt_status' => '收据状态',
+    'admin_restaurant_status_issued' => '已签发',
+    'admin_restaurant_status_used' => '已使用（已认领）',
+    'admin_restaurant_status_none' => '未签发',
+    'admin_restaurant_reissue_btn' => '重新签发收据',
+    'admin_restaurant_reissue_title' => '重新签发收据',
+    'admin_restaurant_reissue_warning' => '将生成新的收据码。之前的码将立即失效。服务商将看到一次新码。',
+    'admin_restaurant_reissue_confirm' => '确认重新签发',
+    'admin_restaurant_reissue_success' => '收据重新签发成功。PDF 已下载。',
+    'admin_restaurant_reissue_max' => '已达重新签发上限。',
+    'admin_restaurant_reissue_claimed' => '无法重新签发 - 订单已被旅客认领。',
+    'admin_restaurant_reissue_config' => '认领系统未配置。请设置 CLAIM_CODE_SECRET。',
 );

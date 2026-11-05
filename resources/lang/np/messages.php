@@ -3150,4 +3150,23 @@ return array (
     'booking_plural' => 'बुकिङहरू',
     'review_singular' => 'समीक्षा',
     'review_plural' => 'समीक्षाहरू',
+
+    // ═══ Phase 4.2D — Admin Restaurant Reissue ═══
+    'admin_restaurant_orders_title' => 'रेस्टुरेन्ट अर्डरहरू',
+    'admin_restaurant_search_placeholder' => 'अर्डर नम्बर वा ग्राहक इमेल...',
+    'admin_restaurant_search_btn' => 'खोज्नुहोस्',
+    'admin_restaurant_order_number' => 'अर्डर नम्बर',
+    'admin_restaurant_customer' => 'ग्राहक',
+    'admin_restaurant_receipt_status' => 'रसिद स्थिति',
+    'admin_restaurant_status_issued' => 'जारी गरिएको',
+    'admin_restaurant_status_used' => 'प्रयोग भयो (दावी)',
+    'admin_restaurant_status_none' => 'जारी गरिएको छैन',
+    'admin_restaurant_reissue_btn' => 'रसिद पुनः जारी गर्नुहोस्',
+    'admin_restaurant_reissue_title' => 'रसिद पुनः जारी गर्नुहोस्',
+    'admin_restaurant_reissue_warning' => 'नयाँ रसिद कोड उत्पन्न हुनेछ। पुरानो कोड तुरुन्तै अवैध हुनेछ। प्रदायकले नयाँ कोड एक पटक देख्नेछ।',
+    'admin_restaurant_reissue_confirm' => 'पुनः जारी गर्न पुष्टि गर्नुहोस्',
+    'admin_restaurant_reissue_success' => 'रसिद सफलतापूर्वक पुनः जारी गरियो। PDF डाउनलोड भयो।',
+    'admin_restaurant_reissue_max' => 'अधिकतम पुनः जारी सीमा पुग्यो।',
+    'admin_restaurant_reissue_claimed' => 'पुनः जारी गर्न सकिँदैन - अर्डर यात्रीले पहिले नै दावी गरिसकेको छ।',
+    'admin_restaurant_reissue_config' => 'दावी प्रणाली कन्फिगर गरिएको छैन। CLAIM_CODE_SECRET सेट गर्नुहोस्।',
 );

@@ -3129,4 +3129,23 @@ return array (
     'booking_plural' => 'Bookings',
     'review_singular' => 'Review',
     'review_plural' => 'Reviews',
+
+    // ═══ Phase 4.2D — Admin Restaurant Reissue ═══
+    'admin_restaurant_orders_title' => 'Restaurant Orders',
+    'admin_restaurant_search_placeholder' => 'Order number or customer email...',
+    'admin_restaurant_search_btn' => 'Search',
+    'admin_restaurant_order_number' => 'Order Number',
+    'admin_restaurant_customer' => 'Customer',
+    'admin_restaurant_receipt_status' => 'Receipt Status',
+    'admin_restaurant_status_issued' => 'Issued',
+    'admin_restaurant_status_used' => 'Used (Claimed)',
+    'admin_restaurant_status_none' => 'Not Issued',
+    'admin_restaurant_reissue_btn' => 'Reissue Receipt',
+    'admin_restaurant_reissue_title' => 'Reissue Receipt',
+    'admin_restaurant_reissue_warning' => 'A new receipt code will be generated. The previous code will become invalid immediately. The provider will see the new code once.',
+    'admin_restaurant_reissue_confirm' => 'Confirm Reissue',
+    'admin_restaurant_reissue_success' => 'Receipt reissued successfully. PDF downloaded.',
+    'admin_restaurant_reissue_max' => 'Maximum reissue limit reached.',
+    'admin_restaurant_reissue_claimed' => 'Cannot reissue - order already claimed by a traveler.',
+    'admin_restaurant_reissue_config' => 'Claim system not configured. Set CLAIM_CODE_SECRET.',
 );
