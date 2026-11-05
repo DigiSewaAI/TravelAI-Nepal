@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Traveler\UnifiedDashboardService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AdService;
+use App\Models\UserMedia;
+use App\Services\Safety\AlertService;
 
 class DashboardV2Controller extends Controller
 {
@@ -103,6 +105,13 @@ class DashboardV2Controller extends Controller
 
                 $data['featuredAds'] = app(AdService::class)->getFeaturedAds();
 
+                $data['userMedia'] = UserMedia::where('user_id', $user->id)
+            ->latest()
+            ->take(12)
+            ->get();
+        $data['unreadAlerts'] = collect(app(AlertService::class)->getUnreadAlerts($user->id));
+
+        $data['isPublic'] = $user->passport_privacy === 'public';
         return view('traveler.dashboard-v2', $data);
     }
 }

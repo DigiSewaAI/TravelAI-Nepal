@@ -2123,4 +2123,5 @@ return array (
     'check_ins' => 'चेक-इन',
     'my_active_trip' => 'मेरी सक्रिय यात्रा',
     'view_trek_passport' => 'ट्रेक पासपोर्ट देखें',
+    'safety_alerts_title' => 'सुरक्षा अलर्ट',
 );

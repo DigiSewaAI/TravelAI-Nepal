@@ -2134,4 +2134,5 @@ return array (
     'check_ins' => '签到',
     'my_active_trip' => '我的活跃行程',
     'view_trek_passport' => '查看徒步护照',
+    'safety_alerts_title' => '安全警报',
 );

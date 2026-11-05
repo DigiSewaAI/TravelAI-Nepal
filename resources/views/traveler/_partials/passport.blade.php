@@ -1,14 +1,8 @@
 @php
     $pd = $passportData ?? null;
-    $isPublic = false;
-    if (is_array($pd) && isset($pd['is_public'])) $isPublic = (bool) $pd['is_public'];
-    elseif (is_object($pd) && isset($pd->is_public)) $isPublic = (bool) $pd->is_public;
-
-    $publicUrl = null;
-    if (is_array($pd) && !empty($pd['public_url'])) $publicUrl = $pd['public_url'];
-    elseif (is_object($pd) && !empty($pd->public_url)) $publicUrl = $pd->public_url;
-
     $ab = $activeBooking ?? null;
+    // Force from actual authenticated user state (source of truth)
+    $isPublic = auth()->check() && auth()->user()->passport_privacy === 'public';
 @endphp
 
 <style>

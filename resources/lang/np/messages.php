@@ -3106,4 +3106,5 @@ return array (
     'check_ins' => 'चेक-इनहरू',
     'my_active_trip' => 'मेरो सक्रिय यात्रा',
     'view_trek_passport' => 'ट्रेक पासपोर्ट हेर्नुहोस्',
+    'safety_alerts_title' => 'सुरक्षा सूचनाहरू',
 );

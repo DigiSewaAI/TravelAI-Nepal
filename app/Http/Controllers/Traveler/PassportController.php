@@ -46,6 +46,12 @@ class PassportController extends Controller
         $user = Auth::user();
         $newPrivacy = $user->passport_privacy === 'public' ? 'private' : 'public';
         $user->passport_privacy = $newPrivacy;
+        
+        // Generate public_id when making public for first time
+        if ($newPrivacy === 'public' && empty($user->passport_public_id)) {
+            $user->passport_public_id = \Illuminate\Support\Str::random(16);
+        }
+        
         $user->save();
 
         return redirect()->back()->with('success', "Passport is now {$newPrivacy}.");

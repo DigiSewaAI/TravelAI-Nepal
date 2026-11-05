@@ -3085,4 +3085,5 @@ return array (
     'check_ins' => 'Check-ins',
     'my_active_trip' => 'My Active Trip',
     'view_trek_passport' => 'View Trek Passport',
+    'safety_alerts_title' => 'Safety Alerts',
 );

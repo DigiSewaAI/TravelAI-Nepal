@@ -2720,4 +2720,5 @@ return array (
     'check_ins' => 'Регистрации',
     'my_active_trip' => 'Моя активная поездка',
     'view_trek_passport' => 'Просмотреть трек-паспорт',
+    'safety_alerts_title' => 'Оповещения о безопасности',
 );

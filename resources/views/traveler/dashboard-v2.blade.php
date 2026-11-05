@@ -44,10 +44,6 @@
         'trekCount' => $trekCount ?? 0,
         'checkinCount' => $checkinCount ?? 0,
     ])
-
-    {{-- Travel Memories anchor --}}
-    <div id="memories" style="scroll-margin-top: 100px;"></div>
-
     {{-- Travel Memories + Journey Replay (grid) --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
         <a href="{{ route('traveler.dashboard-v2') }}#memories" style="background: #fff; border-radius: 16px; padding: 20px; text-decoration: none; color: inherit; border: 1px solid #e5e7eb;">
@@ -178,9 +174,8 @@
             </div>
         @endif
     </div>
-
-    <!-- Travel Memories -->
-    <div class="bg-white rounded-3xl p-6 shadow-float border border-slate-100">
+<!-- Travel Memories -->
+    <div class="bg-white rounded-3xl p-6 shadow-float border border-slate-100" id="memories">
         <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
             <i class="fa-solid fa-images text-purple-500 mr-2 text-lg"></i>Memories
         </h2>
@@ -198,23 +193,87 @@
                 </div>
                 <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-xl font-bold text-xs shadow-md shadow-purple-500/30 hover:opacity-90 transition">Upload Memory</button>
             </form>
+                @if(($userMedia ?? collect())->count() > 0)
+                    <div class="mt-4 grid grid-cols-3 gap-2">
+                        @foreach($userMedia->take(6) as $media)
+                            <div class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square bg-slate-100">
+                                @if($media->media_type === 'image')
+                                    <img src="{{ Storage::url($media->optimized_path) }}" alt="{{ $media->file_name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                @endif
+                                <form action="{{ route('traveler.memory.delete') }}" method="POST" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="id" value="{{ $media->id }}">
+                                    <button type="submit" onclick="return confirm('{{ __('messages.traveler_delete_memory_confirm') ?? 'Delete this memory?' }}')" class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600">&times;</button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                    @if($userMedia->count() > 6)
+                        <p class="text-xs text-slate-400 mt-2">+{{ $userMedia->count() - 6 }} more memories</p>
+                    @endif
+                @else
+                    <p class="text-xs text-slate-400 mt-3">{{ __('messages.traveler_no_memories') ?? 'No memories yet. Upload from your trek checkpoints!' }}</p>
+                @endif
         @endif
     </div>
 </div>
 
 <!-- Safety Alerts -->
 <div class="mt-8 px-4 mb-10">
-    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-6 shadow-soft border border-green-100 flex flex-col md:flex-row items-center justify-between">
-        <div class="flex items-center space-x-4 mb-4 md:mb-0">
-            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm animate-pulse">
-                <i class="fa-solid fa-shield-halved text-xl"></i>
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-6 shadow-soft border border-green-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm {{ ($unreadAlerts ?? collect())->count() > 0 ? 'animate-pulse' : '' }}">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-md font-bold text-green-900 flex items-center gap-2">
+                        {{ __('messages.safety_alerts_title') ?? 'Safety Alerts' }}
+                        @if(($unreadAlerts ?? collect())->count() > 0)
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $unreadAlerts->count() }}</span>
+                        @endif
+                    </h2>
+                    @if(($unreadAlerts ?? collect())->count() === 0)
+                        <p class="text-sm text-green-700 font-medium mt-0.5">No active safety alerts in your area. You are safe to travel!</p>
+                    @endif
+                </div>
             </div>
-            <div>
-                <h2 class="text-md font-bold text-green-900">Safety Alerts</h2>
-                <p class="text-sm text-green-700 font-medium mt-0.5">No active safety alerts in your area. You are safe to travel!</p>
-            </div>
+            <a href="{{ route('safety.index') ?? '#' }}" class="bg-white text-green-700 font-bold text-sm px-6 py-2.5 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">View Safety Map</a>
         </div>
-        <a href="{{ route('safety.index') ?? '#' }}" class="bg-white text-green-700 font-bold text-sm px-6 py-2.5 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">View Safety Map</a>
+
+        @if(($unreadAlerts ?? collect())->count() > 0)
+            <div class="space-y-2 max-h-72 overflow-y-auto">
+                @foreach($unreadAlerts as $alert)
+                    <div class="border-l-4 
+                        @if($alert['severity'] === 'critical') border-red-600
+                        @elseif($alert['severity'] === 'high') border-orange-500
+                        @elseif($alert['severity'] === 'moderate') border-yellow-500
+                        @else border-green-500 @endif
+                        bg-white p-3 rounded-r-lg shadow-sm">
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="min-w-0">
+                                <p class="font-semibold text-sm text-slate-900">
+                                    @if($alert['severity'] === 'critical') 🔴
+                                    @elseif($alert['severity'] === 'high') 🟠
+                                    @elseif($alert['severity'] === 'moderate') 🟡
+                                    @else 🟢 @endif
+                                    {{ $alert['incident']['title'] ?? $alert['message'] ?? 'Safety Alert' }}
+                                </p>
+                                <p class="text-xs text-slate-600 mt-1">{{ $alert['message'] ?? '' }}</p>
+                                <p class="text-xs text-slate-400 mt-1">
+                                    {{ isset($alert['sent_at']) ? \Carbon\Carbon::parse($alert['sent_at'])->diffForHumans() : 'Just now' }}
+                                </p>
+                            </div>
+                            <form method="POST" action="{{ route('traveler.alert.read', $alert['id']) }}" class="inline flex-shrink-0">
+                                @csrf
+                                <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">{{ __('messages.traveler_mark_read_btn') ?? 'Mark read' }}</button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </div>
 <!-- [END AUTO-INJECTED] -->

@@ -699,6 +699,44 @@ function sendSos() {
 </script>
     {{-- ===== End SOS Modal ===== --}}
 
+
+<script>
+// Bell mark-all (auto-injected)
+document.addEventListener('DOMContentLoaded', function() {
+    var menu = document.getElementById('tv2BellMenu');
+    if (!menu) return;
+    
+    var observer = new MutationObserver(function() {
+        if (menu.querySelector('.tv2-mark-all-trigger')) return;
+        var hasItems = menu.querySelector('.tv2-dropdown-item');
+        if (!hasItems) return;
+        
+        var markAll = document.createElement('a');
+        markAll.href = '#';
+        markAll.className = 'tv2-mark-all-trigger';
+        markAll.style.cssText = 'display:block;padding:8px 16px;text-align:right;font-size:11px;color:#2563eb;font-weight:600;border-bottom:1px solid #f3f4f6;text-decoration:none;cursor:pointer;';
+        markAll.textContent = 'Mark all read';
+        markAll.addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                var res = await fetch('{{ route("traveler.notifications.mark-all-read") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    menu.dataset.loaded = '';
+                    menu.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#6b7280;">Loading...</div>';
+                    var btn = document.getElementById('tv2BellBtn');
+                    if (btn) { btn.click(); setTimeout(function(){ btn.click(); }, 50); }
+                }
+            } catch(err) { console.error('Mark all failed:', err); }
+        });
+        menu.prepend(markAll);
+    });
+    
+    observer.observe(menu, { childList: true, subtree: false });
+});
+</script>
 @stack('scripts')
 </body>
 </html>
