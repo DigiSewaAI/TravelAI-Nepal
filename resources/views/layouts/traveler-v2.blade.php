@@ -533,6 +533,59 @@
                 border-radius: 4px !important;
             }
         }
+    
+        /* ROUND5_REVIEWS_EXCHANGE — compact stack on mobile */
+        @media (max-width: 767px) {
+            /* Parent grid — force 1 column + tighter gap */
+            .tv2-dashboard-wrap div[style*="minmax(280px, 1fr)"] {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            /* Cards — compact padding + rounded */
+            .tv2-dashboard-wrap div[style*="minmax(280px, 1fr)"] > div[style*="border-radius: 18px"] {
+                padding: 14px 16px !important;
+                border-radius: 14px !important;
+            }
+            /* Card titles — one line */
+            .tv2-dashboard-wrap div[style*="minmax(280px, 1fr)"] h3 {
+                font-size: 13px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                line-height: 1.2 !important;
+            }
+            /* Body text — compact */
+            .tv2-dashboard-wrap div[style*="minmax(280px, 1fr)"] p {
+                font-size: 12px !important;
+                margin: 0 0 10px 0 !important;
+                line-height: 1.4 !important;
+            }
+            /* Share Experience button */
+            .tv2-dashboard-wrap div[style*="minmax(280px, 1fr)"] a[href*="reviews"] {
+                padding: 9px 12px !important;
+                font-size: 12px !important;
+                border-radius: 10px !important;
+            }
+            /* Exchange rates — title + updated stacked */
+            .tv2-dashboard-wrap #exchange-rates > div:first-child {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 4px !important;
+                margin-bottom: 12px !important;
+            }
+            .tv2-dashboard-wrap #exchange-rates > div:first-child > span {
+                font-size: 10px !important;
+            }
+            /* Exchange rate rows — tighter */
+            .tv2-dashboard-wrap #exchange-rates > div[style*="flex-direction: column"] {
+                gap: 6px !important;
+            }
+            .tv2-dashboard-wrap #exchange-rates > div[style*="flex-direction: column"] > div {
+                font-size: 12px !important;
+                padding: 3px 0 !important;
+            }
+        }
     </style>
     @stack('head')
 </head>
