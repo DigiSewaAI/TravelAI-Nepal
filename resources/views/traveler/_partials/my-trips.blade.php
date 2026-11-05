@@ -46,24 +46,27 @@
     @if($treks && $treks->count() > 0)
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
             @foreach($treks as $trek)
-                <div class="tv2-photo-card" style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; overflow: hidden;">
-                    @php
-                        $img = $trek->service->cover_image ?? null;
-                        $imgUrl = $img ? (\Illuminate\Support\Str::startsWith($img, "http") ? $img : \Illuminate\Support\Facades\Storage::url($img)) : null;
-                    @endphp
-                    @if($imgUrl)
-                        <div style="height: 100px; background: url('') center/cover;"></div>
-                    @else
-                        <div style="height: 100px; background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); display: flex; align-items: center; justify-content: center; font-size: 40px;">🏔️</div>
-                    @endif
-                    <div style="padding: 14px;">
-                    <div style="font-size: 12px; color: #2563eb; font-weight: 700; margin-bottom: 4px;">🏔️ {{ __('messages.tab_treks') ?? 'Trekking' }}</div>
-                    <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $trek->service->name ?? 'Trek' }}</div>
-                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">{{ $trek->created_at->translatedFormat('M d, Y') }}</div>
-                    <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;">{{ __('messages.st_confirmed') ?? 'Confirmed' }}</span>
-                    <div style="margin-top: 12px;">
-                        <a href="{{ route('traveler.bookings.show', $trek) }}" style="color: #2563eb; font-size: 13px; font-weight: 600; text-decoration: none;">{{ __('messages.view') ?? 'View' }} →</a>
-                    </div>
+                @php
+                    $trekImgPath = $trek->service->cover_image ?? null;
+                    $trekImgUrl = $trekImgPath
+                        ? (\Illuminate\Support\Str::startsWith($trekImgPath, 'http') ? $trekImgPath : \Illuminate\Support\Facades\Storage::url($trekImgPath))
+                        : asset('images/defaults/trek.jpg');
+                @endphp
+                <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="position: absolute; inset: 0; background: url('{{ $trekImgUrl }}') center/cover;"></div>
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 100%);"></div>
+                    <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
+                        <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🏔️ {{ __('messages.tab_treks') ?? 'Treks' }}</div>
+                        <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $trek->service->name ?? 'Trek' }}</div>
+                        <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $trek->created_at->translatedFormat('M d, Y') }}</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                ✓ {{ ucfirst($trek->status) }}
+                            </span>
+                            <a href="{{ route('traveler.bookings.show', $trek) }}" style="background: rgba(255,255,255,0.95); color: #1e293b; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">
+                                View →
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -79,16 +82,29 @@
             </h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
                 @foreach($claimedArtcraft as $artOrder)
-                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
-                        <div style="font-size: 12px; color: #db2777; font-weight: 700; margin-bottom: 4px;">🎨 ArtCraft</div>
-                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ ucfirst($artOrder->type) }} · {{ $artOrder->client_name }}</div>
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                            NPR {{ number_format($artOrder->budget, 2) }}
-                            @if($artOrder->deadline) · Due: {{ \Carbon\Carbon::parse($artOrder->deadline)->format('M d, Y') }} @endif
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        @php
+                            $imgPath_artcraft = null;
+                            if ($artOrder->provider) {
+                                $svc_artcraft = $artOrder->provider->services()->first();
+                                $imgPath_artcraft = $svc_artcraft?->cover_image;
+                            }
+                            $imgUrl_artcraft = $imgPath_artcraft
+                                ? (\Illuminate\Support\Str::startsWith($imgPath_artcraft, 'http') ? $imgPath_artcraft : \Illuminate\Support\Facades\Storage::url($imgPath_artcraft))
+                                : asset('images/defaults/artcraft.jpg');
+                        @endphp
+                        <div style="position: absolute; inset: 0; background: url('{{ $imgUrl_artcraft }}') center/cover;"></div>
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 100%);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🎨 ArtCraft</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ ucfirst($artOrder->type) }} · {{ $artOrder->client_name }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                                NPR {{ number_format($artOrder->budget, 2) }}@if($artOrder->deadline) · Due: {{ \Carbon\Carbon::parse($artOrder->deadline)->format('M d, Y') }}@endif
+                            </div>
+                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                ✓ {{ ucfirst($artOrder->status) }}
+                            </span>
                         </div>
-                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
-                            ✓ {{ ucfirst($artOrder->status) }}
-                        </span>
                     </div>
                 @endforeach
             </div>
@@ -104,16 +120,29 @@
             </h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
                 @foreach($claimedRestaurant as $order)
-                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
-                        <div style="font-size: 12px; color: #f59e0b; font-weight: 700; margin-bottom: 4px;">🍽️ {{ __('messages.my_trips_restaurant') }}</div>
-                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $order->order_number }}</div>
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                            {{ $order->created_at ? $order->created_at->translatedFormat('M d, Y') : '' }}
-                            · NPR {{ number_format($order->total ?? 0, 2) }}
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        @php
+                            $imgPath_restaurant = null;
+                            if ($order->provider) {
+                                $svc_restaurant = $order->provider->services()->first();
+                                $imgPath_restaurant = $svc_restaurant?->cover_image;
+                            }
+                            $imgUrl_restaurant = $imgPath_restaurant
+                                ? (\Illuminate\Support\Str::startsWith($imgPath_restaurant, 'http') ? $imgPath_restaurant : \Illuminate\Support\Facades\Storage::url($imgPath_restaurant))
+                                : asset('images/defaults/restaurant.jpg');
+                        @endphp
+                        <div style="position: absolute; inset: 0; background: url('{{ $imgUrl_restaurant }}') center/cover;"></div>
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 100%);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🍽️ {{ __('messages.my_trips_restaurant') }}</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $order->order_number }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                                {{ $order->created_at ? $order->created_at->translatedFormat('M d, Y') : '' }} · NPR {{ number_format($order->total ?? 0, 2) }}
+                            </div>
+                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                ✓ {{ ucfirst($order->status) }}
+                            </span>
                         </div>
-                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
-                            ✓ {{ ucfirst($order->status) }}
-                        </span>
                     </div>
                 @endforeach
             </div>
@@ -128,16 +157,29 @@
             </h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
                 @foreach($claimedTransport as $booking)
-                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
-                        <div style="font-size: 12px; color: #2563eb; font-weight: 700; margin-bottom: 4px;">🚐 {{ __('messages.my_trips_transport') }}</div>
-                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $booking->booking_ref }}</div>
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                            {{ $booking->route_name ?? '' }}
-                            @if($booking->travel_date) · {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }} @endif
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        @php
+                            $imgPath_transport = null;
+                            if ($booking->provider) {
+                                $svc_transport = $booking->provider->services()->first();
+                                $imgPath_transport = $svc_transport?->cover_image;
+                            }
+                            $imgUrl_transport = $imgPath_transport
+                                ? (\Illuminate\Support\Str::startsWith($imgPath_transport, 'http') ? $imgPath_transport : \Illuminate\Support\Facades\Storage::url($imgPath_transport))
+                                : asset('images/defaults/transport.jpg');
+                        @endphp
+                        <div style="position: absolute; inset: 0; background: url('{{ $imgUrl_transport }}') center/cover;"></div>
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 100%);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🚐 {{ __('messages.my_trips_transport') }}</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $booking->booking_ref }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                                {{ $booking->route_name ?? '' }}@if($booking->travel_date) · {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }}@endif
+                            </div>
+                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                ✓ {{ ucfirst($booking->status) }}
+                            </span>
                         </div>
-                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
-                            ✓ {{ ucfirst($booking->status) }}
-                        </span>
                     </div>
                 @endforeach
             </div>
@@ -152,16 +194,29 @@
             </h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
                 @foreach($claimedHotel as $hotelBooking)
-                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
-                        <div style="font-size: 12px; color: #7c3aed; font-weight: 700; margin-bottom: 4px;">🏨 {{ __('messages.my_trips_hotel') }}</div>
-                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $hotelBooking->guest_name ?? 'Guest' }}</div>
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
-                            {{ $hotelBooking->check_in_date ? \Carbon\Carbon::parse($hotelBooking->check_in_date)->format('M d, Y') : '' }}
-                            @if($hotelBooking->nights) · {{ $hotelBooking->nights }} nights @endif
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        @php
+                            $imgPath_hotel = null;
+                            if ($hotelBooking->provider) {
+                                $svc_hotel = $hotelBooking->provider->services()->first();
+                                $imgPath_hotel = $svc_hotel?->cover_image;
+                            }
+                            $imgUrl_hotel = $imgPath_hotel
+                                ? (\Illuminate\Support\Str::startsWith($imgPath_hotel, 'http') ? $imgPath_hotel : \Illuminate\Support\Facades\Storage::url($imgPath_hotel))
+                                : asset('images/defaults/hotel.jpg');
+                        @endphp
+                        <div style="position: absolute; inset: 0; background: url('{{ $imgUrl_hotel }}') center/cover;"></div>
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0) 100%);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🏨 {{ __('messages.my_trips_hotel') }}</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $hotelBooking->guest_name ?? 'Guest' }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
+                                {{ $hotelBooking->check_in_date ? \Carbon\Carbon::parse($hotelBooking->check_in_date)->format('M d, Y') : '' }}@if($hotelBooking->nights) · {{ $hotelBooking->nights }} nights @endif
+                            </div>
+                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                ✓ {{ ucfirst($hotelBooking->status) }}
+                            </span>
                         </div>
-                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
-                            ✓ {{ ucfirst($hotelBooking->status) }}
-                        </span>
                     </div>
                 @endforeach
             </div>
