@@ -1,6 +1,6 @@
 # 🎯 PHASE 4 — COMPLETE MASTER PLAN (v2.0)
 
-**Version:** 2.0 | **Updated:** 2026-11-05
+**Version:** 3.0 | **Updated:** 2026-11-05
 **Owner:** Parashar Regmi (दाइ)
 **Project:** TravelAI Nepal
 **Status:** PLANNING COMPLETE — Implementation pending owner GO
@@ -26,13 +26,28 @@
 
 | Item | Value |
 |---|---|
-| Branch | `feature/traveler-dashboard-v2` |
-| HEAD | `9401840` |
-| Completed | 4 categories + Dashboard V2 |
-| Pending | 5 categories (Transport, Hotel, Restaurant, ArtCraft, MoneyChanger) |
-| Tests Passing | 196+ |
-| Phase 4.1 Foundation | ✅ DONE (3 tables) |
-| DB Backup | `backup_after_dashboard_v2_2026-11-04.sql` (955 KB) |
+| Branch | `feature/restaurant-claim` |
+| HEAD | Latest commit (after Transport) |
+| Completed Categories | 6 (Trekking, Shop, Rental, Wholesale, Restaurant, Transport) |
+| Pending Categories | 3 (Hotel, ArtCraft, MoneyChanger) |
+| Tests Passing | **255** (240 + 15 Transport) |
+| Phase 4.1 Foundation | ✅ DONE |
+| Phase 4.2 Restaurant | ✅ DONE (commit `4423866`) |
+| Phase 4.3 Transport | ✅ DONE (this commit) |
+| DB Backup | `backup_before_phase42b_2026-11-05.sql` |
+
+### Commits Progress
+
+| Commit | Phase |
+|---|---|
+| `fd5a762` | 4.1 Foundation |
+| `043776d` | 4.2A Services |
+| `4c2b75a` | 4.2C Claim flow + i18n |
+| `394d153` | 4.2B Provider + PDF |
+| `277fe31` | Polish (pluralization + Individual card) |
+| `2e007ea` | 4.2D Admin reissue |
+| `4423866` | Restaurant tests (22) + role check |
+| **(new)** | 4.3 Transport claim (15 tests) |
 
 ---
 
@@ -44,9 +59,9 @@
 | Shop | 20 | user_id | order_number | ✅ Working |
 | Rental | 20 | user_id | order_number | ✅ Working |
 | Wholesale | 0 | buyer_id | rfq_number | ✅ Working |
-| **Transport** | 10 | passenger_email | booking_ref | ⏳ Ready (~6 hr) |
+| **Transport** | 10 | passenger_email | booking_ref | ✅ **DONE** (commit pending) |
 | **Hotel** | 16 | guest_email | id | ⏳ Ready (~8 hr) |
-| **Restaurant** | 25 | customer_phone | order_number | ⏳ V4 Design (~16 hr) |
+| **Restaurant** | 25 | customer_phone | order_number | ✅ **DONE** (`4423866`) |
 | **ArtCraft** | 3 | client_email | id | ⏳ Admin manual (~6 hr) |
 | **MoneyChanger** | 26 | ❌ NONE | transaction_number | 🔴 BLOCKED |
 
