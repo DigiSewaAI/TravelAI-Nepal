@@ -2847,4 +2847,27 @@ return array (
     // ═══ Claimed Card State ═══
     'claimed_view_btn' => 'Просмотреть подтвержденные',
     'claimed_count_label' => 'подтверждено',
+
+    // ═══ Phase 4.5 — ArtCraft Claim ═══
+    'artcraft_claim_title' => 'Подтвердить заказ ремесла',
+    'artcraft_claim_heading' => 'Подтвердите заказ ремесла',
+    'artcraft_claim_desc' => 'Введите ID заказа и email.',
+    'artcraft_order_id' => 'ID заказа',
+    'artcraft_order_id_hint' => 'Номер из подтверждения заказа',
+    'artcraft_client_email' => 'Ваш email',
+    'artcraft_claim_submit' => 'Отправить код подтверждения',
+    'artcraft_verify_title' => 'Подтвердить заказ ремесла',
+    'artcraft_verify_heading' => 'Проверьте email',
+    'artcraft_verify_sent_to' => 'Мы отправили код на',
+    'artcraft_verify_btn' => 'Подтвердить',
+    'artcraft_verify_expires' => 'Код истекает через 5 минут',
+    'artcraft_err_generic' => 'Не удалось подтвердить заказ.',
+    'artcraft_err_rate_limit' => 'Слишком много попыток.',
+    'artcraft_err_otp_wrong' => 'Неверный код.',
+    'artcraft_err_otp_max' => 'Слишком много попыток.',
+    'artcraft_err_email_failed' => 'Не удалось отправить письмо.',
+    'artcraft_info_otp_sent' => 'Код отправлен.',
+    'artcraft_success_verified' => 'Заказ подтвержден!',
+    'artcraft_info_already_claimed' => 'Вы уже подтвердили заказ.',
+    'artcraft_btn' => 'Подтвердить заказ',
 );

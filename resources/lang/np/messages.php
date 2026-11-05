@@ -3233,4 +3233,27 @@ return array (
     // ═══ Claimed Card State ═══
     'claimed_view_btn' => 'दावी गरिएको हेर्नुहोस्',
     'claimed_count_label' => 'दावी गरिएको',
+
+    // ═══ Phase 4.5 — ArtCraft Claim ═══
+    'artcraft_claim_title' => 'कला-शिल्प अर्डर दावी गर्नुहोस्',
+    'artcraft_claim_heading' => 'तपाईंको कला-शिल्प अर्डर दावी गर्नुहोस्',
+    'artcraft_claim_desc' => 'तपाईंको अर्डर ID र इमेल प्रविष्ट गर्नुहोस्।',
+    'artcraft_order_id' => 'अर्डर ID',
+    'artcraft_order_id_hint' => 'तपाईंको अर्डर पुष्टिकरणबाट नम्बर',
+    'artcraft_client_email' => 'तपाईंको इमेल',
+    'artcraft_claim_submit' => 'प्रमाणीकरण कोड पठाउनुहोस्',
+    'artcraft_verify_title' => 'कला-शिल्प अर्डर प्रमाणित गर्नुहोस्',
+    'artcraft_verify_heading' => 'तपाईंको इमेल जाँच गर्नुहोस्',
+    'artcraft_verify_sent_to' => 'हामीले 6-अंकको कोड पठायौं',
+    'artcraft_verify_btn' => 'प्रमाणित र दावी गर्नुहोस्',
+    'artcraft_verify_expires' => 'कोड 5 मिनेटमा समाप्त हुन्छ',
+    'artcraft_err_generic' => 'हामीले यो अर्डर प्रमाणित गर्न सकेनौं।',
+    'artcraft_err_rate_limit' => 'धेरै प्रयासहरू। पछि प्रयास गर्नुहोस्।',
+    'artcraft_err_otp_wrong' => 'गलत कोड। फेरि प्रयास गर्नुहोस्।',
+    'artcraft_err_otp_max' => 'धेरै गलत प्रयासहरू।',
+    'artcraft_err_email_failed' => 'इमेल पठाउन सकिएन। फेरि प्रयास गर्नुहोस्।',
+    'artcraft_info_otp_sent' => '6-अंकको कोड पठाइएको छ।',
+    'artcraft_success_verified' => 'अर्डर सफलतापूर्वक दावी गरियो!',
+    'artcraft_info_already_claimed' => 'तपाईंले यो अर्डर पहिले नै दावी गर्नुभयो।',
+    'artcraft_btn' => 'कला-शिल्प अर्डर दावी',
 );

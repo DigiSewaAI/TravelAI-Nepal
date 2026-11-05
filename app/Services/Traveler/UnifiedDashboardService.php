@@ -43,6 +43,8 @@ class UnifiedDashboardService
                 ->where('claimable_type', \App\Models\TransportBooking::class)->count(),
             'hotel' => \App\Models\BookingClaim::where('traveler_id', $userId)
                 ->where('claimable_type', \App\Models\HotelBooking::class)->count(),
+            'artcraft' => \App\Models\BookingClaim::where('traveler_id', $userId)
+                ->where('claimable_type', \App\Models\CustomOrder::class)->count(),
         ];
         // Phase 4.4 — Fetch claimed orders for My Trips tabs
         $claimedRestaurant = \App\Models\BookingClaim::where('traveler_id', $userId)
@@ -68,6 +70,13 @@ class UnifiedDashboardService
             ->get()
             ->pluck('claimable')
             ->filter();
+        $claimedArtcraft = \App\Models\BookingClaim::where('traveler_id', $userId)
+            ->where('claimable_type', \App\Models\CustomOrder::class)
+            ->with('claimable')
+            ->latest('claimed_at')
+            ->get()
+            ->pluck('claimable')
+            ->filter();
         return [
             'counts' => $this->getCounts($userId),
             'treks' => $this->getTreks($userId),
@@ -80,6 +89,7 @@ class UnifiedDashboardService
             'claimedRestaurant' => $claimedRestaurant,
             'claimedTransport' => $claimedTransport,
             'claimedHotel' => $claimedHotel,
+            'claimedArtcraft' => $claimedArtcraft,
         ];
     }
 

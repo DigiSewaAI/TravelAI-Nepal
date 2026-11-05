@@ -3212,4 +3212,27 @@ return array (
     // ═══ Claimed Card State ═══
     'claimed_view_btn' => 'View Claimed',
     'claimed_count_label' => 'claimed',
+
+    // ═══ Phase 4.5 — ArtCraft Claim ═══
+    'artcraft_claim_title' => 'Claim ArtCraft Order',
+    'artcraft_claim_heading' => 'Claim Your ArtCraft Order',
+    'artcraft_claim_desc' => 'Enter your order ID and email to verify ownership.',
+    'artcraft_order_id' => 'Order ID',
+    'artcraft_order_id_hint' => 'Number from your order confirmation',
+    'artcraft_client_email' => 'Your Email',
+    'artcraft_claim_submit' => 'Send Verification Code',
+    'artcraft_verify_title' => 'Verify ArtCraft Order',
+    'artcraft_verify_heading' => 'Check Your Email',
+    'artcraft_verify_sent_to' => 'We sent a 6-digit code to',
+    'artcraft_verify_btn' => 'Verify & Claim',
+    'artcraft_verify_expires' => 'Code expires in 5 minutes',
+    'artcraft_err_generic' => 'We couldn\'t verify this order.',
+    'artcraft_err_rate_limit' => 'Too many attempts. Try again later.',
+    'artcraft_err_otp_wrong' => 'Incorrect code. Try again.',
+    'artcraft_err_otp_max' => 'Too many incorrect attempts.',
+    'artcraft_err_email_failed' => 'Could not send email. Try again.',
+    'artcraft_info_otp_sent' => 'A 6-digit code has been sent.',
+    'artcraft_success_verified' => 'Order successfully claimed!',
+    'artcraft_info_already_claimed' => 'You have already claimed this order.',
+    'artcraft_btn' => 'Claim ArtCraft Order',
 );

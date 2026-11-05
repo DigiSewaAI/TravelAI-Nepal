@@ -33,7 +33,7 @@
                     'Hotel' => ['flag' => 'claim.hotel_enabled', 'route' => 'traveler.hotel.claim.form', 'btn' => 'claim_hotel_btn', 'icon' => '🏨'],
                     'Restaurant' => ['flag' => 'claim.restaurant_enabled', 'route' => 'traveler.restaurant.claim.form', 'btn' => 'claim_restaurant_btn', 'icon' => '🍽️'],
                     'Transport' => ['flag' => 'claim.transport_enabled', 'route' => 'traveler.transport.claim.form', 'btn' => 'claim_transport_btn', 'icon' => '🚐'],
-                    'ArtCraft' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '🎨'],
+                    'ArtCraft' => ['flag' => 'claim.artcraft_enabled', 'route' => 'traveler.artcraft.claim.form', 'btn' => 'artcraft_btn', 'icon' => '🎨'],
                     'MoneyChanger' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '💱'],
                     'Individual / Guide' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '🧑‍💼'],
                 ];
@@ -46,6 +46,7 @@
                         'Hotel' => ($claimedCounts['hotel'] ?? 0),
                         'Restaurant' => ($claimedCounts['restaurant'] ?? 0),
                         'Transport' => ($claimedCounts['transport'] ?? 0),
+                        'ArtCraft' => ($claimedCounts['artcraft'] ?? 0),
                         default => 0,
                     };
                 @endphp

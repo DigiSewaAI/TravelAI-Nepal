@@ -2261,4 +2261,27 @@ return array (
     // ═══ Claimed Card State ═══
     'claimed_view_btn' => '查看已认领',
     'claimed_count_label' => '已认领',
+
+    // ═══ Phase 4.5 — ArtCraft Claim ═══
+    'artcraft_claim_title' => '认领手工艺品订单',
+    'artcraft_claim_heading' => '认领您的手工艺品订单',
+    'artcraft_claim_desc' => '输入您的订单 ID 和电子邮件।',
+    'artcraft_order_id' => '订单 ID',
+    'artcraft_order_id_hint' => '来自您的订单确认',
+    'artcraft_client_email' => '您的邮箱',
+    'artcraft_claim_submit' => '发送验证码',
+    'artcraft_verify_title' => '验证手工艺品订单',
+    'artcraft_verify_heading' => '检查您的电子邮件',
+    'artcraft_verify_sent_to' => '我们已将 6 位验证码发送至',
+    'artcraft_verify_btn' => '验证并认领',
+    'artcraft_verify_expires' => '验证码 5 分钟后过期',
+    'artcraft_err_generic' => '我们无法验证此订单।',
+    'artcraft_err_rate_limit' => '尝试次数过多।',
+    'artcraft_err_otp_wrong' => '验证码错误।',
+    'artcraft_err_otp_max' => '错误尝试过多।',
+    'artcraft_err_email_failed' => '无法发送邮件।',
+    'artcraft_info_otp_sent' => '6 位验证码已发送।',
+    'artcraft_success_verified' => '订单认领成功！',
+    'artcraft_info_already_claimed' => '您已认领此订单।',
+    'artcraft_btn' => '认领订单',
 );

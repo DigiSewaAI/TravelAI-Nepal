@@ -8,6 +8,7 @@
     $claimedRestaurant = $claimedRestaurant ?? collect();
     $claimedTransport = $claimedTransport ?? collect();
     $claimedHotel = $claimedHotel ?? collect();
+    $claimedArtcraft = $claimedArtcraft ?? collect();
 @endphp
 
 <div class="tv2-mytrips" style="background: #fff; border-radius: 18px; padding: 24px; margin-bottom: 24px; border: 1px solid #e5e7eb;">
@@ -34,6 +35,10 @@
         @endif
         @if($claimedHotel->count() > 0)
         <span style="background: #ede9fe; color: #5b21b6; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🏨 {{ __('messages.my_trips_hotel') }} ({{ $claimedHotel->count() }})</span>
+        @endif
+
+        @if($claimedArtcraft->count() > 0)
+        <span style="background: #fce7f3; color: #9f1239; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🎨 ArtCraft ({{ $claimedArtcraft->count() }})</span>
         @endif
     </div>
 
@@ -62,6 +67,31 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+    @endif
+
+    
+    {{-- ═══ Claimed ArtCraft Orders ═══ --}}
+    @if($claimedArtcraft->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                🎨 ArtCraft ({{ $claimedArtcraft->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedArtcraft as $artOrder)
+                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
+                        <div style="font-size: 12px; color: #db2777; font-weight: 700; margin-bottom: 4px;">🎨 ArtCraft</div>
+                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ ucfirst($artOrder->type) }} · {{ $artOrder->client_name }}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                            NPR {{ number_format($artOrder->budget, 2) }}
+                            @if($artOrder->deadline) · Due: {{ \Carbon\Carbon::parse($artOrder->deadline)->format('M d, Y') }} @endif
+                        </div>
+                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                            ✓ {{ ucfirst($artOrder->status) }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
