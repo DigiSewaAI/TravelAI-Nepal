@@ -86,6 +86,7 @@ class HotelClaimController extends Controller
             'user_agent' => Str::limit($request->userAgent() ?? '', 250),
         ]);
 
+
         try {
             \Mail::raw(
                 "Your TravelAI Nepal hotel booking verification code is: {$otp}\n\nExpires in 5 minutes.\nBooking ID: #{$booking->id}",

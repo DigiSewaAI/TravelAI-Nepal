@@ -3214,4 +3214,23 @@ return array (
     'hotel_info_otp_sent' => '6-अंकको कोड तपाईंको इमेलमा पठाइएको छ।',
     'hotel_success_verified' => 'बुकिङ सफलतापूर्वक दावी गरियो! अब ड्यासबोर्डमा देखिन्छ।',
     'hotel_info_already_claimed' => 'तपाईंले यो बुकिङ पहिले नै दावी गर्नुभयो।',
+
+    // ═══ Dashboard Claim Integration ═══
+    'claim_restaurant_btn' => 'रेस्टुरेन्ट अर्डर दावी गर्नुहोस्',
+    'claim_transport_btn' => 'यातायात बुकिङ दावी गर्नुहोस्',
+    'claim_hotel_btn' => 'होटल बुकिङ दावी गर्नुहोस्',
+    'contact_provider_btn' => 'प्रदायकलाई सम्पर्क गर्नुहोस्',
+    'coming_soon_label' => 'चाँडै आउँदैछ',
+
+    // ═══ My Trips Claim Tabs ═══
+    'my_trips_restaurant' => 'रेस्टुरेन्ट',
+    'my_trips_transport' => 'यातायात',
+    'my_trips_hotel' => 'होटल',
+    'my_trips_no_restaurant' => 'अहिलेसम्म कुनै रेस्टुरेन्ट अर्डर दावी गरिएको छैन।',
+    'my_trips_no_transport' => 'अहिलेसम्म कुनै यातायात बुकिङ दावी गरिएको छैन।',
+    'my_trips_no_hotel' => 'अहिलेसम्म कुनै होटल बुकिङ दावी गरिएको छैन।',
+
+    // ═══ Claimed Card State ═══
+    'claimed_view_btn' => 'दावी गरिएको हेर्नुहोस्',
+    'claimed_count_label' => 'दावी गरिएको',
 );

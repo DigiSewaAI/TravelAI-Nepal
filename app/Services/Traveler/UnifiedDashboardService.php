@@ -35,6 +35,39 @@ class UnifiedDashboardService
      */
     public function getData(int $userId): array
     {
+        // Phase 4.4 — Claimed counts per category
+        $claimedCounts = [
+            'restaurant' => \App\Models\BookingClaim::where('traveler_id', $userId)
+                ->where('claimable_type', \App\Models\RestaurantOrder::class)->count(),
+            'transport' => \App\Models\BookingClaim::where('traveler_id', $userId)
+                ->where('claimable_type', \App\Models\TransportBooking::class)->count(),
+            'hotel' => \App\Models\BookingClaim::where('traveler_id', $userId)
+                ->where('claimable_type', \App\Models\HotelBooking::class)->count(),
+        ];
+        // Phase 4.4 — Fetch claimed orders for My Trips tabs
+        $claimedRestaurant = \App\Models\BookingClaim::where('traveler_id', $userId)
+            ->where('claimable_type', \App\Models\RestaurantOrder::class)
+            ->with('claimable')
+            ->latest('claimed_at')
+            ->get()
+            ->pluck('claimable')
+            ->filter();
+
+        $claimedTransport = \App\Models\BookingClaim::where('traveler_id', $userId)
+            ->where('claimable_type', \App\Models\TransportBooking::class)
+            ->with('claimable')
+            ->latest('claimed_at')
+            ->get()
+            ->pluck('claimable')
+            ->filter();
+
+        $claimedHotel = \App\Models\BookingClaim::where('traveler_id', $userId)
+            ->where('claimable_type', \App\Models\HotelBooking::class)
+            ->with('claimable')
+            ->latest('claimed_at')
+            ->get()
+            ->pluck('claimable')
+            ->filter();
         return [
             'counts' => $this->getCounts($userId),
             'treks' => $this->getTreks($userId),
@@ -43,6 +76,10 @@ class UnifiedDashboardService
             'rentalOrders' => $this->getPureOrders($userId, 'rental'),
             'rfqs' => $this->getWholesaleRfqs($userId),
             'mixedOrderIds' => $this->getMixedOrderIds($userId),
+            'claimedCounts' => $claimedCounts,
+            'claimedRestaurant' => $claimedRestaurant,
+            'claimedTransport' => $claimedTransport,
+            'claimedHotel' => $claimedHotel,
         ];
     }
 

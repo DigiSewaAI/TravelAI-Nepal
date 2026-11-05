@@ -2231,4 +2231,23 @@ return array (
     'hotel_info_otp_sent' => '6-अंकीय कोड आपके ईमेल पर भेजा गया है।',
     'hotel_success_verified' => 'बुकिंग सफलतापूर्वक दावा किया गया! अब डैशबोर्ड में दिखाई देता है।',
     'hotel_info_already_claimed' => 'आपने यह बुकिंग पहले ही दावा कर लिया है।',
+
+    // ═══ Dashboard Claim Integration ═══
+    'claim_restaurant_btn' => 'रेस्टोरेंट ऑर्डर दावा करें',
+    'claim_transport_btn' => 'परिवहन बुकिंग दावा करें',
+    'claim_hotel_btn' => 'होटल बुकिंग दावा करें',
+    'contact_provider_btn' => 'प्रदाता से संपर्क करें',
+    'coming_soon_label' => 'जल्द आ रहा है',
+
+    // ═══ My Trips Claim Tabs ═══
+    'my_trips_restaurant' => 'रेस्टोरेंट',
+    'my_trips_transport' => 'परिवहन',
+    'my_trips_hotel' => 'होटल',
+    'my_trips_no_restaurant' => 'अभी तक कोई रेस्टोरेंट ऑर्डर दावा नहीं।',
+    'my_trips_no_transport' => 'अभी तक कोई परिवहन बुकिंग दावा नहीं।',
+    'my_trips_no_hotel' => 'अभी तक कोई होटल बुकिंग दावा नहीं।',
+
+    // ═══ Claimed Card State ═══
+    'claimed_view_btn' => 'दावा किया देखें',
+    'claimed_count_label' => 'दावा किया गया',
 );

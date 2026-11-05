@@ -16,6 +16,10 @@
         'rfqs' => $rfqs,
         'mixedOrderIds' => $mixedOrderIds,
         'counts' => $counts,
+    
+        'claimedRestaurant' => $claimedRestaurant ?? collect(),
+        'claimedTransport' => $claimedTransport ?? collect(),
+        'claimedHotel' => $claimedHotel ?? collect(),
     ])
 
     {{-- Coming Soon Categories --}}
@@ -23,12 +27,53 @@
         <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 16px;">
             🔗 {{ __('messages.coming_soon_personal_access') ?? 'Personal booking access coming soon' }}
         </h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
-            @foreach(['Hotel', 'Restaurant', 'Transport', 'ArtCraft', 'MoneyChanger', 'Individual / Guide'] as $cat)
-                <div style="border: 1px dashed #e5e7eb; border-radius: 10px; padding: 16px; text-align: center; color: #9ca3af;">
-                    <div style="font-size: 28px; margin-bottom: 6px;">📦</div>
-                    <div style="font-weight: 600; font-size: 13px;">{{ $cat }}</div>
-                    <div style="font-size: 11px; margin-top: 4px;">{{ __('messages.not_linked_yet') ?? 'Not linked to your account yet' }}</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+            @php
+                $claimableCategories = [
+                    'Hotel' => ['flag' => 'claim.hotel_enabled', 'route' => 'traveler.hotel.claim.form', 'btn' => 'claim_hotel_btn', 'icon' => '🏨'],
+                    'Restaurant' => ['flag' => 'claim.restaurant_enabled', 'route' => 'traveler.restaurant.claim.form', 'btn' => 'claim_restaurant_btn', 'icon' => '🍽️'],
+                    'Transport' => ['flag' => 'claim.transport_enabled', 'route' => 'traveler.transport.claim.form', 'btn' => 'claim_transport_btn', 'icon' => '🚐'],
+                    'ArtCraft' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '🎨'],
+                    'MoneyChanger' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '💱'],
+                    'Individual / Guide' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '🧑‍💼'],
+                ];
+            @endphp
+            @foreach($claimableCategories as $cat => $meta)
+                @php
+                    $isEnabled = $meta['flag'] ? config($meta['flag'], false) : false;
+                    $routeExists = $meta['route'] && \Illuminate\Support\Facades\Route::has($meta['route']);
+                    $claimedCount = match($cat) {
+                        'Hotel' => ($claimedCounts['hotel'] ?? 0),
+                        'Restaurant' => ($claimedCounts['restaurant'] ?? 0),
+                        'Transport' => ($claimedCounts['transport'] ?? 0),
+                        default => 0,
+                    };
+                @endphp
+                <div style="border: 1px solid {{ $claimedCount > 0 ? '#bbf7d0' : ($isEnabled && $routeExists ? '#dbeafe' : '#e5e7eb') }}; background: {{ $claimedCount > 0 ? '#f0fdf4' : ($isEnabled && $routeExists ? '#f0f9ff' : '#fff') }}; border-radius: 10px; padding: 16px; text-align: center;">
+                    <div style="font-size: 28px; margin-bottom: 6px;">{{ $meta['icon'] }}</div>
+                    <div style="font-weight: 600; font-size: 13px; color: #1e293b;">{{ $cat }}</div>
+                    @if($claimedCount > 0)
+                        <div style="display: inline-block; margin-top: 8px; background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;">
+                            ✓ {{ $claimedCount }} {{ __('messages.claimed_count_label') }}
+                        </div>
+                        @if($isEnabled && $routeExists)
+                            <a href="{{ route($meta['route']) }}" style="display: block; margin-top: 6px; color: #16a34a; font-size: 11px; font-weight: 600; text-decoration: none;">
+                                + {{ __('messages.' . $meta['btn']) ?? 'Claim More' }} →
+                            </a>
+                        @endif
+                    @elseif($isEnabled && $routeExists)
+                        <a href="{{ route($meta['route']) }}" style="display: inline-block; margin-top: 8px; background: #2563eb; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-decoration: none;">
+                            {{ __('messages.' . $meta['btn']) ?? 'Claim' }} →
+                        </a>
+                    @else
+                        <div style="font-size: 11px; margin-top: 4px; color: #9ca3af;">
+                            @if($meta['flag'])
+                                {{ __('messages.coming_soon_label') ?? 'Coming Soon' }}
+                            @else
+                                {{ __('messages.contact_provider_btn') ?? 'Contact Provider' }}
+                            @endif
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>

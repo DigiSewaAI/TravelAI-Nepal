@@ -2828,4 +2828,23 @@ return array (
     'hotel_info_otp_sent' => '6-значный код отправлен на ваш email.',
     'hotel_success_verified' => 'Бронирование успешно подтверждено!',
     'hotel_info_already_claimed' => 'Вы уже подтвердили это бронирование.',
+
+    // ═══ Dashboard Claim Integration ═══
+    'claim_restaurant_btn' => 'Подтвердить заказ ресторана',
+    'claim_transport_btn' => 'Подтвердить бронирование транспорта',
+    'claim_hotel_btn' => 'Подтвердить бронирование отеля',
+    'contact_provider_btn' => 'Связаться с поставщиком',
+    'coming_soon_label' => 'Скоро',
+
+    // ═══ My Trips Claim Tabs ═══
+    'my_trips_restaurant' => 'Ресторан',
+    'my_trips_transport' => 'Транспорт',
+    'my_trips_hotel' => 'Отель',
+    'my_trips_no_restaurant' => 'Пока нет подтвержденных заказов ресторана.',
+    'my_trips_no_transport' => 'Пока нет подтвержденных бронирований транспорта.',
+    'my_trips_no_hotel' => 'Пока нет подтвержденных бронирований отелей.',
+
+    // ═══ Claimed Card State ═══
+    'claimed_view_btn' => 'Просмотреть подтвержденные',
+    'claimed_count_label' => 'подтверждено',
 );

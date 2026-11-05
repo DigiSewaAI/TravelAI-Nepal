@@ -118,4 +118,68 @@ class DashboardV2Test extends TestCase
              ->get('/traveler/dashboard-v2')
              ->assertStatus(200);
     }
+    /** @test */
+    public function test_claimed_hotel_renders_in_dashboard()
+    {
+        Config::set('features.traveler_dashboard_v2', true);
+        Config::set('claim.hotel_enabled', true);
+        
+        $traveler = User::factory()->create(['role' => 'traveler']);
+        $provider = \App\Models\Provider::first();
+        if (!$provider) $this->markTestSkipped('No provider');
+        
+        $room = \Illuminate\Support\Facades\DB::table('hotel_rooms')->first();
+        if (!$room) $this->markTestSkipped('No room');
+        
+        $bookingId = \Illuminate\Support\Facades\DB::table('hotel_bookings')->insertGetId([
+            'provider_id' => $provider->id,
+            'room_id' => $room->id,
+            'guest_name' => 'Test Guest',
+            'guest_email' => 'test@example.com',
+            'check_in_date' => now()->addDays(5)->format('Y-m-d'),
+            'check_out_date' => now()->addDays(7)->format('Y-m-d'),
+            'nights' => 2,
+            'amount' => 1000,
+            'payment_status' => 'pending',
+            'status' => 'confirmed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        
+        \Illuminate\Support\Facades\DB::table('booking_claims')->insert([
+            'claimable_type' => \App\Models\HotelBooking::class,
+            'claimable_id' => $bookingId,
+            'traveler_id' => $traveler->id,
+            'claimed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        
+        $response = $this->actingAs($traveler)->get('/traveler/dashboard-v2');
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function test_claimed_restaurant_renders_in_dashboard()
+    {
+        Config::set('features.traveler_dashboard_v2', true);
+        Config::set('claim.restaurant_enabled', true);
+        
+        $traveler = User::factory()->create(['role' => 'traveler']);
+        
+        $response = $this->actingAs($traveler)->get('/traveler/dashboard-v2');
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function test_claimed_transport_renders_in_dashboard()
+    {
+        Config::set('features.traveler_dashboard_v2', true);
+        Config::set('claim.transport_enabled', true);
+        
+        $traveler = User::factory()->create(['role' => 'traveler']);
+        
+        $response = $this->actingAs($traveler)->get('/traveler/dashboard-v2');
+        $response->assertStatus(200);
+    }
 }

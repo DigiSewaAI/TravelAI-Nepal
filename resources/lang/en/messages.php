@@ -3193,4 +3193,23 @@ return array (
     'hotel_info_otp_sent' => 'A 6-digit code has been sent to your email.',
     'hotel_success_verified' => 'Booking successfully claimed! It now appears in your dashboard.',
     'hotel_info_already_claimed' => 'You have already claimed this booking.',
+
+    // ═══ Dashboard Claim Integration ═══
+    'claim_restaurant_btn' => 'Claim Restaurant Order',
+    'claim_transport_btn' => 'Claim Transport Booking',
+    'claim_hotel_btn' => 'Claim Hotel Booking',
+    'contact_provider_btn' => 'Contact Provider',
+    'coming_soon_label' => 'Coming Soon',
+
+    // ═══ My Trips Claim Tabs ═══
+    'my_trips_restaurant' => 'Restaurant',
+    'my_trips_transport' => 'Transport',
+    'my_trips_hotel' => 'Hotel',
+    'my_trips_no_restaurant' => 'No claimed restaurant orders yet.',
+    'my_trips_no_transport' => 'No claimed transport bookings yet.',
+    'my_trips_no_hotel' => 'No claimed hotel bookings yet.',
+
+    // ═══ Claimed Card State ═══
+    'claimed_view_btn' => 'View Claimed',
+    'claimed_count_label' => 'claimed',
 );

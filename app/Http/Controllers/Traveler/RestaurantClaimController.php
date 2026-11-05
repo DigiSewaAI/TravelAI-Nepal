@@ -126,6 +126,7 @@ class RestaurantClaimController extends Controller
         ]);
 
         // Send OTP via mail (synchronous)
+
         try {
             \Mail::raw(
                 "Your TravelAI Nepal verification code is: {$otp}\n\nThis code expires in 5 minutes.\n\nIf you did not request this, ignore this email.",

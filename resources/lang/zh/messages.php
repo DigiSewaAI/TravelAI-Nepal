@@ -2242,4 +2242,23 @@ return array (
     'hotel_info_otp_sent' => '6 位验证码已发送到您的邮箱।',
     'hotel_success_verified' => '预订认领成功！现在显示在仪表板中।',
     'hotel_info_already_claimed' => '您已认领此预订।',
+
+    // ═══ Dashboard Claim Integration ═══
+    'claim_restaurant_btn' => '认领餐厅订单',
+    'claim_transport_btn' => '认领交通预订',
+    'claim_hotel_btn' => '认领酒店预订',
+    'contact_provider_btn' => '联系服务商',
+    'coming_soon_label' => '即将推出',
+
+    // ═══ My Trips Claim Tabs ═══
+    'my_trips_restaurant' => '餐厅',
+    'my_trips_transport' => '交通',
+    'my_trips_hotel' => '酒店',
+    'my_trips_no_restaurant' => '还没有认领的餐厅订单。',
+    'my_trips_no_transport' => '还没有认领的交通预订。',
+    'my_trips_no_hotel' => '还没有认领的酒店预订。',
+
+    // ═══ Claimed Card State ═══
+    'claimed_view_btn' => '查看已认领',
+    'claimed_count_label' => '已认领',
 );

@@ -5,6 +5,9 @@
     $rentalOrders = $rentalOrders ?? null;
     $rfqs = $rfqs ?? null;
     $counts = $counts ?? [];
+    $claimedRestaurant = $claimedRestaurant ?? collect();
+    $claimedTransport = $claimedTransport ?? collect();
+    $claimedHotel = $claimedHotel ?? collect();
 @endphp
 
 <div class="tv2-mytrips" style="background: #fff; border-radius: 18px; padding: 24px; margin-bottom: 24px; border: 1px solid #e5e7eb;">
@@ -22,6 +25,16 @@
         <span style="background: #f3f4f6; color: #374151; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">{{ __('messages.nav_shop') ?? 'Shop' }} ({{ $counts['shop'] ?? 0 }})</span>
         <span style="background: #f3f4f6; color: #374151; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">{{ __('messages.nav_rental') ?? 'Rental' }} ({{ $counts['rental'] ?? 0 }})</span>
         <span style="background: #f3f4f6; color: #374151; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">{{ __('messages.nav_wholesale') ?? 'Wholesale' }} ({{ $counts['wholesale'] ?? 0 }})</span>
+    
+        @if($claimedRestaurant->count() > 0)
+        <span style="background: #fef3c7; color: #92400e; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🍽️ {{ __('messages.my_trips_restaurant') }} ({{ $claimedRestaurant->count() }})</span>
+        @endif
+        @if($claimedTransport->count() > 0)
+        <span style="background: #dbeafe; color: #1e40af; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🚐 {{ __('messages.my_trips_transport') }} ({{ $claimedTransport->count() }})</span>
+        @endif
+        @if($claimedHotel->count() > 0)
+        <span style="background: #ede9fe; color: #5b21b6; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🏨 {{ __('messages.my_trips_hotel') }} ({{ $claimedHotel->count() }})</span>
+        @endif
     </div>
 
     {{-- Trekking cards --}}
@@ -53,6 +66,77 @@
     @endif
 
     {{-- Recent orders --}}
+    {{-- ═══ Claimed Restaurant Orders ═══ --}}
+    @if($claimedRestaurant->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                🍽️ {{ __('messages.my_trips_restaurant') }} ({{ $claimedRestaurant->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedRestaurant as $order)
+                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
+                        <div style="font-size: 12px; color: #f59e0b; font-weight: 700; margin-bottom: 4px;">🍽️ {{ __('messages.my_trips_restaurant') }}</div>
+                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $order->order_number }}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                            {{ $order->created_at ? $order->created_at->translatedFormat('M d, Y') : '' }}
+                            · NPR {{ number_format($order->total ?? 0, 2) }}
+                        </div>
+                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                            ✓ {{ ucfirst($order->status) }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══ Claimed Transport Bookings ═══ --}}
+    @if($claimedTransport->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                🚐 {{ __('messages.my_trips_transport') }} ({{ $claimedTransport->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedTransport as $booking)
+                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
+                        <div style="font-size: 12px; color: #2563eb; font-weight: 700; margin-bottom: 4px;">🚐 {{ __('messages.my_trips_transport') }}</div>
+                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $booking->booking_ref }}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                            {{ $booking->route_name ?? '' }}
+                            @if($booking->travel_date) · {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }} @endif
+                        </div>
+                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                            ✓ {{ ucfirst($booking->status) }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══ Claimed Hotel Bookings ═══ --}}
+    @if($claimedHotel->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                🏨 {{ __('messages.my_trips_hotel') }} ({{ $claimedHotel->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedHotel as $hotelBooking)
+                    <div style="border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; padding: 14px;">
+                        <div style="font-size: 12px; color: #7c3aed; font-weight: 700; margin-bottom: 4px;">🏨 {{ __('messages.my_trips_hotel') }}</div>
+                        <div style="font-weight: 700; color: #111827; margin-bottom: 6px;">{{ $hotelBooking->guest_name ?? 'Guest' }}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                            {{ $hotelBooking->check_in_date ? \Carbon\Carbon::parse($hotelBooking->check_in_date)->format('M d, Y') : '' }}
+                            @if($hotelBooking->nights) · {{ $hotelBooking->nights }} nights @endif
+                        </div>
+                        <span style="background: #ecfdf5; color: #059669; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                            ✓ {{ ucfirst($hotelBooking->status) }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
     @if($allOrders && $allOrders->count() > 0)
         <div style="margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
