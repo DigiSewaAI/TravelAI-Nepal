@@ -434,6 +434,62 @@
                 margin-top: 4px;
             }
         }
+    
+        /* ROUND2_HIGH_SPEC — override 70px rule for claim cards */
+        @media (max-width: 767px) {
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] > div {
+                padding: 12px 6px !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
+                word-break: normal !important;
+            }
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] > div > div:first-child {
+                font-size: 22px !important;
+                margin-bottom: 4px !important;
+            }
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] > div > div:nth-child(2) {
+                font-size: 12px !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+            }
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] button,
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] a {
+                font-size: 10px !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                line-height: 1.2 !important;
+                max-width: 100% !important;
+                display: inline-block !important;
+            }
+        }
+    
+        /* ROUND2_V5 — Fix long category names (MoneyChanger) */
+        @media (max-width: 767px) {
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] > div > div:nth-child(2) {
+                font-size: 10px !important;
+                letter-spacing: -0.4px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                max-width: 100% !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+            /* "Contact Provider" text for unclaimable — same fix */
+            .tv2-dashboard-wrap div[style*="minmax(200px, 1fr)"] > div > div:nth-child(3) {
+                font-size: 9px !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+            }
+        }
     </style>
     @stack('head')
 </head>
