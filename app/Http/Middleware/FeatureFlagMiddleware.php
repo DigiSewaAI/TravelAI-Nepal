@@ -9,15 +9,31 @@ use Symfony\Component\HttpFoundation\Response;
 class FeatureFlagMiddleware
 {
     /**
-     * Handle feature flag gate.
-     * Usage: ->middleware('feature.flag:traveler_dashboard_v2')
+     * Handle an incoming request.
+     *
+     * Supports two flag formats:
+     *   - "traveler_dashboard_v2" → checks config('features.traveler_dashboard_v2')
+     *   - "claim.restaurant_enabled" → checks config('claim.restaurant_enabled')
      */
     public function handle(Request $request, Closure $next, string $flag): Response
     {
-        if (!config("features.{$flag}", false)) {
+        $enabled = $this->isEnabled($flag);
+
+        if (!$enabled) {
             abort(404);
         }
 
         return $next($request);
+    }
+
+    private function isEnabled(string $flag): bool
+    {
+        // Dot notation → direct config path
+        if (str_contains($flag, '.')) {
+            return (bool) config($flag, false);
+        }
+
+        // Legacy → features.{flag}
+        return (bool) config("features.{$flag}", false);
     }
 }

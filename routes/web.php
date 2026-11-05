@@ -813,10 +813,14 @@ Route::prefix('admin/safety')->name('admin.safety.')->middleware(['auth', 'admin
     Route::get('/audit', [App\Http\Controllers\Admin\SafetyController::class, 'audit'])->name('audit');
 });
 // ═══════════════════════════════════════════════════════
-// PHASE 4.2C — RESTAURANT CLAIM ROUTES (flag-gated)
+// PHASE 4.2C — RESTAURANT CLAIM ROUTES
+// Registered always; feature flag enforced via middleware
+// (allows flag toggle without route cache rebuild)
 // ═══════════════════════════════════════════════════════
-if (config('claim.restaurant_enabled')) {
-    Route::middleware(['auth'])->prefix('traveler/restaurant')->name('traveler.restaurant.')->group(function () {
+Route::middleware(['auth', 'feature.flag:claim.restaurant_enabled'])
+    ->prefix('traveler/restaurant')
+    ->name('traveler.restaurant.')
+    ->group(function () {
         Route::get('/claim', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'showForm'])
             ->name('claim.form');
         Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'initiate'])
@@ -826,7 +830,6 @@ if (config('claim.restaurant_enabled')) {
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'verify'])
             ->name('claim.verify');
     });
-}
 // ═══════════════════════════════════════════════════════
 // PHASE 4.2D — ADMIN RESTAURANT REISSUE
 // ═══════════════════════════════════════════════════════

@@ -19,7 +19,16 @@ class RestaurantClaimController extends Controller
 {
     public function showForm()
     {
+        $this->assertTraveler();
         return view('traveler.restaurant.claim-form');
+    }
+
+    private function assertTraveler(): void
+    {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'traveler') {
+            abort(403);
+        }
     }
 
     public function initiate(Request $request, RateLimitService $rateLimiter)
