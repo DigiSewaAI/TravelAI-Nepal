@@ -16,7 +16,7 @@
         <h2 style="font-size: 22px; font-weight: 800; margin: 0; color: #111827;">
             🧳 {{ __('messages.my_trips') ?? 'My Trips' }}
         </h2>
-        <a href="{{ route('traveler.dashboard-v2') }}" style="color: #2563eb; font-weight: 600; font-size: 14px; text-decoration: none;">{{ __('messages.view_all') ?? 'View All' }} →</a>
+        <a href="{{ route('traveler.dashboard-v2') }}" style="color: #2563eb; font-weight: 600; font-size: 14px; text-decoration: none;">{{ __('messages.view_all') ?? 'View All' }} <span class="tv2-btn-arrow">→</span></a>
     </div>
 
     {{-- Tab counts --}}
@@ -61,10 +61,10 @@
                         <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $trek->created_at->translatedFormat('M d, Y') }}</div>
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                ✓ {{ ucfirst($trek->status) }}
+                                <span class="tv2-check">✓</span> {{ ucfirst($trek->status) }}
                             </span>
                             <a href="{{ route('traveler.bookings.show', $trek) }}" style="background: rgba(255,255,255,0.95); color: #1e293b; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">
-                                View →
+                                View <span class="tv2-btn-arrow">→</span>
                             </a>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                                 NPR {{ number_format($artOrder->budget, 2) }}@if($artOrder->deadline) · Due: {{ \Carbon\Carbon::parse($artOrder->deadline)->format('M d, Y') }}@endif
                             </div>
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                ✓ {{ ucfirst($artOrder->status) }}
+                                <span class="tv2-check">✓</span> {{ ucfirst($artOrder->status) }}
                             </span>
                         </div>
                     </div>
@@ -140,7 +140,7 @@
                                 {{ $order->created_at ? $order->created_at->translatedFormat('M d, Y') : '' }} · NPR {{ number_format($order->total ?? 0, 2) }}
                             </div>
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                ✓ {{ ucfirst($order->status) }}
+                                <span class="tv2-check">✓</span> {{ ucfirst($order->status) }}
                             </span>
                         </div>
                     </div>
@@ -177,7 +177,7 @@
                                 {{ $booking->route_name ?? '' }}@if($booking->travel_date) · {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }}@endif
                             </div>
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                ✓ {{ ucfirst($booking->status) }}
+                                <span class="tv2-check">✓</span> {{ ucfirst($booking->status) }}
                             </span>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
                                 {{ $hotelBooking->check_in_date ? \Carbon\Carbon::parse($hotelBooking->check_in_date)->format('M d, Y') : '' }}@if($hotelBooking->nights) · {{ $hotelBooking->nights }} nights @endif
                             </div>
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                ✓ {{ ucfirst($hotelBooking->status) }}
+                                <span class="tv2-check">✓</span> {{ ucfirst($hotelBooking->status) }}
                             </span>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0;">{{ __('messages.my_orders') ?? 'My Orders' }} <span style="font-size: 12px; font-weight: 500; color: #6b7280;">({{ $allOrders->total() }})</span></h3>
                 <button type="button" id="tv2OrdersToggle" onclick="(function(){var l=document.getElementById('tv2OrdersList');var b=this;if(l.style.display==='none'||!l.style.display){l.style.display='flex';b.textContent='{{ __('messages.hide') ?? "Hide" }} ↑';}else{l.style.display='none';b.textContent='{{ __('messages.view_all') ?? "View All" }} →';}}).call(this)" style="background: #2563eb; color: #fff; border: 0; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                    {{ __('messages.view_all') ?? 'View All' }} →
+                    {{ __('messages.view_all') ?? 'View All' }} <span class="tv2-btn-arrow">→</span>
                 </button>
             </div>
             <div id="tv2OrdersList" style="display: none; flex-direction: column; gap: 10px;">
@@ -242,7 +242,7 @@
                             <div style="font-weight: 700; color: #111827; font-size: 14px;">{{ $order->order_number ?? 'Order' }}</div>
                             <div style="font-size: 12px; color: #6b7280;">{{ $order->created_at->translatedFormat('M d, Y') }} · {{ $order->items->count() }} {{ __('messages.items_count') ?? 'items' }} · {{ $typeLabel }}</div>
                         </div>
-                        <span style="color: #2563eb; font-size: 13px; font-weight: 600;">{{ __('messages.view') ?? 'View' }} →</span>
+                        <span style="color: #2563eb; font-size: 13px; font-weight: 600;">{{ __('messages.view') ?? 'View' }} <span class="tv2-btn-arrow">→</span></span>
                     </a>
                 @endforeach
             </div>

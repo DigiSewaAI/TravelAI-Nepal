@@ -55,16 +55,16 @@
                     <div style="font-weight: 600; font-size: 13px; color: #1e293b;">{{ $cat }}</div>
                     @if($claimedCount > 0)
                         <div style="display: inline-block; margin-top: 8px; background: #16a34a; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;">
-                            ✓ {{ $claimedCount }} {{ __('messages.claimed_count_label') }}
+                            <span class="tv2-check">✓</span> {{ $claimedCount }} {{ __('messages.claimed_count_label') }}
                         </div>
                         @if($isEnabled && $routeExists)
                             <a href="{{ route($meta['route']) }}" style="display: block; margin-top: 6px; color: #16a34a; font-size: 11px; font-weight: 600; text-decoration: none;">
-                                + {{ __('messages.' . $meta['btn']) ?? 'Claim More' }} →
+                                + {{ __('messages.' . $meta['btn']) ?? 'Claim More' }} <span class="tv2-btn-arrow">→</span>
                             </a>
                         @endif
                     @elseif($isEnabled && $routeExists)
                         <a href="{{ route($meta['route']) }}" style="display: inline-block; margin-top: 8px; background: #2563eb; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-decoration: none;">
-                            {{ __('messages.' . $meta['btn']) ?? 'Claim' }} →
+                            {{ __('messages.' . $meta['btn']) ?? 'Claim' }} <span class="tv2-btn-arrow">→</span>
                         </a>
                     @else
                         <div style="font-size: 11px; margin-top: 4px; color: #9ca3af;">
@@ -126,7 +126,7 @@
     <div id="my-bookings-section" class="tv2-my-bookings-section" style="background: #fff; border-radius: 18px; padding: 20px; margin-bottom: 24px; border: 1px solid #e5e7eb;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <h3 style="font-size: 15px; font-weight: 800; color: #111827; margin: 0;">📅 {{ __('messages.nav_my_bookings') ?? 'My Bookings' }}</h3>
-            <a href="{{ route('traveler.my-bookings') }}" style="color: #2563eb; font-size: 12px; font-weight: 600; text-decoration: none;">{{ __('messages.see_all') ?? 'See All' }} →</a>
+            <a href="{{ route('traveler.my-bookings') }}" style="color: #2563eb; font-size: 12px; font-weight: 600; text-decoration: none;">{{ __('messages.see_all') ?? 'See All' }} <span class="tv2-btn-arrow">→</span></a>
         </div>
         @if($treks && $treks->count() > 0)
             @foreach($treks->take(3) as $trek)

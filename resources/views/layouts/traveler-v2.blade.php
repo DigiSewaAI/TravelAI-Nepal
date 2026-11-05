@@ -280,6 +280,11 @@
         /* MOBILE RESPONSIVE FIXES — 2026-11-05 (max-width: 767px) */
         /* ═══════════════════════════════════════════════════════ */
         @media (max-width: 767px) {
+            /* Hide arrows + checkmarks on mobile (prevent cramped buttons) */
+            .tv2-btn-arrow,
+            .tv2-check {
+                display: none !important;
+            }
             /* ─── 1. GLOBAL: Prevent horizontal scroll ─── */
             html, body {
                 overflow-x: hidden !important;
@@ -321,23 +326,43 @@
             }
             
             /* ─── 5. WEATHER WIDGET: Shrink on mobile ─── */
+            /* Widget: small + anchored top-right */
             .tv2-weather-inline {
-                transform: scale(0.75);
+                transform: scale(0.5);
                 transform-origin: top right;
-                margin-top: -10px !important;
-                margin-right: -10px !important;
+                margin-top: 5px !important;
+                margin-right: -18px !important;
             }
             
             .tv2-weather-inline * {
-                font-size: 10px !important;
-                line-height: 1.2 !important;
+                font-size: 8px !important;
+                line-height: 1 !important;
             }
             
             .tv2-weather-inline img,
             .tv2-weather-inline i {
-                width: 20px !important;
-                height: 20px !important;
-                font-size: 20px !important;
+                width: 14px !important;
+                height: 14px !important;
+                font-size: 14px !important;
+            }
+            
+            /* Reserve horizontal space for widget — narrow greeting text */
+            .tv2-hero h1 {
+                max-width: 62% !important;
+                font-size: 22px !important;
+                line-height: 1.15 !important;
+                word-wrap: break-word !important;
+            }
+            
+            .tv2-hero h1 + p {
+                max-width: 58% !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+            }
+            
+            /* Ensure stats + buttons stay full-width */
+            .tv2-hero h1 ~ div {
+                max-width: 100% !important;
             }
             
             /* ─── 6. HERO ACTIONS: Full width on mobile ─── */
@@ -384,7 +409,9 @@
             }
             
             .tv2-weather-inline {
-                transform: scale(0.65);
+                transform: scale(0.42);
+                margin-top: 4px !important;
+                margin-right: -20px !important;
             }
         }
     </style>
