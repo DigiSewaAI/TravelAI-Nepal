@@ -591,44 +591,7 @@
 
 
 
-<!-- TV2 LANDSCAPE FINAL FIX -->
-<style id="tv2-landscape-fix">
-@media (orientation: landscape) and (max-height: 500px) {
-    /* 1. Header - shrink to fit all items in one row */
-    header, .tv2-header {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        padding: 4px 10px !important;
-        min-height: 48px !important;
-    }
 
-    .tv2-header-btn {
-        padding: 4px 8px !important;
-        font-size: 11px !important;
-    }
-
-    /* Hide the "Home" text, keep the icon */
-    .tv2-header-btn span[style*="font-size:13px"] {
-        display: none !important;
-    }
-
-    /* 2. Dropdowns - Center on screen so they NEVER get cut off */
-    .tv2-dropdown-menu {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        max-height: 85vh !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        z-index: 999999 !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
-        width: 90vw !important;
-        max-width: 300px !important;
-    }
-}
-</style>
 
     <!-- REORDER NOTIFICATION BELL (Mobile Fix) -->
     <style id="tv2-bell-reorder-css">
@@ -682,6 +645,41 @@
     /* Fix any internal padding that might push content out */
     .tv2-dropdown-menu * {
         box-sizing: border-box !important;
+    }
+}
+</style>
+
+<!-- ULTIMATE LANDSCAPE DROPDOWN FIX -->
+<style id="ultimate-landscape-dropdown-fix">
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 1. Force Dropdowns to be Fixed to the Viewport */
+    .tv2-dropdown-menu {
+        position: fixed !important;
+        top: 55px !important;       /* Just below the header */
+        right: 15px !important;     /* Keep on screen */
+        left: auto !important;
+        width: 90vw !important;
+        max-width: 320px !important;
+        max-height: calc(100vh - 70px) !important; /* Fit within screen */
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 999999 !important;
+        transform: none !important; /* Remove any centering transforms */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+    }
+
+    /* 2. Ensure Header doesn't block clicks */
+    .tv2-header {
+        position: relative !important;
+        z-index: 1000000 !important;
+    }
+
+    /* 3. Adjust Header Buttons to fit in one line */
+    .tv2-header-actions {
+        gap: 4px !important;
+    }
+    .tv2-header-btn {
+        padding: 6px 8px !important;
     }
 }
 </style>
