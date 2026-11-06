@@ -629,6 +629,62 @@
     }
 }
 </style>
+
+    <!-- REORDER NOTIFICATION BELL (Mobile Fix) -->
+    <style id="tv2-bell-reorder-css">
+    @media (max-width: 767px) {
+        #tv2BellMenu {
+            position: fixed !important;
+            top: 60px !important;
+            right: 15px !important;
+            left: auto !important;
+            width: 90vw !important;
+            max-width: 340px !important;
+            z-index: 999999 !important;
+            box-sizing: border-box !important;
+        }
+    }
+    </style>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Find Notification Bell Wrapper
+        let bellMenu = document.getElementById('tv2BellMenu');
+        if (!bellMenu) return;
+        let bellWrapper = bellMenu.closest('.tv2-dropdown');
+
+        // Find Cart Icon
+        let cartIcon = document.querySelector('a[href*="cart"]');
+
+        // Move Bell to be BEFORE Cart Icon (Between Currency and Cart)
+        if (bellWrapper && cartIcon) {
+            cartIcon.parentNode.insertBefore(bellWrapper, cartIcon);
+        }
+    });
+    </script>
+
+<!-- MOBILE DROPDOWN GLOBAL FIX -->
+<style id="tv2-mobile-dropdown-fix">
+@media (max-width: 767px) {
+    /* Target all dropdown menus in the header */
+    .tv2-dropdown-menu {
+        position: fixed !important;
+        top: 65px !important; /* Below the header */
+        right: 15px !important; /* Safe margin from right edge */
+        left: auto !important; /* Prevent left overflow */
+        width: 90vw !important; 
+        max-width: 320px !important; /* Ensure it fits on 360px screens */
+        z-index: 999999 !important;
+        box-sizing: border-box !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Fix any internal padding that might push content out */
+    .tv2-dropdown-menu * {
+        box-sizing: border-box !important;
+    }
+}
+</style>
 </head>
 <body>
 
