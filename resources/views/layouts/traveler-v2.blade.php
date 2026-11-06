@@ -709,6 +709,32 @@
     }
 }
 </style>
+
+<!-- HERO TITLE WRAP FIX (Specific Devices) -->
+<style id="hero-title-wrap-fix">
+/* 1. Target Landscape Devices (Pixel, Pro Max, iPhone, SE) */
+@media (orientation: landscape) and (max-height: 500px) {
+    .tv2-hero h1 {
+        font-size: 20px !important; /* Make text slightly smaller to fit in 2 lines */
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        white-space: normal !important;
+        max-width: 95% !important;
+        line-height: 1.2 !important;
+    }
+}
+
+/* 2. Target iPad Mini Portrait (768px to 820px) */
+@media (min-width: 768px) and (max-width: 820px) {
+    .tv2-hero h1 {
+        font-size: 26px !important; /* Adjust font size for iPad */
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        white-space: normal !important;
+        max-width: 100% !important;
+    }
+}
+</style>
 </head>
 <body>
 

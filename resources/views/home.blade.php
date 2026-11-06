@@ -1091,3 +1091,26 @@ document.addEventListener('DOMContentLoaded', function() {
   </section>
 
 @endsection
+
+<!-- HERO TITLE EXACT FIX (iPad Mini & Landscape) -->
+<style id="hero-title-exact-fix">
+/* 1. iPad Mini Portrait (768px - 820px) */
+@media (min-width: 768px) and (max-width: 820px) {
+    section#home h1 {
+        font-size: 34px !important; /* Reduce from 60px to fit */
+    }
+    section#home h1 span {
+        white-space: nowrap !important; /* Force 'Nepal Journey' together */
+    }
+}
+
+/* 2. Landscape Devices (Pixel, Pro Max, iPhone, SE) */
+@media (orientation: landscape) and (max-height: 500px) {
+    section#home h1 {
+        font-size: 26px !important; /* Smaller to fit 2 lines */
+    }
+    section#home h1 span {
+        white-space: nowrap !important; /* Force 'Nepal Journey' together */
+    }
+}
+</style>
