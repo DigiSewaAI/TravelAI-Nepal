@@ -175,6 +175,26 @@
         setTimeout(() => clearInterval(interval), 3000); 
     })();
     </script>
+
+<!-- TREK HEADER SCROLL Z-INDEX FIX -->
+<style id="trek-header-scroll-fix">
+@media (max-width: 767px) {
+    /* 1. Force Header to be Sticky and Top Layer */
+    header, .topbar, .main-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 99999 !important; /* Make it higher than all cards */
+        background-color: #ffffff !important; /* Ensure solid background */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important; /* Optional: adds subtle shadow below header */
+    }
+    
+    /* 2. Ensure Main Content stays below the header */
+    main, .main-content, .content-wrapper {
+        position: relative !important;
+        z-index: 1 !important; /* Lower than header */
+    }
+}
+</style>
 </head>
 <body class="overflow-x-hidden">
     <div class="flex h-screen relative">
