@@ -589,38 +589,43 @@
     </style>
     @stack('head')
 
-<!-- LANDSCAPE DROPDOWN & SCROLL FIX -->
-<style id="landscape-final-fix">
+
+
+<!-- TV2 LANDSCAPE FINAL FIX -->
+<style id="tv2-landscape-fix">
 @media (orientation: landscape) and (max-height: 500px) {
-    /* 1. Fix Horizontal Scroll (Pixel Landscape) */
-    html, body {
-        overflow-x: hidden !important;
-        width: 100% !important;
-        max-width: 100vw !important;
+    /* 1. Header - shrink to fit all items in one row */
+    header, .tv2-header {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        padding: 4px 10px !important;
+        min-height: 48px !important;
     }
-    
-    /* 2. Fix Hamburger Sidebar (Scrollable) */
-    .sidebar, .tv2-sidebar, .mobile-menu, #sidebar, #mobileSidebar, .offcanvas {
+
+    .tv2-header-btn {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+
+    /* Hide the "Home" text, keep the icon */
+    .tv2-header-btn span[style*="font-size:13px"] {
+        display: none !important;
+    }
+
+    /* 2. Dropdowns - Center on screen so they NEVER get cut off */
+    .tv2-dropdown-menu {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
         max-height: 85vh !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
-    }
-
-    /* 3. Fix Dropdowns (Profile, Notifications, etc.) - Scrollable & Visible */
-    .dropdown-menu, .tv2-dropdown-menu, [class*="dropdown"], [class*="menu-panel"] {
-        position: absolute !important;
-        top: 100% !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        z-index: 99999 !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
-    }
-
-    /* 4. Ensure Logout Button is visible */
-    .nav-logout, .logout-btn, a[href*="logout"], button[type="submit"] {
-        display: block !important;
-        visibility: visible !important;
+        z-index: 999999 !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+        width: 90vw !important;
+        max-width: 300px !important;
     }
 }
 </style>
@@ -686,7 +691,19 @@
             </div>
         </div>
 
-        {{-- Profile --}}
+        
+                <!-- 🛒 Cart Icon -->
+                <a href="{{ route('cart.index') }}" class="tv2-header-btn" style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; text-decoration:none;">
+                    <i class="fas fa-shopping-cart" style="font-size: 15px;"></i>
+                    @php $cartCount = app(\App\Services\CartService::class)->count(); @endphp
+                    @if($cartCount > 0)
+                        <span style="position:absolute; top:-2px; right:-2px; background:#ef4444; color:#fff; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+                </a>
+
+                {{-- Profile --}}
         <div class="tv2-dropdown">
             <button type="button" class="tv2-header-btn" id="tv2ProfileBtn" style="padding: 4px 8px 4px 4px;">
                 <div class="tv2-profile-avatar">
