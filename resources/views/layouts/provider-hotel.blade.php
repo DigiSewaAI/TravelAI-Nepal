@@ -82,6 +82,72 @@
   @media (max-width:640px){.topbar h2{font-size:19px}.search{display:none}.btn-primary span{display:none}.btn-primary{padding:11px}.main{padding:16px 14px 38px}}
 </style>
 @stack('hotel-head')
+
+<style id="provider-notif-fix">
+@media (max-width: 767px) {
+    /* A: Bell + Add button right edge मा push */
+    #invNotifWrapper {
+        margin-left: auto !important;
+    }
+    /* Bell + Add मा gap */
+    #invNotifWrapper + button, #invNotifWrapper + a {
+        margin-left: 6px !important;
+    }
+    /* B: Dropdown लाई screen center मा anchor (cut हटाउन) */
+    #invNotifPanel {
+        position: fixed !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        top: 64px !important;
+        width: 90vw !important;
+        max-width: 340px !important;
+        box-sizing: border-box !important;
+    }
+    /* Dropdown भित्र content wrap नहोस् */
+    #invNotifPanel * {
+        word-break: break-word;
+    }
+}
+</style>
+
+<style id="provider-footer-fix">
+@media (max-width: 767px) {
+    /* Footer container लाई column layout मा बदल्ने */
+    footer,
+    .footer,
+    .main-footer,
+    .dashboard-footer,
+    .content-wrapper footer {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        gap: 6px !important;
+        padding: 16px 12px !important;
+        width: 100% !important;
+    }
+
+    /* Footer भित्रको text wrap नहोस् र center होस् */
+    footer *,
+    .footer *,
+    .main-footer *,
+    .dashboard-footer * {
+        text-align: center !important;
+        white-space: normal !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* TravelAI OS v1.0 लाई सानो text बनाउने (optional) */
+    footer span:last-child,
+    footer div:last-child {
+        font-size: 11px !important;
+        opacity: 0.8 !important;
+    }
+}
+</style>
 </head>
 <body>
 <div class="overlay" id="overlay"></div>
