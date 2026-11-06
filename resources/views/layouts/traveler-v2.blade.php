@@ -683,6 +683,32 @@
     }
 }
 </style>
+
+
+
+<!-- IPAD MINI WEATHER MINIMAL PUSH FIX -->
+<style id="ipad-weather-minimal-fix">
+/* Target ONLY iPad Mini Portrait width (768px to 820px) */
+@media (min-width: 768px) and (max-width: 820px) {
+    .tv2-weather-inline {
+        /* Make it slightly smaller */
+        transform: scale(0.85) !important;
+        /* Anchor to top-right so it scales away from the text */
+        transform-origin: top right !important;
+        /* Minimal push: 5px up and 5px right */
+        translate: 5px -5px !important; 
+        margin-top: 0 !important;
+        margin-right: 0 !important;
+        position: relative !important;
+        z-index: 10 !important;
+    }
+    
+    /* Ensure the greeting text leaves a little room on the right */
+    .tv2-hero h1 {
+        padding-right: 10px !important;
+    }
+}
+</style>
 </head>
 <body>
 
