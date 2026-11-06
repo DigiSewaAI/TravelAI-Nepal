@@ -236,6 +236,26 @@
     }
 }
 </style>
+
+<!-- LANDSCAPE MOBILE FIX -->
+<style id="landscape-universal-fix">
+@media (orientation: landscape) and (max-height: 500px) {
+    /* Fix Hamburger / Navbar Collapse overflow */
+    #mobileMenu, .mobile-menu, .navbar-collapse, .offcanvas, .sidebar {
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Fix Dropdowns (Profile, etc.) overflow */
+    .dropdown-menu, .tv2-dropdown-menu, [class*="dropdown-content"], [class*="menu-panel"] {
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 99999 !important;
+    }
+}
+</style>
 </head>
 <body class="antialiased overflow-x-hidden">
 
@@ -356,6 +376,17 @@
                 
 
                 <div class="flex lg:hidden items-center gap-1">
+
+<!-- 🛒 Mobile Cart Icon -->
+<a href="{{ route('cart.index') }}" class="relative flex-shrink-0 text-gray-700 hover:text-blue-600 transition-colors p-2">
+    <i class="fas fa-shopping-cart text-lg"></i>
+    @php $cartCount = app(\App\Services\CartService::class)->count(); @endphp
+    @if($cartCount > 0)
+        <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full">
+            {{ $cartCount }}
+        </span>
+    @endif
+</a>
     @auth
 
 <a href="@if(auth()->user()->isSuperAdmin()){{ route('admin.dashboard') }}@elseif(auth()->user()->isProviderOwner() || auth()->user()->isStaff()){{ route('provider.dashboard') }}@elseif(auth()->user()->isTraveler()){{ route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard') }}@else{{ route('home') }}@endif" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">{{ __('messages.dashboard') }}</a>
