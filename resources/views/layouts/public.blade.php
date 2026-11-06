@@ -157,6 +157,85 @@
         });
     </script>
     @endif
+
+<!-- LANDSCAPE DROPDOWN & SCROLL FIX -->
+<style id="landscape-final-fix">
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 1. Fix Horizontal Scroll (Pixel Landscape) */
+    html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+    
+    /* 2. Fix Hamburger Sidebar (Scrollable) */
+    .sidebar, .tv2-sidebar, .mobile-menu, #sidebar, #mobileSidebar, .offcanvas {
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* 3. Fix Dropdowns (Profile, Notifications, etc.) - Scrollable & Visible */
+    .dropdown-menu, .tv2-dropdown-menu, [class*="dropdown"], [class*="menu-panel"] {
+        position: absolute !important;
+        top: 100% !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 99999 !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+    }
+
+    /* 4. Ensure Logout Button is visible */
+    .nav-logout, .logout-btn, a[href*="logout"], button[type="submit"] {
+        display: block !important;
+        visibility: visible !important;
+    }
+}
+</style>
+
+<!-- MASTER HORIZONTAL SCROLL FIX (Up to 1024px) -->
+<style id="master-horizontal-fix">
+@media (max-width: 1024px) {
+    /* 1. Global container guard */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        position: relative !important;
+    }
+
+    /* 2. Force all direct children to respect screen width */
+    body > *, 
+    main > *, 
+    header > *, 
+    footer > *,
+    section > * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Prevent specific oversized elements from pushing the screen */
+    [style*="width: 120%"], 
+    [style*="width: 150%"], 
+    [style*="min-width: 400px"],
+    [style*="min-width: 500px"],
+    [style*="width: 450px"] {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* 4. Images & Media (Safe: NO height auto to protect logos) */
+    img, video, iframe, canvas, svg {
+        max-width: 100% !important;
+    }
+
+    /* 5. Text wrapping (prevents long URLs from stretching) */
+    p, h1, h2, h3, h4, h5, h6, span, a, div {
+        overflow-wrap: break-word !important;
+    }
+}
+</style>
 </head>
 <body class="antialiased overflow-x-hidden">
 

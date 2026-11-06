@@ -286,6 +286,47 @@
         </form>
     </div>
 </div>
+
+<style id="dashboard-greeting-fix">
+@media (max-width: 767px) {
+    /* 1. Allow text to wrap instead of ellipsis (...) */
+    .truncate, 
+    .whitespace-nowrap,
+    [class*="text-ellipsis"],
+    [style*="white-space: nowrap"] {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        word-break: break-word !important;
+    }
+
+    /* 2. Specifically target the subtitle/greeting area */
+    .dashboard-subtitle,
+    .greeting-text,
+    main h2 + p,
+    main h1 + p {
+        white-space: normal !important;
+        line-height: 1.5 !important;
+    }
+}
+</style>
+<script>
+    // JS Fallback: If class names are minified, find "Namaste" and fix it
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.innerWidth <= 767) {
+            let allElements = document.querySelectorAll('p, span, div, h1, h2, h3');
+            allElements.forEach(el => {
+                if (el.textContent.includes('Namaste') || el.textContent.includes('upcoming assignments')) {
+                    el.style.setProperty('white-space', 'normal', 'important');
+                    el.style.setProperty('overflow', 'visible', 'important');
+                    el.style.setProperty('text-overflow', 'clip', 'important');
+                    el.style.setProperty('word-break', 'break-word', 'important');
+                    el.style.setProperty('line-height', '1.5', 'important');
+                }
+            });
+        }
+    });
+</script>
 @endsection
 
 @push('inv-scripts')
