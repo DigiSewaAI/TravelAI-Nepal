@@ -30,6 +30,9 @@
   .svcf-form .svcf-card input[type="password"],
   .svcf-form .svcf-card select,
   .svcf-form .svcf-card textarea{
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     width:100% !important;padding:11px 14px !important;
     border:1.5px solid var(--line,#e5e7eb) !important;border-radius:10px !important;
     background:var(--card,#fff) !important;color:var(--text,#1f2937) !important;
@@ -210,3 +213,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
+<style id="form-box-sizing-final">
+@media (max-width: 767px) {
+    .svcf-form .svcf-card select,
+    .svcf-form .svcf-card input,
+    .svcf-form .svcf-card textarea {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+    .svcf-form .svcf-card { padding: 14px !important; }
+}
+</style>
