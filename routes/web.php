@@ -864,6 +864,7 @@ Route::middleware(['auth', 'feature.flag:claim.hotel_enabled'])
         Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'initiate'])->name('claim.initiate');
         Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'showVerify'])->name('claim.verify.form');
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'verify'])->name('claim.verify');
+        Route::get('/claim/show/{booking}', [\App\Http\Controllers\Traveler\HotelClaimController::class, 'show'])->name('claim.show');
     });
 // ═══ PHASE 4.5 — ARTCRAFT CLAIM ROUTES ═══
 Route::middleware(['auth', 'feature.flag:claim.artcraft_enabled'])
@@ -873,4 +874,5 @@ Route::middleware(['auth', 'feature.flag:claim.artcraft_enabled'])
         Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'initiate'])->name('claim.initiate');
         Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'showVerify'])->name('claim.verify.form');
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'verify'])->name('claim.verify');
+        Route::get('/claim/show/{order}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'show'])->name('claim.show');
     });

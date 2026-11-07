@@ -198,4 +198,16 @@ class HotelClaimController extends Controller
             ]);
         } catch (\Exception $e) { \Log::warning('Hotel event log failed', ['error' => $e->getMessage()]); }
     }
+
+    public function show($booking)
+    {
+        $user = Auth::user();
+        $claim = \App\Models\BookingClaim::where('claimable_type', \App\Models\HotelBooking::class)
+            ->where('claimable_id', $booking)
+            ->where('traveler_id', $user->id)
+            ->first();
+        if (!$claim) abort(404);
+        $booking = \App\Models\HotelBooking::with(['provider'])->findOrFail($booking);
+        return view('traveler.hotel.claim-show', ['booking' => $booking, 'claim' => $claim]);
+    }
 }

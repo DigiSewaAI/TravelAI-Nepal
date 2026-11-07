@@ -198,4 +198,16 @@ class ArtCraftClaimController extends Controller
             ]);
         } catch (\Exception $e) { \Log::warning('ArtCraft event log failed', ['error' => $e->getMessage()]); }
     }
+
+    public function show($order)
+    {
+        $user = Auth::user();
+        $claim = \App\Models\BookingClaim::where('claimable_type', \App\Models\CustomOrder::class)
+            ->where('claimable_id', $order)
+            ->where('traveler_id', $user->id)
+            ->first();
+        if (!$claim) abort(404);
+        $order = \App\Models\CustomOrder::findOrFail($order);
+        return view('traveler.artcraft.claim-show', ['order' => $order, 'claim' => $claim]);
+    }
 }
