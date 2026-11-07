@@ -27,11 +27,166 @@
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .admin-footer { border-top: 1px solid #e5e7eb; background: white; padding: 0.75rem 1.5rem; }
     </style>
+
+<!-- ADMIN MOBILE SIDEBAR FIX -->
+<style id="admin-mobile-sidebar-fix">
+    /* Mobile: Sidebar slides in from left */
+    @media (max-width: 1023px) {
+        #adminSidebar {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            height: 100vh !important;
+            z-index: 50 !important;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            width: 16rem !important; /* Same as w-64 */
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        #adminSidebar.open {
+            transform: translateX(0) !important;
+        }
+        /* Ensure main content takes full width on mobile */
+        .flex-1.flex.flex-col.overflow-hidden {
+            width: 100vw !important;
+        }
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('adminSidebarOverlay');
+        const hamburger = document.getElementById('adminHamburger');
+
+        if (hamburger && sidebar && overlay) {
+            hamburger.addEventListener('click', function() {
+                sidebar.classList.add('open');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            });
+
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+        }
+    });
+</script>
+
+<!-- ADMIN HEADER CLEAN FIX -->
+<style id="admin-header-clean-fix">
+@media (max-width: 1023px) {
+    /* 1. Hide duplicate logo in header (Sidebar has one) */
+    header .flex.items-center.space-x-3 > img[alt="TravelAI Nepal"] {
+        display: none !important;
+    }
+
+    /* 2. Reduce header padding for more room */
+    header {
+        padding: 10px 12px !important;
+    }
+
+    /* 3. Make the "Dashboard" title smaller */
+    header h1 {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        margin-left: 4px !important;
+        max-width: 140px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* 4. Add proper spacing between right-side items */
+    header .flex.items-center.gap-3 {
+        gap: 8px !important;
+        margin-left: auto !important;
+    }
+
+    /* 5. Make admin name smaller (keep the icon) */
+    header .flex.items-center.gap-3 > span {
+        font-size: 12px !important;
+        max-width: 90px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* 6. Notification bell icon - slightly smaller */
+    header #adminNotifToggle {
+        padding: 6px !important;
+    }
+    header #adminNotifToggle i {
+        font-size: 16px !important;
+    }
+
+    /* 7. Ensure left section doesn't push too hard */
+    header .flex.items-center.space-x-3 {
+        gap: 4px !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+    }
+}
+</style>
+
+<!-- ADMIN 3 ISSUES FIX -->
+<style id="admin-3-issues-fix">
+@media (max-width: 1023px) {
+    /* 1. Shrink Sidebar Width */
+    #adminSidebar {
+        width: 220px !important; /* Reduced from 256px (w-64) */
+    }
+    #adminSidebar .sidebar-link {
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+    }
+
+    /* 2. Notification Panel - Center on screen (No left cut-off) */
+    #adminNotifPanel {
+        position: fixed !important;
+        top: 65px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: 90vw !important;
+        max-width: 340px !important;
+        z-index: 99999 !important;
+        box-sizing: border-box !important;
+    }
+}
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileToggle = document.getElementById('adminProfileToggle');
+        const profilePanel = document.getElementById('adminProfilePanel');
+        const profileWrapper = document.getElementById('adminProfileWrapper');
+
+        if (profileToggle && profilePanel) {
+            profileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profilePanel.classList.toggle('hidden');
+                // Close notification if open
+                const notifPanel = document.getElementById('adminNotifPanel');
+                if (notifPanel) notifPanel.classList.add('hidden');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!profileWrapper.contains(e.target)) {
+                    profilePanel.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 </head>
 <body>
+    <div id="adminSidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
     <div class="flex h-screen">
         <!-- ===== SIDEBAR ===== -->
-        <div class="w-64 bg-white border-r shadow-sm p-4 flex flex-col overflow-y-auto">
+        <div id="adminSidebar" class="w-64 bg-white border-r shadow-sm p-4 flex flex-col overflow-y-auto">
             <!-- 🔥 LOGO (Text + Icon → Image + Text) -->
             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2 mb-6">
                 <img src="{{ asset('images/logo.png') }}"
@@ -213,7 +368,10 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header (Logo + Admin Name) -->
             <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm">
-    <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3">
+        <button type="button" id="adminHamburger" class="lg:hidden text-gray-600 hover:text-gray-900 mr-2" aria-label="Open menu">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
         <img src="{{ asset('images/logo.png') }}"
              alt="TravelAI Nepal"
              class="h-8 w-auto">
@@ -236,10 +394,25 @@
                 </div>
             </div>
         </div>
-        <span class="text-sm text-gray-600">
-            <i class="fas fa-user-circle text-lg mr-1"></i>
-            {{ Auth::user()->name ?? 'Admin' }}
-        </span>
+        <div class="relative" id="adminProfileWrapper">
+            <button type="button" id="adminProfileToggle" class="flex items-center gap-2 text-sm text-gray-600 focus:outline-none">
+                <i class="fas fa-user-circle text-lg"></i>
+                <span class="hidden sm:inline">{{ Auth::user()->name ?? 'Admin' }}</span>
+                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+            </button>
+            <div id="adminProfilePanel" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div class="px-4 py-3 border-b">
+                    <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name ?? 'Admin' }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email ?? '' }}</p>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </header>
 
