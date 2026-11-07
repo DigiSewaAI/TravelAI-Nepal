@@ -9,8 +9,8 @@
         <form action="{{ route('traveler.individual.claim.initiate') }}" method="POST">
             @csrf
             <div style="margin-bottom:14px;">
-                <label style="font-size:13px; font-weight:700; color:#374151; display:block; margin-bottom:6px;">Booking ID *</label>
-                <input type="text" name="booking_id" required placeholder="e.g. 12" style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
+                <label style="font-size:13px; font-weight:700; color:#374151; display:block; margin-bottom:6px;">Booking ID (e.g. IND-2026-0007) *</label>
+                <input type="text" name="booking_id" required placeholder="IND-2026-0007" style="width:100%; padding:12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px;">
             </div>
             <div style="margin-bottom:16px;">
                 <label style="font-size:13px; font-weight:700; color:#374151; display:block; margin-bottom:6px;">Email Address *</label>

@@ -15,7 +15,7 @@
             @csrf
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">{{ __('messages.artcraft_order_id') }}</label>
-                <input type="number" name="order_id" value="{{ old('order_id') }}" required min="1"
+                <input type="text" name="order_id" value="{{ old('order_id') }}" required min="1"
                        placeholder="e.g. 1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
                 <p class="text-xs text-slate-500 mt-1">{{ __('messages.artcraft_order_id_hint') }}</p>
             </div>

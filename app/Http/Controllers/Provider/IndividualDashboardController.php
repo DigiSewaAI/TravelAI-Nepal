@@ -147,6 +147,15 @@ class IndividualDashboardController extends Controller
             'status' => 'pending',
         ]);
 
+        // ✅ Send email notification to client (if email provided)
+        if ($booking && !empty($booking->customer_email)) {
+            try {
+                \Mail::to($booking->customer_email)->send(new \App\Mail\IndividualBookingCreatedMail($booking));
+                \Log::info('IndividualBookingCreatedMail sent', ['booking' => $booking->id, 'email' => $booking->customer_email]);
+            } catch (\Throwable $e) {
+                \Log::error('IndividualBookingCreatedMail FAILED', ['booking' => $booking->id, 'error' => $e->getMessage()]);
+            }
+        }
         return back()->with('success', __('messages.assignment_created_success'));
     }
 
@@ -262,13 +271,6 @@ class IndividualDashboardController extends Controller
 
         $chartData = [];
         // Send email notification to client
-        if ($booking && $booking->customer_email) {
-            try {
-                \Mail::to($booking->customer_email)->send(new \App\Mail\IndividualBookingCreatedMail($booking));
-            } catch (\Exception $e) {
-                \Log::error('IndividualBookingCreatedMail failed', ['booking_id' => $booking->id, 'error' => $e->getMessage()]);
-            }
-        }
         foreach ($days as $date) {
             $chartData[] = [
                 'day' => \Carbon\Carbon::parse($date)->format('D'),

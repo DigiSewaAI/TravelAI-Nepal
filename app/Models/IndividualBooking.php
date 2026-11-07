@@ -17,4 +17,21 @@ class IndividualBooking extends Model
     ];
 
     public function provider() { return $this->belongsTo(Provider::class); }
+
+    /**
+     * Auto-generate booking_number on create.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (empty($model->booking_number)) {
+                $year = date('Y');
+                $lastId = static::whereYear('created_at', $year)->max('id') ?? 0;
+                $nextNum = str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
+                $model->booking_number = 'IND-' . $year . '-' . $nextNum;
+            }
+        });
+    }
 }

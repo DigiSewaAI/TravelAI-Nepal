@@ -34,11 +34,18 @@ class ArtCraftClaimController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'order_id' => 'required|integer|min:1',
+            'order_id' => 'required|string|min:1',
             'email' => 'required|email|max:150',
         ]);
 
-        $order = CustomOrder::find((int) $validated['order_id']);
+        // Accept both booking_number (ART-YYYY-XXXX) or numeric id
+        $orderInput = trim($validated['order_id'] ?? $validated['order_number'] ?? '');
+        $order = CustomOrder::where(function ($q) use ($orderInput) {
+            $q->where('booking_number', $orderInput);
+            if (is_numeric($orderInput)) {
+                $q->orWhere('id', (int) $orderInput);
+            }
+        })->first();
 
         try {
             $rateLimiter->assertCanAttempt($user->id, CustomOrder::class, $order->id ?? 0, $request->ip());
@@ -89,7 +96,7 @@ class ArtCraftClaimController extends Controller
 
         try {
             \Mail::raw(
-                "Your TravelAI Nepal ArtCraft order verification code is: {$otp}\n\nExpires in 5 minutes.\nOrder ID: #{$order->id}",
+                "Your TravelAI Nepal ArtCraft order verification code is: {$otp}\n\nExpires in 5 minutes.\nOrder ID: {$order->booking_number}",
                 fn($m) => $m->to($inputEmail)->subject('TravelAI Nepal — ArtCraft Order Verification')
             );
         } catch (\Exception $e) {

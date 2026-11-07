@@ -7,6 +7,7 @@
             <div>
                 <div style="font-size:13px; font-weight:700; color:#3730a3; text-transform:uppercase;">🧑‍💼 {{ ucfirst($booking->service_type) }} Booking</div>
                 <h1 style="font-size:24px; font-weight:800; color:#111827; margin:6px 0;">{{ $booking->title }}</h1>
+                <div style="font-size: 14px; color: #6b7280; margin-top: 6px; font-weight: 600;">📋 ID: <span style="color:#3730a3; font-weight: 800;">{{ $booking->booking_number ?? ('#' . $booking->id) }}</span></div>
                 @if($booking->start_date)<p style="color:#3730a3; font-size:14px; margin:0;">📅 {{ \Carbon\Carbon::parse($booking->start_date)->format('M d, Y') }}</p>@endif
             </div>
             <span style="background:rgba(255,255,255,0.7); color:#3730a3; padding:6px 16px; border-radius:999px; font-size:13px; font-weight:700;">{{ ucfirst($booking->status) }}</span>

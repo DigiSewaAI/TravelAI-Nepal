@@ -7,6 +7,8 @@
             <div>
                 <div style="font-size:13px; font-weight:700; color:#9f1239; text-transform:uppercase;">🎨 ArtCraft Order</div>
                 <h1 style="font-size:24px; font-weight:800; color:#111827; margin:6px 0;">{{ ucfirst($order->type ?? 'ArtCraft') }} · {{ $order->client_name ?? 'Client' }}</h1>
+                <div style="font-size: 14px; color: #6b7280; margin-top: 6px; font-weight: 600;">📋 ID: <span style="color:#9f1239; font-weight: 800;">{{ $order->booking_number ?? ('#' . $order->id) }}</span></div>
+                <div style="font-size:14px; color:#6b7280; margin-top:4px;">ID: <strong style="color:#9f1239;">{{ $order->booking_number ?? ('#' . $order->id) }}</strong></div>
                 @if($order->deadline)<p style="color:#9f1239; font-size:14px; margin:0;">📅 Due: {{ \Carbon\Carbon::parse($order->deadline)->format('M d, Y') }}</p>@endif
             </div>
             <span style="background:rgba(255,255,255,0.7); color:#9f1239; padding:6px 16px; border-radius:999px; font-size:13px; font-weight:700;">{{ ucfirst($order->status) }}</span>

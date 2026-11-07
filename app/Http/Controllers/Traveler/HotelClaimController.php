@@ -34,11 +34,18 @@ class HotelClaimController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'booking_id' => 'required|integer|min:1',
+            'booking_id' => 'required|string|min:1',
             'email' => 'required|email|max:150',
         ]);
 
-        $booking = HotelBooking::find((int) $validated['booking_id']);
+        // Accept both booking_number (HTL-YYYY-XXXX) or numeric id
+        $bookingInput = trim($validated['booking_id']);
+        $booking = HotelBooking::where(function ($q) use ($bookingInput) {
+            $q->where('booking_number', $bookingInput);
+            if (is_numeric($bookingInput)) {
+                $q->orWhere('id', (int) $bookingInput);
+            }
+        })->first();
 
         try {
             $rateLimiter->assertCanAttempt($user->id, HotelBooking::class, $booking->id ?? 0, $request->ip());
@@ -89,7 +96,7 @@ class HotelClaimController extends Controller
 
         try {
             \Mail::raw(
-                "Your TravelAI Nepal hotel booking verification code is: {$otp}\n\nExpires in 5 minutes.\nBooking ID: #{$booking->id}",
+                "Your TravelAI Nepal hotel booking verification code is: {$otp}\n\nExpires in 5 minutes.\nBooking ID: {$booking->booking_number}",
                 fn($m) => $m->to($inputEmail)->subject('TravelAI Nepal — Hotel Booking Verification')
             );
         } catch (\Exception $e) {

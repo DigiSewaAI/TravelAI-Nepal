@@ -106,6 +106,8 @@
                         <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
                             <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🎨 ArtCraft</div>
                             <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ ucfirst($artOrder->type) }} · {{ $artOrder->client_name }}</div>
+                            <div style="font-size: 10px; opacity: 0.75; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $artOrder->booking_number ?? ('#' . $artOrder->id) }}</div>
+                            <div style="font-size: 10px; opacity: 0.75; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $artOrder->booking_number ?? ('#' . $artOrder->id) }}</div>
                             <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
                                 NPR {{ number_format($artOrder->budget, 2) }}@if($artOrder->deadline) · Due: {{ \Carbon\Carbon::parse($artOrder->deadline)->format('M d, Y') }}@endif
                             </div>
@@ -231,6 +233,7 @@
                         <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #fff;">
                             <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🏨 {{ __('messages.my_trips_hotel') }}</div>
                             <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $hotelBooking->guest_name ?? 'Guest' }}</div>
+                            <div style="font-size: 10px; opacity: 0.75; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $hotelBooking->booking_number ?? ('#' . $hotelBooking->id) }}</div>
                             <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
                                 {{ $hotelBooking->check_in_date ? \Carbon\Carbon::parse($hotelBooking->check_in_date)->format('M d, Y') : '' }}@if($hotelBooking->nights) · {{ $hotelBooking->nights }} nights @endif
                             </div>
@@ -288,6 +291,7 @@
                         <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #3730a3;">
                             <div style="font-size: 12px; font-weight: 700; opacity: 0.95;">🧑‍💼 {{ ucfirst($indBooking->service_type) }}</div>
                             <div style="font-weight: 700; font-size: 15px; margin-top: 6px;">{{ $indBooking->title }}</div>
+                            <div style="font-size: 10px; opacity: 0.75; margin-top: 2px;">{{ $indBooking->booking_number ?? ('#' . $indBooking->id) }}</div>
                             <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
                                 {{ $indBooking->start_date ? \Carbon\Carbon::parse($indBooking->start_date)->format('M d, Y') : '' }} · {{ $indBooking->duration }}
                             </div>

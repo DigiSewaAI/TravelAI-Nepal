@@ -19,7 +19,7 @@
 
         <div style="background: #e0e7ff; border: 2px solid #6366f1; border-radius: 12px; padding: 20px; margin: 20px 0;">
             <div style="font-size: 12px; color: #3730a3; text-transform: uppercase; font-weight: bold; margin-bottom: 8px;">Booking ID</div>
-            <div style="font-size: 24px; font-weight: bold; color: #3730a3; letter-spacing: 1px;">#{{ $booking->id }}</div>
+            <div style="font-size: 24px; font-weight: bold; color: #3730a3; letter-spacing: 1px;">{{ $booking->booking_number ?? '#' . $booking->id }}</div>
         </div>
 
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -45,7 +45,7 @@
                 <li>Login: <a href="{{ $loginUrl }}" style="color: #2563eb;">{{ $loginUrl }}</a></li>
                 <li>Go to <strong>Traveler Dashboard → "Claim your bookings"</strong></li>
                 <li>Click <strong>"Claim Individual Booking"</strong></li>
-                <li>Enter Booking ID: <strong>{{ $booking->id }}</strong></li>
+                <li>Enter Booking ID: <strong>{{ $booking->booking_number ?? $booking->id }}</strong></li>
                 <li>Enter this email address</li>
                 <li>You'll receive a 6-digit OTP to verify</li>
             </ol>
@@ -65,7 +65,7 @@
                 <li>Verify your email and login</li>
                 <li>Go to <strong>Traveler Dashboard → "Claim your bookings"</strong></li>
                 <li>Click <strong>"Claim Individual Booking"</strong></li>
-                <li>Enter Booking ID: <strong>{{ $booking->id }}</strong></li>
+                <li>Enter Booking ID: <strong>{{ $booking->booking_number ?? $booking->id }}</strong></li>
             </ol>
             <div style="text-align: center; margin: 25px 0;">
                 <a href="{{ $registerUrl }}" style="display: inline-block; background: #2563eb; color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">Create Free Account</a>

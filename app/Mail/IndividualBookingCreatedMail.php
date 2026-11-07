@@ -20,7 +20,7 @@ class IndividualBookingCreatedMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Your TravelAI Nepal Booking ID: #' . $this->booking->id)
+        return $this->subject('Your TravelAI Nepal Booking ID: ' . ($this->booking->booking_number ?? '#' . $this->booking->id))
             ->view('emails.individual-booking-created')
             ->with([
                 'booking' => $this->booking,

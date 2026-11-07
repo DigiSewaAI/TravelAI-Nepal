@@ -37,9 +37,14 @@ class IndividualClaimController extends Controller
             return back()->withErrors(['email' => 'This email does not match your logged-in account.'])->withInput();
         }
 
-        $booking = IndividualBooking::where('id', $validated['booking_id'])
-            ->where('customer_email', $validated['email'])
-            ->first();
+        // Accept either booking_number (IND-YYYY-XXXX) or numeric id
+        $bookingIdInput = trim($validated['booking_id']);
+        $booking = IndividualBooking::where(function ($q) use ($bookingIdInput) {
+            $q->where('booking_number', $bookingIdInput);
+            if (is_numeric($bookingIdInput)) {
+                $q->orWhere('id', (int) $bookingIdInput);
+            }
+        })->where('customer_email', $validated['email'])->first();
 
         if (!$booking) {
             return back()->withErrors(['error' => __('messages.claim_err_not_found')])->withInput();

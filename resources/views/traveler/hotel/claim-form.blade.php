@@ -15,7 +15,7 @@
             @csrf
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">{{ __('messages.hotel_booking_id') }}</label>
-                <input type="number" name="booking_id" value="{{ old('booking_id') }}" required min="1"
+                <input type="text" name="booking_id" value="{{ old('booking_id') }}" required min="1"
                        placeholder="e.g. 16" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
                 <p class="text-xs text-slate-500 mt-1">{{ __('messages.hotel_booking_id_hint') }}</p>
             </div>

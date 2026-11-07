@@ -7,6 +7,8 @@
             <div>
                 <div style="font-size:13px; font-weight:700; color:#5b21b6; text-transform:uppercase;">🏨 Hotel Booking</div>
                 <h1 style="font-size:24px; font-weight:800; color:#111827; margin:6px 0;">{{ $booking->guest_name ?? 'Guest' }}</h1>
+                <div style="font-size: 14px; color: #6b7280; margin-top: 6px; font-weight: 600;">📋 ID: <span style="color:#5b21b6; font-weight: 800;">{{ $booking->booking_number ?? ('#' . $booking->id) }}</span></div>
+                <div style="font-size:14px; color:#6b7280; margin-top:4px;">ID: <strong style="color:#5b21b6;">{{ $booking->booking_number ?? ('#' . $booking->id) }}</strong></div>
                 @if($booking->check_in_date)
                 <p style="color:#5b21b6; font-size:14px; margin:0;">📅 {{ \Carbon\Carbon::parse($booking->check_in_date)->format('M d, Y') }}{{ $booking->check_out_date ? ' → ' . \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : '' }}</p>
                 @endif
