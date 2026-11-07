@@ -144,6 +144,75 @@
     }
 }
 </style>
+
+<!-- LANDSCAPE SIDEBAR OVERLAP FIX (ALL CATEGORIES) -->
+<style id="landscape-sidebar-fix-all">
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 1. Make entire sidebar scrollable */
+    .sidebar {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* 2. Remove auto-margin pushing widget to bottom */
+    .occ-card, .stock-card, .widget-card {
+        margin-top: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* 3. Nav should NOT flex-collapse */
+    .nav {
+        flex: none !important;
+        overflow-y: visible !important;
+        max-height: none !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* 4. Compact elements for small height */
+    .brand { padding-bottom: 10px !important; }
+    .user-box { margin-top: 10px !important; }
+    .nav a { padding: 8px 10px !important; font-size: 12px !important; }
+    .nav-label { padding: 10px 10px 6px !important; font-size: 9px !important; }
+    .nav-logout { padding: 8px 10px !important; font-size: 12px !important; margin-top: 6px !important; }
+}
+</style>
+
+
+
+<!-- ARTCRAFT ARTIST CARD MOBILE FIX -->
+<style id="artcraft-artist-card-fix">
+@media (max-width: 767px) and (orientation: portrait) {
+    /* Target the actual artist-card element */
+    .artist-card {
+        padding: 10px !important;
+        margin-top: 10px !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+        border-radius: 12px !important;
+    }
+
+    /* Compact avatar */
+    .artist-card .artist-avatar,
+    .artist-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 16px !important;
+        margin: 0 auto 6px !important;
+    }
+
+    /* Compact text inside */
+    .artist-card h1, .artist-card h2, .artist-card h3,
+    .artist-card p, .artist-card span {
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        margin: 2px 0 !important;
+    }
+    .artist-card .u-name, .artist-card .u-role {
+        font-size: 11px !important;
+    }
+}
+</style>
 </head>
 <body>
 <div class="overlay" id="overlay"></div>

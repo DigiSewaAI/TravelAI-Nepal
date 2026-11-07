@@ -140,6 +140,39 @@
     }
 }
 </style>
+
+<!-- LANDSCAPE SIDEBAR OVERLAP FIX (ALL CATEGORIES) -->
+<style id="landscape-sidebar-fix-all">
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 1. Make entire sidebar scrollable */
+    .sidebar {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* 2. Remove auto-margin pushing widget to bottom */
+    .occ-card, .stock-card, .widget-card {
+        margin-top: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* 3. Nav should NOT flex-collapse */
+    .nav {
+        flex: none !important;
+        overflow-y: visible !important;
+        max-height: none !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* 4. Compact elements for small height */
+    .brand { padding-bottom: 10px !important; }
+    .user-box { margin-top: 10px !important; }
+    .nav a { padding: 8px 10px !important; font-size: 12px !important; }
+    .nav-label { padding: 10px 10px 6px !important; font-size: 9px !important; }
+    .nav-logout { padding: 8px 10px !important; font-size: 12px !important; margin-top: 6px !important; }
+}
+</style>
 </head>
 <body>
 <div class="overlay" id="overlay"></div>
