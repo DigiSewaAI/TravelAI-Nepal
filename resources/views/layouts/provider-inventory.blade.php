@@ -150,6 +150,9 @@
     }
 }
 </style>
+<style id="global-overflow-guard">
+html, body { overflow-x: hidden !important; max-width: 100vw !important; }
+</style>
 </head>
 <body>
 <div class="overlay" id="overlay"></div>

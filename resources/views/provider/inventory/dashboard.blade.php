@@ -327,6 +327,53 @@
         }
     });
 </script>
+
+<!-- INVENTORY MOBILE SAFE FIX -->
+<style id="inventory-mobile-safe-fix">
+@media (max-width: 767px) {
+    /* 1. Stop the whole page from scrolling horizontally */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+    .main {
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        padding: 12px !important; /* Reduce padding to give table more room */
+    }
+
+    /* 2. Table: Allow horizontal scroll ONLY inside the table wrapper */
+    .tbl-wrap {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 8px !important;
+    }
+    .tbl {
+        min-width: 600px !important; /* Force table to be wider than screen so it scrolls inside */
+    }
+
+    /* 3. Action Buttons: Use flexbox to wrap if needed (NO nowrap) */
+    .tbl td:last-child {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+        padding: 10px !important;
+    }
+    .act-btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        margin: 0 !important; /* Flexbox gap handles spacing */
+    }
+    
+    /* 4. Header Spacing */
+    .topbar h2 { margin-bottom: 4px !important; }
+    .topbar p { margin-top: 0 !important; font-size: 12px !important; }
+}
+</style>
 @endsection
 
 @push('inv-scripts')
