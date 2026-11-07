@@ -10,6 +10,8 @@ return [
     'transport_enabled'  => env('TRANSPORT_CLAIM_ENABLED', false),
     'hotel_enabled'      => env('HOTEL_CLAIM_ENABLED', false),
     'artcraft_enabled'   => env('ARTCRAFT_CLAIM_ENABLED', false),
+    'moneychanger_enabled' => env('MONEYCHANGER_CLAIM_ENABLED', true),
+    'individual_enabled' => env('INDIVIDUAL_CLAIM_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -63,5 +65,7 @@ return [
         \App\Models\TransportBooking::class => 'transport',
         \App\Models\HotelBooking::class     => 'hotel',
         \App\Models\CustomOrder::class      => 'artcraft',
+        \App\Models\ExchangeTransaction::class => 'moneychanger',
+        \App\Models\IndividualBooking::class => 'individual',
     ],
 ];

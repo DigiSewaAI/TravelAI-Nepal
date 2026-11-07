@@ -1,0 +1,31 @@
+@extends('layouts.traveler-v2')
+@section('content')
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <a href="{{ route('traveler.dashboard-v2') }}" style="display:inline-flex; align-items:center; gap:8px; color:#2563eb; font-weight:600; text-decoration:none; margin-bottom:20px; font-size:14px;">← Back to Dashboard</a>
+    <div style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe); border-radius:18px; padding:24px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+                <div style="font-size:13px; font-weight:700; color:#3730a3; text-transform:uppercase;">🧑‍💼 {{ ucfirst($booking->service_type) }} Booking</div>
+                <h1 style="font-size:24px; font-weight:800; color:#111827; margin:6px 0;">{{ $booking->title }}</h1>
+                @if($booking->start_date)<p style="color:#3730a3; font-size:14px; margin:0;">📅 {{ \Carbon\Carbon::parse($booking->start_date)->format('M d, Y') }}</p>@endif
+            </div>
+            <span style="background:rgba(255,255,255,0.7); color:#3730a3; padding:6px 16px; border-radius:999px; font-size:13px; font-weight:700;">{{ ucfirst($booking->status) }}</span>
+        </div>
+    </div>
+    <div style="background:#fff; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #e5e7eb;">
+        <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">📋 Booking Details</h2>
+        @if($booking->provider)<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Provider</span><span style="font-size:14px; font-weight:700;">{{ $booking->provider->name ?? 'N/A' }}</span></div>@endif
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Client</span><span style="font-size:14px; font-weight:700;">{{ $booking->client_name }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Duration</span><span style="font-size:14px; font-weight:700;">{{ $booking->duration }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0;"><span style="font-size:13px; color:#6b7280;">Pax</span><span style="font-size:14px; font-weight:700;">{{ $booking->pax }}</span></div>
+    </div>
+    <div style="background:#fff; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #e5e7eb;">
+        <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">💰 Amount</h2>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #e5e7eb;"><span style="font-size:16px; font-weight:800;">Total</span><span style="font-size:18px; font-weight:800; color:#059669;">NPR {{ number_format($booking->amount, 2) }}</span></div>
+    </div>
+    <div style="background:#ecfdf5; border-radius:16px; padding:16px; margin-bottom:20px; border:1px solid #a7f3d0;">
+        <p style="font-size:13px; color:#065f46; margin:0; font-weight:600;">✅ Claimed on: {{ $claim->claimed_at ? $claim->claimed_at->translatedFormat('M d, Y') : 'N/A' }}</p>
+    </div>
+    <a href="{{ route('traveler.dashboard-v2') }}" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:12px; border-radius:12px; font-weight:700; text-decoration:none;">Back to Dashboard</a>
+</div>
+@endsection

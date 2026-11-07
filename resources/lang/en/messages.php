@@ -3196,10 +3196,12 @@ return array (
     'hotel_info_already_claimed' => 'You have already claimed this booking.',
 
     // ═══ Dashboard Claim Integration ═══
-    'claim_restaurant_btn' => 'Claim Restaurant Order',
-    'claim_transport_btn' => 'Claim Transport Booking',
-    'claim_hotel_btn' => 'Claim Hotel Booking',
+    'claim_restaurant_btn' => 'Claim Order',
+    'claim_transport_btn' => 'Claim Booking',
+    'claim_hotel_btn' => 'Claim Booking',
     'contact_provider_btn' => 'Contact Provider',
+    'claim_individual_btn' => 'Claim Booking',
+    'claim_moneychanger_btn' => 'Claim',
     'coming_soon_label' => 'Coming Soon',
 
     // ═══ My Trips Claim Tabs ═══
@@ -3235,5 +3237,5 @@ return array (
     'artcraft_info_otp_sent' => 'A 6-digit code has been sent.',
     'artcraft_success_verified' => 'Order successfully claimed!',
     'artcraft_info_already_claimed' => 'You have already claimed this order.',
-    'artcraft_btn' => 'Claim ArtCraft Order',
+    'artcraft_btn' => 'Claim Order',
 );

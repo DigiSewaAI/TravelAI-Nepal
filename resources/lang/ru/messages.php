@@ -2831,10 +2831,12 @@ return array (
     'hotel_info_already_claimed' => 'Вы уже подтвердили это бронирование.',
 
     // ═══ Dashboard Claim Integration ═══
-    'claim_restaurant_btn' => 'Подтвердить заказ ресторана',
-    'claim_transport_btn' => 'Подтвердить бронирование транспорта',
-    'claim_hotel_btn' => 'Подтвердить бронирование отеля',
+    'claim_restaurant_btn' => 'Получить заказ',
+    'claim_transport_btn' => 'Получить бронь',
+    'claim_hotel_btn' => 'Получить бронь',
     'contact_provider_btn' => 'Связаться с поставщиком',
+    'claim_individual_btn' => 'Получить бронь',
+    'claim_moneychanger_btn' => 'Получить',
     'coming_soon_label' => 'Скоро',
 
     // ═══ My Trips Claim Tabs ═══
@@ -2870,5 +2872,5 @@ return array (
     'artcraft_info_otp_sent' => 'Код отправлен.',
     'artcraft_success_verified' => 'Заказ подтвержден!',
     'artcraft_info_already_claimed' => 'Вы уже подтвердили заказ.',
-    'artcraft_btn' => 'Подтвердить заказ',
+    'artcraft_btn' => 'Получить заказ',
 );

@@ -239,6 +239,10 @@
                     <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.client_name') }}</label>
                     <input type="text" name="client_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="John Doe">
                 </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.client_email') ?? 'Client Email (Optional)' }}</label>
+                    <input type="email" name="customer_email" placeholder="client@example.com" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
                 <div>
                     <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.service_type') }}</label>
                     <select name="service_type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
@@ -474,6 +478,10 @@ renderChart(); renderCalendar(); renderUpcoming();
 /* ========== New Assignment Modal ========== */
 const assignmentModal = document.getElementById('assignmentModal');
 document.getElementById('newAssignmentBtn')?.addEventListener('click', () => { assignmentModal.style.display = 'flex'; });
+
+        if ({{ $errors->any() ? 'true' : 'false' }}) {
+            assignmentModal.style.display = 'flex';
+        }
 document.getElementById('closeAssignmentModal')?.addEventListener('click', () => { assignmentModal.style.display = 'none'; });
 assignmentModal?.addEventListener('click', (e) => { if (e.target === assignmentModal) assignmentModal.style.display = 'none'; });
 

@@ -2245,10 +2245,12 @@ return array (
     'hotel_info_already_claimed' => '您已认领此预订।',
 
     // ═══ Dashboard Claim Integration ═══
-    'claim_restaurant_btn' => '认领餐厅订单',
-    'claim_transport_btn' => '认领交通预订',
-    'claim_hotel_btn' => '认领酒店预订',
+    'claim_restaurant_btn' => '领取订单',
+    'claim_transport_btn' => '领取预订',
+    'claim_hotel_btn' => '领取预订',
     'contact_provider_btn' => '联系服务商',
+    'claim_individual_btn' => '领取预订',
+    'claim_moneychanger_btn' => '领取',
     'coming_soon_label' => '即将推出',
 
     // ═══ My Trips Claim Tabs ═══
@@ -2284,5 +2286,5 @@ return array (
     'artcraft_info_otp_sent' => '6 位验证码已发送।',
     'artcraft_success_verified' => '订单认领成功！',
     'artcraft_info_already_claimed' => '您已认领此订单।',
-    'artcraft_btn' => '认领订单',
+    'artcraft_btn' => '领取订单',
 );

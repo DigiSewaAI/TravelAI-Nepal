@@ -127,16 +127,18 @@ class IndividualDashboardController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:150',
             'client_name' => 'required|string|max:100',
+            'customer_email' => 'nullable|email|max:190',
             'service_type' => 'required|in:guide,porter,photographer',
             'start_date' => 'required|date',
             'duration' => 'required|string|max:50',
             'amount' => 'required|numeric|min:0',
         ]);
 
-        IndividualBooking::create([
+        $booking = IndividualBooking::create([
             'provider_id' => $provider->id,
             'service_type' => $validated['service_type'],
             'client_name' => $validated['client_name'],
+            'customer_email' => $validated['customer_email'] ?? null,
             'title' => $validated['title'],
             'pax' => 1,
             'start_date' => $validated['start_date'],
@@ -259,6 +261,14 @@ class IndividualDashboardController extends Controller
             ->groupBy('d')->pluck('v', 'd');
 
         $chartData = [];
+        // Send email notification to client
+        if ($booking && $booking->customer_email) {
+            try {
+                \Mail::to($booking->customer_email)->send(new \App\Mail\IndividualBookingCreatedMail($booking));
+            } catch (\Exception $e) {
+                \Log::error('IndividualBookingCreatedMail failed', ['booking_id' => $booking->id, 'error' => $e->getMessage()]);
+            }
+        }
         foreach ($days as $date) {
             $chartData[] = [
                 'day' => \Carbon\Carbon::parse($date)->format('D'),

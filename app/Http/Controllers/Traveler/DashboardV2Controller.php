@@ -32,6 +32,34 @@ class DashboardV2Controller extends Controller
         $data['currentLocale'] = app()->getLocale();
         $data['currentCurrency'] = session('display_currency', 'NPR');
 
+        // ═══ Claimed MoneyChanger & Individual ═══
+        try {
+            $data['claimedMoneyChanger'] = \App\Models\ExchangeTransaction::whereIn('id',
+                \App\Models\BookingClaim::where('traveler_id', $user->id)
+                    ->where('claimable_type', \App\Models\ExchangeTransaction::class)
+                    ->pluck('claimable_id')
+            )->orderBy('created_at', 'desc')->get();
+        } catch (\Throwable $e) {
+            $data['claimedMoneyChanger'] = collect();
+        }
+
+        try {
+            $data['claimedIndividual'] = \App\Models\IndividualBooking::whereIn('id',
+                \App\Models\BookingClaim::where('traveler_id', $user->id)
+                    ->where('claimable_type', \App\Models\IndividualBooking::class)
+                    ->pluck('claimable_id')
+            )->orderBy('created_at', 'desc')->get();
+        } catch (\Throwable $e) {
+            $data['claimedIndividual'] = collect();
+        }
+
+        // Add counts to claimedCounts (merge with existing if any)
+        if (!isset($data['claimedCounts'])) {
+            $data['claimedCounts'] = [];
+        }
+        $data['claimedCounts']['moneychanger'] = $data['claimedMoneyChanger']->count();
+        $data['claimedCounts']['individual'] = $data['claimedIndividual']->count();
+
         // Exchange rates (5 currencies, live)
         try {
             $data['exchangeRates'] = DB::table('exchange_rates')

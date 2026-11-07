@@ -137,6 +137,10 @@
                     <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.customer_name') }}</label>
                     <input type="text" name="customer_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)" placeholder="John Doe">
                 </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Customer Email (Optional)</label>
+                    <input type="email" name="customer_email" placeholder="customer@example.com" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                </div>
                 <div>
                     <label style="font-size:11px;font-weight:800;color:var(--muted,#64748b);text-transform:uppercase">{{ __('messages.transaction_type') }}</label>
                     <select name="type" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line,#e8edf5);border-radius:10px;font-family:inherit;font-size:13px;background:var(--card,#fff);color:var(--text,#0f172a)">

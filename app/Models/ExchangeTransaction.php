@@ -8,7 +8,7 @@ class ExchangeTransaction extends Model
 {
     protected $fillable = [
         'transaction_number', 'provider_id', 'service_id',
-        'customer_name', 'customer_initials', 'type', 'currency_code',
+        'customer_name', 'customer_initials', 'customer_email', 'receipt_code_hash', 'receipt_code_issued_at', 'receipt_code_used_at', 'type', 'currency_code',
         'amount_foreign', 'rate', 'npr_amount', 'profit', 'status', 'notes',
     ];
 

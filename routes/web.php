@@ -876,3 +876,31 @@ Route::middleware(['auth', 'feature.flag:claim.artcraft_enabled'])
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'verify'])->name('claim.verify');
         Route::get('/claim/show/{order}', [\App\Http\Controllers\Traveler\ArtCraftClaimController::class, 'show'])->name('claim.show');
     });
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5 — MONEYCHANGER CLAIM ROUTES
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth'])
+    ->prefix('traveler/moneychanger')
+    ->name('traveler.moneychanger.claim.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\MoneyChangerClaimController::class, 'showForm'])->name('form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\MoneyChangerClaimController::class, 'initiate'])->name('initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\MoneyChangerClaimController::class, 'showVerify'])->name('verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\MoneyChangerClaimController::class, 'verify'])->name('verify');
+        Route::get('/claim/show/{tx}', [\App\Http\Controllers\Traveler\MoneyChangerClaimController::class, 'show'])->name('show');
+    });
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5 — INDIVIDUAL CLAIM ROUTES
+// ═══════════════════════════════════════════════════════
+Route::middleware(['auth'])
+    ->prefix('traveler/individual')
+    ->name('traveler.individual.claim.')
+    ->group(function () {
+        Route::get('/claim', [\App\Http\Controllers\Traveler\IndividualClaimController::class, 'showForm'])->name('form');
+        Route::post('/claim/initiate', [\App\Http\Controllers\Traveler\IndividualClaimController::class, 'initiate'])->name('initiate');
+        Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\IndividualClaimController::class, 'showVerify'])->name('verify.form');
+        Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\IndividualClaimController::class, 'verify'])->name('verify');
+        Route::get('/claim/show/{booking}', [\App\Http\Controllers\Traveler\IndividualClaimController::class, 'show'])->name('show');
+    });

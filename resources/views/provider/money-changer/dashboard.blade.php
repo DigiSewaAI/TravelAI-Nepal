@@ -289,12 +289,26 @@
             <h3 style="font-size:18px;font-weight:800;color:var(--text)">{{ __('messages.new_transaction') }}</h3>
             <button type="button" id="closeTransactionModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
+        @if($errors->any())
+        <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:12px;border-radius:10px;margin-bottom:16px;font-size:13px;">
+            <strong>⚠️ Error:</strong>
+            <ul style="margin:6px 0 0;padding-left:18px;">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <form action="{{ route('provider.money-changer.transactions.store') }}" method="POST">
             @csrf
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div style="grid-column:span 2">
                     <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.customer_name') }}</label>
                     <input type="text" name="customer_name" required style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="John Doe">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.customer_email') ?? 'Customer Email (Optional)' }}</label>
+                    <input type="email" name="customer_email" placeholder="customer@example.com" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
                 </div>
                 <div>
                     <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.transaction_type') }}</label>
@@ -519,6 +533,11 @@ const rateModal = document.getElementById('rateModal');
 const transactionModal = document.getElementById('transactionModal');
 document.getElementById('addRateBtn')?.addEventListener('click', () => { rateModal.style.display = 'flex'; });
 document.getElementById('newTransactionBtn')?.addEventListener('click', () => { transactionModal.style.display = 'flex'; });
+
+        // FIX: Auto-open modal if there are errors (NRB block, validation, etc.)
+        if ({{ $errors->any() ? 'true' : 'false' }}) {
+            transactionModal.style.display = 'flex';
+        }
 document.getElementById('closeRateModal')?.addEventListener('click', () => { rateModal.style.display = 'none'; });
 document.getElementById('closeTransactionModal')?.addEventListener('click', () => { transactionModal.style.display = 'none'; });
 rateModal?.addEventListener('click', (e) => { if (e.target === rateModal) rateModal.style.display = 'none'; });

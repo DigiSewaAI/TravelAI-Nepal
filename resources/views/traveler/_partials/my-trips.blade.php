@@ -9,6 +9,8 @@
     $claimedTransport = $claimedTransport ?? collect();
     $claimedHotel = $claimedHotel ?? collect();
     $claimedArtcraft = $claimedArtcraft ?? collect();
+    $claimedMoneyChanger = $claimedMoneyChanger ?? collect();
+    $claimedIndividual = $claimedIndividual ?? collect();
 @endphp
 
 <div class="tv2-mytrips" style="background: #fff; border-radius: 18px; padding: 24px; margin-bottom: 24px; border: 1px solid #e5e7eb;">
@@ -39,6 +41,12 @@
 
         @if($claimedArtcraft->count() > 0)
         <span style="background: #fce7f3; color: #9f1239; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🎨 ArtCraft ({{ $claimedArtcraft->count() }})</span>
+        @endif
+@if($claimedMoneyChanger->count() > 0)
+        <span style="background: #d1fae5; color: #065f46; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">💱 MoneyChanger ({{ $claimedMoneyChanger->count() }})</span>
+        @endif
+        @if($claimedIndividual->count() > 0)
+        <span style="background: #e0e7ff; color: #3730a3; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;">🧑‍💼 Guide/Individual ({{ $claimedIndividual->count() }})</span>
         @endif
     </div>
 
@@ -238,6 +246,64 @@
             </div>
         </div>
     @endif
+    {{-- ═══ Claimed MoneyChanger Transactions ═══ --}}
+    @if($claimedMoneyChanger->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                💱 MoneyChanger ({{ $claimedMoneyChanger->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedMoneyChanger as $tx)
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #d1fae5, #a7f3d0);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #065f46;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95;">💱 MoneyChanger</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px;">{{ $tx->transaction_number }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
+                                {{ $tx->created_at ? $tx->created_at->translatedFormat('M d, Y') : '' }} · {{ $tx->currency_code }} {{ number_format($tx->amount_foreign, 2) }}
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-right: 4px;">
+                                <span style="background: rgba(255,255,255,0.7); color: #065f46; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">
+                                    <span class="tv2-check">✓</span> {{ ucfirst($tx->status) }}
+                                </span>
+                                <a href="{{ route('traveler.moneychanger.claim.show', $tx->id) }}" style="background: rgba(255,255,255,0.95); color: #065f46; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">View</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ═══ Claimed Individual/Guide Bookings ═══ --}}
+    @if($claimedIndividual->count() > 0)
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 12px;">
+                🧑‍💼 Guide/Individual ({{ $claimedIndividual->count() }})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+                @foreach($claimedIndividual as $indBooking)
+                    <div style="border-radius: 14px; overflow: hidden; position: relative; height: 260px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #e0e7ff, #c7d2fe);"></div>
+                        <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; color: #3730a3;">
+                            <div style="font-size: 12px; font-weight: 700; opacity: 0.95;">🧑‍💼 {{ ucfirst($indBooking->service_type) }}</div>
+                            <div style="font-weight: 700; font-size: 15px; margin-top: 6px;">{{ $indBooking->title }}</div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
+                                {{ $indBooking->start_date ? \Carbon\Carbon::parse($indBooking->start_date)->format('M d, Y') : '' }} · {{ $indBooking->duration }}
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-right: 4px;">
+                                <span style="background: rgba(255,255,255,0.7); color: #3730a3; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">
+                                    <span class="tv2-check">✓</span> {{ ucfirst($indBooking->status) }}
+                                </span>
+                                <a href="{{ route('traveler.individual.claim.show', $indBooking->id) }}" style="background: rgba(255,255,255,0.95); color: #3730a3; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">View</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     @if($allOrders && $allOrders->count() > 0)
         <div style="margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">

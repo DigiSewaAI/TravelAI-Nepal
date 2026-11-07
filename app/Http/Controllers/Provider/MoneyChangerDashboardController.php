@@ -182,6 +182,7 @@ class MoneyChangerDashboardController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:100',
+            'customer_email' => 'nullable|email|max:190',
             'type' => 'required|in:buy,sell',
             'currency_code' => 'required|string|max:10',
             'amount_foreign' => 'required|numeric|min:0.01',
@@ -201,12 +202,13 @@ class MoneyChangerDashboardController extends Controller
         // Simple profit calculation (Assuming 2% margin if exact spread isn't known)
         $profit = $nprAmount * 0.02;
 
-        ExchangeTransaction::create([
+        $tx = ExchangeTransaction::create([
             'transaction_number' => 'TXN-' . strtoupper(uniqid()),
             'provider_id' => $provider->id,
             'service_id' => $provider->services()->first()->id,
             'customer_name' => $validated['customer_name'],
             'customer_initials' => collect(explode(' ', $validated['customer_name']))->map(fn($w) => strtoupper(substr($w, 0, 1)))->take(2)->join(''),
+            'customer_email' => $validated['customer_email'] ?? null,
             'type' => $validated['type'],
             'currency_code' => strtoupper($validated['currency_code']),
             'amount_foreign' => $validated['amount_foreign'],
@@ -216,6 +218,15 @@ class MoneyChangerDashboardController extends Controller
             'status' => 'completed',
         ]);
 
+        // ✅ Send email notification to customer (if email provided)
+        if ($tx && !empty($tx->customer_email)) {
+            try {
+                \Mail::to($tx->customer_email)->send(new \App\Mail\TransactionCreatedMail($tx));
+                \Log::info('TransactionCreatedMail sent', ['tx' => $tx->transaction_number, 'email' => $tx->customer_email]);
+            } catch (\Throwable $e) {
+                \Log::error('TransactionCreatedMail FAILED', ['tx' => $tx->transaction_number, 'error' => $e->getMessage()]);
+            }
+        }
         return back()->with('success', __('messages.transaction_created_success'));
     }
 
@@ -322,6 +333,7 @@ class MoneyChangerDashboardController extends Controller
             ->groupBy('d');
 
         $chartData = [];
+        // Send email notification to customer
         foreach ($days as $date) {
             $dayTx = $weeklyRaw[$date] ?? collect();
             $chartData[] = [

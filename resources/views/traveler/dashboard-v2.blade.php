@@ -34,8 +34,8 @@
                     'Restaurant' => ['flag' => 'claim.restaurant_enabled', 'route' => 'traveler.restaurant.claim.form', 'btn' => 'claim_restaurant_btn', 'icon' => '🍽️'],
                     'Transport' => ['flag' => 'claim.transport_enabled', 'route' => 'traveler.transport.claim.form', 'btn' => 'claim_transport_btn', 'icon' => '🚐'],
                     'ArtCraft' => ['flag' => 'claim.artcraft_enabled', 'route' => 'traveler.artcraft.claim.form', 'btn' => 'artcraft_btn', 'icon' => '🎨'],
-                    'MoneyChanger' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '💱'],
-                    'Individual / Guide' => ['flag' => null, 'route' => null, 'btn' => 'contact_provider_btn', 'icon' => '🧑‍💼'],
+                    'MoneyChanger' => ['flag' => 'claim.moneychanger_enabled', 'route' => 'traveler.moneychanger.claim.form', 'btn' => 'claim_moneychanger_btn', 'icon' => '💱'],
+                    'Individual / Guide' => ['flag' => 'claim.individual_enabled', 'route' => 'traveler.individual.claim.form', 'btn' => 'claim_individual_btn', 'icon' => '🧑‍💼'],
                 ];
             @endphp
             @foreach($claimableCategories as $cat => $meta)
@@ -47,6 +47,8 @@
                         'Restaurant' => ($claimedCounts['restaurant'] ?? 0),
                         'Transport' => ($claimedCounts['transport'] ?? 0),
                         'ArtCraft' => ($claimedCounts['artcraft'] ?? 0),
+                        'MoneyChanger' => ($claimedCounts['moneychanger'] ?? 0),
+                        'Individual / Guide' => ($claimedCounts['individual'] ?? 0),
                         default => 0,
                     };
                 @endphp

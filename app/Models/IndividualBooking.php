@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class IndividualBooking extends Model
 {
     protected $fillable = [
-        'provider_id', 'service_type', 'client_name', 'title', 'pax',
+        'provider_id', 'service_type', 'client_name', 'customer_email', 'receipt_code_hash', 'receipt_code_issued_at', 'receipt_code_used_at', 'title', 'pax',
         'start_date', 'duration', 'amount', 'status'
     ];
 

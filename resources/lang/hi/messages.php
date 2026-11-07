@@ -2234,10 +2234,12 @@ return array (
     'hotel_info_already_claimed' => 'आपने यह बुकिंग पहले ही दावा कर लिया है।',
 
     // ═══ Dashboard Claim Integration ═══
-    'claim_restaurant_btn' => 'रेस्टोरेंट ऑर्डर दावा करें',
-    'claim_transport_btn' => 'परिवहन बुकिंग दावा करें',
-    'claim_hotel_btn' => 'होटल बुकिंग दावा करें',
+    'claim_restaurant_btn' => 'ऑर्डर दावा',
+    'claim_transport_btn' => 'बुकिंग दावा',
+    'claim_hotel_btn' => 'बुकिंग दावा',
     'contact_provider_btn' => 'प्रदाता से संपर्क करें',
+    'claim_individual_btn' => 'बुकिंग दावा',
+    'claim_moneychanger_btn' => 'दावा करें',
     'coming_soon_label' => 'जल्द आ रहा है',
 
     // ═══ My Trips Claim Tabs ═══
@@ -2273,5 +2275,5 @@ return array (
     'artcraft_info_otp_sent' => '6-अंकीय कोड भेजा गया।',
     'artcraft_success_verified' => 'ऑर्डर सफलतापूर्वक दावा किया गया!',
     'artcraft_info_already_claimed' => 'आपने यह ऑर्डर पहले ही दावा किया।',
-    'artcraft_btn' => 'आर्टक्राफ्ट ऑर्डर दावा',
+    'artcraft_btn' => 'ऑर्डर दावा',
 );
