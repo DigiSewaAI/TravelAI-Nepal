@@ -13,7 +13,7 @@
     var POLL_MS = 15000;
     var enabled = localStorage.getItem('sos_audio_enabled') === 'true';
     var ackKey = 'sos_ack_latest_id';
-    var ackedLatestId = parseInt(sessionStorage.getItem(ackKey) || '0', 10);
+    var ackedLatestId = parseInt(localStorage.getItem(ackKey) || '0', 10);
     var audioCtx = null;
     var ringing = false;
     var ringInterval = null;
@@ -63,7 +63,7 @@
         document.getElementById('sosGlobalAck').addEventListener('click', function(e) {
             e.stopPropagation();
             var latest = lastLatestId || 0;
-            sessionStorage.setItem(ackKey, String(latest));
+            localStorage.setItem(ackKey, String(latest));
             ackedLatestId = latest;
             stopRinging();
         });
@@ -81,7 +81,7 @@
             return audioCtx.resume().then(function() {
                 enabled = true;
                 localStorage.setItem('sos_audio_enabled', 'true');
-                playSiren();
+                // Removed playSiren() here to prevent siren on Status Update click
             });
         } catch (e) { return Promise.resolve(); }
     }
@@ -103,7 +103,14 @@
                 } else if (data.count === 0) {
                     stopRinging();
                 }
-                if (lastLatestId === null) lastLatestId = latest;
+                // FIX: Auto-acknowledge existing alerts on first load
+                if (lastLatestId === null) {
+                    lastLatestId = latest;
+                    if (ackedLatestId === 0 && latest > 0) {
+                        ackedLatestId = latest;
+                        localStorage.setItem(ackKey, String(latest));
+                    }
+                }
             }).catch(function() {});
     }
 
