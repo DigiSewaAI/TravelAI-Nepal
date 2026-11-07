@@ -220,4 +220,28 @@ class TransportClaimController extends Controller
             \Log::warning('Transport claim event log failed', ['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Show detail of a claimed transport booking.
+     */
+    public function show($booking)
+    {
+        $user = Auth::user();
+        
+        $claim = \App\Models\BookingClaim::where('claimable_type', \App\Models\TransportBooking::class)
+            ->where('claimable_id', $booking)
+            ->where('traveler_id', $user->id)
+            ->first();
+        
+        if (!$claim) {
+            abort(404, 'Booking not found or not claimed.');
+        }
+        
+        $booking = \App\Models\TransportBooking::with(['provider', 'vehicle'])->findOrFail($booking);
+        
+        return view('traveler.transport.claim-show', [
+            'booking' => $booking,
+            'claim' => $claim,
+        ]);
+    }
 }

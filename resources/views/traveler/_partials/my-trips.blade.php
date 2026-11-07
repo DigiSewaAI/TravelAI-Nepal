@@ -181,9 +181,14 @@
                             <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
                                 {{ $booking->route_name ?? '' }}@if($booking->travel_date) · {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }}@endif
                             </div>
-                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                <span class="tv2-check">✓</span> {{ ucfirst($booking->status) }}
-                            </span>
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-right: 4px;">
+                                <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                    <span class="tv2-check">✓</span> {{ ucfirst($booking->status) }}
+                                </span>
+                                <a href="{{ route('traveler.transport.claim.show', $booking->id) }}" style="background: rgba(255,255,255,0.95); color: #1e293b; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">
+                                    View
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endforeach
