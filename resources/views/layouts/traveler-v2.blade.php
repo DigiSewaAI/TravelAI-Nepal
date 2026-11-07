@@ -735,6 +735,34 @@
     }
 }
 </style>
+
+<!-- TRAVELER MY TRIPS BUTTONS WRAP FIX -->
+<style id="tv2-btnwrap-fix">
+@media (max-width: 767px) {
+    /* 1. Target the action buttons and status badges in My Trips */
+    .tv2-trip-card .badge,
+    .tv2-trip-card .status,
+    .tv2-trip-card a,
+    .tv2-trip-card button,
+    .tv2-trip-card [class*="btn"] {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        min-width: max-content !important;
+    }
+
+    /* 2. Ensure the container doesn't force them to shrink */
+    .tv2-trip-card .flex {
+        flex-wrap: nowrap !important;
+    }
+    
+    /* 3. Allow the title to shrink/wrap instead of pushing buttons */
+    .tv2-trip-card .flex > div:first-child,
+    .tv2-trip-card .title {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+}
+</style>
 </head>
 <body>
 
@@ -1208,5 +1236,98 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @stack('scripts')
+
+<script id="tv2-btnwrap-js">
+document.addEventListener("DOMContentLoaded", function() {
+    if (window.innerWidth > 767) return;
+    
+    // Find all elements that look like badges or buttons in My Trips
+    const allElements = document.querySelectorAll('.tv2-trip-card *, [id*="my-trips"] *, .my-trips *');
+    allElements.forEach(el => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        if (text === 'confirmed' || text === 'view' || text === 'pending' || text === 'cancelled' || text === 'completed') {
+            el.style.setProperty('white-space', 'nowrap', 'important');
+            el.style.setProperty('flex-shrink', '0', 'important');
+            el.style.setProperty('min-width', 'max-content', 'important');
+        }
+    });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- CARD BOTTOM PADDING FIX -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if (window.innerWidth > 767) return;
+    
+    const allButtons = document.querySelectorAll('a, button, span');
+    
+    allButtons.forEach(el => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        
+        if (text === 'confirmed' || text === 'view' || text.includes('confirmed') || text.includes('view')) {
+            
+            // 1. KEEP WORKING HORIZONTAL FIX (No wrap, no squeeze)
+            el.style.setProperty('white-space', 'nowrap', 'important');
+            el.style.setProperty('flex-shrink', '0', 'important');
+            el.style.setProperty('display', 'inline-block', 'important');
+            el.style.setProperty('font-size', '11px', 'important');
+            el.style.setProperty('padding', '4px 6px', 'important');
+            
+            // 2. GAP between Confirmed and View (Working)
+            if (text === 'confirmed' || text.includes('confirmed')) {
+                el.style.setProperty('margin-right', '10px', 'important');
+            }
+            
+            // 3. THE MAIN FIX: Walk up, find the CARD, add padding-bottom
+            let ancestor = el.parentElement;
+            let depth = 0;
+            
+            while (ancestor && depth < 5) {
+                const style = window.getComputedStyle(ancestor);
+                
+                // Detect card by border-radius, box-shadow, or border
+                const hasRadius = parseFloat(style.borderRadius) > 0;
+                const hasShadow = style.boxShadow !== 'none';
+                const hasBorder = parseFloat(style.borderWidth) > 0;
+                const hasBg = style.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
+                             style.backgroundColor !== 'transparent';
+                
+                // Stop at the card
+                if ((hasRadius && (hasShadow || hasBg)) || (hasShadow && hasBorder)) {
+                    ancestor.style.setProperty('padding-bottom', '18px', 'important');
+                    ancestor.style.setProperty('box-sizing', 'border-box', 'important');
+                    console.log('[Card Fix] Found card at depth ' + depth + ': ' + (ancestor.className || ancestor.tagName));
+                    break;
+                }
+                
+                ancestor = ancestor.parentElement;
+                depth++;
+            }
+        }
+    });
+});
+</script>
 </body>
 </html>
