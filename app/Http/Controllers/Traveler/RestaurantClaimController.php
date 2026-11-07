@@ -280,4 +280,29 @@ class RestaurantClaimController extends Controller
             \Log::warning('Claim event log failed', ['error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Show detail of a claimed restaurant order.
+     */
+    public function show($order)
+    {
+        $user = Auth::user();
+        
+        // Verify the user has claimed this order
+        $claim = \App\Models\BookingClaim::where('claimable_type', \App\Models\RestaurantOrder::class)
+            ->where('claimable_id', $order)
+            ->where('traveler_id', $user->id)
+            ->first();
+        
+        if (!$claim) {
+            abort(404, 'Order not found or not claimed.');
+        }
+        
+        $order = \App\Models\RestaurantOrder::with(['provider', 'service', 'items'])->findOrFail($order);
+        
+        return view('traveler.restaurant.claim-show', [
+            'order' => $order,
+            'claim' => $claim,
+        ]);
+    }
 }

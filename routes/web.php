@@ -829,6 +829,8 @@ Route::middleware(['auth', 'feature.flag:claim.restaurant_enabled'])
             ->name('claim.verify.form');
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'verify'])
             ->name('claim.verify');
+        Route::get('/claim/show/{order}', [\App\Http\Controllers\Traveler\RestaurantClaimController::class, 'show'])
+            ->name('claim.show');
     });
 // ═══════════════════════════════════════════════════════
 // PHASE 4.2D — ADMIN RESTAURANT REISSUE

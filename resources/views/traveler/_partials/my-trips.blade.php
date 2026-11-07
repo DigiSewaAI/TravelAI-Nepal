@@ -59,12 +59,12 @@
                         <div style="font-size: 12px; font-weight: 700; opacity: 0.95; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">🏔️ {{ __('messages.tab_treks') ?? 'Treks' }}</div>
                         <div style="font-weight: 700; font-size: 15px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $trek->service->name ?? 'Trek' }}</div>
                         <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">{{ $trek->created_at->translatedFormat('M d, Y') }}</div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-right: 4px;">
                             <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
                                 <span class="tv2-check">✓</span> {{ ucfirst($trek->status) }}
                             </span>
                             <a href="{{ route('traveler.bookings.show', $trek) }}" style="background: rgba(255,255,255,0.95); color: #1e293b; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">
-                                View <span class="tv2-btn-arrow">→</span>
+                                View
                             </a>
                         </div>
                     </div>
@@ -139,9 +139,14 @@
                             <div style="font-size: 12px; opacity: 0.9; margin-top: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);">
                                 {{ $order->created_at ? $order->created_at->translatedFormat('M d, Y') : '' }} · NPR {{ number_format($order->total ?? 0, 2) }}
                             </div>
-                            <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-top: 10px; align-self: flex-start; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
-                                <span class="tv2-check">✓</span> {{ ucfirst($order->status) }}
-                            </span>
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; padding-right: 4px;">
+                                <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);">
+                                    <span class="tv2-check">✓</span> {{ ucfirst($order->status) }}
+                                </span>
+                                <a href="{{ route('traveler.restaurant.claim.show', $order->id) }}" style="background: rgba(255,255,255,0.95); color: #1e293b; padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-decoration: none;">
+                                    View
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endforeach

@@ -763,6 +763,51 @@
     }
 }
 </style>
+
+
+
+<!-- BADGE TEXT INSIDE FIX -->
+<style id="badge-text-inside-fix">
+@media (max-width: 767px) {
+    /* 1. The row with Confirmed + View */
+    .tv2-mytrips div[style*="justify-content: flex-end"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+        padding-right: 8px !important;
+    }
+
+    /* 2. The Confirmed badge - force inline-flex so content stays inside */
+    .tv2-mytrips div[style*="justify-content: flex-end"] > span {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        gap: 4px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* 3. The checkmark inside badge */
+    .tv2-mytrips div[style*="justify-content: flex-end"] > span > span {
+        display: inline !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+    }
+
+    /* 4. The View button */
+    .tv2-mytrips div[style*="justify-content: flex-end"] > a {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        line-height: 1.2 !important;
+    }
+}
+</style>
 </head>
 <body>
 
@@ -1276,58 +1321,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-<!-- CARD BOTTOM PADDING FIX -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    if (window.innerWidth > 767) return;
-    
-    const allButtons = document.querySelectorAll('a, button, span');
-    
-    allButtons.forEach(el => {
-        const text = (el.textContent || '').trim().toLowerCase();
-        
-        if (text === 'confirmed' || text === 'view' || text.includes('confirmed') || text.includes('view')) {
-            
-            // 1. KEEP WORKING HORIZONTAL FIX (No wrap, no squeeze)
-            el.style.setProperty('white-space', 'nowrap', 'important');
-            el.style.setProperty('flex-shrink', '0', 'important');
-            el.style.setProperty('display', 'inline-block', 'important');
-            el.style.setProperty('font-size', '11px', 'important');
-            el.style.setProperty('padding', '4px 6px', 'important');
-            
-            // 2. GAP between Confirmed and View (Working)
-            if (text === 'confirmed' || text.includes('confirmed')) {
-                el.style.setProperty('margin-right', '10px', 'important');
-            }
-            
-            // 3. THE MAIN FIX: Walk up, find the CARD, add padding-bottom
-            let ancestor = el.parentElement;
-            let depth = 0;
-            
-            while (ancestor && depth < 5) {
-                const style = window.getComputedStyle(ancestor);
-                
-                // Detect card by border-radius, box-shadow, or border
-                const hasRadius = parseFloat(style.borderRadius) > 0;
-                const hasShadow = style.boxShadow !== 'none';
-                const hasBorder = parseFloat(style.borderWidth) > 0;
-                const hasBg = style.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-                             style.backgroundColor !== 'transparent';
-                
-                // Stop at the card
-                if ((hasRadius && (hasShadow || hasBg)) || (hasShadow && hasBorder)) {
-                    ancestor.style.setProperty('padding-bottom', '18px', 'important');
-                    ancestor.style.setProperty('box-sizing', 'border-box', 'important');
-                    console.log('[Card Fix] Found card at depth ' + depth + ': ' + (ancestor.className || ancestor.tagName));
-                    break;
-                }
-                
-                ancestor = ancestor.parentElement;
-                depth++;
-            }
-        }
-    });
-});
-</script>
+
+
+
 </body>
 </html>
