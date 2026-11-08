@@ -1159,19 +1159,15 @@ $serviceName = $service
     // Real services like "Himalayan View Hotel" or "Sherpa Lodge" DO NOT match
     // (they lack the style keyword: Mid-Range / Budget / Luxury / Premium / Standard).
     $isSynthetic = false;
-    if (
-        $locName !== ''
-        && preg_match(
-            '/^(.+?)\s+(Mid-Range|Mid Range|Budget|Luxury|Premium|Standard)\s+(Lodge|Hotel|Guesthouse|Teahouse|Resort|Inn|Homestay)$/i',
-            $name,
-            $m
-        )
-    ) {
-        $prefix = trim($m[1]);
-        // Require prefix to be textually related to location name (double safety)
-        if (stripos($locName, $prefix) !== false || stripos($prefix, $locName) !== false) {
-            $isSynthetic = true;
-        }
+    if (preg_match(
+        '/^(.+?)\s+(Mid-Range|Mid Range|Budget|Luxury|Premium|Standard)\s+(Lodge|Hotel|Guesthouse|Teahouse|Resort|Inn|Homestay)$/i',
+        $name
+    )) {
+        // Pattern is specific enough: "{Place} {Style} {AccommodationType}"
+        // Real businesses like "Himalayan View Hotel" or "Sherpa Lodge"
+        // DO NOT match (no style keyword). This pattern uniquely identifies
+        // synthetic/auto-generated accommodation services.
+        $isSynthetic = true;
     }
 
     if ($isSynthetic) {
