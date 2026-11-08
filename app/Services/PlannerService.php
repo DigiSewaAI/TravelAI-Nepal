@@ -1149,16 +1149,45 @@ $serviceName = $service
 
     // ✅ FORMAT SERVICE HELPER (MISSING METHOD ADDED)
     protected function formatService(Service $service): array
-    {
-        return [
-            'id' => $service->id,
-            'name' => $service->name ?? 'Unknown Service',
-            'price' => (float) ($service->price ?? 0),
-            'currency' => $service->currency ?? 'NPR',
-            'provider' => $service->provider->name ?? 'TravelAI Partner',
-            'location_id' => $service->location_id,
-        ];
+{
+    $name = $service->name ?? 'Unknown Service';
+    $providerName = $service->provider->name ?? 'TravelAI Partner';
+    $locName = $service->location?->name ?? '';
+
+    // ── Synthetic accommodation detection (display-only, DB untouched) ──
+    // Pattern: "{prefix} {style} {accommodationType}" where prefix relates to location name.
+    // Real services like "Himalayan View Hotel" or "Sherpa Lodge" DO NOT match
+    // (they lack the style keyword: Mid-Range / Budget / Luxury / Premium / Standard).
+    $isSynthetic = false;
+    if (
+        $locName !== ''
+        && preg_match(
+            '/^(.+?)\s+(Mid-Range|Mid Range|Budget|Luxury|Premium|Standard)\s+(Lodge|Hotel|Guesthouse|Teahouse|Resort|Inn|Homestay)$/i',
+            $name,
+            $m
+        )
+    ) {
+        $prefix = trim($m[1]);
+        // Require prefix to be textually related to location name (double safety)
+        if (stripos($locName, $prefix) !== false || stripos($prefix, $locName) !== false) {
+            $isSynthetic = true;
+        }
     }
+
+    if ($isSynthetic) {
+        $name = "Accommodation in {$locName} (Est.)";
+        $providerName = 'Estimated';
+    }
+
+    return [
+        'id' => $service->id,                          // ✅ unchanged
+        'name' => $name,                               // ✅ display-only generic if synthetic
+        'price' => (float) ($service->price ?? 0),     // ✅ unchanged
+        'currency' => $service->currency ?? 'NPR',     // ✅ unchanged
+        'provider' => $providerName,                   // ✅ display-only 'Estimated' if synthetic
+        'location_id' => $service->location_id,        // ✅ unchanged
+    ];
+}
 
     // ==========================================
     // DAY-LEVEL SERVICE FETCHER
