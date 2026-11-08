@@ -401,7 +401,44 @@ if ($segments->isNotEmpty()) {
                 }, $day['items'] ?? []),
             ];
         }
+// ============================================================
+//  Synthetic Accommodation Sanitizer (Fix B)
+//  AI-ले service_id बिना accommodation item बनायो भने —
+//  fake business name + provider लाई generic estimate मा बदल्ने
+// ============================================================
+$waypointCache = [];
+foreach ($normalized['days'] as &$sanDay) {
+    $wpName = 'trail';
+    $wpId = $sanDay['overnight_waypoint_id'] ?? null;
+    if (!empty($wpId)) {
+        if (!isset($waypointCache[$wpId])) {
+            $wp = \App\Models\Waypoint::find($wpId);
+            $waypointCache[$wpId] = $wp ? $wp->name : null;
+        }
+        if ($waypointCache[$wpId]) {
+            $wpName = $waypointCache[$wpId];
+        }
+    }
 
+    foreach ($sanDay['items'] as &$sanItem) {
+        if (!empty($sanItem['service_id'])) {
+            continue; // real provider service — untouched
+        }
+
+        // Title: fake lodge/hotel/guesthouse name detect
+        if (!empty($sanItem['title'])
+            && preg_match('/\b(lodge|hotel|guesthouse|teahouse|resort|inn|homestay)\b/i', $sanItem['title'])) {
+            $sanItem['title'] = "Accommodation in {$wpName} (Est.)";
+        }
+
+        // Provider: fake name detect (any non-empty provider with no service_id)
+        if (!empty($sanItem['provider'])) {
+            $sanItem['provider'] = 'Estimated';
+        }
+    }
+    unset($sanItem);
+}
+unset($sanDay);
         // ============================================================
         //  Rest Day Title Override (for distance=0, altitude>=3000m)
         // ============================================================

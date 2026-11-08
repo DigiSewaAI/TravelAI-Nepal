@@ -63,7 +63,7 @@ class ItineraryGenerator
              . "Interests: " . ($data['interests'] ?? 'Not specified') . "\n\n"
              . "Create a detailed day-by-day itinerary for this trip. Include:\n"
              . "- Daily activities and sightseeing\n"
-             . "- Recommended accommodation (budget-friendly or luxury as per style)\n"
+             . "- Accommodation type and area only (e.g. 'Mid-range lodge in Phakding'). DO NOT invent or mention specific business/lodge/hotel names — only generic type + location.\n"
              . "- Local food suggestions\n"
              . "- Transport tips\n"
              . "- Estimated costs per day (show in local currency and USD if needed)\n"
