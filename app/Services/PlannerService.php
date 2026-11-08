@@ -1158,20 +1158,20 @@ $serviceName = $service
     // Pattern: "{prefix} {style} {accommodationType}" where prefix relates to location name.
     // Real services like "Himalayan View Hotel" or "Sherpa Lodge" DO NOT match
     // (they lack the style keyword: Mid-Range / Budget / Luxury / Premium / Standard).
-    $isSynthetic = false;
+        $isSynthetic = false;
+    $place = '';
     if (preg_match(
         '/^(.+?)\s+(Mid-Range|Mid Range|Budget|Luxury|Premium|Standard)\s+(Lodge|Hotel|Guesthouse|Teahouse|Resort|Inn|Homestay)$/i',
-        $name
+        $name,
+        $m
     )) {
-        // Pattern is specific enough: "{Place} {Style} {AccommodationType}"
-        // Real businesses like "Himalayan View Hotel" or "Sherpa Lodge"
-        // DO NOT match (no style keyword). This pattern uniquely identifies
-        // synthetic/auto-generated accommodation services.
         $isSynthetic = true;
+        $place = trim($m[1]);   // "Phakding", "Namche", etc. — extracted from service name
     }
 
     if ($isSynthetic) {
-        $name = "Accommodation in {$locName} (Est.)";
+        $displayPlace = $place !== '' ? $place : ($locName !== '' ? $locName : 'trail');
+        $name = "Accommodation in {$displayPlace} (Est.)";
         $providerName = 'Estimated';
     }
 
