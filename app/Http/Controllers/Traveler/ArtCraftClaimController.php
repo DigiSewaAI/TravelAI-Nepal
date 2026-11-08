@@ -34,7 +34,7 @@ class ArtCraftClaimController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'order_id' => 'required|string|min:1',
+            'order_id' => 'required',
             'email' => 'required|email|max:150',
         ]);
 

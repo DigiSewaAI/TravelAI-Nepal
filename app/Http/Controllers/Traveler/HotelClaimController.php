@@ -34,7 +34,7 @@ class HotelClaimController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'booking_id' => 'required|string|min:1',
+            'booking_id' => 'required',
             'email' => 'required|email|max:150',
         ]);
 
