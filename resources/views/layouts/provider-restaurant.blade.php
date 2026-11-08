@@ -238,6 +238,62 @@
     }
 }
 </style>
+
+<!-- RESTAURANT ACTION BUTTONS SPACING FIX -->
+<style id="restaurant-action-buttons-fix">
+/* 1. Action cell — use flexbox with gap */
+.tbl td:last-child {
+    white-space: nowrap !important;
+}
+.tbl td:last-child form {
+    display: inline-block !important;
+    margin: 0 !important;
+}
+.tbl td:last-child .act-btn {
+    margin: 0 !important;
+}
+
+/* 2. Desktop — flex row with gap */
+.tbl td:last-child {
+    display: flex !important;
+    gap: 8px !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
+/* 3. Buttons — bigger tap targets */
+.act-btn {
+    padding: 7px 12px !important;
+    font-size: 11.5px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+}
+
+/* 4. Mobile — smaller but still separated */
+@media (max-width: 767px) {
+    .tbl td:last-child {
+        gap: 6px !important;
+        padding: 10px 8px !important;
+    }
+    .act-btn {
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+    }
+    /* Hide icon text on very small screens, show icon only */
+    @media (max-width: 375px) {
+        .act-btn span,
+        .act-btn .btn-text {
+            display: none !important;
+        }
+        .act-btn {
+            padding: 8px !important;
+        }
+    }
+}
+</style>
 </head>
 <body>
 <div class="overlay" id="overlay"></div>

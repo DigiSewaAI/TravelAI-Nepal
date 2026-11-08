@@ -113,6 +113,12 @@ class HotelDashboardController extends Controller
         ]);
 
         $room->status = $validated['status'];
+        // Auto-calculate min/max if base_price changes
+        if (isset($validated['base_price'])) {
+            $validated['min_price'] = $validated['min_price'] ?? round((float) $validated['base_price'] * 0.7, 2);
+            $validated['max_price'] = $validated['max_price'] ?? round((float) $validated['base_price'] * 1.5, 2);
+        }
+
         $room->save();
 
         return response()->json(['success' => true, 'status' => $room->status]);
@@ -467,6 +473,14 @@ public function housekeepingPage()
             ->exists();
         if ($exists) {
             return redirect()->back()->withErrors(['room_number' => 'This room number already exists.'])->withInput();
+        }
+
+        // Auto-calculate min/max from base_price if not provided
+        if (!isset($validated['min_price']) && isset($validated['base_price'])) {
+            $validated['min_price'] = round((float) $validated['base_price'] * 0.7, 2);
+        }
+        if (!isset($validated['max_price']) && isset($validated['base_price'])) {
+            $validated['max_price'] = round((float) $validated['base_price'] * 1.5, 2);
         }
 
         HotelRoom::create([
