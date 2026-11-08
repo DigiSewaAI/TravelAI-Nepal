@@ -630,6 +630,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
+    // Manual Claim Tool (Phase 5C)
+    Route::prefix('claims')->name('claims.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ClaimController::class, 'index'])->name('index');
+        Route::get('/{type}/{id}', [\App\Http\Controllers\Admin\ClaimController::class, 'show'])->name('show');
+        Route::post('/{type}/{id}/approve', [\App\Http\Controllers\Admin\ClaimController::class, 'approve'])->name('approve');
+    });
+
     // Ads — Admin moderation
     Route::prefix('ads')->name('ads.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdController::class, 'index'])->name('index');

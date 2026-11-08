@@ -211,6 +211,14 @@
                     <i class="fas fa-building w-5"></i>
                     <span>Providers</span>
                 </a>
+
+                @if(Route::has('admin.claims.index'))
+                <a href="{{ route('admin.claims.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.claims.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-check w-5 text-indigo-500"></i>
+                    <span class="flex-1">Manual Claims</span>
+                </a>
+                @endif
                                 <!-- Ads Moderation -->
                 <a href="{{ route('admin.ads.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.ads.*') ? 'active' : '' }}">
