@@ -415,6 +415,9 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/reports', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'reports'])->name('reports');
         Route::get('/security', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'security'])->name('security');
         Route::post('/toggle-availability', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'toggleAvailability'])->name('toggle-availability');
+                Route::post('/staff', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeStaff'])->name('staff.store');
+        Route::post('/insurance', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeInsurance'])->name('insurance.store');
+        Route::post('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeDocument'])->name('documents.store');
     });
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
@@ -756,6 +759,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('waypoints', \App\Http\Controllers\Admin\WaypointController::class);
     Route::resource('segments', \App\Http\Controllers\Admin\SegmentController::class);
     Route::resource('route-costs', \App\Http\Controllers\Admin\RouteCostController::class);
+
+    // ═══════════════════════════════════════════
+    // ADMIN RESCUE COMMAND CENTER (Phase 3)
+    // ═══════════════════════════════════════════
+    Route::prefix('rescue')->name('rescue.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'index'])->name('index');
+        Route::get('/sos/{sos}', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'showSos'])->name('sos.show');
+        Route::post('/sos/{sos}/dispatch', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'manualDispatch'])->name('sos.dispatch');
+    });
 });
 
 // =======================================

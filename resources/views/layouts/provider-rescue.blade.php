@@ -246,7 +246,7 @@ svg{display:block}button{font-family:inherit}
 /* Form & Modal Styles */
 .modal label{display:block;font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px;margin-top:12px}
 .modal label .req{color:var(--danger);margin-left:2px}
-.modal select,.modal input[type=text],.modal input[type=number],.modal textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--text);background:#fff;transition:border-color .16s,box-shadow .16s}
+.modal select,.modal input[type=text],.modal input[type=number],.modal input[type=tel],.modal input[type=email],.modal input[type=url],.modal textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--text);background:#fff;transition:border-color .16s,box-shadow .16s}
 .modal select:focus,.modal input:focus,.modal textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
 
 /* Responsive */

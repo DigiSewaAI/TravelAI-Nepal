@@ -263,6 +263,12 @@
         <i class="fas fa-history w-5"></i>
         <span>Audit Log</span>
     </a>
+        {{-- 🚨 NEW: Rescue Command Center Link --}}
+<a href="{{ route('admin.rescue.index') }}"
+   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.rescue.*') ? 'active' : '' }}">
+    <i class="fas fa-truck-medical w-5 text-red-500"></i>
+    <span class="flex-1">Rescue Command Center</span>
+</a>
 </div>
 @endif
 

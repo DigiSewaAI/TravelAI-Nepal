@@ -163,6 +163,57 @@ class RescueDashboardController extends Controller
         return back()->with('success', 'Pricing configuration updated successfully.');
     }
 
+    public function storeStaff(Request $request)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $staff = $rescueProvider->staff_members ?? [];
+        $staff[] = $request->validate([
+            'name'    => 'required|string|max:100',
+            'role'    => 'required|string|max:50',
+            'license' => 'nullable|string|max:50',
+            'hours'   => 'nullable|string|max:50',
+            'phone'   => 'required|string|max:20', // 🆕 Phone अनिवार्य
+        ]);
+
+        $rescueProvider->update(['staff_members' => $staff]);
+        return back()->with('success', 'Staff member added successfully.');
+    }
+
+    public function storeInsurance(Request $request)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $partners = $rescueProvider->insurance_partners ?? [];
+        $partners[] = $request->validate([
+            'name' => 'required|string|max:100',
+            'type' => 'required|string|max:50',
+            'status' => 'required|string|in:active,pending',
+        ]);
+
+        $rescueProvider->update(['insurance_partners' => $partners]);
+        return back()->with('success', 'Insurance partner added successfully.');
+    }
+
+    public function storeDocument(Request $request)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $docs = $rescueProvider->documents ?? [];
+        $docs[] = $request->validate([
+            'title' => 'required|string|max:100',
+            'issuer' => 'required|string|max:100',
+            'expiry' => 'required|string|max:50',
+            'status' => 'required|string|in:verified,pending,action_needed',
+        ]);
+
+        $rescueProvider->update(['documents' => $docs]);
+        return back()->with('success', 'Document added successfully.');
+    }
+
     public function insurance()
     {
         return view('provider.rescue.insurance', $this->sharedData());
