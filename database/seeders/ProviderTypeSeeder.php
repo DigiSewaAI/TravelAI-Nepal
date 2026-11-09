@@ -22,6 +22,7 @@ class ProviderTypeSeeder extends Seeder
             ['name' => 'Activity Provider', 'slug' => 'activity-provider'],
             ['name' => 'Local Experience', 'slug' => 'local-experience'],
             ['name' => 'Photographer', 'slug' => 'photographer'],
+            ['name' => 'Rescue Service', 'slug' => 'rescue-service'],
         ];
 
         foreach ($types as $type) {

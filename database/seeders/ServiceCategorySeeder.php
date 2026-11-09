@@ -17,6 +17,7 @@ class ServiceCategorySeeder extends Seeder
             ['name' => 'Transport', 'slug' => 'transport'],
             ['name' => 'Activity', 'slug' => 'activity'],
             ['name' => 'Experience', 'slug' => 'experience'],
+            ['name' => 'Rescue', 'slug' => 'rescue'],
         ];
 
         foreach ($categories as $cat) {

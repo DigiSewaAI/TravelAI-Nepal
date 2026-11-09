@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>{{ __('messages.register_page_title') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -158,7 +159,7 @@
                         <select name="provider_type" id="provider_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">{{ __('messages.select_business_type') }}</option>
                             @foreach($providerTypes ?? [] as $type)
-                                <option value="{{ $type->id }}" {{ old('provider_type') == $type->id ? 'selected' : '' }}>
+                                <option value="{{ $type->id }}" data-slug="{{ $type->slug ?? '' }}" {{ old('provider_type') == $type->id ? 'selected' : '' }}>
                                     {{ $type->name }}
                                 </option>
                             @endforeach
@@ -172,6 +173,66 @@
                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                placeholder="{{ __('messages.specify_business_type_placeholder') }}">
                     </div>
+                                        {{-- ========== RESCUE PROVIDER FIELDS ========== --}}
+                    <div id="rescueFields" style="display: none;" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <h3 class="font-bold text-red-800 text-sm mb-1">
+                            <i class="fas fa-truck-medical"></i> {{ __('messages.rescue_section_title') }}
+                        </h3>
+                        <p class="text-xs text-red-700 mb-3">{{ __('messages.rescue_section_desc') }}</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_aviation_license') }}</label>
+                                <input type="text" name="aviation_license_number" value="{{ old('aviation_license_number') }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       placeholder="e.g. CAAN-2024-1234">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_medical_cert') }}</label>
+                                <input type="text" name="medical_cert_number" value="{{ old('medical_cert_number') }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       placeholder="e.g. MOH-2024-5678">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_insurance_policy') }}</label>
+                                <input type="text" name="insurance_policy_number" value="{{ old('insurance_policy_number') }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       placeholder="e.g. NPL-INS-2024-001">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_max_altitude') }}</label>
+                                <input type="number" name="max_altitude_ft" value="{{ old('max_altitude_ft') }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       placeholder="e.g. 23000" min="0" max="30000">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_coverage_radius') }}</label>
+                                <input type="number" name="coverage_radius_km" value="{{ old('coverage_radius_km', 50) }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       min="10" max="500">
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 text-xs font-bold mb-1">{{ __('messages.rescue_fleet_size') }}</label>
+                                <input type="number" name="fleet_size" value="{{ old('fleet_size', 1) }}"
+                                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                                       min="1" max="100">
+                            </div>
+                        </div>
+
+                        <div class="mt-3 flex items-center gap-2">
+                            <input type="checkbox" name="is_24_7" id="is_24_7" value="1" {{ old('is_24_7') ? 'checked' : '' }}
+                                   class="rounded">
+                            <label for="is_24_7" class="text-xs text-gray-700 font-semibold">{{ __('messages.rescue_is_24_7') }}</label>
+                        </div>
+
+                        <p class="text-xs text-red-600 mt-2 italic">{{ __('messages.rescue_optional_note') }}</p>
+                    </div>
+                    {{-- ========== END RESCUE FIELDS ========== --}}
 
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.business_description') }}</label>
@@ -253,14 +314,29 @@
                 });
             });
 
-            // Custom Type Input Toggle
+            // Custom Type Input Toggle + Rescue Fields
             const typeSelect = document.getElementById('provider_type');
             const customSection = document.getElementById('customTypeSection');
+            const rescueFields = document.getElementById('rescueFields');
 
             if (typeSelect && customSection) {
                 typeSelect.addEventListener('change', function() {
                     customSection.style.display = this.value === 'other' ? 'block' : 'none';
+
+                    // Show rescue-specific fields when rescue-service is selected
+                    if (rescueFields) {
+                        const selectedOption = typeSelect.options[typeSelect.selectedIndex];
+                        const selectedSlug = selectedOption ? (selectedOption.dataset.slug || '').toLowerCase() : '';
+                        const selectedText = selectedOption ? selectedOption.text.trim().toLowerCase() : '';
+                        const isRescue = selectedSlug === 'rescue-service' || selectedText.includes('rescue');
+                        rescueFields.style.display = isRescue ? 'block' : 'none';
+                    }
                 });
+
+                // Trigger on page load (in case old() has rescue selected)
+                if (typeSelect.value) {
+                    typeSelect.dispatchEvent(new Event('change'));
+                }
             }
 
             // Plan Card Selection

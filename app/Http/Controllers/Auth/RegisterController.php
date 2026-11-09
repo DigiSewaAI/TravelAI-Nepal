@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Plan;
 use App\Models\ProviderType;
 use App\Models\Provider;
+use App\Models\RescueProvider;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class RegisterController extends Controller
             'password' => 'required|min:6|confirmed',
             'plan' => 'nullable|exists:plans,slug',
             'phone' => 'nullable|string|max:20',
-            'billing_interval' => 'nullable|in:monthly,yearly', 
+            'billing_interval' => 'nullable|in:monthly,yearly',
         ];
 
         // If provider registration (provider_type field exists)
@@ -52,6 +53,18 @@ class RegisterController extends Controller
                 $rules['custom_provider_type'] = 'required|string|max:255';
             } else {
                 $rules['provider_type'] = 'required|exists:provider_types,id';
+
+                // Rescue-specific validation (all optional)
+                $selectedProviderType = ProviderType::find($request->provider_type);
+                if ($selectedProviderType && $selectedProviderType->slug === 'rescue-service') {
+                    $rules['aviation_license_number'] = 'nullable|string|max:100';
+                    $rules['medical_cert_number'] = 'nullable|string|max:100';
+                    $rules['insurance_policy_number'] = 'nullable|string|max:100';
+                    $rules['max_altitude_ft'] = 'nullable|integer|min:0|max:30000';
+                    $rules['coverage_radius_km'] = 'nullable|integer|min:10|max:500';
+                    $rules['fleet_size'] = 'nullable|integer|min:1|max:100';
+                    $rules['is_24_7'] = 'nullable|boolean';
+                }
             }
         }
 
@@ -72,7 +85,7 @@ class RegisterController extends Controller
                 ->with('info', __('messages.enterprise_requires_contact'));
         }
 
-        // ✅ Determine billing interval
+        // Determine billing interval
         $billingInterval = $request->input('billing_interval', 'monthly');
 
         DB::beginTransaction();
@@ -99,14 +112,12 @@ class RegisterController extends Controller
                         ['name' => $customTypeName]
                     );
 
-                    $providerTypeId = $providerType->id;
-                    Log::info("New provider type created: {$customTypeName} (ID: {$providerTypeId})");
+                    Log::info("New provider type created: {$customTypeName} (ID: {$providerType->id})");
                 } else {
                     $providerType = ProviderType::find($request->provider_type);
                     if (!$providerType) {
                         throw new \Exception('Invalid provider type selected.');
                     }
-                    $providerTypeId = $providerType->id;
                 }
 
                 // Create provider
@@ -123,9 +134,26 @@ class RegisterController extends Controller
                 ]);
 
                 // Attach provider type
-                $provider->types()->attach($providerTypeId);
+                $provider->types()->attach($providerType->id);
 
-                // ✅ Create subscription with billing interval
+                // Rescue-specific record (only if rescue-service type)
+                if ($providerType->slug === 'rescue-service') {
+                    RescueProvider::create([
+                        'provider_id'                 => $provider->id,
+                        'aviation_license_number'     => $request->filled('aviation_license_number') ? trim($request->aviation_license_number) : null,
+                        'medical_cert_number'         => $request->filled('medical_cert_number') ? trim($request->medical_cert_number) : null,
+                        'insurance_policy_number'     => $request->filled('insurance_policy_number') ? trim($request->insurance_policy_number) : null,
+                        'coverage_radius_km'          => $request->filled('coverage_radius_km') ? (int) $request->coverage_radius_km : 50,
+                        'max_altitude_ft'             => $request->filled('max_altitude_ft') ? (int) $request->max_altitude_ft : null,
+                        'fleet_size'                  => $request->filled('fleet_size') ? (int) $request->fleet_size : 1,
+                        'is_24_7'                     => $request->boolean('is_24_7'),
+                        'is_available'                => true,
+                    ]);
+
+                    Log::info("Rescue provider created: {$provider->name} (ID: {$provider->id})");
+                }
+
+                // Create subscription with billing interval
                 $isFree = $plan->isFree();
 
                 $subscriptionData = [
@@ -139,11 +167,10 @@ class RegisterController extends Controller
                 if ($isFree) {
                     $subscriptionData['status'] = 'active';
                     $subscriptionData['start_date'] = now();
-                    $subscriptionData['end_date'] = now()->addYear(); // Free plan: 1 year
+                    $subscriptionData['end_date'] = now()->addYear();
                 } else {
-                    $subscriptionData['status'] = 'pending'; // Payment required
+                    $subscriptionData['status'] = 'pending';
                     $subscriptionData['start_date'] = now();
-                    // Tentative end_date based on billing interval (activates after payment)
                     $subscriptionData['end_date'] = $billingInterval === 'yearly'
                         ? now()->addYear()
                         : now()->addMonth();
@@ -153,7 +180,7 @@ class RegisterController extends Controller
 
                 DB::commit();
 
-                // ✅ Cart Merge Fix for Provider
+                // Cart Merge Fix for Provider
                 $oldSessionId = session()->getId();
                 Auth::login($user);
                 app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
@@ -180,18 +207,17 @@ class RegisterController extends Controller
                 // Redirect based on plan
                 if ($isFree) {
                     return redirect()->route('provider.dashboard')
-                        ->with('success', '🎉 Free plan activated! Welcome to TravelAI Nepal.');
+                        ->with('success', __('messages.registration_provider_success'));
                 } else {
-                    // Redirect to payment page
                     return redirect()->route('provider.payments.show', $subscription->id)
-                        ->with('info', 'Please complete the payment to activate your subscription.');
+                        ->with('info', __('messages.registration_payment_required'));
                 }
             }
 
             // Traveler registration
             DB::commit();
-            
-            // ✅ Cart Merge Fix for Traveler
+
+            // Cart Merge Fix for Traveler
             $oldSessionId = session()->getId();
             Auth::login($user);
             app(\App\Services\CartService::class)->mergeGuestCart($user->id, $oldSessionId);
@@ -215,9 +241,9 @@ class RegisterController extends Controller
                 \Log::warning('Admin traveler-reg notify failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
             }
 
-            // ✅ Redirect intended checkout or dashboard
+            // Redirect intended checkout or dashboard
             return redirect()->intended(route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard'))
-                ->with('success', '🎉 Account created successfully! Welcome to TravelAI Nepal.');
+                ->with('success', __('messages.registration_traveler_success'));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -226,7 +252,7 @@ class RegisterController extends Controller
                 'provider_type' => $request->provider_type ?? null,
             ]);
             return back()->withErrors([
-                'error' => 'Registration failed. Please try again.'
+                'error' => __('messages.registration_failed'),
             ])->withInput();
         }
     }
