@@ -91,6 +91,61 @@ class RescueDashboardController extends Controller
             'missions' => $missions,
         ]));
     }
+        public function acceptSos(SosAlert $sos)
+    {
+        $provider = $this->getProvider();
+        
+        // 1. यदि अरू कसैले पहिले नै लक गरिसकेको छ भने रोक्ने
+        $activeLock = \App\Models\RescueDispatchLock::where('sos_alert_id', $sos->id)
+            ->where('expires_at', '>', now())
+            ->where('provider_id', '!=', $provider->id)
+            ->first();
+
+        if ($activeLock) {
+            return back()->with('error', 'This SOS has already been locked by another provider.');
+        }
+
+        // 2. आफ्नो लक बनाउने (६० सेकेन्डको)
+        \App\Models\RescueDispatchLock::updateOrCreate(
+            ['sos_alert_id' => $sos->id, 'provider_id' => $provider->id],
+            ['expires_at' => now()->addSeconds(60)]
+        );
+
+        return back()->with('success', 'SOS Accepted! Please confirm dispatch within 60 seconds.');
+    }
+
+    public function confirmDispatch(SosAlert $sos)
+    {
+        $provider = $this->getProvider();
+
+        // लक चेक गर्ने (यो लक तपाईंको हो कि होइन र एक्सपायर भएको छैन भनी)
+        $lock = \App\Models\RescueDispatchLock::where('sos_alert_id', $sos->id)
+            ->where('provider_id', $provider->id)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$lock) {
+            return back()->with('error', 'Your lock has expired. Please accept the SOS again.');
+        }
+
+        // मिसन क्रिएट गर्ने
+        \App\Models\RescueMission::create([
+            'mission_number' => 'RSC-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT),
+            'sos_alert_id'   => $sos->id,
+            'provider_id'    => $provider->id,
+            'status'         => 'accepted', // सिधै Accepted
+            'pickup_lat'     => $sos->latitude,
+            'pickup_lng'     => $sos->longitude,
+        ]);
+
+        // SOS लाई responding बनाउने
+        $sos->update(['status' => 'responding']);
+
+        // लक डिलिट गर्ने (काम सकियो)
+        $lock->delete();
+
+        return redirect()->route('provider.rescue.missions')->with('success', 'Dispatch Confirmed! Mission started.');
+    }
         public function updateMissionStatus(Request $request, \App\Models\RescueMission $mission)
     {
         $provider = $this->getProvider();

@@ -398,6 +398,8 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/dashboard', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'index'])->name('dashboard');
         Route::get('/sos', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'sosQueue'])->name('sos');
         Route::get('/missions', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'missions'])->name('missions');
+                Route::post('/sos/{sos}/accept', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'acceptSos'])->name('sos.accept');
+        Route::post('/sos/{sos}/confirm', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'confirmDispatch'])->name('sos.confirm');
                 Route::patch('/missions/{mission}/status', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateMissionStatus'])->name('missions.status');
         Route::get('/gps', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'gps'])->name('gps');
         Route::get('/audit', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'audit'])->name('audit');
