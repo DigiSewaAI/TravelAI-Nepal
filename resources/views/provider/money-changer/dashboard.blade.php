@@ -227,12 +227,13 @@
   <div class="card span-2">
     <div class="card-head">
       <div><h3>{{ __('messages.recent_transactions') }}</h3><div class="sub">{{ __('messages.latest_6_entries') }}</div></div>
-      <a href="#" class="link">{{ __('messages.view_all') }} →</a>
+      <a href="{{ url('provider/money-changer/transactions') }}" class="link">{{ __('messages.view_all') }} →</a>
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr>
           <th>{{ __('messages.customer') }}</th>
+          <th>{{ __('messages.date') ?? 'Date' }}</th>
           <th>{{ __('messages.type') }}</th>
           <th>{{ __('messages.amount') }}</th>
           <th>{{ __('messages.rate') }}</th>
@@ -470,12 +471,13 @@ function renderRates(){
 function renderTx(){
   const body = document.getElementById('txBody');
   if (!RECENT.length){
-    body.innerHTML = '<tr><td colspan="7"><p class="empty">'+T.no_tx+'</p></td></tr>';
+    body.innerHTML = '<tr><td colspan="8"><p class="empty">'+T.no_tx+'</p></td></tr>';
     return;
   }
   body.innerHTML = RECENT.map(t => `
     <tr>
       <td><div class="cur"><div class="flag" style="font-size:11px;font-weight:800;color:#475569">${t.initials || '??'}</div><div class="cur-code">${t.name}</div></div></td>
+      <td style="color:#64748b;font-size:12px">${t.created_at || '—'}</td>
       <td><span class="pill ${t.type==='Buy'?'pill-buy':'pill-sell'}">${TYPE_LABEL[t.type] || t.type}</span></td>
       <td class="num">${t.amt} <span style="color:#94a3b8;font-size:11px">${t.cur}</span></td>
       <td class="num" style="color:#64748b">${t.rate}</td>

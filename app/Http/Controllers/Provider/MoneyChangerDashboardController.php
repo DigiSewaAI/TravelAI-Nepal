@@ -93,15 +93,16 @@ class MoneyChangerDashboardController extends Controller
             ->limit(6)
             ->get()
             ->map(fn($t) => [
-                'db_id'    => $t->id,
-                'name'     => $t->customer_name,
-                'initials' => $t->customer_initials ?? '',
-                'type'     => ucfirst($t->type),
-                'cur'      => $t->currency_code,
-                'amt'      => number_format((float) $t->amount_foreign, 2),
-                'rate'     => number_format((float) $t->rate, 2),
-                'total'    => number_format((float) $t->npr_amount, 0),
-                'status'   => ucfirst($t->status),
+                'db_id'      => $t->id,
+                'name'       => $t->customer_name,
+                'initials'   => $t->customer_initials ?? '',
+                'type'       => ucfirst($t->type),
+                'cur'        => $t->currency_code,
+                'amt'        => number_format((float) $t->amount_foreign, 2),
+                'rate'       => number_format((float) $t->rate, 2),
+                'total'      => number_format((float) $t->npr_amount, 0),
+                'status'     => ucfirst($t->status),
+                'created_at' => $t->created_at ? $t->created_at->format('M d, Y · H:i') : '',
             ]);
 
         // Live USD rate for sidebar
@@ -199,8 +200,25 @@ class MoneyChangerDashboardController extends Controller
 
         $nprAmount = $validated['amount_foreign'] * $validated['rate'];
 
-        // Simple profit calculation (Assuming 2% margin if exact spread isn't known)
-        $profit = $nprAmount * 0.02;
+        // Actual profit calculation based on buy/sell spread
+        $rateConfig = \App\Models\ProviderExchangeRate::where('provider_id', $provider->id)
+            ->where('currency_code', strtoupper($validated['currency_code']))
+            ->where('is_active', true)
+            ->orderByDesc('effective_date')
+            ->first();
+
+        if ($rateConfig && (float) $rateConfig->buy_rate > 0 && (float) $rateConfig->sell_rate > 0) {
+            if ($validated['type'] === 'buy') {
+                // Customer sells to MC at 'rate'; MC will sell later at sell_rate
+                $profit = ((float) $rateConfig->sell_rate - (float) $validated['rate']) * (float) $validated['amount_foreign'];
+            } else {
+                // Customer buys from MC at 'rate'; MC bought at buy_rate
+                $profit = ((float) $validated['rate'] - (float) $rateConfig->buy_rate) * (float) $validated['amount_foreign'];
+            }
+        } else {
+            // Fallback: 2% margin when no rate config exists
+            $profit = $nprAmount * 0.02;
+        }
 
         $tx = ExchangeTransaction::create([
             'transaction_number' => 'TXN-' . strtoupper(uniqid()),

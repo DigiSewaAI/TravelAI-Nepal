@@ -58,6 +58,7 @@ return array (
   'no_bookings_yet' => 'No assignments found.',
   'recent_checkins' => '📍 Recent Check-ins',
   'view_all' => 'View All',
+    'date' => 'Date',
   'checkin_default' => 'Check-in',
   'checked_in' => 'Checked In',
   'view' => 'View',
