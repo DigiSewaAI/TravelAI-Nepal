@@ -27,6 +27,7 @@ class SosAlertController extends Controller
             'porter'             => 'layouts.provider-individual',
             'photographer'       => 'layouts.provider-individual',
             'money-changer'      => 'layouts.provider-money-changer',
+            'rescue-service'     => 'layouts.provider-rescue',
         ];
         return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
     }

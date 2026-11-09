@@ -77,7 +77,12 @@ class LoginController extends Controller
                         'email' => 'Your account is not linked to a provider profile. Please contact support.'
                     ]);
                 }
-                return redirect()->intended(route('provider.dashboard'));
+                // Phase 3: Redirect rescue providers to their specific dashboard
+$provider = auth()->user()?->provider 
+    ?? \App\Models\Provider::where('user_id', auth()->id())->first();
+$isRescue = $provider?->types->contains('slug', 'rescue-service') ?? false;
+$dashboardRoute = $isRescue ? 'provider.rescue.dashboard' : 'provider.dashboard';
+return redirect()->intended(route($dashboardRoute));
             } else {
                 return redirect()->intended(route(config('features.traveler_dashboard_v2', false) ? 'traveler.dashboard-v2' : 'traveler.dashboard'));
             }

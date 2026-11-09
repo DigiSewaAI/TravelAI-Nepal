@@ -393,6 +393,24 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
     Route::post('/{sos}/respond', [\App\Http\Controllers\Provider\SosAlertController::class, 'respond'])->name('respond');
     Route::post('/{sos}/false-alarm', [\App\Http\Controllers\Provider\SosAlertController::class, 'markFalseAlarm'])->name('false-alarm');
     });
+        // ── Rescue Provider Dashboard (Phase 3) ──
+    Route::prefix('rescue')->name('rescue.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/sos', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'sosQueue'])->name('sos');
+        Route::get('/missions', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'missions'])->name('missions');
+        Route::get('/gps', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'gps'])->name('gps');
+        Route::get('/audit', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'audit'])->name('audit');
+        Route::get('/fleet', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'fleet'])->name('fleet');
+        Route::get('/staff', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'staff'])->name('staff');
+        Route::get('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'coverage'])->name('coverage');
+        Route::get('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'documents'])->name('documents');
+        Route::get('/pricing', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'pricing'])->name('pricing');
+        Route::get('/insurance', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'insurance'])->name('insurance');
+        Route::get('/revenue', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'revenue'])->name('revenue');
+        Route::get('/reports', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'reports'])->name('reports');
+        Route::get('/security', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'security'])->name('security');
+        Route::post('/toggle-availability', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'toggleAvailability'])->name('toggle-availability');
+    });
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProviderProfileController::class, 'update'])->name('profile.update');

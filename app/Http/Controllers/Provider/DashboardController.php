@@ -17,8 +17,15 @@ class DashboardController extends Controller
 {
     public function index(AiLimitService $aiLimit)
     {
-        // 🆕 Type-based switch — vertical dashboards (Restaurant)
+        // 🆕 Type-based switch — vertical dashboards
         $user = \Illuminate\Support\Facades\Auth::user();
+
+        // 🆕 Rescue Service vertical dashboard
+        if ($user && $user->getCurrentProvider()?->types->contains('slug', 'rescue-service')) {
+            return redirect()->route('provider.rescue.dashboard');
+        }
+
+        // 🆕 Restaurant vertical dashboard
         if ($user && $user->getCurrentProvider()?->types->contains('slug', 'restaurant')) {
             return redirect()->route('provider.restaurant.dashboard');
         }
