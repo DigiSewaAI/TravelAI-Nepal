@@ -141,118 +141,121 @@
     {{-- Side Column --}}
     <div class="col-side">
 
-        {{-- Provider Status --}}
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i data-lucide="badge-check"></i>
-                    <h2>Provider Status</h2>
+        {{-- Weather & Flight Safety --}}
+        <div class="card" style="background:linear-gradient(160deg,#0b1f2a,#0a1620);border:1px solid #12262f;padding:14px;color:#e2e8f0">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                <div style="font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
+                    <i data-lucide="cloud-sun" style="width:14px;height:14px;color:#2dd4bf"></i> Weather & Flight Safety
+                </div>
+                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)">ADVISORY</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Wind</span>
+                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">12 km/h</strong>
+                </div>
+                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Visibility</span>
+                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">8 km</strong>
+                </div>
+                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Ceiling</span>
+                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">3,500 m</strong>
+                </div>
+                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Temp</span>
+                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">-2 °C</strong>
                 </div>
             </div>
-            <div class="card-body">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-                    <div style="width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#0d9488,#2dd4bf);display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px">
-                        {{ strtoupper(substr($provider->name ?? 'RP', 0, 2)) }}
-                    </div>
-                    <div style="min-width:0">
-                        <div style="font-size:14px;font-weight:700">{{ $provider->name ?? 'Rescue Provider' }}</div>
-                        <div style="font-size:11.5px;color:var(--text-muted)">Rescue Service</div>
-                    </div>
-                </div>
-
-                @if($rescueProvider)
-                <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:12px">
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="color:var(--text-muted)">Fleet Size</span>
-                        <strong>{{ $rescueProvider->fleet_size }}</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="color:var(--text-muted)">Coverage Radius</span>
-                        <strong>{{ $rescueProvider->coverage_radius_km }} km</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="color:var(--text-muted)">Max Altitude</span>
-                        <strong>{{ $rescueProvider->max_altitude_ft ?? '—' }} ft</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="color:var(--text-muted)">24/7 Operations</span>
-                        <strong>{{ $rescueProvider->is_24_7 ? 'Yes' : 'No' }}</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="color:var(--text-muted)">Availability</span>
-                        @if($rescueProvider->is_available)
-                            <span class="badge badge-green">On Duty</span>
-                        @else
-                            <span class="badge badge-gray">Off Duty</span>
-                        @endif
-                    </div>
-                </div>
-                @else
-                <div style="border-top:1px solid var(--border);padding-top:12px;text-align:center;color:var(--text-muted);font-size:12px">
-                    Rescue profile not configured
-                </div>
-                @endif
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:#64748b;padding-top:9px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap">
+                <span style="color:#6ee7b7;font-weight:600;display:inline-flex;align-items:center;gap:4px"><i data-lucide="check-circle-2" style="width:10px;height:10px"></i> DHM Aviation API</span>
+                <span style="font-family:'JetBrains Mono',monospace;color:#94a3b8">Updated 4m ago</span>
             </div>
         </div>
 
-        {{-- Quick Links --}}
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i data-lucide="zap"></i>
-                    <h2>Quick Actions</h2>
+        {{-- GPS Map --}}
+        <div class="card" style="background:linear-gradient(160deg,#0a1620,#0b1f2a);border:1px solid #12262f;overflow:hidden;padding:0">
+            <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <i data-lucide="map" style="width:16px;height:16px;color:#2dd4bf"></i>
+                    <h2 style="color:#e2e8f0;font-size:14px;font-weight:700">GPS · Last-known</h2>
                 </div>
+                <span style="font-size:10px;font-weight:700;color:#fcd34d;background:rgba(245,158,11,.15);padding:4px 9px;border-radius:99px;border:1px solid rgba(245,158,11,.3);display:inline-flex;align-items:center;gap:5px">
+                    <span style="width:5px;height:5px;border-radius:50%;background:#fbbf24"></span> STALE
+                </span>
             </div>
-            <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
-                <a href="{{ route('provider.rescue.sos') }}" class="btn btn-ghost" style="justify-content:flex-start;width:100%">
-                    <i data-lucide="siren"></i> Live SOS Queue
-                </a>
-                <a href="{{ route('provider.rescue.fleet') }}" class="btn btn-ghost" style="justify-content:flex-start;width:100%">
-                    <i data-lucide="plane"></i> Manage Fleet
-                </a>
-                <a href="{{ route('provider.rescue.coverage') }}" class="btn btn-ghost" style="justify-content:flex-start;width:100%">
-                    <i data-lucide="map-pin"></i> Coverage Areas
-                </a>
-                <a href="{{ route('provider.rescue.pricing') }}" class="btn btn-ghost" style="justify-content:flex-start;width:100%">
-                    <i data-lucide="wallet"></i> Pricing Config
-                </a>
-                <a href="{{ route('provider.rescue.documents') }}" class="btn btn-ghost" style="justify-content:flex-start;width:100%">
-                    <i data-lucide="file-text"></i> Documents
-                </a>
+            <div style="position:relative;height:200px;background:#0b1f2a">
+                <svg style="width:100%;height:100%;display:block" viewBox="0 0 420 260" preserveAspectRatio="xMidYMid slice">
+                    <rect width="420" height="260" fill="#0a1620"/>
+                    <path d="M0 200 Q60 155 125 180 T255 165 T420 190 V260 H0 Z" fill="rgba(45,212,191,0.045)"/>
+                    <path d="M0 220 Q75 195 155 210 T305 195 T420 218 V260 H0 Z" fill="rgba(45,212,191,0.07)"/>
+                    <path d="M70 195 L155 145 L255 108 L340 72" stroke="#2dd4bf" stroke-width="2" stroke-dasharray="6 6" fill="none" opacity=".6"/>
+                    <circle cx="70" cy="195" r="6" fill="#2dd4bf"/>
+                    <text x="70" y="220" text-anchor="middle" fill="#5eead4" font-size="8.5" font-weight="700">BASE</text>
+                    <circle cx="255" cy="108" r="22" fill="none" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="3 3" opacity=".65"/>
+                    <circle cx="255" cy="108" r="6" fill="#ef4444"/>
+                    <text x="255" y="140" text-anchor="middle" fill="#fca5a5" font-size="8.5" font-weight="700">LAST-KNOWN</text>
+                    <circle cx="155" cy="145" r="5.5" fill="#3b82f6"/>
+                    <text x="155" y="170" text-anchor="middle" fill="#93c5fd" font-size="8.5" font-weight="700">9N-AJH</text>
+                </svg>
             </div>
         </div>
 
-        {{-- Verification Status --}}
+        {{-- Audit Log --}}
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <i data-lucide="shield-check"></i>
-                    <h2>Verification</h2>
+                    <i data-lucide="scroll-text"></i><h2>Audit Log</h2>
                 </div>
+                <a href="{{ route('provider.rescue.audit') }}" class="btn-link">Full log <i data-lucide="chevron-right"></i></a>
             </div>
-            <div class="card-body">
-                @if($provider->verification_status === 'verified')
-                    <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--success-light);border:1px solid rgba(16,185,129,.3);border-radius:10px">
-                        <i data-lucide="check-circle" style="color:var(--success-dark);width:20px;height:20px"></i>
-                        <div>
-                            <div style="font-size:12.5px;font-weight:700;color:var(--success-dark)">Verified</div>
-                            <div style="font-size:11px;color:var(--success-dark);opacity:.85">Ready for dispatch</div>
-                        </div>
+            <div>
+                <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
+                    <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">14:32</span>
+                    <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--info)"></span>
+                    <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">
+                        <span style="font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);margin-right:4px;text-transform:uppercase">mission</span>
+                        <span style="color:var(--text);font-weight:600">System</span> marked mission en route
                     </div>
-                @else
-                    <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--warning-light);border:1px solid rgba(245,158,11,.3);border-radius:10px">
-                        <i data-lucide="clock" style="color:var(--warning-dark);width:20px;height:20px"></i>
-                        <div>
-                            <div style="font-size:12.5px;font-weight:700;color:var(--warning-dark)">Pending</div>
-                            <div style="font-size:11px;color:var(--warning-dark);opacity:.85">Upload KYC to go live</div>
-                        </div>
+                </div>
+                <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
+                    <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">14:28</span>
+                    <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--danger)"></span>
+                    <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">
+                        <span style="font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);margin-right:4px;text-transform:uppercase">escalate</span>
+                        <span style="color:var(--text);font-weight:600">System</span> auto-escalated SOS alert
                     </div>
-                @endif
+                </div>
             </div>
         </div>
 
-    </div>
-</div>
+        {{-- Fleet Status --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i data-lucide="plane"></i><h2>Fleet Status</h2>
+                </div>
+                <a href="{{ route('provider.rescue.fleet') }}" class="btn-link">Manage <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div style="display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+                    <div style="width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--info-light);color:var(--info-dark)"><i data-lucide="plane" style="width:15px;height:15px"></i></div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;line-height:1.3">9N-AJH · H125</div>
+                    </div>
+                    <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--info-light);color:var(--info-dark)">On Mission</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+                    <div style="width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--success-light);color:var(--success-dark)"><i data-lucide="plane" style="width:15px;height:15px"></i></div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;line-height:1.3">9N-AKL · AS350</div>
+                    </div>
+                    <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--success-light);color:var(--success-dark)">Available</span>
+                </div>
+            </div>
+        </div>
+            </div>
+                </div>
 
 @endsection
 
