@@ -114,11 +114,10 @@ class RescueDashboardController extends Controller
         return back()->with('success', 'SOS Accepted! Please confirm dispatch within 60 seconds.');
     }
 
-    public function confirmDispatch(SosAlert $sos)
+     public function confirmDispatch(SosAlert $sos)
     {
         $provider = $this->getProvider();
 
-        // लक चेक गर्ने (यो लक तपाईंको हो कि होइन र एक्सपायर भएको छैन भनी)
         $lock = \App\Models\RescueDispatchLock::where('sos_alert_id', $sos->id)
             ->where('provider_id', $provider->id)
             ->where('expires_at', '>', now())
@@ -128,25 +127,45 @@ class RescueDashboardController extends Controller
             return back()->with('error', 'Your lock has expired. Please accept the SOS again.');
         }
 
-        // मिसन क्रिएट गर्ने
-        \App\Models\RescueMission::create([
-            'mission_number' => 'RSC-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT),
-            'sos_alert_id'   => $sos->id,
-            'provider_id'    => $provider->id,
-            'status'         => 'accepted', // सिधै Accepted
-            'pickup_lat'     => $sos->latitude,
-            'pickup_lng'     => $sos->longitude,
-        ]);
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($sos, $provider, $lock) {
+                // 1. SOS लाई Lock गर्ने (ताकि अरूले एकैचोटि अपडेट गर्न नसकून्)
+                $freshSos = SosAlert::lockForUpdate()->find($sos->id);
 
-        // SOS लाई responding बनाउने
-        $sos->update(['status' => 'responding']);
+                // 2. SOS अझै pending वा sent छ कि जाँच्ने
+                if (!in_array($freshSos->status, ['pending', 'sent'])) {
+                    throw new \Exception('This SOS is already being handled by another provider.');
+                }
 
-        // लक डिलिट गर्ने (काम सकियो)
-        $lock->delete();
+                // 3. यो SOS को लागि मिसन पहिले नै बनिसकेको छ कि जाँच्ने
+                if (\App\Models\RescueMission::where('sos_alert_id', $sos->id)->exists()) {
+                    throw new \Exception('A rescue mission is already assigned to this SOS.');
+                }
 
-        return redirect()->route('provider.rescue.missions')->with('success', 'Dispatch Confirmed! Mission started.');
+                // 4. मिसन क्रिएट गर्ने
+                \App\Models\RescueMission::create([
+                    'mission_number' => 'RSC-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT),
+                    'sos_alert_id'   => $sos->id,
+                    'provider_id'    => $provider->id,
+                    'status'         => 'accepted',
+                    'pickup_lat'     => $sos->latitude,
+                    'pickup_lng'     => $sos->longitude,
+                ]);
+
+                // 5. SOS अपडेट गर्ने
+                $freshSos->update(['status' => 'responding']);
+
+                // 6. लक डिलिट गर्ने
+                $lock->delete();
+            });
+
+            return redirect()->route('provider.rescue.missions')->with('success', 'Dispatch Confirmed! Mission started.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
-        public function updateMissionStatus(Request $request, \App\Models\RescueMission $mission)
+            public function updateMissionStatus(Request $request, \App\Models\RescueMission $mission)
     {
         $provider = $this->getProvider();
         if (!$provider || $mission->provider_id !== $provider->id) abort(403);

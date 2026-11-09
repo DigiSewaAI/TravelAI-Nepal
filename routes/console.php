@@ -42,3 +42,4 @@ Schedule::command('forex:update')
 
 // Phase 7: SOS auto-escalation – runs every minute
 Schedule::command('sos:escalate')->everyMinute()->withoutOverlapping();
+Schedule::command('rescue:release-locks')->everyMinute()->withoutOverlapping();
