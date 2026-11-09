@@ -1171,7 +1171,7 @@ $serviceName = $service
 
     if ($isSynthetic) {
         $displayPlace = $place !== '' ? $place : ($locName !== '' ? $locName : 'trail');
-        $name = "Accommodation in {$displayPlace} (Est.)";
+        $name = "Accommodation in {$displayPlace}";
         $providerName = 'Estimated';
     }
 
