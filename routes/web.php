@@ -409,6 +409,7 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::post('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateCoverage'])->name('coverage.update');
         Route::get('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'documents'])->name('documents');
         Route::get('/pricing', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'pricing'])->name('pricing');
+        Route::post('/pricing', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updatePricing'])->name('pricing.update');
         Route::get('/insurance', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'insurance'])->name('insurance');
         Route::get('/revenue', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'revenue'])->name('revenue');
         Route::get('/reports', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'reports'])->name('reports');

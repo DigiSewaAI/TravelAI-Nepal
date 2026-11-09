@@ -145,6 +145,24 @@ class RescueDashboardController extends Controller
         return view('provider.rescue.pricing', $this->sharedData());
     }
 
+    public function updatePricing(Request $request)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $validated = $request->validate([
+            'base_rate_npr'               => 'required|numeric|min:0',
+            'per_km_rate_npr'             => 'required|numeric|min:0',
+            'per_hour_rate_npr'           => 'required|numeric|min:0',
+            'night_surcharge_pct'         => 'required|integer|min:0|max:100',
+            'high_altitude_surcharge_pct' => 'required|integer|min:0|max:100',
+        ]);
+
+        $rescueProvider->update($validated);
+
+        return back()->with('success', 'Pricing configuration updated successfully.');
+    }
+
     public function insurance()
     {
         return view('provider.rescue.insurance', $this->sharedData());
