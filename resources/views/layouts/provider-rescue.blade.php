@@ -220,6 +220,28 @@ svg{display:block}button{font-family:inherit}
 .mission-card{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;background:var(--surface)}
 .mission-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;flex-wrap:wrap}
 .mission-id{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--primary-dark);background:var(--primary-light);padding:3px 8px;border-radius:5px}
+/* Person Card & Grid (for Staff) */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.person-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-xs);transition:transform .18s,box-shadow .18s}
+.person-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.person-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.person-avatar{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.person-name{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.person-role{font-size:11px;color:var(--text-muted);margin-top:1px}
+.person-meta{display:flex;flex-direction:column;gap:6px;font-size:11.5px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:11px}
+.person-meta span{display:flex;align-items:center;gap:6px}
+.person-meta svg{width:12px;height:12px;color:var(--text-light);flex-shrink:0}
+
+/* Chart Styles (for Reports) */
+.chart-svg{width:100%;height:auto;display:block}
+.chart-legend{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--text-muted);flex-wrap:wrap}
+.chart-legend span{display:inline-flex;align-items:center;gap:5px}
+.chart-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* Responsive grid */
+@media(max-width:1024px){.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.grid-3,.grid-2{grid-template-columns:1fr}}
 
 /* Form & Modal Styles */
 .modal label{display:block;font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px;margin-top:12px}
