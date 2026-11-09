@@ -4,7 +4,7 @@
 @section('header', 'Dashboard')
 
 @section('content')
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
     <div class="stat-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
         <p class="text-gray-500 text-xs">Providers</p>
         <p class="text-2xl font-bold">{{ $totalProviders }}</p>
@@ -28,6 +28,11 @@
     <div class="stat-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500">
         <p class="text-gray-500 text-xs">Revenue</p>
         <p class="text-2xl font-bold">Rs. {{ number_format($totalPayments, 0) }}</p>
+    </div>
+    <div class="stat-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500">
+        <p class="text-gray-500 text-xs">Rescue Docs Pending</p>
+        <p class="text-2xl font-bold text-amber-700">{{ $pendingRescueDocs ?? 0 }}</p>
+        <a href="{{ route('admin.rescue.documents.index') }}" class="text-xs text-teal-600 font-bold hover:underline">Verify Now →</a>
     </div>
 </div>
 

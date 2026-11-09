@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\SosAlert;
 use App\Models\User;
+use App\Services\RescueDispatchService;
 use App\Notifications\AdminAlertNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -36,26 +37,43 @@ class EscalateSosAlerts extends Command
             $escalated++;
         }
 
-        // Stage 2: Rescue escalation placeholder (after Y minutes)
+        // Stage 2: Rescue escalation (broadcast to nearest providers)
         $needsRescue = SosAlert::whereIn('status', ['pending', 'sent'])
             ->whereNotNull('admin_notified_at')
             ->whereNull('auto_escalated_at')
             ->where('created_at', '<=', now()->subMinutes($rescueMin))
             ->get();
 
-        foreach ($needsRescue as $sos) {
-            $sos->update(['auto_escalated_at' => now()]);
-            $sos->logAction(
-                'auto_escalated', null,
-                $sos->status, $sos->status,
-                "Auto-escalated to rescue after {$rescueMin}min"
-            );
-            // TODO: When Rescue Services are added, dispatch to nearest rescue providers here
-            Log::warning('SOS auto-escalated to rescue (Rescue Service not yet implemented)', ['sos_id' => $sos->id]);
-            $escalated++;
+        if ($needsRescue->isNotEmpty()) {
+            // ✅ RescueDispatchService लाई इन्जेक्ट गर्ने
+            $dispatchService = app(RescueDispatchService::class);
+
+            foreach ($needsRescue as $sos) {
+                // Broadcast गर्ने (यसले नजिकैको Online Provider खोज्छ र खबर पठाउँछ)
+                $notifiedCount = $dispatchService->broadcast($sos);
+
+                if ($notifiedCount > 0) {
+                    // यदि सफल भयो भने
+                    $sos->update(['auto_escalated_at' => now()]);
+                    
+                    // Status 'sent' मा अपडेट हुन्छ (किनकि broadcast() ले यो काम गर्छ)
+                    $sos->logAction(
+                        'auto_escalated', null,
+                        'pending', 'sent', 
+                        "Auto-escalated to {$notifiedCount} rescue provider(s) after {$rescueMin}min"
+                    );
+                    
+                    $this->info("Escalated SOS #{$sos->id} to {$notifiedCount} rescue provider(s).");
+                    $escalated++;
+                } else {
+                    // यदि कोही पनि Online भएनन् भने
+                    $this->warn("No rescue providers available for SOS #{$sos->id}");
+                    Log::warning('SOS auto-escalated to rescue, but no providers were online/available', ['sos_id' => $sos->id]);
+                }
+            }
         }
 
-        $this->info("Escalated {$escalated} SOS alert(s).");
+        $this->info("Total escalated SOS alerts: {$escalated}");
         return self::SUCCESS;
     }
 

@@ -53,6 +53,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // 🆕 Rescue: Pending Documents Count
+        $pendingRescueDocs = 0;
+        \App\Models\RescueProvider::all()->each(function ($rp) use (&$pendingRescueDocs) {
+            $pendingRescueDocs += collect($rp->documents ?? [])->where('status', 'pending')->count();
+        });
+
         return view('admin.dashboard', compact(
             'totalProviders',
             'verifiedProviders',
@@ -65,7 +71,8 @@ class DashboardController extends Controller
             'recentBookings',
             'bookingsTrend',
             'topProviders',
-            'topServices'
+            'topServices',
+            'pendingRescueDocs'
         ));
     }
 }
