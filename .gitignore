@@ -74,3 +74,31 @@ users.txt
 _zoho_*.txt
 _brevo_*.txt
 _gsc_*.txt 
+
+
+# ─── Additional patterns (2026-11-09) ───
+# All backup variations (any suffix after .bak)
+*.bak_*
+**/*.bak_*
+
+# Windows binaries (scratch)
+ngrok.exe
+php
+php.exe
+
+# Scratch scripts (non-underscore prefix)
+final_precise_discovery.php
+restore_only.php
+wire_provider_emails.php
+fix_*.php
+verify_*.php
+*_script.php
+
+# Scratch HTML / images
+traveler_dashboard.html
+tea_house_real.jpg
+public/images/pexels-*.jpg
+
+# Generic scratch image patterns
+public/images/*temp*.jpg
+public/images/*test*.jpg
