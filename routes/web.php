@@ -777,6 +777,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'index'])->name('index');
         Route::get('/sos/{sos}', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'showSos'])->name('sos.show');
         Route::post('/sos/{sos}/dispatch', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'manualDispatch'])->name('sos.dispatch');
+        Route::get('/missions', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'missions'])->name('missions');
+
     });
         // ═══════════════════════════════════════════
     // ADMIN RESCUE DOCUMENTS VERIFICATION

@@ -56,7 +56,16 @@ class RescueCommandCenterController extends Controller
         
         return view('admin.rescue.show', compact('sos', 'rescueProviders'));
     }
+    public function missions()
+    {
+        // सबै Active Missions (Completed/Cancelled बाहेक)
+        $missions = RescueMission::whereNotIn('status', ['completed', 'cancelled'])
+            ->with(['sos.traveler', 'provider', 'fleet'])
+            ->latest()
+            ->get();
 
+        return view('admin.rescue.missions', compact('missions'));
+    }
     public function manualDispatch(Request $request, SosAlert $sos)
     {
         $validated = $request->validate([

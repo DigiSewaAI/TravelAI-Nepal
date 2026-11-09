@@ -272,6 +272,9 @@
 <a href="{{ route('admin.rescue.documents.index') }}" class="nav-link {{ request()->routeIs('admin.rescue.documents.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.documents.*') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
     <i class="fas fa-file-signature" style="width:16px; text-align:center;"></i> Document Verification
 </a>
+<a href="{{ route('admin.rescue.missions') }}" class="nav-link {{ request()->routeIs('admin.rescue.missions') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.missions') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
+    <i class="fas fa-ambulance" style="width:16px; text-align:center;"></i> Active Missions
+</a>
 </div>
 @endif
 
