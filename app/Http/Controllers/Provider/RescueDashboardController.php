@@ -32,11 +32,16 @@ class RescueDashboardController extends Controller
             ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
             ->count();
 
+        // Fetch real fleet and mission count
+        $activeMissions = \App\Models\RescueMission::where('provider_id', $provider?->id)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+
         return [
             'provider'              => $provider,
             'rescueProvider'        => $rescueProvider,
             'liveSosCount'          => $liveSos,
-            'activeMissionsCount'   => 0, // rescue_missions छैन अझै
+            'activeMissionsCount'   => $activeMissions,
         ];
     }
 

@@ -400,7 +400,10 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/missions', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'missions'])->name('missions');
         Route::get('/gps', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'gps'])->name('gps');
         Route::get('/audit', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'audit'])->name('audit');
-        Route::get('/fleet', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'fleet'])->name('fleet');
+        Route::get('/fleet', [\App\Http\Controllers\Provider\RescueFleetController::class, 'index'])->name('fleet');
+        Route::post('/fleet', [\App\Http\Controllers\Provider\RescueFleetController::class, 'store'])->name('fleet.store');
+        Route::put('/fleet/{fleet}', [\App\Http\Controllers\Provider\RescueFleetController::class, 'update'])->name('fleet.update');
+        Route::delete('/fleet/{fleet}', [\App\Http\Controllers\Provider\RescueFleetController::class, 'destroy'])->name('fleet.destroy');
         Route::get('/staff', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'staff'])->name('staff');
         Route::get('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'coverage'])->name('coverage');
         Route::get('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'documents'])->name('documents');

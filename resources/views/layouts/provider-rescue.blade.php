@@ -191,6 +191,23 @@ svg{display:block}button{font-family:inherit}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:55;opacity:0;transition:opacity .2s}
 .sidebar-overlay.show{display:block;opacity:1}
+/* Table Styles (from HTML design) */
+.table-wrap{overflow-x:auto}
+.table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table th{text-align:left;padding:10px 16px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);font-weight:700;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap}
+.table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.table tbody tr:last-child td{border-bottom:none}
+.table tbody tr{transition:background .12s}
+.table tbody tr:hover{background:var(--surface-2)}
+.table .cell-strong{font-weight:700;color:var(--text);white-space:nowrap}
+.table .cell-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.table .cell-muted{color:var(--text-muted);font-size:11.5px}
+
+/* Form & Modal Styles */
+.modal label{display:block;font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px;margin-top:12px}
+.modal label .req{color:var(--danger);margin-left:2px}
+.modal select,.modal input[type=text],.modal input[type=number],.modal textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--text);background:#fff;transition:border-color .16s,box-shadow .16s}
+.modal select:focus,.modal input:focus,.modal textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
 
 /* Responsive */
 @media(max-width:1240px){.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}.topbar-center{display:none}}
