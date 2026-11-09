@@ -21,20 +21,46 @@
     @endif
 
     @php
-        $isActive = in_array($sos->status, ['pending', 'sent']);
+        $isActive = !$sos->isTerminal();
+        $isPending = in_array($sos->status, ['pending', 'sent']);
+        $isAcknowledged = $sos->status === 'acknowledged';
+        $isResponding = $sos->status === 'responding';
+        $isResolved = $sos->status === 'resolved';
+        $isFalseAlarm = $sos->status === 'false_alarm';
+
+        if ($isPending) {
+            $heroBg   = 'bg-gradient-to-r from-red-600 to-rose-700';
+            $heroIcon = 'fa-exclamation-triangle';
+            $heroText = __('messages.sos_alerts_header_active');
+        } elseif ($isAcknowledged) {
+            $heroBg   = 'bg-gradient-to-r from-red-600 to-rose-700';
+            $heroIcon = 'fa-eye';
+            $heroText = __('messages.sos_alerts_header_acknowledged');
+        } elseif ($isResponding) {
+            $heroBg   = 'bg-gradient-to-r from-red-600 to-rose-700';
+            $heroIcon = 'fa-truck-medical';
+            $heroText = __('messages.sos_alerts_header_responding');
+        } elseif ($isResolved) {
+            $heroBg   = 'bg-gradient-to-r from-green-600 to-emerald-700';
+            $heroIcon = 'fa-check-circle';
+            $heroText = __('messages.sos_alerts_header_resolved');
+        } else {
+            $heroBg   = 'bg-gradient-to-r from-gray-600 to-gray-700';
+            $heroIcon = 'fa-ban';
+            $heroText = __('messages.sos_alerts_header_false_alarm');
+        }
     @endphp
 
     {{-- Alert header --}}
-    <div class="rounded-xl overflow-hidden shadow-lg mb-5
-        {{ $isActive ? 'bg-gradient-to-r from-red-600 to-rose-700' : 'bg-gradient-to-r from-green-600 to-emerald-700' }}">
+    <div class="rounded-xl overflow-hidden shadow-lg mb-5 {{ $heroBg }}">
         <div class="p-6 text-white">
             <div class="flex items-center gap-4">
                 <div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
-                    <i class="fas {{ $isActive ? 'fa-exclamation-triangle' : 'fa-check-circle' }} text-2xl"></i>
+                    <i class="fas {{ $heroIcon }} text-2xl"></i>
                 </div>
                 <div class="flex-1">
                     <h1 class="text-2xl font-bold">
-                        {{ $isActive ? __('messages.sos_alerts_header_active') : __('messages.sos_alerts_header_resolved') }}
+                        {{ $heroText }}
                     </h1>
                     <p class="text-white/80 text-sm mt-1">
                         {{ $sos->traveler->name ?? __('messages.sos_alerts_unknown_traveler') }}
@@ -126,16 +152,59 @@
             <h3 class="font-bold text-gray-900 mb-2">{{ __('messages.sos_alerts_actions_title') }}</h3>
             <p class="text-xs text-gray-500 mb-4">{{ __('messages.sos_alerts_actions_desc') }}</p>
 
-            <form action="{{ route('provider.sos-alerts.resolve', $sos) }}" method="POST"
-                  onsubmit="return confirm('{{ __('messages.sos_alerts_resolve_confirm') }}')">
-                @csrf
-                @method('PATCH')
-                <button type="submit"
-                        class="w-full bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-md">
-                    <i class="fas fa-check-circle"></i>
-                    {{ __('messages.sos_alerts_resolve_btn') }}
-                </button>
-            </form>
+            @if($sos->canAcknowledge())
+                <form action="{{ route('provider.sos-alerts.acknowledge', $sos) }}" method="POST" class="mb-3"
+                      onsubmit="return confirm('Acknowledge this SOS? Siren will stop.')">
+                    @csrf
+                    <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-md">
+                        <i class="fas fa-eye"></i>
+                        Acknowledge (I'm responding)
+                    </button>
+                </form>
+            @endif
+
+            @if($sos->canRespond())
+                <form action="{{ route('provider.sos-alerts.respond', $sos) }}" method="POST" class="mb-3"
+                      onsubmit="return confirm('Mark as RESPONDING? Rescue is on the way.')">
+                    @csrf
+                    <button type="submit"
+                            class="w-full bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-md">
+                        <i class="fas fa-truck-medical"></i>
+                        Mark as Responding
+                    </button>
+                </form>
+            @endif
+
+            @if($sos->canResolve())
+                <form action="{{ route('provider.sos-alerts.resolve', $sos) }}" method="POST" class="mb-3"
+                      onsubmit="return confirm('{{ __('messages.sos_alerts_resolve_confirm') }}')">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-md">
+                        <i class="fas fa-check-circle"></i>
+                        {{ __('messages.sos_alerts_resolve_btn') }}
+                    </button>
+                </form>
+            @endif
+
+            @if($sos->canMarkFalseAlarm())
+                <details class="mt-2">
+                    <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-700">Mark as false alarm?</summary>
+                    <form action="{{ route('provider.sos-alerts.false-alarm', $sos) }}" method="POST" class="mt-2"
+                          onsubmit="return confirm('Mark this SOS as FALSE ALARM? This action is logged.')">
+                        @csrf
+                        <textarea name="reason" required minlength="5" maxlength="500" rows="2"
+                                  class="w-full px-3 py-2 border rounded-lg text-sm mb-2"
+                                  placeholder="Reason (required — e.g., accidental trigger, resolved on trail)"></textarea>
+                        <button type="submit"
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold text-sm">
+                            <i class="fas fa-exclamation-triangle"></i> Confirm False Alarm
+                        </button>
+                    </form>
+                </details>
+            @endif
         </div>
     @else
         <div class="bg-green-50 border border-green-200 rounded-xl p-5 text-center">

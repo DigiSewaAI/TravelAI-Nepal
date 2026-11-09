@@ -113,7 +113,7 @@
     @if($alerts->count() > 0)
       <div>
         @foreach($alerts as $alert)
-          @php $__isActive = in_array($alert->status, ['pending', 'sent']); @endphp
+          @php $__isActive = !$alert->isTerminal(); @endphp
           <a href="{{ route('provider.sos-alerts.show', $alert) }}" class="ps-item">
             <div class="ps-item-inner">
               <div class="ps-item-icon {{ $__isActive ? 'danger' : 'ok' }}">

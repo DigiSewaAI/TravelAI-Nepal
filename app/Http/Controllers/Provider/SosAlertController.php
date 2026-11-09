@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Cache;
 
 class SosAlertController extends Controller
 {
-    /**
-     * Resolve vertical-specific layout based on provider type.
-     */
     private function getProviderLayout($provider): string
     {
         $map = [
@@ -33,24 +30,21 @@ class SosAlertController extends Controller
         ];
         return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
     }
-    /**
-     * Resolve current provider (with super_admin fallback).
-     */
+
     private function getProvider()
     {
         $user = Auth::user();
         $provider = $user->provider ?? \App\Models\Provider::where('user_id', $user->id)->first();
-
-        if (!$provider) {
-            abort(403, 'Provider profile not found.');
-        }
-
+        if (!$provider) abort(403, 'Provider profile not found.');
         return $provider;
     }
 
-    /**
-     * List all SOS alerts for this provider.
-     */
+    private function authorizeAlert(SosAlert $sos): void
+    {
+        $provider = $this->getProvider();
+        if ($sos->provider_id !== $provider->id) abort(403);
+    }
+
     public function index(Request $request)
     {
         $provider = $this->getProvider();
@@ -60,81 +54,107 @@ class SosAlertController extends Controller
             ->with(['traveler', 'booking.service']);
 
         if ($status === 'active') {
-            $query->whereIn('status', ['pending', 'sent']);
+            $query->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding']);
         } elseif ($status === 'resolved') {
             $query->where('status', 'resolved');
+        } elseif ($status === 'false_alarm') {
+            $query->where('status', 'false_alarm');
+        } elseif ($status === 'pending') {
+            $query->whereIn('status', ['pending', 'sent']);
         }
 
         $alerts = $query->latest()->paginate(15);
 
         $activeCount = SosAlert::where('provider_id', $provider->id)
-            ->whereIn('status', ['pending', 'sent'])
+            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
             ->count();
 
         $provider_layout = $this->getProviderLayout($provider);
 
+        $base = SosAlert::where('provider_id', $provider->id);
         $stats = [
-            'total' => \App\Models\SosAlert::where('provider_id', $provider->id)->count(),
-            'active' => \App\Models\SosAlert::where('provider_id', $provider->id)->whereIn('status', ['pending','sent'])->count(),
-            'resolved' => \App\Models\SosAlert::where('provider_id', $provider->id)->where('status', 'resolved')->count(),
+            'total'        => (clone $base)->count(),
+            'active'       => (clone $base)->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->count(),
+            'pending'      => (clone $base)->whereIn('status', ['pending', 'sent'])->count(),
+            'acknowledged' => (clone $base)->where('status', 'acknowledged')->count(),
+            'responding'   => (clone $base)->where('status', 'responding')->count(),
+            'resolved'     => (clone $base)->where('status', 'resolved')->count(),
+            'false_alarm'  => (clone $base)->where('status', 'false_alarm')->count(),
         ];
 
-        return view(($provider_layout === 'layouts.provider') ? 'provider.sos-alerts.index' : 'provider.sos-alerts.index-premium', compact('alerts', 'activeCount', 'status', 'provider_layout', 'stats'));
+        return view(
+            ($provider_layout === 'layouts.provider')
+                ? 'provider.sos-alerts.index'
+                : 'provider.sos-alerts.index-premium',
+            compact('alerts', 'activeCount', 'status', 'provider_layout', 'stats')
+        );
     }
 
-    /**
-     * Show SOS alert detail.
-     */
     public function show(SosAlert $sos)
     {
+        $this->authorizeAlert($sos);
+        $sos->load(['traveler', 'booking.service', 'actions.user']);
         $provider = $this->getProvider();
-
-        if ($sos->provider_id !== $provider->id) {
-            abort(403);
-        }
-
-        $sos->load(['traveler', 'booking.service']);
-
         $provider_layout = $this->getProviderLayout($provider);
-return view(($provider_layout === 'layouts.provider') ? 'provider.sos-alerts.show' : 'provider.sos-alerts.show-premium', compact('sos', 'provider_layout'));
+        return view(
+            ($provider_layout === 'layouts.provider')
+                ? 'provider.sos-alerts.show'
+                : 'provider.sos-alerts.show-premium',
+            compact('sos', 'provider_layout')
+        );
     }
 
-    /**
-     * Mark SOS as resolved.
-     */
-    public function resolve(SosAlert $sos)
+    public function acknowledge(SosAlert $sos)
     {
-        $provider = $this->getProvider();
-
-        if ($sos->provider_id !== $provider->id) {
-            abort(403);
+        $this->authorizeAlert($sos);
+        if (!$sos->acknowledge(Auth::id())) {
+            return back()->with('error', 'Cannot acknowledge at current state.');
         }
+        Cache::forget('provider_sos_unread_' . $sos->provider_id);
+        return back()->with('success', 'SOS acknowledged. You are responding.');
+    }
 
-        $sos->update([
-            'status'      => 'resolved',
-            'resolved_at' => now(),
-        ]);
+    public function respond(SosAlert $sos)
+    {
+        $this->authorizeAlert($sos);
+        if (!$sos->respond(Auth::id())) {
+            return back()->with('error', 'Cannot mark responding at current state.');
+        }
+        return back()->with('success', 'SOS marked as responding — rescue is on the way.');
+    }
 
-        // Clear sidebar badge cache
-        Cache::forget('provider_sos_unread_' . $provider->id);
-
+    public function resolve(Request $request, SosAlert $sos)
+    {
+        $this->authorizeAlert($sos);
+        $notes = $request->input('notes');
+        if (!$sos->markResolved(Auth::id(), $notes)) {
+            return back()->with('error', 'Cannot resolve at current state. Must be responding first.');
+        }
+        Cache::forget('provider_sos_unread_' . $sos->provider_id);
         return back()->with('success', __('messages.sos_alerts_resolved_msg'));
     }
 
-    /**
-     * JSON endpoint for global siren polling.
-     * Returns active SOS count + latest ID.
-     */
+    public function markFalseAlarm(Request $request, SosAlert $sos)
+    {
+        $this->authorizeAlert($sos);
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+        if (!$sos->markFalseAlarm(Auth::id(), $validated['reason'])) {
+            return back()->with('error', 'Cannot mark false alarm at current state.');
+        }
+        Cache::forget('provider_sos_unread_' . $sos->provider_id);
+        return back()->with('success', 'SOS marked as false alarm.');
+    }
+
     public function activeCountJson()
     {
         $provider = $this->getProvider();
-        if (!$provider) {
-            return response()->json(['count' => 0, 'latest_id' => 0]);
-        }
-        $q = \App\Models\SosAlert::where('provider_id', $provider->id)
+        if (!$provider) return response()->json(['count' => 0, 'latest_id' => 0]);
+        $q = SosAlert::where('provider_id', $provider->id)
             ->whereIn('status', ['pending', 'sent']);
         return response()->json([
-            'count' => (int) $q->count(),
+            'count'     => (int) $q->count(),
             'latest_id' => (int) ($q->max('id') ?? 0),
         ]);
     }

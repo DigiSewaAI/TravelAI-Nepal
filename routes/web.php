@@ -389,6 +389,9 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/', [\App\Http\Controllers\Provider\SosAlertController::class, 'index'])->name('index');
         Route::get('/{sos}', [\App\Http\Controllers\Provider\SosAlertController::class, 'show'])->name('show');
         Route::patch('/{sos}/resolve', [\App\Http\Controllers\Provider\SosAlertController::class, 'resolve'])->name('resolve');
+            Route::post('/{sos}/acknowledge', [\App\Http\Controllers\Provider\SosAlertController::class, 'acknowledge'])->name('acknowledge');
+    Route::post('/{sos}/respond', [\App\Http\Controllers\Provider\SosAlertController::class, 'respond'])->name('respond');
+    Route::post('/{sos}/false-alarm', [\App\Http\Controllers\Provider\SosAlertController::class, 'markFalseAlarm'])->name('false-alarm');
     });
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');

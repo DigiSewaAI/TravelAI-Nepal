@@ -4,21 +4,15 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use App\Jobs\Safety\FetchSafetySourcesJob;
-use App\Jobs\Safety\VerifyExpiredIncidentsJob;   // ✅ New Phase 4 Job
-use App\Jobs\Safety\UpdateSafetyStatusesJob;      // ✅ New Phase 4 Job
-use App\Jobs\ExpireSubscriptionsJob;              // FIX-07
-// use App\Jobs\CleanupStripeWebhookEventsJob;       // Removed (Phase 7A)
-use App\Jobs\ReleaseStaleAiReservationsJob;       // FIX-12
+use App\Jobs\Safety\VerifyExpiredIncidentsJob;
+use App\Jobs\Safety\UpdateSafetyStatusesJob;
+use App\Jobs\ExpireSubscriptionsJob;
+use App\Jobs\ReleaseStaleAiReservationsJob;
 
 /*
 |--------------------------------------------------------------------------
 | Console Routes
 |--------------------------------------------------------------------------
-|
-| This file is where you may define all of your Closure based console
-| commands. Each Closure is bound to a command instance allowing a
-| simple approach to interacting with each command's IO methods.
-|
 */
 
 Artisan::command('inspire', function () {
@@ -31,13 +25,11 @@ Schedule::job(new FetchSafetySourcesJob)->everyFiveMinutes()->withoutOverlapping
 // Phase 4: Verify expired/stale incidents – runs daily
 Schedule::job(new VerifyExpiredIncidentsJob)->daily()->withoutOverlapping();
 
-// Phase 4: Update safety statuses for all entities – runs every 15 minutes
+// Phase 4: Update safety statuses – runs every 15 minutes
 Schedule::job(new UpdateSafetyStatusesJob)->everyFifteenMinutes()->withoutOverlapping();
 
 // FIX-07: Subscription expiry – runs daily
 Schedule::job(new ExpireSubscriptionsJob)->daily()->withoutOverlapping();
-
-// FIX-08: Stripe webhook cleanup removed (Phase 7A — Stripe decommission)
 
 // FIX-12: Release stale AI reservations — every 5 minutes
 Schedule::job(new ReleaseStaleAiReservationsJob)->everyFiveMinutes()->withoutOverlapping();
@@ -47,3 +39,6 @@ Schedule::command('forex:update')
     ->dailyAt('06:00')
     ->timezone('Asia/Kathmandu')
     ->withoutOverlapping();
+
+// Phase 7: SOS auto-escalation – runs every minute
+Schedule::command('sos:escalate')->everyMinute()->withoutOverlapping();
