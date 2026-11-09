@@ -405,7 +405,8 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::put('/fleet/{fleet}', [\App\Http\Controllers\Provider\RescueFleetController::class, 'update'])->name('fleet.update');
         Route::delete('/fleet/{fleet}', [\App\Http\Controllers\Provider\RescueFleetController::class, 'destroy'])->name('fleet.destroy');
         Route::get('/staff', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'staff'])->name('staff');
-        Route::get('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'coverage'])->name('coverage');
+                Route::get('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'coverage'])->name('coverage');
+        Route::post('/coverage', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateCoverage'])->name('coverage.update');
         Route::get('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'documents'])->name('documents');
         Route::get('/pricing', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'pricing'])->name('pricing');
         Route::get('/insurance', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'insurance'])->name('insurance');

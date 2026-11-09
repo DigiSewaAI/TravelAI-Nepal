@@ -202,6 +202,24 @@ svg{display:block}button{font-family:inherit}
 .table .cell-strong{font-weight:700;color:var(--text);white-space:nowrap}
 .table .cell-mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
 .table .cell-muted{color:var(--text-muted);font-size:11.5px}
+/* Mission Card & Dual Timeline */
+.dual-tl{margin:14px 0 12px;display:flex;flex-direction:column;gap:12px}
+.tl-section{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.tl-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tl-label-badge{font-size:9px;padding:1px 6px;border-radius:99px;font-weight:700}
+.tl-label-badge.sos{background:var(--danger-light);color:var(--danger-dark)}
+.tl-label-badge.rescue{background:var(--primary-light);color:var(--primary-dark)}
+.tl-steps{display:flex;justify-content:space-between;gap:4px;position:relative;padding-top:14px}
+.tl-steps::before{content:'';position:absolute;top:6px;left:5%;right:5%;height:2px;background:var(--border);border-radius:2px;z-index:0}
+.tl-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0}
+.tl-dot{width:11px;height:11px;border-radius:50%;background:#fff;border:2px solid var(--border-strong);transition:.2s}
+.tl-step.done .tl-dot{background:var(--primary);border-color:var(--primary)}
+.tl-step.current .tl-dot{background:#fff;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.18);animation:blink 1.8s infinite}
+.tl-step span{font-size:9.5px;font-weight:600;color:var(--text-light);text-align:center;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tl-step.done span,.tl-step.current span{color:var(--text)}
+.mission-card{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;background:var(--surface)}
+.mission-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+.mission-id{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--primary-dark);background:var(--primary-light);padding:3px 8px;border-radius:5px}
 
 /* Form & Modal Styles */
 .modal label{display:block;font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:5px;margin-top:12px}

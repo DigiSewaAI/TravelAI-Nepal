@@ -79,7 +79,16 @@ class RescueDashboardController extends Controller
     public function missions()
     {
         $shared = $this->sharedData();
-        return view('provider.rescue.missions', $shared);
+        $provider = $shared['provider'];
+
+        $missions = \App\Models\RescueMission::where('provider_id', $provider?->id)
+            ->with(['sos.traveler', 'fleet'])
+            ->latest()
+            ->get();
+
+        return view('provider.rescue.missions', array_merge($shared, [
+            'missions' => $missions,
+        ]));
     }
 
     public function gps()
@@ -105,6 +114,25 @@ class RescueDashboardController extends Controller
     public function coverage()
     {
         return view('provider.rescue.coverage', $this->sharedData());
+    }
+
+    public function updateCoverage(Request $request)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $validated = $request->validate([
+            'coverage_districts' => 'nullable|array',
+            'coverage_districts.*' => 'string|max:50',
+            'coverage_radius_km' => 'required|integer|min:10|max:500',
+        ]);
+
+        $rescueProvider->update([
+            'coverage_districts' => $validated['coverage_districts'] ?? [],
+            'coverage_radius_km' => $validated['coverage_radius_km'],
+        ]);
+
+        return back()->with('success', 'Coverage areas updated successfully.');
     }
 
     public function documents()
