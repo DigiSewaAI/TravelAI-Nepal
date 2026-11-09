@@ -398,6 +398,7 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/dashboard', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'index'])->name('dashboard');
         Route::get('/sos', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'sosQueue'])->name('sos');
         Route::get('/missions', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'missions'])->name('missions');
+                Route::patch('/missions/{mission}/status', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateMissionStatus'])->name('missions.status');
         Route::get('/gps', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'gps'])->name('gps');
         Route::get('/audit', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'audit'])->name('audit');
         Route::get('/fleet', [\App\Http\Controllers\Provider\RescueFleetController::class, 'index'])->name('fleet');
@@ -416,8 +417,15 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         Route::get('/security', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'security'])->name('security');
         Route::post('/toggle-availability', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'toggleAvailability'])->name('toggle-availability');
                 Route::post('/staff', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeStaff'])->name('staff.store');
+                        Route::put('/staff/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateStaff'])->name('staff.update');
+        Route::delete('/staff/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'destroyStaff'])->name('staff.destroy');
         Route::post('/insurance', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeInsurance'])->name('insurance.store');
+                Route::put('/insurance/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateInsurance'])->name('insurance.update');
+        Route::delete('/insurance/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'destroyInsurance'])->name('insurance.destroy');
         Route::post('/documents', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'storeDocument'])->name('documents.store');
+                Route::put('/documents/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'updateDocument'])->name('documents.update');
+        Route::delete('/documents/{index}', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'destroyDocument'])->name('documents.destroy');
+                Route::get('/documents/{index}/download', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'downloadDocument'])->name('documents.download');
     });
     Route::get('/profile', [ProviderProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProviderProfileController::class, 'edit'])->name('profile.edit');

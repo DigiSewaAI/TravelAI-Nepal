@@ -249,6 +249,12 @@ svg{display:block}button{font-family:inherit}
 .modal select,.modal input[type=text],.modal input[type=number],.modal input[type=tel],.modal input[type=email],.modal input[type=url],.modal textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--text);background:#fff;transition:border-color .16s,box-shadow .16s}
 .modal select:focus,.modal input:focus,.modal textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
 
+/* File input (browsers default style is ugly) */
+.modal input[type=file]{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;color:var(--text);background:#fff;cursor:pointer;transition:border-color .16s,box-shadow .16s}
+.modal input[type=file]:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.modal input[type=file]::file-selector-button{padding:6px 12px;margin-right:10px;border:none;border-radius:6px;background:var(--primary-light);color:var(--primary-dark);font-weight:700;font-size:12px;font-family:inherit;cursor:pointer;transition:background .16s}
+.modal input[type=file]::file-selector-button:hover{background:var(--primary);color:#fff}
+
 /* Responsive */
 @media(max-width:1240px){.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}.topbar-center{display:none}}
 @media(max-width:900px){.sidebar{position:fixed;left:-290px;transition:left .25s ease;z-index:70}.sidebar.open{left:0}.menu-btn{display:grid}.topbar{padding:11px 16px;gap:10px}.content{padding:16px}.profile-info{display:none}.network-chip{display:none}.page-title h1{font-size:15.5px;white-space:normal}.page-title p{display:none}}

@@ -82,6 +82,7 @@ class RescueDashboardController extends Controller
         $provider = $shared['provider'];
 
         $missions = \App\Models\RescueMission::where('provider_id', $provider?->id)
+            ->whereNotIn('status', ['completed', 'cancelled'])
             ->with(['sos.traveler', 'fleet'])
             ->latest()
             ->get();
@@ -89,6 +90,58 @@ class RescueDashboardController extends Controller
         return view('provider.rescue.missions', array_merge($shared, [
             'missions' => $missions,
         ]));
+    }
+        public function updateMissionStatus(Request $request, \App\Models\RescueMission $mission)
+    {
+        $provider = $this->getProvider();
+        if (!$provider || $mission->provider_id !== $provider->id) abort(403);
+
+        if (in_array($mission->status, ['completed', 'cancelled'])) {
+            return back()->with('error', 'Mission is already closed.');
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:accepted,en_route,on_scene,extracting,completed,cancelled',
+        ]);
+
+        $timestampMap = [
+            'accepted'   => 'accepted_at',
+            'en_route'   => 'en_route_at',
+            'on_scene'   => 'on_scene_at',
+            'completed'  => 'completed_at',
+        ];
+
+        $data = ['status' => $validated['status']];
+        if (isset($timestampMap[$validated['status']])) {
+            $data[$timestampMap[$validated['status']]] = now();
+        }
+
+        // 🆕 Sync linked SOS status
+        \Illuminate\Support\Facades\DB::transaction(function () use ($mission, $validated, $data) {
+            $mission->update($data);
+
+            $sos = $mission->sos;
+            if ($sos) {
+                if ($validated['status'] === 'completed') {
+                    $sos->update([
+                        'status'      => 'resolved',
+                        'resolved_at' => now(),
+                    ]);
+                } elseif ($validated['status'] === 'accepted' && $sos->status === 'pending') {
+                    $sos->update(['status' => 'acknowledged']);
+                } elseif (in_array($validated['status'], ['en_route', 'on_scene', 'extracting'])
+                          && in_array($sos->status, ['pending', 'sent', 'acknowledged'])) {
+                    $sos->update(['status' => 'responding']);
+                } elseif ($validated['status'] === 'cancelled') {
+                    $sos->update([
+                        'status'      => 'false_alarm',
+                        'resolved_at' => now(),
+                    ]);
+                }
+            }
+        });
+
+        return back()->with('success', 'Mission status updated to ' . str_replace('_', ' ', $validated['status']) . '.');
     }
 
     public function gps()
@@ -180,6 +233,43 @@ class RescueDashboardController extends Controller
         $rescueProvider->update(['staff_members' => $staff]);
         return back()->with('success', 'Staff member added successfully.');
     }
+        public function updateStaff(Request $request, int $index)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $staff = $rescueProvider->staff_members ?? [];
+        if (!isset($staff[$index])) abort(404);
+
+        $validated = $request->validate([
+            'name'    => 'required|string|max:100',
+            'role'    => 'required|string|max:50',
+            'license' => 'nullable|string|max:50',
+            'hours'   => 'nullable|string|max:50',
+            'phone'   => 'required|string|max:20',
+        ]);
+
+        $staff[$index] = $validated;
+        $rescueProvider->update(['staff_members' => $staff]);
+
+        return back()->with('success', 'Staff member updated successfully.');
+    }
+
+    public function destroyStaff(int $index)
+    {
+        $rescueProvider = $this->getRescueProvider();
+        if (!$rescueProvider) abort(403);
+
+        $staff = $rescueProvider->staff_members ?? [];
+        if (!isset($staff[$index])) abort(404);
+
+        unset($staff[$index]);
+        $staff = array_values($staff); // Re-index to prevent gaps
+
+        $rescueProvider->update(['staff_members' => $staff]);
+
+        return back()->with('success', 'Staff member removed successfully.');
+    }
 
     public function storeInsurance(Request $request)
     {
@@ -196,24 +286,159 @@ class RescueDashboardController extends Controller
         $rescueProvider->update(['insurance_partners' => $partners]);
         return back()->with('success', 'Insurance partner added successfully.');
     }
+        public function updateInsurance(Request $request, int $index)
+    {
+        $rp = $this->getRescueProvider();
+        if (!$rp) abort(403);
+        $partners = $rp->insurance_partners ?? [];
+        if (!isset($partners[$index])) abort(404);
+
+        $validated = $request->validate([
+            'name'   => 'required|string|max:100',
+            'type'   => 'required|string|max:50',
+            'status' => 'required|string|in:active,pending',
+        ]);
+
+        $partners[$index] = $validated;
+        $rp->update(['insurance_partners' => $partners]);
+        return back()->with('success', 'Insurance partner updated successfully.');
+    }
+
+    public function destroyInsurance(int $index)
+    {
+        $rp = $this->getRescueProvider();
+        if (!$rp) abort(403);
+        $partners = $rp->insurance_partners ?? [];
+        if (!isset($partners[$index])) abort(404);
+
+        unset($partners[$index]);
+        $rp->update(['insurance_partners' => array_values($partners)]);
+        return back()->with('success', 'Insurance partner removed successfully.');
+    }
 
     public function storeDocument(Request $request)
     {
         $rescueProvider = $this->getRescueProvider();
         if (!$rescueProvider) abort(403);
 
-        $docs = $rescueProvider->documents ?? [];
-        $docs[] = $request->validate([
-            'title' => 'required|string|max:100',
-            'issuer' => 'required|string|max:100',
-            'expiry' => 'required|string|max:50',
-            'status' => 'required|string|in:verified,pending,action_needed',
+        $validated = $request->validate([
+            'title'    => 'required|string|max:100',
+            'issuer'   => 'required|string|max:100',
+            'expiry'   => 'required|string|max:50',
+            'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:' . config('rescue.documents_max_kb', 10240),
         ]);
 
+        // 🚨 SECURITY: Provider NEVER sets status — always pending
+        $validated['status'] = 'pending';
+
+        if ($request->hasFile('document')) {
+            $disk = config('rescue.documents_disk', 'local');
+            $file = $request->file('document');
+
+            $validated['file_path']     = $file->store('rescue-documents/'.$rescueProvider->provider_id, $disk);
+            $validated['file_disk']     = $disk;
+            $validated['original_name'] = $file->getClientOriginalName();
+            $validated['file_size']     = $file->getSize();
+            $validated['mime_type']     = $file->getMimeType();
+            $validated['uploaded_at']   = now()->toIso8601String();
+        }
+
+        $docs = $rescueProvider->documents ?? [];
+        $docs[] = $validated;
+
         $rescueProvider->update(['documents' => $docs]);
-        return back()->with('success', 'Document added successfully.');
+        return back()->with('success', 'Document uploaded — pending admin review.');
+    }
+    public function updateDocument(Request $request, int $index)
+    {
+        $rp = $this->getRescueProvider();
+        if (!$rp) abort(403);
+        $docs = $rp->documents ?? [];
+        if (!isset($docs[$index])) abort(404);
+
+        $validated = $request->validate([
+            'title'    => 'required|string|max:100',
+            'issuer'   => 'required|string|max:100',
+            'expiry'   => 'required|string|max:50',
+            'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:' . config('rescue.documents_max_kb', 10240),
+        ]);
+
+        $oldDoc = $docs[$index];
+
+        // Preserve existing file metadata by default
+        $validated['file_path']     = $oldDoc['file_path']     ?? null;
+        $validated['file_disk']     = $oldDoc['file_disk']     ?? null;
+        $validated['original_name'] = $oldDoc['original_name'] ?? null;
+        $validated['file_size']     = $oldDoc['file_size']     ?? null;
+        $validated['mime_type']     = $oldDoc['mime_type']     ?? null;
+        $validated['uploaded_at']   = $oldDoc['uploaded_at']   ?? null;
+
+        $newFilePath = null;
+        $newDisk     = null;
+
+        // 🚨 SAFE ORDER: store new file FIRST
+        if ($request->hasFile('document')) {
+            $disk = config('rescue.documents_disk', 'local');
+            $file = $request->file('document');
+
+            $newFilePath = $file->store('rescue-documents/'.$rp->provider_id, $disk);
+            $newDisk     = $disk;
+
+            $validated['file_path']     = $newFilePath;
+            $validated['file_disk']     = $disk;
+            $validated['original_name'] = $file->getClientOriginalName();
+            $validated['file_size']     = $file->getSize();
+            $validated['mime_type']     = $file->getMimeType();
+            $validated['uploaded_at']   = now()->toIso8601String();
+        }
+
+        // 🚨 SECURITY: Any edit (metadata or file) resets status to pending
+        $validated['status'] = 'pending';
+
+        $docs[$index] = $validated;
+        $rp->update(['documents' => $docs]);
+
+        // 🚨 SAFE ORDER: delete old file ONLY after DB success
+        if ($newFilePath && !empty($oldDoc['file_path'])) {
+            $oldDisk = $oldDoc['file_disk'] ?? config('rescue.documents_disk', 'local');
+            try {
+                \Storage::disk($oldDisk)->delete($oldDoc['file_path']);
+            } catch (\Throwable $e) {
+                \Log::warning('Old document file delete failed', [
+                    'path' => $oldDoc['file_path'], 'disk' => $oldDisk, 'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Document updated — pending admin re-review.');
     }
 
+    public function destroyDocument(int $index)
+    {
+        $rp = $this->getRescueProvider();
+        if (!$rp) abort(403);
+        $docs = $rp->documents ?? [];
+        if (!isset($docs[$index])) abort(404);
+
+        $removed = $docs[$index];
+
+        unset($docs[$index]);
+        $rp->update(['documents' => array_values($docs)]);
+
+        // Delete file AFTER DB update
+        if (!empty($removed['file_path'])) {
+            $disk = $removed['file_disk'] ?? config('rescue.documents_disk', 'local');
+            try {
+                \Storage::disk($disk)->delete($removed['file_path']);
+            } catch (\Throwable $e) {
+                \Log::warning('Document file delete failed', [
+                    'path' => $removed['file_path'], 'disk' => $disk, 'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Document deleted successfully.');
+    }
     public function insurance()
     {
         return view('provider.rescue.insurance', $this->sharedData());
@@ -241,5 +466,26 @@ class RescueDashboardController extends Controller
             $rescueProvider->update(['is_available' => !$rescueProvider->is_available]);
         }
         return back()->with('success', $rescueProvider?->is_available ? 'You are now On Duty' : 'You are now Off Duty');
+    }
+        public function downloadDocument(int $index)
+    {
+        $rp = $this->getRescueProvider();
+        if (!$rp) abort(403);
+        $docs = $rp->documents ?? [];
+
+        if (!isset($docs[$index])) abort(404);
+        $doc = $docs[$index];
+
+        if (empty($doc['file_path'])) abort(404, 'No file attached.');
+
+        $disk = $doc['file_disk'] ?? config('rescue.documents_disk', 'local');
+        if (!\Storage::disk($disk)->exists($doc['file_path'])) {
+            abort(404, 'File not found on storage.');
+        }
+
+        return \Storage::disk($disk)->download(
+            $doc['file_path'],
+            $doc['original_name'] ?? 'document'
+        );
     }
 }
