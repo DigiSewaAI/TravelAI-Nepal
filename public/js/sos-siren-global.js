@@ -97,19 +97,25 @@
             .then(function(data) {
                 if (!data || typeof data.count !== 'number') return;
                 var latest = data.latest_id || 0;
+
+                // ✅ FIX: First load — auto-acknowledge existing alerts
+                // Show bar (user sees alert) but NO siren (avoid false alarm on every dashboard load)
+                if (lastLatestId === null) {
+                    lastLatestId = latest;
+                    if (latest > 0 && ackedLatestId < latest) {
+                        showBar();
+                        ackedLatestId = latest;
+                        localStorage.setItem(ackKey, String(latest));
+                    }
+                    return;
+                }
+
+                // Subsequent polls — only NEW alerts ring
                 if (data.count > 0 && latest > ackedLatestId && enabled) {
                     lastLatestId = latest;
                     startRinging();
                 } else if (data.count === 0) {
                     stopRinging();
-                }
-                // FIX: Auto-acknowledge existing alerts on first load
-                if (lastLatestId === null) {
-                    lastLatestId = latest;
-                    if (ackedLatestId === 0 && latest > 0) {
-                        ackedLatestId = latest;
-                        localStorage.setItem(ackKey, String(latest));
-                    }
                 }
             }).catch(function() {});
     }
