@@ -59,16 +59,28 @@
                         <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Cost Estimate</div>
                         <div style="font-size:13px;font-weight:700;margin-top:4px">NPR {{ number_format($mission->cost_estimate ?? 0, 2) }}</div>
                     </div>
-                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px">
-                        {{-- Action Buttons based on status --}}
-                        @if($mission->status === 'accepted')
-                            <button class="btn btn-primary btn-sm">Mark En Route</button>
-                        @elseif($mission->status === 'en_route')
-                            <button class="btn btn-primary btn-sm">Mark On Scene</button>
-                        @elseif($mission->status === 'on_scene')
-                            <button class="btn btn-primary btn-sm">Extracting</button>
-                        @elseif($mission->status === 'extracting')
-                            <button class="btn btn-warn btn-sm">Complete Mission</button>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap">
+                        @php
+                            $nextStatus = [
+                                'dispatched' => ['accepted', 'Accept Mission', 'btn-primary'],
+                                'accepted'   => ['en_route', 'Mark En Route', 'btn-primary'],
+                                'en_route'   => ['on_scene', 'Mark On Scene', 'btn-primary'],
+                                'on_scene'   => ['extracting', 'Extracting', 'btn-primary'],
+                                'extracting' => ['completed', 'Complete Mission', 'btn-warn'],
+                            ][$mission->status] ?? null;
+                        @endphp
+
+                        @if($nextStatus)
+                            <form action="{{ route('provider.rescue.missions.status', $mission) }}" method="POST" style="display:inline">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="status" value="{{ $nextStatus[0] }}">
+                                <button type="submit" class="btn {{ $nextStatus[2] }} btn-sm">
+                                    {{ $nextStatus[1] }}
+                                </button>
+                            </form>
+                        @elseif(in_array($mission->status, ['completed', 'cancelled']))
+                            <span class="badge badge-green">✓ {{ strtoupper($mission->status) }}</span>
                         @endif
                     </div>
                 </div>
