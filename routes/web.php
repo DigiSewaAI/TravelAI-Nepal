@@ -776,6 +776,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/sos/{sos}', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'showSos'])->name('sos.show');
         Route::post('/sos/{sos}/dispatch', [\App\Http\Controllers\Admin\RescueCommandCenterController::class, 'manualDispatch'])->name('sos.dispatch');
     });
+        // ═══════════════════════════════════════════
+    // ADMIN RESCUE DOCUMENTS VERIFICATION
+    // ═══════════════════════════════════════════
+    Route::prefix('rescue/documents')->name('rescue.documents.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\RescueDocumentsController::class, 'index'])->name('index');
+        Route::get('/{providerId}/{index}/download', [\App\Http\Controllers\Admin\RescueDocumentsController::class, 'download'])->name('download');
+        Route::post('/{providerId}/{index}/verify', [\App\Http\Controllers\Admin\RescueDocumentsController::class, 'verify'])->name('verify');
+        Route::post('/{providerId}/{index}/reject', [\App\Http\Controllers\Admin\RescueDocumentsController::class, 'reject'])->name('reject');
+    });
 });
 
 // =======================================

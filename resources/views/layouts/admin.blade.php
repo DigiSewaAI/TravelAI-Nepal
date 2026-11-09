@@ -269,6 +269,9 @@
     <i class="fas fa-truck-medical w-5 text-red-500"></i>
     <span class="flex-1">Rescue Command Center</span>
 </a>
+<a href="{{ route('admin.rescue.documents.index') }}" class="nav-link {{ request()->routeIs('admin.rescue.documents.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.documents.*') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
+    <i class="fas fa-file-signature" style="width:16px; text-align:center;"></i> Document Verification
+</a>
 </div>
 @endif
 
