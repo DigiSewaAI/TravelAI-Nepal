@@ -13,11 +13,9 @@ class AutoReleaseRescueLocks extends Command
     public function handle(): int
     {
         $count = RescueDispatchLock::where('expires_at', '<', now())->delete();
-        
+
         if ($count > 0) {
             $this->info("Released {$count} expired rescue lock(s).");
-        } else {
-            $this->info("No expired locks found.");
         }
 
         return self::SUCCESS;

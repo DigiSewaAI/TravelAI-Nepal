@@ -263,24 +263,35 @@
         <i class="fas fa-history w-5"></i>
         <span>Audit Log</span>
     </a>
-        {{-- 🚨 NEW: Rescue Command Center Link --}}
-<a href="{{ route('admin.rescue.index') }}"
-   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.rescue.*') ? 'active' : '' }}">
-    <i class="fas fa-truck-medical w-5 text-red-500"></i>
-    <span class="flex-1">Rescue Command Center</span>
-</a>
-<a href="{{ route('admin.rescue.documents.index') }}" class="nav-link {{ request()->routeIs('admin.rescue.documents.*') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.documents.*') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
-    <i class="fas fa-file-signature" style="width:16px; text-align:center;"></i> Document Verification
-</a>
-<a href="{{ route('admin.rescue.missions') }}" class="nav-link {{ request()->routeIs('admin.rescue.missions') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.missions') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
-    <i class="fas fa-ambulance" style="width:16px; text-align:center;"></i> Active Missions
-</a>
-<a href="{{ route('admin.rescue.providers') }}" class="nav-link {{ request()->routeIs('admin.rescue.providers') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.providers') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
-    <i class="fas fa-helicopter" style="width:16px; text-align:center;"></i> Rescue Providers
-</a>
-<a href="{{ route('admin.rescue.history') }}" class="nav-link {{ request()->routeIs('admin.rescue.history') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.history') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
-    <i class="fas fa-history" style="width:16px; text-align:center;"></i> Dispatch History
-</a>
+                {{-- 🚨 Rescue Section (Collapsible) --}}
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+            <a href="#" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
+               onclick="toggleRescueMenu(event); return false;">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-truck-medical w-5 text-red-500"></i>
+                    <span>Rescue Command Center</span>
+                </div>
+                <i class="fas fa-chevron-down" id="rescueChevron" style="font-size:10px; transition: transform 0.3s ease; color:#94a3b8;"></i>
+            </a>
+
+            <div id="rescueSubMenu" style="display: none; padding-left: 28px; margin-top: 2px; border-left: 2px solid #e2e8f0; margin-left: 22px;">
+                <a href="{{ route('admin.rescue.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.rescue.index') ? 'active' : '' }}"
+                   style="display:block; padding:6px 12px; font-size:12.5px; color:#64748b; text-decoration:none; border-radius:6px;">Overview</a>
+                <a href="{{ route('admin.rescue.documents.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.rescue.documents.*') ? 'active' : '' }}"
+                   style="display:block; padding:6px 12px; font-size:12.5px; color:#64748b; text-decoration:none; border-radius:6px;">Document Verification</a>
+                <a href="{{ route('admin.rescue.missions') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.rescue.missions') ? 'active' : '' }}"
+                   style="display:block; padding:6px 12px; font-size:12.5px; color:#64748b; text-decoration:none; border-radius:6px;">Active Missions</a>
+                <a href="{{ route('admin.rescue.providers') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.rescue.providers') ? 'active' : '' }}"
+                   style="display:block; padding:6px 12px; font-size:12.5px; color:#64748b; text-decoration:none; border-radius:6px;">Rescue Providers</a>
+                <a href="{{ route('admin.rescue.history') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.rescue.history') ? 'active' : '' }}"
+                   style="display:block; padding:6px 12px; font-size:12.5px; color:#64748b; text-decoration:none; border-radius:6px;">Dispatch History</a>
+            </div>
+        </div>
 </div>
 @endif
 
@@ -585,6 +596,32 @@ setInterval(function() {
             lastAdminUnread = data.unread_count;
         }).catch(function() {});
 }, 15000);
+</script>
+<script>
+    function toggleRescueMenu(event) {
+        if (event) event.preventDefault();
+        var submenu = document.getElementById('rescueSubMenu');
+        var chevron = document.getElementById('rescueChevron');
+        if (!submenu || !chevron) return;
+
+        if (submenu.style.display === 'none' || submenu.style.display === '') {
+            submenu.style.display = 'block';
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            submenu.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Auto-expand submenu if current page is any rescue page
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.location.pathname.indexOf('/admin/rescue') !== -1) {
+            var submenu = document.getElementById('rescueSubMenu');
+            var chevron = document.getElementById('rescueChevron');
+            if (submenu) submenu.style.display = 'block';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        }
+    });
 </script>
 </body>
 </html>

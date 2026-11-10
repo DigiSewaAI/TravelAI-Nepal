@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SosAlert;
 use App\Models\RescueProvider;
 use App\Models\RescueMission;
+use App\Models\SosAlertAction;
 use Illuminate\Http\Request;
 
 class RescueCommandCenterController extends Controller
@@ -18,11 +19,11 @@ class RescueCommandCenterController extends Controller
             ->where('created_at', '<=', now()->subMinutes(10))
             ->count();
         $activeMissionsCount = RescueMission::whereNotIn('status', ['completed', 'cancelled'])->count();
-        
+
         $onlineProviders = RescueProvider::where('is_available', true)->count();
         $totalProviders = RescueProvider::count();
 
-        // 2. Escalation Queue (SLA Breach > 10 mins)
+        // 2. Escalation Queue
         $escalations = SosAlert::whereIn('status', ['pending', 'sent'])
             ->where('created_at', '<=', now()->subMinutes(10))
             ->with('traveler')
@@ -36,16 +37,31 @@ class RescueCommandCenterController extends Controller
             ->take(10)
             ->get();
 
-        // 4. Providers Live Status
+        // 4. Providers with real fleet count
         $providers = RescueProvider::with('provider')
             ->orderByDesc('is_available')
             ->take(5)
+            ->get()
+            ->map(function ($rp) {
+                $rp->actual_fleet_count = \App\Models\RescueFleet::where('provider_id', $rp->provider_id)->count();
+                return $rp;
+            });
+
+        // 5. Admin Actions Log
+        $recentActions = SosAlertAction::whereIn('action', ['admin_notified', 'auto_escalated', 'dispatched'])
+            ->latest()
+            ->take(5)
             ->get();
 
+        // 6. Pending docs count
+        $pendingDocsCount = RescueProvider::all()->sum(function ($rp) {
+            return collect($rp->documents ?? [])->where('status', 'pending')->count();
+        });
+
         return view('admin.rescue.index', compact(
-            'liveSosCount', 'slaBreaches', 'activeMissionsCount', 
-            'onlineProviders', 'totalProviders', 'escalations', 
-            'activeSos', 'providers'
+            'liveSosCount', 'slaBreaches', 'activeMissionsCount',
+            'onlineProviders', 'totalProviders', 'escalations',
+            'activeSos', 'providers', 'recentActions', 'pendingDocsCount'
         ));
     }
 
