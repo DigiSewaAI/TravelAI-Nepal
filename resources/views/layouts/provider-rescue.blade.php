@@ -40,6 +40,14 @@
   --shadow-sm:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
   --shadow:0 4px 16px rgba(15,23,42,.06);
   --shadow-lg:0 12px 40px rgba(15,23,42,.12);
+  /* 🆕 Aliases for shared views (subscription, invoices, payments) */
+  --card:var(--surface);
+  --line:var(--border);
+  --muted:var(--text-muted);
+  --green:var(--success);
+  --green-soft:var(--success-light);
+  --red:var(--danger);
+  --red-soft:var(--danger-light);
 }
 html{scroll-behavior:smooth}
 body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5}
@@ -378,8 +386,10 @@ svg{display:block}button{font-family:inherit}
     <button class="icon-btn menu-btn" id="menuBtn"><i data-lucide="menu"></i></button>
     <div class="page-title">
       @php
-          $__pt = trim($__env->yieldContent('page-title'));
-          $__t  = trim($__env->yieldContent('title'));
+          // Laravel `@section` already HTML-escapes content.
+          // Decode once so `{{ }}` re-encode produces correct single-decode output.
+          $__pt = html_entity_decode(trim($__env->yieldContent('page-title')), ENT_QUOTES, 'UTF-8');
+          $__t  = html_entity_decode(trim($__env->yieldContent('title')), ENT_QUOTES, 'UTF-8');
           $__finalTitle = $__pt ?: ($__t ?: 'Operations Overview');
       @endphp
       <h1>{{ $__finalTitle }}</h1>
