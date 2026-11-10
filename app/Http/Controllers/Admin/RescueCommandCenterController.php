@@ -66,6 +66,13 @@ class RescueCommandCenterController extends Controller
 
         return view('admin.rescue.missions', compact('missions'));
     }
+        public function providers()
+    {
+        $providers = \App\Models\RescueProvider::with('provider')
+            ->get();
+
+        return view('admin.rescue.providers', compact('providers'));
+    }
     public function manualDispatch(Request $request, SosAlert $sos)
     {
         $validated = $request->validate([

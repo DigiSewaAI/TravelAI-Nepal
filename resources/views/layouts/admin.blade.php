@@ -275,6 +275,9 @@
 <a href="{{ route('admin.rescue.missions') }}" class="nav-link {{ request()->routeIs('admin.rescue.missions') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.missions') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
     <i class="fas fa-ambulance" style="width:16px; text-align:center;"></i> Active Missions
 </a>
+<a href="{{ route('admin.rescue.providers') }}" class="nav-link {{ request()->routeIs('admin.rescue.providers') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.providers') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
+    <i class="fas fa-helicopter" style="width:16px; text-align:center;"></i> Rescue Providers
+</a>
 </div>
 @endif
 
