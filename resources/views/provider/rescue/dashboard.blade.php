@@ -122,17 +122,45 @@
             <div class="card-header">
                 <div class="card-title">
                     <i data-lucide="ambulance"></i>
-                    <h2>Active Missions</h2>
-                    <span class="pill pill-teal">{{ $activeMissionsCount ?? 0 }} in progress</span>
+                    <h2>Active Mission</h2>
+                    @if($activeMission)
+                        <span class="pill pill-teal">1 in progress</span>
+                    @endif
                 </div>
                 <a href="{{ route('provider.rescue.missions') }}" class="btn-link">
                     View all <i data-lucide="chevron-right"></i>
                 </a>
             </div>
-            <div style="padding:40px 20px;text-align:center;color:var(--text-muted)">
-                <i data-lucide="plane" style="width:32px;height:32px;margin:0 auto 8px;opacity:.4"></i>
-                <div style="font-size:13px;font-weight:600">No active missions</div>
-                <div style="font-size:11.5px;margin-top:4px">Missions will appear when you accept an SOS dispatch</div>
+            <div style="padding:16px">
+                @if($activeMission)
+                    <div class="mission-card" style="margin:0">
+                        <div class="mission-head">
+                            <span class="mission-id">{{ $activeMission->mission_number }}</span>
+                            <span class="badge badge-blue">RESCUE: {{ strtoupper($activeMission->status) }}</span>
+                        </div>
+                        <h3 style="font-size:14px;font-weight:700;margin-bottom:6px">
+                            {{ $activeMission->sos->traveler->name ?? 'Unknown Traveler' }}
+                        </h3>
+                        <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:12px">
+                            <span style="display:inline-flex;align-items:center;gap:4px">
+                                <i data-lucide="map-pin" style="width:12px;height:12px"></i>
+                                {{ number_format($activeMission->pickup_lat ?? 0, 4) }}, {{ number_format($activeMission->pickup_lng ?? 0, 4) }}
+                            </span>
+                            · Cost: <strong>NPR {{ number_format($activeMission->cost_estimate ?? 0, 2) }}</strong>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end">
+                            <a href="{{ route('provider.rescue.missions') }}" class="btn btn-primary btn-sm">
+                                <i data-lucide="navigation" style="width:12px;height:12px"></i> Manage Mission
+                            </a>
+                        </div>
+                    </div>
+                @else
+                    <div style="padding:40px 20px;text-align:center;color:var(--text-muted)">
+                        <i data-lucide="plane" style="width:32px;height:32px;margin:0 auto 8px;opacity:.4"></i>
+                        <div style="font-size:13px;font-weight:600">No active missions</div>
+                        <div style="font-size:11.5px;margin-top:4px">Missions will appear when you accept an SOS dispatch</div>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -210,22 +238,25 @@
                 <a href="{{ route('provider.rescue.audit') }}" class="btn-link">Full log <i data-lucide="chevron-right"></i></a>
             </div>
             <div>
-                <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
-                    <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">14:32</span>
-                    <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--info)"></span>
-                    <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">
-                        <span style="font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);margin-right:4px;text-transform:uppercase">mission</span>
-                        <span style="color:var(--text);font-weight:600">System</span> marked mission en route
+                @forelse($auditLogs as $log)
+                    <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
+                        <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">
+                            {{ $log->created_at ? $log->created_at->format('H:i') : '—' }}
+                        </span>
+                        <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--info)"></span>
+                        <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">
+                            <span style="font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);margin-right:4px;text-transform:uppercase">
+                                {{ $log->action ?? 'action' }}
+                            </span>
+                            <span style="color:var(--text);font-weight:600">System</span>
+                            {{ $log->notes ?? (($log->from_status ?? '') . ' → ' . ($log->to_status ?? '')) }}
+                        </div>
                     </div>
-                </div>
-                <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
-                    <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">14:28</span>
-                    <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--danger)"></span>
-                    <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">
-                        <span style="font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border);margin-right:4px;text-transform:uppercase">escalate</span>
-                        <span style="color:var(--text);font-weight:600">System</span> auto-escalated SOS alert
+                @empty
+                    <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">
+                        No audit logs yet.
                     </div>
-                </div>
+                @endforelse
             </div>
         </div>
 
@@ -238,24 +269,35 @@
                 <a href="{{ route('provider.rescue.fleet') }}" class="btn-link">Manage <i data-lucide="chevron-right"></i></a>
             </div>
             <div style="display:flex;flex-direction:column">
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
-                    <div style="width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--info-light);color:var(--info-dark)"><i data-lucide="plane" style="width:15px;height:15px"></i></div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:12px;font-weight:600;line-height:1.3">9N-AJH · H125</div>
+                @forelse($fleets as $fleet)
+                    @php
+                        $statusColor = match($fleet->status) {
+                            'available' => ['info-light', 'info-dark'],
+                            'on_mission' => ['warning-light', 'warning-dark'],
+                            'maintenance' => ['danger-light', 'danger-dark'],
+                            default => ['surface-3', 'text-muted'],
+                        };
+                    @endphp
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+                        <div style="width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--{{ $statusColor[0] }});color:var(--{{ $statusColor[1] }})">
+                            <i data-lucide="plane" style="width:15px;height:15px"></i>
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:12px;font-weight:600;line-height:1.3">
+                                {{ $fleet->registration_number }}{{ $fleet->model ? ' · ' . $fleet->model : '' }}
+                            </div>
+                        </div>
+                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--{{ $statusColor[0] }});color:var(--{{ $statusColor[1] }})">
+                            {{ ucfirst(str_replace('_', ' ', $fleet->status)) }}
+                        </span>
                     </div>
-                    <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--info-light);color:var(--info-dark)">On Mission</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
-                    <div style="width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--success-light);color:var(--success-dark)"><i data-lucide="plane" style="width:15px;height:15px"></i></div>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:12px;font-weight:600;line-height:1.3">9N-AKL · AS350</div>
+                @empty
+                    <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">
+                        No vehicles added.
                     </div>
-                    <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--success-light);color:var(--success-dark)">Available</span>
-                </div>
+                @endforelse
             </div>
         </div>
-            </div>
-                </div>
 
 @endsection
 

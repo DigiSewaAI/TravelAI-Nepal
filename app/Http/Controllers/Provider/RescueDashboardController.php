@@ -29,7 +29,7 @@ class RescueDashboardController extends Controller
         $rescueProvider = $this->getRescueProvider();
 
         $liveSos = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+            ->whereIn('status', ['pending', 'sent', 'acknowledged'])
             ->count();
 
         // Fetch real fleet and mission count
@@ -50,14 +50,37 @@ class RescueDashboardController extends Controller
         $shared = $this->sharedData();
         $provider = $shared['provider'];
 
+        // 1. Live SOS Queue — matches sharedData() filter
         $sosQueue = SosAlert::where('provider_id', $provider?->id)
             ->whereIn('status', ['pending', 'sent', 'acknowledged'])
             ->latest()
             ->take(10)
             ->get();
 
+        // 2. Active Mission (single latest)
+        $activeMission = \App\Models\RescueMission::where('provider_id', $provider?->id)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->latest()
+            ->first();
+
+        // 3. Audit Log (last 4 entries)
+        $sosIds = SosAlert::where('provider_id', $provider?->id)->pluck('id');
+        $auditLogs = \App\Models\SosAlertAction::whereIn('sos_alert_id', $sosIds)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // 4. Fleet Status (last 4 vehicles)
+        $fleets = \App\Models\RescueFleet::where('provider_id', $provider?->id)
+            ->latest()
+            ->take(4)
+            ->get();
+
         return view('provider.rescue.dashboard', array_merge($shared, [
             'sosQueue' => $sosQueue,
+            'activeMission' => $activeMission,
+            'auditLogs' => $auditLogs,
+            'fleets' => $fleets,
         ]));
     }
 
