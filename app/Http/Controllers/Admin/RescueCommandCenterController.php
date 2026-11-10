@@ -73,6 +73,16 @@ class RescueCommandCenterController extends Controller
 
         return view('admin.rescue.providers', compact('providers'));
     }
+        public function history()
+    {
+        // Completed वा Cancelled भएका मिसनहरू मात्र
+        $missions = RescueMission::whereIn('status', ['completed', 'cancelled'])
+            ->with(['sos.traveler', 'provider', 'fleet'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.rescue.history', compact('missions'));
+    }
     public function manualDispatch(Request $request, SosAlert $sos)
     {
         $validated = $request->validate([

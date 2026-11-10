@@ -278,6 +278,9 @@
 <a href="{{ route('admin.rescue.providers') }}" class="nav-link {{ request()->routeIs('admin.rescue.providers') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.providers') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
     <i class="fas fa-helicopter" style="width:16px; text-align:center;"></i> Rescue Providers
 </a>
+<a href="{{ route('admin.rescue.history') }}" class="nav-link {{ request()->routeIs('admin.rescue.history') ? 'active' : '' }}" style="display:flex; align-items:center; gap:10px; padding:8px 12px; color: {{ request()->routeIs('admin.rescue.history') ? '#2563eb' : '#475569' }}; font-size:13px; font-weight:500; text-decoration:none;">
+    <i class="fas fa-history" style="width:16px; text-align:center;"></i> Dispatch History
+</a>
 </div>
 @endif
 
