@@ -3,7 +3,13 @@
 @section('title', 'Operations Overview')
 @section('page-title', 'Operations Overview')
 @section('page-sub', 'Target SLA · dispatch under 5 min · rescue operations live')
-
+@push('rescue-head')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    /* Fix for missing default Leaflet icons */
+    .leaflet-default-icon-path { background-image: url(https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png); }
+</style>
+@endpush
 @section('content')
 
 {{-- Stats Grid --}}
@@ -171,64 +177,64 @@
     {{-- Side Column --}}
     <div class="col-side">
 
-        {{-- Weather & Flight Safety --}}
+        {{-- Weather & Flight Safety — Real Data (Open-Meteo) --}}
         <div class="card" style="background:linear-gradient(160deg,#0b1f2a,#0a1620);border:1px solid #12262f;padding:14px;color:#e2e8f0">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
                 <div style="font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
                     <i data-lucide="cloud-sun" style="width:14px;height:14px;color:#2dd4bf"></i> Weather & Flight Safety
                 </div>
-                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)">ADVISORY</span>
+                @if($weather)
+                    <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)">LIVE</span>
+                @else
+                    <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)">OFFLINE</span>
+                @endif
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
-                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Wind</span>
-                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">12 km/h</strong>
+            @if($weather)
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                        <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Temp</span>
+                        <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">{{ round($weather['temperature'] ?? 0) }} °C</strong>
+                    </div>
+                    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                        <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Wind</span>
+                        <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">{{ $weather['wind_speed'] ?? 'N/A' }} km/h</strong>
+                    </div>
+                    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                        <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Humidity</span>
+                        <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">{{ $weather['humidity'] ?? 'N/A' }}%</strong>
+                    </div>
+                    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
+                        <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Condition</span>
+                        <strong style="font-size:11px;color:#fff;font-weight:700;display:block;margin-top:4px;font-family:'Inter',sans-serif">{{ \App\Services\OpenMeteoService::describeWmoCode($weather['weather_code'] ?? null)['label'] ?? 'N/A' }}</strong>
+                    </div>
                 </div>
-                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
-                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Visibility</span>
-                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">8 km</strong>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:#64748b;padding-top:9px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap">
+                    <span style="color:#6ee7b7;font-weight:600;display:inline-flex;align-items:center;gap:4px"><i data-lucide="check-circle-2" style="width:10px;height:10px"></i> Open-Meteo (Free)</span>
+                    <span style="font-family:'JetBrains Mono',monospace;color:#94a3b8">Live now</span>
                 </div>
-                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
-                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Ceiling</span>
-                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">3,500 m</strong>
-                </div>
-                <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:7px 9px">
-                    <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;font-weight:600;display:block">Temp</span>
-                    <strong style="font-size:12.5px;color:#fff;font-weight:700;display:block;margin-top:2px;font-family:'JetBrains Mono',monospace">-2 °C</strong>
-                </div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:#64748b;padding-top:9px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap">
-                <span style="color:#6ee7b7;font-weight:600;display:inline-flex;align-items:center;gap:4px"><i data-lucide="check-circle-2" style="width:10px;height:10px"></i> DHM Aviation API</span>
-                <span style="font-family:'JetBrains Mono',monospace;color:#94a3b8">Updated 4m ago</span>
-            </div>
+            @else
+                <div style="padding:20px;text-align:center;color:#94a3b8;font-size:12px">Weather data unavailable</div>
+            @endif
         </div>
 
-        {{-- GPS Map --}}
+        {{-- GPS Map — Real Data (Leaflet + OpenStreetMap) --}}
         <div class="card" style="background:linear-gradient(160deg,#0a1620,#0b1f2a);border:1px solid #12262f;overflow:hidden;padding:0">
             <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
                 <div style="display:flex;align-items:center;gap:8px">
                     <i data-lucide="map" style="width:16px;height:16px;color:#2dd4bf"></i>
                     <h2 style="color:#e2e8f0;font-size:14px;font-weight:700">GPS · Last-known</h2>
                 </div>
-                <span style="font-size:10px;font-weight:700;color:#fcd34d;background:rgba(245,158,11,.15);padding:4px 9px;border-radius:99px;border:1px solid rgba(245,158,11,.3);display:inline-flex;align-items:center;gap:5px">
-                    <span style="width:5px;height:5px;border-radius:50%;background:#fbbf24"></span> STALE
-                </span>
+                @if($isStale)
+                    <span style="font-size:10px;font-weight:700;color:#fcd34d;background:rgba(245,158,11,.15);padding:4px 9px;border-radius:99px;border:1px solid rgba(245,158,11,.3);display:inline-flex;align-items:center;gap:5px">
+                        <span style="width:5px;height:5px;border-radius:50%;background:#fbbf24"></span> STALE
+                    </span>
+                @else
+                    <span style="font-size:10px;font-weight:700;color:#6ee7b7;background:rgba(16,185,129,.15);padding:4px 9px;border-radius:99px;border:1px solid rgba(16,185,129,.3);display:inline-flex;align-items:center;gap:5px">
+                        <span style="width:5px;height:5px;border-radius:50%;background:#10b981"></span> LIVE
+                    </span>
+                @endif
             </div>
-            <div style="position:relative;height:200px;background:#0b1f2a">
-                <svg style="width:100%;height:100%;display:block" viewBox="0 0 420 260" preserveAspectRatio="xMidYMid slice">
-                    <rect width="420" height="260" fill="#0a1620"/>
-                    <path d="M0 200 Q60 155 125 180 T255 165 T420 190 V260 H0 Z" fill="rgba(45,212,191,0.045)"/>
-                    <path d="M0 220 Q75 195 155 210 T305 195 T420 218 V260 H0 Z" fill="rgba(45,212,191,0.07)"/>
-                    <path d="M70 195 L155 145 L255 108 L340 72" stroke="#2dd4bf" stroke-width="2" stroke-dasharray="6 6" fill="none" opacity=".6"/>
-                    <circle cx="70" cy="195" r="6" fill="#2dd4bf"/>
-                    <text x="70" y="220" text-anchor="middle" fill="#5eead4" font-size="8.5" font-weight="700">BASE</text>
-                    <circle cx="255" cy="108" r="22" fill="none" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="3 3" opacity=".65"/>
-                    <circle cx="255" cy="108" r="6" fill="#ef4444"/>
-                    <text x="255" y="140" text-anchor="middle" fill="#fca5a5" font-size="8.5" font-weight="700">LAST-KNOWN</text>
-                    <circle cx="155" cy="145" r="5.5" fill="#3b82f6"/>
-                    <text x="155" y="170" text-anchor="middle" fill="#93c5fd" font-size="8.5" font-weight="700">9N-AJH</text>
-                </svg>
-            </div>
+            <div id="rescueGpsMap" style="height: 200px; width: 100%; z-index: 1;"></div>
         </div>
 
         {{-- Audit Log --}}
@@ -308,5 +314,44 @@
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) lucide.createIcons();
     });
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var mapElement = document.getElementById('rescueGpsMap');
+    if (!mapElement) return;
+
+    var baseLat = {{ $baseLat }}, baseLng = {{ $baseLng }};
+    var lastLat = {{ $lastLat }}, lastLng = {{ $lastLng }};
+    var isStale = {{ $isStale ? 'true' : 'false' }};
+
+    var map = L.map('rescueGpsMap').setView([lastLat, lastLng], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Base marker (teal)
+    var baseIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color:#2dd4bf;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 4px rgba(45,212,191,.3)'></div>",
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+    });
+    L.marker([baseLat, baseLng], {icon: baseIcon}).addTo(map).bindPopup('Base (Pokhara)');
+
+    // Last-known marker (red, if not stale)
+    if (!isStale && (lastLat !== baseLat || lastLng !== baseLng)) {
+        var lastIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background-color:#ef4444;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 4px rgba(239,68,68,.3);animation:blink 1.5s infinite'></div>",
+            iconSize: [14, 14],
+            iconAnchor: [7, 7]
+        });
+        L.marker([lastLat, lastLng], {icon: lastIcon}).addTo(map).bindPopup('Last-known Position').openPopup();
+        map.setView([lastLat, lastLng], 11);
+    }
+});
 </script>
 @endpush

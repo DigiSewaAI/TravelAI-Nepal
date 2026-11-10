@@ -77,9 +77,9 @@ class RescueDashboardController extends Controller
         $shared = $this->sharedData();
         $provider = $shared['provider'];
 
-        // 1. Live SOS Queue — matches sharedData() filter
+        // 1. Live SOS Queue
         $sosQueue = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged'])
+            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
             ->latest()
             ->take(10)
             ->get();
@@ -103,11 +103,37 @@ class RescueDashboardController extends Controller
             ->take(4)
             ->get();
 
+        // 🆕 5. Real Weather (Open-Meteo — Free, No API Key)
+        $baseLat = 28.2096; // Pokhara (Lakeside)
+        $baseLng = 83.9856;
+        $weather = null;
+        try {
+            $weather = app(\App\Services\OpenMeteoService::class)->getWeatherForCoords($baseLat, $baseLng);
+        } catch (\Throwable $e) {
+            \Log::warning('Rescue dashboard weather fetch failed', ['error' => $e->getMessage()]);
+        }
+
+        // 🆕 6. GPS Map Data (Reuse SOS/Mission coords — No new migration)
+        $latestSos = SosAlert::where('provider_id', $provider?->id)
+            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+            ->latest()
+            ->first();
+
+        $lastLat = $latestSos?->latitude ?? $activeMission?->pickup_lat ?? $baseLat;
+        $lastLng = $latestSos?->longitude ?? $activeMission?->pickup_lng ?? $baseLng;
+        $isStale = !$latestSos && !$activeMission;
+
         return view('provider.rescue.dashboard', array_merge($shared, [
             'sosQueue' => $sosQueue,
             'activeMission' => $activeMission,
             'auditLogs' => $auditLogs,
             'fleets' => $fleets,
+            'weather' => $weather,
+            'baseLat' => $baseLat,
+            'baseLng' => $baseLng,
+            'lastLat' => $lastLat,
+            'lastLng' => $lastLng,
+            'isStale' => $isStale,
         ]));
     }
 
