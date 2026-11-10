@@ -6,6 +6,7 @@
     $liveSosCount = $liveSosCount ?? 0;
     $activeMissionsCount = $activeMissionsCount ?? 0;
     $isOnDuty = $rescueProvider?->is_available ?? false;
+    $actualFleetCount = $actualFleetCount ?? 0;
     // 🆕 Unread rescue dispatch notifications
     $unreadNotifs = $currentUser ? $currentUser->unreadNotifications()->where('data->type', 'rescue_dispatch')->count() : 0;
 @endphp
@@ -312,7 +313,7 @@ svg{display:block}button{font-family:inherit}
   <div class="sidebar-footer">
     <div class="plan-card">
       <div class="pc-title"><i data-lucide="zap"></i> Rescue Plan</div>
-      <div class="pc-sub">{{ $rescueProvider?->fleet_size ?? 0 }} vehicles · {{ $isOnDuty ? 'On Duty' : 'Off Duty' }}</div>
+      <div class="pc-sub">{{ $actualFleetCount }} vehicles · {{ $isOnDuty ? 'On Duty' : 'Off Duty' }}</div>
     </div>
     <div class="sidebar-net"><span class="dot"></span><span>{{ $isOnDuty ? 'Online' : 'Offline' }} · synced just now</span></div>
   </div>

@@ -32,16 +32,43 @@ class RescueDashboardController extends Controller
             ->whereIn('status', ['pending', 'sent', 'acknowledged'])
             ->count();
 
-        // Fetch real fleet and mission count
         $activeMissions = \App\Models\RescueMission::where('provider_id', $provider?->id)
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->count();
+
+        // Revenue: completed missions को final_cost (fallback: cost_estimate)
+        $completedMissions = \App\Models\RescueMission::where('provider_id', $provider?->id)
+            ->where('status', 'completed')
+            ->get();
+
+        $totalRevenue = $completedMissions->sum(function ($m) {
+            return $m->final_cost ?? $m->cost_estimate ?? 0;
+        });
+
+        // Avg Response Time: SOS created → Mission accepted (true SLA metric)
+        $missionsWithSos = $completedMissions->filter(fn($m) => $m->sos && ($m->accepted_at || $m->created_at));
+        $avgResponseMinutes = 0;
+        if ($missionsWithSos->count() > 0) {
+            $totalMinutes = 0;
+            foreach ($missionsWithSos as $m) {
+                // Prefer accepted_at (true response); fallback to created_at
+                $responseTime = $m->accepted_at ?? $m->created_at;
+                $totalMinutes += $m->sos->created_at->diffInMinutes($responseTime);
+            }
+            $avgResponseMinutes = round($totalMinutes / $missionsWithSos->count(), 1);
+        }
+
+        // Actual fleet count (sidebar fix)
+        $actualFleetCount = \App\Models\RescueFleet::where('provider_id', $provider?->id)->count();
 
         return [
             'provider'              => $provider,
             'rescueProvider'        => $rescueProvider,
             'liveSosCount'          => $liveSos,
             'activeMissionsCount'   => $activeMissions,
+            'totalRevenue'          => $totalRevenue,
+            'avgResponseMinutes'    => $avgResponseMinutes,
+            'actualFleetCount'      => $actualFleetCount,
         ];
     }
 
@@ -179,10 +206,16 @@ class RescueDashboardController extends Controller
                     'status'         => 'accepted',
                     'pickup_lat'     => $sos->latitude,
                     'pickup_lng'     => $sos->longitude,
+                    'dispatched_at'  => $sos->created_at,   // 🆕 SOS creation = dispatch reference
+                    'accepted_at'    => now(),               // 🆕 Provider accepts NOW
                 ]);
 
-                // 5. SOS अपडेट गर्ने
-                $freshSos->update(['status' => 'responding']);
+                // 5. SOS अपडेट गर्ने — timestamps सहित
+                $freshSos->update([
+                    'status'          => 'responding',
+                    'acknowledged_at' => now(),              // 🆕
+                    'acknowledged_by' => $provider->user_id,
+                ]);
 
                 // 6. लक डिलिट गर्ने
                 $lock->delete();
@@ -254,7 +287,17 @@ class RescueDashboardController extends Controller
 
     public function audit()
     {
-        return view('provider.rescue.audit', $this->sharedData());
+        $shared = $this->sharedData();
+        $provider = $shared['provider'];
+
+        $sosIds = SosAlert::where('provider_id', $provider?->id)->pluck('id');
+        $auditLogs = \App\Models\SosAlertAction::whereIn('sos_alert_id', $sosIds)
+            ->latest()
+            ->paginate(20);
+
+        return view('provider.rescue.audit', array_merge($shared, [
+            'auditLogs' => $auditLogs,
+        ]));
     }
 
     public function fleet()

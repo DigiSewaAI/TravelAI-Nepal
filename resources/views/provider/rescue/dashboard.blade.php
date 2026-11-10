@@ -35,7 +35,9 @@
         <div class="stat-icon"><i data-lucide="timer"></i></div>
         <div class="stat-body">
             <span class="stat-label">Avg Response Time</span>
-            <div class="stat-value">—</div>
+            <div class="stat-value">
+                {{ $avgResponseMinutes > 0 ? $avgResponseMinutes . 'm' : '—' }}
+            </div>
             <span class="stat-sub">Target < 5min</span>
         </div>
     </div>
@@ -44,7 +46,7 @@
         <div class="stat-icon"><i data-lucide="wallet"></i></div>
         <div class="stat-body">
             <span class="stat-label">Revenue</span>
-            <div class="stat-value">NPR 0</div>
+            <div class="stat-value">NPR {{ number_format($totalRevenue ?? 0, 2) }}</div>
             <span class="stat-sub">Completed missions</span>
         </div>
     </div>
