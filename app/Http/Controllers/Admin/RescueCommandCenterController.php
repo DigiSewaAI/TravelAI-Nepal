@@ -53,15 +53,28 @@ class RescueCommandCenterController extends Controller
             ->take(5)
             ->get();
 
-        // 6. Pending docs count
+                // 6. Pending docs count
         $pendingDocsCount = RescueProvider::all()->sum(function ($rp) {
             return collect($rp->documents ?? [])->where('status', 'pending')->count();
         });
 
+        // 7. System Response (avg from completed missions)
+        $avgResponseMinutes = RescueMission::whereNotNull('accepted_at')
+            ->whereNotNull('created_at')
+            ->get()
+            ->avg(function ($m) {
+                return $m->sos ? $m->sos->created_at->diffInMinutes($m->accepted_at) : 0;
+            });
+
+        $systemResponse = $avgResponseMinutes
+            ? round($avgResponseMinutes, 1) . 'm'
+            : '—';
+
         return view('admin.rescue.index', compact(
             'liveSosCount', 'slaBreaches', 'activeMissionsCount',
             'onlineProviders', 'totalProviders', 'escalations',
-            'activeSos', 'providers', 'recentActions', 'pendingDocsCount'
+            'activeSos', 'providers', 'recentActions', 'pendingDocsCount',
+            'systemResponse'
         ));
     }
 

@@ -153,9 +153,9 @@
             <div class="rescue-stat-sub">{{ $totalProviders - $onlineProviders }} offline</div>
         </div>
         <div class="rescue-stat-card purple">
-            <div class="rescue-stat-label">Pending Docs</div>
-            <div class="rescue-stat-value">{{ $pendingDocsCount ?? 0 }}</div>
-            <div class="rescue-stat-sub">Awaiting verification</div>
+            <div class="rescue-stat-label">System Response</div>
+            <div class="rescue-stat-value">{{ $systemResponse }}</div>
+            <div class="rescue-stat-sub">Avg across missions</div>
         </div>
     </div>
 
