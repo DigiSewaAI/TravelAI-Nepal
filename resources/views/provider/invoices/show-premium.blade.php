@@ -1,4 +1,10 @@
-@extends($provider_layout ?? 'layouts.provider')
+@php
+    $__user = auth()->user();
+    $__provider = $__user?->providers()->first();
+    $__isRescue = $__provider && $__provider->types->contains('slug', 'rescue-service');
+    $__layout = $__isRescue ? 'layouts.provider-rescue' : ($provider_layout ?? 'layouts.provider');
+@endphp
+@extends($__layout)
 @section('title', __('messages.invoice_detail_title', ['number' => $invoice->invoice_number]))
 @section('header', __('messages.invoice_detail_header'))
 @section('content')

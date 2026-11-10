@@ -1,4 +1,37 @@
-@extends($provider_layout ?? 'layouts.provider')
+@php
+    $__user = auth()->user();
+    $__provider = $__user?->providers()->first();
+    $__isRescue = $__provider && $__provider->types->contains('slug', 'rescue-service');
+    $__layout = $__isRescue ? 'layouts.provider-rescue' : ($provider_layout ?? 'layouts.provider');
+@endphp
+@extends($__layout)
+@push('rescue-head')
+<style>
+    /* 🆕 Rescue-only: alias variables for shared subscription view */
+    :root {
+        --card: #fff;
+        --line: #e2e8f0;
+        --muted: #64748b;
+        --green: #10b981;
+        --green-soft: #d1fae5;
+        --red: #dc2626;
+        --red-soft: #fee2e2;
+        --accent-d: #0d9488;
+        --accent-soft: rgba(13, 148, 136, 0.12);
+        --blue-soft: #ccfbf1;
+    }
+
+    /* 🆕 Override indigo "Choose Your Plan" button → rescue teal */
+    button[type="submit"][style*="4f46e5"] {
+        background: var(--primary, #0d9488) !important;
+        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3) !important;
+    }
+    button[type="submit"][style*="4f46e5"]:hover {
+        background: var(--primary-dark, #0f766e) !important;
+        transform: translateY(-1px);
+    }
+</style>
+@endpush
 
 @section('title', __('messages.subscription_page_title'))
 @section('header', __('messages.subscription_header'))

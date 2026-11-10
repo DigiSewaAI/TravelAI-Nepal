@@ -1,4 +1,10 @@
-@extends($provider_layout ?? 'layouts.provider')
+@php
+    $__user = auth()->user();
+    $__provider = $__user?->providers()->first();
+    $__isRescue = $__provider && $__provider->types->contains('slug', 'rescue-service');
+    $__layout = $__isRescue ? 'layouts.provider-rescue' : ($provider_layout ?? 'layouts.provider');
+@endphp
+@extends($__layout)
 @section('title', 'Complete Your Payment')
 @section('content')
 <style>
