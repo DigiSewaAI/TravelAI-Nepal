@@ -28,6 +28,7 @@
   --border:#e2e8f0;--border-strong:#cbd5e1;
   --text:#0f172a;--text-muted:#64748b;--text-light:#94a3b8;
   --primary:#0d9488;--primary-dark:#0f766e;--primary-light:#ccfbf1;--accent:#2dd4bf;
+  --accent-d:#0d9488;--accent-soft:rgba(13,148,136,.12);--blue-soft:#ccfbf1;
   --danger:#dc2626;--danger-light:#fee2e2;--danger-dark:#991b1b;
   --warning:#f59e0b;--warning-light:#fef3c7;--warning-dark:#b45309;
   --success:#10b981;--success-light:#d1fae5;--success-dark:#047857;
@@ -98,6 +99,54 @@ svg{display:block}button{font-family:inherit}
 .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;color:var(--text-muted);transition:all .16s;position:relative;flex-shrink:0}
 .icon-btn:hover{background:#fff;color:var(--text);border-color:var(--border-strong)}
 .icon-btn svg{width:17px;height:17px}
+/* 🆕 Dropdown Styles */
+.dropdown-wrap{position:relative}
+.dropdown-menu{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(15,23,42,.15);z-index:1000;overflow:hidden;display:none}
+.dropdown-menu.show{display:block}
+.notif-menu{width:320px;max-width:calc(100vw - 40px)}
+.notif-menu-head{padding:13px 16px;border-bottom:1px solid var(--border);font-weight:800;font-size:13px;color:var(--text);display:flex;justify-content:space-between;align-items:center}
+.notif-list{max-height:300px;overflow-y:auto}
+.notif-item{display:block;padding:12px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:background .12s}
+.notif-item:hover{background:var(--surface-2)}
+.notif-item .nt-title{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.4}
+.notif-item .nt-time{font-size:11px;color:var(--text-muted);margin-top:3px}
+.notif-empty{padding:28px 16px;text-align:center;color:var(--text-muted);font-size:12px}
+.notif-footer{display:block;padding:11px 16px;text-align:center;background:var(--surface-2);font-size:12px;font-weight:700;color:var(--primary);text-decoration:none;border-top:1px solid var(--border)}
+.notif-footer:hover{background:var(--surface-3)}
+/* 🆕 Mobile: Fix dropdown off-screen issue */
+@media (max-width: 768px) {
+    .notif-menu {
+        position: fixed !important;
+        top: 68px !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+    }
+    .profile-menu {
+        position: fixed !important;
+        top: 68px !important;
+        right: 12px !important;
+        left: auto !important;
+        width: 260px !important;
+        max-width: calc(100vw - 24px) !important;
+        transform: none !important;
+    }
+}
+.profile-menu{width:230px}
+.profile-menu-head{padding:14px 16px;border-bottom:1px solid var(--border)}
+.profile-menu-head .pm-name{font-size:13px;font-weight:800;color:var(--text)}
+.profile-menu-head .pm-email{font-size:11.5px;color:var(--text-muted);margin-top:2px;word-break:break-all}
+.profile-menu-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:12.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);transition:background .12s;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;cursor:pointer;font-family:inherit}
+.profile-menu-item:hover{background:var(--surface-2)}
+.profile-menu-item.danger{color:var(--danger);border-bottom:none}
+.profile-menu-item svg{width:15px;height:15px;color:var(--text-muted);flex-shrink:0}
+.profile-menu-item.danger svg{color:var(--danger)}
+/* 🆕 Logout button with text */
+.logout-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .16s}
+.logout-btn:hover{background:#fff;color:var(--danger);border-color:var(--danger)}
+.logout-btn svg{width:15px;height:15px}
 /* 🆕 Notification count badge (bell icon) */
 .notif-count{position:absolute;top:2px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--danger);color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface-2);line-height:1;animation:blink 1.4s infinite}
 .profile-chip{display:flex;align-items:center;gap:9px;padding:4px 9px 4px 4px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:background .16s;text-decoration:none;color:inherit}
@@ -297,6 +346,7 @@ svg{display:block}button{font-family:inherit}
     </div>
     <div class="nav-group">
       <span class="nav-label">Business</span>
+      <a class="nav-item {{ request()->routeIs('provider.ads*') ? 'active' : '' }}" href="{{ route('provider.ads.index') }}"><i data-lucide="megaphone"></i> My Ads</a>
       <a class="nav-item {{ request()->routeIs('provider.rescue.pricing') ? 'active' : '' }}" href="{{ route('provider.rescue.pricing') }}"><i data-lucide="wallet"></i> Pricing Config</a>
       <a class="nav-item {{ request()->routeIs('provider.rescue.insurance') ? 'active' : '' }}" href="{{ route('provider.rescue.insurance') }}"><i data-lucide="shield-check"></i> Insurance Partners</a>
       <a class="nav-item {{ request()->routeIs('provider.rescue.revenue') ? 'active' : '' }}" href="{{ route('provider.rescue.revenue') }}"><i data-lucide="banknote"></i> Mission Revenue</a>
@@ -304,9 +354,12 @@ svg{display:block}button{font-family:inherit}
     </div>
     <div class="nav-group">
       <span class="nav-label">Account</span>
-      <a class="nav-item" href="{{ route('provider.profile') }}"><i data-lucide="user"></i> Provider Profile</a>
-      <a class="nav-item" href="{{ route('provider.verification.index') }}"><i data-lucide="badge-check"></i> Verification</a>
-      <a class="nav-item" href="{{ route('provider.subscriptions.index') }}"><i data-lucide="credit-card"></i> Subscription</a>
+      <a class="nav-item {{ request()->routeIs('provider.profile') ? 'active' : '' }}" href="{{ route('provider.profile') }}"><i data-lucide="user"></i> Provider Profile</a>
+      <a class="nav-item {{ request()->routeIs('provider.verification.*') ? 'active' : '' }}" href="{{ route('provider.verification.index') }}"><i data-lucide="badge-check"></i> Verification</a>
+      <a class="nav-item {{ request()->routeIs('provider.subscriptions.*') ? 'active' : '' }}" href="{{ route('provider.subscriptions.index') }}"><i data-lucide="credit-card"></i> Subscription</a>
+      <a class="nav-item {{ request()->routeIs('provider.invoices.*') ? 'active' : '' }}" href="{{ route('provider.invoices.index') }}"><i data-lucide="file-text"></i> Invoices</a>
+      <a class="nav-item {{ request()->routeIs('provider.payments.*') ? 'active' : '' }}" href="{{ route('provider.payments.index') }}"><i data-lucide="banknote"></i> Payments</a>
+      <a class="nav-item {{ request()->routeIs('provider.settings.payment-methods.*') ? 'active' : '' }}" href="{{ route('provider.settings.payment-methods.index') }}"><i data-lucide="wallet"></i> Payment Methods</a>
       <a class="nav-item {{ request()->routeIs('provider.rescue.security') ? 'active' : '' }}" href="{{ route('provider.rescue.security') }}"><i data-lucide="shield"></i> Security &amp; Permissions</a>
     </div>
   </nav>
@@ -349,23 +402,67 @@ svg{display:block}button{font-family:inherit}
       </label>
     </form>
 
-    {{-- 🆕 Notifications bell --}}
-    <a href="{{ route('provider.rescue.sos') }}" class="icon-btn" title="Notifications" style="text-decoration:none;">
-      <i data-lucide="bell"></i>
-      @if($unreadNotifs > 0)
-        <span class="notif-count">{{ $unreadNotifs > 9 ? '9+' : $unreadNotifs }}</span>
-      @endif
-    </a>
+    {{-- 🆕 Bell Icon with Dropdown --}}
+    <div class="dropdown-wrap">
+      <button type="button" class="icon-btn" id="notifBtn" title="Notifications" onclick="toggleNotif(event)">
+        <i data-lucide="bell"></i>
+        @if($unreadNotifs > 0)
+          <span class="notif-count">{{ $unreadNotifs > 9 ? '9+' : $unreadNotifs }}</span>
+        @endif
+      </button>
 
-    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();" class="icon-btn" title="Logout">
-      <i data-lucide="log-out"></i>
-    </a>
-    <form id="logoutForm" method="POST" action="{{ route('logout') }}" style="display:none">@csrf</form>
-    <div class="profile-chip">
-      <div class="avatar">{{ $initials }}</div>
-      <div class="profile-info">
-        <span class="name">{{ $currentUser?->name ?? 'User' }}</span>
-        <span class="role">Rescue Operator</span>
+      <div class="dropdown-menu notif-menu" id="notifDropdown">
+        <div class="notif-menu-head">
+          <span>Notifications</span>
+          @if($unreadNotifs > 0)
+            <span style="background:var(--danger);color:#fff;font-size:10px;padding:2px 7px;border-radius:99px">{{ $unreadNotifs }}</span>
+          @endif
+        </div>
+        <div class="notif-list">
+          @forelse($currentUser ? $currentUser->unreadNotifications()->take(5)->get() : collect() as $notif)
+            <a href="{{ $notif->data['url'] ?? '#' }}" class="notif-item">
+              <div class="nt-title">{{ $notif->data['message'] ?? 'New notification' }}</div>
+              <div class="nt-time">{{ $notif->created_at->diffForHumans() }}</div>
+            </a>
+          @empty
+            <div class="notif-empty">No new notifications</div>
+          @endforelse
+        </div>
+        <a href="{{ route('provider.rescue.sos') }}" class="notif-footer">View All SOS Alerts</a>
+      </div>
+    </div>
+
+    {{-- 🆕 Profile Chip with Dropdown --}}
+    <div class="dropdown-wrap">
+      <div class="profile-chip" id="profileBtn" onclick="toggleProfile(event)" style="cursor:pointer">
+        <div class="avatar">{{ $initials }}</div>
+        <div class="profile-info">
+          <span class="name">{{ $currentUser?->name ?? 'User' }}</span>
+          <span class="role">Rescue Operator</span>
+        </div>
+        <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-light)"></i>
+      </div>
+
+      <div class="dropdown-menu profile-menu" id="profileDropdown">
+        <div class="profile-menu-head">
+          <div class="pm-name">{{ $currentUser?->name ?? 'User' }}</div>
+          <div class="pm-email">{{ $currentUser?->email ?? '' }}</div>
+        </div>
+        <a href="{{ route('provider.profile') }}" class="profile-menu-item">
+          <i data-lucide="user"></i> My Profile
+        </a>
+        <a href="{{ route('provider.subscriptions.index') }}" class="profile-menu-item">
+          <i data-lucide="credit-card"></i> Subscription
+        </a>
+        <a href="{{ route('provider.verification.index') }}" class="profile-menu-item">
+          <i data-lucide="badge-check"></i> Verification
+        </a>
+        <form method="POST" action="{{ route('logout') }}" style="margin:0">
+          @csrf
+          <button type="submit" class="profile-menu-item danger">
+            <i data-lucide="log-out"></i> Logout
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -411,7 +508,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) lucide.createIcons();
     setTimeout(() => el.remove(), 3400);
   };
+
+  // 🆕 Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    const notifWrap = document.getElementById('notifBtn')?.parentElement;
+    const profileWrap = document.getElementById('profileBtn')?.parentElement;
+    const notifMenu = document.getElementById('notifDropdown');
+    const profileMenu = document.getElementById('profileDropdown');
+    if (notifMenu && notifWrap && !notifWrap.contains(e.target)) notifMenu.classList.remove('show');
+    if (profileMenu && profileWrap && !profileWrap.contains(e.target)) profileMenu.classList.remove('show');
+  });
 });
+
+// 🆕 Toggle functions
+function toggleNotif(e) {
+  e.stopPropagation();
+  document.getElementById('notifDropdown')?.classList.toggle('show');
+  document.getElementById('profileDropdown')?.classList.remove('show');
+}
+
+function toggleProfile(e) {
+  e.stopPropagation();
+  document.getElementById('profileDropdown')?.classList.toggle('show');
+  document.getElementById('notifDropdown')?.classList.remove('show');
+}
 </script>
 @stack('rescue-scripts')
 </body>

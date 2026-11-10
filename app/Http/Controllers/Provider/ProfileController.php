@@ -10,6 +10,28 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+            'rescue-service'     => 'layouts.provider-rescue',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
+
     public function show()
     {
         $user = Auth::user();
@@ -19,7 +41,10 @@ class ProfileController extends Controller
             abort(403, 'No provider found.');
         }
 
-        return view('provider.profile', compact('provider'));
+        return view('provider.profile', [
+            'provider'        => $provider,
+            'provider_layout' => $this->getProviderLayout($provider),
+        ]);
     }
 
     public function edit()
@@ -31,58 +56,60 @@ class ProfileController extends Controller
             abort(403, 'No provider found.');
         }
 
-        return view('provider.profile-edit', compact('provider'));
+        return view('provider.profile-edit', [
+            'provider'        => $provider,
+            'provider_layout' => $this->getProviderLayout($provider),
+        ]);
     }
 
     public function update(Request $request)
-{
-    $user = Auth::user();
-    $provider = $user->providers()->first();
+    {
+        $user = Auth::user();
+        $provider = $user->providers()->first();
 
-    if (!$provider) {
-        abort(403, 'No provider found.');
-    }
-
-$validated = $request->validate([
-    'name' => 'required|string|max:255',
-    'contact_email' => 'nullable|email|max:255',
-    'contact_phone' => 'nullable|string|max:20',
-    'website' => 'nullable|url|max:255',
-    'address' => 'nullable|string|max:500',
-    'description' => 'nullable|string|max:2000',
-    'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-]);
-
-    // Logo upload — FIX-05 Phase 3: gate by custom_logo feature
-if ($request->hasFile('logo')) {
-    if (!$provider->hasFeature('custom_logo')) {
-        return back()
-            ->withErrors(['logo' => 'Your plan does not include Custom Logo. Please upgrade to upload a logo.'])
-            ->withInput();
-    }
-
-    if ($provider->logo_url) {
-        Storage::disk('public')->delete($provider->logo_url);
-    }
-    $path = $request->file('logo')->store('providers/logos', 'public');
-    $validated['logo_url'] = $path;
-}
-unset($validated['logo']);
-
-    // 🔥 Cover image upload
-    if ($request->hasFile('cover_image')) {
-        if ($provider->cover_image) {
-            Storage::disk('public')->delete($provider->cover_image);
+        if (!$provider) {
+            abort(403, 'No provider found.');
         }
-        $path = $request->file('cover_image')->store('providers/covers', 'public');
-        $validated['cover_image'] = $path; // ✅ column मा save गर्ने
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'contact_email' => 'nullable|email|max:255',
+            'contact_phone' => 'nullable|string|max:20',
+            'website' => 'nullable|url|max:255',
+            'address' => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:2000',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+        ]);
+
+        // Logo upload — FIX-05 Phase 3: gate by custom_logo feature
+        if ($request->hasFile('logo')) {
+            if (!$provider->hasFeature('custom_logo')) {
+                return back()
+                    ->withErrors(['logo' => 'Your plan does not include Custom Logo. Please upgrade to upload a logo.'])
+                    ->withInput();
+            }
+
+            if ($provider->logo_url) {
+                Storage::disk('public')->delete($provider->logo_url);
+            }
+            $path = $request->file('logo')->store('providers/logos', 'public');
+            $validated['logo_url'] = $path;
+        }
+        unset($validated['logo']);
+
+        // 🔥 Cover image upload
+        if ($request->hasFile('cover_image')) {
+            if ($provider->cover_image) {
+                Storage::disk('public')->delete($provider->cover_image);
+            }
+            $path = $request->file('cover_image')->store('providers/covers', 'public');
+            $validated['cover_image'] = $path;
+        }
+
+        $provider->update($validated);
+
+        return redirect()->route('provider.profile')
+            ->with('success', 'Profile updated successfully!');
     }
-    // ❌ unset($validated['cover_image']); // ✅ यो line **पूरै हटाउनुहोस्**
-
-    $provider->update($validated);
-
-    return redirect()->route('provider.profile')
-        ->with('success', 'Profile updated successfully!');
-}
 }

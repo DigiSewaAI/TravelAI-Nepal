@@ -10,6 +10,28 @@ use Illuminate\Support\Facades\Storage;
 
 class VerificationController extends Controller
 {
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+            'rescue-service'     => 'layouts.provider-rescue',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -20,7 +42,12 @@ class VerificationController extends Controller
         }
 
         $documents = $provider->documents;
-        return view('provider.verification.index', compact('provider', 'documents'));
+
+        return view('provider.verification.index', [
+            'provider'        => $provider,
+            'documents'       => $documents,
+            'provider_layout' => $this->getProviderLayout($provider),
+        ]);
     }
 
     public function store(Request $request)
@@ -46,7 +73,6 @@ class VerificationController extends Controller
             'status' => 'pending',
         ]);
 
-        // Notify admins: verification document submitted
         try {
             $__adminUrl = \Illuminate\Support\Facades\Route::has('admin.providers.show')
                 ? route('admin.providers.show', $provider->id)

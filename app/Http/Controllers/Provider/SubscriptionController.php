@@ -11,6 +11,27 @@ use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
+    private function getProviderLayout($provider): string
+    {
+        $map = [
+            'restaurant'         => 'layouts.provider-restaurant',
+            'hotel'              => 'layouts.provider-hotel',
+            'resort'             => 'layouts.provider-hotel',
+            'lodge'              => 'layouts.provider-hotel',
+            'homestay'           => 'layouts.provider-hotel',
+            'transport-provider' => 'layouts.provider-transport',
+            'shop-owner'         => 'layouts.provider-inventory',
+            'rental-provider'    => 'layouts.provider-inventory',
+            'wholesale-provider' => 'layouts.provider-inventory',
+            'art-craft'          => 'layouts.provider-art-craft',
+            'guide'              => 'layouts.provider-individual',
+            'porter'             => 'layouts.provider-individual',
+            'photographer'       => 'layouts.provider-individual',
+            'money-changer'      => 'layouts.provider-money-changer',
+            'rescue-service'     => 'layouts.provider-rescue',
+        ];
+        return $map[$provider?->types->first()?->slug] ?? 'layouts.provider';
+    }
 
     /**
      * Notify all admins about a subscription event (in-app bell).
@@ -51,7 +72,11 @@ class SubscriptionController extends Controller
 
         $plans = Plan::all();
 
-        return view('provider.subscriptions.index', compact('currentSubscription', 'plans'));
+        return view('provider.subscriptions.index', [
+            'currentSubscription' => $currentSubscription,
+            'plans'               => $plans,
+            'provider_layout'     => $this->getProviderLayout($provider),
+        ]);
     }
 
     /**
