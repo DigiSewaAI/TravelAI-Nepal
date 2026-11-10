@@ -63,6 +63,12 @@ class RescueDashboardController extends Controller
 
     public function sosQueue()
     {
+        // 🆕 Auto-mark rescue notifications as read when SOS page loads
+        auth()->user()->unreadNotifications()
+            ->where('data->type', 'rescue_dispatch')
+            ->get()
+            ->markAsRead();
+
         $shared = $this->sharedData();
         $provider = $shared['provider'];
 

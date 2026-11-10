@@ -6,6 +6,8 @@
     $liveSosCount = $liveSosCount ?? 0;
     $activeMissionsCount = $activeMissionsCount ?? 0;
     $isOnDuty = $rescueProvider?->is_available ?? false;
+    // 🆕 Unread rescue dispatch notifications
+    $unreadNotifs = $currentUser ? $currentUser->unreadNotifications()->where('data->type', 'rescue_dispatch')->count() : 0;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -95,6 +97,8 @@ svg{display:block}button{font-family:inherit}
 .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;color:var(--text-muted);transition:all .16s;position:relative;flex-shrink:0}
 .icon-btn:hover{background:#fff;color:var(--text);border-color:var(--border-strong)}
 .icon-btn svg{width:17px;height:17px}
+/* 🆕 Notification count badge (bell icon) */
+.notif-count{position:absolute;top:2px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--danger);color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface-2);line-height:1;animation:blink 1.4s infinite}
 .profile-chip{display:flex;align-items:center;gap:9px;padding:4px 9px 4px 4px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;transition:background .16s;text-decoration:none;color:inherit}
 .profile-chip:hover{background:#fff}
 .avatar{width:32px;height:32px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,#0d9488,#2dd4bf);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
@@ -343,6 +347,15 @@ svg{display:block}button{font-family:inherit}
         <span class="label" id="dutyLabel">{{ $isOnDuty ? 'On Duty' : 'Off Duty' }}</span>
       </label>
     </form>
+
+    {{-- 🆕 Notifications bell --}}
+    <a href="{{ route('provider.rescue.sos') }}" class="icon-btn" title="Notifications" style="text-decoration:none;">
+      <i data-lucide="bell"></i>
+      @if($unreadNotifs > 0)
+        <span class="notif-count">{{ $unreadNotifs > 9 ? '9+' : $unreadNotifs }}</span>
+      @endif
+    </a>
+
     <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();" class="icon-btn" title="Logout">
       <i data-lucide="log-out"></i>
     </a>
