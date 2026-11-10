@@ -78,14 +78,13 @@ svg{display:block}button{font-family:inherit}
 .topbar-left{display:flex;align-items:center;gap:12px;min-width:0}
 .page-title h1{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.2;white-space:nowrap}
 .page-title p{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topbar-center{flex:1;display:flex;justify-content:center;min-width:0}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;width:100%;max-width:400px;transition:border-color .16s,box-shadow .16s}
-.search-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.1);background:#fff}
-.search-box svg{width:15px;height:15px;color:var(--text-light);flex-shrink:0}
-.search-box input{border:none;background:transparent;outline:none;flex:1;font-size:12.5px;color:var(--text);font-family:inherit;min-width:0}
-.topbar-right{display:flex;align-items:center;gap:10px}
+
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
 .network-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;font-size:11.5px;font-weight:600;white-space:nowrap;background:var(--success-light);color:var(--success-dark)}
 .network-chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 2s infinite}
+/* 🆕 Offline state — when provider is not On Duty */
+.network-chip.offline{background:var(--danger-light);color:var(--danger-dark)}
+.network-chip.offline .dot{animation:none}
 .live-sos-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;background:#fef2f2;border:1px solid #fecaca;color:var(--danger-dark);font-size:12px;font-weight:700;white-space:nowrap;text-decoration:none}
 .live-sos-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:blink 1.2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
@@ -310,8 +309,8 @@ svg{display:block}button{font-family:inherit}
 .modal input[type=file]::file-selector-button:hover{background:var(--primary);color:#fff}
 
 /* Responsive */
-@media(max-width:1240px){.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}.topbar-center{display:none}}
-@media(max-width:900px){.sidebar{position:fixed;left:-290px;transition:left .25s ease;z-index:70}.sidebar.open{left:0}.menu-btn{display:grid}.topbar{padding:11px 16px;gap:10px}.content{padding:16px}.profile-info{display:none}.network-chip{display:none}.page-title h1{font-size:15.5px;white-space:normal}.page-title p{display:none}}
+@media(max-width:1240px){.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.sidebar{position:fixed;left:-290px;transition:left .25s ease;z-index:70}.sidebar.open{left:0}.menu-btn{display:grid}.topbar{padding:11px 16px;gap:10px}.content{padding:16px}.profile-info{display:none}.network-chip{display:none}.page-title h1{font-size:15.5px;white-space:normal}.page-title p{display:none}}
 @media(max-width:720px){.stats-grid{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:12px}.stat-value{font-size:18px}.duty-toggle .label{display:none}.duty-toggle{padding:4px 6px 4px 4px}}
 @media(max-width:520px){.stats-grid{grid-template-columns:1fr}.topbar-right{gap:6px}.icon-btn{width:32px;height:32px}}
 </style>
@@ -387,14 +386,11 @@ svg{display:block}button{font-family:inherit}
       <p>@yield('page-sub', 'Target SLA · dispatch under 5 min · rescue operations live')</p>
     </div>
   </div>
-  <div class="topbar-center">
-    <div class="search-box">
-      <i data-lucide="search"></i>
-      <input type="text" placeholder="Search missions, travelers, fleet..." />
-    </div>
-  </div>
   <div class="topbar-right">
-    <div class="network-chip"><span class="dot"></span> Online</div>
+    <div class="network-chip {{ $isOnDuty ? '' : 'offline' }}">
+      <span class="dot"></span>
+      {{ $isOnDuty ? 'Online' : 'Offline' }}
+    </div>
     @if($liveSosCount > 0)
     <a href="{{ route('provider.rescue.sos') }}" class="live-sos-badge"><span class="dot"></span> {{ $liveSosCount }} Live SOS</a>
     @endif
