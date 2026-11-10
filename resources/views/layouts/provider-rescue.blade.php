@@ -378,7 +378,12 @@ svg{display:block}button{font-family:inherit}
   <div class="topbar-left">
     <button class="icon-btn menu-btn" id="menuBtn"><i data-lucide="menu"></i></button>
     <div class="page-title">
-      <h1>@yield('page-title', 'Operations Overview')</h1>
+      @php
+          $__pt = trim($__env->yieldContent('page-title'));
+          $__t  = trim($__env->yieldContent('title'));
+          $__finalTitle = $__pt ?: ($__t ?: 'Operations Overview');
+      @endphp
+      <h1>{{ $__finalTitle }}</h1>
       <p>@yield('page-sub', 'Target SLA · dispatch under 5 min · rescue operations live')</p>
     </div>
   </div>
