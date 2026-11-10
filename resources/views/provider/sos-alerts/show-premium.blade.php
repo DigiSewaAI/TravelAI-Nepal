@@ -1,4 +1,8 @@
-@extends($provider_layout ?? 'layouts.provider')
+@php
+    $__isRescue = isset($sos) && $sos->provider && $sos->provider->types->contains('slug', 'rescue-service');
+    $__layout = $__isRescue ? 'layouts.provider-rescue' : ($provider_layout ?? 'layouts.provider');
+@endphp
+@extends($__layout)
 @section('title', __('messages.sos_alerts_detail_title'))
 @section('content')
 <style>
