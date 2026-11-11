@@ -28,8 +28,7 @@ class RescueDashboardController extends Controller
         $provider = $this->getProvider();
         $rescueProvider = $this->getRescueProvider();
 
-        $liveSos = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged'])
+        $liveSos = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })
             ->count();
 
         $activeMissions = \App\Models\RescueMission::where('provider_id', $provider?->id)
@@ -78,8 +77,7 @@ class RescueDashboardController extends Controller
         $provider = $shared['provider'];
 
         // 1. Live SOS Queue
-        $sosQueue = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+        $sosQueue = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })
             ->latest()
             ->take(10)
             ->get();
@@ -91,7 +89,7 @@ class RescueDashboardController extends Controller
             ->first();
 
         // 3. Audit Log (last 4 entries)
-        $sosIds = SosAlert::where('provider_id', $provider?->id)->pluck('id');
+        $sosIds = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })->pluck('id');
         $auditLogs = \App\Models\SosAlertAction::whereIn('sos_alert_id', $sosIds)
             ->latest()
             ->take(4)
@@ -114,8 +112,7 @@ class RescueDashboardController extends Controller
         }
 
         // 🆕 6. GPS Map Data (Reuse SOS/Mission coords — No new migration)
-        $latestSos = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+        $latestSos = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })
             ->latest()
             ->first();
 
@@ -148,8 +145,7 @@ class RescueDashboardController extends Controller
         $shared = $this->sharedData();
         $provider = $shared['provider'];
 
-        $alerts = SosAlert::where('provider_id', $provider?->id)
-            ->whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+        $alerts = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })
             ->latest()
             ->paginate(15);
 
@@ -316,7 +312,7 @@ class RescueDashboardController extends Controller
         $shared = $this->sharedData();
         $provider = $shared['provider'];
 
-        $sosIds = SosAlert::where('provider_id', $provider?->id)->pluck('id');
+        $sosIds = SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])->where(function ($q) { $q->whereIn('emergency_level', ['critical', 'unclassified'])->orWhereNotNull('auto_escalated_at'); })->pluck('id');
         $auditLogs = \App\Models\SosAlertAction::whereIn('sos_alert_id', $sosIds)
             ->latest()
             ->paginate(20);
