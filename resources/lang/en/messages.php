@@ -106,6 +106,39 @@ return array (
 'delete'                => 'Delete',
 'save'                  => 'Save',
 'cancel'                => 'Cancel',
+    // ===== SOS v1.2 — Phase 2 level selector =====
+    'sos_level_question'                => 'What is your situation?',
+    'sos_level_critical_label'          => 'Critical',
+    'sos_level_critical_desc'           => 'Life-threatening — unconscious, severe bleeding, breathing difficulty',
+    'sos_level_urgent_label'            => 'Urgent',
+    'sos_level_urgent_desc'             => 'Serious — fracture, altitude sickness, unable to walk',
+    'sos_level_assistance_label'        => 'Assistance',
+    'sos_level_assistance_desc'         => 'Minor — injury, dehydration, need guidance',
+    'sos_level_unclassified_label'      => 'Not Sure',
+    'sos_level_unclassified_desc'       => 'Not sure? Send SOS now — responders will assess',
+
+    // ===== SOS v1.2 — GPS status =====
+    'sos_gps_live'                      => 'Live location',
+    'sos_gps_stale_warn'                => 'Location may be outdated (last update :minutes min ago)',
+    'sos_gps_stale_critical'            => 'Location significantly outdated — include a landmark in description',
+    'sos_gps_unknown'                   => 'Location unknown — please describe where you are',
+
+    // ===== SOS v1.2 — Cancel flow =====
+    'sos_cancel_prompt'                 => 'Why are you cancelling this SOS?',
+    'sos_cancel_reason_required'        => 'Cancel reason is required',
+    'sos_cancel_reason_accidental'      => 'Accidental SOS',
+    'sos_cancel_reason_self_resolved'   => 'Resolved on my own',
+    'sos_cancel_reason_wrong_person'    => 'Wrong person triggered',
+    'sos_cancel_reason_other'           => 'Other (explain below)',
+    'sos_cancel_confirm'                => 'Confirm Cancellation',
+
+    // ===== SOS v1.2 — Post-send feedback =====
+    'sos_sent_with_level'               => 'SOS sent as :level. Help is on the way.',
+    'sos_upgrade_prompt'                => 'Situation worse? Upgrade level',
+    'sos_level_acknowledged'            => 'Responder acknowledged your SOS',
+
+    // ===== SOS v1.2 — General Help footer =====
+    'sos_general_help_link'             => 'General question? Contact your trekking provider',
   'checkin_default' => 'Check-in',
   'checked_in' => 'Checked In',
   'view' => 'View',

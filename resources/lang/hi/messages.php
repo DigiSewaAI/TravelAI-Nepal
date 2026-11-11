@@ -2276,4 +2276,37 @@ return array (
     'artcraft_success_verified' => 'ऑर्डर सफलतापूर्वक दावा किया गया!',
     'artcraft_info_already_claimed' => 'आपने यह ऑर्डर पहले ही दावा किया।',
     'artcraft_btn' => 'ऑर्डर दावा',
+        // ===== SOS v1.2 — Phase 2 level selector =====
+    'sos_level_question'                => 'आपकी स्थिति क्या है?',
+    'sos_level_critical_label'          => 'गंभीर',
+    'sos_level_critical_desc'           => 'जीवन-घातक — बेहोश, तीव्र रक्तस्राव, सांस लेने में कठिनाई',
+    'sos_level_urgent_label'            => 'अत्यावश्यक',
+    'sos_level_urgent_desc'             => 'गंभीर — फ्रैक्चर, ऊंचाई की बीमारी, चल नहीं सकते',
+    'sos_level_assistance_label'        => 'सहायता',
+    'sos_level_assistance_desc'         => 'मामूली — चोट, निर्जलीकरण, मार्गदर्शन चाहिए',
+    'sos_level_unclassified_label'      => 'पता नहीं',
+    'sos_level_unclassified_desc'       => 'निश्चित नहीं? अभी SOS भेजें — उत्तरदाता आकलन करेंगे',
+
+    // ===== SOS v1.2 — GPS status =====
+    'sos_gps_live'                      => 'लाइव स्थान',
+    'sos_gps_stale_warn'                => 'स्थान पुराना हो सकता है (:minutes मिनट पहले अंतिम अपडेट)',
+    'sos_gps_stale_critical'            => 'स्थान काफी पुराना — विवरण में एक लैंडमार्क शामिल करें',
+    'sos_gps_unknown'                   => 'स्थान अज्ञात — कृपया बताएं आप कहाँ हैं',
+
+    // ===== SOS v1.2 — Cancel flow =====
+    'sos_cancel_prompt'                 => 'आप यह SOS क्यों रद्द कर रहे हैं?',
+    'sos_cancel_reason_required'        => 'रद्द करने का कारण आवश्यक है',
+    'sos_cancel_reason_accidental'      => 'गलती से SOS',
+    'sos_cancel_reason_self_resolved'   => 'स्वयं हल हो गया',
+    'sos_cancel_reason_wrong_person'    => 'गलत व्यक्ति ने ट्रिगर किया',
+    'sos_cancel_reason_other'           => 'अन्य (नीचे समझाएं)',
+    'sos_cancel_confirm'                => 'रद्दीकरण की पुष्टि करें',
+
+    // ===== SOS v1.2 — Post-send feedback =====
+    'sos_sent_with_level'               => ':level के रूप में SOS भेजा गया। सहायता आ रही है।',
+    'sos_upgrade_prompt'                => 'स्थिति बिगड़ी? स्तर बढ़ाएं',
+    'sos_level_acknowledged'            => 'उत्तरदाता ने आपका SOS स्वीकार किया',
+
+    // ===== SOS v1.2 — General Help footer =====
+    'sos_general_help_link'             => 'सामान्य प्रश्न? अपने ट्रेकिंग प्रदाता से संपर्क करें',
 );

@@ -225,6 +225,39 @@ return array (
 'delete'                => 'हटाउनुहोस्',
 'save'                  => 'सुरक्षित गर्नुहोस्',
 'cancel'                => 'रद्द गर्नुहोस्',
+    // ===== SOS v1.2 — Phase 2 level selector =====
+    'sos_level_question'                => 'तपाईंको अवस्था के हो?',
+    'sos_level_critical_label'          => 'अति गम्भीर',
+    'sos_level_critical_desc'           => 'ज्यान जोखिममा — बेहोस, गम्भीर रक्तस्राव, सास फेर्न गाह्रो',
+    'sos_level_urgent_label'            => 'अत्यावश्यक',
+    'sos_level_urgent_desc'             => 'गम्भीर — हड्डी भाँचिएको, लेक लाग्ने, हिँड्न नसक्ने',
+    'sos_level_assistance_label'        => 'सहयोग',
+    'sos_level_assistance_desc'         => 'सामान्य — चोटपटक, पानीको कमी, मार्गदर्शन चाहिन्छ',
+    'sos_level_unclassified_label'      => 'थाहा छैन',
+    'sos_level_unclassified_desc'       => 'निश्चित छैन? अहिले नै SOS पठाउनुहोस् — उद्धारकर्ताले मूल्याङ्कन गर्नेछन्',
+
+    // ===== SOS v1.2 — GPS status =====
+    'sos_gps_live'                      => 'प्रत्यक्ष स्थान',
+    'sos_gps_stale_warn'                => 'स्थान पुरानो हुनसक्छ (:minutes मिनेट अघि अन्तिम अपडेट)',
+    'sos_gps_stale_critical'            => 'स्थान धेरै पुरानो — विवरणमा एउटा चिनारी स्थान उल्लेख गर्नुहोस्',
+    'sos_gps_unknown'                   => 'स्थान अज्ञात — तपाईं कहाँ हुनुहुन्छ वर्णन गर्नुहोस्',
+
+    // ===== SOS v1.2 — Cancel flow =====
+    'sos_cancel_prompt'                 => 'यो SOS किन रद्द गर्दै हुनुहुन्छ?',
+    'sos_cancel_reason_required'        => 'रद्द गर्ने कारण आवश्यक छ',
+    'sos_cancel_reason_accidental'      => 'गल्तीले SOS',
+    'sos_cancel_reason_self_resolved'   => 'आफैं समाधान भयो',
+    'sos_cancel_reason_wrong_person'    => 'गलत व्यक्तिले ट्रिगर गर्‍यो',
+    'sos_cancel_reason_other'           => 'अन्य (तल व्याख्या गर्नुहोस्)',
+    'sos_cancel_confirm'                => 'रद्द गर्ने पुष्टि गर्नुहोस्',
+
+    // ===== SOS v1.2 — Post-send feedback =====
+    'sos_sent_with_level'               => ':level को रूपमा SOS पठाइयो। सहयोग आउँदैछ।',
+    'sos_upgrade_prompt'                => 'अवस्था बिग्रियो? स्तर बढाउनुहोस्',
+    'sos_level_acknowledged'            => 'उद्धारकर्ताले तपाईंको SOS स्वीकार गरे',
+
+    // ===== SOS v1.2 — General Help footer =====
+    'sos_general_help_link'             => 'सामान्य प्रश्न? तपाईंको ट्रेकिङ प्रदायकलाई सम्पर्क गर्नुहोस्',
   'no_invoices_found' => 'कुनै इनभ्वाइस फेला परेन।',
   'invoice_detail_title' => 'इनभ्वाइस #:number | प्रदायक ड्यासबोर्ड',
   'invoice_detail_header' => 'इनभ्वाइस विवरण',

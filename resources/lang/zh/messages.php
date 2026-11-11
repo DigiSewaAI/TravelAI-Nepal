@@ -2287,4 +2287,37 @@ return array (
     'artcraft_success_verified' => '订单认领成功！',
     'artcraft_info_already_claimed' => '您已认领此订单।',
     'artcraft_btn' => '领取订单',
+        // ===== SOS v1.2 — Phase 2 level selector =====
+    'sos_level_question'                => '您的情况如何？',
+    'sos_level_critical_label'          => '危急',
+    'sos_level_critical_desc'           => '危及生命 — 昏迷、严重出血、呼吸困难',
+    'sos_level_urgent_label'            => '紧急',
+    'sos_level_urgent_desc'             => '严重 — 骨折、高原反应、无法行走',
+    'sos_level_assistance_label'        => '协助',
+    'sos_level_assistance_desc'         => '轻微 — 受伤、脱水、需要指导',
+    'sos_level_unclassified_label'      => '不确定',
+    'sos_level_unclassified_desc'       => '不确定？立即发送 SOS — 救援人员将进行评估',
+
+    // ===== SOS v1.2 — GPS status =====
+    'sos_gps_live'                      => '实时位置',
+    'sos_gps_stale_warn'                => '位置可能已过时（上次更新 :minutes 分钟前）',
+    'sos_gps_stale_critical'            => '位置已严重过时 — 请在描述中包含一个地标',
+    'sos_gps_unknown'                   => '位置未知 — 请描述您所在的位置',
+
+    // ===== SOS v1.2 — Cancel flow =====
+    'sos_cancel_prompt'                 => '您为何取消此 SOS？',
+    'sos_cancel_reason_required'        => '取消原因为必填项',
+    'sos_cancel_reason_accidental'      => '误触发 SOS',
+    'sos_cancel_reason_self_resolved'   => '已自行解决',
+    'sos_cancel_reason_wrong_person'    => '他人误触发',
+    'sos_cancel_reason_other'           => '其他（请在下方说明）',
+    'sos_cancel_confirm'                => '确认取消',
+
+    // ===== SOS v1.2 — Post-send feedback =====
+    'sos_sent_with_level'               => 'SOS 已作为 :level 发送。救援正在赶来。',
+    'sos_upgrade_prompt'                => '情况恶化？升级级别',
+    'sos_level_acknowledged'            => '救援人员已确认您的 SOS',
+
+    // ===== SOS v1.2 — General Help footer =====
+    'sos_general_help_link'             => '一般问题？请联系您的徒步旅行服务商',
 );

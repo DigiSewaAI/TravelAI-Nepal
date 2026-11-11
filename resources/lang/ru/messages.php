@@ -2873,4 +2873,37 @@ return array (
     'artcraft_success_verified' => 'Заказ подтвержден!',
     'artcraft_info_already_claimed' => 'Вы уже подтвердили заказ.',
     'artcraft_btn' => 'Получить заказ',
+        // ===== SOS v1.2 — Phase 2 level selector =====
+    'sos_level_question'                => 'Какова ваша ситуация?',
+    'sos_level_critical_label'          => 'Критическая',
+    'sos_level_critical_desc'           => 'Угроза жизни — без сознания, сильное кровотечение, затруднённое дыхание',
+    'sos_level_urgent_label'            => 'Срочная',
+    'sos_level_urgent_desc'             => 'Серьёзная — перелом, горная болезнь, не может идти',
+    'sos_level_assistance_label'        => 'Помощь',
+    'sos_level_assistance_desc'         => 'Незначительная — травма, обезвоживание, нужна консультация',
+    'sos_level_unclassified_label'      => 'Не уверен',
+    'sos_level_unclassified_desc'       => 'Не уверены? Отправьте SOS сейчас — спасатели оценят ситуацию',
+
+    // ===== SOS v1.2 — GPS status =====
+    'sos_gps_live'                      => 'Текущее местоположение',
+    'sos_gps_stale_warn'                => 'Местоположение может быть устаревшим (последнее обновление :minutes мин назад)',
+    'sos_gps_stale_critical'            => 'Местоположение сильно устарело — укажите ориентир в описании',
+    'sos_gps_unknown'                   => 'Местоположение неизвестно — опишите, где вы находитесь',
+
+    // ===== SOS v1.2 — Cancel flow =====
+    'sos_cancel_prompt'                 => 'Почему вы отменяете этот SOS?',
+    'sos_cancel_reason_required'        => 'Требуется указать причину отмены',
+    'sos_cancel_reason_accidental'      => 'Случайный SOS',
+    'sos_cancel_reason_self_resolved'   => 'Решено самостоятельно',
+    'sos_cancel_reason_wrong_person'    => 'Запущено другим человеком',
+    'sos_cancel_reason_other'           => 'Другое (указать ниже)',
+    'sos_cancel_confirm'                => 'Подтвердить отмену',
+
+    // ===== SOS v1.2 — Post-send feedback =====
+    'sos_sent_with_level'               => 'SOS отправлен как :level. Помощь уже в пути.',
+    'sos_upgrade_prompt'                => 'Ситуация ухудшилась? Повысить уровень',
+    'sos_level_acknowledged'            => 'Спасатель подтвердил ваш SOS',
+
+    // ===== SOS v1.2 — General Help footer =====
+    'sos_general_help_link'             => 'Общий вопрос? Свяжитесь с вашим туристическим оператором',
 );
