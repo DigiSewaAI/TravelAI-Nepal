@@ -115,4 +115,41 @@ class SosController extends Controller
             'emergency_level' => $sos->emergency_level,
         ], 201);
     }
+        /**
+     * Cancel an active SOS (traveler-initiated).
+     * Reason mandatory (plan 09.2). Maps to 'false_alarm' + cancel_reason.
+     */
+    public function cancel(Request $request, SosAlert $sos)
+    {
+        if (!Auth::check()) {
+            return response()->json(['success' => false, 'message' => 'Authentication required.'], 401);
+        }
+
+        // Ownership check — traveler can only cancel own SOS
+        if ($sos->traveler_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        // Cannot cancel terminal SOS
+        if ($sos->isTerminal()) {
+            return response()->json(['success' => false, 'message' => 'SOS is already closed.'], 422);
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        $cancelled = $sos->cancel(Auth::id(), $validated['reason']);
+
+        if (!$cancelled) {
+            return response()->json(['success' => false, 'message' => 'Unable to cancel SOS.'], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'SOS cancelled. Stay safe.',
+            'sos_id'  => $sos->id,
+            'status'  => $sos->fresh()->status,
+        ]);
+    }
 }

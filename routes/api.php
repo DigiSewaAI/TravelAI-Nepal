@@ -30,3 +30,6 @@ Route::get('/map/route/{slug}', [MapDataController::class, 'route'])
 Route::get('/map/journey/latest', [MapDataController::class, 'journey'])
     ->middleware(['web', 'throttle:api'])
     ->name('api.map.journey.latest');
+
+Route::post('/sos/{sos}/cancel', [\App\Http\Controllers\Api\SosController::class, 'cancel'])
+    ->middleware(['web', 'throttle:sos']);
