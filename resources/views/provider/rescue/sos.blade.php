@@ -112,10 +112,6 @@
                                 </button>
                             </form>
                         @endif
-
-                        <a href="{{ route('provider.sos-alerts.show', $alert) }}" class="btn btn-ghost btn-sm" style="margin-top:4px;">
-                            <i data-lucide="eye" style="width:13px;height:13px;"></i> View Details
-                        </a>
                     </div>
                 </div>
             </div>

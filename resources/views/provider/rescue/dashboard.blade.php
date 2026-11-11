@@ -109,8 +109,8 @@
                                 </div>
                             </div>
                             <div style="display:flex;gap:7px;flex-shrink:0">
-                                <a href="{{ route('provider.sos-alerts.show', $alert) }}" class="btn btn-primary btn-sm">
-                                    <i data-lucide="eye" style="width:12px;height:12px"></i> View
+                                <a href="{{ route('provider.rescue.sos') }}" class="btn btn-primary btn-sm">
+                                    <i data-lucide="eye" style="width:12px;height:12px"></i> View Queue
                                 </a>
                             </div>
                         </div>
