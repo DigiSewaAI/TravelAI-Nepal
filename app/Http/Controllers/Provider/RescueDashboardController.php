@@ -337,7 +337,7 @@ class RescueDashboardController extends Controller
         return view('provider.rescue.coverage', $this->sharedData());
     }
 
-    public function updateCoverage(Request $request)
+        public function updateCoverage(Request $request)
     {
         $rescueProvider = $this->getRescueProvider();
         if (!$rescueProvider) abort(403);
@@ -346,11 +346,15 @@ class RescueDashboardController extends Controller
             'coverage_districts' => 'nullable|array',
             'coverage_districts.*' => 'string|max:50',
             'coverage_radius_km' => 'required|integer|min:10|max:500',
+            'base_lat'           => 'required|numeric|between:-90,90',   // 🆕
+            'base_lng'           => 'required|numeric|between:-180,180', // 🆕
         ]);
 
         $rescueProvider->update([
             'coverage_districts' => $validated['coverage_districts'] ?? [],
             'coverage_radius_km' => $validated['coverage_radius_km'],
+            'base_lat'           => $validated['base_lat'],   // 🆕
+            'base_lng'           => $validated['base_lng'],   // 🆕
         ]);
 
         return back()->with('success', 'Coverage areas updated successfully.');

@@ -8,7 +8,7 @@ class RescueProvider extends Model
 {
     protected $table = 'rescue_providers';
 
-    // ✅ १. यहाँ नयाँ फिल्डहरू थप्नुहोस्
+    
     protected $fillable = [
         'provider_id',
         'aviation_license_number',
@@ -25,17 +25,20 @@ class RescueProvider extends Model
         'fleet_size',
         'is_24_7',
         'is_available',
-        'staff_members',       // ✅ नयाँ
-        'insurance_partners',  // ✅ नयाँ
-        'documents',           // ✅ नयाँ
+        'staff_members',
+        'insurance_partners',
+        'documents',         
+        'base_lat',
+        'base_lng',
+
     ];
 
-    // ✅ २. Casts मा Array थप्नुहोस्
+
     protected $casts = [
         'coverage_districts'          => 'array',
-        'staff_members'               => 'array', // ✅ नयाँ
-        'insurance_partners'          => 'array', // ✅ नयाँ
-        'documents'                   => 'array', // ✅ नयाँ
+        'staff_members'               => 'array', 
+        'insurance_partners'          => 'array',
+        'documents'                   => 'array',
         'coverage_radius_km'          => 'integer',
         'base_rate_npr'               => 'decimal:2',
         'per_km_rate_npr'             => 'decimal:2',
@@ -46,6 +49,9 @@ class RescueProvider extends Model
         'fleet_size'                  => 'integer',
         'is_24_7'                     => 'boolean',
         'is_available'                => 'boolean',
+        'base_lat' => 'decimal:7',
+        'base_lng' => 'decimal:7', // 🆕 NEW
+
     ];
 
     public function provider()

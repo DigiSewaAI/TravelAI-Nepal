@@ -42,9 +42,44 @@ class RescueDispatchService
         return RescueProvider::with('provider')
             ->where('is_available', true)
             ->get()
-            ->filter(function ($rp) {
-                return $rp->provider && $rp->provider->verification_status === 'verified';
+            ->filter(function ($rp) use ($sos) {
+                // 1. Verify provider
+                if (!$rp->provider || $rp->provider->verification_status !== 'verified') {
+                    return false;
+                }
+
+                // 2. If base coordinates are set, calculate distance
+                if ($rp->base_lat && $rp->base_lng) {
+                    $distance = $this->calculateDistance($rp->base_lat, $rp->base_lng, $sos->latitude, $sos->longitude);
+                    $radius = $rp->coverage_radius_km ?? 50;
+                    
+                    if ($distance > $radius) {
+                        Log::info("Provider {$rp->provider->name} skipped. Distance {$distance}km > Radius {$radius}km");
+                        return false; // Too far
+                    }
+                }
+
+                // 3. Fallback for legacy providers without coordinates (Safety first)
+                return true;
             });
+    }
+
+    /**
+     * Haversine formula to calculate distance in kilometers.
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2): float
+    {
+        $earthRadius = 6371; // km
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
     }
 
     public function assignMission(SosAlert $sos, int $providerId): RescueMission

@@ -62,6 +62,21 @@
                 <div>
                     <div style="font-size:11.5px;color:var(--text-muted);font-weight:600;margin-bottom:6px">Primary Base</div>
                     <div style="font-size:13.5px;font-weight:700">{{ $provider->address ?? 'Not specified' }}</div>
+                    
+                    {{-- 🆕 Base Coordinates (Lat/Lng) --}}
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:var(--text-muted);">Base Latitude</label>
+                            <input type="number" step="0.0000001" name="base_lat" value="{{ $rescueProvider->base_lat ?? '28.2096' }}" required 
+                                   style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; font-size:13px;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:11px;color:var(--text-muted);">Base Longitude</label>
+                            <input type="number" step="0.0000001" name="base_lng" value="{{ $rescueProvider->base_lng ?? '83.9856' }}" required 
+                                   style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; font-size:13px;">
+                        </div>
+                    </div>
+                    <p style="font-size:10px; color:var(--text-muted); margin-top:4px;">Default: Pokhara (28.2096, 83.9856)</p>
                 </div>
                 
                 <div>
