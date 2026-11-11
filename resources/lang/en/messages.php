@@ -139,6 +139,20 @@ return array (
 
     // ===== SOS v1.2 — General Help footer =====
     'sos_general_help_link'             => 'General question? Contact your trekking provider',
+        // Pricing Rescue Section
+    'rescue_badge' => 'Enterprise Custom',
+    'rescue_title' => '🚁 Rescue & Emergency Response Partners',
+    'rescue_desc' => 'A dedicated platform for helicopter operators, medical evacuation providers, mountain rescue teams, and search & rescue organizations. Coordinate SOS alerts, manage missions, and track fleets seamlessly.',
+    'rescue_f1' => 'SOS Alert Coordination',
+    'rescue_f2' => 'Mission Management',
+    'rescue_f3' => 'Fleet & Crew Tracking',
+    'rescue_f4' => 'GPS & Coverage Areas',
+    'rescue_f5' => 'Immutable Audit Logs',
+    'rescue_f6' => 'No Commission per SOS',
+    'rescue_pricing_note' => 'Pricing based on organization',
+    'rescue_custom' => 'Custom',
+    'rescue_cta' => 'Discuss a Partnership →',
+    'rescue_pilot' => '🌟 Founding Rescue Partner Program available (limited 90-day pilot).',
   'checkin_default' => 'Check-in',
   'checked_in' => 'Checked In',
   'view' => 'View',

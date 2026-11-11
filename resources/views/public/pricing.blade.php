@@ -353,7 +353,47 @@
         <strong>ℹ️ AI Features:</strong> {{ __('messages.ai_features_note') }}
     </div>
     </div>
+{{-- 🚁 Rescue Provider Section (Custom Pricing) --}}
+<div class="mt-16 mb-16 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+    
+    <!-- Background Decoration -->
+    <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full" style="background-color: rgba(239, 68, 68, 0.2); filter: blur(40px);"></div>
+    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full" style="background-color: rgba(59, 130, 246, 0.2); filter: blur(40px);"></div>
+    
+    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="flex-1">
+            <div class="inline-block text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider" style="background-color: #ef4444; color: #ffffff;">
+                {{ __('messages.rescue_badge') }}
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-4 flex items-center gap-3" style="color: #ffffff;">
+                {{ __('messages.rescue_title') }}
+            </h2>
+            <p class="text-lg mb-6 max-w-2xl leading-relaxed" style="color: #cbd5e1;">
+                {{ __('messages.rescue_desc') }}
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8 text-sm font-medium" style="color: #e2e8f0;">
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f1') }}</div>
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f2') }}</div>
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f3') }}</div>
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f4') }}</div>
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f5') }}</div>
+                <div class="flex items-center gap-2"><span style="color: #4ade80;">✓</span> {{ __('messages.rescue_f6') }}</div>
+            </div>
+        </div>
 
+        <div class="flex-shrink-0 w-full md:w-auto text-center md:text-right p-6 rounded-2xl border" style="background-color: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);">
+            <p class="text-sm mb-2" style="color: #cbd5e1;">{{ __('messages.rescue_pricing_note') }}</p>
+            <div class="text-3xl font-black mb-6" style="color: #ffffff;">{{ __('messages.rescue_custom') }}</div>
+            <a href="{{ route('pages.contact') }}" class="inline-block w-full font-bold py-3 px-8 rounded-xl transition-all shadow-lg transform hover:-translate-y-0.5" style="background-color: #dc2626; color: #ffffff; text-decoration: none;">
+                {{ __('messages.rescue_cta') }}
+            </a>
+            <p class="text-xs mt-4 max-w-[250px] mx-auto" style="color: #94a3b8;">
+                {{ __('messages.rescue_pilot') }}
+            </p>
+        </div>
+    </div>
+</div>
     {{-- ========== FAQ ========== --}}
     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
