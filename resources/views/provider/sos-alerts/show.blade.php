@@ -55,8 +55,14 @@
         }
     @endphp
 
-    {{-- Alert header --}}
-    <div class="rounded-xl overflow-hidden shadow-lg mb-5 {{ $heroBg }}">
+            {{-- Alert header --}}
+    @php
+        // यदि स्टेटस false_alarm वा resolved छ भने हरियो ब्याकग्राउन्ड, अन्यथा पुरानै
+        $isTerminal = in_array($sos->status, ['false_alarm', 'resolved']);
+        $headerBg = $isTerminal ? 'bg-green-600' : $heroBg;
+    @endphp
+    
+    <div class="rounded-xl overflow-hidden shadow-lg mb-5 {{ $headerBg }}">
         <div class="p-6 text-white">
             <div class="flex items-center gap-4">
                 <div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
@@ -66,7 +72,7 @@
                     <h1 class="text-2xl font-bold">
                         {{ $heroText }}
                     </h1>
-                    <p class="text-white/80 text-sm mt-1">
+                    <p class="text-green-100 text-sm mt-1">
                         {{ $sos->traveler->name ?? __('messages.sos_alerts_unknown_traveler') }}
                     </p>
                 </div>

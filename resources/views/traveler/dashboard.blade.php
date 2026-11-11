@@ -775,8 +775,15 @@
             </button>
             <button type="button" id="sosSendBtn" onclick="sendSos()" disabled
                     class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-paper-plane mr-1"></i>
                 <span>{{ __('messages.sos_send_now') }}</span>
+            </button>
+        </div>
+
+        {{-- Active SOS Cancel Section --}}
+        <div id="activeSosSection" class="hidden mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
+            <p class="text-sm text-red-800 font-semibold mb-2">You have an active SOS.</p>
+            <button type="button" onclick="promptCancelSos()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                Cancel Active SOS
             </button>
         </div>
 
@@ -804,6 +811,17 @@ function openSosModal() {
 
     // GPS banner
     checkGpsStatus();
+
+    // Check active SOS
+    const activeSosId = localStorage.getItem('active_sos_id');
+    const activeSection = document.getElementById('activeSosSection');
+    if (activeSection) {
+        if (activeSosId) {
+            activeSection.classList.remove('hidden');
+        } else {
+            activeSection.classList.add('hidden');
+        }
+    }
 }
 
 function closeSosModal() {
@@ -883,6 +901,7 @@ function sendSos() {
                 if (response.ok && data.success) {
                     statusEl.className = 'text-sm mb-3 text-green-600 font-semibold';
                     statusEl.textContent = 'âœ… ' + (data.message || '{{ __("messages.sos_sent_success") }}');
+                    localStorage.setItem('active_sos_id', data.sos_id);   // ← ADD
                     setTimeout(() => closeSosModal(), 3000);
                 } else {
                     statusEl.className = 'text-sm mb-3 text-red-600';
@@ -901,6 +920,38 @@ function sendSos() {
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+}
+
+async function promptCancelSos() {
+    const reason = prompt("Why are you cancelling this SOS? (Required)");
+    if (!reason || reason.trim() === '') return;
+
+    const activeSosId = localStorage.getItem('active_sos_id');
+    if (!activeSosId) return;
+
+    try {
+        const response = await fetch(`/api/sos/${activeSosId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ reason: reason })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            localStorage.removeItem('active_sos_id');
+            alert('SOS Cancelled.');
+            closeSosModal();
+            location.reload();  // ← dashboard को state refresh गर्न (instruction जस्तै)
+        } else {
+            alert(data.message || 'Failed to cancel SOS.');
+        }
+    } catch (err) {
+        alert('Network error. Please try again.');
+    }
 }
 </script>
     {{-- ===== End SOS Modal ===== --}}
