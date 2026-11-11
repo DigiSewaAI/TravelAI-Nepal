@@ -1,9 +1,5 @@
 /**
  * SOS Global Siren — plays on ANY provider page when new alert arrives.
- * - First visit: one click enables audio (browser policy)
- * - After enable: auto-rings when polling detects active SOS
- * - Loops every 5s until user acknowledges
- * - New alert arriving later re-triggers
  */
 (function() {
     if (window.__sosSirenLoaded) return;
@@ -17,7 +13,7 @@
     var audioCtx = null;
     var ringing = false;
     var ringInterval = null;
-    var lastLatestId = null;
+    var lastLatestId = 0;
 
     function playSiren() {
         try {
@@ -81,7 +77,10 @@
             return audioCtx.resume().then(function() {
                 enabled = true;
                 localStorage.setItem('sos_audio_enabled', 'true');
-                // Removed playSiren() here to prevent siren on Status Update click
+                // यदि SOS एक्टिभ छ भने क्लिक गरेपछि सिरेन बजाउने
+                if (lastLatestId > ackedLatestId) {
+                    startRinging();
+                }
             });
         } catch (e) { return Promise.resolve(); }
     }
@@ -98,29 +97,29 @@
                 if (!data || typeof data.count !== 'number') return;
                 var latest = data.latest_id || 0;
 
-                // ✅ FIX: First load — auto-acknowledge existing alerts
-                // Show bar (user sees alert) but NO siren (avoid false alarm on every dashboard load)
-                if (lastLatestId === null) {
-                    lastLatestId = latest;
-                    if (latest > 0 && ackedLatestId < latest) {
-                        showBar();
-                        ackedLatestId = latest;
-                        localStorage.setItem(ackKey, String(latest));
-                    }
+                if (data.count === 0) {
+                    // SOS रिजोल्भ भयो वा क्यान्सिल भयो भने सबै रिसेट गर्ने
+                    stopRinging();
+                    ackedLatestId = 0;
+                    lastLatestId = 0;
                     return;
                 }
 
-                // Subsequent polls — only NEW alerts ring
-                if (data.count > 0 && latest > ackedLatestId && enabled) {
-                    lastLatestId = latest;
-                    startRinging();
-                } else if (data.count === 0) {
-                    stopRinging();
+                lastLatestId = latest;
+
+                // यदि नयाँ SOS छ (वा पहिले नै साइलेन्स गरिएको छैन भने) सिरेन बजाउने
+                if (latest > ackedLatestId) {
+                    if (enabled) {
+                        startRinging();
+                    } else {
+                        showBar(); // Audio enable गर्न ब्यानर देखाउने
+                    }
+                } else {
+                    showBar(); // साइलेन्स गरिएको छ तर ब्यानर देखाइराख्ने
                 }
             }).catch(function() {});
     }
 
-    // Initial poll after page load
     setTimeout(poll, 3000);
     setInterval(poll, POLL_MS);
 })();

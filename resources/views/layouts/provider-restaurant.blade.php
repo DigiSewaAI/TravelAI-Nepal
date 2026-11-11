@@ -533,28 +533,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 @stack('restaurant-scripts')
 
-<script>
-function playAlertSiren() {
-    try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sawtooth';
-        var now = ctx.currentTime;
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.25, now);
-        for (var i = 0; i < 4; i++) {
-            osc.frequency.linearRampToValueAtTime(1100, now + 0.3 + i * 0.6);
-            osc.frequency.linearRampToValueAtTime(600, now + 0.6 + i * 0.6);
-        }
-        gain.gain.linearRampToValueAtTime(0.01, now + 2.4);
-        osc.start(now);
-        osc.stop(now + 2.5);
-    } catch (e) { console.warn('Siren unavailable:', e); }
-}
-</script>
+
 
 <script src="{{ asset('js/sos-siren-global.js') }}"></script>
 </body>

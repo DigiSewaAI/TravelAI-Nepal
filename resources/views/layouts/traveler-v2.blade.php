@@ -1235,7 +1235,7 @@
 </div>
 
 <script>
-function openSosModal() {
+async function openSosModal() {
     const m = document.getElementById('sosModal');
     m.classList.remove('hidden');
     document.getElementById('sosStatus').classList.add('hidden');
@@ -1262,7 +1262,25 @@ function openSosModal() {
     const activeSection = document.getElementById('activeSosSection');
     if (activeSection) {
         if (activeSosId) {
-            activeSection.classList.remove('hidden');
+            // लोड हुँदा लुकाउने
+            activeSection.classList.add('hidden');
+            
+            // सर्भरलाई सोध्ने कि यो SOS अझै एक्टिभ छ कि छैन
+            try {
+                const res = await fetch(`/api/sos/${activeSosId}/status`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success && data.is_active) {
+                    activeSection.classList.remove('hidden');
+                } else {
+                    // एक्टिभ छैन भने LocalStorage क्लियर गर्ने
+                    try { localStorage.removeItem('active_sos_id'); } catch (e) { window.active_sos_id = null; }
+                }
+            } catch (err) {
+                // नेटवर्क एरर आएमा ब्यानर देखाउने (सुरक्षाको लागि)
+                activeSection.classList.remove('hidden');
+            }
         } else {
             activeSection.classList.add('hidden');
         }
@@ -1403,136 +1421,6 @@ async function promptCancelSos() {
             alert('SOS Cancelled.');
             closeSosModal();
             location.reload(); // Refresh to update state
-        } else {
-            alert(data.message || 'Failed to cancel SOS.');
-        }
-    } catch (err) {
-        alert('Network error. Please try again.');
-    }
-}
-</script>
-
-function closeSosModal() {
-    document.getElementById('sosModal').classList.add('hidden');
-}
-
-function onSosLevelChange() {
-    const selected = document.querySelector('input[name="sos_level"]:checked');
-    const btn = document.getElementById('sosSendBtn');
-    if (btn) btn.disabled = !selected;
-
-    document.querySelectorAll('.sos-level-card').forEach(function (c) {
-        c.classList.remove('border-red-500', 'bg-red-50');
-    });
-    if (selected) {
-        const card = selected.closest('.sos-level-card');
-        if (card) card.classList.add('border-red-500', 'bg-red-50');
-    }
-}
-
-function checkGpsStatus() {
-    const banner = document.getElementById('sosGpsBanner');
-    if (!banner) return;
-    banner.classList.add('hidden');
-    if (!navigator.geolocation) {
-        banner.className = 'text-xs mb-3 px-3 py-2 rounded bg-gray-100 border border-gray-300 text-gray-700';
-        banner.textContent = '{{ __("messages.sos_gps_unknown") }}';
-        banner.classList.remove('hidden');
-    }
-}
-
-function sendSos() {
-    const statusEl = document.getElementById('sosStatus');
-    const btn = document.getElementById('sosSendBtn');
-
-    const selectedLevel = document.querySelector('input[name="sos_level"]:checked');
-    if (!selectedLevel) {
-        statusEl.classList.remove('hidden');
-        statusEl.className = 'text-sm mb-3 text-red-600';
-        statusEl.textContent = '{{ __("messages.sos_level_question") }}';
-        return;
-    }
-
-    statusEl.classList.remove('hidden');
-    statusEl.className = 'text-sm mb-3 px-3 py-2 rounded bg-blue-50 border border-blue-200 text-blue-700 font-medium';
-    statusEl.textContent = '{{ __("messages.sos_getting_location") }}';
-    btn.disabled = true;
-
-    if (!navigator.geolocation) {
-        statusEl.className = 'text-sm mb-3 text-red-600';
-        statusEl.textContent = '{{ __("messages.sos_geo_unsupported") }}';
-        btn.disabled = false;
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            const { latitude, longitude } = position.coords;
-            try {
-                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                const response = await fetch('{{ url("/api/sos") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : '',
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        latitude: latitude,
-                        longitude: longitude,
-                        message: document.getElementById('sosMessage').value || null,
-                        emergency_level: selectedLevel.value,
-                    }),
-                });
-                const data = await response.json();
-                if (response.ok && data.success) {
-                    statusEl.className = 'text-sm mb-3 px-3 py-2 rounded bg-green-50 border border-green-200 text-green-700 font-semibold';
-                    statusEl.textContent = 'âœ… ' + (data.message || '{{ __("messages.sos_sent_success") }}');
-                    localStorage.setItem('active_sos_id', data.sos_id);
-                    setTimeout(() => closeSosModal(), 3000);
-                } else {
-                    statusEl.className = 'text-sm mb-3 px-3 py-2 rounded bg-red-50 border border-red-200 text-red-700 font-semibold';
-                    statusEl.textContent = 'âŒ ' + (data.message || '{{ __("messages.sos_send_failed") }}');
-                }
-            } catch (err) {
-                statusEl.className = 'text-sm mb-3 px-3 py-2 rounded bg-red-50 border border-red-200 text-red-700 font-semibold';
-                statusEl.textContent = 'âŒ {{ __("messages.sos_network_error") }}';
-            }
-            btn.disabled = false;
-        },
-        (error) => {
-            statusEl.className = 'text-sm mb-3 px-3 py-2 rounded bg-red-50 border border-red-200 text-red-700 font-semibold';
-            statusEl.textContent = 'âŒ {{ __("messages.sos_location_denied") }}';
-            btn.disabled = false;
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-}
-
-async function promptCancelSos() {
-    const reason = prompt("Why are you cancelling this SOS? (Required)");
-    if (!reason || reason.trim() === '') return; // Mandatory reason
-
-    const activeSosId = localStorage.getItem('active_sos_id');
-    if (!activeSosId) return;
-
-    try {
-        const response = await fetch(`/api/sos/${activeSosId}/cancel`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-            body: JSON.stringify({ reason: reason })
-        });
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            localStorage.removeItem('active_sos_id');
-            alert('SOS Cancelled.');
-            closeSosModal();
         } else {
             alert(data.message || 'Failed to cancel SOS.');
         }

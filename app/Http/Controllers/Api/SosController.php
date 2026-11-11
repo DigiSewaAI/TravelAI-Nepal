@@ -78,6 +78,24 @@ class SosController extends Controller
             \Log::warning('Admin SOS notify failed', ['sos_id' => $sos->id, 'error' => $e->getMessage()]);
         }
 
+        // Notify provider (Trekking/Hotel/Etc)
+        try {
+            if ($sos->provider) {
+                $providerUser = $sos->provider->user ?? \App\Models\User::find($sos->provider->user_id);
+                if ($providerUser) {
+                    $providerUser->notify(new \App\Notifications\AdminAlertNotification(
+                        '🚨 SOS ALERT',
+                        ($user->name ?? 'Traveler') . ' triggered SOS' . (!empty($validated['message']) ? ': ' . $validated['message'] : ''),
+                        'sos',
+                        url('/provider/sos-alerts/' . $sos->id),
+                        $sos->id
+                    ));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Provider SOS notify failed', ['sos_id' => $sos->id, 'error' => $e->getMessage()]);
+        }
+
         // Dispatch notification (queue)
         try {
             SendSosNotification::dispatch($sos);
@@ -150,6 +168,21 @@ class SosController extends Controller
             'message' => 'SOS cancelled. Stay safe.',
             'sos_id'  => $sos->id,
             'status'  => $sos->fresh()->status,
+        ]);
+    }
+        /**
+     * Check if a specific SOS is still active.
+     */
+    public function status(Request $request, SosAlert $sos)
+    {
+        if (!Auth::check() || $sos->traveler_id !== Auth::id()) {
+            return response()->json(['success' => false], 403);
+        }
+
+        return response()->json([
+            'success'   => true,
+            'is_active' => !$sos->isTerminal(),
+            'status'    => $sos->status
         ]);
     }
 }

@@ -690,6 +690,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const res = await fetch('{{ route('provider.notifications.index') }}', {
                 headers: { 'Accept': 'application/json' }
             });
+            if (!res.ok) throw new Error('Network response was not ok');
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Received HTML instead of JSON"); // एरर लुकाउने
+            }
             const data = await res.json();
 
             // ✅ Update ALL badges and FORCE HIDE
@@ -786,29 +791,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
     @stack('scripts')
 
-<script>
-function playAlertSiren() {
-    try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sawtooth';
-        var now = ctx.currentTime;
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.25, now);
-        for (var i = 0; i < 4; i++) {
-            osc.frequency.linearRampToValueAtTime(1100, now + 0.3 + i * 0.6);
-            osc.frequency.linearRampToValueAtTime(600, now + 0.6 + i * 0.6);
-        }
-        gain.gain.linearRampToValueAtTime(0.01, now + 2.4);
-        osc.start(now);
-        osc.stop(now + 2.5);
-    } catch (e) { console.warn('Siren unavailable:', e); }
-}
-</script>
 
-<script src="{{ asset('js/sos-siren-global.js') }}"></script>
+
+<script src="{{ asset('js/sos-siren-global.js') }}?v=2"></script>
 </body>
 </html>
