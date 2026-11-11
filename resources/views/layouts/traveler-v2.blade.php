@@ -1131,9 +1131,9 @@
 
 
 
-    {{-- ===== SOS Modal + JS (ported from legacy) ===== --}}
+        {{-- ===== SOS Modal + JS (Phase 2: emergency levels) ===== --}}
 <div id="sosModal" class="fixed inset-0 bg-black/60 hidden z-[9999] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -1144,7 +1144,59 @@
             </div>
         </div>
 
+        <div id="sosGpsBanner" class="text-xs mb-3 px-3 py-2 rounded hidden"></div>
         <div id="sosStatus" class="text-sm mb-3 hidden"></div>
+
+        {{-- Level selector --}}
+        <div class="mb-4">
+            <p class="block text-sm font-medium text-gray-700 mb-2">
+                {{ __('messages.sos_level_question') }}
+            </p>
+
+            <label class="sos-level-card flex items-start gap-3 p-3 mb-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-300 transition">
+                <input type="radio" name="sos_level" value="critical" class="mt-1" onchange="onSosLevelChange()">
+                <div class="flex-1">
+                    <div class="font-semibold text-sm text-gray-900 flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-red-600"></span>
+                        {{ __('messages.sos_level_critical_label') }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ __('messages.sos_level_critical_desc') }}</div>
+                </div>
+            </label>
+
+            <label class="sos-level-card flex items-start gap-3 p-3 mb-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-orange-300 transition">
+                <input type="radio" name="sos_level" value="urgent" class="mt-1" onchange="onSosLevelChange()">
+                <div class="flex-1">
+                    <div class="font-semibold text-sm text-gray-900 flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-orange-500"></span>
+                        {{ __('messages.sos_level_urgent_label') }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ __('messages.sos_level_urgent_desc') }}</div>
+                </div>
+            </label>
+
+            <label class="sos-level-card flex items-start gap-3 p-3 mb-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-yellow-300 transition">
+                <input type="radio" name="sos_level" value="assistance" class="mt-1" onchange="onSosLevelChange()">
+                <div class="flex-1">
+                    <div class="font-semibold text-sm text-gray-900 flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-yellow-500"></span>
+                        {{ __('messages.sos_level_assistance_label') }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ __('messages.sos_level_assistance_desc') }}</div>
+                </div>
+            </label>
+
+            <label class="sos-level-card flex items-start gap-3 p-3 mb-2 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-gray-400 transition">
+                <input type="radio" name="sos_level" value="unclassified" class="mt-1" onchange="onSosLevelChange()">
+                <div class="flex-1">
+                    <div class="font-semibold text-sm text-gray-900 flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-gray-800"></span>
+                        {{ __('messages.sos_level_unclassified_label') }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ __('messages.sos_level_unclassified_desc') }}</div>
+                </div>
+            </label>
+        </div>
 
         <div class="mb-4">
             <label for="sosMessage" class="block text-sm font-medium text-gray-700 mb-1">
@@ -1155,16 +1207,22 @@
                       placeholder="{{ __('messages.sos_message_placeholder') }}"></textarea>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 mb-3">
             <button type="button" onclick="closeSosModal()"
                     class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition">
                 {{ __('messages.cancel') ?? 'Cancel' }}
             </button>
-            <button type="button" id="sosSendBtn" onclick="sendSos()"
-                    class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-bold transition shadow-md disabled:opacity-50">
+            <button type="button" id="sosSendBtn" onclick="sendSos()" disabled
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-paper-plane mr-1"></i>
                 <span>{{ __('messages.sos_send_now') }}</span>
             </button>
+        </div>
+
+        <div class="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
+            <a href="#" onclick="closeSosModal(); return false;" class="text-blue-600 hover:underline">
+                {{ __('messages.sos_general_help_link') }}
+            </a>
         </div>
     </div>
 </div>
@@ -1175,15 +1233,58 @@ function openSosModal() {
     m.classList.remove('hidden');
     document.getElementById('sosStatus').classList.add('hidden');
     document.getElementById('sosMessage').value = '';
+
+    // Reset level selection
+    document.querySelectorAll('input[name="sos_level"]').forEach(function (r) { r.checked = false; });
+    document.querySelectorAll('.sos-level-card').forEach(function (c) {
+        c.classList.remove('border-red-500', 'bg-red-50');
+    });
+    document.getElementById('sosSendBtn').disabled = true;
+
+    // GPS banner
+    checkGpsStatus();
 }
 
 function closeSosModal() {
     document.getElementById('sosModal').classList.add('hidden');
 }
 
+function onSosLevelChange() {
+    const selected = document.querySelector('input[name="sos_level"]:checked');
+    const btn = document.getElementById('sosSendBtn');
+    if (btn) btn.disabled = !selected;
+
+    document.querySelectorAll('.sos-level-card').forEach(function (c) {
+        c.classList.remove('border-red-500', 'bg-red-50');
+    });
+    if (selected) {
+        const card = selected.closest('.sos-level-card');
+        if (card) card.classList.add('border-red-500', 'bg-red-50');
+    }
+}
+
+function checkGpsStatus() {
+    const banner = document.getElementById('sosGpsBanner');
+    if (!banner) return;
+    banner.classList.add('hidden');
+    if (!navigator.geolocation) {
+        banner.className = 'text-xs mb-3 px-3 py-2 rounded bg-gray-100 border border-gray-300 text-gray-700';
+        banner.textContent = '{{ __("messages.sos_gps_unknown") }}';
+        banner.classList.remove('hidden');
+    }
+}
+
 function sendSos() {
     const statusEl = document.getElementById('sosStatus');
     const btn = document.getElementById('sosSendBtn');
+
+    const selectedLevel = document.querySelector('input[name="sos_level"]:checked');
+    if (!selectedLevel) {
+        statusEl.classList.remove('hidden');
+        statusEl.className = 'text-sm mb-3 text-red-600';
+        statusEl.textContent = '{{ __("messages.sos_level_question") }}';
+        return;
+    }
 
     statusEl.classList.remove('hidden');
     statusEl.className = 'text-sm mb-3 text-blue-600';
@@ -1214,26 +1315,27 @@ function sendSos() {
                         latitude: latitude,
                         longitude: longitude,
                         message: document.getElementById('sosMessage').value || null,
+                        emergency_level: selectedLevel.value,
                     }),
                 });
                 const data = await response.json();
                 if (response.ok && data.success) {
                     statusEl.className = 'text-sm mb-3 text-green-600 font-semibold';
-                    statusEl.textContent = '✅ ' + (data.message || '{{ __("messages.sos_sent_success") }}');
+                    statusEl.textContent = 'âœ… ' + (data.message || '{{ __("messages.sos_sent_success") }}');
                     setTimeout(() => closeSosModal(), 3000);
                 } else {
                     statusEl.className = 'text-sm mb-3 text-red-600';
-                    statusEl.textContent = '❌ ' + (data.message || '{{ __("messages.sos_send_failed") }}');
+                    statusEl.textContent = 'âŒ ' + (data.message || '{{ __("messages.sos_send_failed") }}');
                 }
             } catch (err) {
                 statusEl.className = 'text-sm mb-3 text-red-600';
-                statusEl.textContent = '❌ {{ __("messages.sos_network_error") }}';
+                statusEl.textContent = 'âŒ {{ __("messages.sos_network_error") }}';
             }
             btn.disabled = false;
         },
         (error) => {
             statusEl.className = 'text-sm mb-3 text-red-600';
-            statusEl.textContent = '❌ {{ __("messages.sos_location_denied") }}';
+            statusEl.textContent = 'âŒ {{ __("messages.sos_location_denied") }}';
             btn.disabled = false;
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
