@@ -25,7 +25,6 @@
                 $cardClass = $isPending ? 'critical' : 'high';
                 $badgeClass = $isPending ? 'badge-critical' : 'badge-high';
 
-                // Check for dispatch locks
                 $myLock = \App\Models\RescueDispatchLock::where('sos_alert_id', $alert->id)
                     ->where('provider_id', $provider->id)
                     ->where('expires_at', '>', now())
@@ -77,11 +76,8 @@
                         @endif
                     </div>
 
-                    {{-- Action Buttons Section --}}
                     <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;flex-direction:column;align-items:flex-end;">
-                        
                         @if($myLock)
-                            {{-- Current provider holds the lock --}}
                             <div style="font-size:12px;color:var(--warning-dark);font-weight:600;margin-bottom:4px;text-align:right;">
                                 <i data-lucide="lock" style="width:12px;height:12px;display:inline;vertical-align:middle;"></i>
                                 Lock expires in <span id="timer-{{ $alert->id }}" data-expires="{{ $myLock->expires_at->timestamp }}">60</span>s
@@ -92,9 +88,7 @@
                                     <i data-lucide="check-circle" style="width:13px;height:13px;"></i> Confirm Dispatch
                                 </button>
                             </form>
-
                         @elseif($otherLock)
-                            {{-- Another provider holds the lock --}}
                             <div style="font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:4px;text-align:right;">
                                 <i data-lucide="lock" style="width:12px;height:12px;display:inline;vertical-align:middle;"></i>
                                 Locked by another provider
@@ -102,9 +96,7 @@
                             <button class="btn btn-ghost btn-sm" disabled style="opacity:0.6;cursor:not-allowed;">
                                 Wait for expiry
                             </button>
-
                         @else
-                            {{-- No lock, allow accept --}}
                             <form action="{{ route('provider.rescue.sos.accept', $alert) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-primary btn-sm">
@@ -137,7 +129,7 @@
 
 @push('rescue-scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
         if (window.lucide) lucide.createIcons();
 
         // Countdown timers for locks
@@ -152,7 +144,6 @@
                 if (diff === 0) {
                     clearInterval(interval);
                     el.innerText = '0';
-                    // Refresh page to show updated lock state
                     window.location.reload();
                 }
             };

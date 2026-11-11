@@ -491,6 +491,23 @@ svg{display:block}button{font-family:inherit}
 </div>
 @endif
 
+{{-- 🔊 Global Rescue Siren Banner (all pages) --}}
+@php
+    $globalActiveSosCount = \App\Models\SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+        ->where(function($q) {
+            $q->whereIn('emergency_level', ['critical', 'unclassified'])
+              ->orWhereNotNull('auto_escalated_at');
+        })->count();
+@endphp
+
+@if($globalActiveSosCount > 0)
+<div id="globalRescueSirenBanner" style="background:#dc2626; color:white; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center; box-shadow:0 4px 12px rgba(220,38,38,0.5);">
+    <h3 style="margin:0; font-size:18px; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> ACTIVE SOS ALERTS ({{ $globalActiveSosCount }})</h3>
+    <p style="margin:5px 0 0; font-size:13px;">🔊 Click anywhere on the page to enable siren sound.</p>
+    <button onclick="document.getElementById('globalRescueSirenBanner').style.display='none'; if(window.stopSiren) window.stopSiren();" style="margin-top:10px; background:white; color:#dc2626; border:none; padding:8px 16px; border-radius:5px; font-weight:bold; cursor:pointer;">🔕 Silence Siren</button>
+</div>
+@endif
+
 @yield('content')
 </main>
 </div>
@@ -545,5 +562,70 @@ function toggleProfile(e) {
 }
 </script>
 @stack('rescue-scripts')
+
+{{-- 🔊 Global Rescue Siren Script (all pages) --}}
+<script>
+    var globalActiveSos = {{ $globalActiveSosCount ?? 0 }};
+    if (globalActiveSos > 0) {
+        var audioCtx = null;
+        var oscillator = null;
+        var sirenInterval = null;
+        var enabled = localStorage.getItem('sos_audio_enabled') === 'true';
+
+        function startSiren() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (!oscillator) {
+                oscillator = audioCtx.createOscillator();
+                var gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.value = 800;
+                gainNode.gain.value = 0.3;
+                oscillator.start();
+
+                var isHigh = true;
+                sirenInterval = setInterval(function() {
+                    if (oscillator && audioCtx) {
+                        oscillator.frequency.setValueAtTime(isHigh ? 400 : 800, audioCtx.currentTime);
+                        isHigh = !isHigh;
+                    }
+                }, 500);
+            }
+        }
+
+        window.stopSiren = function() {
+            if (sirenInterval) clearInterval(sirenInterval);
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                    oscillator.disconnect();
+                } catch(e) {}
+                oscillator = null;
+            }
+            localStorage.setItem('sos_audio_enabled', 'false');
+        };
+
+        if (enabled) {
+            startSiren();
+        }
+
+        if (!enabled) {
+            document.body.addEventListener('click', function() {
+                if (!enabled) {
+                    enabled = true;
+                    localStorage.setItem('sos_audio_enabled', 'true');
+                    startSiren();
+                }
+            }, { once: true });
+        }
+    }
+</script>
 </body>
 </html>
