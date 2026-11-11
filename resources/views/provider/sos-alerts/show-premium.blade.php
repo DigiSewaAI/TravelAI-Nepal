@@ -239,6 +239,11 @@
         <div class="ps-alert success" style="padding:20px;text-align:center;display:block">
             <i class="fas fa-check-circle" style="font-size:32px;margin-bottom:8px"></i>
             <div style="font-size:15px;font-weight:800">{{ __('messages.sos_alerts_resolved_info') }}</div>
+            @if($sos->cancel_reason || $sos->false_alarm_reason)
+                <div style="margin-top:10px; padding:8px; background:rgba(255,255,255,0.4); border-radius:6px; font-size:13px;">
+                    <strong>Reason:</strong> {{ $sos->cancel_reason ?? $sos->false_alarm_reason }}
+                </div>
+            @endif
             @if($sos->resolved_at)
                 <div style="font-size:12px;margin-top:6px">{{ $sos->resolved_at->format('M d, Y H:i') }}</div>
             @endif

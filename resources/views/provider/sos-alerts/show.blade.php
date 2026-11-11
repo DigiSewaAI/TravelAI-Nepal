@@ -220,6 +220,13 @@
         <div class="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
             <i class="fas fa-check-circle text-green-600 text-2xl mb-2"></i>
             <p class="font-semibold text-green-800">{{ __('messages.sos_alerts_resolved_info') }}</p>
+            
+            {{-- 🚨 FIX: Show cancellation / false alarm reason if exists --}}
+            @if($sos->cancel_reason || $sos->false_alarm_reason)
+                <div class="mt-2 p-2 bg-white/60 rounded text-sm text-green-900 border border-green-200">
+                    <strong>Reason given:</strong> {{ $sos->cancel_reason ?? $sos->false_alarm_reason }}
+                </div>
+            @endif
             @if($sos->resolved_at)
                 <p class="text-xs text-green-600 mt-1">
                     {{ $sos->resolved_at->format('M d, Y · H:i') }}
