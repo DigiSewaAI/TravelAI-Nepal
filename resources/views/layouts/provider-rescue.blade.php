@@ -493,18 +493,42 @@ svg{display:block}button{font-family:inherit}
 
 {{-- 🔊 Global Rescue Siren Banner (all pages) --}}
 @php
-    $globalActiveSosCount = \App\Models\SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
+    $globalActiveSosQuery = \App\Models\SosAlert::whereIn('status', ['pending', 'sent', 'acknowledged', 'responding'])
         ->where(function($q) {
             $q->whereIn('emergency_level', ['critical', 'unclassified'])
               ->orWhereNotNull('auto_escalated_at');
-        })->count();
+        });
+    $globalActiveSosCount = $globalActiveSosQuery->count();
+    $globalLatestSosId = $globalActiveSosQuery->max('id') ?? 0;
+    $silencedSosId = (int) ($_COOKIE['sos_silenced_id'] ?? 0);
 @endphp
 
 @if($globalActiveSosCount > 0)
-<div id="globalRescueSirenBanner" style="background:#dc2626; color:white; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center; box-shadow:0 4px 12px rgba(220,38,38,0.5);">
-    <h3 style="margin:0; font-size:18px; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> ACTIVE SOS ALERTS ({{ $globalActiveSosCount }})</h3>
-    <p style="margin:5px 0 0; font-size:13px;">🔊 Click anywhere on the page to enable siren sound.</p>
-    <button onclick="document.getElementById('globalRescueSirenBanner').style.display='none'; if(window.stopSiren) window.stopSiren();" style="margin-top:10px; background:white; color:#dc2626; border:none; padding:8px 16px; border-radius:5px; font-weight:bold; cursor:pointer;">🔕 Silence Siren</button>
+<div id="globalRescueSirenBanner" style="background:{{ $silencedSosId == $globalLatestSosId ? '#4b5563' : '#dc2626' }}; color:white; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition: background 0.3s;">
+    <h3 style="margin:0; font-size:18px; font-weight:bold;">
+        @if($silencedSosId == $globalLatestSosId)
+            🔕 Siren Silenced
+        @else
+            🚨 Emergency Alert Active ({{ $globalActiveSosCount }})
+        @endif
+    </h3>
+    <p style="margin:5px 0 0; font-size:13px; opacity:0.9;">
+        @if($silencedSosId == $globalLatestSosId)
+            Siren is OFF for this SOS. It will re-enable automatically for new alerts.
+        @else
+            Press Silence to stop the siren.
+        @endif
+    </p>
+    
+    @if($silencedSosId != $globalLatestSosId)
+        <button onclick="silenceSiren('{{ $globalLatestSosId }}')" style="margin-top:10px; background:white; color:#dc2626; border:none; padding:8px 16px; border-radius:5px; font-weight:bold; cursor:pointer;">
+            🔕 Silence Siren
+        </button>
+    @else
+        <button onclick="reEnableSiren('{{ $globalLatestSosId }}')" style="margin-top:10px; background:white; color:#4b5563; border:none; padding:8px 16px; border-radius:5px; font-weight:bold; cursor:pointer;">
+            🔊 Re-enable Siren
+        </button>
+    @endif
 </div>
 @endif
 
@@ -565,8 +589,28 @@ function toggleProfile(e) {
 
 {{-- 🔊 Global Rescue Siren Script (all pages) --}}
 <script>
+    // 🔕 Silence Function
+    function silenceSiren(sosId) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+    document.cookie = "sos_silenced_id=" + sosId + "; path=/; expires=" + expires.toUTCString() + "; SameSite=Lax";
+    if (window.stopSiren) window.stopSiren();
+    location.reload(); 
+}
+
+    // 🔊 Re-enable Function
+    function reEnableSiren(sosId) {
+        // Delete cookie
+        document.cookie = "sos_silenced_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        location.reload(); 
+    }
+
+    // Main Siren Logic
     var globalActiveSos = {{ $globalActiveSosCount ?? 0 }};
-    if (globalActiveSos > 0) {
+    var globalLatestSosId = {{ $globalLatestSosId ?? 0 }};
+    var silencedSosId = {{ $silencedSosId ?? 0 }};
+    
+    if (globalActiveSos > 0 && silencedSosId !== globalLatestSosId) {
         var audioCtx = null;
         var oscillator = null;
         var sirenInterval = null;
