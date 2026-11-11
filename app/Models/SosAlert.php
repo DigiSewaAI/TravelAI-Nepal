@@ -9,6 +9,14 @@ class SosAlert extends Model
 {
     use HasFactory;
 
+    // SOS v1.2 - Emergency level severity (higher = more severe)
+    private const LEVEL_SEVERITY = [
+        'assistance'   => 1,
+        'urgent'       => 2,
+        'unclassified' => 2, // = urgent - assessment state, admin classify
+        'critical'     => 3,
+    ];
+
     protected $table = 'sos_alerts';
 
     protected $fillable = [
@@ -19,6 +27,8 @@ class SosAlert extends Model
         'false_alarm_reason', 'auto_escalated_at', 'admin_notified_at',
         'latitude', 'longitude', 'message',
         'trekker_id', 'booking_id', 'is_resolved',
+        // SOS v1.2 - Emergency Level Layer
+        'emergency_level', 'level_changed_at', 'level_changed_by', 'cancel_reason',
     ];
 
     protected $casts = [
@@ -31,16 +41,21 @@ class SosAlert extends Model
         'resolved_at'       => 'datetime',
         'auto_escalated_at' => 'datetime',
         'admin_notified_at' => 'datetime',
+        'level_changed_at'  => 'datetime',   // SOS v1.2 NEW
     ];
 
     // Relations
-    public function traveler()     { return $this->belongsTo(User::class, 'traveler_id'); }
-    public function provider()     { return $this->belongsTo(Provider::class, 'provider_id'); }
-    public function booking()      { return $this->belongsTo(Booking::class, 'booking_id'); }
+    public function traveler()       { return $this->belongsTo(User::class, 'traveler_id'); }
+    public function provider()       { return $this->belongsTo(Provider::class, 'provider_id'); }
+    public function booking()        { return $this->belongsTo(Booking::class, 'booking_id'); }
     public function acknowledgedBy() { return $this->belongsTo(User::class, 'acknowledged_by'); }
     public function respondingBy()   { return $this->belongsTo(User::class, 'responding_by'); }
     public function resolvedBy()     { return $this->belongsTo(User::class, 'resolved_by'); }
-    public function actions()      { return $this->hasMany(SosAlertAction::class, 'sos_alert_id')->latest(); }
+    public function actions()        { return $this->hasMany(SosAlertAction::class, 'sos_alert_id')->latest(); }
+
+    // SOS v1.2 - Level relations
+    public function levelHistory()   { return $this->hasMany(SosLevelHistory::class, 'sos_alert_id')->latest(); }
+    public function levelChangedBy() { return $this->belongsTo(User::class, 'level_changed_by'); }
 
     // Scopes
     public function scopePending($query)      { return $query->where('status', 'pending'); }
@@ -63,7 +78,7 @@ class SosAlert extends Model
     public function canResolve(): bool        { return !$this->isTerminal(); }
     public function canMarkFalseAlarm(): bool { return $this->isPending() || $this->isAcknowledged(); }
 
-    // State transitions (return bool — true if changed)
+    // State transitions (return bool - true if changed)
     public function acknowledge(int $userId): bool
     {
         if (!$this->canAcknowledge()) return false;
@@ -130,5 +145,93 @@ class SosAlert extends Model
             'notes'        => $notes,
             'metadata'     => !empty($metadata) ? $metadata : null,
         ]);
+    }
+
+    // ========================================================
+    // SOS v1.2 - Emergency Level
+    // ========================================================
+
+    public function hasLevel(): bool
+    {
+        return !is_null($this->emergency_level);
+    }
+
+    public function canChangeLevel(): bool
+    {
+        return !$this->isTerminal();
+    }
+
+    /**
+     * Change emergency level. Immutable history + audit.
+     *
+     * Severity computed internally - downgrade detected automatically.
+     * Downgrade requires non-empty $reason (model-level guarantee).
+     * Admin-only downgrade enforcement = Phase 3 controller/UI.
+     *
+     * @param  string|null $newLevel  critical|urgent|assistance|unclassified
+     * @param  int|null    $userId    NULL = system
+     * @param  string|null $reason    required when downgrade detected
+     * @return bool        true if changed
+     */
+    public function changeLevel(?string $newLevel, ?int $userId, ?string $reason = null): bool
+    {
+        if (!$this->canChangeLevel()) return false;
+
+        $valid = ['critical', 'urgent', 'assistance', 'unclassified'];
+        if (!in_array($newLevel, $valid, true)) return false;
+        if ($newLevel === $this->emergency_level) return false;
+
+        $oldSev = self::LEVEL_SEVERITY[$this->emergency_level] ?? null;
+        $newSev = self::LEVEL_SEVERITY[$newLevel] ?? null;
+        $isDowngrade = ($oldSev !== null && $newSev !== null && $newSev < $oldSev);
+
+        if ($isDowngrade && empty($reason)) return false;
+
+        $from = $this->emergency_level;
+
+        $this->update([
+            'emergency_level'  => $newLevel,
+            'level_changed_at' => now(),
+            'level_changed_by' => $userId,
+        ]);
+
+        SosLevelHistory::create([
+            'sos_alert_id' => $this->id,
+            'from_level'   => $from,
+            'to_level'     => $newLevel,
+            'changed_by'   => $userId,
+            'reason'       => $reason,
+            'created_at'   => now(),
+        ]);
+
+        $this->logAction(
+            'level_changed', $userId, $this->status, $this->status,
+            $reason ?? ('Level: ' . ($from ?? 'null') . ' -> ' . $newLevel),
+            ['from_level' => $from, 'to_level' => $newLevel, 'downgrade' => $isDowngrade]
+        );
+
+        return true;
+    }
+
+    /**
+     * Traveler-initiated cancel (plan 09.2).
+     * Maps to existing 'false_alarm' + cancel_reason for Phase 1.
+     * Admin/provider may verify - cancel != safety confirmed.
+     */
+    public function cancel(int $userId, string $reason): bool
+    {
+        if ($this->isTerminal()) return false;
+        $from = $this->status;
+        $this->update([
+            'status'             => 'false_alarm',
+            'resolved_at'        => now(),
+            'resolved_by'        => $userId,
+            'cancel_reason'      => $reason,
+            'false_alarm_reason' => $reason,
+            'is_resolved'        => true,
+        ]);
+        $this->logAction('cancelled', $userId, $from, 'false_alarm', $reason,
+            ['cancel_reason' => $reason]);
+        return true;
     }
 }

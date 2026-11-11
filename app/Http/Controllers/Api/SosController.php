@@ -15,6 +15,10 @@ class SosController extends Controller
     /**
      * Create a new SOS alert (user-based, Option 2).
      * Auth required. Provider notification sent if active booking exists.
+     *
+     * SOS v1.2 - emergency_level (optional, NULL = legacy):
+     * - critical/unclassified -> immediate parallel rescue dispatch
+     * - urgent/assistance/NULL -> legacy 2-stage escalation (sos:escalate)
      */
     public function store(Request $request)
     {
@@ -26,20 +30,21 @@ class SosController extends Controller
         }
 
         $validated = $request->validate([
-            'latitude'  => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'message'   => 'nullable|string|max:500',
+            'latitude'        => 'required|numeric|between:-90,90',
+            'longitude'       => 'required|numeric|between:-180,180',
+            'message'         => 'nullable|string|max:500',
+            'emergency_level' => 'nullable|in:critical,urgent,assistance,unclassified',
         ]);
 
         $user = Auth::user();
 
-        // Find most recent active booking (optional — for provider notification)
+        // Find most recent active booking (optional - for provider notification)
         $activeBooking = Booking::where('traveler_id', $user->id)
             ->whereIn('status', ['confirmed', 'completed'])
             ->latest()
             ->first();
 
-        // Resolve provider through booking → service → provider
+        // Resolve provider through booking -> service -> provider
         $providerId = null;
         if ($activeBooking && $activeBooking->service) {
             $providerId = $activeBooking->service->provider_id ?? null;
@@ -47,13 +52,14 @@ class SosController extends Controller
 
         // Create SOS alert
         $sos = SosAlert::create([
-            'traveler_id' => $user->id,
-            'provider_id' => $providerId,
-            'booking_id'  => $activeBooking?->id,
-            'latitude'    => $validated['latitude'],
-            'longitude'   => $validated['longitude'],
-            'message'     => $validated['message'] ?? null,
-            'status'      => 'pending',
+            'traveler_id'     => $user->id,
+            'provider_id'     => $providerId,
+            'booking_id'      => $activeBooking?->id,
+            'latitude'        => $validated['latitude'],
+            'longitude'       => $validated['longitude'],
+            'message'         => $validated['message'] ?? null,
+            'status'          => 'pending',
+            'emergency_level' => $validated['emergency_level'] ?? null,   // SOS v1.2
         ]);
 
         // Notify admins: SOS alert (safety-critical)
@@ -84,10 +90,29 @@ class SosController extends Controller
             // Alert saved even if notification fails
         }
 
+        // ===== SOS v1.2: Parallel rescue dispatch (critical / unclassified) =====
+        if (in_array($validated['emergency_level'] ?? null, ['critical', 'unclassified'], true)) {
+            try {
+                $notified = app(\App\Services\RescueDispatchService::class)->broadcast($sos);
+                if ($notified > 0) {
+                    $sos->logAction(
+                        'rescue_notified', null, $sos->status, $sos->status,
+                        "Immediate parallel rescue dispatch ({$validated['emergency_level']}) to {$notified} provider(s)",
+                        ['level' => $validated['emergency_level'], 'providers' => $notified]
+                    );
+                } else {
+                    \Log::warning('Parallel rescue dispatch: no providers available', ['sos_id' => $sos->id]);
+                }
+            } catch (\Throwable $e) {
+                \Log::error('Parallel rescue dispatch failed', ['sos_id' => $sos->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         return response()->json([
-            'success' => true,
-            'message' => 'SOS alert sent. Help is on the way.',
-            'sos_id'  => $sos->id,
+            'success'         => true,
+            'message'         => 'SOS alert sent. Help is on the way.',
+            'sos_id'          => $sos->id,
+            'emergency_level' => $sos->emergency_level,
         ], 201);
     }
 }

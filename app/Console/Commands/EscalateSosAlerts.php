@@ -20,8 +20,19 @@ class EscalateSosAlerts extends Command
         $rescueMin = (int) config('sos.escalation.rescue_after_minutes', 10);
         $escalated = 0;
 
+        // ===== Stage 0: Level-aware escalation (SOS v1.2) =====
+        // critical / unclassified -> controller handles parallel dispatch; skip here
+        // urgent      -> escalate if > 3 min
+        // assistance  -> escalate if > 10 min
+        // NULL level  -> fall through to legacy 2-stage below
+        $escalated += $this->handleLevelAwareEscalation();
+
         // Stage 1: Notify admins after X minutes
         $needsAdminNotify = SosAlert::whereIn('status', ['pending', 'sent'])
+            ->where(function ($q) {
+                $q->whereNull('emergency_level')
+                  ->orWhereIn('emergency_level', ['urgent', 'assistance']);
+            })
             ->whereNull('admin_notified_at')
             ->where('created_at', '<=', now()->subMinutes($adminMin))
             ->get();
@@ -39,34 +50,31 @@ class EscalateSosAlerts extends Command
 
         // Stage 2: Rescue escalation (broadcast to nearest providers)
         $needsRescue = SosAlert::whereIn('status', ['pending', 'sent'])
+            ->where(function ($q) {
+                $q->whereNull('emergency_level')
+                  ->orWhereIn('emergency_level', ['urgent', 'assistance']);
+            })
             ->whereNotNull('admin_notified_at')
             ->whereNull('auto_escalated_at')
             ->where('created_at', '<=', now()->subMinutes($rescueMin))
             ->get();
 
         if ($needsRescue->isNotEmpty()) {
-            // ✅ RescueDispatchService लाई इन्जेक्ट गर्ने
             $dispatchService = app(RescueDispatchService::class);
 
             foreach ($needsRescue as $sos) {
-                // Broadcast गर्ने (यसले नजिकैको Online Provider खोज्छ र खबर पठाउँछ)
                 $notifiedCount = $dispatchService->broadcast($sos);
 
                 if ($notifiedCount > 0) {
-                    // यदि सफल भयो भने
                     $sos->update(['auto_escalated_at' => now()]);
-                    
-                    // Status 'sent' मा अपडेट हुन्छ (किनकि broadcast() ले यो काम गर्छ)
                     $sos->logAction(
                         'auto_escalated', null,
-                        'pending', 'sent', 
+                        'pending', 'sent',
                         "Auto-escalated to {$notifiedCount} rescue provider(s) after {$rescueMin}min"
                     );
-                    
                     $this->info("Escalated SOS #{$sos->id} to {$notifiedCount} rescue provider(s).");
                     $escalated++;
                 } else {
-                    // यदि कोही पनि Online भएनन् भने
                     $this->warn("No rescue providers available for SOS #{$sos->id}");
                     Log::warning('SOS auto-escalated to rescue, but no providers were online/available', ['sos_id' => $sos->id]);
                 }
@@ -75,6 +83,58 @@ class EscalateSosAlerts extends Command
 
         $this->info("Total escalated SOS alerts: {$escalated}");
         return self::SUCCESS;
+    }
+
+    /**
+     * Stage 0 - Level-aware escalation.
+     * Only urgent (>3min) and assistance (>10min) handled here.
+     * critical/unclassified are dispatched immediately by SosController::store().
+     * NULL emergency_level falls through to legacy Stage 1/2.
+     */
+    private function handleLevelAwareEscalation(): int
+    {
+        $count = 0;
+        $dispatchService = app(RescueDispatchService::class);
+
+        // Urgent -> 3 min
+        $urgent = SosAlert::whereIn('status', ['pending', 'sent'])
+            ->where('emergency_level', 'urgent')
+            ->whereNull('auto_escalated_at')
+            ->where('created_at', '<=', now()->subMinutes(3))
+            ->get();
+
+        foreach ($urgent as $sos) {
+            $n = $dispatchService->broadcast($sos);
+            if ($n > 0) {
+                $sos->update(['auto_escalated_at' => now()]);
+                $sos->logAction('auto_escalated', null, $sos->status, $sos->status,
+                    "Level-aware escalation (urgent >3min) to {$n} rescue provider(s)",
+                    ['level' => 'urgent', 'providers' => $n]);
+                $count++;
+            } else {
+                Log::warning("Level-aware urgent escalation: no providers for SOS #{$sos->id}");
+            }
+        }
+
+        // Assistance -> 10 min
+        $assistance = SosAlert::whereIn('status', ['pending', 'sent'])
+            ->where('emergency_level', 'assistance')
+            ->whereNull('auto_escalated_at')
+            ->where('created_at', '<=', now()->subMinutes(10))
+            ->get();
+
+        foreach ($assistance as $sos) {
+            $n = $dispatchService->broadcast($sos);
+            if ($n > 0) {
+                $sos->update(['auto_escalated_at' => now()]);
+                $sos->logAction('auto_escalated', null, $sos->status, $sos->status,
+                    "Level-aware escalation (assistance >10min) to {$n} rescue provider(s)",
+                    ['level' => 'assistance', 'providers' => $n]);
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     private function notifyAdmins(SosAlert $sos, int $minutes): void
