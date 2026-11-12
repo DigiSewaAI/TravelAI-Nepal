@@ -220,28 +220,27 @@
       </div>
     </div>
 
-    <div class="svcf-card">
-  <details>
-    <summary class="svcf-card-title" style="cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;justify-content:space-between;">
-      <span>{{ __('messages.additional_details') }}</span>
-      <span style="font-size:12px;color:#6b7280;">▶ Click to expand</span>
-    </summary>
-    <style>
-      details summary::-webkit-details-marker { display: none; }
-      details[open] summary span:last-child { transform: rotate(90deg); display: inline-block; transition: transform 0.2s; }
-    </style>
-    <div style="padding-top:16px;">
-      @include('provider.services._fields_trek', ['service' => null])
-      @include('provider.services._fields_tour', ['service' => null])
-      @include('provider.services._fields_hotel', ['service' => null])
-      @include('provider.services._fields_activity', ['service' => null])
-      @include('provider.services._fields_experience', ['service' => null])
-      @include('provider.services._fields_transport', ['service' => null])
-      @include('provider.services._fields_restaurant', ['service' => null])
-      @include('provider.services._fields_money_changer', ['service' => null])
-      @include('provider.services._fields_art_craft', ['service' => null])
-    </div>
-  </details>
+        <div class="svcf-card">
+  <div class="svcf-card-title" onclick="toggleAdditionalDetails()" style="cursor:pointer;user-select:none;justify-content:space-between;">
+    <span style="display:inline-flex;align-items:center;gap:10px;">
+      {{ __('messages.additional_details') }}
+    </span>
+    <span id="additionalDetailsArrow" style="font-size:12px;color:#6b7280;transition:transform 0.2s;">▼ Click to expand</span>
+  </div>
+  <div id="additionalDetailsContent" style="display:none;padding-top:16px;">
+    <p id="additionalDetailsEmpty" style="color:#6b7280;font-size:13px;text-align:center;padding:20px;font-style:italic;">
+      ⬆️ Please select a category above to see relevant fields.
+    </p>
+    @include('provider.services._fields_trek', ['service' => null])
+    @include('provider.services._fields_tour', ['service' => null])
+    @include('provider.services._fields_hotel', ['service' => null])
+    @include('provider.services._fields_activity', ['service' => null])
+    @include('provider.services._fields_experience', ['service' => null])
+    @include('provider.services._fields_transport', ['service' => null])
+    @include('provider.services._fields_restaurant', ['service' => null])
+    @include('provider.services._fields_money_changer', ['service' => null])
+    @include('provider.services._fields_art_craft', ['service' => null])
+  </div>
 </div>
 
     <div class="svcf-actions">
@@ -255,6 +254,26 @@
 </div>
 
 <script>
+// 🆕 Toggle Additional Details
+function toggleAdditionalDetails() {
+    var content = document.getElementById('additionalDetailsContent');
+    var arrow = document.getElementById('additionalDetailsArrow');
+    if (!content || !arrow) return;
+    
+    var isHidden = content.style.display === 'none' || content.style.display === '';
+    content.style.display = isHidden ? 'block' : 'none';
+    
+    if (isHidden) {
+        arrow.innerHTML = '▲ Click to collapse';
+        arrow.style.transform = 'rotate(0deg)';
+        console.log('[AdditionalDetails] Opened');
+    } else {
+        arrow.innerHTML = '▼ Click to expand';
+        arrow.style.transform = 'rotate(0deg)';
+        console.log('[AdditionalDetails] Closed');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var categorySelect = document.querySelector('select[name="service_category_id"]');
     var hiddenCategory = document.querySelector('input[type="hidden"][name="service_category_id"]');
@@ -275,10 +294,13 @@ document.addEventListener('DOMContentLoaded', function() {
             slug = opt ? (opt.getAttribute('data-slug') || '') : '';
         }
 
+        var anyVisible = false; // 🆕 track if any field group is visible
+
         fieldGroups.forEach(function(group) {
             var __groupSlugs = (group.getAttribute('data-slug') || '').split(',');
             var isActive = slug !== '' && __groupSlugs.indexOf(slug) !== -1;
             group.classList.toggle('hidden', !isActive);
+            if (isActive) anyVisible = true; // 🆕
             group.querySelectorAll('input, select, textarea').forEach(function(input) {
                 if (isActive) {
                     input.removeAttribute('disabled');
@@ -287,6 +309,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+
+        // 🆕 Show/hide placeholder message
+        var placeholder = document.getElementById('additionalDetailsEmpty');
+        if (placeholder) {
+            placeholder.style.display = anyVisible ? 'none' : 'block';
+        }
     }
 
     if (categorySelect) categorySelect.addEventListener('change', updateCategoryFields);

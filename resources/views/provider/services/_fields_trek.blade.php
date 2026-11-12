@@ -1,7 +1,7 @@
 {{-- Phase 4M-2-3+4: Trek category fields --}}
 @php $detail = $service?->trekDetail; @endphp
 
-<div id="fields-trek" class="category-fields hidden space-y-4" data-slug="trek">
+<div id="fields-trek" class="category-fields hidden space-y-4" data-slug="trek,trekking">
 
     <div>
         <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.duration_days') }} *</label>
