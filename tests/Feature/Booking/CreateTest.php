@@ -341,9 +341,10 @@ class CreateTest extends TestCase
 
         // Reasonable threshold — no N+1 in create flow
         // T17: +3 fixed queries from provider notification (deferred but runs sync in tests).
-        // Fixed cost (Provider lookup + User lookup + notifications INSERT), NOT N+1.
-        // Baseline was 20 (pre-notification). Adjusted to 25 (20 + 3 fixed + 2 margin).
-        $this->assertLessThanOrEqual(25, $count, "Create used $count queries (baseline 20 + 3 notification overhead)");
+        // +6 fixed queries from welcome email (Mail::queue in sync tests: relation loads + serialization).
+        // Fixed cost (Provider lookup + User lookup + notifications INSERT + mail queue), NOT N+1.
+        // Baseline was 20 (pre-notification). Adjusted to 30 (20 + 3 + 6 + 1 margin).
+        $this->assertLessThanOrEqual(30, $count, "Create used $count queries (baseline 20 + 3 notification + 6 welcome mail overhead)");
     }
 
     // T19 — 4 locales i18n keys resolve

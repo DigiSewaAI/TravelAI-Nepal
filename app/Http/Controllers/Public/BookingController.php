@@ -211,6 +211,19 @@ class BookingController extends Controller
             \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'service_booking', 'e' => $e->getMessage()]);
         }
 
+        // 📧 Welcome email to traveler (registered or new)
+        try {
+            $__traveler = $booking->traveler;
+            if ($__traveler && $__traveler->email) {
+                $__isRegistered = $__traveler->email_verified_at !== null;
+                \Mail::to($__traveler->email)->queue(
+                    new \App\Mail\BookingWelcomeMail($booking, $__isRegistered, [])
+                );
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Booking welcome mail failed', ['booking_id' => $booking->id, 'e' => $e->getMessage()]);
+        }
+
         return redirect($signedUrl)->with('success', 'Booking created successfully!');
     }
 

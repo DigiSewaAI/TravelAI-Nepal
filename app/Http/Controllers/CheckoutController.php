@@ -71,7 +71,18 @@ class CheckoutController extends Controller
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'product_order', 'e' => $e->getMessage()]);
         }
-
+        // 📧 Welcome email to traveler (registered or guest)
+        try {
+            $__recipientEmail = $order->user?->email ?? $order->contact_email ?? null;
+            if ($__recipientEmail) {
+                $__isRegistered = $order->user && $order->user->email_verified_at !== null;
+                \Mail::to($__recipientEmail)->queue(
+                    new \App\Mail\OrderWelcomeMail($order, $__isRegistered, [])
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Order welcome mail failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+        }
         return redirect()->route('orders.show', $order)
             ->with('success', __('messages.order_created'));
     }
