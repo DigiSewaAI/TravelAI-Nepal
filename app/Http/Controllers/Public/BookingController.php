@@ -199,10 +199,11 @@ class BookingController extends Controller
                     $owner = \App\Models\User::find($ownerId);
                     if ($owner && method_exists($owner, 'notify')) {
                         $owner->notify(new \App\Notifications\ProviderAlertNotification(
-                            title: 'New Booking Received',
-                            message: $__svcName . ' — ' . $__travelerName,
-                            category: 'service_booking'
-                        ));
+    title: 'New Booking Received',
+    message: $__svcName . ' — ' . $__travelerName,
+    category: 'service_booking',
+    url: route('provider.bookings.show', $booking->id)   // 🆕 FIX: Direct booking detail
+));
                     }
                 }
             }

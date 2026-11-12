@@ -74,11 +74,11 @@ class DashboardV2Test extends TestCase
     }
 
     /** @test */
-    public function test_original_dashboard_still_works()
+    public function test_original_dashboard_redirects_to_v2()
     {
         $this->actingAs($this->traveler)
              ->get('/traveler/dashboard')
-             ->assertStatus(200);
+             ->assertRedirect('/traveler/dashboard-v2');
     }
 
     /** @test */

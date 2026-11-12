@@ -590,8 +590,10 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
             ->middleware('feature.flag:traveler_dashboard_v2');
 
 
-        // Dashboard
-        Route::get('/dashboard', [App\Http\Controllers\Traveler\DashboardController::class, 'index'])->name('dashboard');
+        // Dashboard — 🆕 Redirect to V2 (user decision, legacy kept for zero regression)
+        Route::get('/dashboard', function () {
+            return redirect()->route('traveler.dashboard-v2');
+        })->name('dashboard');
         // 🆕 Traveler notifications (in-app bell)
         Route::get('/notifications', [\App\Http\Controllers\Traveler\NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\Traveler\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');

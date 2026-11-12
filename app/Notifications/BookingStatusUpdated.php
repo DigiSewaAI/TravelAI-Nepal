@@ -28,7 +28,7 @@ class BookingStatusUpdated extends Notification
         return (new MailMessage)
             ->subject('Booking Status Updated')
             ->line("Your booking #{$this->booking->id} status has been updated to: " . ucfirst($this->booking->status))
-            ->action('View Booking', route('traveler.dashboard'))
+            ->action('View Booking', route('traveler.bookings.show', $this->booking->id))  // 🆕
             ->line('Thank you for using TravelAI Nepal!');
     }
 
@@ -38,6 +38,7 @@ class BookingStatusUpdated extends Notification
             'booking_id' => $this->booking->id,
             'status' => $this->booking->status,
             'message' => "Booking status updated to {$this->booking->status}",
+            'url' => route('traveler.bookings.show', $this->booking->id),  // 🆕
         ];
     }
 }

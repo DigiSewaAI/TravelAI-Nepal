@@ -8,6 +8,7 @@ use App\Services\ForexService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class ForexTest extends TestCase
@@ -119,10 +120,16 @@ class ForexTest extends TestCase
     }
 
     /**
-     * Test 5: Widget hidden when no rates available
+     * Test 5: Widget shows empty state when no rates available (V2)
+     *
+     * Legacy: widget hidden entirely
+     * V2: widget shown with "No exchange rates available." empty state
      */
-    public function test_widget_hidden_when_no_rates(): void
+    public function test_widget_shows_empty_state_when_no_rates(): void
     {
+        // 🆕 Enable V2 (test env default = false)
+        Config::set('features.traveler_dashboard_v2', true);
+
         Http::fake([
             'open.er-api.com/*' => Http::response('', 500),
         ]);
@@ -130,10 +137,11 @@ class ForexTest extends TestCase
         // No DB records either
         $user = User::factory()->create(['role' => 'traveler']);
 
-        $response = $this->actingAs($user)->get(route('traveler.dashboard'));
+        // 🆕 Route to V2 (legacy redirects to V2, so direct V2 = same result)
+        $response = $this->actingAs($user)->get(route('traveler.dashboard-v2'));
 
         $response->assertStatus(200);
-        // Widget heading should NOT appear
-        $response->assertDontSee('Live currency rates');
+        // 🆕 V2 behavior: empty state message shown (not hidden)
+        $response->assertSee('No exchange rates available.');
     }
 }
