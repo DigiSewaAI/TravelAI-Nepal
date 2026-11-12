@@ -145,12 +145,12 @@
         @endif
     </div>
 
+    {{-- 🆕 Ads: Featured for You (Marquee — full width, after My Bookings) --}}
+    @include('partials.ad-carousel', ['featuredAds' => $featuredAds ?? collect()])
+
     {{-- Reviews + Tools + Exchange rates grid --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        {{-- Ads: Featured for You (ported from legacy) --}}
-@include('partials.ad-carousel', ['featuredAds' => $featuredAds ?? collect()])
-
-@include('traveler._partials.reviews', ['reviewsCount' => $reviewsCount ?? 0])
+        @include('traveler._partials.reviews', ['reviewsCount' => $reviewsCount ?? 0])
         @include('traveler._partials.exchange-rates', ['exchangeRates' => $exchangeRates ?? collect()])
     </div>
 

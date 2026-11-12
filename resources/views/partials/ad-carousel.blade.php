@@ -1,254 +1,216 @@
-{{-- Ads: "Featured for You" section (Phase 1 MVP — Carousel) --}}
+{{-- Ads: "Featured for You" — Marquee (single line, right-to-left) --}}
 @if(isset($featuredAds) && $featuredAds->count() > 0)
     @php $adsCount = $featuredAds->count(); @endphp
 
-    <div style="background:#fff; border-radius:0.75rem; border:1px solid #f3f4f6; padding:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+    <style>
+        @keyframes adMarqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ad-marquee-wrap {
+    background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+    border-radius: 12px;
+    padding: 12px 16px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    border: 1px solid #475569;
+}
+        .ad-marquee-label {
+    color: #fbbf24;
+    font-weight: 800;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #475569;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+        .ad-marquee-viewport {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+        }
+        .ad-marquee-track {
+            display: flex;
+            gap: 28px;
+            animation: adMarqueeScroll 40s linear infinite;
+            width: max-content;
+        }
+        
+        .ad-marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            text-decoration: none;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        .ad-marquee-item:hover { background: rgba(255,255,255,0.12); }
+        .ad-marquee-thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #64748b;
+        }
+        .ad-marquee-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .ad-marquee-title {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ad-marquee-provider {
+            font-size: 10px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+        .ad-marquee-video-badge {
+            font-size: 8px;
+            font-weight: 800;
+            background: #ef4444;
+            color: #fff;
+            padding: 1px 5px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+    </style>
 
-        {{-- Header --}}
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem;">
-            <div style="width:2.5rem; height:2.5rem; border-radius:0.5rem; background:#fffbeb; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                <i class="fas fa-star" style="color:#f59e0b;"></i>
-            </div>
-            <div>
-                <h4 style="font-weight:600; color:#1f2937; margin:0;">{{ __('messages.ads_featured_title') }}</h4>
-                <p style="font-size:0.75rem; color:#6b7280; margin:0;">{{ __('messages.ads_featured_subtitle') }}</p>
-            </div>
-        </div>
-
-        {{-- Carousel wrapper --}}
-        <div style="position:relative; overflow:hidden; border-radius:0.75rem; background:#f9fafb;">
-
-            {{-- Track (slides) --}}
-            <div id="adsTrack" style="display:flex; transition:transform 0.5s ease-out; transform:translateX(0);">
-
-                @foreach($featuredAds as $ad)
-                    <div class="ad-slide" data-ad-id="{{ $ad->id }}" style="min-width:100%; width:100%; flex-shrink:0;">
+    <div class="ad-marquee-wrap">
+        <div class="ad-marquee-label">🎬 {{ __('messages.ads_featured_title') }}</div>
+        <div class="ad-marquee-viewport">
+            <div class="ad-marquee-track">
+                {{-- Loop twice for seamless animation --}}
+                @for($i = 0; $i < 2; $i++)
+                    @foreach($featuredAds as $ad)
                         @if($ad->isVideo())
-                            {{-- 🆕 Video Ad: Click opens modal --}}
-                            <div onclick="openVideoAdModal('{{ Storage::url($ad->video_path) }}', '{{ route('traveler.ads.click', $ad) }}', '{{ $ad->cta_text ?? __('messages.ads_learn_more') }}')"
-                                 style="display:block; position:relative; text-decoration:none; color:inherit; cursor:pointer;"
-                                 data-impression-url="{{ route('traveler.ads.impression', $ad) }}">
-
-                                <span style="position:absolute; top:0.5rem; right:0.5rem; z-index:10; background:#facc15; color:#713f12; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; padding:0.125rem 0.5rem; border-radius:0.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
-                                    {{ __('messages.ads_sponsored_label') }}
-                                </span>
-
-                                <div style="position:relative; background:#fff; border-radius:0.5rem; overflow:hidden;">
-                                    <img src="{{ Storage::url($ad->image_path) }}"
-                                         alt="{{ $ad->title }}"
-                                         style="width:100%; height:12rem; object-fit:cover; display:block;">
-
-                                    {{-- Play Icon Overlay --}}
-                                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:64px; height:64px; border-radius:50%; background:rgba(220,38,38,0.9); color:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
-                                        <i class="fas fa-play"></i>
+                            <div class="ad-marquee-item"
+                                 data-impression-url="{{ route('traveler.ads.impression', $ad) }}"
+                                 data-ad-id="{{ $ad->id }}"
+                                 onclick="trackAdImpression(this); openVideoAdModal('{{ Storage::url($ad->video_path) }}', '{{ route('traveler.ads.click', $ad) }}', '{{ $ad->cta_text ?? __('messages.ads_learn_more') }}')">
+                                <img src="{{ Storage::url($ad->image_path) }}" alt="{{ $ad->title }}" class="ad-marquee-thumb">
+                                <div class="ad-marquee-info">
+                                    <div class="ad-marquee-title">
+                                        <span style="overflow:hidden;text-overflow:ellipsis;">{{ $ad->title }}</span>
+                                        <span class="ad-marquee-video-badge">▶ VIDEO</span>
                                     </div>
-
-                                    {{-- Title Overlay --}}
-                                    <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); color:#fff; padding:2rem 1rem 1rem;">
-                                        <h5 style="font-weight:700; font-size:1rem; margin:0 0 0.25rem;">{{ $ad->title }}</h5>
-                                        @if($ad->provider)
-                                            <p style="font-size:0.75rem; margin:0; opacity:0.9;">
-                                                <i class="fas fa-store"></i> {{ $ad->provider->name }}
-                                            </p>
-                                        @endif
-                                    </div>
+                                    @if($ad->provider)
+                                        <div class="ad-marquee-provider">{{ $ad->provider->name }}</div>
+                                    @endif
                                 </div>
                             </div>
                         @else
-                            {{-- Existing Image Ad (unchanged) --}}
                             <a href="{{ route('traveler.ads.click', $ad) }}"
-                               style="display:block; position:relative; text-decoration:none; color:inherit;"
-                               data-impression-url="{{ route('traveler.ads.impression', $ad) }}">
-
-                                <span style="position:absolute; top:0.5rem; right:0.5rem; z-index:10; background:#facc15; color:#713f12; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; padding:0.125rem 0.5rem; border-radius:0.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
-                                    {{ __('messages.ads_sponsored_label') }}
-                                </span>
-
-                                <div style="display:flex; flex-direction:row; align-items:stretch; background:#fff; border-radius:0.5rem; overflow:hidden;">
-                                    <img src="{{ Storage::url($ad->image_path) }}"
-                                         alt="{{ $ad->title }}"
-                                         style="width:11rem; height:8rem; object-fit:cover; flex-shrink:0;">
-
-                                    <div style="flex:1; padding:1rem; min-width:0;">
-                                        <h5 style="font-weight:700; color:#111827; font-size:1rem; margin:0 0 0.25rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                                            {{ $ad->title }}
-                                        </h5>
-
-                                        @if($ad->provider)
-                                            <p style="font-size:0.75rem; color:#6b7280; margin:0.25rem 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                                <i class="fas fa-store" style="color:#f59e0b; margin-right:0.25rem;"></i>
-                                                {{ $ad->provider->name }}
-                                            </p>
-                                        @endif
-
-                                        @if($ad->description)
-                                            <p style="font-size:0.75rem; color:#4b5563; margin:0.5rem 0 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                                                {{ $ad->description }}
-                                            </p>
-                                        @endif
-
-                                        <span style="display:inline-flex; align-items:center; gap:0.25rem; margin-top:0.75rem; font-size:0.75rem; font-weight:700; color:#d97706;">
-                                            {{ $ad->cta_text ?? __('messages.ads_learn_more') }}
-                                            <i class="fas fa-arrow-right" style="font-size:10px;"></i>
-                                        </span>
-                                    </div>
+                               class="ad-marquee-item"
+                               data-impression-url="{{ route('traveler.ads.impression', $ad) }}"
+                               data-ad-id="{{ $ad->id }}"
+                               onclick="trackAdImpression(this)">
+                                <img src="{{ Storage::url($ad->image_path) }}" alt="{{ $ad->title }}" class="ad-marquee-thumb">
+                                <div class="ad-marquee-info">
+                                    <div class="ad-marquee-title">{{ $ad->title }}</div>
+                                    @if($ad->provider)
+                                        <div class="ad-marquee-provider">{{ $ad->provider->name }}</div>
+                                    @endif
                                 </div>
                             </a>
                         @endif
-                    </div>
-                @endforeach
-
-            </div>
-
-            {{-- Arrows --}}
-            @if($adsCount > 1)
-                <button type="button" onclick="carouselPrev()"
-                        style="position:absolute; top:50%; transform:translateY(-50%); left:0.5rem; z-index:20; width:2rem; height:2rem; border-radius:9999px; background:rgba(255,255,255,0.95); box-shadow:0 2px 8px rgba(0,0,0,0.15); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#374151;">
-                    <i class="fas fa-chevron-left" style="font-size:12px;"></i>
-                </button>
-                <button type="button" onclick="carouselNext()"
-                        style="position:absolute; top:50%; transform:translateY(-50%); right:0.5rem; z-index:20; width:2rem; height:2rem; border-radius:9999px; background:rgba(255,255,255,0.95); box-shadow:0 2px 8px rgba(0,0,0,0.15); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#374151;">
-                    <i class="fas fa-chevron-right" style="font-size:12px;"></i>
-                </button>
-            @endif
-
-        </div>
-
-        {{-- Dots --}}
-        @if($adsCount > 1)
-            <div id="carouselDots" style="display:flex; justify-content:center; gap:0.375rem; margin-top:0.75rem;">
-                @for($i = 0; $i < $adsCount; $i++)
-                    <button type="button" data-index="{{ $i }}"
-                            class="carousel-dot"
-                            style="width:{{ $i === 0 ? '1.25rem' : '0.5rem' }}; height:0.5rem; border-radius:9999px; border:none; cursor:pointer; transition:all 0.3s; background:{{ $i === 0 ? '#f59e0b' : '#d1d5db' }};"></button>
+                    @endforeach
                 @endfor
             </div>
-        @endif
-
+        </div>
     </div>
 
     <script>
-    (function () {
-        const track = document.getElementById('adsTrack');
-        const dots = document.querySelectorAll('.carousel-dot');
-        if (!track) return;
+    // 🆕 Marquee Pause — Desktop (hover) + Mobile (touch)
+    (function() {
+        var viewport = document.querySelector('.ad-marquee-viewport');
+        var track = document.querySelector('.ad-marquee-track');
+        if (!viewport || !track) return;
 
-        const total = {{ $adsCount }};
-        let current = 0;
-        let autoTimer = null;
+        function pause()  { track.style.animationPlayState = 'paused'; }
+        function resume() { track.style.animationPlayState = 'running'; }
 
-        function updateSlide() {
-            track.style.transform = 'translateX(-' + (current * 100) + '%)';
-
-            dots.forEach(function (dot, i) {
-                if (i === current) {
-                    dot.style.width = '1.25rem';
-                    dot.style.background = '#f59e0b';
-                } else {
-                    dot.style.width = '0.5rem';
-                    dot.style.background = '#d1d5db';
-                }
-            });
-
-            const activeSlide = track.querySelectorAll('.ad-slide')[current];
-            if (activeSlide) {
-                const link = activeSlide.querySelector('a[data-impression-url]');
-                if (link) {
-                    trackImpression(link.dataset.impressionUrl, activeSlide.dataset.adId);
-                }
-            }
-        }
-
-        function trackImpression(url, adId) {
-            const tracked = sessionStorage.getItem('ads_tracked') || '';
-            const ids = tracked ? tracked.split(',') : [];
-            if (ids.includes(adId)) return;
-
-            const csrf = document.querySelector('meta[name="csrf-token"]');
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrf ? csrf.content : '',
-                    'Accept': 'application/json',
-                },
-                credentials: 'same-origin',
-            }).then(function () {
-                ids.push(adId);
-                sessionStorage.setItem('ads_tracked', ids.join(','));
-            }).catch(function () { /* silent */ });
-        }
-
-        // 🆕 Video Ad Modal Functions
-        window.openVideoAdModal = function(videoUrl, ctaUrl, ctaText) {
-            const modal = document.getElementById('videoAdModal');
-            const player = document.getElementById('adVideoPlayer');
-            const cta = document.getElementById('videoAdCta');
-            if (!modal || !player || !cta) return;
-
-            player.src = videoUrl;
-            cta.href = ctaUrl;
-            cta.textContent = ctaText + ' \u2192';
-            modal.style.display = 'flex';
-
-            // Pause carousel auto-rotate while modal is open
-            if (autoTimer) {
-                clearInterval(autoTimer);
-                autoTimer = null;
-            }
-
-            // Auto play video
-            player.play().catch(function() { /* silent - autoplay may be blocked */ });
-        };
-
-        window.closeVideoAdModal = function() {
-            const modal = document.getElementById('videoAdModal');
-            const player = document.getElementById('adVideoPlayer');
-            if (modal) modal.style.display = 'none';
-            if (player) {
-                player.pause();
-                player.currentTime = 0;
-                player.src = '';
-            }
-            // Resume carousel
-            restartAuto();
-        };
-
-        window.carouselNext = function () {
-            current = (current + 1) % total;
-            updateSlide();
-            restartAuto();
-        };
-
-        window.carouselPrev = function () {
-            current = (current - 1 + total) % total;
-            updateSlide();
-            restartAuto();
-        };
-
-        dots.forEach(function (dot) {
-            dot.addEventListener('click', function () {
-                current = parseInt(this.dataset.index);
-                updateSlide();
-                restartAuto();
-            });
-        });
-
-        function restartAuto() {
-            if (autoTimer) clearInterval(autoTimer);
-            if (total > 1) {
-                autoTimer = setInterval(function () {
-                    current = (current + 1) % total;
-                    updateSlide();
-                }, 6000);
-            }
-        }
-
-        updateSlide();
-        restartAuto();
+        viewport.addEventListener('mouseenter', pause);
+        viewport.addEventListener('mouseleave', resume);
+        viewport.addEventListener('touchstart', pause, { passive: true });
+        viewport.addEventListener('touchend', resume, { passive: true });
+        viewport.addEventListener('touchcancel', resume, { passive: true });
     })();
+
+    // Track impression (once per session per ad)
+    function trackAdImpression(el) {
+        var url = el.dataset.impressionUrl;
+        var adId = el.dataset.adId;
+        if (!url || !adId) return;
+        var tracked = sessionStorage.getItem('ads_tracked') || '';
+        var ids = tracked ? tracked.split(',') : [];
+        if (ids.includes(adId)) return;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf ? csrf.content : '',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin',
+        }).then(function () {
+            ids.push(adId);
+            sessionStorage.setItem('ads_tracked', ids.join(','));
+        }).catch(function () {});
+    }
+
+    // Video Ad Modal
+    window.openVideoAdModal = function(videoUrl, ctaUrl, ctaText) {
+        var modal = document.getElementById('videoAdModal');
+        var player = document.getElementById('adVideoPlayer');
+        var cta = document.getElementById('videoAdCta');
+        if (!modal || !player || !cta) return;
+        player.src = videoUrl;
+        cta.href = ctaUrl;
+        cta.textContent = ctaText + ' →';
+        modal.style.display = 'flex';
+        player.play().catch(function () {});
+    };
+
+    window.closeVideoAdModal = function() {
+        var modal = document.getElementById('videoAdModal');
+        var player = document.getElementById('adVideoPlayer');
+        if (modal) modal.style.display = 'none';
+        if (player) {
+            player.pause();
+            player.currentTime = 0;
+            player.src = '';
+        }
+    };
     </script>
 
-    {{-- 🆕 Video Ad Modal --}}
+    {{-- Video Ad Modal --}}
     <div id="videoAdModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:99999; align-items:center; justify-content:center; padding:1rem;">
         <div style="position:relative; max-width:800px; width:100%;">
             <button type="button" onclick="closeVideoAdModal()"
@@ -258,7 +220,7 @@
             <video id="adVideoPlayer" controls playsinline style="width:100%; border-radius:12px; background:#000; max-height:70vh;"></video>
             <a id="videoAdCta" href="#" target="_blank"
                style="display:block; margin-top:1rem; text-align:center; background:#f59e0b; color:#fff; padding:14px; border-radius:8px; font-weight:bold; text-decoration:none; font-size:15px;">
-                Learn More &rarr;
+                Learn More →
             </a>
         </div>
     </div>

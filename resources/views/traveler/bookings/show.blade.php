@@ -39,15 +39,15 @@
             </div>
             <div class="col-span-2">
                 <p class="text-sm text-gray-500">{{ __('messages.traveler_booking_provider') }}</p>
-                <p class="font-medium">{{ $booking->service->provider->name ?? __('messages.na') }}</p>
+                <p class="font-medium">{{ $booking->service?->provider?->name ?? __('messages.na') }}</p>
             </div>
         </div>
 
         {{-- PHASE 7E.2 — Payment Methods Display --}}
         @php
-            $providerMethods = $booking->service->provider->paymentMethods
-                ->where('is_active', true)
-                ->sortBy('sort_order');
+            $providerMethods = $booking->service?->provider?->paymentMethods
+                ? $booking->service->provider->paymentMethods->where('is_active', true)->sortBy('sort_order')
+                : collect();
             $domesticMethods = $providerMethods->whereIn('type', ['bank', 'esewa', 'khalti', 'cash'])->values();
             $internationalMethods = $providerMethods->whereIn('type', ['paypal', 'wise', 'international_bank'])->values();
             $typeIcons = [
