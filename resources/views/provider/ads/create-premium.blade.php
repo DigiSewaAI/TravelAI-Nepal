@@ -99,6 +99,18 @@
                     <label>{{ __('messages.ads_image_label') }} <span class="req">*</span> (1200×300)</label>
                     <input type="file" name="image" accept="image/*" required>
                 </div>
+              {{-- 🆕 Video Upload (Rescue Providers Only) --}}
+              @if($isRescue ?? false)
+              <div class="pad-field" style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:8px; margin-top:12px;">
+                  <label style="color:#1e40af; font-weight:600;">
+                      🎥 Video Ad <span style="font-weight:400; font-size:11px;">(Optional - Max 20MB, MP4, 60s)</span>
+                  </label>
+                  <input type="file" name="video" accept="video/mp4" style="margin-top:6px;">
+                  <p style="font-size:11px; color:#1e40af; margin-top:6px; line-height:1.4;">
+                      <i class="fas fa-info-circle"></i> Video upload गरे, Traveler ले Ad थिच्दा Modal मा play हुनेछ। Image (thumbnail) अनिवार्य छ।
+                  </p>
+              </div>
+              @endif
             </div>
         </div>
 
@@ -109,17 +121,31 @@
             </div>
             <div class="pad-card-body">
                 <div class="pad-row">
-                    <div class="pad-field">
-                        <label>{{ __('messages.ads_link_label') }} <span class="req">*</span></label>
-                        <input type="text" name="link_url" required value="{{ old('link_url') }}" placeholder="{{ __('messages.placehold_slug') }}">
-                        <p class="pad-hint">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>
-                                {{ __('messages.ads_link_example_label') }}<br>
-                                <code>/explore/service/everest-base-camp-trek-14-days</code>
-                            </span>
-                        </p>
-                    </div>
+                    @if($isRescue ?? false)
+    <div class="pad-field">
+        <label>Website URL <span class="req">*</span></label>
+        <input type="text" name="link_url" required value="{{ old('link_url') }}" placeholder="https://your-rescue-company.com">
+        <p class="pad-hint">
+            <i class="fas fa-lightbulb"></i>
+            <span>
+                Traveler "Learn More" थिच्दा यो website खुल्नेछ।<br>
+                <code>https://himalayanrescue.com</code> जस्तो पूरा URL राख्नुस्।
+            </span>
+        </p>
+    </div>
+@else
+    <div class="pad-field">
+        <label>{{ __('messages.ads_link_label') }} <span class="req">*</span></label>
+        <input type="text" name="link_url" required value="{{ old('link_url') }}" placeholder="{{ __('messages.placehold_slug') }}">
+        <p class="pad-hint">
+            <i class="fas fa-lightbulb"></i>
+            <span>
+                {{ __('messages.ads_link_example_label') }}<br>
+                <code>/explore/service/everest-base-camp-trek-14-days</code>
+            </span>
+        </p>
+    </div>
+@endif
                     <div class="pad-field">
                         <label>{{ __('messages.ads_link_target_label') }}</label>
                         <select name="link_target">

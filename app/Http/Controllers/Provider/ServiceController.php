@@ -51,6 +51,44 @@ class ServiceController extends Controller
 
     use AuthorizesRequests;
 
+        /**
+     * Check if provider has reached their plan limit for given category.
+     * Returns redirect if limit exceeded, null if OK.
+     */
+    private function checkPlanLimit($provider, string $limitKey, string $modelClass, string $countType)
+    {
+        // Get limit from accessor (e.g., 'max_treks' → $provider->max_treks)
+        $limit = $provider->{$limitKey} ?? -1;
+
+        // -1 = unlimited
+        if ($limit < 0) {
+            return null;
+        }
+
+        // Map countType to category slugs
+        $categorySlugMap = [
+            'treks'  => ['trekking'],
+            'hotels' => ['hotel', 'resort', 'lodge', 'homestay'],
+        ];
+        $slugs = $categorySlugMap[$countType] ?? [$countType];
+
+        // Count provider's existing services in this category
+        $currentCount = $provider->services()
+            ->whereHas('category', function ($q) use ($slugs) {
+                $q->whereIn('slug', $slugs);
+            })
+            ->count();
+
+        // Exceeded?
+        if ($currentCount >= $limit) {
+            return back()->withErrors([
+                'plan_limit' => "You have reached your plan limit of {$limit} {$countType}. Please upgrade your plan to add more.",
+            ])->withInput();
+        }
+
+        return null;
+    }
+
     public function index()
     {
         $provider_layout = $this->getProviderLayout(Auth::user()->getCurrentProvider());
@@ -75,7 +113,17 @@ class ServiceController extends Controller
             return redirect()->route('provider.products.create')
                 ->with('info', 'Please create a Product instead of a Service.');
         }
-
+    // 🆕 Individual Provider (Guide, Porter, Photographer) → Individual dashboard प्रयोग गर्ने
+    $individualSlugs = ['guide', 'porter', 'photographer'];
+    if ($providerType && in_array($providerType->slug, $individualSlugs)) {
+        return redirect()->route('provider.individual.dashboard')
+            ->with('info', 'Individual providers manage bookings via their Individual dashboard, not Services.');
+    }
+        // 🆕 Rescue Provider → Rescue dashboard प्रयोग गर्ने (Service बनाउँदैनन्)
+    if ($providerType && $providerType->slug === 'rescue-service') {
+        return redirect()->route('provider.rescue.dashboard')
+            ->with('info', 'Rescue providers manage operations via their Rescue dashboard, not Services.');
+    }
         // Product Category (shop, rental, wholesale) लाई Service को फर्मबाट हटाउने
         $productCategorySlugs = ['shop', 'rental', 'wholesale'];
 
@@ -122,6 +170,14 @@ class ServiceController extends Controller
         $providerTypeSlug = $provider->types()->first()?->slug;
         if (in_array($providerTypeSlug, ['shop-owner', 'rental-provider', 'wholesale-provider'])) {
             abort(403, 'Product providers cannot create services.');
+        }
+                // 🆕 Individual Provider (Guide, Porter, Photographer) — Service बनाउन नपाउने
+        if (in_array($providerTypeSlug, ['guide', 'porter', 'photographer'])) {
+            abort(403, 'Individual providers cannot create services. Use your Individual dashboard.');
+        }
+                // 🆕 Rescue Provider — Service बनाउन नपाउने
+        if ($providerTypeSlug === 'rescue-service') {
+            abort(403, 'Rescue providers cannot create services. Use your Rescue dashboard.');
         }
 
         $validated = $request->validate([

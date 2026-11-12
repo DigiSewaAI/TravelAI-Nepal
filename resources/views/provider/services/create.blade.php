@@ -186,17 +186,17 @@
         </div>
 
         <div>
-          <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.price') }}</label>
-          <div style="display:flex;gap:8px;">
-            <input type="number" name="price" value="{{ old('price') }}" step="0.01" style="flex:1;" class="@error('price') border-red-500 @enderror">
-            <select name="currency" style="max-width:110px;">
-              <option value="USD" {{ old('currency', 'USD') == 'USD' ? 'selected' : '' }}>USD</option>
-              <option value="NPR" {{ old('currency', 'USD') == 'NPR' ? 'selected' : '' }}>NPR</option>
-            </select>
-          </div>
-          @error('price')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-          @error('currency')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-        </div>
+  <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.price') }}</label>
+  <div style="display:flex;gap:8px;align-items:stretch;">
+    <input type="number" name="price" value="{{ old('price') }}" step="0.01" placeholder="0.00" style="flex:1 1 0;min-width:0;" class="@error('price') border-red-500 @enderror">
+    <select name="currency" style="flex:0 0 100px;width:100px;">
+      <option value="USD" {{ old('currency', 'USD') == 'USD' ? 'selected' : '' }}>USD</option>
+      <option value="NPR" {{ old('currency', 'USD') == 'NPR' ? 'selected' : '' }}>NPR</option>
+    </select>
+  </div>
+  @error('price')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+  @error('currency')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+</div>
 
         <div>
           <label class="block text-gray-700 font-semibold mb-1">{{ __('messages.description') }}</label>
@@ -221,7 +221,16 @@
     </div>
 
     <div class="svcf-card">
-      <div class="svcf-card-title">{{ __('messages.additional_details') }}</div>
+  <details>
+    <summary class="svcf-card-title" style="cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+      <span>{{ __('messages.additional_details') }}</span>
+      <span style="font-size:12px;color:#6b7280;">▶ Click to expand</span>
+    </summary>
+    <style>
+      details summary::-webkit-details-marker { display: none; }
+      details[open] summary span:last-child { transform: rotate(90deg); display: inline-block; transition: transform 0.2s; }
+    </style>
+    <div style="padding-top:16px;">
       @include('provider.services._fields_trek', ['service' => null])
       @include('provider.services._fields_tour', ['service' => null])
       @include('provider.services._fields_hotel', ['service' => null])
@@ -232,6 +241,8 @@
       @include('provider.services._fields_money_changer', ['service' => null])
       @include('provider.services._fields_art_craft', ['service' => null])
     </div>
+  </details>
+</div>
 
     <div class="svcf-actions">
       <button type="submit" class="svcf-submit">

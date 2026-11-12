@@ -11,6 +11,7 @@ class Ad extends Model
 
     protected $fillable = [
         'provider_id', 'title', 'description', 'image_path',
+        'type', 'video_path',                          // 🆕 Rescue Video Ad
         'link_url', 'link_target', 'cta_text',
         'duration_days', 'price_paid',
         'payment_status', 'payment_proof_path',
@@ -100,6 +101,15 @@ class Ad extends Model
         }
         // Cap at 100% — session-deduped impressions can produce >100% CTR
         return min(100.0, round(($this->clicks / $this->impressions) * 100, 2));
+    }
+
+    /**
+     * Check if this ad is a video ad (Rescue only).
+     * Type = 'video' AND video_path must be set.
+     */
+    public function isVideo(): bool
+    {
+        return $this->type === 'video' && !empty($this->video_path);
     }
 
     public function isExpired(): bool

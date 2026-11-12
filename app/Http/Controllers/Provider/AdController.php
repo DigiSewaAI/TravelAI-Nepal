@@ -77,7 +77,8 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.ads.index' : '
         $pricing = Ad::PRICING;
         $provider = Auth::user()->getCurrentProvider();
         $provider_layout = $this->getProviderLayout($provider);
-return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 'provider.ads.create-premium', compact('pricing', 'provider_layout'));
+        $isRescue = $provider->types->first()?->slug === 'rescue-service'; // 🆕
+        return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 'provider.ads.create-premium', compact('pricing', 'provider_layout', 'isRescue'));
     }
 
     /**
@@ -91,6 +92,7 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 
             'title'              => 'required|string|max:150',
             'description'        => 'nullable|string|max:500',
             'image'              => 'required|image|max:3072', // 3MB
+            'video'              => 'nullable|file|mimes:mp4|max:20480', // 🆕 20MB Max
             'link_url'           => 'required|string|max:500',
             'link_target'        => 'in:_blank,_self',
             'cta_text'           => 'nullable|string|max:50',
@@ -110,11 +112,21 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.ads.create' : 
         $imagePath = $request->file('image')->store('ads/images', 'public');
         $proofPath = $request->file('payment_proof')->store('ads/proofs', 'public');
 
+        // 🆕 Video upload (Rescue Only)
+        $videoPath = null;
+        $adType = 'image';
+        if ($request->hasFile('video') && $provider->types->first()?->slug === 'rescue-service') {
+            $videoPath = $request->file('video')->store('ads/videos', 'public');
+            $adType = 'video';
+        }
+
         $ad = Ad::create([
             'provider_id'         => $provider->id,
             'title'               => $validated['title'],
             'description'         => $validated['description'] ?? null,
             'image_path'          => $imagePath,
+            'type'                => $adType,        // 🆕
+            'video_path'          => $videoPath,     // 🆕
             'link_url'            => $validated['link_url'],
             'link_target'         => $validated['link_target'] ?? '_blank',
             'cta_text'            => $validated['cta_text'] ?? 'Learn More',
