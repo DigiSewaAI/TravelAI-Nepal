@@ -398,6 +398,7 @@ Route::get('/active-count', [\App\Http\Controllers\Provider\SosAlertController::
         // ── Rescue Provider Dashboard (Phase 3) ──
     Route::prefix('rescue')->name('rescue.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/notifications/{id}', [\App\Http\Controllers\Provider\NotificationController::class, 'showRescue'])->name('notifications.show');
         Route::get('/sos', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'sosQueue'])->name('sos');
         Route::get('/missions', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'missions'])->name('missions');
                 Route::post('/sos/{sos}/accept', [\App\Http\Controllers\Provider\RescueDashboardController::class, 'acceptSos'])->name('sos.accept');

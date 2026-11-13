@@ -104,7 +104,52 @@ class NotificationController extends Controller
             $notification->markAsRead();
         }
 
-        return view('provider.notifications.show', compact('notification'));
+        $provider = $user->getCurrentProvider();
+        $provider_layout = $this->resolveLayout($provider);
+
+        return view('provider.notifications.show', compact('notification', 'provider', 'provider_layout'));
+    }
+
+    /**
+     * Resolve correct layout by provider's primary type slug.
+     * Mirrors system pattern (Review/Booking controllers).
+     */
+    private function resolveLayout($provider): string
+    {
+        $slug = $provider?->types->first()?->slug;
+
+        return match (true) {
+            in_array($slug, ['hotel', 'resort', 'lodge', 'homestay'], true)
+                => 'layouts.provider-hotel',
+            $slug === 'restaurant'
+                => 'layouts.provider-restaurant',
+            $slug === 'transport-provider'
+                => 'layouts.provider-transport',
+            $slug === 'art-craft'
+                => 'layouts.provider-art-craft',
+            in_array($slug, ['guide', 'porter', 'photographer', 'local-experience'], true)
+                => 'layouts.provider-individual',
+            in_array($slug, ['shop-owner', 'rental-provider', 'wholesale-provider'], true)
+                => 'layouts.provider-inventory',
+            $slug === 'money-changer'
+                => 'layouts.provider-money-changer',
+            $slug === 'rescue-service'
+                => 'layouts.provider-rescue',
+            default
+                => 'layouts.provider',
+        };
+    }
+
+    public function showRescue($id)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($id);
+
+        if ($notification->read_at === null) {
+            $notification->markAsRead();
+        }
+
+        return view('provider-rescue.notifications.show', compact('notification'));
     }
 
     public function markAllAsRead()

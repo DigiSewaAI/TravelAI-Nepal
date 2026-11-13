@@ -431,7 +431,7 @@ svg{display:block}button{font-family:inherit}
         </div>
         <div class="notif-list">
           @forelse($currentUser ? $currentUser->unreadNotifications()->take(5)->get() : collect() as $notif)
-            <a href="{{ $notif->data['url'] ?? '#' }}" class="notif-item">
+            <a href="{{ (isset($notif->data['type']) && $notif->data['type'] === 'admin_broadcast') ? route('provider.rescue.notifications.show', $notif->id) : ($notif->data['url'] ?? '#') }}" class="notif-item">
               <div class="nt-title">{{ $notif->data['message'] ?? 'New notification' }}</div>
               <div class="nt-time">{{ $notif->created_at->diffForHumans() }}</div>
             </a>
