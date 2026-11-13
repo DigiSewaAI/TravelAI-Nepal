@@ -20,8 +20,11 @@ class NotificationController extends Controller
                 $url = $data['url'] ?? null;
                 $category = $data['category'] ?? 'info';
 
-                // Build URL/title based on notification type
-                if (isset($data['quotation_request_id'])) {
+                // 🆕 Admin Broadcast: dedicated announcement page
+                if (($data['type'] ?? null) === 'admin_broadcast') {
+                    $url = route('provider.notifications.show', $n->id);
+                    $category = 'announcement';
+                } elseif (isset($data['quotation_request_id'])) {
                     $title = $title ?? 'New Quotation Request';
                     $url = $url ?? route('provider.quotation-requests.show', $data['quotation_request_id']);
                     $category = 'quotation';
@@ -80,7 +83,23 @@ class NotificationController extends Controller
         return back();
     }
 
-       public function markAllAsRead()
+       /**
+     * 🆕 Show full notification (for announcements / broadcasts)
+     */
+    public function show($id)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications()->findOrFail($id);
+
+        // Auto-mark as read on view
+        if ($notification->read_at === null) {
+            $notification->markAsRead();
+        }
+
+        return view('provider.notifications.show', compact('notification'));
+    }
+
+    public function markAllAsRead()
     {
         $user = auth()->user();
 

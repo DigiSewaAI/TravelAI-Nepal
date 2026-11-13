@@ -380,6 +380,8 @@ Route::post('/art-craft/ai/pricing', [\App\Http\Controllers\Provider\ArtCraftDas
     Route::get('/notifications', [\App\Http\Controllers\Provider\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Provider\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\Provider\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    // 🆕 Show individual notification (for broadcast announcements)
+    Route::get('/notifications/{id}', [\App\Http\Controllers\Provider\NotificationController::class, 'show'])->name('notifications.show');
 
     // REALTIME-INCONSISTENCY-01: AJAX endpoint for live alert counts
     Route::get('/alerts/live-counts', [ProviderDashboardController::class, 'getLiveAlertCounts'])->name('alerts.live-counts');
@@ -598,6 +600,8 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
         Route::get('/notifications', [\App\Http\Controllers\Traveler\NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\Traveler\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
         Route::post('/notifications/read-all', [\App\Http\Controllers\Traveler\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        // 🆕 Show individual notification (for broadcast announcements)
+        Route::get('/notifications/{id}', [\App\Http\Controllers\Traveler\NotificationController::class, 'show'])->name('notifications.show');
         // Ads — Traveler tracking
         Route::post('/ads/{ad}/impression', [\App\Http\Controllers\Traveler\AdController::class, 'impression'])->name('ads.impression');
         Route::get('/ads/{ad}/click', [\App\Http\Controllers\Traveler\AdController::class, 'click'])->name('ads.click');
