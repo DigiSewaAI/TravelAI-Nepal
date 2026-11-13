@@ -311,11 +311,27 @@
                 </a>
                 @endif
 
+                @if(Route::has('admin.reviews.index'))
+                <a href="{{ route('admin.reviews.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                    <i class="fas fa-star w-5"></i>
+                    <span>Reviews</span>
+                </a>
+                @endif
+
                 @if(Route::has('admin.subscriptions.index'))
                 <a href="{{ route('admin.subscriptions.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">
                     <i class="fas fa-crown w-5"></i>
                     <span>Subscriptions</span>
+                </a>
+                @endif
+
+                @if(Route::has('admin.plans.index'))
+                <a href="{{ route('admin.plans.index') }}"
+                   class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}">
+                    <i class="fas fa-layer-group w-5"></i>
+                    <span>Plans</span>
                 </a>
                 @endif
 

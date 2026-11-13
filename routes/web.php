@@ -719,6 +719,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/subscriptions/{subscription}/status', [App\Http\Controllers\Admin\SubscriptionController::class, 'updateStatus'])->name('subscriptions.updateStatus');
     Route::delete('/subscriptions/{subscription}', [App\Http\Controllers\Admin\SubscriptionController::class, 'destroy'])->name('subscriptions.destroy');
 
+        // Plan Management (Admin)
+    Route::get('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
+    Route::get('/plans/{plan}/edit', [\App\Http\Controllers\Admin\PlanController::class, 'edit'])->name('plans.edit');
+    Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'update'])->name('plans.update');
+    
     // Payments
         // PHASE 7D — Admin verify queue (must come BEFORE {payment} wildcard)
     Route::get('/payments/verify', [App\Http\Controllers\Admin\PaymentController::class, 'verifyQueue'])->name('payments.verify');
