@@ -341,6 +341,22 @@
                       <span>Announcements</span>
                   </a>
                   @endif
+                                    @if(Route::has('admin.pages.index'))
+                  <a href="{{ route('admin.pages.index') }}"
+                     class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+                      <i class="fas fa-file-alt w-5"></i>
+                      <span>Content Pages</span>
+                  </a>
+                  @endif
+
+                  @if(Route::has('admin.logs.index'))
+                  <a href="{{ route('admin.logs.index') }}"
+                     class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
+                      <i class="fas fa-terminal w-5"></i>
+                      <span>System Logs</span>
+                  </a>
+                  @endif
+                  
                                 @if(Route::has('admin.payments.index'))
                 <a href="{{ route('admin.payments.index') }}"
                    class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('admin.payments.index') || request()->routeIs('admin.payments.show') ? 'active' : '' }}">
