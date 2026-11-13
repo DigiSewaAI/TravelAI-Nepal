@@ -41,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
         // Register Route Observer
         Route::observe(RouteObserver::class);
 
+        // 🆕 Register Review Observer (aggregate recalculation on status change)
+        \App\Models\Review::observe(\App\Observers\ReviewObserver::class);
+
         // ✅ Force Translation Loader
         $this->loadTranslationsFrom(base_path('lang'), 'messages');
 

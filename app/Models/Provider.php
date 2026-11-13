@@ -83,13 +83,20 @@ class Provider extends Model
         'is_demo',
         'profile_views',
         'completed_jobs',
-        'repeat_clients_pct', 
+        'repeat_clients_pct',
         'experience_years',
+        // 🆕 Rating aggregate fields
+        'average_rating',
+        'reviews_count',
+        'rating_breakdown',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'is_demo'   => 'boolean',
+        'average_rating'   => 'decimal:2',
+        'reviews_count'    => 'integer',
+        'rating_breakdown' => 'array',
     ];
 
     // =====================================================
@@ -134,6 +141,35 @@ class Provider extends Model
     public function services()
     {
         return $this->hasMany(Service::class);
+    }
+
+        /**
+     * 🆕 All approved reviews across all services of this provider
+     */
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 'approved');
+    }
+
+    /**
+     * 🆕 Recalculate provider aggregate (weighted by approved reviews)
+     */
+    public function recalculateRating(): void
+    {
+        $approved = $this->approvedReviews();
+        $count = $approved->count();
+        $avg   = $count > 0 ? round($approved->avg('rating'), 2) : 0.00;
+
+        $breakdown = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        foreach ($approved->get(['rating']) as $r) {
+            $breakdown[(int) $r->rating] = ($breakdown[(int) $r->rating] ?? 0) + 1;
+        }
+
+        $this->update([
+            'reviews_count'    => $count,
+            'average_rating'   => $avg,
+            'rating_breakdown' => $breakdown,
+        ]);
     }
 
     /**

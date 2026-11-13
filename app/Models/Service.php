@@ -22,11 +22,18 @@ class Service extends Model
         'status',
         'itinerary_status',
         'location_id',
+        // 🆕 Rating aggregate fields (for recalculateRating() update())
+        'average_rating',
+        'reviews_count',
+        'rating_breakdown',
     ];
 
     protected $casts = [
         'gallery' => 'array',
         'price' => 'decimal:2',
+        'average_rating'   => 'decimal:2',
+        'reviews_count'    => 'integer',
+        'rating_breakdown' => 'array',
     ];
 
     // Relationships
@@ -104,6 +111,36 @@ class Service extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class)->where('status', 'approved');
+    }
+
+    /**
+     * 🆕 Approved reviews only (public display)
+     */
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 'approved');
+    }
+
+    /**
+     * 🆕 Recalculate aggregates from APPROVED reviews
+     */
+    public function recalculateRating(): void
+    {
+        $approved = $this->reviews()->where('status', 'approved');
+
+        $count = $approved->count();
+        $avg   = $count > 0 ? round($approved->avg('rating'), 2) : 0.00;
+
+        $breakdown = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        foreach ($approved->get(['rating']) as $r) {
+            $breakdown[(int) $r->rating] = ($breakdown[(int) $r->rating] ?? 0) + 1;
+        }
+
+        $this->update([
+            'reviews_count'    => $count,
+            'average_rating'   => $avg,
+            'rating_breakdown' => $breakdown,
+        ]);
     }
 
     public function allReviews()

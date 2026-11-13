@@ -55,7 +55,30 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    /**
+     * 🆕 Review for this order
+     */
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 
+    /**
+     * 🆕 Can this order be reviewed?
+     */
+    public function canBeReviewedBy(?User $user): bool
+    {
+        if (!$user || $user->id !== $this->user_id) return false;
+        // For orders, 'delivered' = completed
+        if (!in_array($this->status, ['delivered', 'completed'], true)) return false;
+        if ($this->review()->exists()) return false;
+        if ($this->updated_at && $this->updated_at->diffInDays(now()) > 30) return false;
+        // self-review block — any item's provider = user
+        foreach ($this->items as $item) {
+            if ($item->provider?->user_id === $user->id) return false;
+        }
+        return true;
+    }
     public function scopeForUser($q, $uid)
     {
         return $q->where('user_id', $uid);

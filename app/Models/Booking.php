@@ -147,6 +147,20 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+        /**
+     * 🆕 Can this booking be reviewed?
+     */
+    public function canBeReviewedBy(?User $user): bool
+    {
+        if (!$user || $user->id !== $this->traveler_id) return false;
+        if ($this->status !== 'completed') return false;
+        if ($this->review()->exists()) return false;
+        if ($this->updated_at && $this->updated_at->diffInDays(now()) > 30) return false;
+        // self-review block
+        if ($this->service?->provider?->user_id === $user->id) return false;
+        return true;
+    }
+
     // =============================================
     // QR TOKEN METHODS (existing)
     // =============================================

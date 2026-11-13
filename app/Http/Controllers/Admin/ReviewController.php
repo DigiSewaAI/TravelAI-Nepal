@@ -30,9 +30,14 @@ class ReviewController extends Controller
         $review->status = 'approved';
         $review->save();
 
-        // 🔥 Send notification to provider owner
+                // 🆕 Send notification to provider owner
         if ($review->service && $review->service->provider && $review->service->provider->user) {
             $review->service->provider->user->notify(new NewReviewReceived($review));
+        }
+
+        // 🆕 Notify traveler (approved)
+        if ($review->user) {
+            $review->user->notify(new \App\Notifications\ReviewApproved($review));
         }
 
         // 🔥 Optionally notify the traveler that their review is approved
@@ -45,10 +50,20 @@ class ReviewController extends Controller
         return back()->with('success', 'Review approved successfully.');
     }
 
-    public function reject(Review $review)
+    public function reject(Request $request, Review $review)
     {
+        $validated = $request->validate([
+            'rejection_reason' => 'nullable|string|max:500',
+        ]);
+
         $review->status = 'rejected';
+        $review->rejection_reason = $validated['rejection_reason'] ?? null;
         $review->save();
+
+        // 🆕 Notify traveler
+        if ($review->user) {
+            $review->user->notify(new \App\Notifications\ReviewRejected($review, $review->rejection_reason));
+        }
 
         // Optionally notify traveler that review was rejected
         // if ($review->user) {

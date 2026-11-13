@@ -613,10 +613,18 @@ Route::get('/provider/{slug}', [ServiceController::class, 'providerProfile'])->n
         // Bookings — Index (MUST be before /bookings/{booking})
         Route::get('/bookings', [App\Http\Controllers\Traveler\BookingController::class, 'index'])->name('bookings.index');
 
-        // Reviews — Index + Create + Store
-        Route::get('/reviews', [App\Http\Controllers\Traveler\ReviewController::class, 'index'])->name('reviews.index');
-        Route::get('/reviews/create/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
-        Route::post('/reviews/store/{booking}', [App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+        // Reviews — Index + Create + Store (Booking + Order)
+        Route::get('/reviews', [\App\Http\Controllers\Traveler\ReviewController::class, 'index'])->name('reviews.index');
+        // Booking-based reviews
+        Route::get('/reviews/create/{booking}', [\App\Http\Controllers\Traveler\ReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/reviews/store/{booking}', [\App\Http\Controllers\Traveler\ReviewController::class, 'store'])->name('reviews.store');
+        // 🆕 Order-based reviews (Restaurant, ArtCraft, Rental, Shop, Wholesale)
+        Route::get('/reviews/create-order/{order}', [\App\Http\Controllers\Traveler\ReviewController::class, 'createOrder'])->name('reviews.create-order');
+        Route::post('/reviews/store-order/{order}', [\App\Http\Controllers\Traveler\ReviewController::class, 'storeOrder'])->name('reviews.store-order');
+        // 🆕 Edit / Update / Delete (24h window, pending only)
+        Route::get('/reviews/{review}/edit', [\App\Http\Controllers\Traveler\ReviewController::class, 'edit'])->name('reviews.edit');
+        Route::put('/reviews/{review}', [\App\Http\Controllers\Traveler\ReviewController::class, 'update'])->name('reviews.update');
+        Route::delete('/reviews/{review}', [\App\Http\Controllers\Traveler\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
         // Bookings — Show + Invoice + Notify
         Route::get('/bookings/{booking}', [App\Http\Controllers\Traveler\BookingController::class, 'show'])->name('bookings.show');
