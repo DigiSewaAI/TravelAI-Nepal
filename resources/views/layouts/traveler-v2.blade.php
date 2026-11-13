@@ -863,7 +863,7 @@
         <div class="tv2-dropdown">
             <button type="button" class="tv2-header-btn" id="tv2CurrencyBtn">
                 <i class="fas fa-dollar-sign"></i>
-                <span>{{ $currentCurrency ?? 'NPR' }}</span>
+                <span>{{ app(\App\Services\CurrencyService::class)->getDisplayCurrency() }}</span>
             </button>
             <div class="tv2-dropdown-menu" id="tv2CurrencyMenu">
                 <span class="tv2-dropdown-item" style="cursor:default; color:#9ca3af; font-size:11px;">Currency is session-based</span>

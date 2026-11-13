@@ -34,19 +34,33 @@ class OrderWelcomeMail extends Mailable implements ShouldQueue
     {
         $this->order->loadMissing(['user', 'items']);
 
+        // Currency conversion — match what user sees on site
+        $currencyService = app(\App\Services\CurrencyService::class);
+        $displayCurrency = $currencyService->getDisplayCurrency();
+        $displayTotal    = $currencyService->format(
+            $currencyService->convert(
+                (float) $this->order->total,
+                $this->order->currency ?? 'NPR',
+                $displayCurrency
+            ),
+            $displayCurrency
+        );
+
         $registerUrl = Route::has('register') ? route('register') : url('/register');
         $loginUrl    = Route::has('login')    ? route('login')    : url('/login');
 
         return new Content(
             view: 'emails.order-welcome',
             with: [
-                'order'        => $this->order,
-                'user'         => $this->order->user,
-                'itemsCount'   => $this->order->items->count(),
-                'isRegistered' => $this->isRegistered,
-                'registerUrl'  => $registerUrl,
-                'loginUrl'     => $loginUrl,
-                'brand'        => $this->brand,
+                'order'           => $this->order,
+                'user'            => $this->order->user,
+                'itemsCount'      => $this->order->items->sum('quantity'),
+                'displayTotal'    => $displayTotal,
+                'displayCurrency' => $displayCurrency,
+                'isRegistered'    => $this->isRegistered,
+                'registerUrl'     => $registerUrl,
+                'loginUrl'        => $loginUrl,
+                'brand'           => $this->brand,
             ]
         );
     }

@@ -13,7 +13,7 @@
     @if(!$order->isPaymentVerified() && !$order->isPaymentNotified())
         <div style="background:#fef4e2;border:2px solid #f59e0b;border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 6px 18px rgba(245,158,11,.15)">
             <div style="min-width:0">
-                <div style="font-weight:800;color:#92400e;font-size:15px;margin-bottom:4px">&#9203; Payment Pending &mdash; NPR {{ number_format($order->total, 2) }}</div>
+                <div style="font-weight:800;color:#92400e;font-size:15px;margin-bottom:4px">&#9203; Payment Pending &mdash; {{ $currencyService->format($currencyService->convert((float) $order->total, $order->currency ?? 'NPR', $displayCurrency), $displayCurrency) }}</div>
                 <div style="font-size:13px;color:#78350f">Complete your payment to proceed. Add transaction reference after payment.</div>
             </div>
             <a href="#payment-section" style="background:#f59e0b;color:#fff;padding:11px 22px;border-radius:10px;text-decoration:none;font-weight:800;font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(245,158,11,.35)">Complete Payment &darr;</a>

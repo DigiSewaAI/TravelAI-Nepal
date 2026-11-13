@@ -36,7 +36,7 @@
             <tr>
                 <td style="padding: 8px 0; color: #666; font-size: 13px;">{{ __('messages.email_order_welcome_total') }}</td>
                 <td style="padding: 8px 0; color: #059669; font-weight: bold; text-align: right; font-size: 15px;">
-                    {{ number_format($order->total, 2) }} {{ $order->currency ?? 'NPR' }}
+                    {{ $displayTotal }}
                 </td>
             </tr>
             <tr>
