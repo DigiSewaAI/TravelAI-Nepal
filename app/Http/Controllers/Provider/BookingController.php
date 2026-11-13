@@ -36,7 +36,39 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $this->authorize('view', $booking);
-        return view('provider.bookings.show', compact('booking'));
+
+        $provider = $booking->service->provider ?? Auth::user()->getCurrentProvider();
+        $provider_layout = $this->resolveLayout($provider);
+
+        return view('provider.bookings.show', compact('booking', 'provider', 'provider_layout'));
+    }
+
+    /**
+     * Resolve correct layout by provider's primary type slug.
+     * Mirrors system pattern (Hotel/Review controllers).
+     */
+    private function resolveLayout($provider): string
+    {
+        $slug = $provider?->types->first()?->slug;
+
+        return match (true) {
+            in_array($slug, ['hotel', 'resort', 'lodge', 'homestay'], true)
+                => 'layouts.provider-hotel',
+            $slug === 'restaurant'
+                => 'layouts.provider-restaurant',
+            $slug === 'transport-provider'
+                => 'layouts.provider-transport',
+            $slug === 'art-craft'
+                => 'layouts.provider-art-craft',
+            in_array($slug, ['guide', 'porter', 'photographer', 'local-experience'], true)
+                => 'layouts.provider-individual',
+            in_array($slug, ['shop-owner', 'rental-provider', 'wholesale-provider'], true)
+                => 'layouts.provider-inventory',
+            $slug === 'money-changer'
+                => 'layouts.provider-money-changer',
+            default
+                => 'layouts.provider', // trekking-agency, tour-agency, activity-provider
+        };
     }
 
     public function downloadInvoice(Booking $booking)

@@ -209,7 +209,14 @@ class HotelDashboardController extends Controller
     $provider = Auth::user()->getCurrentProvider();
     abort_unless($provider, 403, 'Provider not found.');
     $bookings = HotelBooking::with('room')->where('provider_id', $provider->id)->latest()->get();
-    return view('provider.hotel.bookings', compact('provider', 'bookings'));
+
+    // Public bookings via service page (bookings table — different model)
+    $serviceIds = \DB::table('services')->where('provider_id', $provider->id)->pluck('id');
+    $publicBookings = \App\Models\Booking::with(['service', 'traveler'])
+        ->whereIn('service_id', $serviceIds)
+        ->latest()->get();
+
+    return view('provider.hotel.bookings', compact('provider', 'bookings', 'publicBookings'));
 }
 
 public function showBooking(HotelBooking $booking)

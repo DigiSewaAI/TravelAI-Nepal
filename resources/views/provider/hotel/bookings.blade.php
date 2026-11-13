@@ -121,6 +121,56 @@
   </div>
 </div>
 
+{{-- Public bookings (from bookings table via service page) --}}
+@if(isset($publicBookings) && $publicBookings->count() > 0)
+<div class="page-card" style="margin-top:24px;">
+  <div style="padding:16px 18px;border-bottom:1px solid var(--line);">
+    <h3 style="margin:0;font-size:15px;font-weight:800;color:var(--text);">Public Bookings</h3>
+    <p style="margin:4px 0 0;font-size:12px;color:var(--muted);">Bookings from public service page (via travelers)</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Booking #</th>
+          <th>Traveler</th>
+          <th>Service</th>
+          <th>Start Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($publicBookings as $pb)
+          @php
+            $__pbSt = match($pb->status) {
+              'pending'   => ['label' => 'Pending',   'cls' => 'pill-amber'],
+              'confirmed' => ['label' => 'Confirmed', 'cls' => 'pill-blue'],
+              'completed' => ['label' => 'Completed', 'cls' => 'pill-green'],
+              'cancelled' => ['label' => 'Cancelled', 'cls' => 'pill-red'],
+              default     => ['label' => ucfirst($pb->status), 'cls' => 'pill-gray'],
+            };
+          @endphp
+          <tr>
+            <td><strong>{{ $pb->booking_number ?? '#'.$pb->id }}</strong></td>
+            <td>
+              <div class="g-name">{{ $pb->traveler->name ?? 'Guest' }}</div>
+              <div class="g-mail">{{ $pb->traveler->email ?? '—' }}</div>
+            </td>
+            <td>{{ $pb->service->name ?? '—' }}</td>
+            <td>{{ $pb->start_date ? $pb->start_date->format('M d, Y') : '—' }}</td>
+            <td><span class="pill {{ $__pbSt['cls'] }}">{{ $__pbSt['label'] }}</span></td>
+            <td>
+              <a href="{{ route('provider.bookings.show', $pb) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;"><i class="fas fa-eye"></i> View</a>
+            </td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
+@endif
+
 @php
     $__occR = $occupiedRooms ?? null;
     $__totR = $totalRooms ?? null;
