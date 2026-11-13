@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'localize' => \App\Http\Middleware\Localization::class,
             'feature' => \App\Http\Middleware\EnsureFeatureAccess::class,
             'feature.flag' => \App\Http\Middleware\FeatureFlagMiddleware::class,
+        // 🆕 Subscription Check Middleware
+            'provider.active' => \App\Http\Middleware\EnsureProviderHasActiveSubscription::class,
+
         ]);
 
         // ✅ WEB GROUP मा Localization Middleware थप्नुहोस् (सबै web routes मा apply हुन्छ)

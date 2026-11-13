@@ -220,7 +220,7 @@ Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, '
 // =======================================
 // 6. PROVIDER DASHBOARD ROUTES
 // =======================================
-Route::middleware(['auth'])->prefix('provider')->name('provider.')->group(function () {
+Route::middleware(['auth', 'provider.active'])->prefix('provider')->name('provider.')->group(function () {
         // Ads — Provider side
     Route::prefix('ads')->name('ads.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Provider\AdController::class, 'index'])->name('index');
