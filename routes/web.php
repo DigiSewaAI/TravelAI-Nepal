@@ -723,7 +723,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
     Route::get('/plans/{plan}/edit', [\App\Http\Controllers\Admin\PlanController::class, 'edit'])->name('plans.edit');
     Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'update'])->name('plans.update');
-    
+      // Admin Broadcast / Announcements
+    Route::get('/broadcast', [\App\Http\Controllers\Admin\BroadcastController::class, 'index'])->name('broadcast.index');
+    Route::post('/broadcast', [\App\Http\Controllers\Admin\BroadcastController::class, 'send'])->name('broadcast.send');  
     // Payments
         // PHASE 7D — Admin verify queue (must come BEFORE {payment} wildcard)
     Route::get('/payments/verify', [App\Http\Controllers\Admin\PaymentController::class, 'verifyQueue'])->name('payments.verify');
