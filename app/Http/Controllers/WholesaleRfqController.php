@@ -92,6 +92,36 @@ class WholesaleRfqController extends Controller
             \Illuminate\Support\Facades\Log::warning('Notify failed', ['ctx' => 'wholesale_rfq', 'e' => $e->getMessage()]);
         }
 
+        // 📧 Buyer confirmation — bell (database only) + branded email
+        try {
+            $__buyer = $rfq->buyer;
+            if ($__buyer) {
+                // Bell notification — database only (skip mail to avoid duplicate)
+                \DB::table('notifications')->insert([
+                    'id'              => (string) \Illuminate\Support\Str::uuid(),
+                    'type'            => 'App\Notifications\UserAlertNotification',
+                    'notifiable_type' => \App\Models\User::class,
+                    'notifiable_id'   => $__buyer->id,
+                    'data'            => json_encode([
+                        'type'     => 'user_alert',
+                        'category' => 'rfq',
+                        'title'    => 'RFQ Submitted',
+                        'message'  => 'Your RFQ ' . $rfq->rfq_number . ' for ' . $__prodName . ' has been submitted.',
+                        'url'      => route('wholesale.rfq.show', $rfq),
+                    ]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Branded confirmation email
+                if (!empty($__buyer->email)) {
+                    \Mail::to($__buyer->email)->send(new \App\Mail\WholesaleRfqMail($rfq, 'confirmation', 'buyer'));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('RFQ buyer confirmation failed', ['rfq' => $rfq->id, 'e' => $e->getMessage()]);
+        }
+
         return redirect()->route('wholesale.rfq.show', $rfq)
             ->with('success', __('messages.rfq_created'));
     }
