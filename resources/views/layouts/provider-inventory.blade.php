@@ -211,6 +211,10 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
       {{ __('messages.dashboard') }}
     </a>
 
+    <a href="{{ route('provider.reviews.index') }}" class="{{ request()->routeIs('provider.reviews.*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      {{ __('messages.reviews') ?? 'Reviews' }}
+    </a>
     <a href="{{ route('provider.inventory.products') }}" class="{{ request()->routeIs('provider.inventory.products') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
       {{ __('messages.nav_products') }}

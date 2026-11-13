@@ -362,6 +362,11 @@
                 @endif
 
                 @if(!$isProductProvider && auth()->user()->hasPermission('manage_checkins'))
+                <a href="{{ route('provider.reviews.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.reviews.*') ? 'active' : '' }}">
+                    <i class="fas fa-star w-5"></i>
+                    <span>Reviews</span>
+                </a>
+
                 <a href="{{ route('provider.checkins.index') }}" class="sidebar-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 {{ request()->routeIs('provider.checkins.*') ? 'active' : '' }}">
                     <i class="fas fa-qrcode w-5"></i>
                     <span>{{ __('messages.checkins') }}</span>

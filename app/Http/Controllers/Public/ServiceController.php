@@ -299,7 +299,7 @@ class ServiceController extends Controller
         // - Reuses Service::reviews() relation (already approved-only)
         // - Eager loads safe user fields only (id, name) — no email/phone/PII
         $reviews = $service->reviews()
-            ->with('user:id,name')
+            ->with(['user:id,name', 'provider:id,name,slug'])
             ->latest()
             ->paginate(5);
 

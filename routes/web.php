@@ -521,6 +521,11 @@ Route::prefix('services/{service}/itinerary/departures')
     Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscriptions.upgrade');
     Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
+    // Reviews (Phase 2 — Provider Panel)
+    Route::get('/reviews', [\App\Http\Controllers\Provider\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}', [\App\Http\Controllers\Provider\ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{review}/respond', [\App\Http\Controllers\Provider\ReviewController::class, 'respond'])->name('reviews.respond');
+
     // Verification (Phase 8)
     Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
     Route::post('/verification', [VerificationController::class, 'store'])->name('verification.store');

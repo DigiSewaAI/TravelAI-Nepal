@@ -210,6 +210,10 @@
       {{ __('messages.services') }}
     </a>
 
+    <a href="{{ route('provider.reviews.index') }}" class="{{ request()->routeIs('provider.reviews.*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      {{ __('messages.reviews') ?? 'Reviews' }}
+    </a>
     <a href="{{ route('provider.hotel.bookings') }}" class="{{ request()->routeIs('provider.hotel.bookings') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
       {{ __('messages.bookings') }}

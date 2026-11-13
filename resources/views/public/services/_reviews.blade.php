@@ -32,6 +32,27 @@
                 @if($review->comment)
                     <p class="text-sm text-gray-600 leading-relaxed mt-2">{{ $review->comment }}</p>
                 @endif
+
+                @if($review->verified_purchase)
+                    <span class="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        <i class="fas fa-check-circle"></i> Verified Purchase
+                    </span>
+                @endif
+
+                @if($review->provider_response)
+                    <div class="mt-4 pl-4 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-3">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <i class="fas fa-reply text-blue-600 text-xs"></i>
+                            <span class="text-xs font-bold text-blue-700">
+                                {{ $review->provider->name ?? 'Provider' }} responded
+                            </span>
+                            @if($review->provider_responded_at)
+                                <span class="text-xs text-gray-500">· {{ $review->provider_responded_at->format('M d, Y') }}</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed mt-1">{{ $review->provider_response }}</p>
+                    </div>
+                @endif
             </div>
         @endforeach
     </div>
