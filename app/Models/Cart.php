@@ -46,7 +46,7 @@ class Cart extends Model
 
         if ($product->isRental() && $this->rental_start_date && $this->rental_end_date) {
             $days = max(1, (int) $this->rental_start_date->copy()->startOfDay()->diffInDays($this->rental_end_date->copy()->startOfDay()));
-            $perDay = $product->rentalDetail->rental_price_per_day ?? 0;
+            $perDay = (float) ($product->rentalDetail->rental_price_per_day ?? $product->price ?? 0);
             return (float) ($perDay * $days * $this->quantity);
         }
 
