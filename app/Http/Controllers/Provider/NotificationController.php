@@ -48,6 +48,14 @@ class NotificationController extends Controller
                     $title = $title ?? 'Booking Update';
                     $url = $url ?? route('provider.bookings.show', $data['booking_id']);
                     $category = 'booking';
+                } elseif (isset($data['review_id'])) {
+                    $title = $title ?? 'New Review';
+                    $url = $url ?? route('provider.reviews.show', $data['review_id']);
+                    $category = 'review';
+                } elseif (isset($data['review_id'])) {
+                    $title = $title ?? 'New Review';
+                    $url = $url ?? route('provider.reviews.show', $data['review_id']);
+                    $category = 'review';
                 }
 
                 return [
