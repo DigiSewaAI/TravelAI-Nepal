@@ -277,6 +277,10 @@ class ServiceController extends Controller
             if ($categorySlug === 'hotel') {
                 return redirect()->route('public.hotel.show', $slug);
             }
+
+            if ($categorySlug === 'transport') {
+                return redirect()->route('public.transport.show', $slug);
+            }
         }
 
         $service = Service::with([

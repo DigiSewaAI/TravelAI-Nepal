@@ -8,7 +8,8 @@ class TransportBooking extends Model
 {
     protected $fillable = [
         'provider_id', 'vehicle_id', 'passenger_name', 'passenger_email',
-        'booking_ref', 'route_name', 'travel_date', 'amount', 'status'
+        'booking_ref', 'booking_number', 'route_name', 'travel_date', 'travel_time',
+        'amount', 'status'
     ];
 
     protected $casts = [
@@ -18,4 +19,8 @@ class TransportBooking extends Model
 
     public function provider() { return $this->belongsTo(Provider::class); }
     public function vehicle()  { return $this->belongsTo(TransportVehicle::class, 'vehicle_id'); }
+        public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

@@ -35,5 +35,49 @@
             <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#e4ecf6)"><span>{{ __('messages.amount') }}</span><span style="color:var(--accent,#0ea5e9)">Rs {{ number_format($booking->amount, 2) }}</span></div>
         </div>
     </div>
+
+    {{-- Status Update Actions --}}
+    @if(in_array($booking->status, ['pending', 'confirmed']))
+    <div style="background:var(--card,#fff);border:1px solid var(--line,#e4ecf6);border-radius:var(--radius,18px);padding:22px">
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">{{ __('messages.update_status') ?? 'Update Status' }}</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+            @if($booking->status === 'pending')
+            <button type="button" onclick="updateTransportStatus('confirmed')"
+                    style="padding:10px 20px;background:#059669;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                ✅ {{ __('messages.confirm_booking') ?? 'Confirm Booking' }}
+            </button>
+            @endif
+            <button type="button" onclick="updateTransportStatus('cancelled')"
+                    style="padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                ✕ {{ __('messages.cancel_booking') ?? 'Cancel Booking' }}
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function updateTransportStatus(newStatus) {
+        if (!confirm('Are you sure you want to ' + newStatus + ' this booking?')) return;
+
+        fetch('{{ route("provider.transport.bookings.status", $booking->id) }}', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Failed to update status');
+            }
+        })
+        .catch(err => alert('Network error: ' + err.message));
+    }
+    </script>
+    @endif
 </div>
 @endsection

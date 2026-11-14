@@ -161,6 +161,9 @@ Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\Restaura
 // 🆕 Hotel Public Page
 Route::get('/hotel/{slug}', [\App\Http\Controllers\Public\HotelController::class, 'show'])->name('public.hotel.show');
 Route::post('/hotel/{slug}/book', [\App\Http\Controllers\Public\HotelController::class, 'book'])->name('public.hotel.book');
+
+Route::get('/transport/{slug}', [\App\Http\Controllers\Public\TransportController::class, 'show'])->name('public.transport.show');
+Route::post('/transport/{slug}/book', [\App\Http\Controllers\Public\TransportController::class, 'book'])->name('public.transport.book');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
 // =============================================

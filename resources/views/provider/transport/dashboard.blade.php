@@ -195,7 +195,7 @@
             <h3 style="font-size:18px;font-weight:800;color:var(--text)">{{ __('messages.add_vehicle') }}</h3>
             <button type="button" id="closeVehicleModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
-        <form action="{{ route('provider.transport.vehicles.store') }}" method="POST">
+        <form action="{{ route('provider.transport.vehicles.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                 <div>
@@ -217,6 +217,11 @@
                 <div style="grid-column:span 2">
                     <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.route') }}</label>
                     <input type="text" name="route_name" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="KTM → Pokhara">
+                </div>
+                <div style="grid-column:span 2">
+                    <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_image') ?? 'Vehicle Image' }} (Optional)</label>
+                    <input type="file" name="image" accept="image/jpeg,image/png,image/jpg,image/webp" style="width:100%;padding:8px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px;background:#f9fafb">
+                    <p style="font-size:11px;color:var(--muted);margin-top:4px">Max 5MB · JPG, PNG, WEBP</p>
                 </div>
             </div>
             <button type="submit" class="btn-primary" style="width:100%;justify-content:center">{{ __('messages.add_vehicle') }}</button>

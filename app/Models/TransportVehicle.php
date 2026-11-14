@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransportVehicle extends Model
 {
-    protected $fillable = ['provider_id', 'vehicle_number', 'vehicle_type', 'capacity', 'driver_name', 'route_name', 'status'];
+    protected $fillable = ['provider_id', 'vehicle_number', 'vehicle_type', 'capacity', 'driver_name', 'route_name', 'status', 'image_path'];
 
     public function provider() { return $this->belongsTo(Provider::class); }
     public function bookings() { return $this->hasMany(TransportBooking::class, 'vehicle_id'); }

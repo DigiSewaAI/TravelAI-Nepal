@@ -110,8 +110,20 @@ class TransportDashboardController extends Controller
             'status' => 'required|in:pending,confirmed,cancelled',
         ]);
 
+        $oldStatus = $booking->status;
         $booking->status = $validated['status'];
         $booking->save();
+
+        // Dispatch confirmed email on transition to 'confirmed'
+        if ($validated['status'] === 'confirmed' && $oldStatus !== 'confirmed' && $booking->passenger_email) {
+            try {
+                \Mail::to($booking->passenger_email)->queue(
+                    new \App\Mail\TransportBookingConfirmedMail($booking)
+                );
+            } catch (\Throwable $e) {
+                \Log::warning('Transport confirmed mail failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
+            }
+        }
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
@@ -138,7 +150,13 @@ class TransportDashboardController extends Controller
             'capacity' => 'required|integer|min:1',
             'driver_name' => 'nullable|string|max:100',
             'route_name' => 'nullable|string|max:150',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('transport-vehicles/' . $provider->id, 'public');
+        }
 
         TransportVehicle::create([
             'provider_id' => $provider->id,
@@ -147,6 +165,7 @@ class TransportDashboardController extends Controller
             'capacity' => $validated['capacity'],
             'driver_name' => $validated['driver_name'],
             'route_name' => $validated['route_name'],
+            'image_path' => $imagePath,
             'status' => 'available',
         ]);
 
