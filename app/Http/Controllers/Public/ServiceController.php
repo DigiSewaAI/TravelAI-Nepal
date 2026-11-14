@@ -265,6 +265,12 @@ class ServiceController extends Controller
      */
         public function show($slug)
     {
+        // 🆕 Redirect old Restaurant URL to the new dedicated Restaurant Page
+        $checkService = Service::where('slug', $slug)->with('category')->first();
+        if ($checkService && optional($checkService->category)->slug === 'restaurant') {
+            return redirect()->route('public.restaurant.show', $slug);
+        }
+
         $service = Service::with([
             'provider',
             'category',
