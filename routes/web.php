@@ -158,6 +158,11 @@ Route::prefix('explore')->name('public.')->group(function () {
 Route::get('/restaurant/{slug}', [\App\Http\Controllers\Public\RestaurantController::class, 'show'])->name('public.restaurant.show');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
+// 🆕 Hotel Public Page
+Route::get('/hotel/{slug}', [\App\Http\Controllers\Public\HotelController::class, 'show'])->name('public.hotel.show');
+Route::post('/hotel/{slug}/book', [\App\Http\Controllers\Public\HotelController::class, 'book'])->name('public.hotel.book');
+Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
+
 // =============================================
 // PRODUCT CATALOG (Path 3B — B1)
 // =============================================

@@ -1,6 +1,15 @@
 @extends('layouts.public')
 
-@section('title', $service->name)
+@section('title', $provider->name . ' — ' . $service->name)
+@section('meta_description', 'Book a table at ' . $provider->name . '. View our menu, check offers, and reserve your spot instantly at ' . ($provider->address ?? 'Kathmandu') . '.')
+@section('meta_keywords', 'restaurant, ' . $provider->name . ', ' . ($service->category->name ?? 'dining') . ', book table, ' . ($provider->address ?? 'Kathmandu'))
+@section('og_meta')
+<meta property="og:title" content="{{ $provider->name }} - Restaurant">
+<meta property="og:description" content="Book your table at {{ $provider->name }}. Explore our menu and reserve instantly.">
+@if($provider->cover_image)
+<meta property="og:image" content="{{ Storage::url($provider->cover_image) }}">
+@endif
+@endsection
 
 @section('content')
 <style>
@@ -325,7 +334,7 @@
                     <div class="offer-content">
                         <h3 class="offer-title">{{ $offer->title }}</h3>
                         <span class="offer-discount">{{ $offer->discount }}</span>
-                        <p class="offer-validity">Valid until: {{ \Carbon\Carbon::parse($offer->valid_until)->format('M d, Y') }}</p>
+                        <p class="offer-validity">{{ __('messages.public_valid_until') ?? 'Valid until' }}: {{ \Carbon\Carbon::parse($offer->valid_until)->format('M d, Y') }}</p>
                     </div>
                 </div>
             @endforeach
@@ -336,7 +345,7 @@
         {{-- LEFT --}}
         <div>
             {{-- MENU --}}
-            <h2 class="section-title"><i class="fas fa-utensils"></i> Explore Our Menu</h2>
+            <h2 class="section-title"><i class="fas fa-utensils"></i> {{ __('messages.public_menu') ?? 'Explore Our Menu' }}</h2>
             @if($menuItems->isEmpty())
                 <div class="empty-state"><i class="fas fa-utensils"></i><p>Menu is being updated. Please check back later.</p></div>
             @else
@@ -366,7 +375,7 @@
             @endif
 
             {{-- TABLES --}}
-            <h2 class="section-title" style="margin-top: 50px;"><i class="fas fa-chair"></i> Our Tables</h2>
+            <h2 class="section-title" style="margin-top: 50px;"><i class="fas fa-chair"></i> {{ __('messages.public_tables') ?? 'Our Tables' }}</h2>
             @if($tables->isEmpty())
                 <div class="empty-state"><i class="fas fa-chair"></i><p>No tables available at the moment.</p></div>
             @else
@@ -397,7 +406,7 @@
         {{-- SIDEBAR --}}
         <aside class="info-sidebar">
             <div class="info-card">
-                <h3><i class="fas fa-address-card"></i> Contact Information</h3>
+                <h3><i class="fas fa-address-card"></i> {{ __('messages.public_contact_info') ?? 'Contact Information' }}</h3>
                 @if($provider->contact_email)
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-envelope"></i></div>
@@ -426,13 +435,13 @@
 
             @if($provider->description)
             <div class="info-card">
-                <h3><i class="fas fa-info-circle"></i> About Us</h3>
+                <h3><i class="fas fa-info-circle"></i> {{ __('messages.public_about_us') ?? 'About Us' }}</h3>
                 <p class="info-desc">{{ $provider->description }}</p>
             </div>
             @endif
 
             <div class="info-card cta-card">
-                <h3><i class="fas fa-calendar-check"></i> Reserve a Table</h3>
+                <h3><i class="fas fa-calendar-check"></i> {{ __('messages.public_reserve_now') ?? 'Reserve a Table' }}</h3>
                 <p class="cta-text">Book your spot instantly — no advance payment needed.</p>
                 <a href="#reservation" class="cta-btn">Book Now ↓</a>
             </div>
@@ -443,12 +452,12 @@
     <div class="reservation-section" id="reservation">
         <div class="reservation-grid">
             <div class="reservation-info">
-                <h2>Book Your Table</h2>
+                <h2>{{ __('messages.public_book_table') ?? 'Book Your Table' }}</h2>
                 <p>Skip the wait and secure your spot. Reserve a table for your family, friends, or a special date night.</p>
                 <ul class="reservation-features">
-                    <li><i class="fas fa-check"></i> Instant Confirmation</li>
-                    <li><i class="fas fa-check"></i> Choose Your Preferred Table</li>
-                    <li><i class="fas fa-check"></i> No Advance Payment Required</li>
+                    <li><i class="fas fa-check"></i> {{ __('messages.public_instant_confirmation') ?? 'Instant Confirmation' }}</li>
+                    <li><i class="fas fa-check"></i> {{ __('messages.public_choose_table') ?? 'Choose Your Preferred Table' }}</li>
+                    <li><i class="fas fa-check"></i> {{ __('messages.public_no_advance') ?? 'No Advance Payment Required' }}</li>
                 </ul>
             </div>
 
@@ -456,7 +465,7 @@
                 <form action="{{ route('public.restaurant.reserve', $service->slug) }}" method="POST">
                     @csrf
                     <div class="form-group">
-                        <label class="form-label">Select Table</label>
+                        <label class="form-label">{{ __('messages.public_select_table') ?? 'Select Table' }}</label>
                         <select name="table_id" id="tableSelect" required class="form-input">
                             <option value="">Choose a table...</option>
                             @foreach($tables as $table)
@@ -465,15 +474,15 @@
                         </select>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                        <div class="form-group"><label class="form-label">Date</label><input type="date" name="reservation_date" required class="form-input" min="{{ date('Y-m-d') }}"></div>
-                        <div class="form-group"><label class="form-label">Time</label><input type="time" name="reservation_time" required class="form-input"></div>
+                        <div class="form-group"><label class="form-label">{{ __('messages.public_date') ?? 'Date' }}</label><input type="date" name="reservation_date" required class="form-input" min="{{ date('Y-m-d') }}"></div>
+                        <div class="form-group"><label class="form-label">{{ __('messages.public_time') ?? 'Time' }}</label><input type="time" name="reservation_time" required class="form-input"></div>
                     </div>
-                    <div class="form-group"><label class="form-label">Number of Guests</label><input type="number" name="guests" required min="1" max="50" class="form-input" placeholder="e.g. 2"></div>
-                    <div class="form-group"><label class="form-label">Your Name</label><input type="text" name="customer_name" required class="form-input" placeholder="John Doe"></div>
-                    <div class="form-group"><label class="form-label">Phone Number</label><input type="text" name="customer_phone" required class="form-input" placeholder="+977-98XXXXXXXX"></div>
-                    <div class="form-group"><label class="form-label">Email (Optional)</label><input type="email" name="customer_email" class="form-input" placeholder="john@example.com"></div>
-                    <div class="form-group"><label class="form-label">Special Requests (Optional)</label><textarea name="special_requests" rows="2" class="form-input" placeholder="Window seat, birthday setup, etc."></textarea></div>
-                    <button type="submit" class="btn-reserve"><i class="fas fa-calendar-check"></i> Confirm Reservation</button>
+                    <div class="form-group"><label class="form-label">{{ __('messages.public_guests') ?? 'Number of Guests' }}</label><input type="number" name="guests" required min="1" max="50" class="form-input" placeholder="e.g. 2"></div>
+                    <div class="form-group"><label class="form-label">{{ __('messages.public_your_name') ?? 'Your Name' }}</label><input type="text" name="customer_name" required class="form-input" placeholder="John Doe"></div>
+                    <div class="form-group"><label class="form-label">{{ __('messages.public_phone') ?? 'Phone Number' }}</label><input type="text" name="customer_phone" required class="form-input" placeholder="+977-98XXXXXXXX"></div>
+                    <div class="form-group"><label class="form-label">{{ __('messages.public_email_optional') ?? 'Email (Optional)' }}</label><input type="email" name="customer_email" class="form-input" placeholder="john@example.com"></div>
+                    <div class="form-group"><label class="form-label">{{ __('messages.public_special_requests') ?? 'Special Requests (Optional)' }}</label><textarea name="special_requests" rows="2" class="form-input" placeholder="Window seat, birthday setup, etc."></textarea></div>
+                    <button type="submit" class="btn-reserve"><i class="fas fa-calendar-check"></i> {{ __('messages.public_confirm_reservation') ?? 'Confirm Reservation' }}</button>
                 </form>
             </div>
         </div>

@@ -451,7 +451,7 @@ public function housekeepingPage()
             return $redirect;
         }
 
-        $validated = $request->validate([
+                $validated = $request->validate([
             'room_number' => 'required|string|max:20',
             'room_type'   => 'required|string|max:50',
             'floor'       => 'required|integer|min:1',
@@ -459,8 +459,13 @@ public function housekeepingPage()
             'base_price'  => 'nullable|numeric|min:0',
             'min_price'   => 'nullable|numeric|min:0',
             'max_price'   => 'nullable|numeric|min:0',
-            'base_price'  => 'nullable|numeric|min:0',
+            'image'       => 'nullable|image|max:2048', // 🆕
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('hotel-rooms', 'public');
+        }
 
         $exists = HotelRoom::where('provider_id', $provider->id)
             ->where('room_number', $validated['room_number'])
@@ -483,7 +488,8 @@ public function housekeepingPage()
             'room_type'   => $validated['room_type'],
             'floor'       => $validated['floor'],
             'status'      => $validated['status'] ?? 'available',
-                    'base_price' => $validated['base_price'] ?? null,
+            'base_price'  => $validated['base_price'] ?? null,
+            'image_path'  => $imagePath, // 🆕 Save Path
         ]);
 
         return redirect()->back()->with('success', 'Room added successfully.');
@@ -502,7 +508,7 @@ public function housekeepingPage()
             'base_price'  => 'nullable|numeric|min:0',
             'min_price'   => 'nullable|numeric|min:0',
             'max_price'   => 'nullable|numeric|min:0',
-            'base_price'  => 'nullable|numeric|min:0',
+            'image'       => 'nullable|image|max:2048', // 🆕
         ]);
 
         $exists = HotelRoom::where('provider_id', $provider->id)
@@ -511,6 +517,14 @@ public function housekeepingPage()
             ->exists();
         if ($exists) {
             return redirect()->back()->withErrors(['room_number' => 'This room number already exists.'])->withInput();
+        }
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($room->image_path && \Storage::disk('public')->exists($room->image_path)) {
+                \Storage::disk('public')->delete($room->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('hotel-rooms', 'public');
         }
 
         $room->update($validated);
