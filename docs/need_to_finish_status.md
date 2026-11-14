@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-13 (Evening — after Push)  
-**Current Commit:** `TBD-after-this-push` (Review Phase 2 + Notification + Booking fixes)  
+**Last Updated:** 2026-11-14 (Afternoon — Invoice white-label fix)  
+**Current Commit:** `TBD-after-this-commit` (+2 PDF white-label fixes, pending push)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -189,6 +189,24 @@
 - `e974a29` Booking show + hotel public section
 - `yyyyyyy` Broadcast notification CSS colors + rescue page
 
+### 10. Invoice PDF White-label Level 1 (COMPLETE)
+**Date:** 2026-11-14
+
+**Files:**
+- `app/Http/Controllers/Provider/InvoiceController.php` — `$brand` pass via InvoiceBrand
+- `resources/views/provider/invoices/pdf.blade.php` — header logo+name via `$brand`, footer copyright
+
+**Verified:**
+- Provider 179 (Business + logo) → white_label tier → logo + name
+- Provider 178 (Business no logo) → white_label tier → name + default logo fallback
+- Subscription invoice type (booking_id NULL) → InvoiceBrand works (provider-based)
+- Trek booking-pdf + Restaurant receipt-pdf → regression PASS
+
+**White-label Definition (Level 1 — current scope):**
+- Logo, business name, footer copyright in **documents only** (Invoice, Receipt, Emails)
+- NOT full website rebrand, NOT custom domain, NOT email SMTP rebrand
+- Level 2 (Branded Portal) + Level 3 (Custom Domain) = **Future tickets**
+
 ---
 
 ## 🔴 PENDING WORK (Priority Order)
@@ -280,6 +298,18 @@
 5. **Notification templates** — customizable per category
 
 ---
+
+### 🟣 FUTURE TICKETS (Documented — Not Started)
+
+| Ticket | Scope | Priority |
+|---|---|---|
+| **CUSTOM-DOMAIN-FEATURE-01** | White-label Level 3 — Custom domain (`provider.com`), DNS, SSL, tenant resolution, branded portal | Future (Enterprise+) |
+| **BOOKING-WELCOME-EMAIL-FIX-01** | `BookingWelcomeMail` dispatch missing in `Public\BookingController@store` — email कहिल्यै जाँदैन। Dispatch, queue, delivery test चाहियो | High (customer experience) |
+| **INVOICES-PDF-DEAD-CODE-01** | `resources/views/invoices/pdf.blade.php` = 100% unreferenced (कोई controller नै) — cleanup ticket | Low |
+| **VERTICALS-PDF-GENERATION-01** | Hotel, Transport, ArtCraft, Individual, MoneyChanger — कोई invoice/receipt PDF generation feature नै (भविष्य) | Medium |
+| **EMAIL-BRANDING-AUDIT-01** | २२ mail classes — कुन-कुन `$brand` use गर्छ? कुन-कुन hardcoded? Comprehensive audit | Medium |
+| **PRICING-WHITE-LABEL-CLARIFY-01** | Pricing page मा "White-label" → "Branded Documents (Level 1)" — scope clarification | Low |
+| **RESTAURANT-ADD-ITEMS-01** | Restaurant order मा थप items (existing order मा append) — Master approved Option B, testing पछि | Medium |
 
 ### ❌ OUT OF SCOPE (No Need)
 1. **Products/Shop Moderation** — Admin ले provider को product हेर्नु पर्दैन
@@ -422,7 +452,9 @@ Audit scripts debug को लागि मात्र — production code न�
 New migration create गर्दा php artisan make:migration बाट generate हुने file नै edit गर्नुस्। manual filename नबनाउनुस् (Phase 1 मा YYYY_MM_DD_HHMMSS_... file बनाइयो — delete गर्यो)।
 
 📋 NEXT STEPS — Priority
-Master GO चाहिन्छ Push को लागि — ५+ local commits pending
+Master GO चाहिन्छ Push को लागि — ~१५ local commits pending (Phase 2 + all fixes)
+Restaurant E2E test continue — receipt claim test pending
+Future tickets documented — CUSTOM-DOMAIN, BOOKING-WELCOME-EMAIL, etc.
 
 Phase 2 सुरु गर्ने — Provider Review Panel
 
@@ -564,6 +596,16 @@ Phase 2 (DONE): ✅ Review System — Provider Panel (respond)
 Notification Fixes (DONE): ✅ Broadcast layouts + URLs + CSS colors
 ↓
 Booking Fixes (DONE): ✅ Dynamic layout + hotel public section
+↓
+PDF White-label Level 1 (DONE): ✅ Provider invoice + receipt branding
+↓
+Sidebar Logo Fix (DONE): ✅ 7 layouts conditional provider logo
+↓
+Profile/Subscription hasFeature (DONE): ✅ Slug normalization + white-label alias
+↓
+Testing Phase (NEXT): 🟢 Restaurant → Transport → ArtCraft → Individual → MoneyChanger
+↓
+Future Tickets: 🟣 Custom Domain, Welcome Email Fix, Add Items, Email Audit
 ↓
 Phase 3: 🟢 Review System — Public Advanced (photos, votes)
 ↓
