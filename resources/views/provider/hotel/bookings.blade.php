@@ -90,12 +90,23 @@
             <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
             <td style="text-align:right;white-space:nowrap;">
               <a href="{{ route('provider.hotel.bookings.show', $b) }}" class="act-btn" style="background:var(--blue-soft);color:#1d4ed8;text-decoration:none;display:inline-block;"><i class="fas fa-eye"></i> {{ __('messages.view') }}</a>
-              @if($b->status === 'pending')
-                <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
-                  @csrf @method('PATCH')
-                  <input type="hidden" name="action" value="check_in">
-                  <button type="submit" class="act-btn act-in">{{ __('messages.check_in') }}</button>
-                </form>
+                            @if($b->status === 'pending')
+                  <form action="{{ route('provider.hotel.bookings.confirm', $b) }}" method="POST" style="display:inline;margin:0;">
+                      @csrf @method('PATCH')
+                      <button type="submit" class="act-btn" style="background:var(--green-soft);color:#065f46;padding:6px 12px;border:none;border-radius:6px;font-weight:700;cursor:pointer;">✓ {{ __('messages.confirm') ?? 'Confirm' }}</button>
+                  </form>
+              @elseif($b->status === 'confirmed')
+                  <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
+                      @csrf @method('PATCH')
+                      <input type="hidden" name="action" value="check_in">
+                      <button type="submit" class="act-btn act-in">{{ __('messages.check_in') }}</button>
+                  </form>
+              @elseif($b->status === 'checked_in')
+                  <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
+                      @csrf @method('PATCH')
+                      <input type="hidden" name="action" value="check_out">
+                      <button type="submit" class="act-btn act-out">{{ __('messages.check_out') }}</button>
+                  </form>
               @elseif($b->status === 'checked_in')
                 <form action="{{ route('provider.hotel.bookings.action', $b) }}" method="POST" style="display:inline;margin:0;">
                   @csrf @method('PATCH')

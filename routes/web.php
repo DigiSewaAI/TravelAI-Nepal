@@ -329,6 +329,7 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::delete('/hotel/housekeeping/{task}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyTask'])->name('hotel.housekeeping.destroy');
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
     Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
+Route::patch('/hotel/bookings/{booking}/confirm', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'confirmBooking'])->name('hotel.bookings.confirm');
         // Hotel CRUD Routes
     Route::post('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeBooking'])->name('hotel.bookings.store');
     Route::delete('/hotel/bookings/{booking}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyBooking'])->name('hotel.bookings.destroy');

@@ -156,6 +156,30 @@ class HotelDashboardController extends Controller
         return back()->with('success', $message);
     }
 
+    // 🆕 Confirm Booking
+    public function confirmBooking(HotelBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        if ($booking->status !== 'pending') {
+            return back()->with('error', 'This booking is not pending.');
+        }
+
+        $booking->update(['status' => 'confirmed']);
+
+        // Send Confirmation Email to Guest
+        if ($booking->guest_email) {
+            try {
+                \Mail::to($booking->guest_email)->queue(new \App\Mail\HotelBookingConfirmedMail($booking));
+            } catch (\Throwable $e) {
+                \Log::warning('Hotel booking confirm email failed', ['id' => $booking->id, 'error' => $e->getMessage()]);
+            }
+        }
+
+        return back()->with('success', 'Booking confirmed successfully.');
+    }
+
     public function storeBooking(Request $request)
     {
         $provider = Auth::user()->getCurrentProvider();
