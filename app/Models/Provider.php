@@ -237,7 +237,26 @@ class Provider extends Model
             return false;
         }
 
-        return in_array($feature, $features, true);
+        // Normalize slug: 'custom_logo' → 'custom logo', 'white_label' → 'white label'
+        $needle = str_replace(['_', '-'], ' ', strtolower(trim($feature)));
+
+        // White-label plans implicitly include custom logo (Business/Enterprise)
+        $aliases = [$needle];
+        if (in_array($needle, ['custom logo', 'logo'], true)) {
+            $aliases[] = 'white label';
+        }
+
+        foreach ($features as $f) {
+            if (!is_string($f)) {
+                continue;
+            }
+            $normalized = str_replace(['_', '-'], ' ', strtolower(trim($f)));
+            if (in_array($normalized, $aliases, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function documents()

@@ -78,8 +78,16 @@
 </head>
 <body>
     <div class="header">
-        <h1>{{ $provider->business_name ?? 'TravelAI Nepal' }}</h1>
+        @if(!empty($brand['logo_base64']))
+            <div style="text-align:center;margin-bottom:10px;">
+                <img src="data:{{ $brand['logo_mime'] ?? 'image/png' }};base64,{{ $brand['logo_base64'] }}" alt="{{ $brand['name'] ?? 'Logo' }}" style="max-height:60px;max-width:180px;">
+            </div>
+        @endif
+        <h1>{{ $brand['name'] ?? $provider->name ?? 'TravelAI Nepal' }}</h1>
         <p>{{ $provider->address ?? 'Kathmandu, Nepal' }}</p>
+        @if($provider->contact_phone)
+            <p>{{ $provider->contact_phone }}</p>
+        @endif
     </div>
 
     <div class="order-info">
@@ -136,7 +144,12 @@
 
     <div class="footer">
         <p>Thank you for dining with us!</p>
-        <p style="margin-top:5px;">Issued by TravelAI Nepal · travelainepal.com</p>
+        @if(($brand['tier'] ?? 'travelai') !== 'white_label')
+            <p style="margin-top:5px;">Issued by TravelAI Nepal · travelainepal.com</p>
+        @else
+            <p style="margin-top:5px;">{{ $brand['footer_tagline'] ?? $brand['name'] }}</p>
+        @endif
+        <p style="margin-top:3px;font-size:9px;color:#9ca3af;">{{ $brand['copyright'] ?? '' }}</p>
     </div>
 </body>
 </html>

@@ -229,9 +229,18 @@
                             @else
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: var(--muted); margin-bottom: 8px;"></i>
                             @endif
-                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">{{ __('messages.click_to_upload_new_logo') }}</p>
-                            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Max 2MB</p>
-                            <input type="file" name="logo" accept="image/*">
+                            @if($provider->hasFeature('custom_logo'))
+                                <img id="logo-preview" src="" alt="Preview" style="display:none;max-height:80px;max-width:120px;margin:8px auto;border-radius:8px;object-fit:cover;border:2px solid var(--accent, #f97316);">
+                                <p style="font-size: 13px; font-weight: 700; color: var(--text);" id="logo-text">{{ __('messages.click_to_upload_new_logo') }}</p>
+                                <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Max 2MB</p>
+                                <p id="logo-filename" style="display:none;font-size:12px;color:#059669;font-weight:700;margin-top:8px;">
+                                    <i class="fas fa-check-circle"></i> <span></span>
+                                </p>
+                                <input type="file" name="logo" accept="image/*" onchange="previewUpload(this, 'logo')">
+                            @else
+                                <p style="font-size: 13px; font-weight: 700; color: #dc2626;">Your plan does not include Custom Logo.</p>
+                                <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Upgrade to Professional or higher to upload a logo.</p>
+                            @endif
                         </div>
                         @error('logo') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
@@ -245,9 +254,13 @@
                             @else
                                 <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: var(--muted); margin-bottom: 8px;"></i>
                             @endif
-                            <p style="font-size: 13px; font-weight: 700; color: var(--text);">{{ __('messages.click_to_upload_new_cover') }}</p>
+                            <img id="cover_image-preview" src="" alt="Preview" style="display:none;max-height:60px;max-width:120px;margin:8px auto;border-radius:8px;object-fit:cover;border:2px solid var(--accent, #f97316);">
+                            <p style="font-size: 13px; font-weight: 700; color: var(--text);" id="cover_image-text">{{ __('messages.click_to_upload_new_cover') }}</p>
                             <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Max 5MB</p>
-                            <input type="file" name="cover_image" accept="image/*">
+                            <p id="cover_image-filename" style="display:none;font-size:12px;color:#059669;font-weight:700;margin-top:8px;">
+                                <i class="fas fa-check-circle"></i> <span></span>
+                            </p>
+                            <input type="file" name="cover_image" accept="image/*" onchange="previewUpload(this, 'cover_image')">
                         </div>
                         @error('cover_image') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
@@ -311,5 +324,27 @@
     </div>
 
 @endif
+
+<script>
+function previewUpload(input, field) {
+    var preview = document.getElementById(field + '-preview');
+    var filename = document.getElementById(field + '-filename');
+    var text = document.getElementById(field + '-text');
+
+    if (input.files && input.files[0]) {
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
+        };
+        reader.readAsDataURL(file);
+        if (filename) {
+            filename.querySelector('span').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+            filename.style.display = 'block';
+        }
+        if (text) { text.textContent = 'New file selected — click to change'; }
+    }
+}
+</script>
 
 @endsection

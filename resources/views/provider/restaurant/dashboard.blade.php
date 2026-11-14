@@ -429,7 +429,7 @@ let orderTotal = 0;
 function calculateTotal() {
   orderTotal = 0;
   document.querySelectorAll('.order-item-check').forEach(check => {
-    const qtyInput = check.closest('div').querySelector('.item-qty');
+    const qtyInput = check.closest('div').parentElement.querySelector('.item-qty');
     if (check.checked) {
       qtyInput.disabled = false;
       const price = parseFloat(check.dataset.price) || 0;

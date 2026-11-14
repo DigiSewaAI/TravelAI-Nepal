@@ -19,9 +19,16 @@
             <div style="font-size:22px;font-weight:800">{{ $order->order_number }}</div>
             <div style="font-size:13px;opacity:.88;margin-top:4px">{{ $order->created_at->format('M d, Y H:i') }}</div>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
             <span style="padding:7px 14px;border-radius:10px;background:{{ $sBg }};color:{{ $sFg }};font-size:12px;font-weight:800;text-transform:uppercase">{{ $order->status }}</span>
             <span style="padding:7px 14px;border-radius:10px;background:{{ $pBg }};color:{{ $pFg }};font-size:12px;font-weight:800;text-transform:uppercase">Payment: {{ $order->payment_status }}</span>
+            @if($hasReceipt ?? false)
+                <a href="{{ route('provider.restaurant.orders.receipt-pdf', $order->id) }}"
+                   style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;background:#fff;color:#ea580c;font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.15);text-transform:uppercase;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Receipt PDF
+                </a>
+            @endif
         </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">

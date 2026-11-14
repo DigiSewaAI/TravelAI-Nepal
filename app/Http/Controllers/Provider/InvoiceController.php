@@ -102,7 +102,8 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.invoices.show'
 
         // ✅ PDF generation – DomPDF प्रयोग गर्नुहोस्
                 try {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.invoices.pdf', compact('invoice'));
+            $brand = \App\Support\InvoiceBrand::forBookingInvoice($provider);
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.invoices.pdf', compact('invoice', 'provider', 'brand'));
             return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
         } catch (\Exception $e) {
             \Log::error('Invoice PDF generation failed', ['invoice_id' => $invoice->id, 'error_class' => get_class($e)]);

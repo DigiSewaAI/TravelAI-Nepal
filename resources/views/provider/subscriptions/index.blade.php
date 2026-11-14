@@ -122,14 +122,14 @@
 
                     <ul style="list-style: none; padding: 0; margin: 0 0 25px 0; font-size: 13px; color: var(--text);">
                         @php $features = $plan->features ?? []; @endphp
-                        @foreach(array_slice($features, 0, 4) as $feature)
+                        @foreach(array_slice($features, 0, 5) as $feature)
                             <li style="display: flex; align-items: flex-start; margin-bottom: 10px;">
                                 <i class="fas fa-check-circle" style="color: var(--green); margin-top: 2px; margin-right: 8px;"></i>
                                 <span>{{ $feature }}</span>
                             </li>
                         @endforeach
-                        @if(count($features) > 4)
-                            <li style="font-size: 12px; color: var(--muted); font-style: italic; margin-top: 5px;">+ {{ count($features) - 4 }} more features</li>
+                        @if(count($features) > 5)
+                            <li style="font-size: 12px; color: var(--muted); font-style: italic; margin-top: 5px;">+ {{ count($features) - 5 }} more features</li>
                         @endif
                     </ul>
                 </div>

@@ -246,6 +246,7 @@ Route::middleware(['auth', 'provider.active'])->prefix('provider')->name('provid
         // Restaurant Sidebar Unlocks
     Route::get('/restaurant/orders', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'ordersPage'])->name('restaurant.orders.list');
     Route::get('/restaurant/orders/{order}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'showOrder'])->name('restaurant.orders.show');
+    Route::get('/restaurant/orders/{order}/receipt-pdf', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'downloadReceipt'])->name('restaurant.orders.receipt-pdf');
     Route::get('/restaurant/menu', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'menuPage'])->name('restaurant.menu.list');
     Route::get('/restaurant/tables', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'tablesPage'])->name('restaurant.tables.list');
         // Restaurant Reports & Offers

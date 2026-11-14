@@ -144,25 +144,17 @@
 </head>
 <body>
 
-    {{-- ====== HEADER: TravelAI Nepal Branding (Issuer) ====== --}}
+        {{-- ====== HEADER: Brand-aware (InvoiceBrand) ====== --}}
     <div class="header">
         <div class="header-left">
-            {{-- TravelAI Logo --}}
-            @php
-                $logoData = null;
-                $logoPath = public_path('images/logo.png');
-                if (file_exists($logoPath)) {
-                    $logoData = base64_encode(file_get_contents($logoPath));
-                }
-            @endphp
-            @if($logoData)
-                <img src="data:image/png;base64,{{ $logoData }}" alt="TravelAI Nepal" class="brand-logo">
+            @if(!empty($brand['logo_base64'] ?? null))
+                <img src="data:{{ $brand['logo_mime'] ?? 'image/png' }};base64,{{ $brand['logo_base64'] }}" alt="{{ $brand['name'] ?? 'Logo' }}" class="brand-logo">
             @else
-                <div style="font-size: 28px; font-weight: 700; color: #2563eb;">🏔️</div>
+                <div style="font-size: 28px; font-weight: 700; color: #2563eb;">🔷</div>
             @endif
 
             <div>
-                <div class="brand-name">{{ __('messages.travelai_nepal') }}</div>
+                <div class="brand-name">{{ $brand['name'] ?? __('messages.travelai_nepal') }}</div>
                 
             </div>
         </div>
@@ -273,7 +265,7 @@
     {{-- ====== FOOTER ====== --}}
     <div class="footer">
         {{ __('messages.footer_text') }}<br>
-        © {{ date('Y') }} TravelAI Nepal. {{ __('messages.all_rights_reserved') }}<br>
+                {{ $brand['copyright'] ?? ('© ' . date('Y') . ' TravelAI Nepal. ' . __('messages.all_rights_reserved')) }}<br>
         <span style="font-size: 10px; color: #94a3b8;">{{ __('messages.system_generated_notice') }}</span>
     </div>
 

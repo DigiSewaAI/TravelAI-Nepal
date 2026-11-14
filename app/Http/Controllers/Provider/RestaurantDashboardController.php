@@ -164,6 +164,20 @@ class RestaurantDashboardController extends Controller
             'tables_total'    => $tablesTotal,
         ];
 
+        // 🆕 Menu items for New Order modal
+        $allProducts = MenuItem::where('provider_id', $provider->id)
+            ->where('is_available', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($m) => [
+                'db_id' => $m->id,
+                'name'  => $m->name,
+                'price' => (float) $m->price,
+                'emoji' => $m->emoji ?: '🍽️',
+            ])
+            ->toArray();
+
         return view('provider.restaurant.dashboard', [
             'provider'       => $provider,
             'service'        => $service,
@@ -174,6 +188,7 @@ class RestaurantDashboardController extends Controller
             'tablesData'     => $tablesData,
             'dishesData'     => $dishesData,
             'reviewsData'    => $reviewsData,
+            'allProducts'    => $allProducts,
         ]);
     }
 
@@ -344,16 +359,24 @@ class RestaurantDashboardController extends Controller
         // If receipt code generated, stream PDF
         if ($plainCode !== null) {
             try {
+                $brand = \App\Support\InvoiceBrand::forBookingInvoice($provider);
+
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.restaurant.receipt-pdf', [
                     'order' => $order,
                     'plainCode' => $plainCode,
                     'provider' => $provider,
+                    'brand' => $brand,
                 ]);
-                return response()->streamDownload(function () use ($pdf) {
-                    echo $pdf->output();
-                }, 'receipt-' . $order->order_number . '.pdf', [
-                    'Content-Type' => 'application/pdf',
-                ]);
+
+                // Save to storage (temp)
+                $filename = 'receipt-' . $order->order_number . '.pdf';
+                \Storage::disk('local')->put('receipts/' . $filename, $pdf->output());
+
+                // Flash receipt code + PDF path + redirect to order show
+                return redirect()
+                    ->route('provider.restaurant.orders.show', $order->id)
+                    ->with('success', 'Order created! Receipt code: ' . $plainCode)
+                    ->with('receipt_pdf', $filename);
             } catch (\Exception $e) {
                 // PDF failed — null the receipt fields so admin can reissue
                 $order->receipt_code_hash = null;
@@ -400,7 +423,25 @@ class RestaurantDashboardController extends Controller
         abort_unless((int)$order->provider_id === (int)$provider->id, 403);
         $order->load('items');
         $provider_layout = 'layouts.provider-restaurant';
-        return view('provider.restaurant.orders.show', compact('order', 'provider', 'provider_layout'));
+
+        $hasReceipt = $order->receipt_code_hash
+            && \Storage::disk('local')->exists('receipts/receipt-' . $order->order_number . '.pdf');
+
+        return view('provider.restaurant.orders.show', compact('order', 'provider', 'provider_layout', 'hasReceipt'));
+    }
+
+    public function downloadReceipt(RestaurantOrder $order)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+        abort_unless((int)$order->provider_id === (int)$provider->id, 403);
+
+        $filename = 'receipt-' . $order->order_number . '.pdf';
+        $path = 'receipts/' . $filename;
+
+        abort_unless(\Storage::disk('local')->exists($path), 404, 'Receipt PDF not found. Please reissue the receipt code.');
+
+        return \Storage::disk('local')->download($path, $filename);
     }
 
     public function menuPage()
