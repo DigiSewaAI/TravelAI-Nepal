@@ -85,34 +85,57 @@
         </div>
     </div>
 
-    {{-- Actions --}}
+    {{-- QR Code --}}
+    @if($booking->qr_code)
     <div style="background:var(--card,#fff);border:1px solid var(--line,#e7eaf3);border-radius:var(--radius,18px);padding:22px">
-        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#111827)">{{ __('messages.actions') }}</h3>
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text)">QR Code</h3>
+        <div style="display:flex;align-items:center;gap:20px">
+            <img src="{{ route('provider.hotel.bookings.qr', $booking) }}" alt="QR Code" style="width:128px;height:128px">
+            <p style="font-size:12px;color:var(--muted)">Scan for check-in</p>
+        </div>
+    </div>
+    @endif
+
+    {{-- Actions (Invoice + Status + Delete) --}}
+    <div style="background:var(--card,#fff);border:1px solid var(--line,#e7eaf3);border-radius:var(--radius,18px);padding:22px">
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text)">{{ __('messages.actions') }}</h3>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-            @if($booking->status === 'confirmed')
-                <form method="POST" action="{{ route('provider.hotel.bookings.action', $booking) }}">
+            <a href="{{ route('provider.hotel.bookings.invoice', $booking) }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--green,#059669);color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none">
+                📥 Download Invoice
+            </a>
+            @if($booking->payment_status === 'pending')
+                <form action="{{ route('provider.hotel.bookings.verify-payment', $booking) }}" method="POST" style="display:inline;margin:0;">
+                    @csrf @method('PATCH')
+                    <button type="submit" style="padding:10px 20px;background:#f59e0b;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">💰 Mark as Paid</button>
+                </form>
+            @endif
+            @if($booking->status === 'pending')
+                <form action="{{ route('provider.hotel.bookings.confirm', $booking) }}" method="POST" style="display:inline;margin:0;">
+                    @csrf @method('PATCH')
+                    <button type="submit" style="padding:10px 20px;background:var(--accent,#c9a227);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">✓ Confirm Booking</button>
+                </form>
+            @elseif($booking->status === 'confirmed')
+                <form action="{{ route('provider.hotel.bookings.action', $booking) }}" method="POST" style="display:inline;margin:0;">
                     @csrf @method('PATCH')
                     <input type="hidden" name="action" value="check_in">
-                    <button type="submit" style="padding:10px 18px;border-radius:10px;background:#2563eb;color:#fff;font-size:13px;font-weight:800;border:0;cursor:pointer">{{ __('messages.check_in') }}</button>
+                    <button type="submit" style="padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">→ Check In</button>
                 </form>
-            @endif
-            @if($booking->status === 'checked_in')
-                <form method="POST" action="{{ route('provider.hotel.bookings.action', $booking) }}">
+            @elseif($booking->status === 'checked_in')
+                <form action="{{ route('provider.hotel.bookings.action', $booking) }}" method="POST" style="display:inline;margin:0;">
                     @csrf @method('PATCH')
                     <input type="hidden" name="action" value="check_out">
-                    <button type="submit" style="padding:10px 18px;border-radius:10px;background:#059669;color:#fff;font-size:13px;font-weight:800;border:0;cursor:pointer">{{ __('messages.check_out') }}</button>
+                    <button type="submit" style="padding:10px 20px;background:#6b7280;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">← Check Out</button>
                 </form>
             @endif
-            <form method="POST" action="{{ route('provider.hotel.bookings.destroy', $booking) }}" onsubmit="return confirm('Delete this booking?')">
+
+            <form method="POST" action="{{ route('provider.hotel.bookings.destroy', $booking) }}" onsubmit="return confirm('Delete this booking?')" style="display:inline;margin:0;">
                 @csrf @method('DELETE')
                 <button type="submit" style="padding:10px 18px;border-radius:10px;background:#fdecec;color:#dc2626;font-size:13px;font-weight:800;border:1px solid #fecaca;cursor:pointer">{{ __('messages.delete_booking') }}</button>
             </form>
         </div>
     </div>
 
-</div>
-
-    {{-- ═══ FOLIO CHARGES ═══ --}}
+    {{-- ═══ FOLIO CHARGES (main flex div भित्र) ═══ --}}
     <div id="folio-charges" style="background:var(--card,#fff);border:1px solid var(--line,#e7eaf3);border-radius:var(--radius,18px);padding:22px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <h3 style="font-size:14px;font-weight:800;color:var(--text,#111827);margin:0;display:flex;align-items:center;gap:8px">
@@ -197,4 +220,6 @@
             <p style="font-size:13px;color:#9ca3af;margin:0;padding:16px 0;text-align:center">No charges yet. Click "+ Add Charge" to start the folio.</p>
         @endif
     </div>
+
+</div>
 @endsection

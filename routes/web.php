@@ -330,6 +330,9 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::patch('/hotel/rooms/{room}/status', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateRoomStatus'])->name('hotel.rooms.status');
     Route::patch('/hotel/bookings/{booking}/action', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'checkInOut'])->name('hotel.bookings.action');
 Route::patch('/hotel/bookings/{booking}/confirm', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'confirmBooking'])->name('hotel.bookings.confirm');
+Route::get('/hotel/bookings/{booking}/invoice', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'downloadInvoice'])->name('hotel.bookings.invoice');
+Route::get('/hotel/bookings/{booking}/qr', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'qrCode'])->name('hotel.bookings.qr');
+Route::patch('/hotel/bookings/{booking}/verify-payment', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'verifyPayment'])->name('hotel.bookings.verify-payment');
         // Hotel CRUD Routes
     Route::post('/hotel/bookings', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeBooking'])->name('hotel.bookings.store');
     Route::delete('/hotel/bookings/{booking}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'destroyBooking'])->name('hotel.bookings.destroy');

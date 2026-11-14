@@ -9,7 +9,7 @@ class HotelBooking extends Model
     protected $fillable = [
         'provider_id', 'room_id', 'guest_name', 'guest_email',
         'check_in_date', 'check_out_date', 'nights', 'amount',
-        'payment_status', 'status'
+        'payment_status', 'status', 'qr_code'
     ];
 
     protected $casts = [
@@ -44,6 +44,9 @@ class HotelBooking extends Model
                 $lastId = static::whereYear('created_at', $year)->max('id') ?? 0;
                 $nextNum = str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
                 $model->booking_number = 'HTL-' . $year . '-' . $nextNum;
+            }
+            if (empty($model->qr_code)) {
+                $model->qr_code = \Illuminate\Support\Str::random(32);
             }
         });
     }

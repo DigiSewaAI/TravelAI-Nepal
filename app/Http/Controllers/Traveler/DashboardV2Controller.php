@@ -140,6 +140,19 @@ class DashboardV2Controller extends Controller
         $data['unreadAlerts'] = collect(app(AlertService::class)->getUnreadAlerts($user->id));
 
         $data['isPublic'] = $user->passport_privacy === 'public';
+
+        // 🆕 Hotel Bookings for Traveler
+        try {
+            $data['hotelBookings'] = \App\Models\HotelBooking::where('guest_email', $user->email)
+                ->with(['room', 'provider'])
+                ->latest()
+                ->take(10)
+                ->get();
+        } catch (\Throwable $e) {
+            $data['hotelBookings'] = collect();
+        }
+
         return view('traveler.dashboard-v2', $data);
     }
+    
 }

@@ -623,4 +623,38 @@ public function housekeepingPage()
 
         return redirect()->back()->with('success', 'Task deleted successfully.');
     }
+        public function downloadInvoice(HotelBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $booking->load(['room', 'provider']);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.hotel-booking-pdf', [
+            'booking' => $booking,
+            'provider' => $provider,
+            'room' => $booking->room,
+        ]);
+
+        return $pdf->download('hotel-invoice-' . $booking->booking_number . '.pdf');
+    }
+
+    public function verifyPayment(HotelBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $booking->update(['payment_status' => 'paid']);
+
+        return back()->with('success', 'Payment marked as paid.');
+    }
+
+    public function qrCode(HotelBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $url = route('provider.hotel.bookings.show', $booking);
+        return response(\SimpleSoftwareIO\QrCode\Facades\QrCode::size(300)->generate($url))
+            ->header('Content-Type', 'image/svg+xml');
+    }
 }
