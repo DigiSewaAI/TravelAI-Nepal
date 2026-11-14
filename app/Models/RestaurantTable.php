@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RestaurantTable extends Model
 {
     protected $fillable = [
-        'provider_id', 'service_id', 'table_number', 'seats', 'status',
+        'provider_id', 'service_id', 'table_number', 'seats', 'status', 'image_path',
     ];
 
     public function provider() { return $this->belongsTo(Provider::class); }

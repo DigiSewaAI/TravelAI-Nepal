@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-14 (Afternoon — Invoice white-label fix)  
-**Current Commit:** `TBD-after-this-commit` (+2 PDF white-label fixes, pending push)  
+**Last Updated:** 2026-11-14 (Evening — Restaurant Public Page + Reservation)  
+**Current Commit:** `TBD` (Restaurant Reservation + Emails + Public Page, pending push)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -206,6 +206,35 @@
 - Logo, business name, footer copyright in **documents only** (Invoice, Receipt, Emails)
 - NOT full website rebrand, NOT custom domain, NOT email SMTP rebrand
 - Level 2 (Branded Portal) + Level 3 (Custom Domain) = **Future tickets**
+
+### 11. Restaurant Public Page & Table Reservation (COMPLETE)
+**Date:** 2026-11-14
+**Status:** ✅ Complete (Public Page + Emails + Provider Dashboard)
+
+**Files Created/Modified:**
+- `app/Http/Controllers/Public/RestaurantController.php` — show + reserve
+- `app/Models/RestaurantReservation.php` — new model
+- `database/migrations/2026_11_14_054937_create_restaurant_reservations_table.php`
+- `app/Mail/ReservationCreatedMail.php`, `ReservationConfirmedMail.php`
+- `app/Notifications/NewReservationNotification.php`
+- `resources/views/public/restaurant/show.blade.php` — Premium UI
+- `resources/views/provider/restaurant/reservations.blade.php`, `reservations-show.blade.php`
+- `resources/views/emails/restaurant-reservation-created.blade.php`, `-confirmed.blade.php`
+- Routes: `GET/POST restaurant/{slug}`, `POST restaurant/{slug}/reserve`, `GET/PATCH provider/restaurant/reservations`
+- Sidebar Link: "Reservations" added to Restaurant layout
+
+**Features:**
+- Public Page: Menu display, Contact sidebar, Reservation form
+- Email: Customer gets "Request Received" and "Confirmed" emails
+- Provider: Bell notification, Dashboard list, Confirm/Cancel, View Details
+- Redirect: Old Explore URL for restaurant now redirects to new page
+
+**Verified:** 
+- Test email sent successfully (SMTP OK).
+- Reservation created in DB (count = 1).
+- Provider Dashboard displays reservation and status updates.
+
+**Note:** Other verticals (Hotel, Transport, ArtCraft, Individual, MoneyChanger) still use the old generic Explore page. Need to build dedicated public pages for them.
 
 ---
 
@@ -452,9 +481,9 @@ Audit scripts debug को लागि मात्र — production code न�
 New migration create गर्दा php artisan make:migration बाट generate हुने file नै edit गर्नुस्। manual filename नबनाउनुस् (Phase 1 मा YYYY_MM_DD_HHMMSS_... file बनाइयो — delete गर्यो)।
 
 📋 NEXT STEPS — Priority
-Master GO चाहिन्छ Push को लागि — ~१५ local commits pending (Phase 2 + all fixes)
-Restaurant E2E test continue — receipt claim test pending
-Future tickets documented — CUSTOM-DOMAIN, BOOKING-WELCOME-EMAIL, etc.
+Master GO चाहिन्छ Push को लागि — ~९ local commits pending (Restaurant + All Fixes)
+Restaurant E2E test — DONE (Public page, Email, Reservation, Provider dashboard all verified)
+Next Vertical: Build Public Page for Hotel (2 services) using same pattern.
 
 Phase 2 सुरु गर्ने — Provider Review Panel
 

@@ -16,6 +16,9 @@
   .act-edit:hover{background:var(--accent);color:#fff;}
   .act-del{background:var(--red-soft);color:#b91c1c;}
   .act-del:hover{background:#dc2626;color:#fff;}
+  .thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--line);margin-right:8px;vertical-align:middle;}
+  .thumb-empty{width:40px;height:40px;border-radius:8px;background:var(--bg);display:inline-flex;align-items:center;justify-content:center;font-size:20px;margin-right:8px;vertical-align:middle;border:1px solid var(--line);}
+  .img-preview{max-width:120px;max-height:120px;border-radius:10px;object-fit:cover;border:1px solid var(--line);margin-top:8px;display:none;}
 </style>
 @endpush
 
@@ -42,7 +45,14 @@
             <tbody>
                 @forelse($menuItems as $item)
                 <tr>
-                    <td><strong>{{ $item->emoji ?? '🍽️' }} {{ $item->name }}</strong></td>
+                    <td>
+                        @if($item->image_path)
+                            <img src="{{ Storage::disk('public')->url($item->image_path) }}" alt="{{ $item->name }}" class="thumb">
+                        @else
+                            <span class="thumb-empty">{{ $item->emoji ?? '🍽️' }}</span>
+                        @endif
+                        <strong>{{ $item->name }}</strong>
+                    </td>
                     <td><span class="pill" style="background:var(--accent-soft);color:var(--accent-d);">{{ ucfirst($item->category) }}</span></td>
                     <td style="font-weight:800;">Rs {{ number_format($item->price) }}</td>
                     <td>
@@ -53,7 +63,7 @@
                         @endif
                     </td>
                     <td style="text-align:right;">
-                        <button type="button" class="act-btn act-edit" onclick="openEditMenuModal({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->price }}, '{{ addslashes($item->category) }}', '{{ $item->emoji ?? '' }}')">
+                        <button type="button" class="act-btn act-edit" onclick="openEditMenuModal({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->price }}, '{{ addslashes($item->category) }}', '{{ $item->emoji ?? '' }}', '{{ $item->image_path ? Storage::disk('public')->url($item->image_path) : '' }}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <form action="{{ route('provider.restaurant.menu.destroy', $item) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete this menu item?')">
@@ -77,7 +87,7 @@
             <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_menu_item') }}</h3>
             <button type="button" onclick="closeMenuModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
-        <form action="{{ route('provider.restaurant.menu.store') }}" method="POST">
+        <form action="{{ route('provider.restaurant.menu.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div style="margin-bottom:14px">
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.menu_item_name') }}</label>
@@ -95,6 +105,10 @@
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.emoji') }}</label>
                 <input type="text" name="emoji" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px" placeholder="🍽️">
             </div>
+            <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+            </div>
             <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.add_menu_item') }}</button>
         </form>
     </div>
@@ -107,7 +121,7 @@
             <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_menu_item') }}</h3>
             <button type="button" onclick="closeEditMenuModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
-        <form id="editMenuForm" method="POST">
+        <form id="editMenuForm" method="POST" enctype="multipart/form-data">
             @csrf @method('PUT')
             <div style="margin-bottom:14px">
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.menu_item_name') }}</label>
@@ -125,6 +139,11 @@
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.emoji') }}</label>
                 <input type="text" name="emoji" id="edit_menu_emoji" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
             </div>
+            <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Change Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                <img id="edit_menu_image_preview" class="img-preview" alt="Current image">
+            </div>
             <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_menu_item') }}</button>
         </form>
     </div>
@@ -135,13 +154,23 @@ function openMenuModal() { document.getElementById('menuModal').style.display = 
 function closeMenuModal() { document.getElementById('menuModal').style.display = 'none'; }
 document.getElementById('menuModal').addEventListener('click', function(e) { if (e.target === this) closeMenuModal(); });
 
-function openEditMenuModal(id, name, price, category, emoji) {
+function openEditMenuModal(id, name, price, category, emoji, imageUrl) {
     var form = document.getElementById('editMenuForm');
     form.action = '/provider/restaurant/menu-items/' + id;
     document.getElementById('edit_menu_name').value = name;
     document.getElementById('edit_menu_price').value = price;
     document.getElementById('edit_menu_category').value = category;
     document.getElementById('edit_menu_emoji').value = emoji;
+
+    var preview = document.getElementById('edit_menu_image_preview');
+    if (imageUrl) {
+        preview.src = imageUrl;
+        preview.style.display = 'block';
+    } else {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+    }
+
     document.getElementById('editMenuModal').style.display = 'flex';
 }
 function closeEditMenuModal() { document.getElementById('editMenuModal').style.display = 'none'; }

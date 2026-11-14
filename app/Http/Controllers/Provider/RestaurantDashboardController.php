@@ -248,7 +248,13 @@ class RestaurantDashboardController extends Controller
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:50',
             'emoji' => 'nullable|string|max:10',
+            'image' => 'nullable|image|max:2048', // 🆕 Image Validation
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('menu-items', 'public');
+        }
 
         MenuItem::create([
             'provider_id' => $provider->id,
@@ -258,6 +264,7 @@ class RestaurantDashboardController extends Controller
             'currency' => 'NPR',
             'category' => $validated['category'],
             'emoji' => $validated['emoji'] ?? '🍽️',
+            'image_path' => $imagePath, // 🆕 Save Path
             'is_available' => true,
         ]);
 
@@ -583,7 +590,16 @@ class RestaurantDashboardController extends Controller
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:100',
             'emoji' => 'nullable|string|max:10',
+            'image' => 'nullable|image|max:2048', // 🆕
         ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($menuItem->image_path && \Storage::disk('public')->exists($menuItem->image_path)) {
+                \Storage::disk('public')->delete($menuItem->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('menu-items', 'public');
+        }
 
         $menuItem->update($validated);
         return redirect()->back()->with('success', 'Menu item updated.');
@@ -602,6 +618,7 @@ class RestaurantDashboardController extends Controller
             'table_number' => 'required|string|max:20',
             'seats' => 'required|integer|min:1',
             'status' => 'nullable|in:free,occupied,reserved,cleaning',
+            'image' => 'nullable|image|max:2048', // 🆕
         ]);
 
         $exists = RestaurantTable::where('provider_id', $provider->id)
@@ -615,12 +632,18 @@ class RestaurantDashboardController extends Controller
             ->whereNotNull('service_id')
             ->value('service_id');
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('tables', 'public');
+        }
+
         RestaurantTable::create([
             'provider_id' => $provider->id,
             'service_id' => $serviceId,
             'table_number' => $validated['table_number'],
             'seats' => $validated['seats'],
             'status' => $validated['status'] ?? 'free',
+            'image_path' => $imagePath, // 🆕 Save Path
         ]);
 
         return redirect()->back()->with('success', 'Table added successfully.');
@@ -635,6 +658,7 @@ class RestaurantDashboardController extends Controller
             'table_number' => 'required|string|max:20',
             'seats' => 'required|integer|min:1',
             'status' => 'required|in:free,occupied,reserved,cleaning',
+            'image' => 'nullable|image|max:2048', // 🆕
         ]);
 
         $exists = RestaurantTable::where('provider_id', $provider->id)
@@ -643,6 +667,14 @@ class RestaurantDashboardController extends Controller
             ->exists();
         if ($exists) {
             return redirect()->back()->withErrors(['table_number' => 'This table number already exists.'])->withInput();
+        }
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($table->image_path && \Storage::disk('public')->exists($table->image_path)) {
+                \Storage::disk('public')->delete($table->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('tables', 'public');
         }
 
         $table->update($validated);

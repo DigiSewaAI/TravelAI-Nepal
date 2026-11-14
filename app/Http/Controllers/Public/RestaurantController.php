@@ -14,24 +14,30 @@ class RestaurantController extends Controller
 {
     public function show($slug)
     {
-        // Load service with provider and category
         $service = Service::with(['provider', 'category'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();
 
-        // Load Menu Items for this provider
+        $provider = $service->provider;
+
         $menuItems = MenuItem::where('provider_id', $service->provider_id)
             ->where('is_available', true)
             ->orderBy('category')
             ->get();
 
-        // Load Available Tables
         $tables = RestaurantTable::where('provider_id', $service->provider_id)
             ->orderBy('table_number')
             ->get();
 
-        return view('public.restaurant.show', compact('service', 'menuItems', 'tables'));
+        // 🆕 Fetch Active Offers
+        $offers = \App\Models\ProviderOffer::where('provider_id', $service->provider_id)
+            ->where('is_active', true)
+            ->where('valid_until', '>=', now())
+            ->orderBy('valid_until')
+            ->get();
+
+        return view('public.restaurant.show', compact('service', 'provider', 'menuItems', 'tables', 'offers'));
     }
 
     public function reserve(Request $request, $slug)

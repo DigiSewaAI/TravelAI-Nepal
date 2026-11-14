@@ -21,6 +21,9 @@
   .tbl-alert{padding:11px 15px; border-radius:10px; font-size:13px; font-weight:600; margin-bottom:14px; display:flex; gap:10px; align-items:flex-start; border-left:4px solid;}
   .tbl-ok{background:var(--green-soft); color:#047857; border-color:#10b981;}
   .tbl-err{background:var(--red-soft); color:#b91c1c; border-color:#dc2626;}
+  .tbl-img{width:100%; height:90px; object-fit:cover; border-radius:10px; margin-bottom:10px; border:1px solid var(--line);}
+  .tbl-img-empty{width:100%; height:90px; border-radius:10px; margin-bottom:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:26px; border:1px dashed var(--line); color:var(--muted);}
+  .img-preview{max-width:140px; max-height:140px; border-radius:10px; object-fit:cover; border:1px solid var(--line); margin-top:8px; display:none;}
 </style>
 @endpush
 
@@ -48,12 +51,21 @@
     @forelse($tables as $t)
     <div class="tbl-card">
         <div class="tbl-actions">
-            <button type="button" class="tbl-act tbl-edit" onclick="openEditTableModal({{ $t->id }}, '{{ addslashes($t->table_number) }}', {{ $t->seats ?? 0 }}, '{{ $t->status }}')" title="Edit"><i class="fas fa-edit"></i></button>
+            <button type="button" class="tbl-act tbl-edit"
+                onclick="openEditTableModal({{ $t->id }}, '{{ addslashes($t->table_number) }}', {{ $t->seats ?? 0 }}, '{{ $t->status }}', '{{ $t->image_path ? Storage::disk('public')->url($t->image_path) : '' }}')"
+                title="Edit"><i class="fas fa-edit"></i></button>
             <form action="{{ route('provider.restaurant.tables.destroy', $t) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete table {{ $t->table_number }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="tbl-act tbl-del" title="Delete"><i class="fas fa-trash"></i></button>
             </form>
         </div>
+
+        @if($t->image_path)
+            <img src="{{ Storage::disk('public')->url($t->image_path) }}" alt="Table {{ $t->table_number }}" class="tbl-img">
+        @else
+            <div class="tbl-img-empty">🪑</div>
+        @endif
+
         <div class="tbl-num">{{ $t->table_number }}</div>
         <div class="tbl-seats">{{ $t->seats }} {{ __('messages.seats') }}</div>
         @php
@@ -75,12 +87,12 @@
 
 {{-- Add Table Modal --}}
 <div id="addTableModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
-    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);">
+    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
             <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.add_new_table') }}</h3>
             <button type="button" onclick="closeAddTableModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
-        <form action="{{ route('provider.restaurant.tables.store') }}" method="POST">
+        <form action="{{ route('provider.restaurant.tables.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div style="margin-bottom:14px">
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.table_number') }}</label>
@@ -99,6 +111,10 @@
                     <option value="cleaning">{{ __('messages.cleaning') }}</option>
                 </select>
             </div>
+            <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+            </div>
             <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.add_table') }}</button>
         </form>
     </div>
@@ -106,12 +122,12 @@
 
 {{-- Edit Table Modal --}}
 <div id="editTableModal" style="display:none;position:fixed;inset:0;background:rgba(28,25,23,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
-    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);">
+    <div style="background:var(--card,#fff);border-radius:18px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
             <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_table') }}</h3>
             <button type="button" onclick="closeEditTableModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
         </div>
-        <form id="editTableForm" method="POST">
+        <form id="editTableForm" method="POST" enctype="multipart/form-data">
             @csrf @method('PUT')
             <div style="margin-bottom:14px">
                 <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.table_number') }}</label>
@@ -130,6 +146,11 @@
                     <option value="cleaning">{{ __('messages.cleaning') }}</option>
                 </select>
             </div>
+            <div style="margin-bottom:14px">
+                <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">Change Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="width:100%;padding:10px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px">
+                <img id="edit_tbl_image_preview" class="img-preview" alt="Current image">
+            </div>
             <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent,#f97316),var(--accent-d,#ea580c));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_table') }}</button>
         </form>
     </div>
@@ -140,12 +161,22 @@ function openAddTableModal() { document.getElementById('addTableModal').style.di
 function closeAddTableModal() { document.getElementById('addTableModal').style.display = 'none'; }
 document.getElementById('addTableModal').addEventListener('click', function(e) { if (e.target === this) closeAddTableModal(); });
 
-function openEditTableModal(id, number, seats, status) {
+function openEditTableModal(id, number, seats, status, imageUrl) {
     var form = document.getElementById('editTableForm');
     form.action = '/provider/restaurant/tables/' + id;
     document.getElementById('edit_tbl_number').value = number;
     document.getElementById('edit_tbl_seats').value = seats;
     document.getElementById('edit_tbl_status').value = (status === 'available') ? 'free' : status;
+
+    var preview = document.getElementById('edit_tbl_image_preview');
+    if (imageUrl) {
+        preview.src = imageUrl;
+        preview.style.display = 'block';
+    } else {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+    }
+
     document.getElementById('editTableModal').style.display = 'flex';
 }
 function closeEditTableModal() { document.getElementById('editTableModal').style.display = 'none'; }
