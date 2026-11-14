@@ -1,5 +1,5 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-14 (Evening — Restaurant Public Page + Reservation)  
+**Last Updated:** 2026-11-14 (Night — Hotel Booking Complete + VAT/Tax Audit)  
 **Current Commit:** `TBD` (Restaurant Reservation + Emails + Public Page, pending push)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
@@ -236,6 +236,35 @@
 
 **Note:** Other verticals (Hotel, Transport, ArtCraft, Individual, MoneyChanger) still use the old generic Explore page. Need to build dedicated public pages for them.
 
+### 12. Hotel Public Page & Booking Flow (COMPLETE)
+**Date:** 2026-11-14 (Night)
+**Status:** ✅ Complete
+
+**Files Created/Modified:**
+- `app/Http/Controllers/Public/HotelController.php` — show + book (Public Booking)
+- `app/Mail/HotelBookingCreatedMail.php`, `HotelBookingConfirmedMail.php`
+- `app/Notifications/NewHotelBookingNotification.php`
+- `resources/views/public/hotel/show.blade.php` — Premium UI (Amenities, Rooms, Booking Modal)
+- `resources/views/emails/hotel-booking-created.blade.php`, `-confirmed.blade.php`
+- `resources/views/invoices/hotel-booking-pdf.blade.php` — PDF Invoice (Logo + Contact)
+- `app/Models/HotelBooking.php` — QR auto-generate on create
+- `app/Http/Controllers/Provider/HotelDashboardController.php` — confirm, verifyPayment, qrCode, downloadInvoice
+- `app/Http/Controllers/Traveler/DashboardV2Controller.php` — hotelBookings data
+- Migration: `add_qr_code_to_hotel_bookings_table` + `add_image_path_to_hotel_rooms_table`
+- Routes: `/hotel/{slug}`, `/hotel/{slug}/book`, `/hotel/bookings/{id}/confirm`, `/verify-payment`, `/qr`, `/invoice`
+
+**Verified:**
+- Public booking → Provider notification + email
+- Status flow: Pending → Confirmed → Checked In → Checked Out
+- Mark as Paid → Payment Status Paid
+- QR Code generated + displayed
+- Invoice PDF with Logo + Contact + Payment Status
+- Email with Logo
+- Tests: 297 pass
+
+**Pending (VAT/Tax — see Section 13):**
+- Nepal VAT compliance not yet implemented
+
 ---
 
 ## 🔴 PENDING WORK (Priority Order)
@@ -339,6 +368,33 @@
 | **EMAIL-BRANDING-AUDIT-01** | २२ mail classes — कुन-कुन `$brand` use गर्छ? कुन-कुन hardcoded? Comprehensive audit | Medium |
 | **PRICING-WHITE-LABEL-CLARIFY-01** | Pricing page मा "White-label" → "Branded Documents (Level 1)" — scope clarification | Low |
 | **RESTAURANT-ADD-ITEMS-01** | Restaurant order मा थप items (existing order मा append) — Master approved Option B, testing पछि | Medium |
+| **NEPAL-VAT-INVOICE-01** | **Nepal VAT (13%) Compliance — All Providers** — नेपाल सरकारको ईनभ्वाइस मापदण्ड अनुसार VAT breakdown, PAN/VAT number, sequential invoice numbering, fiscal year format | 🔴 **HIGH** |
+| **PROVIDER-PAN-VAT-01** | Provider profile मा PAN/VAT number field थप्ने (नयाँ registration र profile edit मा) | 🔴 HIGH |
+| **INVOICE-FORMAT-NEPAL-01** | नेपाल सरकारको prescribed invoice format (IRD मापदण्ड) — सबै verticals को लागि | 🔴 HIGH |
+| **VAT-THRESHOLD-CONFIG-01** | VAT threshold config (hotel/restaurant 13%, trek/tour may vary, threshold amount) | 🟡 MEDIUM |
+
+### 13. VAT/Tax Nepal Compliance — Discussion Needed
+
+**Current Gap (Rule A verified):**
+- Restaurant Receipt: कोई VAT breakdown नै (Total मात्र)
+- Hotel Invoice: कोई VAT breakdown नै (Total मात्र, Section 12 मा थपिएको Invoice पनि)
+- Provider Profile: कोई **PAN/VAT number** field नै
+- Invoice Number Format: `HTL-2026-0032` — Nepal fiscal year (Shrawan-Ashad) अनुसार नै
+- Nepal Government (IRD) prescribed format: **follow गरिएको छैन**
+
+**Nepal VAT Rules (IRC 2058):**
+1. **13% VAT** — Hotel, Restaurant, Catering (threshold: Rs. 20 lakh annual turnover)
+2. **PAN/VAT Number** — Invoice मा अनिवार्य (9-digit PAN, VAT registered: 9-digit + suffix)
+3. **Sequential Invoice Number** — Fiscal year अनुसार (Shrawan 1 — Ashad 31)
+4. **Tax Invoice Format** — IRD prescribed (provider name, PAN, invoice no, date, description, taxable amount, VAT amount, total)
+5. **Fiscal Year Format** — 2081/82 (not 2026)
+
+**Master Decision Needed:**
+- के यो Phase मा implement गर्ने? कि Future (production launch अघि)?
+- कति providers ले VAT threshold cross गरेका छन्? (currently सबै below threshold हुनसक्छन्)
+- Simple breakdown (13% flat) कि full IRD format?
+
+**Recommendation:** Production launch अघि **अनिवार्य** — नेपालमा VAT invoice बिना service provide गर्न गैरकानूनी हुनसक्छ।
 
 ### ❌ OUT OF SCOPE (No Need)
 1. **Products/Shop Moderation** — Admin ले provider को product हेर्नु पर्दैन
@@ -481,9 +537,10 @@ Audit scripts debug को लागि मात्र — production code न�
 New migration create गर्दा php artisan make:migration बाट generate हुने file नै edit गर्नुस्। manual filename नबनाउनुस् (Phase 1 मा YYYY_MM_DD_HHMMSS_... file बनाइयो — delete गर्यो)।
 
 📋 NEXT STEPS — Priority
-Master GO चाहिन्छ Push को लागि — ~९ local commits pending (Restaurant + All Fixes)
+Master GO प्राप्त ✅ — 3 commits push भइरहेको छ (Hotel Public Page + Booking Flow + Complete)
 Restaurant E2E test — DONE (Public page, Email, Reservation, Provider dashboard all verified)
-Next Vertical: Build Public Page for Hotel (2 services) using same pattern.
+Hotel E2E test — DONE (Public page, Email, Reservation, QR, Invoice, Payment verified)
+Next Vertical: Transport Public Page using same pattern.
 
 Phase 2 सुरु गर्ने — Provider Review Panel
 
@@ -640,7 +697,7 @@ Phase 3: 🟢 Review System — Public Advanced (photos, votes)
 ↓
 Phase 4: 🟣 Review System — Polish (analytics, digest)
 ↓
-Testing Phase: 🟢 Restaurant → Transport → ArtCraft → Individual → MoneyChanger
+Testing Phase: 🟢 (Restaurant DONE, Hotel DONE) → Transport → ArtCraft → Individual → MoneyChanger
 ↓
 Medium Priority: 🟡 Fleet CRUD, Reports, Per-Vertical CRUD
 ↓
