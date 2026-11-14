@@ -304,7 +304,13 @@
         <span style="font-size: 14px; font-weight: 800; color: #fff; letter-spacing: 0.5px;">TravelAI Nepal</span>
     </a>
     <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-        <div class="brand-logo">🍜</div>
+        <div class="brand-logo" style="overflow:hidden;padding:0;">
+            @if(!empty($provider->logo_url))
+                <img src="{{ Storage::url($provider->logo_url) }}" alt="{{ $provider->name ?? 'Logo' }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">
+            @else
+                🍜
+            @endif
+        </div>
         <div>
           <h1 style="font-size: 16px; margin: 0;">{{ \Illuminate\Support\Str::limit($provider->name ?? 'Savory', 13) }}</h1>
           <span style="font-size: 9px; color: #8b9bb0;">RESTAURANT</span>
