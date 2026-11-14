@@ -153,6 +153,12 @@ Route::prefix('explore')->name('public.')->group(function () {
 });
 
 // =============================================
+// 🆕 RESTAURANT PUBLIC PAGE & RESERVATION
+// =============================================
+Route::get('/restaurant/{slug}', [\App\Http\Controllers\Public\RestaurantController::class, 'show'])->name('public.restaurant.show');
+Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
+
+// =============================================
 // PRODUCT CATALOG (Path 3B — B1)
 // =============================================
 Route::get('/shop',      [App\Http\Controllers\Public\ProductController::class, 'shop'])->name('public.shop.index');
