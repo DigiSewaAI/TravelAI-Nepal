@@ -9,13 +9,14 @@ use App\Models\RestaurantOrderItem;
 use App\Models\RestaurantTable;
 use App\Models\ServiceCategory;
 use App\Services\RestaurantAiService;
+use App\Http\Controllers\Provider\Concerns\ManagesOffers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RestaurantDashboardController extends Controller
 {
-
+    use ManagesOffers;
     use \App\Traits\EnforcesPlanLimits;
 
     public function __construct(protected RestaurantAiService $restaurantAi) {}
@@ -523,20 +524,6 @@ class RestaurantDashboardController extends Controller
         $orders = RestaurantOrder::where('provider_id', $provider->id)->latest()->take(10)->get();
         
         return view('provider.restaurant.reports', compact('provider', 'totalSales', 'totalOrders', 'avgOrder', 'orders'));
-    }
-
-    public function offersPage()
-    {
-        $provider = Auth::user()->getCurrentProvider();
-        abort_unless($provider, 403, 'Provider not found.');
-        // Dummy offers for UI (No offers table yet in R8 scope)
-        $offers = collect([
-            (object)['title' => 'Happy Hour (4-6 PM)', 'discount' => '20% Off', 'valid_until' => now()->addDays(7), 'status' => 'active'],
-            (object)['title' => 'Weekend Family Combo', 'discount' => '15% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
-            (object)['title' => 'Student Discount', 'discount' => '10% Off', 'valid_until' => now()->addDays(30), 'status' => 'inactive'],
-        ]);
-        
-        return view('provider.restaurant.offers', compact('provider', 'offers'));
     }
         public function updateMenuItem(Request $request, MenuItem $menuItem)
     {

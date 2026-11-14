@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Services\TransportAiService;
 use App\Models\TransportBooking;
 use App\Models\TransportVehicle;
+use App\Http\Controllers\Provider\Concerns\ManagesOffers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TransportDashboardController extends Controller
 {
-
+    use ManagesOffers;
     use \App\Traits\EnforcesPlanLimits;
 
     public function __construct(protected TransportAiService $transportAi) {}
@@ -333,26 +334,6 @@ class TransportDashboardController extends Controller
             'activeFleet', 'totalFleet',
             'chartData', 'chartTotal', 'topRoutes'
         ));
-    }
-
-    public function offersPage()
-    {
-        $provider = \App\Models\Provider::where('user_id', Auth::id())
-            ->whereHas('types', fn($q) => $q->where('slug', 'transport-provider'))
-            ->first();
-        abort_unless($provider, 403);
-
-        $activeFleet = TransportVehicle::where('provider_id', $provider->id)
-            ->whereIn('status', ['available', 'on-route'])->count();
-        $totalFleet = TransportVehicle::where('provider_id', $provider->id)->count();
-
-        $offers = collect([
-            (object)['title' => 'Dashain Travel Discount', 'discount' => '20% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
-            (object)['title' => 'Group Booking Special', 'discount' => '15% Off', 'valid_until' => now()->addDays(30), 'status' => 'active'],
-            (object)['title' => 'Weekend Getaway Offer', 'discount' => '10% Off', 'valid_until' => now()->addDays(7), 'status' => 'inactive'],
-        ]);
-
-        return view('provider.transport.offers', compact('provider', 'offers', 'activeFleet', 'totalFleet'));
     }
 
     public function updateVehicle(Request $request, TransportVehicle $vehicle)

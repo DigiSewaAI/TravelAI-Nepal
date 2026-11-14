@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HotelBooking;
 use App\Models\HotelRoom;
 use App\Models\HousekeepingTask;
+use App\Http\Controllers\Provider\Concerns\ManagesOffers;
 use App\Services\HotelAiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class HotelDashboardController extends Controller
 {
-
+    use ManagesOffers;
     use \App\Traits\EnforcesPlanLimits;
 
     public function __construct(protected HotelAiService $hotelAi) {}
@@ -439,20 +440,6 @@ public function housekeepingPage()
             'totalRooms', 'occupiedRooms', 'occupancyRate',
             'chartData', 'chartTotal', 'topRooms'
         ));
-    }
-
-    public function offersPage()
-    {
-        $provider = Auth::user()->getCurrentProvider();
-        abort_unless($provider, 403);
-
-        $offers = collect([
-            (object)['title' => 'Monsoon Special', 'discount' => '25% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
-            (object)['title' => 'Long Stay Discount', 'discount' => '15% Off', 'valid_until' => now()->addDays(30), 'status' => 'active'],
-            (object)['title' => 'Weekend Getaway', 'discount' => '10% Off', 'valid_until' => now()->addDays(7), 'status' => 'inactive'],
-        ]);
-
-        return view('provider.hotel.offers', compact('provider', 'offers'));
     }
 
     public function storeRoom(Request $request)

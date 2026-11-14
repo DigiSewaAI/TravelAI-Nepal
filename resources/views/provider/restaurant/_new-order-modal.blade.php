@@ -96,5 +96,6 @@
     document.querySelectorAll('.order-item-check').forEach(c => c.addEventListener('change', calculateTotal));
     document.querySelectorAll('.item-qty').forEach(q => q.addEventListener('input', calculateTotal));
 })();
+
 </script>
 @endonce

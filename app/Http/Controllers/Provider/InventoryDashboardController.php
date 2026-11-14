@@ -8,6 +8,7 @@ use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Http\Controllers\Provider\Concerns\ManagesOffers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ use Illuminate\Support\Str;
 
 class InventoryDashboardController extends Controller
 {
-
+    use ManagesOffers;
     use \App\Traits\EnforcesPlanLimits;
 
     public function __construct(protected InventoryAiService $inventoryAi) {}
@@ -522,24 +523,6 @@ public function verifyPayment(\Illuminate\Http\Request $request, \App\Models\Ord
         $chartTotal = collect($chartData)->sum('value');
 
         return view('provider.inventory.reports', compact('provider', 'totalProducts', 'lowStockCount', 'stockValue', 'ordersToday', 'stockHealth', 'topProducts', 'chartData', 'chartTotal'));
-    }
-
-    public function offersPage()
-    {
-        $provider = Auth::user()->getCurrentProvider();
-        abort_unless($provider, 403);
-
-        $totalProducts = Product::where('provider_id', $provider->id)->count();
-        $inStockCount = Product::where('provider_id', $provider->id)->where('stock_quantity', '>', 0)->count();
-        $stockHealth = $totalProducts > 0 ? (int) round(($inStockCount / $totalProducts) * 100) : 100;
-
-        $offers = collect([
-            (object)['title' => 'Seasonal Discount', 'discount' => '15% Off', 'valid_until' => now()->addDays(14), 'status' => 'active'],
-            (object)['title' => 'Bulk Purchase Deal', 'discount' => '20% Off', 'valid_until' => now()->addDays(30), 'status' => 'active'],
-            (object)['title' => 'Rental Weekend Special', 'discount' => '10% Off', 'valid_until' => now()->addDays(7), 'status' => 'inactive'],
-        ]);
-
-        return view('provider.inventory.offers', compact('provider', 'offers', 'stockHealth'));
     }
 
     public function confirmReturn(Request $request, Order $order, OrderItem $item)

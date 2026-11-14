@@ -254,6 +254,10 @@ Route::middleware(['auth', 'provider.active'])->prefix('provider')->name('provid
 Route::post('/restaurant/ai/menu-intelligence', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'aiMenuIntelligence'])->name('restaurant.ai.menu');
 Route::post('/restaurant/ai/demand-forecast', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'aiDemandForecast'])->name('restaurant.ai.forecast');
     Route::get('/restaurant/offers', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'offersPage'])->name('restaurant.offers.list');
+        Route::post('/restaurant/offers', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeOffer'])->name('restaurant.offers.store');
+    Route::put('/restaurant/offers/{offer}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateOffer'])->name('restaurant.offers.update');
+    Route::delete('/restaurant/offers/{offer}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'deleteOffer'])->name('restaurant.offers.destroy');
+
         // 🆕 Money Changer vertical dashboard route
     Route::get('/money-changer/dashboard', [\App\Http\Controllers\Provider\MoneyChangerDashboardController::class, 'index'])->name('money-changer.dashboard');
         // Money Changer CRUD Routes
@@ -296,6 +300,10 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
     Route::get('/inventory/suppliers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'suppliersPage'])->name('inventory.suppliers');
     Route::get('/inventory/reports', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'reportsPage'])->name('inventory.reports');
     Route::get('/inventory/offers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'offersPage'])->name('inventory.offers');
+        Route::post('/inventory/offers', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'storeOffer'])->name('inventory.offers.store');
+    Route::put('/inventory/offers/{offer}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'updateOffer'])->name('inventory.offers.update');
+    Route::delete('/inventory/offers/{offer}', [\App\Http\Controllers\Provider\InventoryDashboardController::class, 'deleteOffer'])->name('inventory.offers.destroy');
+
         // 🆕 Hotel vertical dashboard routes
     Route::get('/hotel/dashboard', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'index'])->name('hotel.dashboard');
     Route::post('/hotel/rooms', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeRoom'])->name('hotel.rooms.store');
@@ -320,6 +328,9 @@ Route::patch('/inventory/orders/{order}/items/{item}/confirm-return', [\App\Http
         Route::get('/hotel/reports', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'reportsPage'])->name('hotel.reports');
 Route::get('/hotel/price-history', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'priceHistoryPage'])->name('hotel.price-history');
     Route::get('/hotel/offers', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'offersPage'])->name('hotel.offers');
+        Route::post('/hotel/offers', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'storeOffer'])->name('hotel.offers.store');
+    Route::put('/hotel/offers/{offer}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'updateOffer'])->name('hotel.offers.update');
+    Route::delete('/hotel/offers/{offer}', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'deleteOffer'])->name('hotel.offers.destroy');
 Route::post('/hotel/ai/occupancy-forecast', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiOccupancyForecast'])->name('hotel.ai.occupancy');
 Route::post('/hotel/ai/pricing-suggestions', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'aiPricingSuggestions'])->name('hotel.ai.pricing');
 Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDashboardController::class, 'applyPricing'])->name('hotel.ai.apply-pricing');
@@ -343,6 +354,10 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
 Route::post('/transport/ai/vehicle-assignment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiVehicleAssignment'])->name('transport.ai.vehicle');
 Route::post('/transport/ai/cost-estimator', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiCostEstimator'])->name('transport.ai.cost');
     Route::get('/transport/offers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'offersPage'])->name('transport.offers');
+        Route::post('/transport/offers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeOffer'])->name('transport.offers.store');
+    Route::put('/transport/offers/{offer}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateOffer'])->name('transport.offers.update');
+    Route::delete('/transport/offers/{offer}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'deleteOffer'])->name('transport.offers.destroy');
+
         // 🆕 Individual Services vertical dashboard routes
     Route::get('/individual/dashboard', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'index'])->name('individual.dashboard');
     Route::patch('/individual/bookings/{booking}/status', [\App\Http\Controllers\Provider\IndividualDashboardController::class, 'updateBookingStatus'])->name('individual.bookings.status');
