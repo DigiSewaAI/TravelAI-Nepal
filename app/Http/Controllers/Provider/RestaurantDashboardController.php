@@ -356,11 +356,12 @@ class RestaurantDashboardController extends Controller
             return $order;
         });
 
+        // 🆕 Compute brand (used by both PDF + Email)
+        $brand = \App\Support\InvoiceBrand::forBookingInvoice($provider);
+
         // If receipt code generated, stream PDF
         if ($plainCode !== null) {
             try {
-                $brand = \App\Support\InvoiceBrand::forBookingInvoice($provider);
-
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('provider.restaurant.receipt-pdf', [
                     'order' => $order,
                     'plainCode' => $plainCode,
@@ -371,6 +372,20 @@ class RestaurantDashboardController extends Controller
                 // Save to storage (temp)
                 $filename = 'receipt-' . $order->order_number . '.pdf';
                 \Storage::disk('local')->put('receipts/' . $filename, $pdf->output());
+
+                // 🆕 Send order confirmation email to customer (with PDF attachment)
+                if (!empty($order->customer_email)) {
+                    try {
+                        \Mail::to($order->customer_email)->queue(
+                            new \App\Mail\RestaurantOrderPlacedMail($order, $provider, $plainCode, $brand)
+                        );
+                    } catch (\Throwable $e) {
+                        \Log::warning('Restaurant order email failed', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
 
                 // Flash receipt code + PDF path + redirect to order show
                 return redirect()
@@ -413,7 +428,33 @@ class RestaurantDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403, 'Provider not found.');
         $orders = RestaurantOrder::where('provider_id', $provider->id)->with('items')->latest()->get();
-        return view('provider.restaurant.orders', compact('provider', 'orders'));
+
+        // New Order modal data (shared partial)
+        $tablesData = RestaurantTable::where('provider_id', $provider->id)
+            ->orderBy('table_number')
+            ->get()
+            ->map(fn($t) => [
+                'db_id'  => $t->id,
+                'n'      => (int) preg_replace('/\D/', '', $t->table_number),
+                'label'  => $t->table_number,
+                'seats'  => $t->seats,
+            ])
+            ->all();
+
+        $allProducts = MenuItem::where('provider_id', $provider->id)
+            ->where('is_available', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($m) => [
+                'db_id' => $m->id,
+                'name'  => $m->name,
+                'price' => (float) $m->price,
+                'emoji' => $m->emoji ?: '🍽️',
+            ])
+            ->all();
+
+        return view('provider.restaurant.orders', compact('provider', 'orders', 'tablesData', 'allProducts'));
     }
 
     public function showOrder(RestaurantOrder $order)
