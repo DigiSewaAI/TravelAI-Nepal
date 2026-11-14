@@ -3353,4 +3353,9 @@ return array (
     'artcraft_success_verified' => 'अर्डर सफलतापूर्वक दावी गरियो!',
     'artcraft_info_already_claimed' => 'तपाईंले यो अर्डर पहिले नै दावी गर्नुभयो।',
     'artcraft_btn' => 'अर्डर दाबी',
+        'back' => 'पछाडि',
+    'restaurant_order' => 'रेस्टुरेन्ट अर्डर',
+    'table' => 'टेबल',
+    'claimed_on' => 'दाबी गरिएको मिति',
+
 );

@@ -2309,4 +2309,9 @@ return array (
 
     // ===== SOS v1.2 — General Help footer =====
     'sos_general_help_link'             => 'सामान्य प्रश्न? अपने ट्रेकिंग प्रदाता से संपर्क करें',
+        'back' => 'वापस',
+    'restaurant_order' => 'रेस्टोरेंट ऑर्डर',
+    'table' => 'टेबल',
+    'claimed_on' => 'दावा की तिथि',
+
 );

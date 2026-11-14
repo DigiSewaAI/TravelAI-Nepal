@@ -61,7 +61,7 @@
             @foreach($order->items as $item)
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9fafb; border-radius: 10px;">
                 <div>
-                    <div style="font-weight: 700; color: #111827; font-size: 14px;">{{ $item->name ?? 'Item' }}</div>
+                    <div style="font-weight: 700; color: #111827; font-size: 14px;">{{ $item->item_name ?? 'Item' }}</div>
                     @if($item->quantity)
                     <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Qty: {{ $item->quantity }}</div>
                     @endif

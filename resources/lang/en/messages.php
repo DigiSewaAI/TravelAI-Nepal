@@ -3368,4 +3368,9 @@ return array (
 
     'email_order_welcome_pending_label'         => 'What happens next?',
     'email_order_welcome_pending_text'          => 'Your order is currently pending. The provider will process and confirm it shortly. You will receive an email as soon as it is confirmed.',
+  // Restaurant claim show page (added 2026-11-14)
+  'back' => 'Back',
+  'restaurant_order' => 'Restaurant Order',
+  'table' => 'Table',
+  'claimed_on' => 'Claimed on',
 );

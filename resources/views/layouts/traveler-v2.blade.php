@@ -986,6 +986,21 @@
 
     {{-- ═══ MAIN ═══ --}}
     <main class="tv2-main">
+        @if(session('info'))
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:600;">
+                <i class="fas fa-info-circle" style="margin-right:8px;"></i>{{ session('info') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:600;">
+                <i class="fas fa-check-circle" style="margin-right:8px;"></i>{{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:600;">
+                <i class="fas fa-exclamation-circle" style="margin-right:8px;"></i>{{ session('error') }}
+            </div>
+        @endif
         @hasSection('traveler-v2-content')
             @yield('traveler-v2-content')
         @else

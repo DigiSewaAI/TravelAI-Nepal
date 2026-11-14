@@ -2320,4 +2320,9 @@ return array (
 
     // ===== SOS v1.2 — General Help footer =====
     'sos_general_help_link'             => '一般问题？请联系您的徒步旅行服务商',
+        'back' => '返回',
+    'restaurant_order' => '餐厅订单',
+    'table' => '桌号',
+    'claimed_on' => '认领日期',
+    
 );

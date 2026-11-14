@@ -2906,4 +2906,9 @@ return array (
 
     // ===== SOS v1.2 — General Help footer =====
     'sos_general_help_link'             => 'Общий вопрос? Свяжитесь с вашим туристическим оператором',
+        'back' => 'Назад',
+    'restaurant_order' => 'Заказ в ресторане',
+    'table' => 'Столик',
+    'claimed_on' => 'Дата заявки',
+
 );
