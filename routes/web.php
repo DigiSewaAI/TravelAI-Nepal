@@ -260,6 +260,10 @@ Route::middleware(['auth', 'provider.active'])->prefix('provider')->name('provid
 Route::post('/restaurant/ai/menu-intelligence', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'aiMenuIntelligence'])->name('restaurant.ai.menu');
 Route::post('/restaurant/ai/demand-forecast', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'aiDemandForecast'])->name('restaurant.ai.forecast');
     Route::get('/restaurant/offers', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'offersPage'])->name('restaurant.offers.list');
+        Route::get('/restaurant/reservations', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'reservationsPage'])->name('restaurant.reservations');
+Route::patch('/restaurant/reservations/{id}/status', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateReservationStatus'])->name('restaurant.reservations.status');
+Route::get('/restaurant/reservations/{id}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'showReservation'])->name('restaurant.reservations.show');
+
         Route::post('/restaurant/offers', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'storeOffer'])->name('restaurant.offers.store');
     Route::put('/restaurant/offers/{offer}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'updateOffer'])->name('restaurant.offers.update');
     Route::delete('/restaurant/offers/{offer}', [\App\Http\Controllers\Provider\RestaurantDashboardController::class, 'deleteOffer'])->name('restaurant.offers.destroy');

@@ -501,7 +501,55 @@ class RestaurantDashboardController extends Controller
         $tables = RestaurantTable::where('provider_id', $provider->id)->orderBy('table_number')->get();
         return view('provider.restaurant.tables', compact('provider', 'tables'));
     }
-        public function aiMenuIntelligence(Request $request)
+
+    // 🆕 Reservation Management
+    public function reservationsPage()
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403, 'Provider not found.');
+
+        $reservations = \App\Models\RestaurantReservation::where('provider_id', $provider->id)
+            ->with('table')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('provider.restaurant.reservations', compact('provider', 'reservations'));
+    }
+
+    public function updateReservationStatus(Request $request, $id)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        $reservation = \App\Models\RestaurantReservation::where('provider_id', $provider->id)->findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:confirmed,cancelled'
+        ]);
+
+        $reservation->update(['status' => $validated['status']]);
+
+        // 🆕 Send Confirmed Email to Customer (if confirmed)
+        if ($validated['status'] === 'confirmed' && $reservation->customer_email) {
+            try {
+                \Mail::to($reservation->customer_email)->queue(new \App\Mail\ReservationConfirmedMail($reservation));
+            } catch (\Throwable $e) {
+                \Log::warning('Reservation confirmed email failed', ['id' => $reservation->id, 'error' => $e->getMessage()]);
+            }
+        }
+
+        return back()->with('success', 'Reservation status updated to ' . $validated['status'] . '.');
+    }
+
+        public function showReservation($id)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        $reservation = \App\Models\RestaurantReservation::where('provider_id', $provider->id)
+            ->with(['table'])
+            ->findOrFail($id);
+
+        return view('provider.restaurant.reservations-show', compact('provider', 'reservation'));
+    }
+
+    public function aiMenuIntelligence(Request $request)
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403);

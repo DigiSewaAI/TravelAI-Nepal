@@ -52,7 +52,26 @@ class RestaurantController extends Controller
         $validated['provider_id'] = $service->provider_id;
         $validated['status'] = 'pending';
 
-        RestaurantReservation::create($validated);
+        $reservation = RestaurantReservation::create($validated);
+
+        // 1. Send Email to Customer
+        if ($reservation->customer_email) {
+            try {
+                \Mail::to($reservation->customer_email)->queue(new \App\Mail\ReservationCreatedMail($reservation));
+            } catch (\Throwable $e) {
+                \Log::warning('Reservation email failed', ['id' => $reservation->id, 'error' => $e->getMessage()]);
+            }
+        }
+
+        // 2. Send Notification to Provider (Bell)
+        try {
+            $providerUser = $service->provider->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\NewReservationNotification($reservation));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Reservation provider notify failed', ['id' => $reservation->id, 'error' => $e->getMessage()]);
+        }
 
         return back()->with('success', 'Your table reservation request has been sent! The restaurant will confirm shortly.');
     }
