@@ -2424,4 +2424,7 @@ return array (
   'public_complete_payment' => 'भुगतान पूरा करें',
   'payment_proof_submitted_success' => 'भुगतान प्रमाण सबमिट हो गया! प्रदाता शीघ्र ही सत्यापित करेंगे।',
     'transport_booking' => 'परिवहन बुकिंग',
+      // ── Payment receipt (public + traveler) ──
+  'payment_receipt' => 'भुगतान रसीद',
+  'download_receipt' => 'रसीद डाउनलोड करें',
 );

@@ -30,25 +30,12 @@ class TransportBookingCreatedMail extends Mailable implements ShouldQueue
     {
         $this->booking->loadMissing(['provider', 'vehicle']);
 
-        $logoData = null;
-        $logoUrl = null;
-        $provider = $this->booking->provider;
-
-        if ($provider && $provider->logo_url) {
-            $logoPath = storage_path('app/public/' . $provider->logo_url);
-            if (file_exists($logoPath)) {
-                $size = filesize($logoPath);
-                // Logo <= 50KB: inline base64 (email self-contained)
-                // Logo > 50KB: public URL (avoids Gmail 102KB clipping)
-                if ($size <= 51200) {
-                    $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
-                    $mime = ($ext === 'jpg') ? 'jpeg' : $ext;
-                    $logoData = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($logoPath));
-                } else {
-                    $logoUrl = url('storage/' . $provider->logo_url);
-                }
-            }
-        }
+                $provider = $this->booking->provider;
+        $logo = $provider
+            ? app(\App\Services\TransportReceiptService::class)->buildLogoForEmail($provider)
+            : ['logoData' => null, 'logoUrl' => null];
+        $logoData = $logo['logoData'];
+        $logoUrl  = $logo['logoUrl'];
 
                 // Registered user check + CTA URLs (BookingWelcomeMail pattern)
         $isRegistered = \App\Models\User::where('email', $this->booking->passenger_email)->exists();

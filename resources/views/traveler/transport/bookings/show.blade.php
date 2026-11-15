@@ -114,6 +114,12 @@
     @elseif(($booking->payment_status ?? 'pending') === 'paid')
         <div style="background:#dcfce7;border:1px solid #86efac;padding:16px;border-radius:14px;margin-top:16px;color:#166534;font-size:13px;font-weight:600">
             ✅ <strong>Payment Verified</strong> — Thank you! Your booking is confirmed.
+            <div style="margin-top:12px">
+                <a href="{{ route('traveler.transport.bookings.receipt', $booking->id) }}"
+                   style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#059669;color:#fff;border-radius:8px;font-weight:700;font-size:12px;text-decoration:none">
+                    📄 Download Receipt (PDF)
+                </a>
+            </div>
         </div>
     @endif
 </div>

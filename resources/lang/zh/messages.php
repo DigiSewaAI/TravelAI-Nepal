@@ -2435,4 +2435,7 @@ return array (
   'public_complete_payment' => '完成付款',
   'payment_proof_submitted_success' => '付款证明已提交！提供者将尽快验证。',
     'transport_booking' => '交通预订',
+      // ── Payment receipt (public + traveler) ──
+  'payment_receipt' => '付款收据',
+  'download_receipt' => '下载收据',
 );

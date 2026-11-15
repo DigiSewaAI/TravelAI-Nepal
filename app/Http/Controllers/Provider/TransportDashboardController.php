@@ -177,14 +177,17 @@ class TransportDashboardController extends Controller
             $booking->update([
                 'payment_status' => 'paid',
                 'paid_at'        => now(),
-                'status'         => 'confirmed', // auto-confirm on verify
+                'status'         => 'confirmed',
             ]);
 
-            // Dispatch confirmed email if transitioning
+            // Generate receipt (idempotent)
+            $receipt = app(\App\Services\TransportReceiptService::class)->create($booking);
+
+            // Dispatch confirmed email with receipt attachment
             if ($oldStatus !== 'confirmed' && $booking->passenger_email) {
                 try {
                     \Mail::to($booking->passenger_email)->queue(
-                        new \App\Mail\TransportBookingConfirmedMail($booking)
+                        new \App\Mail\TransportBookingConfirmedMail($booking, $receipt)
                     );
                 } catch (\Throwable $e) {
                     \Log::warning('Confirmed email failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
@@ -193,6 +196,26 @@ class TransportDashboardController extends Controller
         });
 
         return back()->with('success', '✅ Payment verified. Booking confirmed. Traveler notified.');
+    }
+        public function downloadReceipt(TransportBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        $invoice = \App\Models\Invoice::where('provider_id', $provider->id)
+            ->whereJsonContains('metadata->transport_booking_id', $booking->id)
+            ->firstOrFail();
+
+        $brand = app(\App\Services\TransportReceiptService::class)->buildBrandForPdf($provider);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.transport-receipt', [
+            'invoice'  => $invoice,
+            'booking'  => $booking,
+            'provider' => $provider,
+            'brand'    => $brand,
+        ]);
+
+        return $pdf->download('receipt-' . $invoice->invoice_number . '.pdf');
     }
 
     public function rejectPaymentProof(Request $request, TransportBooking $booking)

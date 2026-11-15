@@ -15,7 +15,8 @@ class TransportBookingConfirmedMail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public function __construct(
-        public TransportBooking $booking
+        public TransportBooking $booking,
+        public ?\App\Models\Invoice $receipt = null
     ) {}
 
     public function envelope(): Envelope
@@ -30,22 +31,12 @@ class TransportBookingConfirmedMail extends Mailable implements ShouldQueue
     {
         $this->booking->loadMissing(['provider', 'vehicle']);
 
-        $logoData = null;
-        $logoUrl = null;
         $provider = $this->booking->provider;
-        if ($provider && $provider->logo_url) {
-            $logoPath = storage_path('app/public/' . $provider->logo_url);
-            if (file_exists($logoPath)) {
-                $size = filesize($logoPath);
-                if ($size <= 51200) {
-                    $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
-                    $mime = ($ext === 'jpg') ? 'jpeg' : $ext;
-                    $logoData = 'data:image/' . $mime . ';base64,' . base64_encode(file_get_contents($logoPath));
-                } else {
-                    $logoUrl = url('storage/' . $provider->logo_url);
-                }
-            }
-        }
+        $logo = $provider
+            ? app(\App\Services\TransportReceiptService::class)->buildLogoForEmail($provider)
+            : ['logoData' => null, 'logoUrl' => null];
+        $logoData = $logo['logoData'];
+        $logoUrl  = $logo['logoUrl'];
 
         // Registered user check + CTA URLs (BookingWelcomeMail pattern)
         $isRegistered = \App\Models\User::where('email', $this->booking->passenger_email)->exists();
@@ -69,5 +60,33 @@ class TransportBookingConfirmedMail extends Mailable implements ShouldQueue
                 'dashboardUrl' => $dashboardUrl,
             ]
         );
+    }
+        public function attachments(): array
+    {
+        if (!$this->receipt) {
+            return [];
+        }
+
+        try {
+            $provider = $this->booking->provider;
+            $brand = app(\App\Services\TransportReceiptService::class)->buildBrandForPdf($provider);
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.transport-receipt', [
+                'invoice'  => $this->receipt,
+                'booking'  => $this->booking,
+                'provider' => $provider,
+                'brand'    => $brand,
+            ]);
+
+            return [
+                \Illuminate\Mail\Mailables\Attachment::fromData(
+                    fn() => $pdf->output(),
+                    'receipt-' . $this->receipt->invoice_number . '.pdf'
+                )->withMime('application/pdf'),
+            ];
+        } catch (\Throwable $e) {
+            \Log::warning('Receipt attachment failed', ['booking_id' => $this->booking->id, 'e' => $e->getMessage()]);
+            return [];
+        }
     }
 }

@@ -92,4 +92,25 @@ class TransportBookingController extends Controller
             ->route('traveler.transport.bookings.show', $booking->id)
             ->with('success', 'Payment proof submitted. The provider will verify shortly.');
     }
+        public function downloadReceipt($id)
+    {
+        $booking = TransportBooking::where('passenger_email', $this->travelerEmail())
+            ->findOrFail($id);
+
+        $invoice = \App\Models\Invoice::where('provider_id', $booking->provider_id)
+            ->whereJsonContains('metadata->transport_booking_id', $booking->id)
+            ->firstOrFail();
+
+        $provider = $booking->provider;
+        $brand = app(\App\Services\TransportReceiptService::class)->buildBrandForPdf($provider);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.transport-receipt', [
+            'invoice'  => $invoice,
+            'booking'  => $booking,
+            'provider' => $provider,
+            'brand'    => $brand,
+        ]);
+
+        return $pdf->download('receipt-' . $invoice->invoice_number . '.pdf');
+    }
 }

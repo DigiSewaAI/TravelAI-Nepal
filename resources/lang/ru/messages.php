@@ -3022,4 +3022,7 @@ return array (
   'public_complete_payment' => 'Завершить оплату',
   'payment_proof_submitted_success' => 'Подтверждение оплаты отправлено! Провайдер скоро проверит.',
     'transport_booking' => 'Бронирование транспорта',
+      // ── Payment receipt (public + traveler) ──
+  'payment_receipt' => 'Квитанция об оплате',
+  'download_receipt' => 'Скачать квитанцию',
 );

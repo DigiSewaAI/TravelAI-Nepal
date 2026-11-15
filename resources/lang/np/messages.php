@@ -3486,4 +3486,7 @@ return array (
   'public_complete_payment' => 'भुक्तानी पूरा गर्नुहोस्',
   'payment_proof_submitted_success' => 'भुक्तानी प्रमाण पेश भयो! प्रदायकले चाँडै प्रमाणित गर्नुहुनेछ।',
     'transport_booking' => 'यातायात बुकिंग',
+      // ── Payment receipt (public + traveler) ──
+  'payment_receipt' => 'भुक्तानी रसिद',
+  'download_receipt' => 'रसिद डाउनलोड गर्नुहोस्',
 );

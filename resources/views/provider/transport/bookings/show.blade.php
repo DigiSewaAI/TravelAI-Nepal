@@ -153,6 +153,15 @@
             💵 Pay on Arrival — Collect payment at departure. Use "Confirm Booking" to accept.
         </div>
         @endif
+
+        @if(($booking->payment_status ?? 'pending') === 'paid')
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line,#e4ecf6)">
+            <a href="{{ route('provider.transport.bookings.receipt', $booking->id) }}"
+               style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;border-radius:10px;font-weight:800;font-size:13px;text-decoration:none">
+                📄 Download Payment Receipt
+            </a>
+        </div>
+        @endif
     </div>
 
     {{-- STATUS ACTIONS --}}

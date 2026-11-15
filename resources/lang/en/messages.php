@@ -3499,4 +3499,6 @@ return array (
     'public_complete_payment' => 'Complete Payment',
   'payment_proof_submitted_success' => 'Payment proof submitted! The provider will verify shortly.',
     'transport_booking' => 'Transport Booking',
+      'payment_receipt' => 'Payment Receipt',
+  'download_receipt' => 'Download Receipt',
 );
