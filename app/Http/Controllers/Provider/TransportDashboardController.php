@@ -283,13 +283,95 @@ class TransportDashboardController extends Controller
     {
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider, 403, 'Provider not found.');
-        $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
-        $routes = $vehicles->whereNotNull('route_name')->groupBy('route_name');
 
+        $routes = \App\Models\TransportRoute::with(['fromLocation:id,city,state', 'toLocation:id,city,state'])
+            ->withCount('trips')
+            ->where('provider_id', $provider->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $locations = \App\Models\Location::where('is_habitable', true)
+            ->orderBy('city')
+            ->get(['id', 'city', 'state']);
+
+        $vehicles = TransportVehicle::where('provider_id', $provider->id)->get();
         $totalFleet = $vehicles->count();
         $activeFleet = $vehicles->whereIn('status', ['available', 'on-route'])->count();
 
-        return view('provider.transport.routes', compact('provider', 'routes', 'activeFleet', 'totalFleet'));
+        return view('provider.transport.routes', compact('provider', 'routes', 'locations', 'activeFleet', 'totalFleet'));
+    }
+
+    public function storeRoute(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'from_location_id' => 'required|exists:locations,id',
+            'to_location_id'   => 'required|exists:locations,id|different:from_location_id',
+            'duration_minutes' => 'nullable|integer|min:0',
+            'distance_km'      => 'nullable|numeric|min:0',
+        ]);
+
+        $exists = \App\Models\TransportRoute::where('provider_id', $provider->id)
+            ->where('from_location_id', $validated['from_location_id'])
+            ->where('to_location_id', $validated['to_location_id'])
+            ->exists();
+        if ($exists) {
+            return back()->withErrors(['from_location_id' => 'This route already exists for your account.'])->withInput();
+        }
+
+        $fromLoc = \App\Models\Location::find($validated['from_location_id']);
+        $toLoc = \App\Models\Location::find($validated['to_location_id']);
+
+        \App\Models\TransportRoute::create([
+            'provider_id'      => $provider->id,
+            'from_location_id' => $validated['from_location_id'],
+            'to_location_id'   => $validated['to_location_id'],
+            'name'             => $fromLoc->city . ' → ' . $toLoc->city,
+            'duration_minutes' => $validated['duration_minutes'] ?? 0,
+            'distance_km'      => $validated['distance_km'] ?? null,
+            'is_active'        => true,
+        ]);
+
+        return back()->with('success', 'Route created successfully.');
+    }
+
+    public function updateRoute(Request $request, \App\Models\TransportRoute $route)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $route->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'from_location_id' => 'required|exists:locations,id',
+            'to_location_id'   => 'required|exists:locations,id|different:from_location_id',
+            'duration_minutes' => 'nullable|integer|min:0',
+            'distance_km'      => 'nullable|numeric|min:0',
+            'is_active'        => 'nullable|boolean',
+        ]);
+
+        $fromLoc = \App\Models\Location::find($validated['from_location_id']);
+        $toLoc = \App\Models\Location::find($validated['to_location_id']);
+
+        $validated['name'] = $fromLoc->city . ' → ' . $toLoc->city;
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $route->update($validated);
+
+        return back()->with('success', 'Route updated successfully.');
+    }
+
+    public function destroyRoute(\App\Models\TransportRoute $route)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $route->provider_id === $provider->id, 403);
+
+        if ($route->trips()->count() > 0) {
+            return back()->withErrors(['route' => 'Cannot delete — this route has scheduled trips. Cancel/remove trips first.']);
+        }
+
+        $route->delete();
+        return back()->with('success', 'Route deleted successfully.');
     }
 
     public function driversPage()

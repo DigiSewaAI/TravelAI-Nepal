@@ -372,6 +372,9 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
             // Transport Sidebar Unlocks (Read-Only Views)
     Route::get('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'vehiclesPage'])->name('transport.vehicles');
     Route::get('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'routesPage'])->name('transport.routes');
+    Route::post('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeRoute'])->name('transport.routes.store');
+    Route::put('/transport/routes/{route}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateRoute'])->name('transport.routes.update');
+    Route::delete('/transport/routes/{route}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyRoute'])->name('transport.routes.destroy');
     Route::get('/transport/drivers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'driversPage'])->name('transport.drivers');
         Route::get('/transport/reports', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'reportsPage'])->name('transport.reports');
 Route::post('/transport/ai/vehicle-assignment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiVehicleAssignment'])->name('transport.ai.vehicle');
