@@ -364,6 +364,10 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
     Route::patch('/transport/bookings/{booking}/verify-payment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'verifyPayment'])->name('transport.bookings.verify-payment');
     Route::patch('/transport/bookings/{booking}/verify-payment-proof', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'verifyPaymentProof'])->name('transport.bookings.verify-payment-proof');
     Route::get('/transport/bookings/{booking}/receipt', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'downloadReceipt'])->name('transport.bookings.receipt');
+    Route::get('/transport/cancellations', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'cancellationsPage'])->name('transport.cancellations');
+    Route::patch('/transport/cancellations/{cancellation}/approve', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'approveCancellation'])->name('transport.cancellations.approve');
+    Route::patch('/transport/cancellations/{cancellation}/reject', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'rejectCancellation'])->name('transport.cancellations.reject');
+    Route::patch('/transport/cancellations/{cancellation}/refund', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'markRefunded'])->name('transport.cancellations.refund');
     Route::patch('/transport/bookings/{booking}/reject-payment-proof', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'rejectPaymentProof'])->name('transport.bookings.reject-payment-proof');
         // Transport CRUD Routes
     Route::post('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeVehicle'])->name('transport.vehicles.store');
@@ -1022,6 +1026,8 @@ Route::middleware(['auth'])
         Route::get('/{id}', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'show'])->name('show');
         Route::post('/{id}/payment-proof', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'uploadProof'])->name('payment-proof');
         Route::get('/{id}/receipt', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'downloadReceipt'])->name('receipt');
+        Route::get('/{id}/cancel', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'showCancelForm'])->name('cancel-request');
+        Route::post('/{id}/cancel', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'requestCancel'])->name('cancel-request.store');
     });
 // ═══ PHASE 4.4 — HOTEL CLAIM ROUTES ═══
 Route::middleware(['auth', 'feature.flag:claim.hotel_enabled'])

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Order;
 use App\Models\WholesaleRfq;
+use App\Models\TransportBooking;
 use Illuminate\Support\Facades\Auth;
 
 class UnifiedBookingController extends Controller
@@ -23,20 +24,26 @@ class UnifiedBookingController extends Controller
 
         $rfqs = WholesaleRfq::where('buyer_id', $userId)->with('product', 'provider')->latest()->get();
 
+        $transportBookings = TransportBooking::where('passenger_email', Auth::user()->email)
+            ->with(['trip.vehicle', 'trip.route', 'provider', 'vehicle'])
+            ->latest()
+            ->get();
+
         $tab = request('tab', 'all');
-        if (!in_array($tab, ['all','treks','shop','rental','wholesale','rfqs'], true)) $tab = 'all';
+        if (!in_array($tab, ['all','treks','shop','rental','wholesale','rfqs','transport'], true)) $tab = 'all';
 
         $counts = [
-            'all'       => $treks->count() + $orders->count() + $rfqs->count(),
+            'all'       => $treks->count() + $orders->count() + $rfqs->count() + $transportBookings->count(),
             'treks'     => $treks->count(),
             'shop'      => $shopOrders->count(),
             'rental'    => $rentalOrders->count(),
             'wholesale' => $wholesaleOrders->count(),
             'rfqs'      => $rfqs->count(),
+            'transport' => $transportBookings->count(),
         ];
 
         return view('traveler.my-bookings.index', compact(
-            'treks', 'shopOrders', 'rentalOrders', 'wholesaleOrders', 'rfqs', 'tab', 'counts'
+            'treks', 'shopOrders', 'rentalOrders', 'wholesaleOrders', 'rfqs', 'transportBookings', 'tab', 'counts'
         ));
     }
 }

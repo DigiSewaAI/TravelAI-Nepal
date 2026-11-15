@@ -2438,4 +2438,11 @@ return array (
       // ── Payment receipt (public + traveler) ──
   'payment_receipt' => '付款收据',
   'download_receipt' => '下载收据',
+    // ── Cancellation ──
+  'cancellation_request' => '取消请求',
+  'cancellation_requested' => '取消请求已提交。',
+  'cancellation_approved' => '取消已批准。',
+  'cancellation_rejected' => '取消已拒绝。',
+  'cancellation' => '取消',
+    'tab_transport' => '交通',
 );

@@ -227,6 +227,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.5-2V4L9 6"/><path d="M15 4l5.5 2v14L15 18"/><path d="M9 6l6-2"/><path d="M9 20l6-2"/></svg>
       Routes &amp; Trips
     </a>
+    <a href="{{ route('provider.transport.cancellations') }}" class="{{ request()->routeIs('provider.transport.cancellations*') ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      Cancellations
+    </a>
     <a href="{{ route('provider.transport.drivers') }}" class="{{ request()->routeIs('provider.transport.drivers') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       {{ __('messages.drivers') }}

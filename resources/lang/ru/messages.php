@@ -3025,4 +3025,11 @@ return array (
       // ── Payment receipt (public + traveler) ──
   'payment_receipt' => 'Квитанция об оплате',
   'download_receipt' => 'Скачать квитанцию',
+    // ── Cancellation ──
+  'cancellation_request' => 'Запрос на отмену',
+  'cancellation_requested' => 'Запрос на отмену отправлен.',
+  'cancellation_approved' => 'Отмена одобрена.',
+  'cancellation_rejected' => 'Отмена отклонена.',
+  'cancellation' => 'Отмена',
+    'tab_transport' => 'Транспорт',
 );

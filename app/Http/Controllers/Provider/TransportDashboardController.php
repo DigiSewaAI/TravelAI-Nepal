@@ -217,6 +217,130 @@ class TransportDashboardController extends Controller
 
         return $pdf->download('receipt-' . $invoice->invoice_number . '.pdf');
     }
+        public function cancellationsPage()
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $requests = \App\Models\TransportCancellationRequest::with([
+                'booking.trip.route.fromLocation',
+                'booking.trip.route.toLocation',
+                'booking.vehicle',
+                'requester',
+            ])
+            ->whereHas('booking', fn($q) => $q->where('provider_id', $provider->id))
+            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        return view('provider.transport.cancellations.index', compact('requests', 'provider'));
+    }
+
+    public function approveCancellation(\App\Models\TransportCancellationRequest $cancellation)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $cancellation->booking?->provider_id === $provider->id, 403);
+
+        if ($cancellation->status !== 'pending') {
+            return back()->withErrors(['cancel' => 'Request already ' . $cancellation->status . '.']);
+        }
+
+        \DB::transaction(function () use ($cancellation) {
+            $booking = $cancellation->booking;
+            $oldBookingStatus = $booking->status;
+
+            $refundStatus = ($booking->payment_status === 'paid' && (float) $cancellation->estimated_refund > 0)
+                ? 'pending'
+                : 'none';
+
+            $cancellation->update([
+                'status'         => 'approved',
+                'refund_status'  => $refundStatus,
+                'responded_at'   => now(),
+            ]);
+
+            $booking->update([
+                'status'              => 'cancelled',
+                'cancellation_status' => 'approved',
+                'cancelled_at'        => now(),
+            ]);
+
+            if ($booking->trip_id && $oldBookingStatus !== 'cancelled') {
+                $trip = \App\Models\TransportTrip::lockForUpdate()->find($booking->trip_id);
+                if ($trip) {
+                    $restore = $booking->booking_type === 'full_vehicle'
+                        ? $trip->seats_total
+                        : (int) $booking->passenger_count;
+                    $trip->update([
+                        'seats_available' => min($trip->seats_total, $trip->seats_available + $restore),
+                    ]);
+                }
+            }
+
+            try {
+                $traveler = \App\Models\User::where('email', $booking->passenger_email)->first();
+                if ($traveler) {
+                    $traveler->notify(new \App\Notifications\CancellationApprovedNotification($booking, $cancellation));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Cancel approve notify failed', ['id' => $cancellation->id]);
+            }
+        });
+
+        return back()->with('success', 'Cancellation approved. Seats restored. Traveler notified.');
+    }
+
+    public function rejectCancellation(Request $request, \App\Models\TransportCancellationRequest $cancellation)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $cancellation->booking?->provider_id === $provider->id, 403);
+
+        if ($cancellation->status !== 'pending') {
+            return back()->withErrors(['cancel' => 'Request already ' . $cancellation->status . '.']);
+        }
+
+        $validated = $request->validate([
+            'provider_response' => 'required|string|max:500',
+        ]);
+
+        \DB::transaction(function () use ($cancellation, $validated) {
+            $cancellation->update([
+                'status'            => 'rejected',
+                'provider_response' => $validated['provider_response'],
+                'responded_at'      => now(),
+            ]);
+
+            $cancellation->booking->update(['cancellation_status' => 'rejected']);
+
+            try {
+                $traveler = \App\Models\User::where('email', $cancellation->booking->passenger_email)->first();
+                if ($traveler) {
+                    $traveler->notify(new \App\Notifications\CancellationRejectedNotification($cancellation));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Cancel reject notify failed', ['id' => $cancellation->id]);
+            }
+        });
+
+        return back()->with('success', 'Cancellation request rejected. Traveler notified.');
+    }
+
+    public function markRefunded(\App\Models\TransportCancellationRequest $cancellation)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $cancellation->booking?->provider_id === $provider->id, 403);
+
+        if ($cancellation->refund_status !== 'pending') {
+            return back()->withErrors(['refund' => 'Refund not pending.']);
+        }
+
+        $cancellation->update([
+            'refund_status' => 'refunded',
+            'refunded_at'   => now(),
+        ]);
+
+        return back()->with('success', '💰 Refund marked as completed.');
+    }
 
     public function rejectPaymentProof(Request $request, TransportBooking $booking)
     {

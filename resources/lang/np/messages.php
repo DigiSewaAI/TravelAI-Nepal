@@ -3489,4 +3489,11 @@ return array (
       // ── Payment receipt (public + traveler) ──
   'payment_receipt' => 'भुक्तानी रसिद',
   'download_receipt' => 'रसिद डाउनलोड गर्नुहोस्',
+    // ── Cancellation ──
+  'cancellation_request' => 'रद्द गर्ने अनुरोध',
+  'cancellation_requested' => 'रद्द गर्ने अनुरोध पेश भयो।',
+  'cancellation_approved' => 'रद्द स्वीकृत भयो।',
+  'cancellation_rejected' => 'रद्द अस्वीकृत भयो।',
+  'cancellation' => 'रद्द',
+    'tab_transport' => 'यातायात',
 );

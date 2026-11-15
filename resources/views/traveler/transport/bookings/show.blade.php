@@ -113,7 +113,12 @@
         </div>
     @elseif(($booking->payment_status ?? 'pending') === 'paid')
         <div style="background:#dcfce7;border:1px solid #86efac;padding:16px;border-radius:14px;margin-top:16px;color:#166534;font-size:13px;font-weight:600">
-            ✅ <strong>Payment Verified</strong> — Thank you! Your booking is confirmed.
+            ✅ <strong>Payment Verified</strong>
+            @if($booking->status === 'cancelled')
+                — Booking was cancelled{{ $booking->cancellation_status === 'approved' ? ' (refund may be pending)' : '' }}.
+            @else
+                — Thank you! Your booking is confirmed.
+            @endif
             <div style="margin-top:12px">
                 <a href="{{ route('traveler.transport.bookings.receipt', $booking->id) }}"
                    style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#059669;color:#fff;border-radius:8px;font-weight:700;font-size:12px;text-decoration:none">
@@ -121,6 +126,25 @@
                 </a>
             </div>
         </div>
+    @endif
+
+    {{-- Cancellation --}}
+    @if(in_array($booking->status, ['pending', 'confirmed']) && !$booking->cancellation_status)
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-top:16px">
+        <h3 style="font-size:14px;font-weight:800;margin:0 0 10px">🚫 Cancellation</h3>
+        <p style="font-size:12px;color:#64748b;margin:0 0 12px">Need to cancel this booking? Submit a cancellation request to the provider.</p>
+        <a href="{{ route('traveler.transport.bookings.cancel-request', $booking->id) }}" style="display:inline-block;padding:10px 18px;background:#fef4e2;color:#b45309;border:1px solid #fbbf24;border-radius:10px;font-weight:800;font-size:12px;text-decoration:none">
+            Request Cancellation
+        </a>
+    </div>
+    @elseif($booking->cancellation_status === 'pending')
+    <div style="background:#fef4e2;border:1px solid #fbbf24;border-radius:14px;padding:16px;margin-top:16px;color:#92400e;font-size:13px;font-weight:700">
+        ⏳ Cancellation request pending — waiting for provider response.
+    </div>
+    @elseif($booking->cancellation_status === 'rejected')
+    <div style="background:#fdecec;border:1px solid #fca5a5;border-radius:14px;padding:16px;margin-top:16px;color:#991b1b;font-size:13px;font-weight:700">
+        ❌ Cancellation request was rejected by the provider.
+    </div>
     @endif
 </div>
 @endsection

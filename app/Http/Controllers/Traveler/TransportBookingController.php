@@ -8,6 +8,7 @@ use App\Models\ProviderPaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\TransportCancellationRequest;
 
 class TransportBookingController extends Controller
 {
@@ -112,5 +113,92 @@ class TransportBookingController extends Controller
         ]);
 
         return $pdf->download('receipt-' . $invoice->invoice_number . '.pdf');
+    }
+        public function showCancelForm($id)
+    {
+        $booking = TransportBooking::with(['trip.route', 'provider'])
+            ->where('passenger_email', $this->travelerEmail())
+            ->findOrFail($id);
+
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+            return redirect()->route('traveler.transport.bookings.show', $id)
+                ->withErrors(['cancel' => 'This booking cannot be cancelled.']);
+        }
+
+        if ($booking->cancellation_status) {
+            return redirect()->route('traveler.transport.bookings.show', $id)
+                ->withErrors(['cancel' => 'Cancellation request already exists.']);
+        }
+
+        // Calculate hours until departure
+        $departure = \Carbon\Carbon::parse($booking->travel_date->format('Y-m-d') . ' ' . ($booking->travel_time ?? '00:00:00'));
+        $hoursUntil = max(0, now()->diffInHours($departure, false));
+
+        // Refund calculation
+        $refundPct = 0;
+        if (($booking->payment_status ?? 'pending') === 'paid') {
+            if ($hoursUntil >= 24) $refundPct = 1.0;
+            elseif ($hoursUntil >= 12) $refundPct = 0.5;
+        }
+        $estimatedRefund = $refundPct * (float) ($booking->total_amount ?? $booking->amount ?? 0);
+
+        // Policy display
+        $policy = $booking->provider?->services()->first()?->transportDetail?->cancellation_policy
+            ?? "Full refund (100%) if cancelled 24+ hours before departure.\nPartial refund (50%) if cancelled 12-24 hours before departure.\nNo refund if cancelled less than 12 hours before departure.\nPay on Arrival bookings require no refund.";
+
+        return view('traveler.transport.bookings.cancel-request', compact('booking', 'hoursUntil', 'estimatedRefund', 'policy'));
+    }
+
+    public function requestCancel(Request $request, $id)
+    {
+        $booking = TransportBooking::where('passenger_email', $this->travelerEmail())
+            ->findOrFail($id);
+
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+            return back()->withErrors(['cancel' => 'This booking cannot be cancelled.']);
+        }
+
+        if ($booking->cancellation_status) {
+            return back()->withErrors(['cancel' => 'Cancellation request already exists.']);
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        $departure = \Carbon\Carbon::parse($booking->travel_date->format('Y-m-d') . ' ' . ($booking->travel_time ?? '00:00:00'));
+        $hoursUntil = max(0, now()->diffInHours($departure, false));
+
+        $refundPct = 0;
+        if (($booking->payment_status ?? 'pending') === 'paid') {
+            if ($hoursUntil >= 24) $refundPct = 1.0;
+            elseif ($hoursUntil >= 12) $refundPct = 0.5;
+        }
+        $estimatedRefund = $refundPct * (float) ($booking->total_amount ?? $booking->amount ?? 0);
+
+        \DB::transaction(function () use ($booking, $validated, $estimatedRefund) {
+            TransportCancellationRequest::create([
+                'transport_booking_id' => $booking->id,
+                'requested_by'         => Auth::id(),
+                'reason'               => $validated['reason'],
+                'estimated_refund'     => $estimatedRefund,
+                'status'               => 'pending',
+                'refund_status'        => 'none',
+            ]);
+
+            $booking->update(['cancellation_status' => 'pending']);
+
+            try {
+                $providerUser = $booking->provider?->user;
+                if ($providerUser) {
+                    $providerUser->notify(new \App\Notifications\CancellationRequestedNotification($booking));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Cancel request notify failed', ['id' => $booking->id]);
+            }
+        });
+
+        return redirect()->route('traveler.transport.bookings.show', $id)
+            ->with('success', 'Cancellation request submitted. The provider will respond shortly.');
     }
 }

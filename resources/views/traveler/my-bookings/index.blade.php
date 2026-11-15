@@ -13,7 +13,7 @@
 
     {{-- Tabs --}}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-        @foreach(['all'=>__('messages.tab_all'),'treks'=>__('messages.tab_treks'),'shop'=>__('messages.tab_shop'),'rental'=>__('messages.tab_rental'),'wholesale'=>__('messages.tab_wholesale'),'rfqs'=>__('messages.tab_rfqs')] as $key => $label)
+        @foreach(['all'=>__('messages.tab_all'),'treks'=>__('messages.tab_treks'),'shop'=>__('messages.tab_shop'),'rental'=>__('messages.tab_rental'),'wholesale'=>__('messages.tab_wholesale'),'rfqs'=>__('messages.tab_rfqs'),'transport'=>'🚐 Transport'] as $key => $label)
             @php $active = ($tab === $key); @endphp
             <a href="{{ route('traveler.my-bookings', array_merge(['tab'=>$key], request('ctx') ? ['ctx'=>request('ctx')] : [])) }}"
                style="padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;transition:.2s;{{ $active ? 'background:var(--accent,#6366f1);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.12)' : 'background:var(--card,#fff);color:var(--muted,#6b7280);border:1px solid var(--line,#e5e7eb)' }}">
@@ -99,13 +99,56 @@
             @endforeach
         @endif
 
+        @if($tab === 'all' || $tab === 'transport')
+            @foreach($transportBookings as $tb)
+                @php
+                    $tbStatusColor = [
+                        'pending'   => ['#fef4e2','#b45309'],
+                        'confirmed' => ['#e7f8f1','#059669'],
+                        'cancelled' => ['#fdecec','#dc2626'],
+                        'completed' => ['#f3f4f6','#6b7280'],
+                    ][$tb->status] ?? ['#f3f4f6','#6b7280'];
+                @endphp
+                <a href="{{ route('traveler.transport.bookings.show', $tb->id) }}"
+                   style="display:block;background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:var(--radius,18px);padding:18px 20px;text-decoration:none;color:inherit;transition:.2s"
+                   onmouseover="this.style.boxShadow='0 10px 24px rgba(0,0,0,.08)'"
+                   onmouseout="this.style.boxShadow='none'">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+                        <div style="min-width:0;flex:1">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+                                <span style="padding:3px 9px;border-radius:6px;background:#e0f2fe;color:#0369a1;font-size:10px;font-weight:800;letter-spacing:.4px">🚐 TRANSPORT</span>
+                                <span style="font-weight:800;font-size:14px;color:var(--text,#111827);font-family:monospace">{{ $tb->booking_ref }}</span>
+                            </div>
+                            <div style="font-size:13px;color:var(--text,#111827);font-weight:600">{{ $tb->route_name }}</div>
+                            <div style="font-size:12px;color:var(--muted,#6b7280);margin-top:2px">
+                                📅 {{ $tb->travel_date?->format('M d, Y') }}
+                                @if($tb->travel_time) · {{ substr($tb->travel_time, 0, 5) }} @endif
+                                · {{ $tb->passenger_count }} pax
+                            </div>
+                            @if($tb->cancellation_status === 'pending')
+                            <div style="font-size:11px;color:#b45309;font-weight:800;margin-top:6px">⏳ Cancellation pending</div>
+                            @endif
+                        </div>
+                        <div style="text-align:right;flex-shrink:0">
+                            <span style="padding:5px 12px;border-radius:8px;background:{{ $tbStatusColor[0] }};color:{{ $tbStatusColor[1] }};font-size:11px;font-weight:800;text-transform:uppercase;display:inline-block">{{ $tb->status }}</span>
+                            <div style="font-weight:800;color:var(--accent,#6366f1);margin-top:6px;font-size:14px">Rs {{ number_format((float)($tb->total_amount ?? $tb->amount ?? 0), 2) }}</div>
+                            @if(($tb->payment_status ?? 'pending') === 'paid')
+                                <div style="font-size:10px;color:#059669;font-weight:800;margin-top:2px">💳 PAID</div>
+                            @endif
+                        </div>
+                    </div>
+                </a>
+            @endforeach
+        @endif
+
         @if(
             ($tab === 'all' && $counts['all'] === 0) ||
             ($tab === 'treks' && $counts['treks'] === 0) ||
             ($tab === 'shop' && $counts['shop'] === 0) ||
             ($tab === 'rental' && $counts['rental'] === 0) ||
             ($tab === 'wholesale' && $counts['wholesale'] === 0) ||
-            ($tab === 'rfqs' && $counts['rfqs'] === 0)
+            ($tab === 'rfqs' && $counts['rfqs'] === 0) ||
+            ($tab === 'transport' && $counts['transport'] === 0)
         )
             <div style="text-align:center;padding:60px 20px;background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:var(--radius,18px);color:var(--muted,#6b7280)">
                 <p style="margin:0 0 16px;font-size:14px">{{ __('messages.no_bookings_category_yet') }}</p>

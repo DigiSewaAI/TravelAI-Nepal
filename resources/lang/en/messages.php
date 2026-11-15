@@ -3501,4 +3501,10 @@ return array (
     'transport_booking' => 'Transport Booking',
       'payment_receipt' => 'Payment Receipt',
   'download_receipt' => 'Download Receipt',
+    'cancellation_request' => 'Cancellation Request',
+  'cancellation_requested' => 'Cancellation request submitted.',
+  'cancellation_approved' => 'Cancellation approved.',
+  'cancellation_rejected' => 'Cancellation rejected.',
+  'cancellation' => 'Cancellation',
+    'tab_transport' => 'Transport',
 );

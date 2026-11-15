@@ -2427,4 +2427,11 @@ return array (
       // ── Payment receipt (public + traveler) ──
   'payment_receipt' => 'भुगतान रसीद',
   'download_receipt' => 'रसीद डाउनलोड करें',
+    // ── Cancellation ──
+  'cancellation_request' => 'रद्दीकरण अनुरोध',
+  'cancellation_requested' => 'रद्दीकरण अनुरोध सबमिट हो गया।',
+  'cancellation_approved' => 'रद्दीकरण स्वीकृत हो गया।',
+  'cancellation_rejected' => 'रद्दीकरण अस्वीकृत हो गया।',
+  'cancellation' => 'रद्दीकरण',
+    'tab_transport' => 'परिवहन',
 );
