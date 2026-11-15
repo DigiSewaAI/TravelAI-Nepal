@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-15 (Transport Phase C — Chunks 1-4 Complete, Payment + Receipt Flow Live)  
-**Current Commit:** `TBD-after-chunk4` (Transport Phase C Chunks 1-4 — 15 commits ahead of origin/main)  
+**Last Updated:** 2026-11-15 (Transport Phase C COMPLETE — 6 Chunks Done + ArtCraft A+ Approved)  
+**Current Commit:** `02527fb` (Transport Phase C 100% complete — 18 commits ahead)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -23,11 +23,11 @@
 ## 📊 CURRENT STATE — Verified
 
 ### Git Status
-- **HEAD:** `4339259` (Chunks 2+3) + pending Chunk 4 commit
+- **HEAD:** `02527fb` (Transport Phase C — Chunk 6 final)
 - **Branch:** main
-- **Ahead of origin/main by:** 15 commits (after Chunk 4 commit)
+- **Ahead of origin/main by:** 18 commits
 - **Tests:** 297 passed, 1 skipped (1970 assertions)
-- **Production:** 🟡 15 commits pending push (after Chunk 5-6 + remaining verticals + Admin Notification complete)
+- **Production:** 🟡 18 commits pending push (after ArtCraft + Individual + MoneyChanger + Admin Notification complete)
 
 ### Environment
 - **PHP:** 8.4.27 (Laragon, Device Guard exclusion applied)
@@ -480,8 +480,34 @@ Provider
 - Push (एकैचोटि)
 
 ### 16. Transport Phase C — Payments & Cancellation (Master APPROVED 2026-11-15, C/A/B/A)
-**Status:** ✅ **ALL 6 CHUNKS COMPLETE** (2026-11-15)
-**Commit:** `5defb0a` (Chunks 5 complete) + Chunk 6 polish
+**Status:** ✅ **ALL 6 CHUNKS COMPLETE** (2026-11-15) — **Transport CLOSE**
+**Commits:** Chunk 1 `ece6a03`/`a96204a` + `ece6a03` | Chunks 2+3 `4339259` | Chunk 4 `6ffda0d` | Chunk 5 `5defb0a` | Chunk 6 `02527fb`
+
+**Chunk 5 (`5defb0a`):** Traveler Cancellation + Provider Approve/Reject/Refund
+- Migrations: `transport_cancellation_requests` (unique booking_id, reason, estimated_refund, status, refund_status) + `transport_bookings.cancellation_status`/`cancelled_at`
+- Model: `TransportCancellationRequest` + `TransportBooking::cancellationRequest()` relation
+- Traveler: `showCancelForm` (policy + hours + refund calculator), `requestCancel`
+- Refund rules: 24h+ → 100%, 12-24h → 50%, <12h → 0%, PAY → 0%
+- Provider: `cancellationsPage`, `approveCancellation` (seat restore + refund_status='pending'), `rejectCancellation`, `markRefunded` (manual)
+- Notifications: `CancellationRequested/Approved/Rejected`
+- Views: `cancel-request.blade.php`, `provider/transport/cancellations/index.blade.php`
+- **My Bookings integration:** `UnifiedBookingController` + `my-bookings/index.blade.php` — Transport tab + cards
+- Fix: Double ✅ (flash), "Payment Verified — Booking was cancelled" (cancelled state)
+
+**Chunk 6 (`02527fb`):** Polish
+- Hours display `22h 9m` (float → readable)
+- Doc update
+
+**Total Transport Feature Set (Phase 1 + B + C):**
+- Public search flow (date + from/to → trips → booking)
+- Payment: advance/PAY/both (per provider) + 5 primary method safety rules
+- Payment proof upload + verify/reject + receipt PDF (VAT-free, plan-gated logo)
+- Invoice table reuse via metadata JSON
+- Traveler cancellation request + provider approve/reject/refund
+- My Bookings integration
+- Full i18n (5 locales)
+
+**Chunks 1-4 details:** (see below)
 
 **Chunks 1-4 (✅ COMPLETE):**
 
@@ -725,9 +751,245 @@ Provider
 | **TRAVELER-CANCEL-POLICY-UI-01** | Chunk 5 follow-up — policy display + estimated refund calculator (client-side) | 🟡 Medium |
 | **PROVIDER-REFUND-TRACKER-01** | After cancellation approve — track manual refund status (audit trail) | 🟡 Medium |
 
+### 17. ArtCraft A+ — Digital Art Gallery + Custom Commission + Quotation System
+**Status:** 🟡 Not started — Phase 1 (Schema) approved, कोई code नै
+**Master Decision (2026-11-15, after ChatGPT + DeepSeek audit):** A+ (production-quality, not MVP)
+**Total scope:** ~16-18 hours (5 phases)
+
+**Master Directive:**
+> "ArtCraft = Digital Art Gallery + Custom Commission + Quotation & Order Management. Production-quality, future-ready (international + payment-ready), कोई shortcut नै।"
+
+**Audit Findings (Rule A — verified):**
+| Component | State |
+|---|---|
+| Artwork model + table | ✅ EXISTS (`name, artist_name, category, price, material_cost, labor_hours, labor_cost, craftsmanship_level, status, emoji, gradient`) — **कोई image नै** |
+| CustomOrder model + table | ✅ EXISTS (`booking_number, client_name, client_email, type, budget, deadline, status`) — **कोई description/reference/quotation नै** |
+| ArtCraftDetail model | ✅ craft_type, materials, artist_name, dimensions, is_handmade (reuse public display) |
+| Provider dashboard | ✅ FULL (13 routes: dashboard, gallery, orders, artists, sales + AI endpoints) |
+| Provider views | ✅ dashboard, gallery, orders, orders/show, artists, sales |
+| Public page | ❌ नै |
+| Public controller | ❌ नै |
+| ArtCraft mails | ❌ कोई नै |
+| ArtCraft notifications | ❌ कोई नै |
+| Traveler Claim flow | ✅ FULL (OTP, existing) |
+| **2 Critical bugs** | 1) `updateOrderStatus` validation `in:pending,progress,done` vs DB actual `pending,in_progress,completed` mismatch<br>2) `booking_number` NULL (boot() `whereYear('created_at',...)` fail because created_at NULL on creating event) |
+
+**Master Decisions (ChatGPT reviewed, all approved with corrections):**
+| # | Decision | Choice |
+|---|---|---|
+| 1 | Order status expansion | **GO with transition rules** — preserve `pending/in_progress/completed` + add `under_review, quoted, accepted, revision_requested, rejected, ready_for_delivery, cancelled`. Valid transitions per role. Customer direct `cancelled` नै। |
+| 2 | Reference image storage | **OPTION B (Private)** — no public URL, authorized access via controller, MIME/size validation, randomized filenames |
+| 3 | Ready-made vs Custom | **OPTION A modified** — single `custom_orders` table + `request_type` (`ready_made`/`custom`) + `ready_made_artwork_id` nullable FK. `type` = craft category (painting/sculpture/pottery). |
+| 4 | Online payment | **NO** (future ticket `ARTCRAFT-PAYMENT-FLOW-01`) |
+| 5 | Quotation revision | **Immutable history** — `custom_order_quotes` table, version unique per order, never overwrite |
+| 6 | Accepted quote | **Atomic** + one accepted per order + `accepted_quote_id` + snapshots (`quoted_amount`, `currency`) — immutable |
+| 7 | Cancellation | **Request-based** — customer → `cancellation_requested` field, provider approves → `cancelled` (final). Customer direct `cancelled` नै। |
+| 8 | Booking number | `ART-YYYY-NNNN` + **transaction-safe + unique constraint + retry on collision** + backfill NULL safely |
+| 9 | `is_published` | Default **false** (safety) — provider explicit publish |
+| 10 | Snapshot currency | Both `artworks` and `custom_orders` — preserve currency (NPR default, future multi) |
+
+**Architecture — Two Journeys:**
+
+**A. Ready-made Artwork (fixed price):**
+- Public gallery → artwork detail (image, artist, materials, dimensions, price, availability)
+- Enquire / Reserve Request (customer form: name, email, message)
+- `CustomOrder::create(request_type='ready_made', ready_made_artwork_id=...)`
+- Snapshot: `artwork_name_snapshot`, `artwork_price_snapshot`, `artwork_currency_snapshot`
+- Provider confirms availability → status progression
+
+**B. Custom Commission (quote-based):**
+- Public → "Request Custom Commission" form (type, description, reference image, materials, dimensions, quantity, budget, deadline, addresses)
+- `CustomOrder::create(request_type='custom', status='pending')`
+- Provider reviews → sends quote (`custom_order_quotes` version=1, status='pending')
+- Customer accepts/revision_requested/rejected
+- Revision → new quote (version=2), old quote status='superseded'
+- Accept → atomic: `accepted_quote_id` set, quote status='accepted', `custom_orders.quoted_amount` + `currency` snapshot
+- Status flow: `pending → under_review → quoted → accepted → in_progress → ready_for_delivery → completed`
+
+**Order Statuses (10):**
+`pending, under_review, quoted, accepted, revision_requested, rejected, in_progress, ready_for_delivery, completed, cancelled`
+
+**Status Transition Matrix:**
+- **Customer:** `quoted → accepted|revision_requested|rejected`, `ready_for_delivery → completed`
+- **Provider:** `pending → under_review|cancelled`, `under_review → quoted|cancelled`, `revision_requested → under_review|quoted`, `accepted → in_progress|cancelled`, `in_progress → ready_for_delivery`, `ready_for_delivery → completed`
+- **Terminal:** `rejected`, `cancelled` (admin recovery only)
+- **Role permissions separate from `canTransitionTo()`** — ownership check + auth अलग
+
+**Booking Number Strategy (concurrency-safe):**
+```php
+// DB unique constraint on booking_number (partial — NULL allowed)
+// Generation in a DB transaction with retry loop on unique collision
+static::creating(function ($model) {
+    if (empty($model->booking_number)) {
+        $year = date('Y');
+        $prefix = 'ART-' . $year . '-';
+        $maxAttempts = 5;
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            $lastSeq = static::where('booking_number', 'like', $prefix.'%')
+                ->lockForUpdate()
+                ->selectRaw('MAX(CAST(SUBSTRING(booking_number, -4) AS UNSIGNED)) as max_seq')
+                ->value('max_seq') ?? 0;
+            $candidate = $prefix . str_pad($lastSeq + 1 + $i, 4, '0', STR_PAD_LEFT);
+            if (!static::where('booking_number', $candidate)->exists()) {
+                $model->booking_number = $candidate;
+                return;
+            }
+        }
+        throw new \RuntimeException('Booking number generation failed after 5 attempts');
+    }
+});
+// + Migration: ALTER TABLE custom_orders ADD UNIQUE INDEX (booking_number)
+// + Backfill: existing NULL → next available sequence (query existing max)
+Quote Acceptance (atomic):
+
+php
+\DB::transaction(function () use ($order, $quote) {
+    // Lock order + quote
+    $lockedOrder = CustomOrder::lockForUpdate()->find($order->id);
+    $lockedQuote = CustomOrderQuote::lockForUpdate()->find($quote->id);
+
+    // Guard: no existing accepted
+    if ($lockedOrder->accepted_quote_id) {
+        throw new \RuntimeException('Order already has an accepted quote');
+    }
+
+    // Atomic update
+    $lockedQuote->update(['status' => 'accepted', 'responded_at' => now()]);
+    $lockedOrder->update([
+        'accepted_quote_id' => $lockedQuote->id,
+        'quoted_amount' => $lockedQuote->quoted_amount,
+        'quoted_at' => now(),
+        'status' => 'accepted',
+    ]);
+
+    // Supersede earlier pending quotes
+    CustomOrderQuote::where('custom_order_id', $order->id)
+        ->where('id', '!=', $quote->id)
+        ->where('status', 'pending')
+        ->update(['status' => 'superseded']);
+});
+// Accepted quotes = immutable (कोई edit/delete नै)
+Private Storage (Pre-implementation verify — Master requirement):
+
+⚠️ Verify Laravel Cloud persistent storage — local disk production मा persistent छ कि नै
+
+Options: Local disk (verify) OR S3-compatible (Laravel Cloud native)
+
+कोई public URL नै — controller stream + authorization (customer/provider/admin)
+
+MIME + size + extension validation + randomized filenames + cleanup on delete
+
+Schema (5 Migrations — order matters):
+
+text
+M1: add_public_fields_to_artworks_table
+    (image_path, additional_images JSON, description, materials, dimensions,
+     is_published BOOL default false, published_at)
+
+M2: expand_custom_orders_table (कोई FK अझै)
+    (request_type ENUM ready_made/custom default custom,
+     ready_made_artwork_id FK nullable → artworks,
+     description, materials, dimensions, quantity INT default 1,
+     reference_image_path, pickup_address, delivery_address,
+     quoted_amount DECIMAL, quoted_at, accepted_quote_id column (कोई FK अझै),
+     production_started_at, ready_at, completed_at, cancelled_at,
+     cancellation_requested BOOL default false, cancellation_reason TEXT,
+     artwork_name_snapshot, artwork_price_snapshot, artwork_currency_snapshot VARCHAR(3) default 'NPR',
+     accepted_quote_currency VARCHAR(3) nullable,
+     status enum expand → 10 states)
+
+M3: create_custom_order_quotes_table
+    (custom_order_id FK cascade, version INT,
+     quoted_amount DECIMAL, currency VARCHAR(3) default 'NPR',
+     materials TEXT, dimensions, quantity INT, production_days INT,
+     delivery_terms TEXT, advance_proposal DECIMAL nullable,
+     valid_until DATE, provider_message TEXT,
+     status ENUM pending/accepted/rejected/superseded default pending,
+     customer_response TEXT nullable, responded_at,
+     UNIQUE(custom_order_id, version))
+
+M4: add_accepted_quote_fk_to_custom_orders
+    (accepted_quote_id → custom_order_quotes onDelete set null — FK constraint only)
+
+M5: add_unique_booking_number_to_custom_orders
+    (UNIQUE INDEX on booking_number — partial, NULL allowed)
+5 Phases (Master approved):
+
+Phase	Files	Est.	Commit
+1 — Bug fixes + Schema	~10	~3h	1 commit
+2 — Public gallery	~7	~5h	1 commit
+3 — Emails + Notifications	~7	~3h	1 commit
+4 — Provider dashboard (quote + status)	~5	~4h	1 commit
+5 — E2E + i18n + Polish	ongoing	~2h	1 commit
+Existing Data Backfill (कोई destructive नै):
+
+1 CustomOrder → request_type='custom', booking_number = ART-2026-0001 (safe sequence check)
+
+6 Artworks → is_published=true (verified)
+
+Future artworks → default false
+
+Future Tickets (documented):
+
+ARTCRAFT-PAYMENT-FLOW-01 — advance/PAY reuse (Transport pattern)
+
+ARTCRAFT-PUBLIC-REFINE-01 — gallery filters, artist portfolio expansion
+
+ARTCRAFT-INTERNATIONAL-01 — multi-currency, international delivery
+
+ARTCRAFT-BULK-ORDER-01 — bulk custom orders (hotel/corporate)
+
+🗂️ KEY FILES REFERENCE
+text
+
 ---
 
-## 🗂️ KEY FILES REFERENCE
+### Edit 5 — NEXT STEPS + Work Order
+
+**🔍 FIND:**
+📋 NEXT STEPS — Priority
+Transport Phase 1 — DONE (Public page, Emails, Payment, Edit image)
+Transport Phase B — DONE (B1-B5 — Trips, seat inventory, search flow, emails)
+Transport Phase C — Chunks 1-4 DONE ✅ | Chunks 5-6 PENDING 🟡
+Next: Chunk 5 (Traveler Cancellation) → Chunk 6 (E2E + polish)
+After Transport C: ArtCraft → Individual → MoneyChanger public pages (Transport pattern)
+After 3 verticals: Admin Notification System → Final Push
+
+text
+
+**✅ REPLACE:**
+📋 NEXT STEPS — Priority
+Transport Phase 1 — DONE ✅
+Transport Phase B — DONE ✅
+Transport Phase C — ALL 6 CHUNKS DONE ✅ | Transport CLOSE
+ArtCraft A+ — APPROVED (5 Phases, ~16-18h) — Phase 1 सुरु
+After ArtCraft: Individual → MoneyChanger (same A+ pattern)
+After 3 verticals: Admin Notification System → Final Push (18+ commits)
+
+🚦 ACTIVE WORK: ArtCraft Phase 1 (Schema + Bug Fixes)
+
+M1-M5 migrations (5 migrations, order matters)
+
+Models (Artwork, CustomOrder, CustomOrderQuote)
+
+2 bug fixes (validation + booking_number)
+
+Existing data backfill (1 order + 6 artworks)
+
+Test: concurrency + authorization + rollback
+
+text
+
+---
+
+## 📦 Doc Commit
+
+```cmd
+git add docs/need_to_finish_status.md
+git commit -m "Docs: Transport Phase C 100% complete + ArtCraft A+ architecture approved (5 phases)"
+Expected: main 19 commits ahead।
+
+
 
 ### Routes
 - `routes\web.php` — सबै routes (line ~५००+ मा traveler reviews, ~४००+ मा admin, ~२००+ मा provider)
