@@ -223,9 +223,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h16"/><path d="M6 17V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/><path d="M9 7V4"/><path d="M15 7V4"/><circle cx="7.5" cy="20" r="1.5"/><circle cx="16.5" cy="20" r="1.5"/></svg>
       {{ __('messages.land_transport') }}
     </a>
-    <a href="{{ route('provider.transport.routes') }}" class="{{ request()->routeIs('provider.transport.routes') ? 'active' : '' }}">
+    <a href="{{ route('provider.transport.routes') }}" class="{{ request()->routeIs('provider.transport.routes') || request()->routeIs('provider.transport.trips*') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.5-2V4L9 6"/><path d="M15 4l5.5 2v14L15 18"/><path d="M9 6l6-2"/><path d="M9 20l6-2"/></svg>
-      {{ __('messages.routes') }}
+      Routes &amp; Trips
     </a>
     <a href="{{ route('provider.transport.drivers') }}" class="{{ request()->routeIs('provider.transport.drivers') ? 'active' : '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>

@@ -375,6 +375,10 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
     Route::post('/transport/routes', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeRoute'])->name('transport.routes.store');
     Route::put('/transport/routes/{route}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateRoute'])->name('transport.routes.update');
     Route::delete('/transport/routes/{route}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyRoute'])->name('transport.routes.destroy');
+    Route::get('/transport/trips', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'tripsPage'])->name('transport.trips');
+    Route::post('/transport/trips', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeTrip'])->name('transport.trips.store');
+    Route::put('/transport/trips/{trip}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateTrip'])->name('transport.trips.update');
+    Route::delete('/transport/trips/{trip}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'destroyTrip'])->name('transport.trips.destroy');
     Route::get('/transport/drivers', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'driversPage'])->name('transport.drivers');
         Route::get('/transport/reports', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'reportsPage'])->name('transport.reports');
 Route::post('/transport/ai/vehicle-assignment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'aiVehicleAssignment'])->name('transport.ai.vehicle');

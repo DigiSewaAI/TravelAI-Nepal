@@ -373,6 +373,186 @@ class TransportDashboardController extends Controller
         $route->delete();
         return back()->with('success', 'Route deleted successfully.');
     }
+    
+    public function tripsPage(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $filterDate = $request->query('date', now()->format('Y-m-d'));
+        $filterRoute = $request->query('route_id');
+        $filterStatus = $request->query('status', 'scheduled');
+
+        $query = \App\Models\TransportTrip::with([
+                'vehicle:id,vehicle_number,vehicle_type,capacity',
+                'route:id,name,from_location_id,to_location_id',
+                'route.fromLocation:id,city',
+                'route.toLocation:id,city',
+            ])
+            ->where('provider_id', $provider->id)
+            ->orderBy('departure_date')
+            ->orderBy('departure_time');
+
+        if ($filterDate) $query->whereDate('departure_date', $filterDate);
+        if ($filterRoute) $query->where('route_id', $filterRoute);
+        if ($filterStatus) $query->where('status', $filterStatus);
+
+        $trips = $query->get()->groupBy(fn($t) => $t->departure_date->format('Y-m-d'));
+
+        $routes = \App\Models\TransportRoute::where('provider_id', $provider->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $vehicles = TransportVehicle::where('provider_id', $provider->id)
+            ->whereIn('status', ['available', 'on-route'])
+            ->orderBy('vehicle_number')
+            ->get(['id', 'vehicle_number', 'vehicle_type', 'capacity', 'driver_name']);
+
+        $tripsForJs = collect($trips)->flatten(1)->map(fn($t) => [
+            'id' => $t->id,
+            'vehicle_id' => $t->vehicle_id,
+            'route_id' => $t->route_id,
+            'departure_date' => $t->departure_date->format('Y-m-d'),
+            'departure_time' => substr($t->departure_time, 0, 5),
+            'price_per_seat' => (float) $t->price_per_seat,
+            'price_per_vehicle' => $t->price_per_vehicle ? (float) $t->price_per_vehicle : null,
+            'driver_name' => $t->driver_name,
+            'pickup_point' => $t->pickup_point,
+            'status' => $t->status,
+            'seats_total' => $t->seats_total,
+        ])->values();
+
+        return view('provider.transport.trips', compact(
+            'provider', 'trips', 'routes', 'vehicles',
+            'filterDate', 'filterRoute', 'filterStatus', 'tripsForJs'
+        ));
+    }
+
+    public function storeTrip(Request $request)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider, 403);
+
+        $validated = $request->validate([
+            'vehicle_id' => 'required|exists:transport_vehicles,id',
+            'route_id' => 'required|exists:transport_routes,id',
+            'departure_date' => 'required|date|after_or_equal:today',
+            'departure_time' => 'required|date_format:H:i',
+            'price_per_seat' => 'required|numeric|min:0',
+            'price_per_vehicle' => 'nullable|numeric|min:0',
+            'driver_name' => 'nullable|string|max:100',
+            'pickup_point' => 'nullable|string|max:255',
+        ]);
+
+        $vehicle = TransportVehicle::where('id', $validated['vehicle_id'])
+            ->where('provider_id', $provider->id)->firstOrFail();
+        $route = \App\Models\TransportRoute::where('id', $validated['route_id'])
+            ->where('provider_id', $provider->id)->firstOrFail();
+
+        $conflict = \App\Models\TransportTrip::where('vehicle_id', $vehicle->id)
+            ->whereDate('departure_date', $validated['departure_date'])
+            ->whereTime('departure_time', $validated['departure_time'])
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+        if ($conflict) {
+            return back()->withErrors(['vehicle_id' => 'This vehicle already has a departure at this date & time.'])->withInput();
+        }
+
+        // Auto pickup from transport_details default
+        $pickup = $validated['pickup_point'];
+        if (empty($pickup)) {
+            $service = \App\Models\Service::where('provider_id', $provider->id)
+                ->whereHas('category', fn($q) => $q->where('slug', 'transport'))->first();
+            $pickup = $service?->transportDetail?->pickup_point;
+        }
+
+        \App\Models\TransportTrip::create([
+            'provider_id' => $provider->id,
+            'vehicle_id' => $vehicle->id,
+            'route_id' => $route->id,
+            'departure_date' => $validated['departure_date'],
+            'departure_time' => $validated['departure_time'],
+            'price_per_seat' => $validated['price_per_seat'],
+            'price_per_vehicle' => $validated['price_per_vehicle'] ?? null,
+            'seats_total' => $vehicle->capacity,
+            'seats_available' => $vehicle->capacity,
+            'driver_name' => $validated['driver_name'] ?? $vehicle->driver_name,
+            'pickup_point' => $pickup,
+            'status' => 'scheduled',
+        ]);
+
+        return back()->with('success', 'Departure created successfully.');
+    }
+
+    public function updateTrip(Request $request, \App\Models\TransportTrip $trip)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $trip->provider_id === $provider->id, 403);
+
+        $validated = $request->validate([
+            'vehicle_id' => 'required|exists:transport_vehicles,id',
+            'route_id' => 'required|exists:transport_routes,id',
+            'departure_date' => 'required|date',
+            'departure_time' => 'required|date_format:H:i',
+            'price_per_seat' => 'required|numeric|min:0',
+            'price_per_vehicle' => 'nullable|numeric|min:0',
+            'driver_name' => 'nullable|string|max:100',
+            'pickup_point' => 'nullable|string|max:255',
+            'status' => 'required|in:scheduled,completed,cancelled',
+        ]);
+
+        $vehicle = TransportVehicle::where('id', $validated['vehicle_id'])
+            ->where('provider_id', $provider->id)->firstOrFail();
+        $route = \App\Models\TransportRoute::where('id', $validated['route_id'])
+            ->where('provider_id', $provider->id)->firstOrFail();
+
+        $conflict = \App\Models\TransportTrip::where('vehicle_id', $vehicle->id)
+            ->whereDate('departure_date', $validated['departure_date'])
+            ->whereTime('departure_time', $validated['departure_time'])
+            ->where('status', '!=', 'cancelled')
+            ->where('id', '!=', $trip->id)
+            ->exists();
+        if ($conflict) {
+            return back()->withErrors(['vehicle_id' => 'This vehicle already has a departure at this date & time.'])->withInput();
+        }
+
+        $bookedSeats = (int) $trip->bookings()->where('status', '!=', 'cancelled')->sum('passenger_count');
+        $newSeatsTotal = $vehicle->capacity;
+        if ($newSeatsTotal < $bookedSeats) {
+            return back()->withErrors(['vehicle_id' => "Cannot use a vehicle with fewer seats than already booked ($bookedSeats seats)."])->withInput();
+        }
+
+        $trip->update([
+            'vehicle_id' => $vehicle->id,
+            'route_id' => $route->id,
+            'departure_date' => $validated['departure_date'],
+            'departure_time' => $validated['departure_time'],
+            'price_per_seat' => $validated['price_per_seat'],
+            'price_per_vehicle' => $validated['price_per_vehicle'] ?? null,
+            'seats_total' => $newSeatsTotal,
+            'seats_available' => $newSeatsTotal - $bookedSeats,
+            'driver_name' => $validated['driver_name'] ?? $trip->driver_name,
+            'pickup_point' => $validated['pickup_point'],
+            'status' => $validated['status'],
+        ]);
+
+        return back()->with('success', 'Departure updated successfully.');
+    }
+
+    public function destroyTrip(\App\Models\TransportTrip $trip)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $trip->provider_id === $provider->id, 403);
+
+        $bookedCount = (int) $trip->bookings()->where('status', '!=', 'cancelled')->count();
+        if ($bookedCount > 0) {
+            return back()->withErrors(['trip' => "Cannot delete — $bookedCount booking(s) exist. Cancel this departure instead."]);
+        }
+
+        $trip->delete();
+        return back()->with('success', 'Departure deleted successfully.');
+    }
 
     public function driversPage()
     {

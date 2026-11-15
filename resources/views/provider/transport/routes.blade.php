@@ -31,10 +31,19 @@
   .empty-state { text-align: center; padding: 60px 20px; background: var(--card); border: 2px dashed var(--line); border-radius: 16px; }
   .empty-state h3 { font-size: 16px; margin-bottom: 8px; color: var(--text); }
   .empty-state p { font-size: 13px; color: var(--muted); margin-bottom: 20px; max-width: 400px; margin-left:auto; margin-right:auto; }
+  .tab-nav { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .tab-nav a { padding: 12px 22px; font-weight: 800; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .tab-nav a.active { color: var(--sky-d); border-bottom: 2px solid var(--sky); }
+  .tab-nav a:not(.active) { color: var(--muted); border-bottom: 2px solid transparent; }
 </style>
 @endpush
 
 @section('content')
+
+<div class="tab-nav">
+    <a href="{{ route('provider.transport.routes') }}" class="{{ request()->routeIs('provider.transport.routes') ? 'active' : '' }}">🛣️ Routes</a>
+    <a href="{{ route('provider.transport.trips') }}" class="{{ request()->routeIs('provider.transport.trips*') ? 'active' : '' }}">📅 Daily Departures</a>
+</div>
 
 @if(session('success'))
 <div style="background:var(--green-soft);color:#047857;padding:14px 18px;border-radius:12px;margin-bottom:18px;font-size:13px;font-weight:700;border:1px solid #86efac">✅ {{ session('success') }}</div>
