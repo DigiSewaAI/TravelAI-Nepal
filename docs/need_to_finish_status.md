@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-15 (Transport Phase B — B1-B5 Complete + Payment Architecture Approved)  
-**Current Commit:** `1221566` (Transport B5 complete — 10 commits ahead of origin/main)  
+**Last Updated:** 2026-11-15 (Transport Phase C — Chunks 1-4 Complete, Payment + Receipt Flow Live)  
+**Current Commit:** `TBD-after-chunk4` (Transport Phase C Chunks 1-4 — 15 commits ahead of origin/main)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -23,11 +23,11 @@
 ## 📊 CURRENT STATE — Verified
 
 ### Git Status
-- **HEAD:** `1221566` (Transport Phase B — B5 complete)
+- **HEAD:** `4339259` (Chunks 2+3) + pending Chunk 4 commit
 - **Branch:** main
-- **Ahead of origin/main by:** 10 commits (`1221566` → `73bf131` → `4865e69` → `f72545f` → `a9f57dc` → `59f4aad` → `1823f55` → `844414c` → `603e42f` → `911f112`)
+- **Ahead of origin/main by:** 15 commits (after Chunk 4 commit)
 - **Tests:** 297 passed, 1 skipped (1970 assertions)
-- **Production:** 🟡 10 commits pending push (after Transport Phase B + Payment chunks complete)
+- **Production:** 🟡 15 commits pending push (after Chunk 5-6 + remaining verticals + Admin Notification complete)
 
 ### Environment
 - **PHP:** 8.4.27 (Laragon, Device Guard exclusion applied)
@@ -480,8 +480,76 @@ Provider
 - Push (एकैचोटि)
 
 ### 16. Transport Phase C — Payments & Cancellation (Master APPROVED 2026-11-15, C/A/B/A)
-**Status:** 🟡 Not started — Chunk 1 (Payment Methods) approval pending
-**Estimate:** 15-20 hours (6 chunks, phased)
+**Status:** 🟡 **Chunks 1-4 COMPLETE** | Chunks 5-6 pending
+**Estimate:** 15-20 hours (6 chunks) — **~4-6h remaining** (Chunks 5-6)
+
+**Chunks 1-4 (✅ COMPLETE):**
+
+**Chunk 1 (`ece6a03` + `a96204a` + placeholder polish `ece6a03`):** Payment Methods + Model
+- Migration: `providers.transport_payment_model` (advance/pay_on_arrival/both, default both)
+- Migration: `provider_payment_methods.is_primary` (index guard)
+- `Provider::hasFeature()` plan gate
+- Controller: 6 methods (store/update/destroy/toggle/setPrimary/updatePaymentModel) + `isTransportProvider()` helper
+- Transaction locking (parent provider row) + 5 safety rules:
+  1. एक मात्र primary per provider
+  2. Atomic switch (transaction + lock)
+  3. Inactive cannot be primary
+  4. Delete primary → auto-fallback (next active) / कोई active नै → zero primary
+  5. A1 toggle: reject disable of primary
+- Blade: Payment Model radio (top) + is_primary checkbox + Primary badge + Set Primary button
+- **Type-based field visibility:** eSewa/Khalti/PayPal/Wise → Identifier only; Bank/Intl Bank → Account Name + Number + Bank; Cash → कोई account; Intl Bank → + SWIFT
+- **Domestic/Intl dropdown filter** (optgroup data-pm-group) — add domestic → only domestic options
+- **Dynamic placeholders + help texts** per type
+- i18n: 17 new keys
+
+**Chunk 2+3 (`4339259`):** Public payment modal + Traveler upload + Provider verify/reject
+- Migration: `transport_bookings.payment_model` (advance/pay_on_arrival) + `payment_submitted_at`
+- Public form: Payment Option radio (advance vs PAY) — provider model 'both' मा; PAY मा note only
+- `Public\TransportController@book`: `payment_model` snapshot + advance validation (≥1 active method)
+- Public payment modal auto-opens on advance booking (payment methods + QR + proof upload)
+- `Public\TransportController@uploadPublicProof`: email guard, resubmit block, provider notification
+- Traveler controller: `index`, `show`, `uploadProof` (email match guard)
+- Traveler views: `/traveler/transport/bookings` + `/traveler/transport/bookings/{id}` (payment methods display + upload form)
+- Email CTA: "Complete Payment →" (advance pending मा)
+- Provider verify: `verifyPaymentProof` (auto-confirm + paid + email) + `rejectPaymentProof` (reason + traveler notify)
+- Provider show page: Payment section (Model/Status/Method/Ref/Submitted At/Verified At + Proof screenshot + Verify/Reject buttons + Reject form)
+- Notifications: `PaymentProofSubmittedNotification` (provider), `PaymentRejectedNotification` (traveler)
+- Routes: 3 traveler + 2 provider verify/reject
+- i18n: 13 keys + `transport_booking` missing key fix (५ locale)
+- Claim show fix: `$booking->vehicle->vehicle_number ?? 'N/A'` (name/type नै)
+
+**Chunk 4 (pending commit `+ pending`):** Receipt PDF + Invoice integration + Email attachment
+- `app/Services/TransportReceiptService.php` (NEW):
+  - `create(TransportBooking)` — idempotent invoice generation (`TR-RCP-YYYY-NNNN`, `tax=0`, VAT-free, metadata JSON)
+  - `buildBrandForPdf($provider)` — logo base64 (कोई size limit, DomPDF-safe) + plan gate `hasFeature('custom_logo')`
+  - `buildLogoForEmail($provider)` — hybrid (<=50KB base64, >50KB URL) + plan gate
+- `invoices.transport-receipt.blade.php` (NEW): white-label header (logo + name + contact), customer + booking ref, trip details, amount table (कोई tax row), payment info (method + ref + paid_at), **legal notice** ("Payment Receipt, not Tax Invoice"), footer
+- Provider `downloadReceipt` + Traveler `downloadReceipt` (service call, कोई inline brand build)
+- `TransportBookingConfirmedMail`: receipt PDF attachment (DomPDF), nullable `$receipt` param
+- `TransportBookingCreatedMail` + Confirmed: logo via service (plan-gated)
+- Provider/traveler show pages: "📄 Download Receipt" button (paid state मा)
+- Routes: 2 (provider.receipt + traveler.receipt)
+- **Invoice table reuse** — कोई migration नै (metadata JSON मा `transport_booking_id` + `provider_vat_status: non_registered` + `receipt_type: payment_receipt`)
+- Provider invoices page: existing `/provider/invoices` मा transport receipts (TR-RCP-*) देखिने (verified — 2 receipts Paid)
+- Email attachment: Gmail "One attachment" (scanned)
+
+**Chunks 5-6 (PENDING — next):**
+
+**Chunk 5 — Traveler Cancellation (3-4h):**
+- Migration: `transport_cancellation_requests` table (booking_id, requested_at, reason, refund_amount, status, provider_response)
+- Traveler: cancel request form (policy display + estimated refund)
+- Provider: approve/reject request + refund status track (कोई gateway — manual)
+- On approve: seat restore + booking cancelled + refund_status = 'pending'
+- On refund: provider marks refunded (audit trail)
+- Notifications: traveler (approve/reject), provider (new request)
+- Reuse: `transport_details.cancellation_policy` field (Master decision B — provider-controlled)
+
+**Chunk 6 — Full E2E + Polish (1-2h):**
+- Full E2E: public → advance → upload → verify → receipt → email (सबै)
+- Reject cycle E2E
+- PAY cycle E2E
+- Regression 297 pass
+- Doc update + commit + (NO PUSH)
 
 **Master Decisions (Final):**
 
@@ -555,6 +623,91 @@ Provider
 - Cancellation approval/rejection
 - Refund status changes
 - Immutable issued document snapshots
+
+### 17. Remaining Verticals Public Pages (Master Directive — Transport Pattern)
+**Status:** 🟡 Not started — next after Transport Phase C (Chunks 5-6)
+**Estimate:** 15-18 hours (~5-6h per vertical)
+
+**Master Directive (2026-11-15):**
+> "बाँकी verticals (ArtCraft, Individual, MoneyChanger) public pages **Transport जस्तै advanced, professional, simple** — **herne bittikai bujhne** UI pattern"
+
+**Common Pattern (Transport model — सबै verticals मा apply):**
+
+1. **Premium hero** — vertical-specific color theme + gradient + cover placeholder (icon)
+2. **Profile card** — provider name + verified badge + rating + address + logo/cover
+3. **Search/filter UI** — vertical-appropriate (date/from-to/search as needed)
+4. **Item cards** — visual, high-information (image + price + meta + CTA)
+5. **Booking flow** — modal-based, progressive (Step 1 → Step 2 → Step 3)
+6. **Email** — created + confirmed (logo plan-gated + user journey CTA + price breakdown)
+7. **Provider bell notification** — new booking/order
+8. **Payment flow** — reuse transport payment infrastructure (advance/PAY/both, per-vertical model)
+9. **Receipt PDF** — reuse `TransportReceiptService` pattern (rename → generic — see `RECEIPT-SERVICE-GENERIC-01` ticket)
+10. **i18n 5 locales** (en/np/hi/zh/ru)
+11. **SEO + OG tags** (vertical-specific)
+12. **Cover placeholder** (gradient + icon fallback)
+
+**A. ArtCraft Public Page (Order: 1st)**
+**Pattern:** Gallery-based (e-commerce style)
+- Hero: gallery carousel (artwork photos)
+- Artist profile (bio + specialized crafts + experience)
+- Products grid (image + price + type: handmade/painting/sculpture/pottery)
+- Filter: craft type, price range, availability
+- **Custom order request form** — instead of direct purchase (provider quote + accept)
+- **Unique:** Gallery lightbox, artwork zoom, custom commission flow
+- **i18n keys:** `public_artcraft_*` (gallery, artist profile, custom order, etc.)
+- **Estimate:** 5-6 hours
+
+**B. Individual (Guide) Public Page (Order: 2nd)**
+**Pattern:** Profile-based (professional booking)
+- Hero: guide photo + experience years + certifications
+- Profile card (languages, specialties: trekking/porter/cultural guide)
+- **Calendar availability display** (dates available/unavailable)
+- Services list (day hike, multi-day trek, porter services, cultural tour)
+- Per-service pricing (per day / per trek)
+- Booking: date picker → confirm
+- **Unique:** Calendar integration, availability display, per-day pricing
+- **i18n keys:** `public_individual_*` (guide profile, calendar, specialty, etc.)
+- **Estimate:** 5-6 hours
+
+**C. MoneyChanger Public Page (Order: 3rd)**
+**Pattern:** Rate-table based (utility style)
+- Hero: exchange rates display (live from `ForexService` — existing)
+- Rate table (currency + buy + sell rates + updated at)
+- Calculator widget (currency conversion — two-way)
+- Location + hours + contact
+- Booking: reserve currency (pickup time slot)
+- **Unique:** Live rates, calculator, threshold display
+- **Note:** Generic page पनि functional छ — तर rate widget + calculator = high value-add. Transport जस्तै full build recommended।
+- **i18n keys:** `public_moneychanger_*` (rates, calculator, reserve, etc.)
+- **Estimate:** 4-5 hours (simpler than ArtCraft/Individual)
+
+**Shared refactors (future tickets — apply before/after):**
+- `PAYMENT-MODEL-GENERIC-01` — rename `transport_payment_model` → `payment_model` (providers table) — apply to all verticals
+- `RECEIPT-SERVICE-GENERIC-01` — extract `TransportReceiptService` → `ReceiptService` (polymorphic)
+- Reuse `is_primary` payment method logic (already shared across all verticals)
+- Reuse `invoices` table via metadata JSON (`source: artcraft_receipt | individual_receipt | ...`)
+
+**Order rationale:**
+1. **ArtCraft** — highest commercial value, gallery-driven
+2. **Individual** — professional service (guide profile)
+3. **MoneyChanger** — smallest scope, rate-table (generic reuse)
+
+**After all 3:** Admin Notification System (final) → Push
+
+---
+
+### 18. Additional Future Tickets (पछि)
+
+| Ticket | Scope | Priority |
+|---|---|---|
+| **PROVIDER-EARNINGS-DASHBOARD-01** | Provider total earnings across all verticals (transport + hotel + restaurant + artcraft + individual) — monthly/weekly summary + charts. **Note:** `/provider/payments` page currently TravelAI subscription payments only (सही — कोई fix नै)। Earnings dashboard अलग page। | 🟡 Medium |
+| **PAYMENT-MODEL-GENERIC-01** | Rename `transport_payment_model` → `payment_model` (providers table) — apply to Hotel, Restaurant, ArtCraft, Individual, Trek | 🟡 Medium (before/after remaining verticals) |
+| **RECEIPT-SERVICE-GENERIC-01** | Extract `TransportReceiptService` → `ReceiptService` (polymorphic — provider + booking type) | 🟢 Low (after 3 verticals) |
+| **RECEIPT-LOCALE-01** | Receipt PDF i18n (currently English only) — traveler locale based | 🟢 Low |
+| **RECEIPT-BRANDING-AUDIT-01** | Audit all verticals receipts — logo policy consistency (`hasFeature('custom_logo')`) | 🟢 Low |
+| **LEGACY-BOOKINGS-FILTER-01** | Legacy 15 transport bookings (trip_id NULL) — provider dashboard filter option | 🟢 Low |
+| **TRAVELER-CANCEL-POLICY-UI-01** | Chunk 5 follow-up — policy display + estimated refund calculator (client-side) | 🟡 Medium |
+| **PROVIDER-REFUND-TRACKER-01** | After cancellation approve — track manual refund status (audit trail) | 🟡 Medium |
 
 ---
 
@@ -692,9 +845,11 @@ New migration create गर्दा php artisan make:migration बाट genera
 
 📋 NEXT STEPS — Priority
 Transport Phase 1 — DONE (Public page, Emails, Payment, Edit image)
-Transport Phase B — DONE (B1-B5, 10 commits ahead — Trips, seat inventory, search flow, emails)
-Transport Phase C — APPROVED (Payments + Cancellation, C/A/B/A, 6 chunks) — Chunk 1 pending approval
-After Payment Chunks: ArtCraft → Individual → MoneyChanger → Admin Notification System → Push
+Transport Phase B — DONE (B1-B5 — Trips, seat inventory, search flow, emails)
+Transport Phase C — Chunks 1-4 DONE ✅ | Chunks 5-6 PENDING 🟡
+Next: Chunk 5 (Traveler Cancellation) → Chunk 6 (E2E + polish)
+After Transport C: ArtCraft → Individual → MoneyChanger public pages (Transport pattern)
+After 3 verticals: Admin Notification System → Final Push
 
 🟣 PENDING TASKS — A-Z COMPLETE LIST
 🔴 HIGH PRIORITY (Immediate)
@@ -848,8 +1003,10 @@ Phase 4: 🟣 Review System — Polish (analytics, digest)
 ↓
 Transport Phase 1 (DONE): ✅ Public page + Emails + Payment + Images
 Transport Phase B (DONE): ✅ Scheduled Trips + Seat Inventory + Multi-route (B1-B5)
-Transport Phase C (NEXT): 🟡 Payments + Cancellation — 6 chunks, Chunk 1 pending
-Testing Phase: 🟢 (Restaurant DONE, Hotel DONE) → ArtCraft → Individual → MoneyChanger
+Transport Phase C (Chunks 1-4 DONE): ✅ Payment flow + verify/reject + receipt + invoice + email
+Transport Phase C (Chunks 5-6 NEXT): 🟡 Traveler Cancellation + E2E polish
+Remaining Verticals Public Pages (NEXT): 🟡 ArtCraft → Individual → MoneyChanger (Transport pattern — advanced, professional, simple)
+Testing Phase: 🟢 (Restaurant DONE, Hotel DONE)
 ↓
 Medium Priority: 🟡 Fleet CRUD, Reports, Per-Vertical CRUD
 ↓
