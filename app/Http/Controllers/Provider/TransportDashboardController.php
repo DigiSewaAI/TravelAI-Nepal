@@ -114,6 +114,26 @@ class TransportDashboardController extends Controller
         $booking->status = $validated['status'];
         $booking->save();
 
+        // Seats inventory adjustment
+        if ($booking->trip_id) {
+            $trip = \App\Models\TransportTrip::lockForUpdate()->find($booking->trip_id);
+            if ($trip) {
+                $seats = $booking->booking_type === 'full_vehicle'
+                    ? $trip->seats_total
+                    : (int) $booking->passenger_count;
+
+                if ($validated['status'] === 'cancelled' && $oldStatus !== 'cancelled') {
+                    $trip->update([
+                        'seats_available' => min($trip->seats_total, $trip->seats_available + $seats),
+                    ]);
+                } elseif ($validated['status'] !== 'cancelled' && $oldStatus === 'cancelled') {
+                    $trip->update([
+                        'seats_available' => max(0, $trip->seats_available - $seats),
+                    ]);
+                }
+            }
+        }
+
         // Dispatch confirmed email on transition to 'confirmed'
         if ($validated['status'] === 'confirmed' && $oldStatus !== 'confirmed' && $booking->passenger_email) {
             try {
@@ -244,7 +264,21 @@ class TransportDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
-        $booking->delete();
+        DB::transaction(function () use ($booking) {
+            if ($booking->trip_id && $booking->status !== 'cancelled') {
+                $trip = \App\Models\TransportTrip::lockForUpdate()->find($booking->trip_id);
+                if ($trip) {
+                    $restore = $booking->booking_type === 'full_vehicle'
+                        ? $trip->seats_total
+                        : (int) $booking->passenger_count;
+                    $trip->update([
+                        'seats_available' => min($trip->seats_total, $trip->seats_available + $restore),
+                    ]);
+                }
+            }
+            $booking->delete();
+        });
+
         return back()->with('success', __('messages.booking_deleted_success'));
     }
 

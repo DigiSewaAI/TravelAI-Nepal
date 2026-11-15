@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class TransportBooking extends Model
 {
     protected $fillable = [
-        'provider_id', 'vehicle_id', 'passenger_name', 'passenger_email',
+        'provider_id', 'vehicle_id', 'trip_id',
+        'passenger_name', 'passenger_email', 'passenger_count',
+        'booking_type', 'pickup_point', 'price_per_unit', 'total_amount',
         'booking_ref', 'booking_number', 'route_name', 'travel_date', 'travel_time',
         'amount', 'status',
         'payment_status', 'payment_method', 'payment_ref', 'payment_proof', 'paid_at',
