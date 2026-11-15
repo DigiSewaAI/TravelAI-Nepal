@@ -3527,5 +3527,37 @@ return array (
   'artcraft_request_commission' => 'Request a Custom Commission',
   'artcraft_request_commission_sub' => 'Tell us about your dream artwork. The artist will review and send you a quote.',
   'artcraft_submit_commission' => 'Submit Custom Commission Request',
-
+  // ── i18n fix 2026-11-15 — missing keys ──
+  // ArtCraft form labels
+  'artcraft_artwork_type' => 'Artwork Type',
+  'artcraft_budget' => 'Budget',
+  'artcraft_deadline' => 'Deadline',
+  'artcraft_delivery_address' => 'Delivery Address',
+  'artcraft_description' => 'Description',
+  'artcraft_description_hint' => 'Describe what you want — size, style, colors, theme...',
+  'artcraft_dimensions_hint' => 'e.g. 30cm × 20cm',
+  'artcraft_materials_hint' => 'e.g. wood, brass, canvas',
+  'artcraft_message' => 'Message (Optional)',
+  'artcraft_message_hint' => 'Ask about availability, delivery, customization...',
+  'artcraft_pickup_address' => 'Pickup Address',
+  'artcraft_quantity' => 'Quantity',
+  'artcraft_reference_hint' => 'Max 5MB · JPG, PNG, WEBP · Private — only the artist will see it',
+  'artcraft_reference_image' => 'Reference Image',
+  'artcraft_select_type' => 'Select Type',
+  'artcraft_send_enquiry' => 'Send Enquiry',
+  'artcraft_sold_hint' => 'You can still request a custom commission.',
+  // Trek filter
+  'max_days' => 'Max Days',
+  'min_days' => 'Min Days',
+  // Pricing page meta
+  'pricing_meta_title' => 'Pricing Plans — TravelAI Nepal',
+  'pricing_meta_description' => 'Transparent pricing for every provider vertical. Choose the plan that fits your business.',
+    'artcraft_gallery_heading' => 'Gallery — Explore Handmade Art',
+  'artcraft_hero_subtitle' => 'Gallery · Nepal Handmade Art',
+    'artcraft_by' => 'by',
+  'artcraft_category_woodwork' => 'Woodwork',
+  'artcraft_category_metalwork' => 'Metalwork',
+  'artcraft_category_textile' => 'Textile',
+  'artcraft_category_sculpture' => 'Sculpture',
+  'artcraft_category_painting' => 'Painting',
 );

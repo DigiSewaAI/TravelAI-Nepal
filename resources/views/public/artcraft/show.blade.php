@@ -64,7 +64,7 @@
                 {{ $provider->name }}
             </div>
             <div style="font-size:12px;font-weight:600;opacity:0.7;">
-                {{ __('messages.artcraft_gallery') }} · Nepal Handmade Art
+                {{ __('messages.artcraft_hero_subtitle') }}
             </div>
         </div>
     @endif
@@ -116,14 +116,20 @@
 <!-- GALLERY -->
 <div class="ac-section">
     {{-- ✅ Edit 1A: section title translated --}}
-    <h2 class="ac-section-title">🎨 {{ __('messages.artcraft_gallery') }} — Explore Handmade Art</h2>
+    <h2 class="ac-section-title">🎨 {{ __('messages.artcraft_gallery_heading') }}</h2>
 
     @if($categories->count() > 1)
     <div class="ac-filter">
         {{-- ✅ Edit 1B: "All" filter translated --}}
         <a href="{{ route('public.artcraft.show', $service->slug) }}" class="ac-filter-btn {{ !request('cat') ? 'active' : '' }}">{{ __('messages.tab_all') ?? 'All' }}</a>
         @foreach($categories as $cat)
-            <a href="{{ route('public.artcraft.show', $service->slug) }}?cat={{ urlencode($cat) }}" class="ac-filter-btn {{ request('cat') === $cat ? 'active' : '' }}">{{ $cat }}</a>
+            @php
+                $__catKey = 'artcraft_category_' . strtolower($cat);
+                $__catLabel = \Illuminate\Support\Facades\Lang::has('messages.' . $__catKey)
+                    ? __('messages.' . $__catKey)
+                    : $cat;
+            @endphp
+            <a href="{{ route('public.artcraft.show', $service->slug) }}?cat={{ urlencode($cat) }}" class="ac-filter-btn {{ request('cat') === $cat ? 'active' : '' }}">{{ $__catLabel }}</a>
         @endforeach
     </div>
     @endif
@@ -152,9 +158,15 @@
                 </div>
                 <div class="ac-card-body">
                     {{-- ✅ Edit 1D: category fallback translated --}}
-                    <span class="ac-card-cat">{{ $artwork->category ?: __('messages.artcraft_art') ?? 'Art' }}</span>
+                    @php
+                        $__catKey = 'artcraft_category_' . strtolower($artwork->category);
+                        $__catLabel = $artwork->category && \Illuminate\Support\Facades\Lang::has('messages.' . $__catKey)
+                            ? __('messages.' . $__catKey)
+                            : ($artwork->category ?: __('messages.artcraft_art'));
+                    @endphp
+                    <span class="ac-card-cat">{{ $__catLabel }}</span>
                     <h3 class="ac-card-name">{{ $artwork->name }}</h3>
-                    <p class="ac-card-artist">by {{ $artwork->artist_name ?: $provider->name }}</p>
+                    <p class="ac-card-artist">{{ __('messages.artcraft_by') }} {{ $artwork->artist_name ?: $provider->name }}</p>
                     <div class="ac-card-footer">
                         <div class="ac-card-price">Rs {{ number_format($artwork->price, 0) }}<small> NPR</small></div>
                         {{-- ✅ Edit 1E: status badge translated dynamically --}}

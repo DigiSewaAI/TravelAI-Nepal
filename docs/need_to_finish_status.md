@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-15 (Transport Phase C COMPLETE — 6 Chunks Done + ArtCraft A+ Approved)  
-**Current Commit:** `02527fb` (Transport Phase C 100% complete — 18 commits ahead)  
+**Last Updated:** 2026-11-15 (Night — ArtCraft Phase 1+2+3 partial complete; i18n fix in progress by parallel assistant)  
+**Current Commit:** `TBD-after-phase2commit` (ArtCraft Phase 2+3 partial — 22 commits ahead)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -752,7 +752,39 @@ Provider
 | **PROVIDER-REFUND-TRACKER-01** | After cancellation approve — track manual refund status (audit trail) | 🟡 Medium |
 
 ### 17. ArtCraft A+ — Digital Art Gallery + Custom Commission + Quotation System
-**Status:** 🟡 Not started — Phase 1 (Schema) approved, कोई code नै
+**Status:** 🟡 **Phase 1+2+3 (partial) COMPLETE** — Phases 4-5 pending + i18n parallel fix
+
+**Commits:**
+- Phase 1 `bb00f6a` — Schema (5 migrations) + models + status transitions + booking number fix
+- Phase 2+3 partial — Public gallery, artwork detail, custom commission form, enquiry mail + notification, explore redirect (pending commit)
+
+**Phase 2+3 (partial) Details:**
+- `config/filesystems.php` — `artcraft-references` private disk added
+- `Public\ArtCraftController` — show, artworkDetail, enquireReservation, customCommissionForm, submitCustomCommission (5 methods)
+- Routes (5 public): `/artcraft/{slug}`, `/artcraft/{slug}/artwork/{id}`, `.../enquire`, `.../custom` (GET+POST)
+- Views: `public/artcraft/show.blade.php` (gallery + category filter), `artwork-detail.blade.php` (detail + enquire modal), `custom-commission.blade.php` (full custom form)
+- Mail: `ArtCraftEnquiryReceivedMail` (ready-made + custom variants, logo plan-gated)
+- Notification: `NewArtCraftEnquiryNotification`
+- Email blade: `emails/artcraft-enquiry-received.blade.php`
+- `ServiceController@show` — ArtCraft explore redirect (`/explore/service/{slug}` → `/artcraft/{slug}`)
+- i18n: Partial keys added to 5 locales (full fix in progress by parallel assistant)
+
+**Pending (Phases 4-5):**
+- Phase 4 — Provider quote system UI (send quote, revision history, status progression, accept/reject from customer side) — ~4h
+- Phase 5 — Full E2E + i18n complete
+
+**i18n Parallel Fix (अर्को Assistant):**
+- `i18n-audit.ps1` + `i18n-audit.bat` (project root) — audit tooling committed
+- `docs/i18n-fix-instructions.md` — handoff guide (already written)
+- `docs/i18n-audit-report.md` — audit output (generated)
+- **Scope:** `resources/views/public/**` + `traveler/**` + `emails/**` + `layouts/**` (provider/admin English only)
+- **Rule:** 297 tests must still pass। कोई push without Master GO।
+
+**Known Limitations (Phase 4/5 fix):**
+- Mail + notification classes not yet browser-tested (भोलि E2E)
+- Enquire modal + custom form submit not runtime verified
+- Quote system अझै नै (customer ले quote accept/reject गर्न सक्दैनन्)
+- Reference image display in provider dashboard अझै नै
 **Master Decision (2026-11-15, after ChatGPT + DeepSeek audit):** A+ (production-quality, not MVP)
 **Total scope:** ~16-18 hours (5 phases)
 
@@ -966,29 +998,30 @@ ArtCraft A+ — APPROVED (5 Phases, ~16-18h) — Phase 1 सुरु
 After ArtCraft: Individual → MoneyChanger (same A+ pattern)
 After 3 verticals: Admin Notification System → Final Push (18+ commits)
 
-🚦 ACTIVE WORK: ArtCraft Phase 1 (Schema + Bug Fixes)
+🚦 ACTIVE WORK: ArtCraft Phase 2+3 (public gallery + enquiry) — BROWSER TEST PENDING
 
-M1-M5 migrations (5 migrations, order matters)
+📅 NEXT (भोलि — Fresh morning):
+   1. Full ArtCraft E2E:
+      - Enquire flow (ready-made artwork)
+      - Custom commission flow
+      - Verify email delivery (customer)
+      - Verify bell notification (provider)
+      - DB CustomOrder created with correct request_type
+   2. ArtCraft Phase 4 (Quote system UI — ~4h):
+      - Provider send quote UI
+      - Customer accept/reject/revision
+      - Status progression
+      - Quote sent/accepted mails + notifications
+   3. i18n verify (after parallel assistant completes)
+   4. Regression: 297 tests pass
 
-Models (Artwork, CustomOrder, CustomOrderQuote)
-
-2 bug fixes (validation + booking_number)
-
-Existing data backfill (1 order + 6 artworks)
-
-Test: concurrency + authorization + rollback
-
-text
-
----
-
-## 📦 Doc Commit
-
-```cmd
-git add docs/need_to_finish_status.md
-git commit -m "Docs: Transport Phase C 100% complete + ArtCraft A+ architecture approved (5 phases)"
-Expected: main 19 commits ahead।
-
+📋 CURRENT STATE:
+   - Transport: ✅ COMPLETE (all phases)
+   - ArtCraft: 🟡 Phase 1-3 partial complete
+   - Individual: 🔴 Not started
+   - MoneyChanger: 🔴 Not started
+   - Admin Notification System: 🔴 Final task
+   - Push: 🔴 Hold (Master GO after all)
 
 
 ### Routes

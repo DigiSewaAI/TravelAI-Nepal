@@ -50,7 +50,13 @@
 
         <div>
             {{-- ✅ Edit 1D-जस्तै: category fallback translated --}}
-            <span class="acd-cat">{{ $artwork->category ?: __('messages.artcraft_art') ?? 'Art' }}</span>
+            @php
+                $__catKey = 'artcraft_category_' . strtolower($artwork->category);
+                $__catLabel = $artwork->category && \Illuminate\Support\Facades\Lang::has('messages.' . $__catKey)
+                    ? __('messages.' . $__catKey)
+                    : ($artwork->category ?: __('messages.artcraft_art'));
+            @endphp
+            <span class="acd-cat">{{ $__catLabel }}</span>
             <h1 class="acd-title">{{ $artwork->name }}</h1>
             <p class="acd-artist">{{ __('messages.artcraft_artist') }}: <strong>{{ $artwork->artist_name ?: $provider->name }}</strong></p>
 
