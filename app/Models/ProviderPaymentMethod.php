@@ -23,11 +23,13 @@ class ProviderPaymentMethod extends Model
         'instructions',
         'is_active',
         'sort_order',
+        'is_primary',
     ];
 
     protected $casts = [
         'is_active'  => 'boolean',
         'sort_order' => 'integer',
+        'is_primary' => 'boolean',
     ];
 
     public function provider()

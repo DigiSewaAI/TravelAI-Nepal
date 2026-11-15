@@ -83,6 +83,31 @@
     <span>{{ __('messages.pm_disclaimer') }}</span>
   </div>
 
+  @if($provider->types->contains('slug', 'transport-provider'))
+  <div class="pm-card" style="margin-bottom:20px">
+    <div class="pm-card-head">
+      <h2><i class="fas fa-cog"></i> {{ __('messages.pm_transport_payment_model') }}</h2>
+    </div>
+    <div class="pm-body">
+      <p style="font-size:12px;color:var(--muted);margin:0 0 16px">{{ __('messages.pm_transport_payment_model_help') }}</p>
+      <form method="POST" action="{{ route('provider.settings.payment-model.update') }}">
+        @csrf @method('PATCH')
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          @php $__cur = $provider->transport_payment_model ?? 'both'; @endphp
+          @foreach(['advance' => ['l' => 'pm_model_advance', 'h' => 'pm_model_advance_help'], 'pay_on_arrival' => ['l' => 'pm_model_pay_on_arrival', 'h' => 'pm_model_pay_on_arrival_help'], 'both' => ['l' => 'pm_model_both', 'h' => 'pm_model_both_help']] as $__v => $__d)
+          <label style="cursor:pointer;padding:14px;border:2px solid {{ $__cur === $__v ? 'var(--accent,#2563eb)' : 'var(--line,#e8edf5)' }};border-radius:10px;display:block">
+            <input type="radio" name="transport_payment_model" value="{{ $__v }}" @checked($__cur === $__v) style="margin-right:6px">
+            <strong style="font-size:13px">{{ __('messages.' . $__d['l']) }}</strong>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">{{ __('messages.' . $__d['h']) }}</div>
+          </label>
+          @endforeach
+        </div>
+        <button type="submit" class="pm-btn save" style="margin-top:14px">{{ __('messages.pm_save') }}</button>
+      </form>
+    </div>
+  </div>
+  @endif
+
   @php
     $sections = [
       ['key' => 'domestic',      'flag' => '🇳🇵', 'title' => __('messages.pm_domestic_section'),      'add' => __('messages.pm_add_domestic'),      'items' => $domestic],
@@ -129,6 +154,18 @@
                     </div>
                   </div>
                   <div class="pm-item-actions">
+                    @if($m->is_primary)
+                      <span class="pm-icon-btn" style="cursor:default;color:#b45309;border-color:#fde68a;background:#fef4e2" title="{{ __('messages.pm_primary_badge') }}">
+                        <i class="fas fa-star"></i>
+                      </span>
+                    @elseif($m->is_active)
+                      <form method="POST" action="{{ route('provider.settings.payment-methods.set-primary', $m->id) }}" style="display:inline">
+                        @csrf
+                        <button type="submit" class="pm-icon-btn" title="{{ __('messages.pm_set_primary_button') }}">
+                          <i class="fas fa-star"></i>
+                        </button>
+                      </form>
+                    @endif
                     <form method="POST" action="{{ route('provider.settings.payment-methods.toggle', $m->id) }}" style="display:inline">
                       @csrf
                       <button type="submit" class="pm-icon-btn {{ $m->is_active ? 'toggle-on' : '' }}" title="{{ __('messages.pm_toggle_active') }}">
@@ -136,7 +173,7 @@
                       </button>
                     </form>
                     <button type="button"
-                      data-pm-edit="{{ base64_encode(json_encode($m->only(['id','type','label','account_name','account_number','identifier','bank_name','swift_code','currency','sort_order','instructions','qr_image_path']))) }}"
+                      data-pm-edit="{{ base64_encode(json_encode($m->only(['id','type','label','account_name','account_number','identifier','bank_name','swift_code','currency','sort_order','instructions','qr_image_path','is_primary']))) }}"
                       onclick="openPmEdit(this)"
                       class="pm-icon-btn" title="Edit">
                       <i class="fas fa-edit"></i>
@@ -225,6 +262,13 @@
           </div>
         </div>
         <div class="pm-field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px;font-weight:700;letter-spacing:0">
+            <input type="checkbox" name="is_primary" id="pmIsPrimary" value="1" style="width:16px;height:16px;margin:0">
+            {{ __('messages.pm_set_as_primary') }}
+          </label>
+          <p style="font-size:11px;color:var(--muted);margin:4px 0 0 24px">{{ __('messages.pm_set_as_primary_help') }}</p>
+        </div>
+        <div class="pm-field">
           <label>{{ __('messages.pm_qr_image') }}</label>
           <input type="file" name="qr_image" accept="image/png,image/jpeg">
           <p style="font-size:11px;color:var(--muted);margin-top:4px">PNG / JPG, max 2MB</p>
@@ -261,6 +305,7 @@ function openPmModal(context) {
     document.getElementById('pmCurrency').value = 'NPR';
     document.getElementById('pmSortOrder').value = 0;
     document.getElementById('pmQrPreview').style.display = 'none';
+    document.getElementById('pmIsPrimary').checked = false;
     document.getElementById('pmModal').classList.add('open');
 }
 
@@ -281,6 +326,7 @@ function openPmEdit(btn) {
     document.getElementById('pmCurrency').value      = m.currency || 'NPR';
     document.getElementById('pmSortOrder').value     = m.sort_order || 0;
     document.getElementById('pmInstructions').value  = m.instructions || '';
+    document.getElementById('pmIsPrimary').checked   = !!m.is_primary;
     if (m.qr_image_path) {
         document.getElementById('pmQrPreviewImg').src = '/storage/' + m.qr_image_path;
         document.getElementById('pmQrPreview').style.display = 'block';

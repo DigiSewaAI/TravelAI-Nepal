@@ -594,7 +594,11 @@ Route::prefix('services/{service}/itinerary/departures')
             Route::put('/{id}', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'update'])->name('update');
             Route::delete('/{id}', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/toggle', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'toggle'])->name('toggle');
+            Route::post('/{id}/set-primary', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'setPrimary'])->name('set-primary');
         });
+
+    // Payment model — payment-methods group बाहिर (path फरक छ: payment-model, payment-methods होइन)
+    Route::patch('/settings/payment-model', [\App\Http\Controllers\Provider\PaymentMethodController::class, 'updatePaymentModel'])->name('settings.payment-model.update');
 
     // Analytics (Phase 11)
     Route::middleware('feature:full_analytics')->group(function () {

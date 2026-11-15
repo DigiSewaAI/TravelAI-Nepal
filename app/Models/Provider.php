@@ -89,6 +89,7 @@ class Provider extends Model
         'average_rating',
         'reviews_count',
         'rating_breakdown',
+        'transport_payment_model',
     ];
 
     protected $casts = [
@@ -97,6 +98,7 @@ class Provider extends Model
         'average_rating'   => 'decimal:2',
         'reviews_count'    => 'integer',
         'rating_breakdown' => 'array',
+        'transport_payment_model' => 'string',
     ];
 
     // =====================================================

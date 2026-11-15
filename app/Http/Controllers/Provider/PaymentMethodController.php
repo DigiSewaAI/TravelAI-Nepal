@@ -45,7 +45,10 @@ class PaymentMethodController extends Controller
         }
         return $provider;
     }
-
+    private function isTransportProvider($provider): bool
+    {
+        return $provider->types->contains('slug', 'transport-provider');
+    }
     private function validated(Request $request): array
     {
         return $request->validate([
@@ -60,6 +63,8 @@ class PaymentMethodController extends Controller
             'currency'       => 'nullable|string|size:3',
             'instructions'   => 'nullable|string|max:1000',
             'sort_order'     => 'nullable|integer|min:0|max:999',
+            'is_primary'     => 'nullable|boolean',
+
         ]);
     }
 
@@ -82,18 +87,43 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.settings.payme
         $provider  = $this->provider();
         $validated = $this->validated($request);
 
+        $qrPath = null;
         if ($request->hasFile('qr_image')) {
-            $validated['qr_image_path'] = $request->file('qr_image')
-                ->store('provider-qr/' . $provider->id, 'public');
+            $qrPath = $request->file('qr_image')->store('provider-qr/' . $provider->id, 'public');
         }
         unset($validated['qr_image']);
+        if ($qrPath) $validated['qr_image_path'] = $qrPath;
 
         $validated['provider_id'] = $provider->id;
         $validated['currency']    = $validated['currency'] ?? 'NPR';
         $validated['is_active']   = true;
         $validated['sort_order']  = $validated['sort_order'] ?? 0;
 
-        ProviderPaymentMethod::create($validated);
+        $wantsPrimary = $request->boolean('is_primary');
+        unset($validated['is_primary']);
+
+        try {
+            \DB::transaction(function () use ($provider, $validated, $wantsPrimary) {
+                \App\Models\Provider::where('id', $provider->id)->lockForUpdate()->first();
+
+                $hasPrimary = ProviderPaymentMethod::where('provider_id', $provider->id)
+                    ->where('is_primary', true)->exists();
+
+                $makePrimary = $wantsPrimary || !$hasPrimary;
+
+                if ($makePrimary && $hasPrimary) {
+                    ProviderPaymentMethod::where('provider_id', $provider->id)
+                        ->where('is_primary', true)->update(['is_primary' => false]);
+                }
+
+                $validated['is_primary'] = $makePrimary;
+                ProviderPaymentMethod::create($validated);
+            });
+        } catch (\Throwable $e) {
+            // Orphan cleanup: DB failed → delete uploaded file
+            if ($qrPath) \Storage::disk('public')->delete($qrPath);
+            throw $e;
+        }
 
         return back()->with('success', __('messages.pm_created'));
     }
@@ -105,16 +135,47 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.settings.payme
 
         $validated = $this->validated($request);
 
+        $newQrPath = null;
+        $oldQrPath = $method->qr_image_path;
         if ($request->hasFile('qr_image')) {
-            if ($method->qr_image_path) {
-                Storage::disk('public')->delete($method->qr_image_path);
-            }
-            $validated['qr_image_path'] = $request->file('qr_image')
-                ->store('provider-qr/' . $provider->id, 'public');
+            $newQrPath = $request->file('qr_image')->store('provider-qr/' . $provider->id, 'public');
+            $validated['qr_image_path'] = $newQrPath;
         }
         unset($validated['qr_image']);
 
-        $method->update($validated);
+        $wantsPrimary = $request->boolean('is_primary');
+        unset($validated['is_primary']);
+
+        $willBeActive = array_key_exists('is_active', $validated) ? (bool)$validated['is_active'] : $method->is_active;
+
+        if ($wantsPrimary && !$willBeActive) {
+            if ($newQrPath) \Storage::disk('public')->delete($newQrPath);
+            return back()->withErrors(['is_primary' => __('messages.pm_cannot_set_inactive_primary')])->withInput();
+        }
+
+        try {
+            \DB::transaction(function () use ($provider, $method, $validated, $wantsPrimary) {
+                \App\Models\Provider::where('id', $provider->id)->lockForUpdate()->first();
+
+                if ($wantsPrimary && !$method->is_primary) {
+                    ProviderPaymentMethod::where('provider_id', $provider->id)
+                        ->where('id', '!=', $method->id)
+                        ->where('is_primary', true)
+                        ->update(['is_primary' => false]);
+                    $validated['is_primary'] = true;
+                }
+
+                $method->update($validated);
+            });
+        } catch (\Throwable $e) {
+            if ($newQrPath) \Storage::disk('public')->delete($newQrPath);
+            throw $e;
+        }
+
+        // Old QR delete AFTER DB commit
+        if ($newQrPath && $oldQrPath) {
+            \Storage::disk('public')->delete($oldQrPath);
+        }
 
         return back()->with('success', __('messages.pm_updated'));
     }
@@ -124,22 +185,94 @@ return view(($provider_layout === 'layouts.provider') ? 'provider.settings.payme
         $provider = $this->provider();
         $method   = ProviderPaymentMethod::where('provider_id', $provider->id)->findOrFail($id);
 
-        if ($method->qr_image_path) {
-            Storage::disk('public')->delete($method->qr_image_path);
-        }
+        $qrPath     = $method->qr_image_path;
+        $wasPrimary = $method->is_primary;
 
-        $method->delete();
+        \DB::transaction(function () use ($provider, $method, $wasPrimary) {
+            \App\Models\Provider::where('id', $provider->id)->lockForUpdate()->first();
+
+            $method->delete();
+
+            if ($wasPrimary) {
+                $nextPrimary = ProviderPaymentMethod::where('provider_id', $provider->id)
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')->orderBy('id')
+                    ->first();
+                if ($nextPrimary) {
+                    $nextPrimary->update(['is_primary' => true]);
+                }
+                // कोई active नै भने — zero primary (कोई null नै)
+            }
+        });
+
+        // QR delete AFTER DB commit
+        if ($qrPath) \Storage::disk('public')->delete($qrPath);
 
         return back()->with('success', __('messages.pm_deleted'));
     }
 
-    public function toggle($id)
+        public function toggle($id)
     {
         $provider = $this->provider();
         $method   = ProviderPaymentMethod::where('provider_id', $provider->id)->findOrFail($id);
 
-        $method->update(['is_active' => !$method->is_active]);
+        if ($method->is_primary && $method->is_active) {
+            return back()->withErrors(['primary' => __('messages.pm_cannot_disable_primary')]);
+        }
+
+        \DB::transaction(function () use ($provider, $method) {
+            \App\Models\Provider::where('id', $provider->id)->lockForUpdate()->first();
+            $method->update(['is_active' => !$method->is_active]);
+        });
 
         return back()->with('success', __('messages.pm_toggled'));
+    }
+        public function setPrimary($id)
+    {
+        $provider = $this->provider();
+        $method   = ProviderPaymentMethod::where('provider_id', $provider->id)->findOrFail($id);
+
+        if (!$method->is_active) {
+            return back()->withErrors(['primary' => __('messages.pm_cannot_set_inactive_primary')]);
+        }
+
+        \DB::transaction(function () use ($provider, $method) {
+            \App\Models\Provider::where('id', $provider->id)->lockForUpdate()->first();
+
+            ProviderPaymentMethod::where('provider_id', $provider->id)
+                ->where('is_primary', true)->update(['is_primary' => false]);
+
+            $method->update(['is_primary' => true]);
+        });
+
+        return back()->with('success', __('messages.pm_primary_set'));
+    }
+        public function updatePaymentModel(Request $request)
+    {
+        $provider = $this->provider();
+
+        if (!$this->isTransportProvider($provider)) {
+            abort(403, 'Payment model configuration is only available for transport providers.');
+        }
+
+        $validated = $request->validate([
+            'transport_payment_model' => 'required|in:advance,pay_on_arrival,both',
+        ]);
+
+        $newModel = $validated['transport_payment_model'];
+
+        if (in_array($newModel, ['advance', 'both'])) {
+            $hasActive = ProviderPaymentMethod::where('provider_id', $provider->id)
+                ->where('is_active', true)->exists();
+            if (!$hasActive) {
+                return back()->withErrors([
+                    'transport_payment_model' => __('messages.pm_advance_requires_method'),
+                ])->withInput();
+            }
+        }
+
+        $provider->update(['transport_payment_model' => $newModel]);
+
+        return back()->with('success', __('messages.pm_payment_model_updated'));
     }
 }
