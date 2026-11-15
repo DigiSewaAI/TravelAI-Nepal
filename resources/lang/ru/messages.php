@@ -3004,4 +3004,22 @@ return array (
   'per_seat_label' => 'По местам',
   'full_vehicle_label' => 'Весь транспорт',
   'price_breakdown' => 'Детализация цены',
+    // ── Chunk 2 — Transport payment (public + traveler) ──
+  'public_payment_option' => 'Вариант оплаты',
+  'public_pay_advance' => 'Оплатить сейчас (аванс)',
+  'public_pay_on_arrival' => 'Оплата при отправлении',
+  'public_pay_on_arrival_note' => 'Вы оплатите при отправлении.',
+  'traveler_transport_bookings' => 'Мои бронирования транспорта',
+  'traveler_payment_required' => 'Требуется оплата',
+  'traveler_complete_payment' => 'Завершить оплату',
+  'traveler_payment_method_used' => 'Использованный способ оплаты',
+  'traveler_transaction_ref' => 'Ссылка / ID транзакции',
+  'traveler_payment_screenshot' => 'Скриншот оплаты',
+  'traveler_submit_payment_proof' => 'Отправить подтверждение оплаты',
+  'traveler_pay_at_departure' => 'Оплата при отправлении',
+  'traveler_payment_submitted' => 'Подтверждение оплаты отправлено',
+    // ── Chunk 2 — Payment modal (public transport) ──
+  'public_complete_payment' => 'Завершить оплату',
+  'payment_proof_submitted_success' => 'Подтверждение оплаты отправлено! Провайдер скоро проверит.',
+    'transport_booking' => 'Бронирование транспорта',
 );

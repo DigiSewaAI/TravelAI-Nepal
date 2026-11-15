@@ -98,6 +98,15 @@
                 <p style="margin: 0; color: #92400e; font-size: 13px;"><strong>📌 What's next?</strong> The operator will review and confirm your booking. You'll receive a confirmation email once it's approved.</p>
             </div>
 
+            @if(($booking->payment_model ?? 'pay_on_arrival') === 'advance' && ($booking->payment_status ?? 'pending') === 'pending')
+            <div style="background: #fef4e2; border: 1px solid #fbbf24; padding: 16px 18px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0 0 10px; color: #92400e; font-size: 13px;"><strong>💳 Payment Required</strong> — Complete your payment to confirm this booking.</p>
+                <a href="{{ route('traveler.transport.bookings.show', $booking->id) }}" style="display: inline-block; background: #d97706; color: #ffffff; padding: 11px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px;">
+                    Complete Payment →
+                </a>
+            </div>
+            @endif
+
             {{-- User Journey CTA --}}
             @if($isRegistered ?? false)
             <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px 18px; border-radius: 8px; margin: 20px 0; text-align: center;">

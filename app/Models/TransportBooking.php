@@ -12,7 +12,7 @@ class TransportBooking extends Model
         'booking_type', 'pickup_point', 'price_per_unit', 'total_amount',
         'booking_ref', 'booking_number', 'route_name', 'travel_date', 'travel_time',
         'amount', 'status',
-        'payment_status', 'payment_method', 'payment_ref', 'payment_proof', 'paid_at',
+        'payment_status', 'payment_method', 'payment_ref', 'payment_proof', 'paid_at', 'payment_model', 'payment_submitted_at',
     ];
 
     protected $casts = [
@@ -21,7 +21,7 @@ class TransportBooking extends Model
         'price_per_unit' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'passenger_count' => 'integer',
-        'paid_at' => 'datetime',
+        'paid_at' => 'datetime', 'payment_submitted_at' => 'datetime',
     ];
 
     public function provider() { return $this->belongsTo(Provider::class); }

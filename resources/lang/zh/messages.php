@@ -2417,4 +2417,22 @@ return array (
   'per_seat_label' => '按座位',
   'full_vehicle_label' => '整车',
   'price_breakdown' => '价格明细',
+    // ── Chunk 2 — Transport payment (public + traveler) ──
+  'public_payment_option' => '付款选项',
+  'public_pay_advance' => '立即付款（预付款）',
+  'public_pay_on_arrival' => '出发时付款',
+  'public_pay_on_arrival_note' => '您将在出发时付款。',
+  'traveler_transport_bookings' => '我的交通预订',
+  'traveler_payment_required' => '需要付款',
+  'traveler_complete_payment' => '完成付款',
+  'traveler_payment_method_used' => '使用的付款方式',
+  'traveler_transaction_ref' => '交易参考号 / ID',
+  'traveler_payment_screenshot' => '付款截图',
+  'traveler_submit_payment_proof' => '提交付款证明',
+  'traveler_pay_at_departure' => '出发时付款',
+  'traveler_payment_submitted' => '付款证明已提交',
+    // ── Chunk 2 — Payment modal (public transport) ──
+  'public_complete_payment' => '完成付款',
+  'payment_proof_submitted_success' => '付款证明已提交！提供者将尽快验证。',
+    'transport_booking' => '交通预订',
 );

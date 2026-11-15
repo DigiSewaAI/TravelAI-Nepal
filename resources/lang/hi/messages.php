@@ -2406,4 +2406,22 @@ return array (
   'per_seat_label' => 'प्रति सीट',
   'full_vehicle_label' => 'पूर्ण वाहन',
   'price_breakdown' => 'मूल्य विवरण',
+    // ── Chunk 2 — Transport payment (public + traveler) ──
+  'public_payment_option' => 'भुगतान विकल्प',
+  'public_pay_advance' => 'अभी भुगतान करें (अग्रिम)',
+  'public_pay_on_arrival' => 'प्रस्थान पर भुगतान करें',
+  'public_pay_on_arrival_note' => 'आप प्रस्थान पर भुगतान करेंगे।',
+  'traveler_transport_bookings' => 'मेरी परिवहन बुकिंग',
+  'traveler_payment_required' => 'भुगतान आवश्यक',
+  'traveler_complete_payment' => 'भुगतान पूरा करें',
+  'traveler_payment_method_used' => 'प्रयुक्त भुगतान विधि',
+  'traveler_transaction_ref' => 'लेनदेन संदर्भ / आईडी',
+  'traveler_payment_screenshot' => 'भुगतान स्क्रीनशॉट',
+  'traveler_submit_payment_proof' => 'भुगतान प्रमाण सबमिट करें',
+  'traveler_pay_at_departure' => 'प्रस्थान पर भुगतान करें',
+  'traveler_payment_submitted' => 'भुगतान प्रमाण सबमिट हो गया',
+    // ── Chunk 2 — Payment modal (public transport) ──
+  'public_complete_payment' => 'भुगतान पूरा करें',
+  'payment_proof_submitted_success' => 'भुगतान प्रमाण सबमिट हो गया! प्रदाता शीघ्र ही सत्यापित करेंगे।',
+    'transport_booking' => 'परिवहन बुकिंग',
 );

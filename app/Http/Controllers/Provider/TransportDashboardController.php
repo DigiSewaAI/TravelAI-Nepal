@@ -162,6 +162,71 @@ class TransportDashboardController extends Controller
 
         return back()->with('success', 'Payment verified successfully.');
     }
+        public function verifyPaymentProof(Request $request, TransportBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        if ($booking->payment_status !== 'submitted') {
+            return back()->withErrors(['payment' => 'No payment proof to verify. Current status: ' . $booking->payment_status]);
+        }
+
+        \DB::transaction(function () use ($booking) {
+            $oldStatus = $booking->status;
+
+            $booking->update([
+                'payment_status' => 'paid',
+                'paid_at'        => now(),
+                'status'         => 'confirmed', // auto-confirm on verify
+            ]);
+
+            // Dispatch confirmed email if transitioning
+            if ($oldStatus !== 'confirmed' && $booking->passenger_email) {
+                try {
+                    \Mail::to($booking->passenger_email)->queue(
+                        new \App\Mail\TransportBookingConfirmedMail($booking)
+                    );
+                } catch (\Throwable $e) {
+                    \Log::warning('Confirmed email failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
+                }
+            }
+        });
+
+        return back()->with('success', '✅ Payment verified. Booking confirmed. Traveler notified.');
+    }
+
+    public function rejectPaymentProof(Request $request, TransportBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        if ($booking->payment_status !== 'submitted') {
+            return back()->withErrors(['payment' => 'No submitted proof to reject.']);
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $booking->update([
+            'payment_status' => 'pending',
+            'payment_ref'    => null,
+            'payment_proof'  => null,
+            'payment_submitted_at' => null,
+        ]);
+
+        // Notify traveler (bell)
+        try {
+            $traveler = \App\Models\User::where('email', $booking->passenger_email)->first();
+            if ($traveler) {
+                $traveler->notify(new \App\Notifications\PaymentRejectedNotification($booking, $validated['rejection_reason']));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Payment reject notify failed', ['id' => $booking->id]);
+        }
+
+        return back()->with('success', 'Payment proof rejected. Traveler notified to re-submit.');
+    }
 
     public function storeVehicle(Request $request)
     {
@@ -231,7 +296,7 @@ class TransportDashboardController extends Controller
         ]);
 
         // TRANSPORT-TIME-OVERLAP: prevent double-booking same vehicle at same time
-        $conflict = DB::table('transport_bookings')
+        $conflict = \DB::table('transport_bookings')
             ->where('provider_id', $provider->id)
             ->where('vehicle_id', $validated['vehicle_id'])
             ->where('travel_date', $validated['travel_date'])

@@ -75,22 +75,83 @@
 
     {{-- PAYMENT --}}
     <div style="background:var(--card,#fff);border:1px solid var(--line,#e4ecf6);border-radius:var(--radius,18px);padding:22px">
-        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">Payment</h3>
+        <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--text,#0c1e33)">💳 Payment</h3>
+
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:var(--muted,#6b7f96)">Model</span>
+            <span style="font-weight:700;text-transform:capitalize">{{ str_replace('_', ' ', $booking->payment_model ?? 'pay_on_arrival') }}</span>
+        </div>
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
             <span style="color:var(--muted,#6b7f96)">Status</span>
             <span style="font-weight:700;text-transform:capitalize">{{ $booking->payment_status ?? 'pending' }}</span>
         </div>
+        @if($booking->payment_method)
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:var(--muted,#6b7f96)">Method</span>
+            <span style="font-weight:700;text-transform:capitalize">{{ $booking->payment_method }}</span>
+        </div>
+        @endif
+        @if($booking->payment_ref)
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:var(--muted,#6b7f96)">Transaction Ref</span>
+            <span style="font-weight:700;font-family:monospace">{{ $booking->payment_ref }}</span>
+        </div>
+        @endif
+        @if($booking->payment_submitted_at)
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:var(--muted,#6b7f96)">Submitted At</span>
+            <span style="font-weight:700">{{ $booking->payment_submitted_at->format('M d, Y H:i') }}</span>
+        </div>
+        @endif
         @if($booking->paid_at)
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-            <span style="color:var(--muted,#6b7f96)">Paid At</span>
+            <span style="color:var(--muted,#6b7f96)">Verified At</span>
             <span style="font-weight:700">{{ $booking->paid_at->format('M d, Y H:i') }}</span>
         </div>
         @endif
-        @if(($booking->payment_status ?? 'pending') === 'pending' && $booking->status !== 'cancelled')
-        <form action="{{ route('provider.transport.bookings.verify-payment', $booking) }}" method="POST" style="margin-top:14px">
+
+        {{-- Proof screenshot --}}
+        @if($booking->payment_proof)
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#e4ecf6)">
+            <div style="font-size:11px;font-weight:800;color:var(--muted,#6b7f96);text-transform:uppercase;margin-bottom:8px">📸 Payment Proof Screenshot</div>
+            <a href="{{ \Storage::url($booking->payment_proof) }}" target="_blank" style="display:inline-block">
+                <img src="{{ \Storage::url($booking->payment_proof) }}" alt="Payment Proof" style="max-width:100%;max-height:400px;border:2px solid #e2e8f0;border-radius:12px;background:#fff;padding:4px">
+            </a>
+            <div style="margin-top:6px">
+                <a href="{{ \Storage::url($booking->payment_proof) }}" target="_blank" style="font-size:12px;color:#0284c7;font-weight:700;text-decoration:none">🔍 Open full size</a>
+            </div>
+        </div>
+        @endif
+
+        {{-- Actions --}}
+        @if(($booking->payment_status ?? 'pending') === 'submitted')
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+            <form action="{{ route('provider.transport.bookings.verify-payment-proof', $booking) }}" method="POST" onsubmit="return confirm('Verify this payment? Booking will be auto-confirmed and traveler notified.');" style="flex:1;min-width:160px;margin:0">
+                @csrf @method('PATCH')
+                <button type="submit" style="width:100%;padding:11px;background:#059669;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer">
+                    ✅ Verify Payment
+                </button>
+            </form>
+            <button type="button" onclick="document.getElementById('rejectForm').style.display='block'" style="flex:1;min-width:160px;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer">
+                ❌ Reject Proof
+            </button>
+        </div>
+
+        <form id="rejectForm" action="{{ route('provider.transport.bookings.reject-payment-proof', $booking) }}" method="POST" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line,#e4ecf6)">
             @csrf @method('PATCH')
-            <button type="submit" style="padding:10px 20px;background:#059669;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer">✅ Mark as Paid</button>
+            <div style="margin-bottom:10px">
+                <label style="display:block;font-size:11px;font-weight:800;color:var(--muted,#6b7f96);text-transform:uppercase;margin-bottom:4px">Reason for Rejection *</label>
+                <textarea name="rejection_reason" required maxlength="500" rows="3" placeholder="e.g. Transaction ID not found in our system, Amount mismatch, Screenshot unclear" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;font-family:inherit;font-size:13px"></textarea>
+            </div>
+            <div style="display:flex;gap:8px">
+                <button type="button" onclick="document.getElementById('rejectForm').style.display='none'" style="flex:1;padding:9px;background:#f1f5f9;color:#0f172a;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px">Cancel</button>
+                <button type="submit" style="flex:1;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px">Confirm Reject</button>
+            </div>
         </form>
+        @elseif(($booking->payment_status ?? 'pending') === 'pending' && $booking->status !== 'cancelled' && ($booking->payment_model ?? 'pay_on_arrival') === 'pay_on_arrival')
+        <div style="margin-top:14px;padding:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;font-size:12px;color:#0369a1;font-weight:600">
+            💵 Pay on Arrival — Collect payment at departure. Use "Confirm Booking" to accept.
+        </div>
         @endif
     </div>
 

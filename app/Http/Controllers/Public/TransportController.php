@@ -50,14 +50,12 @@ class TransportController extends Controller
                 ->where('to_location_id', $toLocId)->pluck('id');
 
             if ($routeIds->isNotEmpty()) {
-                // First: count all scheduled trips on this date/route (regardless of seats)
                 $allScheduled = TransportTrip::where('provider_id', $provider->id)
                     ->whereIn('route_id', $routeIds)
                     ->whereDate('departure_date', $travelDate)
                     ->where('status', 'scheduled')
                     ->count();
 
-                // Then: only those with availability
                 $trips = TransportTrip::with([
                         'vehicle:id,vehicle_number,vehicle_type,capacity',
                         'route:id,name,from_location_id,to_location_id,duration_minutes',
@@ -72,7 +70,6 @@ class TransportController extends Controller
                     ->orderBy('departure_time')
                     ->get();
 
-                // Flag: all trips exist but full
                 $allBookedOut = ($allScheduled > 0 && $trips->isEmpty());
             }
         }
@@ -81,6 +78,16 @@ class TransportController extends Controller
             ->where('is_active', true)
             ->where('valid_until', '>=', now())
             ->orderBy('valid_until')->get();
+
+        // ✅ Chunk 2 Edit 3A — payment methods + model
+        $paymentMethods = \App\Models\ProviderPaymentMethod::where('provider_id', $provider->id)
+            ->where('is_active', true)
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->get();
+
+        $paymentModel = $provider->transport_payment_model ?? 'both';
+        $hasActiveMethods = $paymentMethods->isNotEmpty();
 
         $tripsForJs = $trips->map(fn($t) => [
             'id' => $t->id,
@@ -100,7 +107,8 @@ class TransportController extends Controller
         return view('public.transport.show', compact(
             'service', 'provider', 'vehicles', 'routes', 'locations', 'trips', 'tripsForJs',
             'hasSearch', 'travelDate', 'fromLocId', 'toLocId', 'offers',
-            'allBookedOut'
+            'allBookedOut',
+            'paymentMethods', 'paymentModel', 'hasActiveMethods'
         ));
     }
 
@@ -110,6 +118,7 @@ class TransportController extends Controller
         $provider = $service->provider;
         abort_unless($provider, 404);
 
+        // ✅ Chunk 2 Edit 3B — payment_model validation
         $validated = $request->validate([
             'trip_id'         => 'required|exists:transport_trips,id',
             'passenger_name'  => 'required|string|max:100',
@@ -117,9 +126,31 @@ class TransportController extends Controller
             'passenger_count' => 'required|integer|min:1',
             'booking_type'    => 'required|in:per_seat,full_vehicle',
             'pickup_point'    => 'nullable|string|max:255',
+            'payment_model'   => 'nullable|in:advance,pay_on_arrival',
         ]);
 
-        return DB::transaction(function () use ($provider, $validated) {
+        // Resolve payment_model from provider settings
+        $providerModel = $provider->transport_payment_model ?? 'both';
+        if ($providerModel === 'both') {
+            $chosenModel = $validated['payment_model'] ?? 'advance';
+        } else {
+            $chosenModel = $providerModel;
+        }
+        unset($validated['payment_model']);
+
+        // Advance requires active payment method
+        if ($chosenModel === 'advance') {
+            $hasActive = \App\Models\ProviderPaymentMethod::where('provider_id', $provider->id)
+                ->where('is_active', true)->exists();
+            if (!$hasActive) {
+                return back()->withErrors([
+                    'payment_model' => 'This provider has no active payment methods. Please choose Pay on Arrival.'
+                ])->withInput();
+            }
+        }
+
+        // ✅ FIX 1: $chosenModel closure मा use गर्नुस्
+        return DB::transaction(function () use ($provider, $validated, $chosenModel) {
             $trip = TransportTrip::where('id', $validated['trip_id'])
                 ->where('provider_id', $provider->id)
                 ->where('status', 'scheduled')
@@ -176,9 +207,15 @@ class TransportController extends Controller
                 'amount' => $totalAmount,
                 'status' => 'pending',
                 'payment_status' => 'pending',
+                'payment_model' => $chosenModel,   // ✅ FIX 2: snapshot
             ]);
 
             $trip->decrement('seats_available', $seatsNeeded);
+
+            // ✅ FIX 3: Dispatch with payment CTA based on model
+            if ($chosenModel === 'advance') {
+                // Email already includes a "Complete Payment" CTA (see email view)
+            }
 
             try {
                 \Mail::to($booking->passenger_email)->queue(new \App\Mail\TransportBookingCreatedMail($booking));
@@ -195,7 +232,85 @@ class TransportController extends Controller
                 \Log::warning('Transport provider notify failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
             }
 
+            if ($chosenModel === 'advance') {
+                $paymentMethods = \App\Models\ProviderPaymentMethod::where('provider_id', $provider->id)
+                    ->where('is_active', true)
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->get();
+
+                session()->flash('payment_booking', [
+                    'id' => $booking->id,
+                    'ref' => $booking->booking_ref,
+                    'email' => $booking->passenger_email,
+                    'amount' => $booking->total_amount,
+                    'methods' => $paymentMethods->map(fn($m) => [
+                        'id' => $m->id,
+                        'type' => $m->type,
+                        'label' => $m->label ?: ucfirst($m->type),
+                        'identifier' => $m->identifier,
+                        'account_name' => $m->account_name,
+                        'account_number' => $m->account_number,
+                        'bank_name' => $m->bank_name,
+                        'qr_url' => $m->qr_image_path ? \Storage::url($m->qr_image_path) : null,
+                        'instructions' => $m->instructions,
+                        'is_primary' => $m->is_primary,
+                    ])->toArray(),
+                ]);
+            }
+
             return back()->with('success', __('messages.public_transport_booking_success') ?? 'Your booking request has been sent!');
         });
+    }
+        public function uploadPublicProof(Request $request, $bookingId)
+    {
+        $booking = TransportBooking::findOrFail($bookingId);
+
+        // Guard: email must match
+        $email = $request->input('email');
+        if (!$email || strtolower($email) !== strtolower($booking->passenger_email)) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if ($booking->payment_status !== 'pending') {
+            return back()->withErrors(['payment' => 'Payment proof already submitted.']);
+        }
+
+        if (($booking->payment_model ?? 'pay_on_arrival') !== 'advance') {
+            return back()->withErrors(['payment' => 'This booking does not require advance payment.']);
+        }
+
+        $validated = $request->validate([
+            'payment_method_id' => 'required|exists:provider_payment_methods,id',
+            'payment_ref'       => 'required|string|max:100',
+            'payment_proof'     => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ]);
+
+        $method = \App\Models\ProviderPaymentMethod::where('id', $validated['payment_method_id'])
+            ->where('provider_id', $booking->provider_id)
+            ->firstOrFail();
+
+        $proofPath = $request->file('payment_proof')->store('transport-payment-proofs/' . $booking->id, 'public');
+
+        $booking->update([
+            'payment_status'       => 'submitted',
+            'payment_method'       => $method->type,
+            'payment_ref'          => $validated['payment_ref'],
+            'payment_proof'        => $proofPath,
+            'payment_submitted_at' => now(),
+        ]);
+
+        try {
+            $providerUser = $booking->provider?->user;
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\PaymentProofSubmittedNotification($booking));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Payment proof notify failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
+        }
+
+        return redirect()
+            ->route('public.transport.show', $booking->trip?->route?->fromLocation?->city ? $booking->provider?->services?->first()?->slug : 'himalayan-transport-service')
+            ->with('success', 'Payment proof submitted! The provider will verify shortly.');
     }
 }

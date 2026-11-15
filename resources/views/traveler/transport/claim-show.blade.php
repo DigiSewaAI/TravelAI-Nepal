@@ -44,7 +44,7 @@
             @if($booking->vehicle)
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6;">
                 <span style="font-size: 13px; color: #6b7280; font-weight: 600;">{{ __('messages.vehicle') ?? 'Vehicle' }}</span>
-                <span style="font-size: 14px; color: #111827; font-weight: 700;">{{ $booking->vehicle->name ?? $booking->vehicle->type ?? 'N/A' }}</span>
+                <span style="font-size: 14px; color: #111827; font-weight: 700;">{{ $booking->vehicle->vehicle_number ?? 'N/A' }}@if($booking->vehicle->vehicle_type) — {{ $booking->vehicle->vehicle_type }}@endif</span>
             </div>
             @endif
             @if($booking->passenger_name)

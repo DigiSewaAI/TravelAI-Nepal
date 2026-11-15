@@ -3468,4 +3468,22 @@ return array (
   'pm_cannot_set_inactive_primary' => 'निष्क्रिय विधि प्राथमिकको रूपमा सेट गर्न सकिँदैन। पहिले सक्रिय गर्नुहोस्।',
   'pm_payment_model_updated' => 'भुक्तानी मोडेल अद्यावधिक भयो।',
   'pm_advance_requires_method' => 'अग्रिम वा दुवै भुक्तानीको लागि कम्तीमा एउटा सक्रिय भुक्तानी विधि आवश्यक छ।',
+    // ── Chunk 2 — Transport payment (public + traveler) ──
+  'public_payment_option' => 'भुक्तानी विकल्प',
+  'public_pay_advance' => 'अहिले भुक्तानी गर्नुहोस् (अग्रिम)',
+  'public_pay_on_arrival' => 'प्रस्थानमा भुक्तानी गर्नुहोस्',
+  'public_pay_on_arrival_note' => 'तपाईंले प्रस्थानमा भुक्तानी गर्नुहुनेछ।',
+  'traveler_transport_bookings' => 'मेरा यातायात बुकिङहरू',
+  'traveler_payment_required' => 'भुक्तानी आवश्यक',
+  'traveler_complete_payment' => 'भुक्तानी पूरा गर्नुहोस्',
+  'traveler_payment_method_used' => 'प्रयोग गरिएको भुक्तानी विधि',
+  'traveler_transaction_ref' => 'लेनदेन सन्दर्भ / आईडी',
+  'traveler_payment_screenshot' => 'भुक्तानी स्क्रिनसट',
+  'traveler_submit_payment_proof' => 'भुक्तानी प्रमाण पेश गर्नुहोस्',
+  'traveler_pay_at_departure' => 'प्रस्थानमा भुक्तानी गर्नुहोस्',
+  'traveler_payment_submitted' => 'भुक्तानी प्रमाण पेश भयो',
+    // ── Chunk 2 — Payment modal (public transport) ──
+  'public_complete_payment' => 'भुक्तानी पूरा गर्नुहोस्',
+  'payment_proof_submitted_success' => 'भुक्तानी प्रमाण पेश भयो! प्रदायकले चाँडै प्रमाणित गर्नुहुनेछ।',
+    'transport_booking' => 'यातायात बुकिंग',
 );

@@ -164,6 +164,7 @@ Route::post('/hotel/{slug}/book', [\App\Http\Controllers\Public\HotelController:
 
 Route::get('/transport/{slug}', [\App\Http\Controllers\Public\TransportController::class, 'show'])->name('public.transport.show');
 Route::post('/transport/{slug}/book', [\App\Http\Controllers\Public\TransportController::class, 'book'])->name('public.transport.book');
+Route::post('/transport/bookings/{bookingId}/payment-proof', [\App\Http\Controllers\Public\TransportController::class, 'uploadPublicProof'])->name('public.transport.payment-proof');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
 // =============================================
@@ -361,6 +362,8 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');
     Route::patch('/transport/bookings/{booking}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateBookingStatus'])->name('transport.bookings.status');
     Route::patch('/transport/bookings/{booking}/verify-payment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'verifyPayment'])->name('transport.bookings.verify-payment');
+    Route::patch('/transport/bookings/{booking}/verify-payment-proof', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'verifyPaymentProof'])->name('transport.bookings.verify-payment-proof');
+    Route::patch('/transport/bookings/{booking}/reject-payment-proof', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'rejectPaymentProof'])->name('transport.bookings.reject-payment-proof');
         // Transport CRUD Routes
     Route::post('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeVehicle'])->name('transport.vehicles.store');
     Route::put('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicle'])->name('transport.vehicles.update');
@@ -1007,6 +1010,16 @@ Route::middleware(['auth', 'feature.flag:claim.transport_enabled'])
         Route::get('/claim/verify/{token}', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'showVerify'])->name('claim.verify.form');
         Route::post('/claim/verify/{token}', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'verify'])->name('claim.verify');
         Route::get('/claim/show/{booking}', [\App\Http\Controllers\Traveler\TransportClaimController::class, 'show'])->name('claim.show');
+    });
+
+// Traveler transport bookings — separate group (कोई feature flag नै)
+Route::middleware(['auth'])
+    ->prefix('traveler/transport/bookings')
+    ->name('traveler.transport.bookings.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'show'])->name('show');
+        Route::post('/{id}/payment-proof', [\App\Http\Controllers\Traveler\TransportBookingController::class, 'uploadProof'])->name('payment-proof');
     });
 // ═══ PHASE 4.4 — HOTEL CLAIM ROUTES ═══
 Route::middleware(['auth', 'feature.flag:claim.hotel_enabled'])

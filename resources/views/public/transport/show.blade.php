@@ -633,6 +633,30 @@
                 <input type="number" name="passenger_count" id="bm_passengers" value="1" min="1" class="tr-form-input" onchange="recalcTotal()">
             </div>
 
+            @if(isset($paymentModel) && $paymentModel === 'both')
+            <div class="tr-form-group">
+                <label class="tr-form-label">{{ __('messages.public_payment_option') ?? 'Payment Option' }}</label>
+                <div class="tr-radio-group">
+                    @if($hasActiveMethods ?? false)
+                    <div class="tr-radio-option">
+                        <input type="radio" name="payment_model" value="advance" id="pm_advance" checked>
+                        <label for="pm_advance">{{ __('messages.public_pay_advance') ?? 'Pay Now (Advance)' }}</label>
+                    </div>
+                    @endif
+                    <div class="tr-radio-option">
+                        <input type="radio" name="payment_model" value="pay_on_arrival" id="pm_pay_arrival" {{ ($hasActiveMethods ?? false) ? '' : 'checked' }}>
+                        <label for="pm_pay_arrival">{{ __('messages.public_pay_on_arrival') ?? 'Pay at Departure' }}</label>
+                    </div>
+                </div>
+            </div>
+            @elseif(isset($paymentModel) && $paymentModel === 'pay_on_arrival')
+            <div class="tr-form-group">
+                <div style="background:#f0f9ff;border:1px solid #bae6fd;padding:12px 14px;border-radius:10px;font-size:13px;color:#0369a1;">
+                    💵 {{ __('messages.public_pay_on_arrival_note') ?? 'You will pay at departure.' }}
+                </div>
+            </div>
+            @endif
+
             <div class="tr-form-group">
                 <label class="tr-form-label">{{ __('messages.public_your_name') ?? 'Your Name' }}</label>
                 <input type="text" name="passenger_name" required class="tr-form-input">
@@ -750,5 +774,97 @@ document.getElementById('bookingModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeBookingModal();
 });
 </script>
+{{-- PAYMENT MODAL (Advance Payment — auto-opens after booking) --}}
+@if(session('payment_booking'))
+@php $pb = session('payment_booking'); @endphp
+<div id="paymentModal" class="tr-modal-overlay" style="display:flex">
+    <div class="tr-modal-box">
+        <div class="tr-modal-head">
+            <h3>💳 {{ __('messages.public_complete_payment') ?? 'Complete Payment' }}</h3>
+            <button type="button" class="tr-modal-close" onclick="closePaymentModal()">&times;</button>
+        </div>
 
+        <div style="background:#fffbeb;border:1px solid #fbbf24;padding:14px 16px;border-radius:12px;margin-bottom:16px;">
+            <div style="font-size:11px;color:#92400e;font-weight:800;text-transform:uppercase;letter-spacing:.5px">Booking Reference</div>
+            <div style="font-size:18px;font-weight:800;color:#92400e;margin-top:4px">{{ $pb['ref'] }}</div>
+            <div style="font-size:20px;font-weight:800;color:#92400e;margin-top:8px">Rs {{ number_format($pb['amount'], 2) }}</div>
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:10px">Step 1 — Send payment to:</div>
+        @foreach($pb['methods'] as $i => $m)
+        <label style="display:block;border:2px solid {{ $i === 0 ? '#0284c7' : '#e2e8f0' }};border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;background:{{ $i === 0 ? '#f0f9ff' : '#fff' }}" class="payment-method-option">
+            <input type="radio" name="pm_select" value="{{ $m['id'] }}" {{ $i === 0 ? 'checked' : '' }} onchange="selectPaymentMethod(this)" style="margin-right:8px">
+            <strong style="font-size:14px">{{ $m['label'] }}</strong>
+            @if($m['is_primary'])
+                <span style="font-size:10px;background:#fef4e2;color:#b45309;padding:2px 8px;border-radius:6px;margin-left:6px;font-weight:800">⭐ PRIMARY</span>
+            @endif
+            <div style="margin-top:8px;font-size:12px;color:#0f172a;padding-left:24px;line-height:1.7">
+                @if($m['identifier'])<div><strong>Phone/Email:</strong> {{ $m['identifier'] }}</div>@endif
+                @if($m['account_name'])<div><strong>Name:</strong> {{ $m['account_name'] }}</div>@endif
+                @if($m['account_number'])<div><strong>Account:</strong> {{ $m['account_number'] }}</div>@endif
+                @if($m['bank_name'])<div><strong>Bank:</strong> {{ $m['bank_name'] }}</div>@endif
+                @if($m['instructions'])<div style="color:#64748b;margin-top:4px">{{ $m['instructions'] }}</div>@endif
+            </div>
+            @if($m['qr_url'])
+                <div style="margin-top:10px;padding-left:24px">
+                    <img src="{{ $m['qr_url'] }}" alt="QR" style="width:120px;height:120px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;padding:4px">
+                    <div style="font-size:11px;color:#64748b;margin-top:4px">Scan this QR to pay</div>
+                </div>
+            @endif
+        </label>
+        @endforeach
+
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin:16px 0 10px">Step 2 — Upload proof:</div>
+
+        <form method="POST" action="{{ route('public.transport.payment-proof', $pb['id']) }}" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="email" value="{{ $pb['email'] }}">
+            <input type="hidden" name="service_slug" value="{{ $service->slug }}">
+            <input type="hidden" name="payment_method_id" id="pm_selected_id" value="{{ $pb['methods'][0]['id'] ?? '' }}">
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">Transaction Reference / ID</label>
+                <input type="text" name="payment_ref" required placeholder="e.g. TXN-12345" class="tr-form-input">
+            </div>
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">Payment Screenshot</label>
+                <input type="file" name="payment_proof" accept="image/*" required class="tr-form-input">
+                <div style="font-size:11px;color:#64748b;margin-top:4px">Max 5MB · JPG, PNG, WEBP</div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:16px">
+                <button type="button" onclick="closePaymentModal()" style="flex:1;padding:12px;background:#f1f5f9;color:#0f172a;border:none;border-radius:10px;font-weight:700;cursor:pointer">
+                    Pay Later
+                </button>
+                <button type="submit" style="flex:2;padding:12px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer">
+                    Submit Payment Proof
+                </button>
+            </div>
+        </form>
+
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;text-align:center;font-size:12px;color:#64748b">
+            ⓘ You can also complete payment later from your <a href="{{ url('/traveler/dashboard-v2') }}" style="color:#0284c7;font-weight:700">dashboard</a> or email link.
+        </div>
+    </div>
+</div>
+
+<script>
+function selectPaymentMethod(radio) {
+    document.getElementById('pm_selected_id').value = radio.value;
+    document.querySelectorAll('.payment-method-option').forEach(el => {
+        el.style.borderColor = '#e2e8f0';
+        el.style.background = '#fff';
+    });
+    radio.closest('.payment-method-option').style.borderColor = '#0284c7';
+    radio.closest('.payment-method-option').style.background = '#f0f9ff';
+}
+
+function closePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+    // Clear session flash on close (backend session will clear on next request)
+    window.location.href = '{{ route("public.transport.show", $service->slug) }}';
+}
+</script>
+@endif
 @endsection
