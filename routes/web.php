@@ -165,6 +165,13 @@ Route::post('/hotel/{slug}/book', [\App\Http\Controllers\Public\HotelController:
 Route::get('/transport/{slug}', [\App\Http\Controllers\Public\TransportController::class, 'show'])->name('public.transport.show');
 Route::post('/transport/{slug}/book', [\App\Http\Controllers\Public\TransportController::class, 'book'])->name('public.transport.book');
 Route::post('/transport/bookings/{bookingId}/payment-proof', [\App\Http\Controllers\Public\TransportController::class, 'uploadPublicProof'])->name('public.transport.payment-proof');
+
+// ArtCraft public routes
+Route::get('/artcraft/{slug}', [\App\Http\Controllers\Public\ArtCraftController::class, 'show'])->name('public.artcraft.show');
+Route::get('/artcraft/{slug}/artwork/{artworkId}', [\App\Http\Controllers\Public\ArtCraftController::class, 'artworkDetail'])->name('public.artcraft.artwork-detail');
+Route::post('/artcraft/{slug}/artwork/{artworkId}/enquire', [\App\Http\Controllers\Public\ArtCraftController::class, 'enquireReservation'])->name('public.artcraft.enquire');
+Route::get('/artcraft/{slug}/custom', [\App\Http\Controllers\Public\ArtCraftController::class, 'customCommissionForm'])->name('public.artcraft.custom');
+Route::post('/artcraft/{slug}/custom', [\App\Http\Controllers\Public\ArtCraftController::class, 'submitCustomCommission'])->name('public.artcraft.custom.submit');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
 // =============================================

@@ -2434,4 +2434,26 @@ return array (
   'cancellation_rejected' => 'रद्दीकरण अस्वीकृत हो गया।',
   'cancellation' => 'रद्दीकरण',
     'tab_transport' => 'परिवहन',
+      // ── ArtCraft (Phase 2 — public) ──
+  'artcraft_gallery' => 'गैलरी',
+  'artcraft_custom_commission' => 'कस्टम कमीशन',
+  'artcraft_enquire' => 'पूछताछ / आरक्षण',
+  'artcraft_available' => 'उपलब्ध',
+  'artcraft_sold' => 'बिक गया',
+  'artcraft_artist' => 'कलाकार',
+  'artcraft_materials' => 'सामग्री',
+  'artcraft_dimensions' => 'आयाम',
+  'artcraft_request_custom' => 'कस्टम कमीशन का अनुरोध करें',
+  'artcraft_enquiry_sent' => 'आपकी पूछताछ भेज दी गई है! कलाकार शीघ्र ही संपर्क करेंगे।',
+    // ── ArtCraft Phase 2 — translation fixes (9 new) ──
+  'artcraft_back_to_gallery' => 'गैलरी पर वापस',
+  'artcraft_art' => 'कला',
+  'artcraft_no_artworks' => 'अभी कोई कलाकृति नहीं',
+  'artcraft_no_artworks_hint' => 'जल्द फिर देखें या कस्टम कमीशन अनुरोध करें।',
+  'artcraft_custom_request' => 'कस्टम अनुरोध',
+  'artcraft_enquire_about' => 'इस कलाकृति के बारे में पूछें',
+  'artcraft_request_commission' => 'कस्टम कमीशन का अनुरोध करें',
+  'artcraft_request_commission_sub' => 'अपनी सपनों की कलाकृति के बारे में बताएं। कलाकार समीक्षा करेगा और कोट भेजेगा।',
+  'artcraft_submit_commission' => 'कस्टम कमीशन अनुरोध सबमिट करें',
+
 );

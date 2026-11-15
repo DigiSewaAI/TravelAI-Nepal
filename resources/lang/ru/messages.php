@@ -3032,4 +3032,26 @@ return array (
   'cancellation_rejected' => 'Отмена отклонена.',
   'cancellation' => 'Отмена',
     'tab_transport' => 'Транспорт',
+      // ── ArtCraft (Phase 2 — public) ──
+  'artcraft_gallery' => 'Галерея',
+  'artcraft_custom_commission' => 'Индивидуальный заказ',
+  'artcraft_enquire' => 'Спросить / Забронировать',
+  'artcraft_available' => 'Доступно',
+  'artcraft_sold' => 'Продано',
+  'artcraft_artist' => 'Художник',
+  'artcraft_materials' => 'Материалы',
+  'artcraft_dimensions' => 'Размеры',
+  'artcraft_request_custom' => 'Запросить индивидуальный заказ',
+  'artcraft_enquiry_sent' => 'Ваш запрос отправлен! Художник скоро свяжется с вами.',
+    // ── ArtCraft Phase 2 — translation fixes (9 new) ──
+  'artcraft_back_to_gallery' => 'Назад в галерею',
+  'artcraft_art' => 'Искусство',
+  'artcraft_no_artworks' => 'Пока нет произведений',
+  'artcraft_no_artworks_hint' => 'Заходите позже или запросите индивидуальный заказ.',
+  'artcraft_custom_request' => 'Индивидуальный запрос',
+  'artcraft_enquire_about' => 'Спросить об этом произведении',
+  'artcraft_request_commission' => 'Запросить индивидуальный заказ',
+  'artcraft_request_commission_sub' => 'Расскажите о произведении вашей мечты. Художник рассмотрит и пришлёт расценку.',
+  'artcraft_submit_commission' => 'Отправить запрос на индивидуальный заказ',
+
 );

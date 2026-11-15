@@ -2445,4 +2445,26 @@ return array (
   'cancellation_rejected' => '取消已拒绝。',
   'cancellation' => '取消',
     'tab_transport' => '交通',
+      // ── ArtCraft (Phase 2 — public) ──
+  'artcraft_gallery' => '画廊',
+  'artcraft_custom_commission' => '定制委托',
+  'artcraft_enquire' => '咨询 / 预订',
+  'artcraft_available' => '可购买',
+  'artcraft_sold' => '已售出',
+  'artcraft_artist' => '艺术家',
+  'artcraft_materials' => '材料',
+  'artcraft_dimensions' => '尺寸',
+  'artcraft_request_custom' => '请求定制委托',
+  'artcraft_enquiry_sent' => '您的咨询已发送！艺术家将尽快与您联系。',
+    // ── ArtCraft Phase 2 — translation fixes (9 new) ──
+  'artcraft_back_to_gallery' => '返回画廊',
+  'artcraft_art' => '艺术',
+  'artcraft_no_artworks' => '还没有艺术品',
+  'artcraft_no_artworks_hint' => '请稍后再来或申请定制委托。',
+  'artcraft_custom_request' => '定制请求',
+  'artcraft_enquire_about' => '咨询此艺术品',
+  'artcraft_request_commission' => '申请定制委托',
+  'artcraft_request_commission_sub' => '告诉我们您梦想中的艺术品。艺术家将审核并发送报价。',
+  'artcraft_submit_commission' => '提交定制委托请求',
+
 );

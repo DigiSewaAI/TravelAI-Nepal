@@ -3496,4 +3496,26 @@ return array (
   'cancellation_rejected' => 'रद्द अस्वीकृत भयो।',
   'cancellation' => 'रद्द',
     'tab_transport' => 'यातायात',
+      // ── ArtCraft (Phase 2 — public) ──
+  'artcraft_gallery' => 'ग्यालरी',
+  'artcraft_custom_commission' => 'अनुकूलित कमिसन',
+  'artcraft_enquire' => 'सोधपुछ / आरक्षण',
+  'artcraft_available' => 'उपलब्ध',
+  'artcraft_sold' => 'बिक्री भयो',
+  'artcraft_artist' => 'कलाकार',
+  'artcraft_materials' => 'सामग्रीहरू',
+  'artcraft_dimensions' => 'आयामहरू',
+  'artcraft_request_custom' => 'अनुकूलित कमिसन अनुरोध गर्नुहोस्',
+  'artcraft_enquiry_sent' => 'तपाईंको सोधपुछ पठाइयो! कलाकारले चाँडै सम्पर्क गर्नुहुनेछ।',
+    // ── ArtCraft Phase 2 — translation fixes (9 new) ──
+  'artcraft_back_to_gallery' => 'ग्यालरीमा फर्कनुहोस्',
+  'artcraft_art' => 'कला',
+  'artcraft_no_artworks' => 'अझै कुनै कलाकृति नै',
+  'artcraft_no_artworks_hint' => 'चाँडै फेरि हेर्नुहोस् वा अनुकूलित कमिसन अनुरोध गर्नुहोस्।',
+  'artcraft_custom_request' => 'अनुकूलित अनुरोध',
+  'artcraft_enquire_about' => 'यो कलाकृतिको बारेमा सोध्नुहोस्',
+  'artcraft_request_commission' => 'अनुकूलित कमिसन अनुरोध गर्नुहोस्',
+  'artcraft_request_commission_sub' => 'तपाईंको सपनाको कलाकृतिको बारेमा बताउनुहोस्। कलाकारले समीक्षा गरेर मूल्य पठाउनेछ।',
+  'artcraft_submit_commission' => 'अनुकूलित कमिसन अनुरोध पेश गर्नुहोस्',
+
 );
