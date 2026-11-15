@@ -109,10 +109,35 @@ class ArtCraftDashboardController extends Controller
         abort_unless($provider && $order->provider_id === $provider->id, 403);
 
         $validated = $request->validate([
-            'status' => 'required|in:pending,progress,done',
+            'status' => 'required|in:pending,under_review,quoted,accepted,revision_requested,rejected,in_progress,ready_for_delivery,completed,cancelled',
         ]);
 
+        // Transition guard (provider role)
+        if (!$order->canTransitionTo($validated['status'], 'provider')) {
+            $msg = 'Invalid status transition from ' . $order->status . ' to ' . $validated['status'];
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'error' => $msg], 422);
+            }
+            return back()->withErrors(['status' => $msg]);
+        }
+
+        $oldStatus = $order->status;
         $order->status = $validated['status'];
+
+        // Production timestamps
+        if ($validated['status'] === 'in_progress' && !$order->production_started_at) {
+            $order->production_started_at = now();
+        }
+        if ($validated['status'] === 'ready_for_delivery' && !$order->ready_at) {
+            $order->ready_at = now();
+        }
+        if ($validated['status'] === 'completed' && !$order->completed_at) {
+            $order->completed_at = now();
+        }
+        if ($validated['status'] === 'cancelled' && !$order->cancelled_at) {
+            $order->cancelled_at = now();
+        }
+
         $order->save();
 
         if ($request->expectsJson() || $request->ajax()) {
