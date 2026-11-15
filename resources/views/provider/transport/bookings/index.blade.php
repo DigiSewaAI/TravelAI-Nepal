@@ -39,15 +39,28 @@
                                 </td>
                                 <td style="padding:14px 8px;font-size:13px;color:var(--text,#0c1e33)">{{ $b->route_name ?? 'N/A' }}</td>
                                 <td style="padding:14px 8px;font-size:13px;color:var(--muted,#6b7f96)">{{ $b->travel_date ? \Carbon\Carbon::parse($b->travel_date)->format('M d, Y') : 'N/A' }}</td>
-                                <td style="padding:14px 8px;font-size:13px;font-weight:700;color:var(--text,#0c1e33)">Rs {{ number_format($b->amount, 2) }}</td>
+                                <td style="padding:14px 8px;font-size:13px;font-weight:700;color:var(--text,#0c1e33)">
+                                    @if(is_null($b->trip_id))
+                                        <span style="display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:#b45309;background:#fef4e2;padding:2px 6px;border-radius:4px;width:max-content;margin-bottom:4px">Legacy</span>
+                                    @endif
+                                    @if((float)$b->amount > 0)
+                                        Rs {{ number_format($b->amount, 2) }}
+                                    @else
+                                        <span style="color:var(--muted,#6b7f96);font-weight:600">{{ __('messages.price_on_request') ?? 'Price on request' }}</span>
+                                    @endif
+                                </td>
                                 <td style="padding:14px 8px">
                                     <span style="padding:5px 10px;border-radius:8px;background:{{ $bg }};color:{{ $fg }};font-size:11px;font-weight:800;text-transform:uppercase">{{ $b->status }}</span>
                                 </td>
-                                <td style="padding:14px 8px;text-align:right">
-                                    <a href="{{ route('provider.transport.bookings.show', $b) }}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:var(--sky-soft,#e0f2fe);color:var(--accent-d,#0284c7);font-size:12px;font-weight:800;text-decoration:none">
+                                <td style="padding:14px 8px;text-align:right;white-space:nowrap">
+                                    <a href="{{ route('provider.transport.bookings.show', $b) }}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:var(--sky-soft,#e0f2fe);color:var(--accent-d,#0284c7);font-size:12px;font-weight:800;text-decoration:none;margin-right:6px">
                                         {{ __('messages.view') }}
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                                     </a>
+                                    <form action="{{ route('provider.transport.bookings.destroy', $b) }}" method="POST" onsubmit="return confirm('Delete booking {{ $b->booking_ref }}?');" style="display:inline;margin:0">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" style="padding:6px 10px;border-radius:8px;background:#fdecec;color:#b91c1c;border:none;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit">🗑</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

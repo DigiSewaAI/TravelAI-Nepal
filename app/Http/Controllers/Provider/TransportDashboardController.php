@@ -264,7 +264,7 @@ class TransportDashboardController extends Controller
         $provider = Auth::user()->getCurrentProvider();
         abort_unless($provider && $booking->provider_id === $provider->id, 403);
 
-        DB::transaction(function () use ($booking) {
+        \DB::transaction(function () use ($booking) {
             if ($booking->trip_id && $booking->status !== 'cancelled') {
                 $trip = \App\Models\TransportTrip::lockForUpdate()->find($booking->trip_id);
                 if ($trip) {

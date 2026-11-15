@@ -355,6 +355,19 @@
     </div>
 </div>
 
+@if(session('success'))
+<div class="tr-search-section" style="margin-bottom: 12px;">
+    <div class="tr-alert tr-alert-success">{{ session('success') }}</div>
+</div>
+@endif
+@if($errors->any())
+<div class="tr-search-section" style="margin-bottom: 12px;">
+    <div class="tr-alert tr-alert-error">
+        @foreach($errors->all() as $err)<div>• {{ $err }}</div>@endforeach
+    </div>
+</div>
+@endif
+
 <!-- SEARCH BAR -->
 <div class="tr-search-section">
     <div class="tr-search-box">
@@ -563,61 +576,7 @@
                 <p>{{ __('messages.public_search_hint_body') ?? 'Use the search bar above to find available departures on your route.' }}</p>
             </div>
 
-                @if(session('success'))
-                    <div class="tr-alert tr-alert-success">{{ session('success') }}</div>
-                @endif
-                @if($errors->any())
-                    <div class="tr-alert tr-alert-error">
-                        @foreach($errors->all() as $err)<div>{{ $err }}</div>@endforeach
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('public.transport.book', $service->slug) }}">
-                    @csrf
-
-                    <div class="tr-form-group">
-                        <label class="tr-form-label">{{ __('messages.public_transport_vehicle') ?? 'Select Vehicle' }}</label>
-                        <select name="vehicle_id" required class="tr-form-input">
-                            <option value="">— {{ __('messages.public_transport_choose') ?? 'Choose' }} —</option>
-                            @foreach($vehicles as $v)
-                                <option value="{{ $v->id }}" @selected(old('vehicle_id') == $v->id)>
-                                    {{ $v->vehicle_type }} — {{ $v->vehicle_number }} ({{ $v->capacity }} seats)
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="tr-form-group">
-                        <label class="tr-form-label">{{ __('messages.public_transport_route') ?? 'Route' }}</label>
-                        <input type="text" name="route_name" value="{{ old('route_name', $vehicles->first()->route_name ?? '') }}" required class="tr-form-input">
-                    </div>
-
-                    <div class="tr-form-row">
-                        <div class="tr-form-group">
-                            <label class="tr-form-label">{{ __('messages.public_date') ?? 'Date' }}</label>
-                            <input type="date" name="travel_date" required min="{{ date('Y-m-d') }}" value="{{ old('travel_date') }}" class="tr-form-input">
-                        </div>
-                        <div class="tr-form-group">
-                            <label class="tr-form-label">{{ __('messages.public_time') ?? 'Time (Optional)' }}</label>
-                            <input type="time" name="travel_time" value="{{ old('travel_time') }}" class="tr-form-input">
-                        </div>
-                    </div>
-
-                    <div class="tr-form-group">
-                        <label class="tr-form-label">{{ __('messages.public_your_name') ?? 'Your Name' }}</label>
-                        <input type="text" name="passenger_name" required value="{{ old('passenger_name') }}" class="tr-form-input">
-                    </div>
-
-                    <div class="tr-form-group">
-                        <label class="tr-form-label">{{ __('messages.public_email') ?? 'Email' }}</label>
-                        <input type="email" name="passenger_email" required value="{{ old('passenger_email') }}" class="tr-form-input">
-                    </div>
-
-                    <button type="submit" class="tr-btn-book">
-                        <i class="fas fa-ticket-alt"></i> {{ __('messages.public_confirm_booking') ?? 'Confirm Booking' }}
-                    </button>
-                </form>
-            </div>
+        </div>
 
             <div class="tr-side-card">
                 <h3><i class="fas fa-address-card"></i> {{ __('messages.public_contact_info') ?? 'Contact' }}</h3>
