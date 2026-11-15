@@ -83,7 +83,7 @@
                         </span>
                     </td>
                     <td style="text-align:right;white-space:nowrap;">
-                        <button type="button" onclick="openEditVehicleModal({{ $v->id }}, '{{ addslashes($v->vehicle_number) }}', '{{ addslashes($v->vehicle_type) }}', {{ $v->capacity }}, '{{ addslashes($v->driver_name ?? '') }}', '{{ addslashes($v->route_name ?? '') }}', '{{ $v->status }}')" style="padding:6px 10px;border-radius:7px;border:none;background:var(--sky-soft);color:var(--sky-d);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;margin-right:4px;"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
+                        <button type="button" onclick="openEditVehicleModal({{ $v->id }}, '{{ addslashes($v->vehicle_number) }}', '{{ addslashes($v->vehicle_type) }}', {{ $v->capacity }}, '{{ addslashes($v->driver_name ?? '') }}', '{{ addslashes($v->route_name ?? '') }}', '{{ $v->status }}', '{{ addslashes($v->image_path ?? '') }}')" style="padding:6px 10px;border-radius:7px;border:none;background:var(--sky-soft);color:var(--sky-d);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;margin-right:4px;"><i class="fas fa-edit"></i> {{ __('messages.edit') }}</button>
                         <form action="{{ route('provider.transport.vehicles.destroy', $v) }}" method="POST" style="display:inline;margin:0;" onsubmit="return confirm('Delete?')">
                             @csrf @method('DELETE')
                             <button type="submit" style="padding:6px 10px;border-radius:7px;border:none;background:var(--red-soft);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;"><i class="fas fa-trash"></i></button>
@@ -105,7 +105,7 @@
       <h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0">{{ __('messages.edit_vehicle') }}</h3>
       <button type="button" onclick="closeEditVehicleModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1">&times;</button>
     </div>
-    <form id="editVehicleForm" method="POST">
+    <form id="editVehicleForm" method="POST" enctype="multipart/form-data">
       @csrf @method('PUT')
       <div style="margin-bottom:14px">
         <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_number') }}</label>
@@ -143,13 +143,21 @@
           <option value="charging">{{ __('messages.charging') }}</option>
         </select>
       </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase">{{ __('messages.vehicle_image') ?? 'Vehicle Image' }} (Optional)</label>
+        <div id="ev_current_image_preview" style="margin-top:6px;margin-bottom:6px;display:none">
+          <img id="ev_current_image" src="" alt="Current" style="max-height:60px;border-radius:6px;border:1px solid var(--line)">
+        </div>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/jpg,image/webp" style="width:100%;padding:8px;margin-top:4px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13px;background:#f9fafb">
+        <p style="font-size:11px;color:var(--muted);margin-top:4px">Max 5MB · JPG, PNG, WEBP · Leave empty to keep current</p>
+      </div>
       <button type="submit" style="width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--sky,#0ea5e9),var(--sky-d,#0284c7));color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;">{{ __('messages.update_vehicle') }}</button>
     </form>
   </div>
 </div>
 
 <script>
-function openEditVehicleModal(id, number, type, capacity, driver, route, status) {
+function openEditVehicleModal(id, number, type, capacity, driver, route, status, imagePath) {
     document.getElementById('editVehicleForm').action = '/provider/transport/vehicles/' + id;
     document.getElementById('ev_number').value = number;
     document.getElementById('ev_type').value = type;
@@ -157,6 +165,17 @@ function openEditVehicleModal(id, number, type, capacity, driver, route, status)
     document.getElementById('ev_driver').value = driver;
     document.getElementById('ev_route').value = route;
     document.getElementById('ev_status').value = status;
+
+    var preview = document.getElementById('ev_current_image_preview');
+    var img = document.getElementById('ev_current_image');
+    if (imagePath) {
+        img.src = '/storage/' + imagePath;
+        preview.style.display = 'block';
+    } else {
+        img.src = '';
+        preview.style.display = 'none';
+    }
+
     document.getElementById('editVehicleModal').style.display = 'flex';
 }
 function closeEditVehicleModal() { document.getElementById('editVehicleModal').style.display = 'none'; }

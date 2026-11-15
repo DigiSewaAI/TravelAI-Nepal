@@ -382,6 +382,7 @@ class TransportDashboardController extends Controller
             'driver_name'    => 'nullable|string|max:100',
             'route_name'     => 'nullable|string|max:150',
             'status'         => 'required|in:available,on-route,maintenance,charging',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $exists = TransportVehicle::where('provider_id', $provider->id)
@@ -390,6 +391,14 @@ class TransportDashboardController extends Controller
         if ($exists) {
             return redirect()->back()->withErrors(['vehicle_number' => __('messages.vehicle_number_exists')])->withInput();
         }
+
+        if ($request->hasFile('image')) {
+            if ($vehicle->image_path) {
+                \Storage::disk('public')->delete($vehicle->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('transport-vehicles/' . $provider->id, 'public');
+        }
+        unset($validated['image']);
 
         $vehicle->update($validated);
         return redirect()->back()->with('success', __('messages.vehicle_updated_success'));
