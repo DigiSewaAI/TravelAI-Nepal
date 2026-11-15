@@ -48,9 +48,31 @@
                         <td style="padding: 6px 0; color: #64748b;">Time</td>
                         <td style="padding: 6px 0; text-align: right; font-weight: 600;">{{ $booking->travel_time }}</td>
                     </tr>
-                    @endif
-                    <tr>
-                        <td style="padding: 6px 0; color: #64748b;">Amount</td>
+                            @endif
+        @if($booking->trip_id)
+        <tr>
+            <td style="padding: 6px 0; color: #64748b;">{{ __('messages.passengers_count') }}</td>
+            <td style="padding: 6px 0; text-align: right; font-weight: 600;">{{ $booking->passenger_count }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 6px 0; color: #64748b;">{{ __('messages.booking_type_label') }}</td>
+            <td style="padding: 6px 0; text-align: right; font-weight: 600;">
+                @if($booking->booking_type === 'full_vehicle')
+                    {{ __('messages.full_vehicle_label') }}
+                @else
+                    {{ __('messages.per_seat_label') }}
+                @endif
+            </td>
+        </tr>
+        @endif
+        @if($booking->pickup_point)
+        <tr>
+            <td style="padding: 6px 0; color: #64748b;">{{ __('messages.pickup_label') }}</td>
+            <td style="padding: 6px 0; text-align: right; font-weight: 600;">{{ $booking->pickup_point }}</td>
+        </tr>
+        @endif
+        <tr>
+            <td style="padding: 6px 0; color: #64748b;">Amount</td>
                         <td style="padding: 6px 0; text-align: right; font-weight: 700; color: #059669;">
                             @if((float)$booking->amount > 0)
                                 Rs {{ number_format((float) $booking->amount, 2) }}
@@ -59,10 +81,19 @@
                             @endif
                         </td>
                     </tr>
-                </table>
-            </div>
+                    </table>
+</div>
 
-            {{-- Reminder --}}
+@if($booking->trip_id && $booking->price_per_unit && $booking->total_amount)
+<div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px;">
+    <div style="font-size: 12px; color: #065f46; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">{{ __('messages.price_breakdown') }}</div>
+    <div style="font-size: 15px; color: #111827; font-weight: 600;">
+        {{ $booking->passenger_count }} × Rs {{ number_format($booking->price_per_unit, 2) }} = <strong>Rs {{ number_format($booking->total_amount, 2) }}</strong>
+    </div>
+</div>
+@endif
+
+{{-- Reminder --}}
             <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px;">
                 <p style="margin: 0; color: #166534; font-size: 13px;"><strong>🚀 Ready to go!</strong> Please arrive at the departure point 15 minutes early. Bring your booking reference.</p>
             </div>

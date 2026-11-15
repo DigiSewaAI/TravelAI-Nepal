@@ -274,6 +274,51 @@
     .tr-side-card h3 i { color: #0284c7; }
     .tr-side-card p { color: #64748b; font-size: 13px; margin: 8px 0; }
     .tr-side-card p strong { color: #0f172a; }
+
+    /* ===== NEW: Search Bar ===== */
+    .tr-search-section { max-width: 1120px; margin: 0 auto 32px; padding: 0 24px; }
+    .tr-search-box { background: #fff; border: 2px solid #bae6fd; border-radius: 20px; padding: 24px 28px; box-shadow: 0 12px 32px rgba(2,132,199,0.08); }
+    .tr-search-title { font-size: 16px; font-weight: 800; color: #0f172a; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    .tr-search-sub { font-size: 12.5px; color: #64748b; margin: 0 0 18px; font-weight: 600; }
+    .tr-search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    @media (max-width: 720px) { .tr-search-grid { grid-template-columns: 1fr; } }
+    .tr-search-field label { display: block; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .tr-search-field input, .tr-search-field select { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit; background: #fff; }
+    .tr-search-field input:focus, .tr-search-field select:focus { outline: none; border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
+    .tr-search-btn { padding: 11px 24px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: 0; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .tr-search-btn:hover { filter: brightness(1.08); }
+
+    /* ===== NEW: Trip Results ===== */
+    .tr-trip-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 14px; transition: .2s; }
+    .tr-trip-card:hover { border-color: #0284c7; box-shadow: 0 8px 24px rgba(2,132,199,0.12); }
+    .tr-trip-time { font-size: 24px; font-weight: 900; color: #0284c7; font-family: 'Courier New', monospace; letter-spacing: -1px; line-height: 1; }
+    .tr-trip-vehicle { font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 6px; }
+    .tr-trip-route { font-size: 13px; color: #64748b; font-weight: 700; margin-top: 2px; }
+    .tr-trip-price { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .tr-trip-price small { font-size: 12px; font-weight: 600; color: #64748b; }
+    .tr-trip-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: #64748b; font-weight: 600; padding: 12px 0; margin-top: 12px; border-top: 1px dashed #e2e8f0; border-bottom: 1px dashed #e2e8f0; }
+    .tr-book-btn { margin-top: 14px; padding: 11px 20px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: 0; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; }
+    .tr-book-btn:hover { filter: brightness(1.08); }
+    .tr-empty-results { text-align: center; padding: 48px 20px; background: #fff; border: 2px dashed #cbd5e1; border-radius: 16px; }
+    .tr-empty-results h3 { font-size: 16px; margin: 0 0 8px; color: #0f172a; }
+    .tr-empty-results p { font-size: 13px; color: #64748b; margin: 0; }
+
+    /* ===== NEW: Booking Modal ===== */
+    .tr-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,28,51,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+    .tr-modal-box { background: #fff; border-radius: 20px; width: 100%; max-width: 520px; padding: 28px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
+    .tr-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .tr-modal-head h3 { font-size: 18px; font-weight: 800; margin: 0; color: #0f172a; }
+    .tr-modal-close { background: none; border: none; font-size: 26px; cursor: pointer; color: #64748b; line-height: 1; }
+    .tr-trip-summary { background: #f0f9ff; border: 1px solid #bae6fd; padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 13px; color: #0f172a; line-height: 1.7; }
+    .tr-trip-summary strong { color: #0369a1; }
+    .tr-radio-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .tr-radio-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: .15s; }
+    .tr-radio-option:hover { border-color: #0284c7; background: #f0f9ff; }
+    .tr-radio-option input[type="radio"] { width: 18px; height: 18px; cursor: pointer; margin: 0; }
+    .tr-radio-option label { cursor: pointer; font-size: 14px; font-weight: 600; color: #0f172a; flex: 1; }
+    .tr-total-box { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid #bae6fd; padding: 14px 16px; border-radius: 12px; margin: 18px 0; display: flex; justify-content: space-between; align-items: center; }
+    .tr-total-box span:first-child { font-size: 13px; font-weight: 700; color: #0369a1; text-transform: uppercase; }
+    .tr-total-box span:last-child { font-size: 22px; font-weight: 900; color: #0f172a; }
 </style>
 
 <!-- HERO -->
@@ -310,6 +355,41 @@
     </div>
 </div>
 
+<!-- SEARCH BAR -->
+<div class="tr-search-section">
+    <div class="tr-search-box">
+        <h2 class="tr-search-title">🔍 {{ __('messages.public_search_title') ?? 'Find Available Departures' }}</h2>
+        <p class="tr-search-sub">{{ __('messages.public_search_subtitle') ?? 'Pick a date and route to see available trips' }}</p>
+        <form method="GET" action="{{ route('public.transport.show', $service->slug) }}">
+            <div class="tr-search-grid">
+                <div class="tr-search-field">
+                    <label>{{ __('messages.public_travel_date') ?? 'Travel Date' }}</label>
+                    <input type="date" name="date" required min="{{ date('Y-m-d') }}" value="{{ $travelDate ?? '' }}">
+                </div>
+                <div class="tr-search-field">
+                    <label>{{ __('messages.public_from') ?? 'From' }}</label>
+                    <select name="from" required>
+                        <option value="">— {{ __('messages.public_transport_choose') ?? 'Choose' }} —</option>
+                        @foreach($locations as $loc)
+                        <option value="{{ $loc->id }}" @selected($fromLocId == $loc->id)>{{ $loc->city }}@if($loc->state) — {{ $loc->state }}@endif</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="tr-search-field">
+                    <label>{{ __('messages.public_to') ?? 'To' }}</label>
+                    <select name="to" required>
+                        <option value="">— {{ __('messages.public_transport_choose') ?? 'Choose' }} —</option>
+                        @foreach($locations as $loc)
+                        <option value="{{ $loc->id }}" @selected($toLocId == $loc->id)>{{ $loc->city }}@if($loc->state) — {{ $loc->state }}@endif</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="tr-search-btn">🔍 {{ __('messages.public_search_trips') ?? 'Search Trips' }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- OFFERS -->
 @if($offers->count())
 <div class="tr-offers">
@@ -327,6 +407,7 @@
     <div class="tr-main-grid">
         <!-- LEFT: Vehicles + Booking -->
         <div>
+            @if(!$hasSearch)
             <!-- Routes -->
             <div class="tr-route-card">
                 <h2 class="tr-section-title" style="margin-top: 0;">
@@ -419,12 +500,68 @@
                 <p style="color: #64748b;">No vehicles listed yet.</p>
                 @endforelse
             </div>
+            @else
+            {{-- SEARCH RESULTS --}}
+            <h2 class="tr-section-title">
+                <i class="fas fa-bus"></i> {{ __('messages.public_available_departures') ?? 'Available Departures' }}
+                @if($travelDate) — {{ \Carbon\Carbon::parse($travelDate)->format('D, M d, Y') }} @endif
+            </h2>
+            @forelse($trips as $trip)
+                @php
+                    $vt = strtolower($trip->vehicle->vehicle_type ?? '');
+                    $icon = str_contains($vt, 'bus') ? '🚌' : (str_contains($vt, 'van') || str_contains($vt, 'hiace') ? '🚐' : (str_contains($vt, 'jeep') || str_contains($vt, 'suv') ? '🚙' : (str_contains($vt, 'bike') ? '🏍️' : '🚗')));
+                @endphp
+                <div class="tr-trip-card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+                        <div>
+                            <div class="tr-trip-time">{{ substr($trip->departure_time, 0, 5) }}</div>
+                            <div class="tr-trip-vehicle">{{ $icon }} {{ $trip->vehicle->vehicle_type ?? '' }} — {{ $trip->vehicle->vehicle_number ?? '' }}</div>
+                            <div class="tr-trip-route">{{ $trip->route->fromLocation->city ?? '' }} → {{ $trip->route->toLocation->city ?? '' }}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div class="tr-trip-price">Rs {{ number_format($trip->price_per_seat, 0) }}<small>/seat</small></div>
+                            <div style="font-size:12px;color:#64748b;margin-top:4px;font-weight:700">🪑 {{ $trip->seats_available }} {{ __('messages.public_seats_left') ?? 'seats left' }}</div>
+                        </div>
+                    </div>
+                    <div class="tr-trip-meta">
+                        @if($trip->route->duration_minutes)
+                        <span>⏱ {{ intdiv($trip->route->duration_minutes, 60) }}h {{ $trip->route->duration_minutes % 60 }}m</span>
+                        @endif
+                        @if($trip->driver_name)
+                        <span>👤 {{ $trip->driver_name }}</span>
+                        @endif
+                        @if($trip->pickup_point)
+                        <span>📍 {{ $trip->pickup_point }}</span>
+                        @endif
+                        @if($trip->price_per_vehicle)
+                        <span>🚐 Rs {{ number_format($trip->price_per_vehicle, 0) }}/vehicle</span>
+                        @endif
+                    </div>
+                    <button type="button" class="tr-book-btn" onclick="openBookingModal({{ $trip->id }})">
+                        {{ __('messages.public_book_now') ?? 'Book Now' }} →
+                    </button>
+                </div>
+            @empty
+                <div class="tr-empty-results">
+                    <div style="font-size:56px;margin-bottom:12px">{{ ($allBookedOut ?? false) ? '🔴' : '🚌' }}</div>
+                    @if($allBookedOut ?? false)
+                        <h3>{{ __('messages.fully_booked_no_trips') ?? 'All departures are fully booked on this date' }}</h3>
+                        <p>{{ __('messages.fully_booked_hint') ?? 'Try a different date, or check back later.' }}</p>
+                    @else
+                        <h3>{{ __('messages.public_no_trips_found') ?? 'No departures found' }}</h3>
+                        <p>{{ __('messages.public_no_trips_hint') ?? 'Try a different date or route.' }}</p>
+                    @endif
+                </div>
+            @endforelse
+            @endif
         </div>
 
-        <!-- RIGHT: Booking Form + Contact -->
+        <!-- RIGHT: Contact + About (Booking मodal मा छ) -->
         <div>
-            <div class="tr-booking-card">
-                <h2>🚌 {{ __('messages.public_transport_book') ?? 'Book Your Ride' }}</h2>
+            <div class="tr-side-card">
+                <h3><i class="fas fa-search"></i> {{ __('messages.public_search_hint_title') ?? 'Search for a trip' }}</h3>
+                <p>{{ __('messages.public_search_hint_body') ?? 'Use the search bar above to find available departures on your route.' }}</p>
+            </div>
 
                 @if(session('success'))
                     <div class="tr-alert tr-alert-success">{{ session('success') }}</div>
@@ -502,4 +639,157 @@
         </div>
     </div>
 </div>
+{{-- BOOKING MODAL --}}
+<div id="bookingModal" class="tr-modal-overlay">
+    <div class="tr-modal-box">
+        <div class="tr-modal-head">
+            <h3>🎫 {{ __('messages.public_book_now') ?? 'Book Your Trip' }}</h3>
+            <button type="button" class="tr-modal-close" onclick="closeBookingModal()">&times;</button>
+        </div>
+
+        <div class="tr-trip-summary" id="tripSummary"></div>
+
+        <div id="seatsWarning" style="display:none;background:#fef4e2;border:1px solid #fbbf24;color:#92400e;padding:10px 14px;border-radius:10px;font-size:12.5px;font-weight:700;margin-bottom:14px;"></div>
+
+        <form id="bookingForm" method="POST" action="{{ route('public.transport.book', $service->slug) }}">
+            @csrf
+            <input type="hidden" name="trip_id" id="bm_trip_id">
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">{{ __('messages.public_booking_type') ?? 'Booking Type' }}</label>
+                <div class="tr-radio-group">
+                    <div class="tr-radio-option">
+                        <input type="radio" name="booking_type" value="per_seat" id="bt_seat" checked onchange="recalcTotal()">
+                        <label for="bt_seat" id="bt_seat_label">{{ __('messages.public_per_seat') ?? 'Per Seat' }}</label>
+                    </div>
+                    <div class="tr-radio-option" id="bt_full_option">
+                        <input type="radio" name="booking_type" value="full_vehicle" id="bt_full" onchange="recalcTotal()">
+                        <label for="bt_full" id="bt_full_label">{{ __('messages.public_full_vehicle') ?? 'Full Vehicle (Private)' }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tr-form-group" id="passengersGroup">
+                <label class="tr-form-label">{{ __('messages.public_passengers') ?? 'Number of Passengers' }}</label>
+                <input type="number" name="passenger_count" id="bm_passengers" value="1" min="1" class="tr-form-input" onchange="recalcTotal()">
+            </div>
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">{{ __('messages.public_your_name') ?? 'Your Name' }}</label>
+                <input type="text" name="passenger_name" required class="tr-form-input">
+            </div>
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">{{ __('messages.public_email') ?? 'Email' }}</label>
+                <input type="email" name="passenger_email" required class="tr-form-input">
+            </div>
+
+            <div class="tr-form-group">
+                <label class="tr-form-label">📍 {{ __('messages.pickup_point') }}</label>
+                <input type="text" name="pickup_point" id="bm_pickup" class="tr-form-input" placeholder="{{ __('messages.pickup_point_hint') }}">
+            </div>
+
+            <div class="tr-total-box">
+                <span>{{ __('messages.public_total') ?? 'Total' }}</span>
+                <span id="totalAmount">Rs 0</span>
+            </div>
+
+            <button type="submit" class="tr-btn-book">
+                {{ __('messages.public_confirm_booking') ?? 'Confirm Booking' }}
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+const ALL_TRIPS = @json($tripsForJs);
+
+function openBookingModal(tripId) {
+    const t = ALL_TRIPS.find(x => x.id === tripId);
+    if (!t) return;
+
+    document.getElementById('bm_trip_id').value = t.id;
+    document.getElementById('tripSummary').innerHTML =
+        '<strong>🚌 ' + t.vehicle_type + ' — ' + t.vehicle_number + '</strong><br>' +
+        t.route_name + '<br>' +
+        '📅 ' + t.departure_date + ' at ' + t.departure_time + '<br>' +
+        '💰 Rs ' + t.price_per_seat.toLocaleString() + '/seat';
+
+    const passInput = document.getElementById('bm_passengers');
+    passInput.max = t.seats_available;
+    passInput.value = 1;
+
+    // Show seats available prominently
+    const seatsWarn = document.getElementById('seatsWarning');
+    if (t.seats_available <= 5) {
+        seatsWarn.innerHTML = '⚠️ ' + '{{ __("messages.seats_available_count", ["count" => ":count"]) }}'.replace(':count', t.seats_available);
+        seatsWarn.style.display = 'block';
+    } else {
+        seatsWarn.style.display = 'none';
+    }
+
+    document.getElementById('bt_seat').checked = true;
+    document.getElementById('bt_seat_label').textContent =
+        '{{ __("messages.per_seat_price", ["price" => ":price"]) }}'.replace(':price', t.price_per_seat.toLocaleString());
+
+    const fullOption = document.getElementById('bt_full_option');
+    if (t.price_per_vehicle) {
+        fullOption.style.display = 'flex';
+        document.getElementById('bt_full_label').textContent =
+            '{{ __("messages.full_vehicle_price", ["price" => ":price"]) }}'.replace(':price', t.price_per_vehicle.toLocaleString());
+    } else {
+        fullOption.style.display = 'none';
+    }
+
+    document.getElementById('bm_pickup').value = t.pickup_point || '';
+    document.getElementById('bookingForm').dataset.priceSeat = t.price_per_seat;
+    document.getElementById('bookingForm').dataset.priceVehicle = t.price_per_vehicle || '';
+    document.getElementById('bookingForm').dataset.maxSeats = t.seats_available;
+
+    recalcTotal();
+    document.getElementById('bookingModal').style.display = 'flex';
+}
+
+function recalcTotal() {
+    const form = document.getElementById('bookingForm');
+    const priceSeat = parseFloat(form.dataset.priceSeat) || 0;
+    const priceVehicle = parseFloat(form.dataset.priceVehicle) || 0;
+    const maxSeats = parseInt(form.dataset.maxSeats) || 1;
+    const type = document.querySelector('input[name="booking_type"]:checked').value;
+    const passInput = document.getElementById('bm_passengers');
+
+    const seatsWarn = document.getElementById('seatsWarning');
+    if (type === 'full_vehicle') {
+        passInput.disabled = true;
+        passInput.value = maxSeats;
+        document.getElementById('totalAmount').textContent = 'Rs ' + priceVehicle.toLocaleString();
+        seatsWarn.style.display = 'none';
+    } else {
+        passInput.disabled = false;
+        let n = parseInt(passInput.value) || 1;
+        if (n > maxSeats) {
+            n = maxSeats;
+            passInput.value = n;
+            // Show warning message
+            seatsWarn.innerHTML = '⚠️ ' + '{{ __("messages.only_seats_available", ["count" => ":count"]) }}'.replace(/:count/g, maxSeats);
+            seatsWarn.style.display = 'block';
+        } else if (maxSeats <= 5) {
+            seatsWarn.innerHTML = '⚠️ ' + '{{ __("messages.seats_available_count", ["count" => ":count"]) }}'.replace(':count', maxSeats);
+            seatsWarn.style.display = 'block';
+        } else {
+            seatsWarn.style.display = 'none';
+        }
+        document.getElementById('totalAmount').textContent = 'Rs ' + (n * priceSeat).toLocaleString();
+    }
+}
+
+function closeBookingModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+}
+
+document.getElementById('bookingModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeBookingModal();
+});
+</script>
+
 @endsection
