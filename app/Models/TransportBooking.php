@@ -16,13 +16,21 @@ class TransportBooking extends Model
     protected $casts = [
         'travel_date' => 'date',
         'amount' => 'decimal:2',
+        'price_per_unit' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'passenger_count' => 'integer',
         'paid_at' => 'datetime',
     ];
 
     public function provider() { return $this->belongsTo(Provider::class); }
     public function vehicle()  { return $this->belongsTo(TransportVehicle::class, 'vehicle_id'); }
-        public function service()
+    public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function trip()
+    {
+        return $this->belongsTo(TransportTrip::class, 'trip_id');
     }
 }
