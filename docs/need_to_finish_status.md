@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-15 (Transport Phase 1 Complete — Phase B Architecture Approved)  
-**Current Commit:** `844414c` (Transport Phase 1 — pending push after Phase B complete)  
+**Last Updated:** 2026-11-15 (Transport Phase B — B1-B5 Complete + Payment Architecture Approved)  
+**Current Commit:** `1221566` (Transport B5 complete — 10 commits ahead of origin/main)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -23,11 +23,11 @@
 ## 📊 CURRENT STATE — Verified
 
 ### Git Status
-- **HEAD:** `844414c` (Transport Phase 1)
+- **HEAD:** `1221566` (Transport Phase B — B5 complete)
 - **Branch:** main
-- **Ahead of origin/main by:** 3 commits (`844414c`, `603e42f`, `911f112` — Transport Phase 1)
+- **Ahead of origin/main by:** 10 commits (`1221566` → `73bf131` → `4865e69` → `f72545f` → `a9f57dc` → `59f4aad` → `1823f55` → `844414c` → `603e42f` → `911f112`)
 - **Tests:** 297 passed, 1 skipped (1970 assertions)
-- **Production:** 🟡 3 commits pending push (after Transport Phase B complete)
+- **Production:** 🟡 10 commits pending push (after Transport Phase B + Payment chunks complete)
 
 ### Environment
 - **PHP:** 8.4.27 (Laragon, Device Guard exclusion applied)
@@ -381,16 +381,61 @@
 - Edit Vehicle image → public page updates
 - Tests: 297 pass, 1 skip
 
-**Known Limitations (Phase B मा fix):**
-- Amount सधैं Rs 0.00 (TransportDetail config नै — Phase B मा per-trip pricing)
-- Vehicle = Route (१ vehicle १ route मात्र — Phase B मा multi-route)
-- Passenger count field नै (Phase B मा seat inventory)
-- Pickup point service-level मात्र (Phase B मा trip-level)
-- कोई Scheduled Trips entity नै
+**Known Limitations (Phase B मा fix — ✅ ALL RESOLVED in B1-B5):**
+- ~~Amount सधैं Rs 0.00~~ → ✅ per-trip pricing (B1-B4)
+- ~~Vehicle = Route~~ → ✅ multi-route per vehicle (B1-B4)
+- ~~Passenger count field नै~~ → ✅ seat inventory + passenger_count (B1-B5)
+- ~~Pickup point service-level मात्र~~ → ✅ trip-level + snapshot (B1-B5)
+- ~~कोई Scheduled Trips entity नै~~ → ✅ `transport_trips` table (B1)
 
-### 15. Transport Phase B — Full v2 Architecture (APPROVED, Master GO 2026-11-15)
-**Status:** 🟡 Not started — Implementation pending
-**Estimate:** 15-25 hours (2-3 days)
+### 15. Transport Phase B — Full v2 Architecture (✅ DONE — B1-B5, 2026-11-15)
+**Status:** ✅ **Complete** (B1-B5, 10 commits ahead of origin/main)
+**Commits:** `59f4aad` (B1) → `a9f57dc` (B2) → `f72545f` (B3) → `4865e69` (B4.2) → `73bf131` + `1221566` (B5)
+
+**B1 — Data Model (DONE `59f4aad`):**
+- `transport_routes` table + `TransportRoute` model
+- `transport_trips` table + `TransportTrip` model
+- `transport_bookings` extend: trip_id, passenger_count, booking_type, pickup_point, price_per_unit, total_amount
+- Legacy 15 bookings preserved (`trip_id = NULL`)
+
+**B2 — Provider Routes CRUD (DONE `a9f57dc`):**
+- `routesPage` rewrite (visual cards)
+- `storeRoute`, `updateRoute`, `destroyRoute` + routes
+- i18n via `messages.pickup_point` etc.
+
+**B3 — Provider Trips CRUD (DONE `f72545f`):**
+- `tripsPage` + `storeTrip` + `updateTrip` + `destroyTrip`
+- Tab nav (Routes | Daily Departures) + sidebar merge
+- Conflict guard (same vehicle + date + time)
+- Seat auto-fill from vehicle capacity
+
+**B4 — Public Search Flow (DONE `73bf131`/`1221566`):**
+- Search bar (date + from + to) → results
+- Booking modal (trip-based, passengers, type, pickup)
+- Seat inventory (`lockForUpdate` + `decrement`)
+- Double-booking guard
+- Price snapshot (`price_per_unit` + `total_amount`)
+
+**B4.2 — Hotfix (DONE `4865e69`):**
+- `TransportBooking` fillable fix (`trip_id` + Phase B fields — silent fail fix)
+- Seat restore on cancel/delete (`destroyBooking` + `updateBookingStatus` + `\DB::transaction`)
+
+**B5 — Booking Display + Email Upgrade (DONE `73bf131` + `1221566`):**
+- Email: passenger count + type + pickup + price breakdown
+- Show page: passengers + type + pickup + price breakdown + Restore button + Delete button + Legacy badge
+- Index page: Legacy badge + Price on request + Delete button
+- i18n keys (5 locales)
+
+**Verified:**
+- Public search → trip results → booking with seat decrement (4 → 2) ✅
+- Cancel → seats restore (2 → 4) ✅
+- Restore → seats decrement (4 → 2) ✅
+- Delete → seats restore + booking deleted ✅
+- Email (created + confirmed) — all fields + price breakdown + no Gmail clipping ✅
+- Legacy bookings — "Legacy" badge + "Price on request" + no seat impact ✅
+- Tests: 297 pass, 1 skip ✅
+
+**Original Architecture (Master approved Option C):**
 
 **Architecture (ChatGPT-sourced, Master approved Option C):**
 Provider
@@ -433,6 +478,83 @@ Provider
 - ArtCraft, Individual, MoneyChanger — Public Pages
 - Admin Notification System (final)
 - Push (एकैचोटि)
+
+### 16. Transport Phase C — Payments & Cancellation (Master APPROVED 2026-11-15, C/A/B/A)
+**Status:** 🟡 Not started — Chunk 1 (Payment Methods) approval pending
+**Estimate:** 15-20 hours (6 chunks, phased)
+
+**Master Decisions (Final):**
+
+| # | Decision | Choice | Reason |
+|---|---|---|---|
+| 1 | Payment Model | **C (Both)** | Advance + Pay on Arrival दुवै — provider choose |
+| 2 | Scope | **A (All 6 chunks, phased)** | Complete system, one chunk at a time |
+| 3 | Traveler Cancel | **B (Request → Provider Approval)** | Nepal business reality — auto refund risky |
+| 4 | Receipt Format | **A (PDF + Email + Download)** | Legal compliance + professional |
+
+**Infrastructure Audit (Rule A — Verified):**
+
+| Component | State | Reuse |
+|---|---|---|
+| `provider_payment_methods` table | ✅ EXISTS (16 cols, 0 rows) | ✅ As-is + extend |
+| `ProviderPaymentMethod` model | ✅ Full (fillable, scope, relations) | ✅ Extend fillable |
+| `Provider\PaymentMethodController` | ✅ Full (5 methods, vertical layout) | ✅ Extend validated() |
+| Routes `provider.settings.payment-methods.*` | ✅ 5 routes | ✅ As-is |
+| Views `payment-methods.blade.php` + premium | ✅ EXISTS | ✅ Extend form |
+| i18n `pm_*` keys | ✅ 29 keys (line 574-609) | ✅ Extend |
+| `invoices` table + `InvoiceController` + DomPDF | ✅ EXISTS (2 rows) | ✅ Reuse via `metadata` JSON |
+| `Provider\HotelDashboardController@verifyPayment` | ✅ Pattern | ✅ Reference |
+
+**⚠️ Critical:** कोई duplicate payment system नै। Existing infrastructure extend मात्र।
+
+**Chunk 1 — Payment Methods Setup (Pending approval):**
+- Payment Model: **provider-level** (Master directive: not per-method — conflicting config risk)
+  - New column `providers.transport_payment_model` enum (`advance`/`pay_on_arrival`/`both`, default `both`)
+- `is_primary` safety rules (५):
+  1. एक मात्र primary per provider
+  2. Switch गर्दा पुरानो primary auto-false
+  3. Disabled method primary हुन नसक्ने
+  4. Delete गर्दा safe fallback (auto-assign अन्य active method)
+  5. सबै vertical shared behavior
+- Files: +2 migrations, +2 model fillable, controller validated + is_primary logic, blade radio + checkbox, ~8 i18n keys
+- **Estimate:** 1.5-2 hours
+
+**Chunk 2 — Traveler Payment Flow (Not started):**
+- Traveler booking show page (`/traveler/transport/bookings/{id}`)
+- Payment methods display (from provider, active only)
+- Transaction ref + proof upload (`payment_proof` column exists)
+- `payment_status` → `submitted`
+- Provider bell notification
+
+**Chunk 3 — Provider Verify + Receipt (Not started):**
+- Provider dashboard → payment proof review
+- ✅ Approve / ❌ Reject
+- On Approve: PDF receipt generate + email attachment + invoice auto-add
+- On Reject: reason note + traveler notification
+
+**Chunk 4 — Provider Invoice Integration (Not started):**
+- `/provider/transport/invoices` — list (existing infrastructure reuse)
+- Auto-generate from paid bookings
+- PDF download (DomPDF)
+- Filters
+
+**Chunk 5 — Traveler Cancellation (Not started):**
+- Traveler cancel request (separate table `transport_cancellation_requests`)
+- Policy display + estimated refund
+- Provider approve/reject
+- On Approve: seat restore + refund status tracking
+
+**Chunk 6 — Polish + E2E (Not started):**
+- All emails (payment submitted, verified, cancelled)
+- Full E2E test
+- Doc update
+- Commit
+
+**Audit Trails Required (Master directive):**
+- Payment approval/rejection (who + when + notes)
+- Cancellation approval/rejection
+- Refund status changes
+- Immutable issued document snapshots
 
 ---
 
@@ -569,9 +691,10 @@ Audit scripts debug को लागि मात्र — production code न�
 New migration create गर्दा php artisan make:migration बाट generate हुने file नै edit गर्नुस्। manual filename नबनाउनुस् (Phase 1 मा YYYY_MM_DD_HHMMSS_... file बनाइयो — delete गर्यो)।
 
 📋 NEXT STEPS — Priority
-Transport Phase 1 — DONE (Public page, Emails, Payment, Edit image — 3 commits ahead)
-Transport Phase B — APPROVED (Full scheduled-trips architecture) — next focus
-After Phase B: ArtCraft → Individual → MoneyChanger → Admin Notification System → Push
+Transport Phase 1 — DONE (Public page, Emails, Payment, Edit image)
+Transport Phase B — DONE (B1-B5, 10 commits ahead — Trips, seat inventory, search flow, emails)
+Transport Phase C — APPROVED (Payments + Cancellation, C/A/B/A, 6 chunks) — Chunk 1 pending approval
+After Payment Chunks: ArtCraft → Individual → MoneyChanger → Admin Notification System → Push
 
 🟣 PENDING TASKS — A-Z COMPLETE LIST
 🔴 HIGH PRIORITY (Immediate)
@@ -724,7 +847,8 @@ Phase 3: 🟢 Review System — Public Advanced (photos, votes)
 Phase 4: 🟣 Review System — Polish (analytics, digest)
 ↓
 Transport Phase 1 (DONE): ✅ Public page + Emails + Payment + Images
-Transport Phase B (NEXT): 🟡 Scheduled Trips + Seat Inventory + Multi-route
+Transport Phase B (DONE): ✅ Scheduled Trips + Seat Inventory + Multi-route (B1-B5)
+Transport Phase C (NEXT): 🟡 Payments + Cancellation — 6 chunks, Chunk 1 pending
 Testing Phase: 🟢 (Restaurant DONE, Hotel DONE) → ArtCraft → Individual → MoneyChanger
 ↓
 Medium Priority: 🟡 Fleet CRUD, Reports, Per-Vertical CRUD
