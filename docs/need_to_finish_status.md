@@ -480,8 +480,8 @@ Provider
 - Push (एकैचोटि)
 
 ### 16. Transport Phase C — Payments & Cancellation (Master APPROVED 2026-11-15, C/A/B/A)
-**Status:** 🟡 **Chunks 1-4 COMPLETE** | Chunks 5-6 pending
-**Estimate:** 15-20 hours (6 chunks) — **~4-6h remaining** (Chunks 5-6)
+**Status:** ✅ **ALL 6 CHUNKS COMPLETE** (2026-11-15)
+**Commit:** `5defb0a` (Chunks 5 complete) + Chunk 6 polish
 
 **Chunks 1-4 (✅ COMPLETE):**
 
@@ -533,9 +533,25 @@ Provider
 - Provider invoices page: existing `/provider/invoices` मा transport receipts (TR-RCP-*) देखिने (verified — 2 receipts Paid)
 - Email attachment: Gmail "One attachment" (scanned)
 
-**Chunks 5-6 (PENDING — next):**
+**Chunk 5 (`5defb0a`):** Traveler Cancellation + Provider Approve/Reject/Refund
+- Migration: `transport_cancellation_requests` (unique booking_id, reason, estimated_refund, status, refund_status)
+- Migration: `transport_bookings.cancellation_status` + `cancelled_at`
+- `TransportCancellationRequest` model + relation
+- Traveler: `showCancelForm` (policy display + hours + refund calculator), `requestCancel`
+- Policy: default 24h/12h/0 refund rules + provider override
+- Provider: `cancellationsPage`, `approveCancellation` (seat restore + refund_status='pending'), `rejectCancellation` (reason), `markRefunded` (manual)
+- Notifications: `CancellationRequestedNotification` (provider), `CancellationApprovedNotification` (traveler), `CancellationRejectedNotification` (traveler)
+- Views: `cancel-request.blade.php`, `provider/transport/cancellations/index.blade.php`, show page cancellation state
+- Routes: 2 traveler + 4 provider
+- **My Bookings integration:** `UnifiedBookingController` + `my-bookings/index.blade.php` — Transport tab + cards + counts (🚐 Transport (N))
+- **Fix:** Double ✅ (flash), "Payment Verified — Booking was cancelled" (cancelled state)
 
-**Chunk 5 — Traveler Cancellation (3-4h):**
+**Chunks 6 (Final — polish):**
+- Hours display: `22h 9m` (float → readable)
+- Full E2E: advance → PAY → cancel → reject cycle
+- Doc update + Transport CLOSE
+
+**Chunks 1-4 (✅ COMPLETE — see below for details):**
 - Migration: `transport_cancellation_requests` table (booking_id, requested_at, reason, refund_amount, status, provider_response)
 - Traveler: cancel request form (policy display + estimated refund)
 - Provider: approve/reject request + refund status track (कोई gateway — manual)

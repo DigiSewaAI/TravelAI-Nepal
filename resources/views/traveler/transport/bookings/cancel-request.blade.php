@@ -16,7 +16,13 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
             <div style="background:#f8fafc;padding:14px;border-radius:10px">
                 <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">Hours until departure</div>
-                <div style="font-size:20px;font-weight:800;color:#0f172a">{{ $hoursUntil }}h</div>
+                <div style="font-size:20px;font-weight:800;color:#0f172a">
+                    @if($hoursUntil >= 1)
+                        {{ (int) $hoursUntil }}h {{ (int) (($hoursUntil - (int)$hoursUntil) * 60) }}m
+                    @else
+                        {{ (int) ($hoursUntil * 60) }}m
+                    @endif
+                </div>
             </div>
             <div style="background:#f0f9ff;padding:14px;border-radius:10px">
                 <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">Estimated Refund</div>
