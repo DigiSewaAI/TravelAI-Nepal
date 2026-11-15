@@ -2968,4 +2968,6 @@ return array (
   'update_status' => 'Обновить статус',
   'confirm_booking' => 'Подтвердить бронирование',
   'cancel_booking' => 'Отменить бронирование',
+    'price_on_request' => 'Цена по запросу',
+    'payment' => 'Оплата',
 );

@@ -2382,4 +2382,5 @@ return array (
   'update_status' => '更新状态',
   'confirm_booking' => '确认预订',
   'cancel_booking' => '取消预订',
+    'price_on_request' => '价格面议',
 );

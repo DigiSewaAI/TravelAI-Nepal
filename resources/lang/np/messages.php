@@ -3415,4 +3415,5 @@ return array (
   'update_status' => 'स्थिति अपडेट गर्नुहोस्',
   'confirm_booking' => 'बुकिंग पुष्टि गर्नुहोस्',
   'cancel_booking' => 'बुकिंग रद्द गर्नुहोस्',
+    'price_on_request' => 'मूल्य अनुरोधमा',
 );

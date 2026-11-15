@@ -2371,4 +2371,5 @@ return array (
   'update_status' => 'स्थिति अपडेट करें',
   'confirm_booking' => 'बुकिंग की पुष्टि करें',
   'cancel_booking' => 'बुकिंग रद्द करें',
+    'price_on_request' => 'मूल्य अनुरोध पर',
 );

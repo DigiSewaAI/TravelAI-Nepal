@@ -127,6 +127,21 @@ class TransportDashboardController extends Controller
 
         return response()->json(['success' => true, 'status' => $booking->status]);
     }
+        public function verifyPayment(TransportBooking $booking)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && $booking->provider_id === $provider->id, 403);
+
+        if ($booking->payment_status === 'paid') {
+            return back()->with('info', 'Payment already verified.');
+        }
+
+        $booking->payment_status = 'paid';
+        $booking->paid_at = now();
+        $booking->save();
+
+        return back()->with('success', 'Payment verified successfully.');
+    }
 
     public function storeVehicle(Request $request)
     {

@@ -3431,4 +3431,5 @@ return array (
   'update_status' => 'Update Status',
   'confirm_booking' => 'Confirm Booking',
   'cancel_booking' => 'Cancel Booking',
+    'price_on_request' => 'Price on request',
 );

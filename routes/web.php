@@ -360,6 +360,7 @@ Route::post('/hotel/ai/apply-pricing', [\App\Http\Controllers\Provider\HotelDash
     Route::get('/transport/dashboard', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'index'])->name('transport.dashboard');
     Route::patch('/transport/vehicles/{vehicle}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicleStatus'])->name('transport.vehicles.status');
     Route::patch('/transport/bookings/{booking}/status', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateBookingStatus'])->name('transport.bookings.status');
+    Route::patch('/transport/bookings/{booking}/verify-payment', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'verifyPayment'])->name('transport.bookings.verify-payment');
         // Transport CRUD Routes
     Route::post('/transport/vehicles', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'storeVehicle'])->name('transport.vehicles.store');
     Route::put('/transport/vehicles/{vehicle}', [\App\Http\Controllers\Provider\TransportDashboardController::class, 'updateVehicle'])->name('transport.vehicles.update');
