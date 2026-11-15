@@ -14,6 +14,7 @@ class TransportDetail extends Model
         'transport_type',
         'from_location_id',
         'to_location_id',
+        'pickup_point',
         'departure_time',
         'duration_minutes',
         'price_per_person',

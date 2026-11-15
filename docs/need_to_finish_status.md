@@ -1,6 +1,6 @@
 # 🎯 TravelAI Nepal — MASTER HANDOVER DOCUMENT
-**Last Updated:** 2026-11-14 (Night — Hotel Booking Complete + VAT/Tax Audit)  
-**Current Commit:** `TBD` (Restaurant Reservation + Emails + Public Page, pending push)  
+**Last Updated:** 2026-11-15 (Transport Phase 1 Complete — Phase B Architecture Approved)  
+**Current Commit:** `844414c` (Transport Phase 1 — pending push after Phase B complete)  
 **Test Baseline:** ✅ **297 passed, 1 skipped** (1970 assertions)  
 **Production URL:** https://travelainepal.com (Laravel Cloud)
 
@@ -23,11 +23,11 @@
 ## 📊 CURRENT STATE — Verified
 
 ### Git Status
-- **HEAD:** Latest push (Review Phase 2 + Notification fixes + Booking fixes)
+- **HEAD:** `844414c` (Transport Phase 1)
 - **Branch:** main
-- **Ahead of origin/main by:** 0 commits (✅ pushed — production live)
+- **Ahead of origin/main by:** 3 commits (`844414c`, `603e42f`, `911f112` — Transport Phase 1)
 - **Tests:** 297 passed, 1 skipped (1970 assertions)
-- **Production:** ✅ All local commits pushed
+- **Production:** 🟡 3 commits pending push (after Transport Phase B complete)
 
 ### Environment
 - **PHP:** 8.4.27 (Laragon, Device Guard exclusion applied)
@@ -273,40 +273,6 @@
 **Status:** ✅ **COMPLETE** (2026-11-13 Evening)  
 **Verified:** 297 pass, all 8 verticals working
 
-**Scope:**
-1. **Provider Review Dashboard** — `/provider/reviews` list
-2. **Provider Review Detail** — `/provider/reviews/{id}`
-3. **Provider Response** — one-time public reply (already in DB `provider_response` field)
-4. **Traveler Notification** — `ReviewResponded` class (नयाँ)
-5. **Provider Sidebar Link** — "Reviews" menu
-6. **`ReviewResponded` notification** — traveler लाई provider reply आउँदा
-
-**Files to Create:**
-- 🆕 `app\Http\Controllers\Provider\ReviewController.php` — index, show, respond
-- 🆕 `resources\views\provider\reviews\index.blade.php`
-- 🆕 `resources\views\provider\reviews\show.blade.php`
-- 🆕 `app\Notifications\ReviewResponded.php`
-- ✏️ `routes\web.php` — provider review routes (inside `provider.active` group)
-- ✏️ `resources\views\layouts\provider.blade.php` (or vertical-specific) — sidebar link
-
-**Flow:**
-- Provider → `/provider/reviews` → sees only reviews on his services
-- Click → detail page → "Respond" button (only if `provider_response` is NULL)
-- Submit → `provider_response` save + `provider_responded_at` set
-- Notify traveler via `ReviewResponded`
-- Public page shows provider response below review
-
-**Guard:**
-- Provider sees only `$review->service->provider_id === $provider->id`
-- One-time response only (`provider_response` already set → edit नै, button hide)
-
-**Test:**
-- Admin approve गरिसकेको review (ID 2) मा respond गर्नुस्
-- Public page मा response देखिनुपर्ने
-- Traveler लाई notification
-
----
-
 ### 🟡 PHASE 3 — Review System: Public Display Advanced
 **Status:** Not started  
 **Estimate:** ~२-३ घण्टा
@@ -319,14 +285,6 @@
 5. **Helpful Votes** — `helpful_count` field थपिएको छ, UI थप्नुछ
 6. **Flag/Report** — `flagged_count` field थपिएको छ, UI थप्नुछ
 
-**Files to Create:**
-- 🆕 `app\Http\Controllers\Public\ReviewController.php` (or similar)
-- 🆕 `resources\views\public\reviews\index.blade.php` (dedicated)
-- 🆕 `resources\views\public\reviews\partials\_rating-breakdown.blade.php`
-- ✏️ `resources\views\public\services\_reviews.blade.php` (enhanced)
-
----
-
 ### 🟢 PHASE 4 — Review System: Polish
 **Status:** Not started  
 **Estimate:** ~२-३ घण्टा
@@ -334,8 +292,6 @@
 1. Fraud detection (admin)
 2. Analytics dashboard
 3. Weekly email digest (top reviews)
-
----
 
 ### 🔴 FINAL TASK — Admin Notification System (Full)
 **Status:** Not started  
@@ -354,8 +310,6 @@
 3. **Scheduled digest** — daily/weekly summary email
 4. **Admin → User custom notifications** — send targeted alerts
 5. **Notification templates** — customizable per category
-
----
 
 ### 🟣 FUTURE TICKETS (Documented — Not Started)
 
@@ -396,10 +350,89 @@
 
 **Recommendation:** Production launch अघि **अनिवार्य** — नेपालमा VAT invoice बिना service provide गर्न गैरकानूनी हुनसक्छ।
 
-### ❌ OUT OF SCOPE (No Need)
-1. **Products/Shop Moderation** — Admin ले provider को product हेर्नु पर्दैन
-2. **Quotations (AI Planner)** — Provider को काम
-3. **Notification Queue (7.6s delay)** — `sync` चल्न दिने (तपाईंको निर्णय)
+### 14. Transport Public Page + Booking Flow — Phase 1 (COMPLETE)
+**Date:** 2026-11-14/15
+**Status:** ✅ Complete (Phase 1 — bug fixes + emails + payment + images)
+
+**Files Created/Modified:**
+- `app/Http/Controllers/Public/TransportController.php` — show + book
+- `app/Mail/TransportBookingCreatedMail.php`, `TransportBookingConfirmedMail.php`
+- `app/Notifications/NewTransportBookingNotification.php`
+- `resources/views/public/transport/show.blade.php` — Premium UI (sky-blue theme)
+- `resources/views/emails/transport-booking-created.blade.php`, `-confirmed.blade.php`
+- `resources/views/provider/transport/bookings/show.blade.php` — status + payment + Verify buttons
+- Migration: `add_image_path_to_transport_vehicles_table`, `add_booking_number_to_transport_bookings_table`, `add_payment_fields_to_transport_bookings_table`, `add_pickup_point_to_transport_details_table`
+- Routes: `/transport/{slug}`, `/transport/{slug}/book`, `provider/transport/bookings/{id}/status`, `/verify-payment`
+- i18n: 5 locales (`public_transport_*`, `price_on_request`, `vehicle_image`, `update_status`, `confirm_booking`, `cancel_booking`)
+
+**Features:**
+- Public page: hero + vehicles + routes + booking form (5 locales, SEO, cover placeholder)
+- Booking: sequential `TR-YYYY-NNNN` ref, customer email (with logo + user-journey CTA), provider bell notification
+- Provider dashboard: bell notification, booking show with payment badge + Verify Payment + Confirm/Cancel buttons
+- Email: hybrid logo (≤50KB base64, >50KB URL) — Gmail clipping fixed
+- Edit Vehicle: image upload + preview (Add मा पहिले नै)
+- Payment: `payment_status`, `payment_method`, `payment_ref`, `payment_proof`, `paid_at`
+- Amount 0 → "Price on request" fallback
+
+**Verified:**
+- Public booking → customer email (logo + CTA + no clipping) + provider bell
+- Confirm → confirmed email (green theme, logo, dashboard CTA)
+- Payment verify → badge paid + Paid At timestamp
+- Edit Vehicle image → public page updates
+- Tests: 297 pass, 1 skip
+
+**Known Limitations (Phase B मा fix):**
+- Amount सधैं Rs 0.00 (TransportDetail config नै — Phase B मा per-trip pricing)
+- Vehicle = Route (१ vehicle १ route मात्र — Phase B मा multi-route)
+- Passenger count field नै (Phase B मा seat inventory)
+- Pickup point service-level मात्र (Phase B मा trip-level)
+- कोई Scheduled Trips entity नै
+
+### 15. Transport Phase B — Full v2 Architecture (APPROVED, Master GO 2026-11-15)
+**Status:** 🟡 Not started — Implementation pending
+**Estimate:** 15-25 hours (2-3 days)
+
+**Architecture (ChatGPT-sourced, Master approved Option C):**
+Provider
+├── Fleet Vehicles (existing — image, capacity, status)
+├── Routes (existing — Route, RouteCost, RouteSegment)
+├── Scheduled Trips ⬅ NEW: vehicle_id + route_id + date + departure_time + duration + seats_total + seats_available + price_per_seat + price_per_vehicle + driver_id + status
+└── Bookings (extend: trip_id, passenger_count, booking_type, pickup_point, price_snapshot)
+
+
+**Core Principles:**
+1. **Vehicle ≠ Route** — एक bus ले धेरै routes चलाउन सक्ने
+2. **Pricing route/departure-specific** — same bus, different routes = different fares
+3. **Seat inventory** — 30-seat bus, 3 booked = 27 available; double-booking prevention
+4. **Immutable booking price snapshot** — provider price बदले पनि पुरानो booking स्थिर
+5. **Driver per trip** (not per vehicle)
+6. **Service-level defaults only** — description, cancellation policy (`transport_details`)
+7. **Pickup: provider default + trip-level + customer request** (provider confirm)
+8. **UX principle (Master directive):** Professional but user-friendly — "herne bittikai bujhne"
+   - Provider: visual cards, plain language ("When does your bus leave? Where? How much per seat?")
+   - Traveler: progressive (date → trips → seat count → pickup → total)
+   - No technical jargon, no confusing dropdowns
+
+**Implementation Batches:**
+- 4A.1 — Migration: `transport_trips` table + `transport_bookings.trip_id` (nullable) + snapshot columns
+- 4A.2 — Provider: Routes CRUD + Trips CRUD (visual, user-friendly)
+- 4B — Public: date → trips list → seat select → pickup → amount auto-calc
+- 4C — Booking display + email (trip details, seat count, pickup point)
+- 4D — Seat inventory + double-booking (pessimistic lock) + driver assignment
+- 4E — Legacy 15 bookings migration (trip_id nullable, कोई data loss नै)
+- 4F — Logo auto-resize upload handler
+- 4G — Full E2E + commit each batch
+
+**Rule C Compliance:**
+- पहिले read-only audit (Routes, RouteCosts, existing bookings, Reviews/Claims references)
+- कोई destructive migration नै
+- Legacy bookings `trip_id = NULL` (preserved)
+- Rollback plan प्रत्येक migration संगै
+
+**पछि (Phase B पछि):**
+- ArtCraft, Individual, MoneyChanger — Public Pages
+- Admin Notification System (final)
+- Push (एकैचोटि)
 
 ---
 
@@ -457,7 +490,6 @@ Store → Review::create (status='pending', verified_purchase=true)
 ↓
 Admin notify (AdminAlertNotification, category='review')
 
-text
 
 ### Admin Approval Flow
 Admin@approve → status='approved' → save()
@@ -471,7 +503,6 @@ Traveler notify (ReviewApproved)
 ↓
 Public display (average_rating, count)
 
-text
 
 ### Response Pattern (Phase 2 को लागि)
 ```php
@@ -481,7 +512,6 @@ $review->provider_responded_at = now();
 $review->save();
 $review->user->notify(new ReviewResponded($review));
 Rating Calculation
-php
 $reviews = Review::where('service_id', $id)
     ->where('status', 'approved')
     ->get(['rating']);
@@ -493,12 +523,13 @@ foreach ($reviews as $r) {
 }
 🧪 TESTING WORKFLOW
 After EVERY change:
-cmd
+
 php artisan optimize:clear
 php artisan test
 Expected: 297 passed, 1 skipped
 
 New Feature Test:
+
 Feature file बनाउनुस् tests\Feature\Review\{Feature}Test.php
 
 297 existing tests intact राख्नुस्
@@ -506,6 +537,7 @@ Feature file बनाउनुस् tests\Feature\Review\{Feature}Test.php
 New tests थपेपछि total बढ्न सक्छ
 
 Manual Browser Test (Review system):
+
 Submit: Traveler → completed booking → write review
 
 Admin: /admin/reviews → approve
@@ -537,144 +569,138 @@ Audit scripts debug को लागि मात्र — production code न�
 New migration create गर्दा php artisan make:migration बाट generate हुने file नै edit गर्नुस्। manual filename नबनाउनुस् (Phase 1 मा YYYY_MM_DD_HHMMSS_... file बनाइयो — delete गर्यो)।
 
 📋 NEXT STEPS — Priority
-Master GO प्राप्त ✅ — 3 commits push भइरहेको छ (Hotel Public Page + Booking Flow + Complete)
-Restaurant E2E test — DONE (Public page, Email, Reservation, Provider dashboard all verified)
-Hotel E2E test — DONE (Public page, Email, Reservation, QR, Invoice, Payment verified)
-Next Vertical: Transport Public Page using same pattern.
+Transport Phase 1 — DONE (Public page, Emails, Payment, Edit image — 3 commits ahead)
+Transport Phase B — APPROVED (Full scheduled-trips architecture) — next focus
+After Phase B: ArtCraft → Individual → MoneyChanger → Admin Notification System → Push
 
-Phase 2 सुरु गर्ने — Provider Review Panel
+🟣 PENDING TASKS — A-Z COMPLETE LIST
+🔴 HIGH PRIORITY (Immediate)
+#	Task	Source	Est.
+1	Push to Production — ५+ local commits pending (Master GO पछि)	भोलिको to-do #1	—
+2	Notification Queue (7.6s delay) — सबै notification class मा implements ShouldQueue	भोलिको to-do #2	1-2h
+3	Rescue Quick Accept (1-Click) — Dashboard card मै Accept button	भोलिको to-do #3	1-2h
+🟡 MEDIUM PRIORITY
+#	Task	Source	Est.
+4	Fleet & Staff CRUD Verify — Helicopter, गाडी, staff add/remove test	भोलिको to-do #4	30m
+5	Reports & Analytics Verify — Revenue, Charts सही छन्?	भोलिको to-do #5	30m
+6	Provider Manual Booking Notification — Provider आफैंले booking बनाउँदा admin notify?	Earlier discussion	30m
+7	Per-Vertical CRUD Deep Test — Hotel, Restaurant, Transport, ArtCraft, Individual, MoneyChanger (Add/Edit/Delete UI)	भोलिको to-do #6	1h
+🟢 TESTING PHASE (तपाईंको Plan — Order important!)
+#	Task	Note	Est.
+8	Restaurant E2E — Order → email verify (cart → checkout → delivered)	Hotel पछि	15m
+9	Transport E2E — Booking → email verify (Public Booking flow)	—	15m
+10	ArtCraft E2E — Order → email verify (cart flow)	—	15m
+11	Individual Guide E2E — Booking → email verify	—	15m
+12	MoneyChanger E2E — Order → email verify (सबैभन्दा अन्तिम)	—	15m
+🟣 COSMETIC / LOW PRIORITY
+#	Task	Source	Est.
+13	Ad Title Duplicate Fix — Rescue ad मा title = description (UI bug)	Earlier observation	15m
+14	Provider Notification 'View all' page — same JSON bug fix करना (Traveler मा fix भयो, Provider मा verify गर्नुछ)	Pending assumption	30m
+15	Active Districts Filter (if pending)	Phase 3 (earlier)	1h
+16	Detail Page (Service detail enhancement)	Phase 3 (earlier)	1h
+🟢 FUTURE FEATURES (Not Yet Started — For Discussion)
+🔵 1. Expedition Service Vertical (NEW — Discuss करना)
+What is it?
+A new vertical for multi-day expedition packages (Mountaineering, Peak Climbing, Long Treks like Annapurna Circuit, Manaslu, Mustang, etc.) — beyond standard Trek/Tour.
 
-Phase 3 — Public advanced display
+Why separate from Trek?
 
-Phase 4 — Polish
+Trek = standard routes (EBC, ABC) with fixed itinerary
 
-Admin Notification System (Full) — अन्तिम
+Expedition = technical climbing (Island Peak, Mera Peak, Lobuche East), expedition permits, summit certificates, climbing gear rental, rescue insurance mandatory, Sherpa climbing guides
 
-Push — सबै काम सिध्याएपछि, Master GO पछि
+Suggested Features:
 
-## 🟣 PENDING TASKS — A-Z COMPLETE LIST
+Expedition listing (peak, grade, difficulty, technicality)
 
-### 🔴 HIGH PRIORITY (Immediate)
+Required climbing gear checklist
 
-| # | Task | Source | Est. |
-|---|---|---|---|
-| 1 | **Push to Production** — ५+ local commits pending (Master GO पछि) | भोलिको to-do #1 | — |
-| 2 | **Notification Queue (7.6s delay)** — सबै notification class मा `implements ShouldQueue` | भोलिको to-do #2 | 1-2h |
-| 3 | **Rescue Quick Accept (1-Click)** — Dashboard card मै Accept button | भोलिको to-do #3 | 1-2h |
+Insurance mandatory verification
 
-### 🟡 MEDIUM PRIORITY
+Sherpa climbing guide assignment
 
-| # | Task | Source | Est. |
-|---|---|---|---|
-| 4 | **Fleet & Staff CRUD Verify** — Helicopter, गाडी, staff add/remove test | भोलिको to-do #4 | 30m |
-| 5 | **Reports & Analytics Verify** — Revenue, Charts सही छन्? | भोलिको to-do #5 | 30m |
-| 6 | **Provider Manual Booking Notification** — Provider आफैंले booking बनाउँदा admin notify? | Earlier discussion | 30m |
-| 7 | **Per-Vertical CRUD Deep Test** — Hotel, Restaurant, Transport, ArtCraft, Individual, MoneyChanger (Add/Edit/Delete UI) | भोलिको to-do #6 | 1h |
+Expedition permits (different from TIMS/ACAP)
 
-### 🟢 TESTING PHASE (तपाईंको Plan — Order important!)
+Summit certificate (auto-issue)
 
-| # | Task | Note | Est. |
-|---|---|---|---|
-| 8 | **Restaurant E2E** — Order → email verify (cart → checkout → delivered) | Hotel पछि | 15m |
-| 9 | **Transport E2E** — Booking → email verify (Public Booking flow) | — | 15m |
-| 10 | **ArtCraft E2E** — Order → email verify (cart flow) | — | 15m |
-| 11 | **Individual Guide E2E** — Booking → email verify | — | 15m |
-| 12 | **MoneyChanger E2E** — Order → email verify (**सबैभन्दा अन्तिम**) | — | 15m |
+Expedition-specific review (technicality, safety, gear quality)
 
-### 🟣 COSMETIC / LOW PRIORITY
+Admin scope: Approve expedition listings, verify permits, monitor safety
 
-| # | Task | Source | Est. |
-|---|---|---|---|
-| 13 | **Ad Title Duplicate Fix** — Rescue ad मा title = description (UI bug) | Earlier observation | 15m |
-| 14 | **Provider Notification 'View all' page** — same JSON bug fix करना (Traveler मा fix भयो, Provider मा verify गर्नुछ) | Pending assumption | 30m |
-| 15 | **Active Districts Filter** (if pending) | Phase 3 (earlier) | 1h |
-| 16 | **Detail Page** (Service detail enhancement) | Phase 3 (earlier) | 1h |
+Decision needed: Master (discuss करना)
 
----
+🟠 2. Blockchain-Based Digital Permits (Future — Website मा "Coming 2026")
+Already on marketing website — mentioned as "Coming 2026"
 
-## 🟢 FUTURE FEATURES (Not Yet Started — For Discussion)
+Scope (Conceptual):
 
-### 🔵 1. Expedition Service Vertical (NEW — Discuss करना)
+TIMS & ACAP permits as NFTs / blockchain credentials
 
-**What is it?**
-A new vertical for **multi-day expedition packages** (Mountaineering, Peak Climbing, Long Treks like Annapurna Circuit, Manaslu, Mustang, etc.) — beyond standard Trek/Tour.
+Immutable, verifiable, instant
 
-**Why separate from Trek?**
-- Trek = standard routes (EBC, ABC) with fixed itinerary
-- Expedition = **technical climbing** (Island Peak, Mera Peak, Lobuche East), **expedition permits**, **summit certificates**, **climbing gear rental**, **rescue insurance mandatory**, **Sherpa climbing guides**
+Reduces corruption & delays
 
-**Suggested Features:**
-- Expedition listing (peak, grade, difficulty, technicality)
-- Required climbing gear checklist
-- Insurance mandatory verification
-- Sherpa climbing guide assignment
-- Expedition permits (different from TIMS/ACAP)
-- Summit certificate (auto-issue)
-- Expedition-specific review (technicality, safety, gear quality)
+Traveler receives digital permit via blockchain
 
-**Admin scope:** Approve expedition listings, verify permits, monitor safety
+Checkpost QR scan verifies on-chain
 
-**Decision needed:** Master (discuss करना)
+Agency cannot fake permits
 
----
+Rescue teams access permit holder data (privacy-controlled)
 
-### 🟠 2. Blockchain-Based Digital Permits (Future — Website मा "Coming 2026")
+Possible Implementation Options:
 
-**Already on marketing website — mentioned as "Coming 2026"**
+Polygon / Solana (low gas fee)
 
-**Scope (Conceptual):**
-- **TIMS & ACAP permits** as NFTs / blockchain credentials
-- Immutable, verifiable, instant
-- Reduces corruption & delays
-- Traveler receives digital permit via blockchain
-- Checkpost QR scan verifies on-chain
-- Agency cannot fake permits
-- Rescue teams access permit holder data (privacy-controlled)
+Private consortium chain (Nepal tourism board partnership)
 
-**Possible Implementation Options:**
-- **Polygon / Solana** (low gas fee)
-- **Private consortium chain** (Nepal tourism board partnership)
-- **Decentralized identity (DID)** standard
+Decentralized identity (DID) standard
 
-**Decision needed:** Master (is it scope? when?)
+Decision needed: Master (is it scope? when?)
 
----
+🟡 3. Advanced Review Features (Phase 3/4 — discussed)
+Photos in reviews (DB ready)
 
-### 🟡 3. Advanced Review Features (Phase 3/4 — discussed)
+Helpful votes (DB ready)
 
-- Photos in reviews (DB ready)
-- Helpful votes (DB ready)
-- Flag/report (DB ready)
-- Dedicated public reviews page
-- Rating breakdown charts
-- Provider response visibility
-- Review email digest (weekly)
+Flag/report (DB ready)
 
----
+Dedicated public reviews page
 
-### 🟢 4. Other Future Ideas (Not Yet Discussed in Detail)
+Rating breakdown charts
 
-- **Live Chat / Messaging** — Traveler ↔ Provider direct chat
-- **Multi-currency Wallet** — Save & pay in multiple currencies
-- **Loyalty / Rewards Program** — Points for repeat bookings
-- **AI-Powered Dynamic Pricing** — Auto-adjust based on demand
-- **Video Content Moderation** — AI scan of video ads
-- **Mobile PWA Push Notifications** — Real-time alerts on mobile
-- **Trip Replay Social Sharing** — Viral growth loop
-- **Referral Program** — Agency & traveler referrals
-- **Expedition Insurance Integration** — Automated policy
-- **Blockchain Permits** (above)
-- **B2B API for Agencies** — White-label integration
+Provider response visibility
 
----
+Review email digest (weekly)
 
-## 🎯 CURRENT MASTER DIRECTIVE
+🟢 4. Other Future Ideas (Not Yet Discussed in Detail)
+Live Chat / Messaging — Traveler ↔ Provider direct chat
 
-> "सबै काम A-Z complete गरेपछि मात्र one time push। Admin Notification System = सबैभन्दा अन्तिम काम। Rule A, B, C, D, E पालना गर्नुस्। कोई hasty नै।"
+Multi-currency Wallet — Save & pay in multiple currencies
 
----
+Loyalty / Rewards Program — Points for repeat bookings
 
-## 🚦 WORK ORDER — Priority Sequence
+AI-Powered Dynamic Pricing — Auto-adjust based on demand
+
+Video Content Moderation — AI scan of video ads
+
+Mobile PWA Push Notifications — Real-time alerts on mobile
+
+Trip Replay Social Sharing — Viral growth loop
+
+Referral Program — Agency & traveler referrals
+
+Expedition Insurance Integration — Automated policy
+
+Blockchain Permits (above)
+
+B2B API for Agencies — White-label integration
+
+🎯 CURRENT MASTER DIRECTIVE
+"सबै काम A-Z complete गरेपछि मात्र one time push। Admin Notification System = सबैभन्दा अन्तिम काम। Rule A, B, C, D, E पालना गर्नुस्। कोई hasty नै।"
+
+🚦 WORK ORDER — Priority Sequence
+text
 Phase 1 (DONE): ✅ Review System Foundation
 ↓
 Phase 2 (DONE): ✅ Review System — Provider Panel (respond)
@@ -697,7 +723,9 @@ Phase 3: 🟢 Review System — Public Advanced (photos, votes)
 ↓
 Phase 4: 🟣 Review System — Polish (analytics, digest)
 ↓
-Testing Phase: 🟢 (Restaurant DONE, Hotel DONE) → Transport → ArtCraft → Individual → MoneyChanger
+Transport Phase 1 (DONE): ✅ Public page + Emails + Payment + Images
+Transport Phase B (NEXT): 🟡 Scheduled Trips + Seat Inventory + Multi-route
+Testing Phase: 🟢 (Restaurant DONE, Hotel DONE) → ArtCraft → Individual → MoneyChanger
 ↓
 Medium Priority: 🟡 Fleet CRUD, Reports, Per-Vertical CRUD
 ↓
@@ -710,36 +738,32 @@ FINAL TASK: 🔴 Admin Notification System (Full)
 Discuss: 🔵 Expedition Service | Blockchain Permits | Future Features
 ↓
 Master GO: 🚀 Single Push to Production
+📞 HANDOVER CONTACTS / CREDENTIALS
+Role	Credential
+Admin	parasharregmi@gmail.com (super_admin)
+Test Traveler	hostelhub.nep@gmail.com (User ID 299)
+Test Provider	anjuregmimesh@gmail.com (Anju Regmi — Provider ID 177)
+Test Service	Service ID 46 (Everest Base Camp Trek — 14 Days)
+Test Hotel Provider	hotel@test.com (Bikash Gurung)
+Test Restaurant Provider	restaurant@test.com (pending setup)
+📝 FINAL NOTES FOR NEW ASSISTANT
+यो doc पूरै पढ्नुस् — कोई guess नै।
 
-text
+Rule A — कोई code लेख्नु अघि actual file पढ्नुस्।
 
----
+Review System Phase 1 + 2 — 100% verified (297 tests, 2 reviews live)।
 
-## 📞 HANDOVER CONTACTS / CREDENTIALS
+Transport Phase 1 — DONE (3 commits ahead, pending push)।
 
-| Role | Credential |
-|---|---|
-| **Admin** | `parasharregmi@gmail.com` (super_admin) |
-| **Test Traveler** | `hostelhub.nep@gmail.com` (User ID 299) |
-| **Test Provider** | `anjuregmimesh@gmail.com` (Anju Regmi — Provider ID 177) |
-| **Test Service** | Service ID 46 (Everest Base Camp Trek — 14 Days) |
-| **Test Hotel Provider** | `hotel@test.com` (Bikash Gurung) |
-| **Test Restaurant Provider** | `restaurant@test.com` (pending setup) |
+NEXT — Transport Phase B — Scheduled Trips + Seat Inventory + Multi-route।
 
----
+Push — सबै सिध्याएपछि, Master GO पछि एकैचोटि।
 
-## 📝 FINAL NOTES FOR NEW ASSISTANT
+Admin Notification System — अन्तिम task।
 
-1. **यो doc पूरै पढ्नुस्** — कोई guess नै।
-2. **Rule A** — कोई code लेख्नु अघि actual file पढ्नुस्।
-3. **Review System Phase 1** — 100% verified (297 tests, 2 reviews live)।
-4. **NEXT — Phase 2** — Provider Panel (respond feature)।
-5. **Push** — सबै सिध्याएपछि, Master GO पछि एकैचोटि।
-6. **Admin Notification System** — अन्तिम task।
-7. **Future Features (Expedition, Blockchain)** — Master सँग discuss गर्नुस्।
+Future Features (Expedition, Blockchain) — Master सँग discuss गर्नुस्।
 
----
+END OF HANDOVER — कोई confusion भए user (दाइ) लाई सोध्नुस्, guess नगर्नुस्। 🙏
 
-**END OF HANDOVER — कोई confusion भए user (दाइ) लाई सोध्नुस्, guess नगर्नुस्। 🙏**
+🇳🇵 TravelAI Nepal — Verified Trust & Reputation System निर्माण गर्दै।
 
-**🇳🇵 TravelAI Nepal — Verified Trust & Reputation System निर्माण गर्दै।**
