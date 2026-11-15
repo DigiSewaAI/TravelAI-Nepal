@@ -209,14 +209,14 @@
       <div class="pm-form">
         <div class="pm-field">
           <label>{{ __('messages.pm_type') }} *</label>
-          <select name="type" id="pmType" required>
-            <optgroup label="{{ __('messages.pm_domestic_section') }}">
+          <select name="type" id="pmType" required onchange="updatePmFieldVisibility()">
+            <optgroup label="{{ __('messages.pm_domestic_section') }}" data-pm-group="domestic">
               <option value="bank">{{ __('messages.pm_type_bank') }}</option>
               <option value="esewa">{{ __('messages.pm_type_esewa') }}</option>
               <option value="khalti">{{ __('messages.pm_type_khalti') }}</option>
               <option value="cash">{{ __('messages.pm_type_cash') }}</option>
             </optgroup>
-            <optgroup label="{{ __('messages.pm_international_section') }}">
+            <optgroup label="{{ __('messages.pm_international_section') }}" data-pm-group="international">
               <option value="paypal">{{ __('messages.pm_type_paypal') }}</option>
               <option value="wise">{{ __('messages.pm_type_wise') }}</option>
               <option value="international_bank">{{ __('messages.pm_type_international_bank') }}</option>
@@ -225,28 +225,29 @@
         </div>
         <div class="pm-field">
           <label>{{ __('messages.pm_label') }}</label>
-          <input type="text" name="label" id="pmLabel" maxlength="100" placeholder="e.g. NIC Asia Bank">
+          <input type="text" name="label" id="pmLabel" maxlength="100">
         </div>
         <div class="pm-row">
-          <div class="pm-field">
+          <div class="pm-field" data-pm-for="bank,international_bank">
             <label>{{ __('messages.pm_account_name') }}</label>
             <input type="text" name="account_name" id="pmAccountName" maxlength="150">
           </div>
-          <div class="pm-field">
+          <div class="pm-field" data-pm-for="bank,international_bank">
             <label>{{ __('messages.pm_account_number') }}</label>
             <input type="text" name="account_number" id="pmAccountNumber" maxlength="100">
           </div>
         </div>
-        <div class="pm-field">
+        <div class="pm-field" data-pm-for="esewa,khalti,paypal,wise">
           <label>{{ __('messages.pm_identifier') }}</label>
           <input type="text" name="identifier" id="pmIdentifier" maxlength="150">
+          <p id="pmIdentifierHelp" style="font-size:11px;color:var(--muted);margin-top:4px"></p>
         </div>
         <div class="pm-row">
-          <div class="pm-field">
+          <div class="pm-field" data-pm-for="bank,international_bank">
             <label>{{ __('messages.pm_bank_name') }}</label>
             <input type="text" name="bank_name" id="pmBankName" maxlength="150">
           </div>
-          <div class="pm-field">
+          <div class="pm-field" data-pm-for="international_bank">
             <label>{{ __('messages.pm_swift_code') }}</label>
             <input type="text" name="swift_code" id="pmSwiftCode" maxlength="30">
           </div>
@@ -301,11 +302,13 @@ function openPmModal(context) {
     document.getElementById('pmModalTitle').textContent = context === 'domestic'
         ? '{{ __('messages.pm_add_domestic') }}'
         : '{{ __('messages.pm_add_international') }}';
+    filterPmTypeOptions(context);
     document.getElementById('pmType').value = context === 'domestic' ? 'bank' : 'paypal';
     document.getElementById('pmCurrency').value = 'NPR';
     document.getElementById('pmSortOrder').value = 0;
     document.getElementById('pmQrPreview').style.display = 'none';
     document.getElementById('pmIsPrimary').checked = false;
+    updatePmFieldVisibility();
     document.getElementById('pmModal').classList.add('open');
 }
 
@@ -316,6 +319,7 @@ function openPmEdit(btn) {
     f.action = PM_INDEX + '/' + m.id;
     document.getElementById('pmMethod').value = 'PUT';
     document.getElementById('pmModalTitle').textContent = '{{ __('messages.pm_edit_method') }}';
+    filterPmTypeOptions('all');
     document.getElementById('pmType').value          = m.type || 'bank';
     document.getElementById('pmLabel').value         = m.label || '';
     document.getElementById('pmAccountName').value   = m.account_name || '';
@@ -333,11 +337,60 @@ function openPmEdit(btn) {
     } else {
         document.getElementById('pmQrPreview').style.display = 'none';
     }
+    updatePmFieldVisibility();
     document.getElementById('pmModal').classList.add('open');
 }
 
 function closePmModal() {
     document.getElementById('pmModal').classList.remove('open');
+}
+
+function updatePmFieldVisibility() {
+    const type = document.getElementById('pmType').value;
+
+    document.querySelectorAll('[data-pm-for]').forEach(el => {
+        const types = el.dataset.pmFor.split(',');
+        el.style.display = types.includes(type) ? '' : 'none';
+    });
+    document.querySelectorAll('.pm-row').forEach(row => {
+        const visible = Array.from(row.children).filter(c => c.style.display !== 'none');
+        row.style.display = visible.length ? '' : 'none';
+        row.style.gridTemplateColumns = visible.length === 1 ? '1fr' : '';
+    });
+
+    // Type-specific placeholders
+    const labelPlaceholders = {
+        'bank': 'e.g. NIC Asia Bank',
+        'esewa': 'e.g. My eSewa',
+        'khalti': 'e.g. My Khalti',
+        'cash': 'e.g. Counter Cash',
+        'paypal': 'e.g. My PayPal',
+        'wise': 'e.g. My Wise',
+        'international_bank': 'e.g. Chase Bank'
+    };
+    document.getElementById('pmLabel').placeholder = labelPlaceholders[type] || 'Display label';
+
+    // Identifier helper text (context-aware)
+    const identifierHelp = {
+        'esewa': 'Phone number linked to your eSewa account',
+        'khalti': 'Phone number linked to your Khalti account',
+        'paypal': 'Email address linked to your PayPal account',
+        'wise': 'Email address linked to your Wise account'
+    };
+    const helpEl = document.getElementById('pmIdentifierHelp');
+    if (helpEl) {
+        helpEl.textContent = identifierHelp[type] || '';
+    }
+}
+
+function filterPmTypeOptions(context) {
+    document.querySelectorAll('#pmType optgroup').forEach(og => {
+        const matches = (context === 'all') || (og.dataset.pmGroup === context);
+        og.style.display = matches ? '' : 'none';
+        og.querySelectorAll('option').forEach(opt => {
+            opt.disabled = !matches;
+        });
+    });
 }
 </script>
 @endsection
