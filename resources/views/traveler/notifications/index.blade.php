@@ -26,7 +26,7 @@
         <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 48px 24px; text-align: center;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔔</div>
             <h2 style="font-size: 18px; color: #111827; margin: 0 0 8px;">{{ __('messages.notif_empty_title') }}</h2>
-            <p style="color: #6b7280; margin: 0;">{{ __(\'messages.notif_empty_desc\') }}</p>
+            <p style="color: #6b7280; margin: 0;">{{ __("messages.notif_empty_desc") }}</p>
         </div>
     @else
         <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">

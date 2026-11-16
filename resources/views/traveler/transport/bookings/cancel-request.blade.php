@@ -49,7 +49,7 @@
 
             <div style="display:flex;gap:10px">
                 <a href="{{ route('traveler.transport.bookings.show', $booking->id) }}" style="flex:1;padding:12px;background:#f1f5f9;color:#0f172a;border-radius:10px;font-weight:700;text-align:center;text-decoration:none;font-size:13px">{{ __('messages.cancel_keep_booking') }}</a>
-                <button type="submit" onclick="return confirm('{{ __(\'messages.cancel_confirm_prompt\') }}')" style="flex:2;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px">{{ __('messages.cancel_submit') }}</button>
+                <button type="submit" onclick="return confirm('{{ __("messages.cancel_confirm_prompt") }}')" style="flex:2;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px">{{ __('messages.cancel_submit') }}</button>
             </div>
         </form>
     </div>
