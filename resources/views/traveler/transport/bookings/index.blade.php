@@ -7,8 +7,8 @@
     @if($bookings->isEmpty())
         <div style="background:#fff;border:2px dashed #cbd5e1;border-radius:16px;padding:48px 20px;text-align:center">
             <div style="font-size:56px;margin-bottom:12px">🚌</div>
-            <h3 style="font-size:16px;margin:0 0 8px">No bookings yet</h3>
-            <p style="color:#64748b;font-size:13px;margin:0">Your transport bookings will appear here.</p>
+            <h3 style="font-size:16px;margin:0 0 8px">{{ __('messages.tb_index_no_bookings') }}</h3>
+            <p style="color:#64748b;font-size:13px;margin:0">{{ __('messages.tb_index_empty_desc') }}</p>
         </div>
     @else
         <div style="display:flex;flex-direction:column;gap:12px">

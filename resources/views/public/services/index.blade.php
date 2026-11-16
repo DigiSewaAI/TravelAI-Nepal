@@ -913,13 +913,13 @@ function renderDistrictPanelContent(result) {
 
     if (result.status === 'ambiguous') {
         summary.textContent = '';
-        list.innerHTML = '<p class="text-xs text-gray-500 italic">District-level waypoint data is not currently mapped for this district.</p>';
+        list.innerHTML = '<p class="text-xs text-gray-500 italic">{{ __(\'messages.svc_district_no_data\') }}</p>';
         return;
     }
 
     if (result.status === 'empty') {
         summary.textContent = '';
-        list.innerHTML = '<p class="text-xs text-gray-500 italic">No waypoint data mapped to this district yet.</p>';
+        list.innerHTML = '<p class="text-xs text-gray-500 italic">{{ __(\'messages.svc_no_waypoints\') }}</p>';
         return;
     }
 

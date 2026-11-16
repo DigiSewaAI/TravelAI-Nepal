@@ -16,18 +16,18 @@
         <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">💱 Transaction Details</h2>
         @if($tx->provider)<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Provider</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ $tx->provider->name ?? 'N/A' }}</span></div>@endif
         <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Type</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ strtoupper($tx->type) }}</span></div>
-        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Currency</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ $tx->currency_code }}</span></div>
-        <div style="display:flex; justify-content:space-between; padding:8px 0;"><span style="font-size:13px; color:#6b7280;">Customer</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ $tx->customer_name }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">{{ __('messages.claim_currency') }}</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ $tx->currency_code }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0;"><span style="font-size:13px; color:#6b7280;">{{ __('messages.claim_client') }}</span><span style="font-size:14px; color:#111827; font-weight:700;">{{ $tx->customer_name }}</span></div>
     </div>
     <div style="background:#fff; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #e5e7eb;">
         <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">💰 Amount</h2>
-        <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#6b7280;">Foreign Amount</span><span style="font-size:14px; font-weight:700;">{{ number_format($tx->amount_foreign, 2) }} {{ $tx->currency_code }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#6b7280;">{{ __('messages.claim_foreign_amount') }}</span><span style="font-size:14px; font-weight:700;">{{ number_format($tx->amount_foreign, 2) }} {{ $tx->currency_code }}</span></div>
         <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#6b7280;">Rate</span><span style="font-size:14px; font-weight:700;">{{ number_format($tx->rate, 4) }}</span></div>
-        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #e5e7eb; margin-top:6px;"><span style="font-size:16px; font-weight:800;">NPR Total</span><span style="font-size:18px; font-weight:800; color:#059669;">NPR {{ number_format($tx->npr_amount, 2) }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #e5e7eb; margin-top:6px;"><span style="font-size:16px; font-weight:800;">{{ __('messages.claim_npr_total') }}</span><span style="font-size:18px; font-weight:800; color:#059669;">NPR {{ number_format($tx->npr_amount, 2) }}</span></div>
     </div>
     <div style="background:#ecfdf5; border-radius:16px; padding:16px; margin-bottom:20px; border:1px solid #a7f3d0;">
         <p style="font-size:13px; color:#065f46; margin:0; font-weight:600;">✅ Claimed on: {{ $claim->claimed_at ? $claim->claimed_at->translatedFormat('M d, Y') : 'N/A' }}</p>
     </div>
-    <a href="{{ route('traveler.dashboard-v2') }}" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:12px; border-radius:12px; font-weight:700; text-decoration:none;">Back to Dashboard</a>
+    <a href="{{ route('traveler.dashboard-v2') }}" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:12px; border-radius:12px; font-weight:700; text-decoration:none;">{{ __('messages.claim_back_dashboard') }}</a>
 </div>
 @endsection

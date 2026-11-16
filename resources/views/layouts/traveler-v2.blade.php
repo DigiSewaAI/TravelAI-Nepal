@@ -866,7 +866,7 @@
                 <span>{{ app(\App\Services\CurrencyService::class)->getDisplayCurrency() }}</span>
             </button>
             <div class="tv2-dropdown-menu" id="tv2CurrencyMenu">
-                <span class="tv2-dropdown-item" style="cursor:default; color:#9ca3af; font-size:11px;">Currency is session-based</span>
+                <span class="tv2-dropdown-item" style="cursor:default; color:#9ca3af; font-size:11px;">{{ __('messages.layout_currency_session') }}</span>
             </div>
         </div>
 
@@ -1125,7 +1125,7 @@
             const data = await res.json();
             const items = (data.notifications || []).slice(0, 5);
             if (items.length === 0) {
-                menu.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#6b7280;">No notifications</div>';
+                menu.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#6b7280;">{{ __('messages.layout_no_notifications') }}</div>';
             } else {
                 menu.innerHTML = items.map(n => `
                     <a href="${n.url || '#'}" class="tv2-dropdown-item" style="border-bottom:1px solid #f3f4f6;">
@@ -1133,12 +1133,12 @@
                         <div style="font-size:11px;color:#6b7280;margin-top:2px;">${n.message || ''}</div>
                     </a>
                 `).join('') + `
-                    <a href="{{ route('traveler.notifications.index') }}" class="tv2-dropdown-item" style="text-align:center;color:#2563eb;font-weight:600;">View all</a>
+                    <a href="{{ route('traveler.notifications.index') }}" class="tv2-dropdown-item" style="text-align:center;color:#2563eb;font-weight:600;">{{ __('messages.layout_view_all') }}</a>
                 `;
             }
             menu.dataset.loaded = 'true';
         } catch (e) {
-            menu.innerHTML = '<div style="padding:10px;text-align:center;font-size:13px;color:#dc2626;">Failed to load</div>';
+            menu.innerHTML = '<div style="padding:10px;text-align:center;font-size:13px;color:#dc2626;">{{ __('messages.layout_failed_load') }}</div>';
         }
     }
 })();
@@ -1235,7 +1235,7 @@
         </div>
                 {{-- Active SOS Cancel Section --}}
         <div id="activeSosSection" class="hidden mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
-            <p class="text-sm text-red-800 font-semibold mb-2">You have an active SOS.</p>
+            <p class="text-sm text-red-800 font-semibold mb-2">{{ __('messages.layout_active_sos') }}</p>
             <button type="button" onclick="promptCancelSos()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">
                 Cancel Active SOS
             </button>
@@ -1472,7 +1472,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 if (res.ok) {
                     menu.dataset.loaded = '';
-                    menu.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#6b7280;">Loading...</div>';
+                    menu.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#6b7280;">{{ __('messages.layout_loading') }}</div>';
                     var btn = document.getElementById('tv2BellBtn');
                     if (btn) { btn.click(); setTimeout(function(){ btn.click(); }, 50); }
                 }

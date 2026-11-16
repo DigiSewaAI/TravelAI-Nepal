@@ -30,19 +30,19 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-gray-50">
             <div class="text-center">
                 <div class="text-2xl font-bold text-blue-600">{{ $statistics['total_treks'] ?? 0 }}</div>
-                <div class="text-xs text-gray-500">Treks</div>
+                <div class="text-xs text-gray-500">{{ __('messages.passport_treks') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-green-600">{{ $statistics['total_checkins'] ?? 0 }}</div>
-                <div class="text-xs text-gray-500">Check-ins</div>
+                <div class="text-xs text-gray-500">{{ __('messages.passport_checkins') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-purple-600">{{ $statistics['unique_waypoints'] ?? 0 }}</div>
-                <div class="text-xs text-gray-500">Places</div>
+                <div class="text-xs text-gray-500">{{ __('messages.passport_places') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-orange-600">{{ $statistics['highest_altitude'] ?? 0 }}m</div>
-                <div class="text-xs text-gray-500">Highest Altitude</div>
+                <div class="text-xs text-gray-500">{{ __('messages.passport_highest_altitude') }}</div>
             </div>
         </div>
 
@@ -63,7 +63,7 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-gray-500 text-center py-4">No stamps collected yet.</p>
+                <p class="text-gray-500 text-center py-4">{{ __('messages.passport_no_stamps') }}</p>
             @endif
         </div>
 
@@ -88,14 +88,14 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-gray-500 text-center py-4">No achievements unlocked yet.</p>
+                <p class="text-gray-500 text-center py-4">{{ __('messages.passport_no_achievements') }}</p>
             @endif
         </div>
 
         {{-- Footer --}}
         <div class="bg-gray-50 px-6 py-4 text-center text-xs text-gray-400 border-t border-gray-100">
             <p>Verified Trek Passport • TravelAI Nepal</p>
-            <p class="mt-1">This passport is publicly shared by the traveler.</p>
+            <p class="mt-1">{{ __('messages.passport_publicly_shared') }}</p>
         </div>
     </div>
 

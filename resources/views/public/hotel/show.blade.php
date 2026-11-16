@@ -601,7 +601,7 @@
                 <div class="info-row">
                     <div class="info-icon-box"><i class="fas fa-globe"></i></div>
                     <div class="info-content-wrap">
-                        <div class="info-lbl">Website</div>
+                        <div class="info-lbl">{{ __('messages.hotel_website_label') }}</div>
                         <div class="info-val"><a href="{{ $provider->website }}" target="_blank">{{ $provider->website }}</a></div>
                     </div>
                 </div>
@@ -610,7 +610,7 @@
                 <div class="info-row">
                     <div class="info-icon-box"><i class="fas fa-map-marker-alt"></i></div>
                     <div class="info-content-wrap">
-                        <div class="info-lbl">Address</div>
+                        <div class="info-lbl">{{ __('messages.hotel_address_label') }}</div>
                         <div class="info-val">{{ $provider->address }}</div>
                     </div>
                 </div>
@@ -640,17 +640,17 @@
 <div id="bookingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px);">
     <div style="background:#fff; border-radius:20px; width:100%; max-width:500px; padding:30px; box-shadow:0 20px 40px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; font-size:20px; font-weight:800; color:#0f172a;">Complete Your Booking</h3>
+            <h3 style="margin:0; font-size:20px; font-weight:800; color:#0f172a;">{{ __('messages.hotel_complete_booking') }}</h3>
             <button onclick="closeBookingModal()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
         </div>
 
         <div style="background:#f8fafc; padding:15px; border-radius:10px; margin-bottom:20px; display:flex; justify-content:space-between; border: 1px solid #e2e8f0;">
             <div>
-                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:800;">Selected Room</div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:800;">{{ __('messages.hotel_selected_room') }}</div>
                 <div id="modal_room_name" style="font-weight:800; color:#0f172a; margin-top:2px; font-size: 14px;"></div>
             </div>
             <div style="text-align:right;">
-                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:800;">Price</div>
+                <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:800;">{{ __('messages.hotel_price') }}</div>
                 <div id="modal_room_price" style="font-weight:800; color:#0ea5e9; margin-top:2px; font-size: 14px;"></div>
             </div>
         </div>
@@ -660,22 +660,22 @@
             <input type="hidden" name="room_id" id="book_room_id">
 
             <div style="margin-bottom:15px;">
-                <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Full Name</label>
+                <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">{{ __('messages.hotel_full_name') }}</label>
                 <input type="text" name="guest_name" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; font-family:inherit; font-size:14px; outline:none;" placeholder="John Doe">
             </div>
 
             <div style="margin-bottom:15px;">
-                <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Email</label>
+                <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">{{ __('messages.public_email') }}</label>
                 <input type="email" name="guest_email" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; font-family:inherit; font-size:14px; outline:none;" placeholder="john@example.com">
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                 <div>
-                    <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Check-in</label>
+                    <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">{{ __('messages.hotel_checkin') }}</label>
                     <input type="date" name="check_in_date" required min="{{ date('Y-m-d') }}" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; font-family:inherit; font-size:14px; outline:none;">
                 </div>
                 <div>
-                    <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">Check-out</label>
+                    <label style="display:block; font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:5px;">{{ __('messages.hotel_checkout') }}</label>
                     <input type="date" name="check_out_date" required min="{{ date('Y-m-d', strtotime('+1 day')) }}" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; font-family:inherit; font-size:14px; outline:none;">
                 </div>
             </div>

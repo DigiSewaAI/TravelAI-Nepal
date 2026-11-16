@@ -109,7 +109,7 @@
                     <span class="text-gray-400">/ {{ count($journeyWaypoints) }}</span>
                 </span>
                 <span class="px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 font-bold shadow-sm transition-all"
-                      id="journeyStatus">Ready</span>
+                      id="journeyStatus">{{ __('messages.svc_ready') }}</span>
             </div>
 
             {{-- Progress bar --}}
@@ -197,7 +197,7 @@
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z"/>
                 </svg>
-                <span id="journeyPlayLabel">Replay</span>
+                <span id="journeyPlayLabel">{{ __('messages.svc_replay') }}</span>
             </button>
 
             <button type="button" id="journeyNextBtn"

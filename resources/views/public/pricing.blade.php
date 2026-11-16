@@ -396,27 +396,27 @@
 </div>
     {{-- ========== FAQ ========== --}}
     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ __('messages.pricing_faq_title') }}</h2>
         <div class="space-y-4">
             <details class="border-b pb-3">
-                <summary class="font-semibold cursor-pointer">Can I use multiple verticals in one plan?</summary>
+                <summary class="font-semibold cursor-pointer">{{ __('messages.pricing_faq_q1') }}</summary>
                 <p class="mt-2 text-sm text-gray-600">Yes! Each plan covers all 8 verticals — Trekking, Hotel, Restaurant, Transport, Individual, Money Changer, Art Craft, and Inventory. Your limits are per-vertical (e.g., Free gets 3 treks + 1 hotel + 5 products simultaneously).</p>
             </details>
             <details class="border-b pb-3">
-                <summary class="font-semibold cursor-pointer">Can I switch plans later?</summary>
-                <p class="mt-2 text-sm text-gray-600">Yes, you can upgrade, downgrade, or cancel at any time from your dashboard.</p>
+                <summary class="font-semibold cursor-pointer">{{ __('messages.pricing_faq_q2') }}</summary>
+                <p class="mt-2 text-sm text-gray-600">{{ __('messages.pricing_faq_a2') }}</p>
             </details>
             <details class="border-b pb-3">
-                <summary class="font-semibold cursor-pointer">What payment methods do you accept?</summary>
-                <p class="mt-2 text-sm text-gray-600">We accept bank transfer, eSewa, and Khalti. Payments are manually verified before plan activation.</p>
+                <summary class="font-semibold cursor-pointer">{{ __('messages.pricing_faq_q3') }}</summary>
+                <p class="mt-2 text-sm text-gray-600">{{ __('messages.pricing_faq_a3') }}</p>
             </details>
             <details class="border-b pb-3">
-                <summary class="font-semibold cursor-pointer">What happens if I exceed my plan limits?</summary>
-                <p class="mt-2 text-sm text-gray-600">You'll be notified and can upgrade to a higher plan to continue using the service.</p>
+                <summary class="font-semibold cursor-pointer">{{ __('messages.pricing_faq_q4') }}</summary>
+                <p class="mt-2 text-sm text-gray-600">{{ __('messages.pricing_faq_a4') }}</p>
             </details>
             <details>
-                <summary class="font-semibold cursor-pointer">What about AI requests across verticals?</summary>
-                <p class="mt-2 text-sm text-gray-600">All AI features (trek itinerary, quotation, future vertical-specific AI) share the same monthly quota.</p>
+                <summary class="font-semibold cursor-pointer">{{ __('messages.pricing_faq_q5') }}</summary>
+                <p class="mt-2 text-sm text-gray-600">{{ __('messages.pricing_faq_a5') }}</p>
             </details>
         </div>
     </div>

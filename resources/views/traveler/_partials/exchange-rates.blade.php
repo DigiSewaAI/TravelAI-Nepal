@@ -29,6 +29,6 @@
             @endforeach
         </div>
     @else
-        <p style="font-size: 13px; color: #9ca3af; margin: 0;">No exchange rates available.</p>
+        <p style="font-size: 13px; color: #9ca3af; margin: 0;">{{ __('messages.exchange_rates_empty') }}</p>
     @endif
 </div>

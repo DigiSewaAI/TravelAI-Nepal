@@ -80,7 +80,7 @@
         <h2 style="font-size: 16px; font-weight: 800; color: #111827; margin: 0 0 14px;">💰 {{ __('messages.payment') ?? 'Payment' }}</h2>
         <div style="display: grid; gap: 10px;">
             <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                <span style="font-size: 14px; color: #6b7280;">Subtotal</span>
+                <span style="font-size: 14px; color: #6b7280;">{{ __('messages.claim_subtotal') }}</span>
                 <span style="font-size: 14px; color: #111827;">{{ $order->currency ?? 'NPR' }} {{ number_format($order->subtotal ?? 0, 2) }}</span>
             </div>
             <div style="display: flex; justify-content: space-between; padding: 6px 0;">
@@ -88,11 +88,11 @@
                 <span style="font-size: 14px; color: #111827;">{{ $order->currency ?? 'NPR' }} {{ number_format($order->tax ?? 0, 2) }}</span>
             </div>
             <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #e5e7eb; margin-top: 6px;">
-                <span style="font-size: 16px; font-weight: 800; color: #111827;">Total</span>
+                <span style="font-size: 16px; font-weight: 800; color: #111827;">{{ __('messages.claim_total') }}</span>
                 <span style="font-size: 18px; font-weight: 800; color: #059669;">{{ $order->currency ?? 'NPR' }} {{ number_format($order->total ?? 0, 2) }}</span>
             </div>
             <div style="display: flex; justify-content: space-between; padding: 6px 0; margin-top: 6px;">
-                <span style="font-size: 13px; color: #6b7280;">Payment Status</span>
+                <span style="font-size: 13px; color: #6b7280;">{{ __('messages.claim_payment_status') }}</span>
                 <span style="font-size: 13px; font-weight: 700; color: {{ $order->payment_status === 'paid' ? '#059669' : '#d97706' }};">
                     {{ ucfirst($order->payment_status ?? 'pending') }}
                 </span>

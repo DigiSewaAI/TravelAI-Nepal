@@ -16,17 +16,17 @@
     <div style="background:#fff; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #e5e7eb;">
         <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">📋 Booking Details</h2>
         @if($booking->provider)<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Provider</span><span style="font-size:14px; font-weight:700;">{{ $booking->provider->name ?? 'N/A' }}</span></div>@endif
-        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Client</span><span style="font-size:14px; font-weight:700;">{{ $booking->client_name }}</span></div>
-        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">Duration</span><span style="font-size:14px; font-weight:700;">{{ $booking->duration }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">{{ __('messages.claim_client') }}</span><span style="font-size:14px; font-weight:700;">{{ $booking->client_name }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3f4f6;"><span style="font-size:13px; color:#6b7280;">{{ __('messages.claim_duration') }}</span><span style="font-size:14px; font-weight:700;">{{ $booking->duration }}</span></div>
         <div style="display:flex; justify-content:space-between; padding:8px 0;"><span style="font-size:13px; color:#6b7280;">Pax</span><span style="font-size:14px; font-weight:700;">{{ $booking->pax }}</span></div>
     </div>
     <div style="background:#fff; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #e5e7eb;">
         <h2 style="font-size:16px; font-weight:800; color:#111827; margin:0 0 14px;">💰 Amount</h2>
-        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #e5e7eb;"><span style="font-size:16px; font-weight:800;">Total</span><span style="font-size:18px; font-weight:800; color:#059669;">NPR {{ number_format($booking->amount, 2) }}</span></div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #e5e7eb;"><span style="font-size:16px; font-weight:800;">{{ __('messages.claim_total') }}</span><span style="font-size:18px; font-weight:800; color:#059669;">NPR {{ number_format($booking->amount, 2) }}</span></div>
     </div>
     <div style="background:#ecfdf5; border-radius:16px; padding:16px; margin-bottom:20px; border:1px solid #a7f3d0;">
         <p style="font-size:13px; color:#065f46; margin:0; font-weight:600;">✅ Claimed on: {{ $claim->claimed_at ? $claim->claimed_at->translatedFormat('M d, Y') : 'N/A' }}</p>
     </div>
-    <a href="{{ route('traveler.dashboard-v2') }}" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:12px; border-radius:12px; font-weight:700; text-decoration:none;">Back to Dashboard</a>
+    <a href="{{ route('traveler.dashboard-v2') }}" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:12px; border-radius:12px; font-weight:700; text-decoration:none;">{{ __('messages.claim_back_dashboard') }}</a>
 </div>
 @endsection

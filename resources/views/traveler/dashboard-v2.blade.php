@@ -165,28 +165,28 @@
     <!-- Status Counters -->
     <div class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl shadow-soft border border-blue-100 hover:-translate-y-1 transition-transform duration-300">
         <div class="flex items-center justify-between">
-            <p class="text-xs text-blue-600 font-bold uppercase tracking-wider">Upcoming</p>
+            <p class="text-xs text-blue-600 font-bold uppercase tracking-wider">{{ __('messages.dash_upcoming') }}</p>
             <i class="fa-regular fa-calendar-alt text-blue-400"></i>
         </div>
         <h4 class="text-3xl font-extrabold text-blue-900 mt-2">{{ $statusCounts['upcoming'] ?? 0 }}</h4>
     </div>
     <div class="bg-gradient-to-br from-green-50 to-white p-5 rounded-2xl shadow-soft border border-green-100 hover:-translate-y-1 transition-transform duration-300">
         <div class="flex items-center justify-between">
-            <p class="text-xs text-green-600 font-bold uppercase tracking-wider">Active</p>
+            <p class="text-xs text-green-600 font-bold uppercase tracking-wider">{{ __('messages.dash_active') }}</p>
             <i class="fa-solid fa-plane-departure text-green-400"></i>
         </div>
         <h4 class="text-3xl font-extrabold text-green-900 mt-2">{{ $statusCounts['active'] ?? 0 }}</h4>
     </div>
     <div class="bg-gradient-to-br from-purple-50 to-white p-5 rounded-2xl shadow-soft border border-purple-100 hover:-translate-y-1 transition-transform duration-300">
         <div class="flex items-center justify-between">
-            <p class="text-xs text-purple-600 font-bold uppercase tracking-wider">Completed</p>
+            <p class="text-xs text-purple-600 font-bold uppercase tracking-wider">{{ __('messages.dash_completed') }}</p>
             <i class="fa-solid fa-check-circle text-purple-400"></i>
         </div>
         <h4 class="text-3xl font-extrabold text-purple-900 mt-2">{{ $statusCounts['completed'] ?? 0 }}</h4>
     </div>
     <div class="bg-gradient-to-br from-yellow-50 to-white p-5 rounded-2xl shadow-soft border border-yellow-100 hover:-translate-y-1 transition-transform duration-300">
         <div class="flex items-center justify-between">
-            <p class="text-xs text-yellow-600 font-bold uppercase tracking-wider">Reviews</p>
+            <p class="text-xs text-yellow-600 font-bold uppercase tracking-wider">{{ __('messages.dash_reviews') }}</p>
             <i class="fa-solid fa-star text-yellow-400"></i>
         </div>
         <h4 class="text-3xl font-extrabold text-yellow-900 mt-2">{{ $statusCounts['reviews'] ?? 0 }}</h4>
@@ -201,7 +201,7 @@
                 <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
             </div>
             <div>
-                <h3 class="font-bold text-slate-900 text-sm">Wholesale RFQs</h3>
+                <h3 class="font-bold text-slate-900 text-sm">{{ __('messages.dash_wholesale_rfqs') }}</h3>
                 <p class="text-sm text-slate-500 font-medium">{{ $wholesale_count ?? 0 }} total</p>
             </div>
         </div>
@@ -217,8 +217,8 @@
             <p class="text-sm text-slate-600 font-medium">You have {{ $qr_scans }} check-ins.</p>
         @else
             <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 text-center">
-                <p class="text-slate-500 text-xs mb-3 font-medium">No trek history yet.</p>
-                <a href="{{ route('traveler.bookings.index') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md shadow-blue-500/30 hover:bg-blue-700 transition">Scan Checkpoint</a>
+                <p class="text-slate-500 text-xs mb-3 font-medium">{{ __('messages.dash_no_trek_history') }}</p>
+                <a href="{{ route('traveler.bookings.index') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md shadow-blue-500/30 hover:bg-blue-700 transition">{{ __('messages.dash_scan_checkpoint') }}</a>
             </div>
         @endif
     </div>
@@ -236,10 +236,10 @@
                     <input type="file" name="media" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
                     <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-3 text-center hover:bg-slate-100 transition">
                         <i class="fa-solid fa-cloud-upload-alt text-slate-400 mb-1"></i>
-                        <p class="text-[10px] text-slate-500 font-bold">Choose File to Upload</p>
+                        <p class="text-[10px] text-slate-500 font-bold">{{ __('messages.dash_choose_file') }}</p>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-xl font-bold text-xs shadow-md shadow-purple-500/30 hover:opacity-90 transition">Upload Memory</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-2 rounded-xl font-bold text-xs shadow-md shadow-purple-500/30 hover:opacity-90 transition">{{ __('messages.dash_upload_memory') }}</button>
             </form>
                 @if(($userMedia ?? collect())->count() > 0)
                     <div class="mt-4 grid grid-cols-3 gap-2">
@@ -283,11 +283,11 @@
                         @endif
                     </h2>
                     @if(($unreadAlerts ?? collect())->count() === 0)
-                        <p class="text-sm text-green-700 font-medium mt-0.5">No active safety alerts in your area. You are safe to travel!</p>
+                        <p class="text-sm text-green-700 font-medium mt-0.5">{{ __('messages.dash_no_alerts_safe') }}</p>
                     @endif
                 </div>
             </div>
-            <a href="{{ route('safety.index') ?? '#' }}" class="bg-white text-green-700 font-bold text-sm px-6 py-2.5 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">View Safety Map</a>
+            <a href="{{ route('safety.index') ?? '#' }}" class="bg-white text-green-700 font-bold text-sm px-6 py-2.5 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">{{ __('messages.dash_view_safety_map') }}</a>
         </div>
 
         @if(($unreadAlerts ?? collect())->count() > 0)

@@ -431,7 +431,7 @@
                         <div class="tr-route-dot"></div>
                         <div class="tr-route-info">
                             <p class="tr-route-name">{{ $service->transportDetail->fromLocation->city }}</p>
-                            <p class="tr-route-sub">Pickup point</p>
+                            <p class="tr-route-sub">{{ __('messages.tr_pickup_point') }}</p>
                         </div>
                     </div>
                     <div class="tr-route-line" style="border-bottom: 0; padding-left: 4px; color: #0284c7;">
@@ -448,7 +448,7 @@
                         <div class="tr-route-dot end"></div>
                         <div class="tr-route-info">
                             <p class="tr-route-name">{{ $service->transportDetail->toLocation->city }}</p>
-                            <p class="tr-route-sub">Destination</p>
+                            <p class="tr-route-sub">{{ __('messages.tr_destination') }}</p>
                         </div>
                     </div>
                 @else
@@ -462,7 +462,7 @@
                             </div>
                         </div>
                     @empty
-                        <p style="color: #64748b; font-size: 14px;">Routes will be updated soon.</p>
+                        <p style="color: #64748b; font-size: 14px;">{{ __('messages.tr_routes_updating') }}</p>
                     @endforelse
                 @endif
             </div>
@@ -510,7 +510,7 @@
                     </div>
                 </div>
                 @empty
-                <p style="color: #64748b;">No vehicles listed yet.</p>
+                <p style="color: #64748b;">{{ __('messages.tr_no_vehicles') }}</p>
                 @endforelse
             </div>
             @else
@@ -581,13 +581,13 @@
             <div class="tr-side-card">
                 <h3><i class="fas fa-address-card"></i> {{ __('messages.public_contact_info') ?? 'Contact' }}</h3>
                 @if($provider->contact_phone)
-                    <p><strong>Phone:</strong> {{ $provider->contact_phone }}</p>
+                    <p><strong>{{ __('messages.tr_phone_label') }}:</strong> {{ $provider->contact_phone }}</p>
                 @endif
                 @if($provider->contact_email)
-                    <p><strong>Email:</strong> {{ $provider->contact_email }}</p>
+                    <p><strong>{{ __('messages.tr_email_label') }}:</strong> {{ $provider->contact_email }}</p>
                 @endif
                 @if($provider->address)
-                    <p><strong>Address:</strong> {{ $provider->address }}</p>
+                    <p><strong>{{ __('messages.tr_address_label') }}:</strong> {{ $provider->address }}</p>
                 @endif
             </div>
 
@@ -785,7 +785,7 @@ document.getElementById('bookingModal')?.addEventListener('click', function(e) {
         </div>
 
         <div style="background:#fffbeb;border:1px solid #fbbf24;padding:14px 16px;border-radius:12px;margin-bottom:16px;">
-            <div style="font-size:11px;color:#92400e;font-weight:800;text-transform:uppercase;letter-spacing:.5px">Booking Reference</div>
+            <div style="font-size:11px;color:#92400e;font-weight:800;text-transform:uppercase;letter-spacing:.5px">{{ __('messages.tr_booking_ref') }}</div>
             <div style="font-size:18px;font-weight:800;color:#92400e;margin-top:4px">{{ $pb['ref'] }}</div>
             <div style="font-size:20px;font-weight:800;color:#92400e;margin-top:8px">Rs {{ number_format($pb['amount'], 2) }}</div>
         </div>
@@ -808,7 +808,7 @@ document.getElementById('bookingModal')?.addEventListener('click', function(e) {
             @if($m['qr_url'])
                 <div style="margin-top:10px;padding-left:24px">
                     <img src="{{ $m['qr_url'] }}" alt="QR" style="width:120px;height:120px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;padding:4px">
-                    <div style="font-size:11px;color:#64748b;margin-top:4px">Scan this QR to pay</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:4px">{{ __('messages.tr_scan_qr') }}</div>
                 </div>
             @endif
         </label>
@@ -828,7 +828,7 @@ document.getElementById('bookingModal')?.addEventListener('click', function(e) {
             </div>
 
             <div class="tr-form-group">
-                <label class="tr-form-label">Payment Screenshot</label>
+                <label class="tr-form-label">{{ __('messages.tr_payment_screenshot') }}</label>
                 <input type="file" name="payment_proof" accept="image/*" required class="tr-form-input">
                 <div style="font-size:11px;color:#64748b;margin-top:4px">Max 5MB · JPG, PNG, WEBP</div>
             </div>
@@ -844,7 +844,7 @@ document.getElementById('bookingModal')?.addEventListener('click', function(e) {
         </form>
 
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;text-align:center;font-size:12px;color:#64748b">
-            ⓘ You can also complete payment later from your <a href="{{ url('/traveler/dashboard-v2') }}" style="color:#0284c7;font-weight:700">dashboard</a> or email link.
+            {{ __('messages.tr_complete_payment_later') }}
         </div>
     </div>
 </div>

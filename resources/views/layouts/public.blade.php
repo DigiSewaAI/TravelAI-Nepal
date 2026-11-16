@@ -424,7 +424,7 @@
                         </select>
                     </div>
                     <div class="flex items-center justify-between px-3 py-2">
-                        <span class="text-xs font-semibold text-gray-500 uppercase">Currency</span>
+                        <span class="text-xs font-semibold text-gray-500 uppercase">{{ __('messages.layout_currency') }}</span>
                         <select id="mobile-currency-selector" class="bg-gray-100 border border-gray-300 rounded-lg px-2 py-1 text-xs">
                             <option value="USD" {{ session('display_currency', 'USD') === 'USD' ? 'selected' : '' }}>🇺🇸 USD</option>
                             <option value="NPR" {{ session('display_currency', 'USD') === 'NPR' ? 'selected' : '' }}>🇳🇵 NPR</option>

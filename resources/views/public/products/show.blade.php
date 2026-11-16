@@ -85,11 +85,11 @@
                 <!-- Category Badge -->
                 <div class="absolute top-5 left-5 z-10">
                     @if($product->product_type === 'rental')
-                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100/90 backdrop-blur-md rounded-xl shadow-sm border border-amber-200/50">Rental Gear</span>
+                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100/90 backdrop-blur-md rounded-xl shadow-sm border border-amber-200/50">{{ __('messages.product_badge_rental') }}</span>
                     @elseif($product->product_type === 'shop')
-                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100/90 backdrop-blur-md rounded-xl shadow-sm border border-emerald-200/50">Handicraft</span>
+                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100/90 backdrop-blur-md rounded-xl shadow-sm border border-emerald-200/50">{{ __('messages.product_badge_handicraft') }}</span>
                     @else
-                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-purple-900 bg-purple-100/90 backdrop-blur-md rounded-xl shadow-sm border border-purple-200/50">Wholesale</span>
+                        <span class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-purple-900 bg-purple-100/90 backdrop-blur-md rounded-xl shadow-sm border border-purple-200/50">{{ __('messages.product_badge_wholesale') }}</span>
                     @endif
                 </div>
 
@@ -100,7 +100,7 @@
                 @else
                     <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
                         <i class="fas fa-box-open text-6xl mb-4"></i>
-                        <span class="text-sm font-medium">No Image Available</span>
+                        <span class="text-sm font-medium">{{ __('messages.product_no_image') }}</span>
                     </div>
                 @endif
             </div>
@@ -219,13 +219,13 @@
                                 <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100 text-xs space-y-1.5">
                                     <div class="font-bold text-amber-900 mb-2 uppercase tracking-wide">{{ __('messages.rental_terms_heading') }}</div>
                                     @if($rentalDetail->rental_deposit > 0)
-                                        <div class="text-amber-800 flex justify-between"><span>Deposit:</span> <span>{{ $baseCurrency }} {{ number_format($rentalDetail->rental_deposit, 2) }}</span></div>
+                                        <div class="text-amber-800 flex justify-between"><span>{{ __('messages.product_deposit') }}:</span> <span>{{ $baseCurrency }} {{ number_format($rentalDetail->rental_deposit, 2) }}</span></div>
                                     @endif
                                     @if($rentalDetail->late_fee_per_day > 0)
-                                        <div class="text-amber-800 flex justify-between"><span>Late Fee:</span> <span>{{ $baseCurrency }} {{ number_format($rentalDetail->late_fee_per_day, 2) }}/day</span></div>
+                                        <div class="text-amber-800 flex justify-between"><span>{{ __('messages.product_late_fee') }}:</span> <span>{{ $baseCurrency }} {{ number_format($rentalDetail->late_fee_per_day, 2) }}/{{ __('messages.product_per_day') }}</span></div>
                                     @endif
                                     @if($rentalDetail->damage_deposit_pct < 100)
-                                        <div class="text-amber-800 flex justify-between"><span>Damage Deduction:</span> <span>{{ $rentalDetail->damage_deposit_pct }}%</span></div>
+                                        <div class="text-amber-800 flex justify-between"><span>{{ __('messages.product_damage_deduction') }}:</span> <span>{{ $rentalDetail->damage_deposit_pct }}%</span></div>
                                     @endif
                                 </div>
                             @endif

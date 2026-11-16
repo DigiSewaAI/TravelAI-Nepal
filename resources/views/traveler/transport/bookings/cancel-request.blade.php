@@ -15,7 +15,7 @@
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
             <div style="background:#f8fafc;padding:14px;border-radius:10px">
-                <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">Hours until departure</div>
+                <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">{{ __('messages.cancel_hours_until') }}</div>
                 <div style="font-size:20px;font-weight:800;color:#0f172a">
                     @if($hoursUntil >= 1)
                         {{ (int) $hoursUntil }}h {{ (int) (($hoursUntil - (int)$hoursUntil) * 60) }}m
@@ -25,14 +25,14 @@
                 </div>
             </div>
             <div style="background:#f0f9ff;padding:14px;border-radius:10px">
-                <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">Estimated Refund</div>
+                <div style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;margin-bottom:4px">{{ __('messages.cancel_estimated_refund') }}</div>
                 <div style="font-size:20px;font-weight:800;color:#0284c7">Rs {{ number_format($estimatedRefund, 2) }}</div>
             </div>
         </div>
 
         @if(($booking->payment_status ?? 'pending') !== 'paid')
             <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px;font-size:12px;color:#0369a1;margin-bottom:18px">
-                ⓘ This booking has not been paid yet. No refund will be issued.
+                [i] This booking has not been paid yet. No refund will be issued.
             </div>
         @elseif($estimatedRefund == 0)
             <div style="background:#fef4e2;border:1px solid #fbbf24;border-radius:10px;padding:12px;font-size:12px;color:#92400e;margin-bottom:18px">
@@ -48,8 +48,8 @@
             </div>
 
             <div style="display:flex;gap:10px">
-                <a href="{{ route('traveler.transport.bookings.show', $booking->id) }}" style="flex:1;padding:12px;background:#f1f5f9;color:#0f172a;border-radius:10px;font-weight:700;text-align:center;text-decoration:none;font-size:13px">Keep Booking</a>
-                <button type="submit" onclick="return confirm('Submit cancellation request?')" style="flex:2;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px">Submit Cancellation Request</button>
+                <a href="{{ route('traveler.transport.bookings.show', $booking->id) }}" style="flex:1;padding:12px;background:#f1f5f9;color:#0f172a;border-radius:10px;font-weight:700;text-align:center;text-decoration:none;font-size:13px">{{ __('messages.cancel_keep_booking') }}</a>
+                <button type="submit" onclick="return confirm('{{ __(\'messages.cancel_confirm_prompt\') }}')" style="flex:2;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px">{{ __('messages.cancel_submit') }}</button>
             </div>
         </form>
     </div>

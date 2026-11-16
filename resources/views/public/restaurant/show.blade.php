@@ -309,15 +309,15 @@
         <div class="rest-profile-stats">
             <div class="rest-stat">
                 <span class="rest-stat-value">{{ $menuItems->count() }}</span>
-                <span class="rest-stat-label">Menu Items</span>
+                <span class="rest-stat-label">{{ __('messages.rest_menu_items') }}</span>
             </div>
             <div class="rest-stat">
                 <span class="rest-stat-value">{{ $tables->count() }}</span>
-                <span class="rest-stat-label">Tables</span>
+                <span class="rest-stat-label">{{ __('messages.rest_tables') }}</span>
             </div>
             <div class="rest-stat">
                 <span class="rest-stat-value">{{ $provider->average_rating ? number_format($provider->average_rating, 1) : 'New' }}</span>
-                <span class="rest-stat-label">Rating</span>
+                <span class="rest-stat-label">{{ __('messages.rest_rating') }}</span>
             </div>
         </div>
     </div>
@@ -347,7 +347,7 @@
             {{-- MENU --}}
             <h2 class="section-title"><i class="fas fa-utensils"></i> {{ __('messages.public_menu') ?? 'Explore Our Menu' }}</h2>
             @if($menuItems->isEmpty())
-                <div class="empty-state"><i class="fas fa-utensils"></i><p>Menu is being updated. Please check back later.</p></div>
+                <div class="empty-state"><i class="fas fa-utensils"></i><p>{{ __('messages.rest_menu_updating') }}</p></div>
             @else
                 <div class="menu-grid">
                     @foreach($menuItems as $item)
@@ -377,7 +377,7 @@
             {{-- TABLES --}}
             <h2 class="section-title" style="margin-top: 50px;"><i class="fas fa-chair"></i> {{ __('messages.public_tables') ?? 'Our Tables' }}</h2>
             @if($tables->isEmpty())
-                <div class="empty-state"><i class="fas fa-chair"></i><p>No tables available at the moment.</p></div>
+                <div class="empty-state"><i class="fas fa-chair"></i><p>{{ __('messages.rest_no_tables') }}</p></div>
             @else
                 <div class="tables-grid">
                     @foreach($tables as $table)
@@ -453,7 +453,7 @@
         <div class="reservation-grid">
             <div class="reservation-info">
                 <h2>{{ __('messages.public_book_table') ?? 'Book Your Table' }}</h2>
-                <p>Skip the wait and secure your spot. Reserve a table for your family, friends, or a special date night.</p>
+                <p>{{ __('messages.rest_reserve_cta') }}</p>
                 <ul class="reservation-features">
                     <li><i class="fas fa-check"></i> {{ __('messages.public_instant_confirmation') ?? 'Instant Confirmation' }}</li>
                     <li><i class="fas fa-check"></i> {{ __('messages.public_choose_table') ?? 'Choose Your Preferred Table' }}</li>
@@ -467,7 +467,7 @@
                     <div class="form-group">
                         <label class="form-label">{{ __('messages.public_select_table') ?? 'Select Table' }}</label>
                         <select name="table_id" id="tableSelect" required class="form-input">
-                            <option value="">Choose a table...</option>
+                            <option value="">{{ __('messages.rest_choose_table') }}</option>
                             @foreach($tables as $table)
                                 <option value="{{ $table->id }}">Table {{ $table->table_number }} ({{ $table->seats }} Seats)</option>
                             @endforeach

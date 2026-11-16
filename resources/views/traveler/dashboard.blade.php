@@ -781,7 +781,7 @@
 
         {{-- Active SOS Cancel Section --}}
         <div id="activeSosSection" class="hidden mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-center">
-            <p class="text-sm text-red-800 font-semibold mb-2">You have an active SOS.</p>
+            <p class="text-sm text-red-800 font-semibold mb-2">{{ __('messages.dash_old_sos_active') }}</p>
             <button type="button" onclick="promptCancelSos()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">
                 Cancel Active SOS
             </button>

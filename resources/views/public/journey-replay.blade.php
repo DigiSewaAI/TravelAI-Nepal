@@ -15,7 +15,7 @@
 <div class="container mx-auto px-4 py-10 max-w-6xl">
     <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">
         <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-8 md:p-12">
-            <h1 class="text-3xl md:text-5xl font-bold">My Journey</h1>
+            <h1 class="text-3xl md:text-5xl font-bold">{{ __('messages.jr_my_journey') }}</h1>
             <p class="text-blue-100 mt-2 text-lg">{{ $replayData['stats']['total_places'] }} Places • {{ $replayData['stats']['total_moments'] }} Moments • {{ $replayData['stats']['highest_altitude'] }}m</p>
             <div class="mt-4 flex flex-wrap gap-2 text-sm">
                 <span class="bg-white/20 px-3 py-1 rounded-full">{{ $replayData['stats']['journey_start']->format('M d, Y') }}</span>
@@ -65,7 +65,7 @@
 
             <!-- Share Buttons -->
             <div class="mt-8 border-t border-gray-200 pt-6">
-                <h3 class="font-semibold text-gray-700 mb-3">Share this journey</h3>
+                <h3 class="font-semibold text-gray-700 mb-3">{{ __('messages.jr_share_this') }}</h3>
                 <div class="flex flex-wrap gap-3">
                     <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ url()->current() }}'), '_blank')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">📘 Facebook</button>
                     <button onclick="window.open('https://wa.me/?text='+encodeURIComponent('Check out my journey! {{ url()->current() }}'), '_blank')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">💬 WhatsApp</button>
@@ -78,7 +78,7 @@
 
             <!-- CTA -->
             <div class="mt-8 text-center bg-gray-50 rounded-xl p-6">
-                <p class="text-gray-600">Inspired by this journey? Plan your own Nepal adventure.</p>
+                <p class="text-gray-600">{{ __('messages.jr_inspired') }}</p>
                 <a href="{{ route('home') }}" class="inline-block mt-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Explore Nepal →</a>
             </div>
         </div>

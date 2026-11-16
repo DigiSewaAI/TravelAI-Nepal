@@ -359,7 +359,7 @@
                 <button type="button" id="itinerary-toggle-all"
                         data-state="collapsed"
                         class="text-sm font-semibold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition inline-flex items-center gap-2">
-                    <span id="itinerary-toggle-label">Expand All</span>
+                    <span id="itinerary-toggle-label">{{ __('messages.svc_expand_all') }}</span>
                     <i class="fas fa-chevron-down text-xs transition-transform" id="itinerary-toggle-icon"></i>
                 </button>
             </div>
@@ -386,13 +386,13 @@
                                     @if($day->startWaypoint)
                                         <span class="inline-flex items-center gap-1.5 text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
                                             <i class="fas fa-play-circle text-gray-400"></i>
-                                            <span class="text-gray-500">Start:</span> {{ $day->startWaypoint->name }}
+                                            <span class="text-gray-500">{{ __('messages.svc_start') }}:</span> {{ $day->startWaypoint->name }}
                                         </span>
                                     @endif
                                     @if($day->overnightWaypoint)
                                         <span class="inline-flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
                                             <i class="fas fa-bed text-emerald-500"></i>
-                                            <span class="text-emerald-600">Overnight:</span> {{ $day->overnightWaypoint->name }}
+                                            <span class="text-emerald-600">{{ __('messages.svc_overnight') }}:</span> {{ $day->overnightWaypoint->name }}
                                         </span>
                                     @endif
                                     @if($day->endWaypoint)
@@ -439,7 +439,7 @@
 
                             @if($day->items->isNotEmpty())
                                 <div>
-                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Activities</h4>
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{{ __('messages.svc_activities') }}</h4>
                                     <ul class="space-y-1.5">
                                         @foreach($day->items as $item)
                                             <li class="flex items-start gap-2 text-sm text-gray-700">
@@ -461,7 +461,7 @@
 
                             @if($day->media->isNotEmpty())
                                 <div>
-                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Media</h4>
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{{ __('messages.svc_media') }}</h4>
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                                         @foreach($day->media as $media)
                                             @if($media->media_type === 'image')
