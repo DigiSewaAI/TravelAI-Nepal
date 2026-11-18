@@ -52,7 +52,7 @@
                 </div>
                 <div>
                     <div class="md-label">Time Requested</div>
-                    <div class="md-value">{{ $sos->created_at->format('M d, Y H:i') }}</div>
+                    <div class="md-value">{{ local_time($sos->created_at, 'M d, Y H:i') }}</div>
                     <div class="md-sub">{{ $sos->created_at->diffForHumans() }}</div>
                 </div>
                 <div>

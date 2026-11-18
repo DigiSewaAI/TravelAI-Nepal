@@ -24,7 +24,7 @@
 
         {{-- Date --}}
         <p style="font-size: 13px; color: #6b7280; margin: 0 0 24px 0;">
-            {{ $notification->created_at->format('F d, Y \a\t h:i A') }}
+            {{ local_time($notification->created_at, 'F d, Y \a\t h:i A') }}
             · {{ $notification->created_at->diffForHumans() }}
         </p>
 

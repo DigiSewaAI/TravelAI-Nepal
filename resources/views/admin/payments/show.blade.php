@@ -9,7 +9,7 @@
     <div class="flex justify-between items-start mb-6">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Payment #{{ $payment->id }}</h2>
-            <p class="text-gray-500 text-sm">Created: {{ $payment->created_at->format('M d, Y H:i') }}</p>
+            <p class="text-gray-500 text-sm">Created: {{ local_time($payment->created_at, 'M d, Y H:i') }}</p>
         </div>
         <div>
             <span class="px-3 py-1 rounded-full text-sm font-medium
@@ -78,11 +78,11 @@
             <div class="space-y-2">
                 <div class="flex justify-between py-2 border-b">
                     <span class="text-gray-500">Created</span>
-                    <span class="text-gray-800">{{ $payment->created_at->format('M d, Y H:i') }}</span>
+                    <span class="text-gray-800">{{ local_time($payment->created_at, 'M d, Y H:i') }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b">
                     <span class="text-gray-500">Paid At</span>
-                    <span class="text-gray-800">{{ $payment->paid_at ? $payment->paid_at->format('M d, Y H:i') : 'N/A' }}</span>
+                    <span class="text-gray-800">{{ $payment->paid_at ? local_time($payment->paid_at, 'M d, Y H:i') : 'N/A' }}</span>
                 </div>
             </div>
         </div>

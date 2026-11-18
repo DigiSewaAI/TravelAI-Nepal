@@ -3,7 +3,7 @@
 @section('title', __('messages.booking_detail_title', ['id' => $booking->booking_number ?? $booking->id]))
 @section('header', __('messages.booking_detail_header'))
 @section('page-title', __('messages.booking_detail_header'))
-@section('page-subtitle', $booking->created_at->format('M d, Y H:i'))
+@section('page-subtitle', local_time($booking->created_at, 'M d, Y H:i'))
 
 @section('content')
 
@@ -57,7 +57,7 @@
                     {{ $booking->booking_number ?? '#'.$booking->id }}
                 </h1>
                 <p style="font-size:12px;color:{{ $cvMuted }};margin:0;">
-                    {{ __('messages.booking_detail_header') }} · {{ $booking->created_at->format('M d, Y H:i') }}
+                    {{ __('messages.booking_detail_header') }} · {{ local_time($booking->created_at, 'M d, Y H:i') }}
                 </p>
             </div>
             <span style="display:inline-block;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;background:{{ $status['bg'] }};color:{{ $status['fg'] }};text-transform:uppercase;letter-spacing:0.5px;">
@@ -82,7 +82,7 @@
             </div>
             <div>
                 <p style="font-size:11px;color:{{ $cvMuted }};text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin:0 0 4px;">{{ __('messages.booking_date') }}</p>
-                <p style="font-size:14px;font-weight:700;color:{{ $cvText }};margin:0;">{{ $booking->booking_date ? $booking->booking_date->format('M d, Y H:i') : __('messages.na') }}</p>
+                <p style="font-size:14px;font-weight:700;color:{{ $cvText }};margin:0;">{{ $booking->booking_date ? $booking->booking_date->format('M d, Y') : __('messages.na') }}</p>
             </div>
         </div>
     </div>

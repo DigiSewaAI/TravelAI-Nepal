@@ -27,10 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
 
-        // ✅ WEB GROUP मा Localization Middleware थप्नुहोस् (सबै web routes मा apply हुन्छ)
+        // ✅ WEB GROUP मा Localization + Timezone Middleware added (सबै web routes मा apply हुन्छ)
         $middleware->web(append: [
             \App\Http\Middleware\Localization::class,
             \App\Http\Middleware\NoIndexAuthenticated::class,
+            \App\Http\Middleware\SetUserTimezone::class,
         ]);
 
         // CSRF exception: Stripe webhook authenticates via Stripe-Signature

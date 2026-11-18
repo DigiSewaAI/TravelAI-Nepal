@@ -249,7 +249,7 @@
                 @forelse($auditLogs as $log)
                     <div style="display:flex;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border)">
                         <span style="font-size:10px;color:var(--text-light);font-family:'JetBrains Mono',monospace;font-weight:600;min-width:44px;padding-top:2px">
-                            {{ $log->created_at ? $log->created_at->format('H:i') : '—' }}
+                            {{ $log->created_at ? local_time($log->created_at, 'H:i') : '—' }}
                         </span>
                         <span style="width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--info)"></span>
                         <div style="flex:1;font-size:11.5px;color:var(--text-muted);line-height:1.45">

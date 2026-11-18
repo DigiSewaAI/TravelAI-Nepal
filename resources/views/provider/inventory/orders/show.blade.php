@@ -29,7 +29,7 @@
   <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap">
     <div>
       <div style="font-size:22px;font-weight:800;letter-spacing:-.5px">{{ $order->order_number }}</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:4px">{{ $order->created_at->format('M d, Y H:i') }}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">{{ local_time($order->created_at, 'M d, Y H:i') }}</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <span style="padding:7px 14px;border-radius:10px;background:{{ $sBg }};color:{{ $sFg }};font-size:12px;font-weight:800;text-transform:uppercase">{{ $order->status }}</span>

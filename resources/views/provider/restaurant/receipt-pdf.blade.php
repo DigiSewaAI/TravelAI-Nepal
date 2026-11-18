@@ -97,7 +97,7 @@
         </div>
         <div>
             <div class="label">Date</div>
-            <div class="value">{{ $order->created_at->format('M d, Y H:i') }}</div>
+            <div class="value">{{ local_time($order->created_at, 'M d, Y H:i') }}</div>
         </div>
     </div>
 

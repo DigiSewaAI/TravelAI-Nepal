@@ -48,7 +48,7 @@
                     </div>
                     <span style="font-size:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px">
                         <i data-lucide="clock" style="width:13px;height:13px"></i>
-                        {{ $alert->created_at->diffForHumans() }} · {{ $alert->created_at->format('H:i') }}
+                        {{ $alert->created_at->diffForHumans() }} · {{ local_time($alert->created_at, 'H:i') }}
                     </span>
                 </div>
 

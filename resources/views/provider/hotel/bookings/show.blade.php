@@ -2,7 +2,7 @@
 
 @section('title', 'Booking #' . $booking->id)
 @section('page-title', 'Booking #' . $booking->id)
-@section('page-subtitle', $booking->created_at->format('M d, Y H:i'))
+@section('page-subtitle', local_time($booking->created_at, 'M d, Y H:i'))
 
 @section('content')
 @php
@@ -29,7 +29,7 @@
     <div style="background:linear-gradient(135deg,var(--accent,#c9a227) 0%,var(--accent-d,#a8861c) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;box-shadow:0 10px 30px rgba(0,0,0,.15)">
         <div>
             <div style="font-size:22px;font-weight:800;letter-spacing:-.5px">Booking #{{ $booking->id }}</div>
-            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ $booking->created_at->format('M d, Y H:i') }}</div>
+            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ local_time($booking->created_at, 'M d, Y H:i') }}</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
             <span style="padding:7px 14px;border-radius:10px;background:{{ $sBg }};color:{{ $sFg }};font-size:12px;font-weight:800;text-transform:uppercase">{{ __('messages.st_' . $booking->status) }}</span>

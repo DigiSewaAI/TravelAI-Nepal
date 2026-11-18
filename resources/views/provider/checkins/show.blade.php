@@ -41,7 +41,7 @@
         </div>
         <div>
             <p class="text-sm text-gray-500">{{ __('messages.checked_in_at') }}</p>
-            <p class="font-medium">{{ $scan->scanned_at->format('M d, Y H:i') }}</p>
+            <p class="font-medium">{{ local_time($scan->scanned_at, 'M d, Y H:i') }}</p>
         </div>
     </div>
 

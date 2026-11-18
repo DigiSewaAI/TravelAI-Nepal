@@ -162,7 +162,7 @@
                 <div class="ps-row-icon amber"><i class="far fa-clock"></i></div>
                 <div class="ps-row-body">
                     <div class="ps-row-label">{{ __('messages.sos_alerts_time_label') }}</div>
-                    <div class="ps-row-val">{{ $sos->created_at->format('M d, Y H:i') }}</div>
+                    <div class="ps-row-val">{{ local_time($sos->created_at, 'M d, Y H:i') }}</div>
                     <div class="ps-row-sub">{{ $sos->created_at->diffForHumans() }}</div>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                 </div>
             @endif
             @if($sos->resolved_at)
-                <div style="font-size:12px;margin-top:6px">{{ $sos->resolved_at->format('M d, Y H:i') }}</div>
+                <div style="font-size:12px;margin-top:6px">{{ local_time($sos->resolved_at, 'M d, Y H:i') }}</div>
             @endif
         </div>
     @endif

@@ -307,7 +307,7 @@
                 <div>
                     @forelse($recentActions as $action)
                         <div class="admin-action-row">
-                            <span class="admin-action-time">{{ $action->created_at->format('H:i') }}</span>
+                            <span class="admin-action-time">{{ local_time($action->created_at, 'H:i') }}</span>
                             <span class="rescue-badge badge-gray" style="font-size: 9px; padding: 1px 6px; flex-shrink: 0;">{{ $action->action }}</span>
                             <div class="admin-action-body">
                                 <span class="who">System</span> {{ $action->notes ?? 'Action logged' }}

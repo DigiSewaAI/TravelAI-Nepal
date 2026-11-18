@@ -8,7 +8,7 @@
     <div class="flex justify-between items-start mb-6">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">{{ __('messages.invoice_hash', ['number' => $invoice->invoice_number]) }}</h2>
-            <p class="text-sm text-gray-500">{{ __('messages.created_at') }}: {{ $invoice->created_at->format('M d, Y H:i') }}</p>
+            <p class="text-sm text-gray-500">{{ __('messages.created_at') }}: {{ local_time($invoice->created_at, 'M d, Y H:i') }}</p>
         </div>
         <div>
             <span class="px-3 py-1 rounded-full text-sm font-medium
@@ -50,7 +50,7 @@
         </div>
         <div>
             <p class="text-gray-500">{{ __('messages.paid_at') }}</p>
-            <p class="font-medium">{{ $invoice->paid_at ? $invoice->paid_at->format('M d, Y H:i') : __('messages.na') }}</p>
+            <p class="font-medium">{{ $invoice->paid_at ? local_time($invoice->paid_at, 'M d, Y H:i') : __('messages.na') }}</p>
         </div>
     </div>
 

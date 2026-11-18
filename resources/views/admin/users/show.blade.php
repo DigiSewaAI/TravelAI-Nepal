@@ -35,11 +35,11 @@
         </div>
         <div>
             <p class="text-sm text-gray-500">Joined</p>
-            <p class="font-medium">{{ $user->created_at->format('M d, Y H:i') }}</p>
+            <p class="font-medium">{{ local_time($user->created_at, 'M d, Y H:i') }}</p>
         </div>
         <div>
             <p class="text-sm text-gray-500">Last Updated</p>
-            <p class="font-medium">{{ $user->updated_at->format('M d, Y H:i') }}</p>
+            <p class="font-medium">{{ local_time($user->updated_at, 'M d, Y H:i') }}</p>
         </div>
         <div>
             <p class="text-sm text-gray-500">User ID</p>

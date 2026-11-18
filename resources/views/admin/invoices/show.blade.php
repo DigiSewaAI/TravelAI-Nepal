@@ -9,7 +9,7 @@
     <div class="flex justify-between items-start mb-6">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">{{ $invoice->invoice_number }}</h2>
-            <p class="text-gray-500 text-sm">Created: {{ $invoice->created_at->format('M d, Y H:i') }}</p>
+            <p class="text-gray-500 text-sm">Created: {{ local_time($invoice->created_at, 'M d, Y H:i') }}</p>
         </div>
         <div>
             <span class="px-3 py-1 rounded-full text-sm font-medium

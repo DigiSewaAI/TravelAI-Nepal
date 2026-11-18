@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-art-craft')
 @section('title', 'Order #' . $order->id)
 @section('page-title', 'Order #' . $order->id)
-@section('page-subtitle', $order->created_at->format('M d, Y H:i'))
+@section('page-subtitle', local_time($order->created_at, 'M d, Y H:i'))
 @section('content')
 @php
     $sc = ['pending'=>['#fbf1dc','#b45309'],'in_progress'=>['#fbf1dc','#b45309'],'completed'=>['#e8f0e2','#4d6b3f'],'cancelled'=>['#fbe3df','#b54434']];
@@ -15,7 +15,7 @@
     <div style="background:linear-gradient(135deg,var(--accent,#c65d3b) 0%,var(--accent-d,#a8492b) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;box-shadow:0 10px 30px rgba(0,0,0,.15)">
         <div>
             <div style="font-size:22px;font-weight:800">Order #{{ $order->id }}</div>
-            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ ucfirst($order->type) }} · {{ $order->created_at->format('M d, Y H:i') }}</div>
+            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ ucfirst($order->type) }} · {{ local_time($order->created_at, 'M d, Y H:i') }}</div>
         </div>
         <span style="padding:7px 14px;border-radius:10px;background:{{ $sBg }};color:{{ $sFg }};font-size:12px;font-weight:800;text-transform:uppercase">{{ $order->status }}</span>
     </div>

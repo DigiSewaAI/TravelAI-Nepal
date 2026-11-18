@@ -35,7 +35,7 @@
           <a href="{{ route('orders.show', $order) }}" style="display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--line,#e7eaf3);border-radius:12px;text-decoration:none;color:inherit;transition:.2s;background:var(--card,#fff)" onmouseover="this.style.background='var(--accent-soft, #eef0fe)';this.style.borderColor='var(--accent, #6366f1)'" onmouseout="this.style.background='var(--card,#fff)';this.style.borderColor='var(--line,#e7eaf3)'">
             <div style="min-width:0">
               <div style="font-weight:800;font-size:14px;color:var(--accent-d,#4f46e5);font-family:monospace">{{ $order->order_number }}</div>
-              <div style="font-size:12px;color:var(--muted,#6b7280);margin-top:3px">{{ $order->created_at->format('M d, Y H:i') }} · {{ $order->items->count() }} {{ __('messages.items_count') }}</div>
+              <div style="font-size:12px;color:var(--muted,#6b7280);margin-top:3px">{{ local_time($order->created_at, 'M d, Y H:i') }} · {{ $order->items->count() }} {{ __('messages.items_count') }}</div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
               <span style="padding:6px 12px;border-radius:8px;background:{{ $sc[0] }};color:{{ $sc[1] }};font-size:11px;font-weight:800;text-transform:uppercase">{{ $order->status }}</span>

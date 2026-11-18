@@ -82,7 +82,7 @@
 
     <div class="ps-hero">
         <h1><i class="fas fa-credit-card"></i> {{ __('messages.payment_hash', ['id' => $payment->id]) }}</h1>
-        <p>{{ $payment->created_at->format('F d, Y H:i') }}</p>
+        <p>{{ local_time($payment->created_at, 'F d, Y H:i') }}</p>
     </div>
 
     <div class="ps-card">
@@ -130,7 +130,7 @@
                 @if($payment->paid_at)
                     <div>
                         <dt>{{ __('messages.paid_at_label') }}</dt>
-                        <dd>{{ $payment->paid_at->format('F d, Y H:i') }}</dd>
+                        <dd>{{ local_time($payment->paid_at, 'F d, Y H:i') }}</dd>
                     </div>
                 @endif
             </dl>

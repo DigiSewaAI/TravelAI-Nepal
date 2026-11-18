@@ -39,7 +39,7 @@
         </div>
         <div>
             <p class="text-sm text-gray-500">Booking Date</p>
-            <p class="font-medium">{{ $booking->created_at->format('M d, Y H:i') }}</p>
+            <p class="font-medium">{{ local_time($booking->created_at, 'M d, Y H:i') }}</p>
         </div>
         <div class="col-span-2">
             <p class="text-sm text-gray-500">QR Code</p>

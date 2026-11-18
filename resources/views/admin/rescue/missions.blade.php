@@ -79,7 +79,7 @@
                                 <span class="am-badge {{ $badgeClass }}">{{ $mission->status }}</span>
                             </td>
                             <td style="color: #64748b; font-size: 12px;">
-                                {{ $mission->created_at->format('M d, H:i') }}
+                                {{ local_time($mission->created_at, 'M d, H:i') }}
                             </td>
                             <td>
                                 <a href="{{ route('admin.rescue.sos.show', $mission->sos_alert_id) }}" style="color: #0d9488; font-weight: 700; text-decoration: none;">View SOS</a>

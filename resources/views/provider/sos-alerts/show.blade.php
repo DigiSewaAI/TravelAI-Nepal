@@ -138,7 +138,7 @@
                 </div>
                 <div class="min-w-0">
                     <p class="text-xs text-gray-400 uppercase tracking-wider">{{ __('messages.sos_alerts_time_label') }}</p>
-                    <p class="font-semibold text-gray-900">{{ $sos->created_at->format('M d, Y · H:i') }}</p>
+                    <p class="font-semibold text-gray-900">{{ local_time($sos->created_at, 'M d, Y · H:i') }}</p>
                     <p class="text-xs text-gray-500">{{ $sos->created_at->diffForHumans() }}</p>
                 </div>
             </div>
@@ -229,7 +229,7 @@
             @endif
             @if($sos->resolved_at)
                 <p class="text-xs text-green-600 mt-1">
-                    {{ $sos->resolved_at->format('M d, Y · H:i') }}
+                    {{ local_time($sos->resolved_at, 'M d, Y · H:i') }}
                 </p>
             @endif
         </div>

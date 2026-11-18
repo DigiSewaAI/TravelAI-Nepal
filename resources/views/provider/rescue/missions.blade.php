@@ -24,7 +24,7 @@
                         @endif
                     </div>
                     <div style="font-size:12px;color:var(--text-muted)">
-                        {{ $mission->created_at->format('M d, H:i') }}
+                        {{ local_time($mission->created_at, 'M d, H:i') }}
                     </div>
                 </div>
 

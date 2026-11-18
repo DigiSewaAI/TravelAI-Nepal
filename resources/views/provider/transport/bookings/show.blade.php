@@ -1,7 +1,7 @@
 @extends($provider_layout ?? 'layouts.provider-transport')
 @section('title', ($booking->booking_ref ?? '#' . $booking->id))
 @section('page-title', $booking->booking_ref ?? '#' . $booking->id)
-@section('page-subtitle', $booking->created_at->format('M d, Y H:i'))
+@section('page-subtitle', local_time($booking->created_at, 'M d, Y H:i'))
 @section('content')
 @php
     $sc = ['pending'=>['#fef4e2','#b45309'],'confirmed'=>['#e6f8f1','#059669'],'completed'=>['#e6f8f1','#059669'],'cancelled'=>['#fdecec','#dc2626'],'in_progress'=>['#e0f2fe','#0284c7']];
@@ -19,7 +19,7 @@
     <div style="background:linear-gradient(135deg,var(--accent,#0ea5e9) 0%,var(--accent-d,#0284c7) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;box-shadow:0 10px 30px rgba(0,0,0,.15)">
         <div>
             <div style="font-size:22px;font-weight:800">{{ $booking->booking_ref ?? '#' . $booking->id }}</div>
-            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ $booking->created_at->format('M d, Y H:i') }}</div>
+            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ local_time($booking->created_at, 'M d, Y H:i') }}</div>
             @if($isLegacy)
             <span style="display:inline-block;margin-top:8px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.2);font-size:11px;font-weight:800;text-transform:uppercase">Legacy Booking</span>
             @endif
@@ -100,13 +100,13 @@
         @if($booking->payment_submitted_at)
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
             <span style="color:var(--muted,#6b7f96)">Submitted At</span>
-            <span style="font-weight:700">{{ $booking->payment_submitted_at->format('M d, Y H:i') }}</span>
+            <span style="font-weight:700">{{ local_time($booking->payment_submitted_at, 'M d, Y H:i') }}</span>
         </div>
         @endif
         @if($booking->paid_at)
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
             <span style="color:var(--muted,#6b7f96)">Verified At</span>
-            <span style="font-weight:700">{{ $booking->paid_at->format('M d, Y H:i') }}</span>
+            <span style="font-weight:700">{{ local_time($booking->paid_at, 'M d, Y H:i') }}</span>
         </div>
         @endif
 

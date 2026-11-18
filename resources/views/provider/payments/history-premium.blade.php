@@ -70,7 +70,7 @@
           <tbody>
             @foreach($payments as $payment)
               <tr>
-                <td>{{ $payment->created_at->format('Y-m-d H:i') }}</td>
+                <td>{{ local_time($payment->created_at, 'Y-m-d H:i') }}</td>
                 <td>
                   <a href="{{ route('provider.payments.show', $payment->id) }}" class="pp-link">
                     {{ substr($payment->payment_id, 0, 12) }}...

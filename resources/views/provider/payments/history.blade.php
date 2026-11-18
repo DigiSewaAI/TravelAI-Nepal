@@ -28,7 +28,7 @@
                 <tbody>
                     @foreach($payments as $payment)
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="py-3 text-sm">{{ $payment->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="py-3 text-sm">{{ local_time($payment->created_at, 'Y-m-d H:i') }}</td>
                         <td class="py-3 text-sm font-mono text-gray-600">
                             <a href="{{ route('provider.payments.show', $payment->id) }}" class="text-blue-600 hover:underline">
                                 {{ substr($payment->payment_id, 0, 12) }}...

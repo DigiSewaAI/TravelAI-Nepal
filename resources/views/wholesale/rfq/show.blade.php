@@ -22,7 +22,7 @@
         <div class="flex justify-between items-start mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ $rfq->rfq_number }}</h1>
-                <p class="text-sm text-gray-500 mt-1">{{ $rfq->created_at->format('M d, Y H:i') }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ local_time($rfq->created_at, 'M d, Y H:i') }}</p>
             </div>
             <span class="inline-block px-3 py-1.5 rounded-full text-sm font-semibold
                 @if($rfq->status === 'pending') bg-yellow-100 text-yellow-800

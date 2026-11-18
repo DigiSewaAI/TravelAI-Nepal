@@ -42,7 +42,7 @@
                             <div class="mt-2 flex flex-wrap gap-4 text-sm text-gray-300">
                                 @if($scene['scanned_at'])
                                     <span>{{ $scene['scanned_at']->translatedFormat('F j, Y') }}</span>
-                                    <span>{{ $scene['scanned_at']->format('g:i A') }}</span>
+                                    <span>{{ local_time($scene['scanned_at'], 'g:i A') }}</span>
                                 @endif
                                 @if($scene['altitude'])
                                     <span>{{ $scene['altitude'] }} m</span>

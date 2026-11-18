@@ -78,7 +78,7 @@
 <div class="ps-wrap" style="max-width:820px">
     <div class="ps-hero">
         <h1><i class="fas fa-file-invoice"></i> {{ __('messages.invoice_hash', ['number' => $invoice->invoice_number]) }}</h1>
-        <p>{{ __('messages.created_at') }}: {{ $invoice->created_at->format('M d, Y H:i') }}</p>
+        <p>{{ __('messages.created_at') }}: {{ local_time($invoice->created_at, 'M d, Y H:i') }}</p>
     </div>
 
     <div class="ps-card">
@@ -121,7 +121,7 @@
                 </div>
                 <div>
                     <dt>{{ __('messages.paid_at') }}</dt>
-                    <dd>{{ $invoice->paid_at ? $invoice->paid_at->format('M d, Y H:i') : __('messages.na') }}</dd>
+                    <dd>{{ $invoice->paid_at ? local_time($invoice->paid_at, 'M d, Y H:i') : __('messages.na') }}</dd>
                 </div>
             </dl>
         </div>

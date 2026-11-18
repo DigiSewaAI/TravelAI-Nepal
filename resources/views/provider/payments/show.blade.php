@@ -161,7 +161,7 @@
                             <h3 class="font-bold text-orange-800">{{ __('messages.awaiting_verification') }}</h3>
                             <p class="text-sm text-orange-700 mt-1">
                                 Your payment proof was submitted on
-                                {{ $pendingPayment->created_at->format('M d, Y g:i A') }}.
+                                {{ local_time($pendingPayment->created_at, 'M d, Y g:i A') }}.
                                 Reference: <strong>{{ $pendingPayment->reference_number }}</strong>
                             </p>
                             <p class="text-xs text-orange-600 mt-2">

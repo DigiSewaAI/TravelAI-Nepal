@@ -51,7 +51,7 @@
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap mb-1">
                     <span class="px-2 py-0.5 {{ $colors[0] }} {{ $colors[1] }} text-xs font-bold rounded uppercase">{{ $log->action }}</span>
-                    <span class="text-xs text-gray-400 font-mono">{{ $log->created_at->format('M d, Y H:i') }}</span>
+                    <span class="text-xs text-gray-400 font-mono">{{ local_time($log->created_at, 'M d, Y H:i') }}</span>
                     @if($log->user_id)
                         <span class="text-xs text-gray-500">· User #{{ $log->user_id }}</span>
                     @endif

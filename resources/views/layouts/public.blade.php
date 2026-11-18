@@ -577,5 +577,23 @@
 
     @stack('scripts')
     @include('components.cookie-banner')
+
+    {{-- ========== TIMEZONE SYNC (Guest) ========== --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Browser ko timezone detect garchha (e.g. 'Asia/Kathmandu')
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            // Server lai guest ko timezone pathauchha (session ma save hunchha)
+            fetch('{{ route("set.guest.timezone") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ timezone: userTimezone })
+            }).catch(err => console.log('Timezone sync failed:', err));
+        });
+    </script>
 </body>
 </html>

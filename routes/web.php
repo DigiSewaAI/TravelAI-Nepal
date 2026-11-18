@@ -945,6 +945,15 @@ Route::get('/lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
+// =======================================
+// TIMEZONE SYNC (Guest + Auth)
+// =======================================
+Route::post('/api/set-timezone', function (\Illuminate\Http\Request $request) {
+    $request->validate(['timezone' => 'required|string|timezone']);
+    session(['guest_timezone' => $request->timezone]);
+    return response()->json(['success' => true]);
+})->name('set.guest.timezone');
+
 // ✅ Planner Route – web middleware को session पाउँछ
 Route::post('/api/planner/generate', [App\Http\Controllers\Api\PlannerController::class, 'generate'])->middleware('throttle:ai');
 

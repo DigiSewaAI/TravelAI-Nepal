@@ -65,7 +65,7 @@
                             <i class="fas fa-map-pin text-blue-500 mr-1"></i>
                             {{ $scan->checkpoint_name ?? __('messages.checkin_default') }}
                         </td>
-                        <td class="py-3 text-sm">{{ $scan->scanned_at->format('M d, Y H:i') }}</td>
+                        <td class="py-3 text-sm">{{ local_time($scan->scanned_at, 'M d, Y H:i') }}</td>
                         <td class="py-3 text-sm">
                             <a href="{{ route('provider.checkins.show', $scan) }}" class="text-blue-600 hover:text-blue-800">
                                 <i class="fas fa-eye"></i> {{ __('messages.view') }}

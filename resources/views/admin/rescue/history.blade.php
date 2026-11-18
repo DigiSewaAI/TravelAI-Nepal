@@ -59,7 +59,7 @@
                                 {{ $mission->provider->name ?? 'Unknown Provider' }}
                             </td>
                             <td style="color: #64748b; font-size: 12px;">
-                                {{ $mission->updated_at->format('M d, Y - H:i') }}
+                                {{ local_time($mission->updated_at, 'M d, Y - H:i') }}
                             </td>
                             <td style="font-weight: 700;">
                                 {{ $mission->final_cost ? 'NPR ' . number_format($mission->final_cost, 2) : '—' }}

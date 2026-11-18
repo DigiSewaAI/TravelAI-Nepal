@@ -15,7 +15,7 @@
         <div class="flex justify-between items-start mb-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">{{ __('messages.payment_hash', ['id' => $payment->id]) }}</h2>
-                <p class="text-sm text-gray-500">{{ $payment->created_at->format('F d, Y H:i') }}</p>
+                <p class="text-sm text-gray-500">{{ local_time($payment->created_at, 'F d, Y H:i') }}</p>
             </div>
             <span class="px-3 py-1 rounded-full text-sm font-semibold
                 @if($payment->status === 'success') bg-green-100 text-green-800
@@ -57,7 +57,7 @@
             @if($payment->paid_at)
                 <div>
                     <p class="text-sm text-gray-500">{{ __('messages.paid_at_label') }}</p>
-                    <p class="font-medium">{{ $payment->paid_at->format('F d, Y H:i') }}</p>
+                    <p class="font-medium">{{ local_time($payment->paid_at, 'F d, Y H:i') }}</p>
                 </div>
             @endif
         </div>

@@ -2,7 +2,7 @@
 
 @section('title', $rfq->rfq_number)
 @section('page-title', $rfq->rfq_number)
-@section('page-subtitle', $rfq->created_at->format('M d, Y H:i'))
+@section('page-subtitle', local_time($rfq->created_at, 'M d, Y H:i'))
 
 @section('content')
 @php
@@ -35,7 +35,7 @@
     <div style="background:linear-gradient(135deg,var(--accent,#6366f1) 0%,var(--accent-d,#4f46e5) 100%);border-radius:var(--radius,18px);padding:26px 28px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;box-shadow:0 10px 30px rgba(0,0,0,.15)">
         <div>
             <div style="font-size:22px;font-weight:800;letter-spacing:-.5px">{{ $rfq->rfq_number }}</div>
-            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ $rfq->created_at->format('M d, Y H:i') }}</div>
+            <div style="font-size:13px;opacity:.88;margin-top:4px">{{ local_time($rfq->created_at, 'M d, Y H:i') }}</div>
         </div>
         <span style="padding:7px 14px;border-radius:10px;background:{{ $sBg }};color:{{ $sFg }};font-size:12px;font-weight:800;text-transform:uppercase">{{ $rfq->status }}</span>
     </div>

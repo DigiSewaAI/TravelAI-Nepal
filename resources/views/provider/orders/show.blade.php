@@ -33,7 +33,7 @@
     <div class="flex justify-between items-start mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">{{ $order->order_number }}</h1>
-            <p class="text-sm text-gray-500 mt-1">{{ $order->created_at->format('M d, Y H:i') }}</p>
+            <p class="text-sm text-gray-500 mt-1">{{ local_time($order->created_at, 'M d, Y H:i') }}</p>
         </div>
         <span class="px-3 py-1.5 rounded-full text-sm font-semibold
             @if($order->status === 'pending') bg-yellow-100 text-yellow-800

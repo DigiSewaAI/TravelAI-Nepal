@@ -2,7 +2,7 @@
 
 @section('title', 'Reservation Details')
 @section('page-title', 'Reservation #' . $reservation->id)
-@section('page-subtitle', 'Booked on ' . $reservation->created_at->format('M d, Y h:i A'))
+@section('page-subtitle', 'Booked on ' . local_time($reservation->created_at, 'M d, Y h:i A'))
 
 @section('content')
 <div style="max-width: 800px;">

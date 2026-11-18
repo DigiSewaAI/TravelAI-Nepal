@@ -54,7 +54,7 @@
                                 <div><span class="text-gray-500">Ref:</span> <strong>{{ $payment->payment_reference }}</strong></div>
                             @endif
                             <div><span class="text-gray-500">Amount:</span> <strong>Rs. {{ number_format($payment->amount) }}</strong></div>
-                            <div><span class="text-gray-500">Submitted:</span> {{ $payment->created_at->format('M d, Y H:i') }}</div>
+                            <div><span class="text-gray-500">Submitted:</span> {{ local_time($payment->created_at, 'M d, Y H:i') }}</div>
                             <div><span class="text-gray-500">Status:</span>
                                 <span class="px-2 py-0.5 rounded text-xs font-bold
                                     {{ $payment->status === 'verified' ? 'bg-green-100 text-green-700' : ($payment->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
@@ -135,7 +135,7 @@
                     <span>Ad ID:</span><strong>{{ $ad->id }}</strong>
                 </div>
                 <div class="flex justify-between mb-1">
-                    <span>Created:</span><span>{{ $ad->created_at->format('M d, Y H:i') }}</span>
+                    <span>Created:</span><span>{{ local_time($ad->created_at, 'M d, Y H:i') }}</span>
                 </div>
                 <div class="flex justify-between mb-1">
                     <span>Payment:</span>

@@ -199,7 +199,7 @@
                             <i class="fas fa-hourglass-half" style="font-size:20px"></i>
                             <div>
                                 <div style="font-size:14px;font-weight:800">{{ __('messages.awaiting_verification') }}</div>
-                                <div style="font-size:13px;margin-top:4px;font-weight:600">Your payment proof was submitted on {{ $pendingPayment->created_at->format('M d, Y g:i A') }}. Reference: <strong>{{ $pendingPayment->reference_number }}</strong></div>
+                                <div style="font-size:13px;margin-top:4px;font-weight:600">Your payment proof was submitted on {{ local_time($pendingPayment->created_at, 'M d, Y g:i A') }}. Reference: <strong>{{ $pendingPayment->reference_number }}</strong></div>
                                 <div style="font-size:11.5px;margin-top:6px">We verify payments within 24 hours. You'll be notified once approved.</div>
                             </div>
                         </div>

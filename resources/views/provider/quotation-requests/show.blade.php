@@ -27,7 +27,7 @@
                     </strong>
                     ({{ $quotationRequest->traveler_email ?? $quotationRequest->traveler->email ?? 'N/A' }})
                 </p>
-                <p class="text-gray-500">Received: {{ $quotationRequest->created_at->format('M d, Y H:i') }}</p>
+                <p class="text-gray-500">Received: {{ local_time($quotationRequest->created_at, 'M d, Y H:i') }}</p>
             </div>
             <span class="px-3 py-1 text-sm rounded-full
                 @if($quotationRequest->status == 'pending') bg-yellow-100 text-yellow-800
