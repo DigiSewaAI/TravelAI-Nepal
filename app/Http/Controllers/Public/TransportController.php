@@ -217,11 +217,20 @@ class TransportController extends Controller
                 // Email already includes a "Complete Payment" CTA (see email view)
             }
 
+            // 📧 1. Traveler lai (Queue hataera Send)
             try {
-                \Mail::to($booking->passenger_email)->queue(new \App\Mail\TransportBookingCreatedMail($booking));
-            } catch (\Throwable $e) {
-                \Log::warning('Transport created mail failed', ['id' => $booking->id, 'e' => $e->getMessage()]);
-            }
+                if ($booking->passenger_email) {
+                    \Mail::to($booking->passenger_email)->send(new \App\Mail\TransportBookingCreatedMail($booking));
+                }
+            } catch (\Throwable $e) { \Log::warning('Traveler transport mail failed', ['e' => $e->getMessage()]); }
+
+            // 📧 2. Provider lai
+            try {
+                $pEmail = $booking->provider?->contact_email ?? $booking->trip?->provider?->contact_email;
+                if ($pEmail) {
+                    \Mail::to($pEmail)->send(new \App\Mail\ProviderBookingReceivedMail($booking));
+                }
+            } catch (\Throwable $e) { \Log::warning('Provider transport mail failed', ['e' => $e->getMessage()]); }
 
             try {
                 $providerUser = $provider->user;

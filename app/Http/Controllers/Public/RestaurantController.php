@@ -60,16 +60,26 @@ class RestaurantController extends Controller
 
         $reservation = RestaurantReservation::create($validated);
 
-        // 1. Send Email to Customer
+        // 📧 1. Send Email to Customer (Queue -> Send)
         if ($reservation->customer_email) {
             try {
-                \Mail::to($reservation->customer_email)->queue(new \App\Mail\ReservationCreatedMail($reservation));
+                \Mail::to($reservation->customer_email)->send(new \App\Mail\ReservationCreatedMail($reservation));
             } catch (\Throwable $e) {
                 \Log::warning('Reservation email failed', ['id' => $reservation->id, 'error' => $e->getMessage()]);
             }
         }
 
-        // 2. Send Notification to Provider (Bell)
+        // 📧 2. NEW FIX: Send Email to Provider
+        try {
+            $providerEmail = $service->provider->contact_email;
+            if ($providerEmail) {
+                \Mail::to($providerEmail)->send(new \App\Mail\ProviderReservationReceivedMail($reservation));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Provider reservation email failed', ['id' => $reservation->id, 'error' => $e->getMessage()]);
+        }
+
+        // 🔔 3. Send Notification to Provider (Bell)
         try {
             $providerUser = $service->provider->user;
             if ($providerUser) {

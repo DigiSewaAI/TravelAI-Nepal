@@ -94,11 +94,20 @@ class ArtCraftController extends Controller
             ]);
         });
 
+        // 📧 1. Traveler lai (Queue hataera Send)
         try {
-            \Mail::to($order->client_email)->queue(new \App\Mail\ArtCraftEnquiryReceivedMail($order));
-        } catch (\Throwable $e) {
-            \Log::warning('ArtCraft enquiry mail failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
-        }
+            if ($order->client_email) {
+                \Mail::to($order->client_email)->send(new \App\Mail\ArtCraftEnquiryReceivedMail($order));
+            }
+        } catch (\Throwable $e) { \Log::warning('Traveler artcraft enquiry mail failed', ['e' => $e->getMessage()]); }
+
+        // 📧 2. Provider lai (Naya thapne)
+        try {
+            $pEmail = $provider->contact_email;
+            if ($pEmail) {
+                \Mail::to($pEmail)->send(new \App\Mail\ProviderArtCraftReceivedMail($order, $provider));
+            }
+        } catch (\Throwable $e) { \Log::warning('Provider artcraft enquiry mail failed', ['e' => $e->getMessage()]); }
 
         try {
             $providerUser = $provider->user;
@@ -169,11 +178,20 @@ class ArtCraftController extends Controller
             ]);
         });
 
+        // 📧 1. Traveler lai (Queue hataera Send)
         try {
-            \Mail::to($order->client_email)->queue(new \App\Mail\ArtCraftEnquiryReceivedMail($order));
-        } catch (\Throwable $e) {
-            \Log::warning('ArtCraft custom mail failed', ['order_id' => $order->id]);
-        }
+            if ($order->client_email) {
+                \Mail::to($order->client_email)->send(new \App\Mail\ArtCraftEnquiryReceivedMail($order));
+            }
+        } catch (\Throwable $e) { \Log::warning('Traveler artcraft custom mail failed', ['e' => $e->getMessage()]); }
+
+        // 📧 2. Provider lai (Naya thapne)
+        try {
+            $pEmail = $provider->contact_email;
+            if ($pEmail) {
+                \Mail::to($pEmail)->send(new \App\Mail\ProviderArtCraftReceivedMail($order, $provider));
+            }
+        } catch (\Throwable $e) { \Log::warning('Provider artcraft custom mail failed', ['e' => $e->getMessage()]); }
 
         try {
             $providerUser = $provider->user;

@@ -53,6 +53,7 @@ class OrdersController extends Controller
         \App\Models\OrderStatusHistory::record(
             $order, $order->status, $order->status, null, auth()->id(), 'buyer', 'Payment notice sent'
         );
+        
         // 🔔 Notify providers: traveler sent payment notice
         try {
             $providerIds = $order->items()->pluck('provider_id')->unique();
@@ -65,14 +66,23 @@ class OrdersController extends Controller
                         : route('provider.orders.show', $order->id);
 
                     // Self-notify guard
-        if ($prov->user && $prov->user->id !== auth()->id()) {
-            $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
-                        'Payment Notice Received',
-                        'Traveler sent payment for order ' . $order->order_number . ' (Ref: ' . $validated['payment_reference'] . ')',
-                        'payment',
-                        $__url
-                    ));
-        }
+                    if ($prov->user && $prov->user->id !== auth()->id()) {
+                        $prov->user->notify(new \App\Notifications\ProviderAlertNotification(
+                            'Payment Notice Received',
+                            'Traveler sent payment for order ' . $order->order_number . ' (Ref: ' . $validated['payment_reference'] . ')',
+                            'payment',
+                            $__url
+                        ));
+
+                        // 📧 NEW FIX: Provider lai Email pathau
+                        try {
+                            if ($prov->contact_email) {
+                                \Mail::to($prov->contact_email)->send(new \App\Mail\ProviderOrderPaymentNoticeMail($order, $validated['payment_reference']));
+                            }
+                        } catch (\Throwable $e) {
+                            \Log::warning('Provider payment email failed', ['order_id' => $order->id, 'e' => $e->getMessage()]);
+                        }
+                    }
                 }
             }
         } catch (\Throwable $e) {
@@ -132,6 +142,7 @@ class OrdersController extends Controller
         try {
             $provider = $item->provider;
             if ($provider?->contact_email) {
+                // FIXED: queue() hataera send() gareko
                 \Mail::to($provider->contact_email)
                     ->queue(new \App\Mail\ReturnRequestedMail($order, $item));
             }
@@ -144,14 +155,14 @@ class OrdersController extends Controller
             $providerUser = $item->provider?->user;
             if ($providerUser) {
                 // Self-notify guard
-        if ($providerUser && $providerUser->id !== auth()->id()) {
-            $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
-                    'Return Requested',
-                    'Traveler requested return for ' . ($order->order_number ?? '#'.$order->id) . ' — ' . $item->product_name,
-                    'return',
-                    $item->providerNotificationUrl('return')
-                ));
-        }
+                if ($providerUser && $providerUser->id !== auth()->id()) {
+                    $providerUser->notify(new \App\Notifications\ProviderAlertNotification(
+                        'Return Requested',
+                        'Traveler requested return for ' . ($order->order_number ?? '#'.$order->id) . ' — ' . $item->product_name,
+                        'return',
+                        $item->providerNotificationUrl('return')
+                    ));
+                }
             }
         } catch (\Throwable $e) {
             \Log::warning('Return requested bell notification failed', ['order' => $order->id, 'error' => $e->getMessage()]);
