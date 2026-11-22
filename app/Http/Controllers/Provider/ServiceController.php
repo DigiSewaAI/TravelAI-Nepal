@@ -131,6 +131,14 @@ class ServiceController extends Controller
             $allowedCategories = $providerType->serviceCategories->reject(function ($cat) use ($productCategorySlugs) {
                 return in_array($cat->slug, $productCategorySlugs);
             });
+
+            // 🆕 FIX: Ensure 'trekking' is always available for trekking providers
+            if (str_contains($providerType->slug, 'trek') && !$allowedCategories->contains('slug', 'trekking')) {
+                $trekkingCat = ServiceCategory::where('slug', 'trekking')->first();
+                if ($trekkingCat) {
+                    $allowedCategories->push($trekkingCat);
+                }
+            }
         } else {
             $allowedCategories = ServiceCategory::whereNotIn('slug', $productCategorySlugs)->get();
         }
