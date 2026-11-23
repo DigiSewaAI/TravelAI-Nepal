@@ -3677,4 +3677,10 @@ return array (
   'layout_currency' => 'मुद्रा',
   'contact_provider' => 'प्रदायकलाई सम्पर्क गर्नुहोस्',
   'service_not_bookable' => 'यो सेवा यस समय बुक गर्न मिल्दैन।',
+      'artcraft_quote_sent' => 'मूल्य प्रस्ताव पठाइयो',
+    'artcraft_quote_accepted' => 'मूल्य स्वीकृत',
+    'artcraft_quote_rejected' => 'मूल्य अस्वीकृत',
+    'artcraft_revision_requested' => 'संशोधन अनुरोध',
+    'artcraft_quote_respond_title' => 'तपाईंको ArtCraft मूल्य प्रस्ताव',
+    'artcraft_quote_respond_success' => 'तपाईंको प्रतिक्रिया रेकर्ड भयो। प्रदायकलाई सूचित गरियो।',
 );

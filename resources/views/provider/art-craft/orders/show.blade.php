@@ -32,5 +32,6 @@
             <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,#ede1d3)"><span>{{ __('messages.budget') }}</span><span style="color:var(--accent,#c65d3b)">NPR {{ number_format($order->budget, 2) }}</span></div>
         </div>
     </div>
+    @include('provider.art-craft._quote-section', ['order' => $order])
 </div>
 @endsection

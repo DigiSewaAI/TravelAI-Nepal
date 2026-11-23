@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Artwork;
 use App\Models\CustomOrder;
+use App\Models\CustomOrderQuote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,77 @@ class ArtCraftController extends Controller
         return view('public.artcraft.show', compact(
             'service', 'provider', 'artworks', 'categories', 'offers'
         ));
+    }
+
+        public function showQuoteRespond(CustomOrder $order)
+    {
+        // Signed middleware already validated the URL
+        $latestQuote = $order->quotes()
+            ->where('status', 'pending')
+            ->latest('version')
+            ->first();
+
+        abort_unless($latestQuote, 404, 'No pending quote to respond to.');
+        abort_unless($order->status === 'quoted', 404, 'Order is not awaiting a response.');
+
+        return view('public.artcraft.quote-respond', compact('order', 'latestQuote'));
+    }
+
+    public function handleQuoteResponse(Request $request, CustomOrder $order)
+    {
+        $validated = $request->validate([
+            'action'            => 'required|in:accept,reject,revision',
+            'customer_response' => 'nullable|string|max:2000|required_if:action,revision,reject',
+        ]);
+
+        $quote = $order->quotes()->where('status', 'pending')->latest('version')->first();
+        abort_unless($quote, 404, 'No pending quote to respond to.');
+        abort_unless($order->status === 'quoted', 400, 'Order is not awaiting a response.');
+
+        DB::transaction(function () use ($order, $quote, $validated) {
+            $action = $validated['action'];
+
+            if ($action === 'accept') {
+                $quote->status = 'accepted';
+                $order->status = 'accepted';
+                $order->accepted_quote_id = $quote->id;
+                $order->accepted_quote_currency = $quote->currency;
+                $order->quoted_amount = $quote->quoted_amount;
+            } elseif ($action === 'reject') {
+                $quote->status = 'rejected';
+                $order->status = 'rejected';
+                $order->cancelled_at = now();
+            } else { // revision
+                $quote->status = 'superseded';
+                $order->status = 'revision_requested';
+            }
+
+            $quote->customer_response = $validated['customer_response'] ?? null;
+            $quote->responded_at = now();
+            $quote->save();
+            $order->save();
+        });
+
+        $provider = $order->provider;
+        $providerUser = $provider->user ?? null;
+
+        if ($validated['action'] === 'accept') {
+            try {
+                $providerEmail = $provider->contact_email ?? ($providerUser->email ?? null);
+                if ($providerEmail) {
+                    \Mail::to($providerEmail)->queue(new \App\Mail\ArtCraftQuoteAcceptedMail($order, $quote, $provider));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('ArtCraft quote accepted mail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+            if ($providerUser) {
+                $providerUser->notify(new \App\Notifications\ArtCraftQuoteAcceptedNotification($order));
+            }
+        } elseif ($validated['action'] === 'revision' && $providerUser) {
+            $providerUser->notify(new \App\Notifications\ArtCraftRevisionRequestedNotification($order, $validated['customer_response']));
+        }
+
+        return back()->with('success', 'Your response has been recorded. The provider has been notified.');
     }
 
     public function artworkDetail($slug, $artworkId)

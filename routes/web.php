@@ -172,6 +172,10 @@ Route::get('/artcraft/{slug}/artwork/{artworkId}', [\App\Http\Controllers\Public
 Route::post('/artcraft/{slug}/artwork/{artworkId}/enquire', [\App\Http\Controllers\Public\ArtCraftController::class, 'enquireReservation'])->name('public.artcraft.enquire');
 Route::get('/artcraft/{slug}/custom', [\App\Http\Controllers\Public\ArtCraftController::class, 'customCommissionForm'])->name('public.artcraft.custom');
 Route::post('/artcraft/{slug}/custom', [\App\Http\Controllers\Public\ArtCraftController::class, 'submitCustomCommission'])->name('public.artcraft.custom.submit');
+
+// 🆕 Customer quote response (signed — 30 day valid, no login)
+Route::get('/artcraft/quote/respond/{order}', [\App\Http\Controllers\Public\ArtCraftController::class, 'showQuoteRespond'])->name('public.artcraft.quote.respond')->middleware('signed');
+Route::post('/artcraft/quote/respond/{order}', [\App\Http\Controllers\Public\ArtCraftController::class, 'handleQuoteResponse'])->name('public.artcraft.quote.respond.submit')->middleware('signed');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
 // =============================================
@@ -426,6 +430,7 @@ Route::post('/individual/ai/profile-builder', [\App\Http\Controllers\Provider\In
     Route::get('/art-craft/gallery', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'galleryPage'])->name('art-craft.gallery');
     Route::get('/art-craft/custom-orders', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'ordersPage'])->name('art-craft.orders');
     Route::get('/art-craft/custom-orders/{order}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'showOrder'])->name('art-craft.orders.show');
+    Route::post('/art-craft/custom-orders/{order}/quote', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'sendQuote'])->name('art-craft.orders.quote');
         // Art/Craft CRUD Routes
     Route::post('/art-craft/artworks', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'storeArtwork'])->name('art-craft.artworks.store');
     Route::put('/art-craft/artworks/{artwork}', [\App\Http\Controllers\Provider\ArtCraftDashboardController::class, 'updateArtwork'])->name('art-craft.artworks.update');

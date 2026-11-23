@@ -51,15 +51,22 @@
                     <td><strong>{{ $o->client_name }}</strong><br><small style="color:var(--muted)">{{ $o->client_email }}</small></td>
                     <td><span class="type-badge t-{{ strtolower($o->type) }}">{{ $o->type }}</span></td>
                     <td style="font-weight:800">Rs {{ number_format($o->budget) }}</td>
-                    <td>{{ $o->deadline->format('M d, Y') }}</td>
+                    <td>{{ $o->deadline ? $o->deadline->format('M d, Y') : '—' }}</td>
                     <td>
                         <form action="{{ route('provider.art-craft.orders.status', $o) }}" method="POST" style="display:inline;margin:0;">
                             @csrf @method('PATCH')
                             <select name="status" onchange="this.form.submit()" style="padding:5px 8px;border-radius:6px;border:1px solid var(--line);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;background:var(--card);color:var(--text);">
-                                <option value="pending" {{ $o->status === 'pending' ? 'selected' : '' }}>{{ __('messages.pending') }}</option>
-                                <option value="progress" {{ $o->status === 'progress' ? 'selected' : '' }}>{{ __('messages.in_progress') }}</option>
-                                <option value="done" {{ $o->status === 'done' ? 'selected' : '' }}>{{ __('messages.done') ?? 'Done' }}</option>
-                            </select>
+    <option value="pending" {{ $o->status === 'pending' ? 'selected' : '' }}>Pending</option>
+    <option value="under_review" {{ $o->status === 'under_review' ? 'selected' : '' }}>Under Review</option>
+    <option value="quoted" {{ $o->status === 'quoted' ? 'selected' : '' }}>Quoted</option>
+    <option value="accepted" {{ $o->status === 'accepted' ? 'selected' : '' }}>Accepted</option>
+    <option value="revision_requested" {{ $o->status === 'revision_requested' ? 'selected' : '' }}>Revision Requested</option>
+    <option value="in_progress" {{ $o->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+    <option value="ready_for_delivery" {{ $o->status === 'ready_for_delivery' ? 'selected' : '' }}>Ready for Delivery</option>
+    <option value="completed" {{ $o->status === 'completed' ? 'selected' : '' }}>Completed</option>
+    <option value="rejected" {{ $o->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+    <option value="cancelled" {{ $o->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+</select>
                         </form>
                     </td>
                     <td style="text-align:right;white-space:nowrap;">

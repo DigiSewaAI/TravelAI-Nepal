@@ -2657,4 +2657,10 @@ return array (
   'layout_currency' => '货币',
   'contact_provider' => '联系提供者',
   'service_not_bookable' => '此服务目前不可预订。',
+      'artcraft_quote_sent' => '报价已发送',
+    'artcraft_quote_accepted' => '报价已接受',
+    'artcraft_quote_rejected' => '报价已拒绝',
+    'artcraft_revision_requested' => '已请求修改',
+    'artcraft_quote_respond_title' => '您的 ArtCraft 报价',
+    'artcraft_quote_respond_success' => '您的回复已记录。已通知提供商。',
 );

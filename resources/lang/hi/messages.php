@@ -2659,4 +2659,10 @@ return array (
   'layout_currency' => 'मुद्रा',
   'contact_provider' => 'प्रदाता से संपर्क करें',
   'service_not_bookable' => 'यह सेवा इस समय बुक करने योग्य नहीं है।',
+      'artcraft_quote_sent' => 'कोटेशन भेजा गया',
+    'artcraft_quote_accepted' => 'कोटेशन स्वीकृत',
+    'artcraft_quote_rejected' => 'कोटेशन अस्वीकृत',
+    'artcraft_revision_requested' => 'संशोधन अनुरोध',
+    'artcraft_quote_respond_title' => 'आपका ArtCraft कोटेशन',
+    'artcraft_quote_respond_success' => 'आपकी प्रतिक्रिया रिकॉर्ड हो गई। प्रदाता को सूचित किया गया।',
 );

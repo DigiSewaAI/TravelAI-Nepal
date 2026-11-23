@@ -3242,5 +3242,10 @@ return array (
   'layout_currency' => 'Валюта',
   'contact_provider' => 'Связаться с провайдером',
   'service_not_bookable' => 'Эта услуга в настоящее время недоступна для бронирования.',
-
+    'artcraft_quote_sent' => 'Предложение отправлено',
+    'artcraft_quote_accepted' => 'Предложение принято',
+    'artcraft_quote_rejected' => 'Предложение отклонено',
+    'artcraft_revision_requested' => 'Запрошена доработка',
+    'artcraft_quote_respond_title' => 'Ваше предложение ArtCraft',
+    'artcraft_quote_respond_success' => 'Ваш ответ записан. Провайдер уведомлён.',
 );

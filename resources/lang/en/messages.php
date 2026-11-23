@@ -3714,4 +3714,10 @@ return array (
   // Services show — contact_provider + service_not_bookable (already in hi/zh, add to others)
   'contact_provider' => 'Contact Provider',
   'service_not_bookable' => 'This service is not bookable at the moment.',
+      'artcraft_quote_sent' => 'Quote Sent',
+    'artcraft_quote_accepted' => 'Quote Accepted',
+    'artcraft_quote_rejected' => 'Quote Rejected',
+    'artcraft_revision_requested' => 'Revision Requested',
+    'artcraft_quote_respond_title' => 'Your ArtCraft Quotation',
+    'artcraft_quote_respond_success' => 'Your response has been recorded. The provider has been notified.',
 );

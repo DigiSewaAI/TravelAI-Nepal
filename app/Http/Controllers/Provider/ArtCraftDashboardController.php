@@ -146,6 +146,68 @@ class ArtCraftDashboardController extends Controller
 
         return redirect()->back()->with('success', __('messages.updated_success'));
     }
+        public function sendQuote(Request $request, CustomOrder $order)
+    {
+        $provider = Provider::where('user_id', Auth::id())->first();
+        abort_unless($provider && $order->provider_id === $provider->id, 403);
+
+        if (!in_array($order->status, ['pending', 'under_review', 'revision_requested'], true)) {
+            return back()->withErrors(['status' => 'Cannot send quote — order is "' . $order->status . '".']);
+        }
+
+        $validated = $request->validate([
+            'quoted_amount'    => 'required|numeric|min:1',
+            'currency'         => 'nullable|string|size:3',
+            'materials'        => 'nullable|string|max:500',
+            'dimensions'       => 'nullable|string|max:100',
+            'quantity'         => 'required|integer|min:1|max:999',
+            'production_days'  => 'required|integer|min:1|max:365',
+            'delivery_terms'   => 'nullable|string|max:1000',
+            'advance_proposal' => 'nullable|numeric|min:0',
+            'valid_until'      => 'required|date|after:today',
+            'provider_message' => 'nullable|string|max:2000',
+        ]);
+
+        $quote = DB::transaction(function () use ($order, $validated) {
+            // Supersede previous pending quotes
+            CustomOrderQuote::where('custom_order_id', $order->id)
+                ->where('status', 'pending')
+                ->update(['status' => 'superseded']);
+
+            $quote = CustomOrderQuote::create([
+                'custom_order_id'  => $order->id,
+                'version'          => $order->nextQuoteVersion(),
+                'quoted_amount'    => $validated['quoted_amount'],
+                'currency'         => $validated['currency'] ?? 'NPR',
+                'materials'        => $validated['materials'] ?? null,
+                'dimensions'       => $validated['dimensions'] ?? null,
+                'quantity'         => $validated['quantity'],
+                'production_days'  => $validated['production_days'],
+                'delivery_terms'   => $validated['delivery_terms'] ?? null,
+                'advance_proposal' => $validated['advance_proposal'] ?? null,
+                'valid_until'      => $validated['valid_until'],
+                'provider_message' => $validated['provider_message'] ?? null,
+                'status'           => 'pending',
+            ]);
+
+            // Quote creation itself IS the transition — bypass state machine
+            $order->status = 'quoted';
+            $order->quoted_amount = $validated['quoted_amount'];
+            $order->quoted_at = now();
+            $order->save();
+
+            return $quote;
+        });
+
+        try {
+            \Mail::to($order->client_email)
+                ->queue(new \App\Mail\ArtCraftQuoteSentMail($order, $quote, $provider));
+        } catch (\Throwable $e) {
+            \Log::warning('ArtCraft quote email failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        return back()->with('success', 'Quote #' . $quote->version . ' sent to ' . $order->client_email);
+    }
 
     public function storeArtwork(Request $request)
     {
