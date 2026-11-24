@@ -114,6 +114,14 @@ class ArtCraftController extends Controller
         return back()->with('success', 'Your response has been recorded. The provider has been notified.');
     }
 
+        public function publicStatus(CustomOrder $order)
+    {
+        $order->load(['quotes', 'provider', 'acceptedQuote']);
+        $latestPendingQuote = $order->quotes()->where('status', 'pending')->latest('version')->first();
+
+        return view('public.artcraft.order-status', compact('order', 'latestPendingQuote'));
+    }
+    
     public function artworkDetail($slug, $artworkId)
     {
         $service = Service::with(['provider', 'category'])->where('slug', $slug)->where('status', 'active')->firstOrFail();

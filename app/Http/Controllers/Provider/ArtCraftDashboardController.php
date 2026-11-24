@@ -209,6 +209,47 @@ class ArtCraftDashboardController extends Controller
         return back()->with('success', 'Quote #' . $quote->version . ' sent to ' . $order->client_email);
     }
 
+        public function referenceImage(CustomOrder $order)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && (int)$order->provider_id === (int)$provider->id, 403);
+        abort_unless($order->reference_image_path, 404, 'No reference image.');
+
+        // Try common storage locations
+        $candidates = [
+            storage_path('app/' . $order->reference_image_path),
+            storage_path('app/private/' . $order->reference_image_path),
+            storage_path('app/artcraft-references/' . $order->reference_image_path),
+        ];
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                return response()->file($path);
+            }
+        }
+        abort(404, 'Reference image file not found.');
+    }
+
+    public function confirmAvailability(Request $request, CustomOrder $order)
+    {
+        $provider = Auth::user()->getCurrentProvider();
+        abort_unless($provider && (int)$order->provider_id === (int)$provider->id, 403);
+        abort_unless($order->request_type === 'ready_made', 400, 'Only ready-made enquiries can be confirmed this way.');
+        abort_unless($order->status === 'pending', 400, 'Order is not pending.');
+
+        DB::transaction(function () use ($order) {
+            $order->status = 'accepted';
+            $order->save();
+        });
+
+        try {
+            \Mail::to($order->client_email)->queue(new \App\Mail\ArtCraftReadyMadeConfirmedMail($order, $provider));
+        } catch (\Throwable $e) {
+            \Log::warning('ArtCraft ready-made confirm mail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
+
+        return back()->with('success', 'Availability confirmed. Customer has been notified by email.');
+    }
+
     public function storeArtwork(Request $request)
     {
         $provider = Auth::user()->getCurrentProvider();
