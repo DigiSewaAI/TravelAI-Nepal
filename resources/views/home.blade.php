@@ -170,7 +170,7 @@
           </p>
           <div class="flex flex-wrap gap-4 mt-8">
             <a href="{{ route('public.services.index') }}" class="bg-gray-900 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-xl flex items-center gap-2"><i class="fas fa-map-marked-alt"></i> {{ __('messages.explore_trips') }}</a>
-            <a href="{{ route('register') }}" class="border border-gray-300 hover:border-blue-400 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl transition-all hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-handshake"></i> {{ __('messages.become_partner_btn') }}</a>
+            <a href="{{ route('register', ['account_type' => 'provider']) }}" class="border border-gray-300 hover:border-blue-400 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl transition-all hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-handshake"></i> {{ __('messages.become_partner_btn') }}</a>
           </div>
           <div class="flex flex-wrap gap-6 mt-10 text-sm text-gray-500">
             <div class="flex items-center gap-1"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.no_hidden_fees') }}</div>
@@ -445,22 +445,6 @@
     </div>
   </section>
 
-  {{-- ========== PRICING CTA SECTION ========== --}}
-  <div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl">
-      <h2 class="text-3xl md:text-4xl font-bold mb-3">{{ __('messages.ready_to_scale') }}</h2>
-      <p class="text-blue-100 text-lg max-w-2xl mx-auto">{{ __('messages.choose_plan_text') }}</p>
-      <div class="flex flex-wrap justify-center gap-4 mt-6">
-        <a href="{{ route('pages.pricing') }}" class="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl transition shadow-lg">
-          {{ __('messages.view_pricing') }} →
-        </a>
-        <a href="{{ route('register') }}" class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold px-8 py-3 rounded-xl transition">
-          {{ __('messages.get_started_free') }}
-        </a>
-      </div>
-    </div>
-  </div>
-
   <!-- फिचर ग्रिड (Core intelligence) -->
   <section id="features" class="py-20 px-6 md:px-10 max-w-7xl mx-auto">
     <div class="text-center max-w-2xl mx-auto mb-14">
@@ -511,18 +495,21 @@
     </div>
   </section>
 
-  <section id="early-access" class="py-20 px-6 bg-gray-900 text-white relative overflow-hidden">
+  <section id="business-cta" class="py-20 px-6 bg-gray-900 text-white relative overflow-hidden">
     <div class="absolute top-0 right-0 w-80 h-80 bg-blue-500 opacity-10 rounded-full blur-3xl"></div>
     <div class="max-w-4xl mx-auto text-center relative z-10">
-      <i class="fas fa-hiking text-4xl text-blue-300 mb-4"></i>
+      <i class="fas fa-handshake text-4xl text-blue-300 mb-4"></i>
       <h2 class="text-3xl md:text-5xl font-extrabold">{{ __('messages.ready_to_transform') }}</h2>
-      <p class="text-gray-300 text-lg mt-4 max-w-2xl mx-auto">{{ __('messages.waitlist_text') }}</p>
-      <form class="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" action="#">
-        @csrf
-        <input type="email" required placeholder="{{ __('messages.email_placeholder') }}" class="flex-1 px-5 py-3 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 border-0">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"><i class="fas fa-rocket"></i> {{ __('messages.reserve_early_spot') }}</button>
-      </form>
-      <p class="text-gray-400 text-xs mt-4">{{ __('messages.no_spam') }}</p>
+      <p class="text-gray-300 text-lg mt-4 max-w-2xl mx-auto">{{ __('messages.business_cta_description') }}</p>
+      <p class="text-blue-200 text-base mt-3 max-w-2xl mx-auto">{{ __('messages.business_cta_sub') }}</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg mx-auto justify-center">
+        <a href="{{ route('register', ['account_type' => 'provider']) }}" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+  <i class="fas fa-handshake"></i> {{ __('messages.become_partner_btn') }}
+</a>
+        <a href="{{ route('pages.pricing') }}" class="border-2 border-white/30 hover:border-white text-white font-semibold px-6 py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-tags"></i> {{ __('messages.view_pricing') }}
+        </a>
+      </div>
     </div>
   </section>
 
@@ -610,43 +597,7 @@
         </div>
       `).join('');
     }
-    function initForm() {
-    document.querySelector('#early-access form')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const form = this;
-        const email = form.querySelector('input[type="email"]').value;
-        const btn = form.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
 
-        btn.innerHTML = 'Submitting...';
-        btn.disabled = true;
-
-        try {
-            const response = await fetch('/waitlist', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
-                body: JSON.stringify({ email: email })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                alert(data.message);
-                form.reset();
-            } else {
-                alert(data.message || 'Something went wrong. Please try again.');
-            }
-        } catch (error) {
-            alert('Server error. Please try again.');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
-    });
-}
     function initSmoothScroll() {
       document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) {
         const target = document.querySelector(this.getAttribute('href'));
@@ -656,7 +607,6 @@
     renderFeatures();
     renderExtraBadges();
     renderWorkflow();
-    initForm();
     initSmoothScroll();
   </script>
 

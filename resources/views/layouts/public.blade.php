@@ -505,7 +505,7 @@
                     <li><a href="{{ route('pages.press') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.press') }}</a></li>
                     <li><a href="{{ route('pages.contact') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.contact_us') }}</a></li>
                     <!-- Become Partner moved here -->
-                    <li><a href="{{ route('register') }}" class="text-blue-400 font-semibold hover:text-blue-300 hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.become_partner') }} &rarr;</a></li>
+                    <li><a href="{{ route('register', ['account_type' => 'provider']) }}" class="text-blue-400 font-semibold hover:text-blue-300 hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.become_partner') }} &rarr;</a></li>
                 </ul>
             </div>
 
