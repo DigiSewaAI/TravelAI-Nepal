@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'About TravelAI Nepal — AI-Powered Trekking Ecosystem')
-@section('meta_description', 'Learn about TravelAI Nepal — an AI-powered trekking ecosystem connecting travelers with verified local providers. Safer, smarter, and more accessible Nepal adventures.')
+@section('title', 'About TravelAI Nepal — Research-Backed Tourism Ecosystem')
+@section('meta_description', 'Learn about TravelAI Nepal — a research-backed tourism ecosystem connecting travelers with Nepal\'s destinations, researched routes and trusted local tourism businesses.')
 @section('meta_keywords', 'About TravelAI Nepal, Nepal trekking company, AI travel platform Nepal, Himalayan trekking, local provider network, Nepal tourism innovation')
 
 @push('head')
@@ -52,28 +52,9 @@
         </div>
     </div>
 
-    {{-- ========== STATS SECTION ========== --}}
-    <div class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">{{ __('messages.about_stats_title') }}</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-blue-50 rounded-xl p-6 text-center border border-blue-100">
-                <p class="text-3xl font-black text-blue-600">138+</p>
-                <p class="text-sm text-gray-600 mt-1">{{ __('messages.about_stats_routes') }}</p>
-            </div>
-            <div class="bg-green-50 rounded-xl p-6 text-center border border-green-100">
-                <p class="text-3xl font-black text-green-600">1,169+</p>
-                <p class="text-sm text-gray-600 mt-1">{{ __('messages.about_stats_services') }}</p>
-            </div>
-            <div class="bg-purple-50 rounded-xl p-6 text-center border border-purple-100">
-                <p class="text-3xl font-black text-purple-600">726+</p>
-                <p class="text-sm text-gray-600 mt-1">{{ __('messages.about_stats_providers') }}</p>
-            </div>
-            <div class="bg-yellow-50 rounded-xl p-6 text-center border border-yellow-100">
-                <p class="text-3xl font-black text-yellow-600">4</p>
-                <p class="text-sm text-gray-600 mt-1">{{ __('messages.about_stats_languages') }}</p>
-            </div>
-        </div>
-    </div>
+    {{-- Stats section removed pending production data verification.
+         Will be restored with verified counts (138 routes, 590 waypoints)
+         after data provenance audit is complete. --}}
 
     {{-- ========== STORY SECTION ========== --}}
     <div class="bg-white rounded-xl shadow-md border p-8 mb-12">

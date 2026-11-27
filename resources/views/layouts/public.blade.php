@@ -64,7 +64,7 @@
     'name' => 'TravelAI Nepal',
     'url' => url('/'),
     'logo' => asset('images/logo.png'),
-    'description' => 'AI-powered trekking ecosystem connecting travelers with local agencies in Nepal.',
+    'description' => 'AI-assisted tourism ecosystem connecting travelers with Nepal\'s destinations, researched routes and trusted local tourism businesses.',
     'address' => [
         '@@type' => 'PostalAddress',
         'addressLocality' => 'Kathmandu',
@@ -500,7 +500,7 @@
             <div class="md:col-span-3">
                 <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wider">{{ __('messages.company') }}</h4>
                 <ul class="space-y-3 text-sm">
-                    <li><a href="{{ route('pages.about') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.about_nepal_trek') }}</a></li>
+                    <li><a href="{{ route('pages.about') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">About TravelAI Nepal</a></li>
                     <li><a href="{{ route('pages.careers') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.careers') }}</a></li>
                     <li><a href="{{ route('pages.press') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.press') }}</a></li>
                     <li><a href="{{ route('pages.contact') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.contact_us') }}</a></li>

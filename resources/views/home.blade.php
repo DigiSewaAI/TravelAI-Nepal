@@ -368,31 +368,19 @@
     </div>
   </div>
 
-  <!-- Stats Banner -->
-<div class="bg-gray-50 border-y border-gray-100 py-6">
+  {{-- Stats Banner — hidden until verified metrics are available --}}
+  @if(!empty($stats))
+  <div class="bg-gray-50 border-y border-gray-100 py-6">
     <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-around gap-6 text-center">
       @foreach($stats as $stat)
       <div>
         <span class="text-3xl font-black text-blue-600">{{ $stat['value'] }}</span>
-        <p class="text-xs text-gray-500">
-          @if($stat['label'] == 'Tourism Services')
-            {{ __('messages.tourism_services') }}
-          @elseif($stat['label'] == 'Trusted Providers')
-            {{ __('messages.trusted_providers') }}
-          @elseif($stat['label'] == 'Happy Travelers')
-            {{ __('messages.happy_travelers') }}
-          @elseif($stat['label'] == 'Zero Commission')
-            {{ __('messages.zero_commission') }}
-          @elseif($stat['label'] == 'Smart Contracts Ready')
-            {{ __('messages.smart_contracts_ready') }}
-          @else
-            {{ $stat['label'] }}
-          @endif
-        </p>
+        <p class="text-xs text-gray-500">{{ $stat['label'] }}</p>
       </div>
       @endforeach
     </div>
   </div>
+  @endif
 
   {{-- Featured Services सेक्सन --}}
   <section id="services" class="py-20 px-6 md:px-10 max-w-7xl mx-auto">

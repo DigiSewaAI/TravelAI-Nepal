@@ -32,18 +32,10 @@ class HomeController extends Controller
         ->take(6)
         ->get();
 
-    // Real-time stats from database
-    $totalServices = Service::count();
-    $totalProviders = Provider::count();
-    $totalBookings = Booking::count();
-
-    // Stats array for the banner
-    $stats = [
-        ['value' => $totalServices . '+', 'label' => 'Tourism Services'],
-        ['value' => $totalProviders, 'label' => 'Trusted Providers'],
-        ['value' => $totalBookings, 'label' => 'Happy Travelers'],
-        ['value' => 'Zero Commission', 'label' => 'Smart Contracts Ready']
-    ];
+    // Statistics temporarily disabled pending production data verification.
+    // Will be re-enabled with verified counts (138 routes, 590 waypoints)
+    // after data provenance audit is complete.
+    $stats = [];
 
     // Recent Check‑ins (existing)
     $recentCheckins = QrScan::with(['booking.service.provider', 'booking.traveler'])
