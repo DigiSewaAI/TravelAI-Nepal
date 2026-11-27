@@ -101,6 +101,18 @@ class Service extends Model
     {
         return $this->hasOne(TransportDetail::class);
     }
+
+        public function individualDetail()
+    {
+        return $this->hasOneThrough(
+            IndividualDetail::class,
+            Provider::class,
+            'id',              // providers.id
+            'provider_id',     // individual_details.provider_id
+            'provider_id',     // services.provider_id
+            'id'               // providers.id
+        );
+    }
     // Bookings
     public function bookings()
     {

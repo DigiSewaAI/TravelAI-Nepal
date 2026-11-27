@@ -145,6 +145,10 @@ class Provider extends Model
         return $this->hasMany(Service::class);
     }
 
+        public function individualDetail()
+    {
+        return $this->hasOne(IndividualDetail::class);
+    }
         /**
      * 🆕 All approved reviews across all services of this provider
      */

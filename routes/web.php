@@ -179,6 +179,10 @@ Route::post('/artcraft/quote/respond/{order}', [\App\Http\Controllers\Public\Art
 
 // 🆕 Public order status (signed — 90 day valid)
 Route::get('/artcraft/order/{order}/status', [\App\Http\Controllers\Public\ArtCraftController::class, 'publicStatus'])->name('public.artcraft.order.status')->middleware('signed');
+
+// 🆕 Individual (Guide) Public Page
+Route::get('/guide/{slug}', [\App\Http\Controllers\Public\IndividualController::class, 'show'])->name('public.individual.show');
+Route::post('/guide/{slug}/book', [\App\Http\Controllers\Public\IndividualController::class, 'book'])->name('public.individual.book');
 Route::post('/restaurant/{slug}/reserve', [\App\Http\Controllers\Public\RestaurantController::class, 'reserve'])->name('public.restaurant.reserve');
 
 // =============================================
