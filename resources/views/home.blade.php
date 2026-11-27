@@ -482,16 +482,25 @@
         {{-- Removed fake partner names (legal risk) — replaced with no display --}}
       </div>
       <div class="bg-white/40 backdrop-blur-sm p-6 rounded-2xl border border-white shadow-lg">
-        <div class="flex justify-between items-center border-b pb-3 mb-3"><span class="font-bold"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i> {{ __('messages.today_dashboard') }}</span><span class="text-xs bg-green-100 px-2 py-0.5 rounded-full">{{ __('messages.efficiency_plus') }}</span></div>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between"><span>📊 {{ __('messages.active_treks') }}</span><span class="font-semibold">18</span></div>
-          <div class="flex justify-between"><span>🧾 {{ __('messages.permits_issued') }}</span><span class="font-semibold">46</span></div>
-          <div class="flex justify-between"><span>📈 {{ __('messages.ai_revenue_forecast') }}</span><span class="font-semibold text-green-600">+22%</span></div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-2 mt-2"><div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div></div>
-        <p class="text-xs text-gray-500 mt-3">{{ __('messages.less_paperwork') }}</p>
-        <div class="mt-5 text-center text-xs text-gray-500"><i class="fas fa-lock"></i> {{ __('messages.zero_commission_smart_contract') }}</div>
-      </div>
+  <div class="flex justify-between items-center border-b pb-3 mb-4">
+    <span class="font-bold"><i class="fas fa-desktop text-blue-500 mr-2"></i> {{ __('messages.sample_dashboard_title') }}</span>
+    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase tracking-wide">Sample</span>
+  </div>
+  
+  <div class="relative rounded-lg overflow-hidden border border-gray-200 mb-4 shadow-sm bg-gray-50">
+    <img src="{{ asset('images/sample-rescue-dashboard.png') }}" alt="{{ __('messages.sample_dashboard_alt') }}" class="w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm bg-white" loading="lazy">
+
+  <ul class="space-y-2 text-sm text-gray-700 mt-4">
+    <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.cap_booking') }}</li>
+    <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.cap_service') }}</li>
+    <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.cap_ai') }}</li>
+    <li class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> {{ __('messages.cap_reports') }}</li>
+  </ul>
+
+  <p class="text-xs text-gray-500 mt-4 border-t pt-3 italic">
+    {{ __('messages.sample_dashboard_note') }}
+  </p>
+</div>
     </div>
   </section>
 

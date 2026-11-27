@@ -439,10 +439,6 @@ return array (
   'supercharge_bullet3' => 'Connect with a growing network of travelers and tourism partners',
   'trusted_by_early' => 'Trusted by early partners: Himalayan Guides, Nepal Eco Treks, & more',
   'today_dashboard' => 'Today\'s dashboard preview',
-  'efficiency_plus' => '+32% efficiency',
-  'active_treks' => 'Active treks',
-  'permits_issued' => 'Permits issued (auto)',
-  'ai_revenue_forecast' => 'AI revenue forecast',
   'less_paperwork' => '80% less paperwork → agencies scale faster',
   'zero_commission_smart_contract' => 'Digital contracts ready',
   'ready_to_transform' => 'Ready to Grow Your Tourism Business?',
@@ -3744,4 +3740,17 @@ return array (
     'artcraft_confirm_availability' => 'Confirm Availability',
     'artcraft_ready_made' => 'Ready-Made Enquiry',
     'artcraft_custom_commission' => 'Custom Commission',
+        // Dashboard section नयाँ keys
+    'sample_dashboard_title' => 'Sample Rescue Operations Dashboard',
+    'sample_dashboard_alt' => 'Sample interface of the TravelAI Nepal provider dashboard',
+    'sample_dashboard_note' => 'Illustrative interface preview. Not live provider activity or actual operational performance.',
+    'cap_booking' => 'Booking & Inquiry Management',
+    'cap_service' => 'Service & Operations Management',
+    'cap_ai' => 'AI-Assisted Quotations',
+    'cap_reports' => 'Business Reports & Analytics',
+
+    // 80% claims fix
+    'less_paperwork' => 'Digital tools for everyday business operations',
+    'agency_dashboard_desc' => 'Bookings, permits, guide assignment, AI quotations and analytics — all in one place.',
+    'features_dashboard_desc' => 'Manage treks, bookings, customers, itineraries, and analytics through a dedicated dashboard.',
 );
