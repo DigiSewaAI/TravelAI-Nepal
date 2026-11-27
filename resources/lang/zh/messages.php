@@ -369,7 +369,7 @@ return array (
   'app_name' => 'TravelAI 尼泊尔',
   'app_name_short' => 'TravelAI',
   'nepal' => '尼泊尔',
-  'footer_tagline' => 'AI + 数据驱动的徒步生态系统。为尼泊尔打造，充满激情。',
+  'footer_tagline' => 'AI 辅助的旅游生态系统。为尼泊尔打造，充满激情。',
   'product' => '产品',
   'company' => '公司',
   'legal' => '法律',

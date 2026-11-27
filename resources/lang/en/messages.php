@@ -459,7 +459,7 @@ return array (
   'app_name' => 'TravelAI Nepal',
   'app_name_short' => 'TravelAI',
   'nepal' => 'Nepal',
-  'footer_tagline' => 'AI + data-driven trekking ecosystem. Built for Nepal, by passion.',
+  'footer_tagline' => 'AI-assisted tourism ecosystem. Built for Nepal, by passion.',
   'product' => 'Product',
   'company' => 'Company',
   'legal' => 'Legal',
