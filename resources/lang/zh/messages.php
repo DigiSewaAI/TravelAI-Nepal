@@ -381,7 +381,7 @@ return array (
   'privacy_policy' => '隐私政策',
   'terms_service' => '服务条款',
   'gdpr_data_safety' => 'GDPR和数据安全',
-  'footer_copyright' => '© :year TravelAI 尼泊尔 — 通过AI和开放技术重新定义喜马拉雅冒险。🇳🇵 尼泊尔制造，面向世界。',
+  'footer_copyright' => '© :year TravelAI Nepal。在尼泊尔制造，服务于全球旅行者和当地旅游企业。',
   'plan_entire' => '探索尼泊尔',
   'nepal_journey' => '充满信心',
     'home_subtitle' => '智能旅行规划。真实的本地体验。值得信赖的联系。',

@@ -471,7 +471,7 @@ return array (
   'privacy_policy' => 'Privacy policy',
   'terms_service' => 'Terms of service',
   'gdpr_data_safety' => 'GDPR & data safety',
-  'footer_copyright' => '© :year TravelAI Nepal — Redefining Himalayan adventures with AI & open tech. 🇳🇵 Made in Nepal for the world.',
+  'footer_copyright' => '© :year TravelAI Nepal. Built in Nepal for travelers and local tourism businesses worldwide.',
   'plan_entire' => 'Discover Nepal',
   'nepal_journey' => 'with Confidence',
   'home_subtitle' => 'Smart Travel Planning. Real Local Experiences. Trusted Connections.',
