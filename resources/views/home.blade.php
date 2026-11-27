@@ -495,7 +495,7 @@
           <li class="flex gap-2 items-start"><i class="fas fa-check-circle text-green-500 mt-1"></i><span>{{ __('messages.supercharge_bullet2') }}</span></li>
           <li class="flex gap-2 items-start"><i class="fas fa-check-circle text-green-500 mt-1"></i><span>{{ __('messages.supercharge_bullet3') }}</span></li>
         </ul>
-        <div class="mt-8 flex items-center gap-3"><i class="fas fa-chart-line text-2xl text-blue-600"></i><span class="text-sm font-medium text-gray-700">{{ __('messages.trusted_by_early') }}</span></div>
+        {{-- Removed fake partner names (legal risk) — replaced with no display --}}
       </div>
       <div class="bg-white/40 backdrop-blur-sm p-6 rounded-2xl border border-white shadow-lg">
         <div class="flex justify-between items-center border-b pb-3 mb-3"><span class="font-bold"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i> {{ __('messages.today_dashboard') }}</span><span class="text-xs bg-green-100 px-2 py-0.5 rounded-full">{{ __('messages.efficiency_plus') }}</span></div>
