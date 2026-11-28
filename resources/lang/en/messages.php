@@ -1761,7 +1761,7 @@ return array (
   'clear_filters' => 'Clear filters',
   'no_items_found' => 'No :type found matching your criteria.',
   'view_status' => 'View status →',
-  'safety_subtitle' => 'Real-time safety updates, AI-driven risk assessments, and live incident tracking for travelers across Nepal.',
+  'safety_subtitle' => 'Live weather data, safety resources, and incident updates for travelers across Nepal.',
   'check_destination_weather_safety' => 'Check a destination\'s weather & safety',
   'weather_across_nepal' => 'Weather conditions across Nepal',
   'search_results' => 'Search Results',

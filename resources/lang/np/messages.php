@@ -1800,7 +1800,7 @@ return array (
   'traveler_reviews_showing' => ':count समीक्षा देखाउँदै',
   'traveler_reviews_view_booking' => 'बुकिङ हेर्नु',
   'traveler_reviews_view_booking_arrow' => 'बुकिङ हेर्नु →',
-  'safety_subtitle' => 'नेपालभरका यात्रुहरूको लागि वास्तविक-समय सुरक्षा अपडेट, एआई-संचालित जोखिम मूल्याङ्कन, र लाइभ घटना ट्र्याकिङ।',
+  'safety_subtitle' => 'नेपालभर यात्रा गर्नेहरूका लागि प्रत्यक्ष मौसमसम्बन्धी जानकारी, सुरक्षा स्रोतहरू र घटना अपडेटहरू।',
   'check_destination_weather_safety' => 'कुनै गन्तव्यको मौसम र सुरक्षा जाँच गर्नुहोस्',
   'weather_across_nepal' => 'नेपालभर मौसम अवस्था',
   'search_results' => 'खोज परिणाम',

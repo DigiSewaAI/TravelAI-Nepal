@@ -1,7 +1,7 @@
 @extends($layout ?? 'layouts.public')
 
-@section('title', 'Travel Safety — Nepal | Real-Time Updates & Weather | TravelAI Nepal')
-@section('meta_description', 'Real-time safety updates, weather intelligence, and live incident tracking across Nepal. Check destination safety status, advisory level, and trek safety tips.')
+@section('title', 'Travel Safety — Nepal | Weather & Safety Information | TravelAI Nepal')
+@section('meta_description', 'Live weather data, safety information, and incident updates for destinations across Nepal. Check destination weather, safety status, and travel tips.')
 @section('meta_keywords', 'Nepal travel safety, trekking safety Nepal, real-time safety updates, Nepal weather, incident tracking, safe trekking Nepal')
 
 @push('head')
@@ -33,7 +33,7 @@
       "name": "Is it safe to travel in Nepal right now?",
       "acceptedAnswer": {
         "@@type": "Answer",
-        "text": "TravelAI Nepal provides real-time safety updates for all 138+ destinations across Nepal. Check each destination's safety status — Normal, Caution, High Risk, or Avoid — based on live incident reports, weather conditions, and AI-driven risk assessments."
+        "text": "TravelAI Nepal provides weather data and safety information for destinations across Nepal. Check destination weather and safety status — Normal, Caution, High Risk, or Avoid — based on incident reports and weather conditions."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "How does TravelAI Nepal track trekking safety?",
       "acceptedAnswer": {
         "@@type": "Answer",
-        "text": "We combine real-time weather data from OpenWeatherMap, verified incident reports from local sources, AI-driven risk scoring, and traveler check-ins via QR code to provide comprehensive safety intelligence for every trekking route in Nepal."
+        "text": "We combine weather data, verified incident reports from local sources, rule-based risk scoring, and traveler check-ins via QR code to provide safety information for trekking routes across Nepal."
       }
     },
     {
