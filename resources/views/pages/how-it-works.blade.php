@@ -117,23 +117,23 @@
 
 <div class="max-w-7xl mx-auto px-4 py-12">
 
-    {{-- ========== STATS BAR ========== --}}
+    {{-- ========== HONEST TRUST BANNER ========== --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         <div class="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
-            <p class="text-2xl font-bold text-blue-600">500+</p>
-            <p class="text-sm text-gray-600">{{ __('messages.how_it_works_stat_treks') }}</p>
+            <p class="text-lg font-bold text-blue-600">AI-Powered</p>
+            <p class="text-sm text-gray-600">Smart Itineraries</p>
         </div>
         <div class="bg-green-50 rounded-xl p-4 text-center border border-green-100">
-            <p class="text-2xl font-bold text-green-600">50+</p>
-            <p class="text-sm text-gray-600">{{ __('messages.how_it_works_stat_agencies') }}</p>
+            <p class="text-lg font-bold text-green-600">Verified</p>
+            <p class="text-sm text-gray-600">Local Providers</p>
         </div>
         <div class="bg-purple-50 rounded-xl p-4 text-center border border-purple-100">
-            <p class="text-2xl font-bold text-purple-600">100%</p>
-            <p class="text-sm text-gray-600">{{ __('messages.how_it_works_stat_satisfied') }}</p>
+            <p class="text-lg font-bold text-purple-600">Secure</p>
+            <p class="text-sm text-gray-600">Booking System</p>
         </div>
         <div class="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100">
-            <p class="text-2xl font-bold text-yellow-600">24/7</p>
-            <p class="text-sm text-gray-600">{{ __('messages.how_it_works_stat_safety') }}</p>
+            <p class="text-lg font-bold text-yellow-600">Connected</p>
+            <p class="text-sm text-gray-600">Tourism Ecosystem</p>
         </div>
     </div>
 

@@ -116,23 +116,23 @@
 
 <div class="max-w-7xl mx-auto px-4 py-12">
 
-    {{-- ========== STATS BAR ========== --}}
+    {{-- ========== HONEST TRUST BANNER ========== --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         <div class="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
-            <p class="text-2xl font-bold text-blue-600">9+</p>
-            <p class="text-sm text-gray-600">{{ __('messages.features_stat_features') }}</p>
+            <p class="text-lg font-bold text-blue-600">Complete</p>
+            <p class="text-sm text-gray-600">Tourism Tools</p>
         </div>
         <div class="bg-green-50 rounded-xl p-4 text-center border border-green-100">
-            <p class="text-2xl font-bold text-green-600">24/7</p>
-            <p class="text-sm text-gray-600">{{ __('messages.features_stat_support') }}</p>
+            <p class="text-lg font-bold text-green-600">Always</p>
+            <p class="text-sm text-gray-600">Safety First</p>
         </div>
         <div class="bg-purple-50 rounded-xl p-4 text-center border border-purple-100">
-            <p class="text-2xl font-bold text-purple-600">100%</p>
-            <p class="text-sm text-gray-600">{{ __('messages.features_stat_offline') }}</p>
+            <p class="text-lg font-bold text-purple-600">Ready</p>
+            <p class="text-sm text-gray-600">Offline Features</p>
         </div>
         <div class="bg-yellow-50 rounded-xl p-4 text-center border border-yellow-100">
-            <p class="text-2xl font-bold text-yellow-600">AI</p>
-            <p class="text-sm text-gray-600">{{ __('messages.features_stat_powered') }}</p>
+            <p class="text-lg font-bold text-yellow-600">AI</p>
+            <p class="text-sm text-gray-600">Powered</p>
         </div>
     </div>
 

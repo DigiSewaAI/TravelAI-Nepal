@@ -500,7 +500,7 @@
             <div class="md:col-span-3">
                 <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wider">{{ __('messages.company') }}</h4>
                 <ul class="space-y-3 text-sm">
-                    <li><a href="{{ route('pages.about') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">About TravelAI Nepal</a></li>
+                    <li><a href="{{ route('pages.about') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.about_travelai_nepal') }}</a></li>
                     <li><a href="{{ route('pages.careers') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.careers') }}</a></li>
                     <li><a href="{{ route('pages.press') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.press') }}</a></li>
                     <li><a href="{{ route('pages.contact') }}" class="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">{{ __('messages.contact_us') }}</a></li>
