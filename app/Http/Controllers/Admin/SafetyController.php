@@ -261,21 +261,27 @@ class SafetyController extends Controller
      * Create or update source
      */
     public function storeSource(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:rss,json,html',
-            'feed_url' => 'required|url',
-            'source_category' => 'required|in:official,institutional,news,other',
-            'reliability_score' => 'required|numeric|min:0|max:1',
-            'fetch_interval' => 'required|integer|min:5|max:1440',
-            'enabled' => 'boolean',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'type' => 'required|in:rss,json,html',
+        'feed_url' => 'required|url|max:255',
+        'source_category' => 'required|in:official,institutional,news,other',
+        'reliability_score' => 'required|numeric|min:0|max:1',
+        'fetch_interval' => 'required|integer|min:5|max:1440',
+        'enabled' => 'nullable|boolean',
+    ]);
 
-        $source = SafetySource::create($request->all());
+    // Checkbox pattern sends "0" when unchecked, "1" when checked;
+    // respect DB default (true) when field is completely absent.
+    $validated['enabled'] = $request->boolean('enabled', true);
 
-        return redirect()->back()->with('success', 'Source created successfully');
-    }
+    SafetySource::create($validated);
+
+    return redirect()
+        ->route('admin.safety.sources')
+        ->with('success', 'Source "'.$validated['name'].'" created successfully.');
+}
 
     /**
      * Toggle source enabled status

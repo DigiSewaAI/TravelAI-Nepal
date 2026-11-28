@@ -15,31 +15,96 @@
     </a>
 </div>
 
+{{-- Validation / success feedback --}}
+@if ($errors->any())
+<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+    <div class="font-bold mb-1"><i class="fas fa-exclamation-triangle"></i> Please fix:</div>
+    <ul class="list-disc list-inside">
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
+@if (session('success'))
+<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+    <i class="fas fa-check-circle"></i> {{ session('success') }}
+</div>
+@endif
+
 {{-- Add Source --}}
 <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
     <h3 class="text-sm font-bold text-gray-900 mb-4"><i class="fas fa-plus-circle text-blue-600"></i> Add New Source</h3>
-    <form action="{{ route('admin.safety.sources.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+    <form action="{{ route('admin.safety.sources.store') }}" method="POST"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         @csrf
-        <input type="text" name="name" required placeholder="Source name" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-        <select name="type" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="">Type</option>
-            <option value="rss">RSS</option>
-            <option value="json">JSON API</option>
-            <option value="html">HTML Scrape</option>
-        </select>
-        <input type="url" name="feed_url" required placeholder="https://..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-        <select name="source_category" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="">Category</option>
-            <option value="government">Government</option>
-            <option value="news">News</option>
-            <option value="weather">Weather</option>
-            <option value="traffic">Traffic</option>
-            <option value="health">Health</option>
-            <option value="other">Other</option>
-        </select>
-        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">
-            <i class="fas fa-plus"></i> Add Source
-        </button>
+
+        <div>
+            <input type="text" name="name" value="{{ old('name') }}" required placeholder="Source name"
+                   class="w-full px-3 py-2 border @error('name') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+            @error('name')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <select name="type" required
+                    class="w-full px-3 py-2 border @error('type') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+                <option value="">Type</option>
+                <option value="rss"  @selected(old('type') === 'rss')>RSS</option>
+                <option value="json" @selected(old('type') === 'json')>JSON API</option>
+                <option value="html" @selected(old('type') === 'html')>HTML Scrape</option>
+            </select>
+            @error('type')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <input type="url" name="feed_url" value="{{ old('feed_url') }}" required placeholder="https://..."
+                   class="w-full px-3 py-2 border @error('feed_url') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+            @error('feed_url')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <select name="source_category" required
+                    class="w-full px-3 py-2 border @error('source_category') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+                <option value="">Category</option>
+                <option value="official"      @selected(old('source_category') === 'official')>Government / Official</option>
+                <option value="institutional" @selected(old('source_category') === 'institutional')>Institutional</option>
+                <option value="news"          @selected(old('source_category') === 'news')>News</option>
+                <option value="other"         @selected(old('source_category') === 'other')>Other</option>
+            </select>
+            @error('source_category')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 mb-1">Reliability (0–1)</label>
+            <input type="number" name="reliability_score" value="{{ old('reliability_score', 0.5) }}"
+                   min="0" max="1" step="0.1" required
+                   class="w-full px-3 py-2 border @error('reliability_score') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+            @error('reliability_score')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 mb-1">Fetch interval (min)</label>
+            <input type="number" name="fetch_interval" value="{{ old('fetch_interval', 60) }}"
+                   min="5" max="1440" required
+                   class="w-full px-3 py-2 border @error('fetch_interval') border-red-400 @else border-gray-300 @enderror rounded-lg text-sm">
+            @error('fetch_interval')<div class="text-xs text-red-600 mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div class="flex items-end pb-1">
+            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input type="hidden" name="enabled" value="0">
+                <input type="checkbox" name="enabled" value="1" @checked(old('enabled', true))>
+                <span>Enabled</span>
+            </label>
+        </div>
+
+        <div class="flex items-end">
+            <button type="submit"
+                    class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">
+                <i class="fas fa-plus"></i> Add Source
+            </button>
+        </div>
     </form>
 </div>
 
