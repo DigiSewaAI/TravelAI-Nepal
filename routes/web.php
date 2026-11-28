@@ -983,6 +983,13 @@ Route::get('/travel-safety', [App\Http\Controllers\SafetyController::class, 'ind
 Route::get('/travel-safety/destination/{slug}', [App\Http\Controllers\SafetyController::class, 'destination'])->name('safety.destination');
 Route::get('/travel-safety/incident/{id}', [App\Http\Controllers\SafetyController::class, 'incident'])->name('safety.incident');
 
+// Traveler dashboard safety (auth required) — same controller, different layout
+Route::middleware('auth')->prefix('traveler/safety')->name('traveler.safety.')->group(function () {
+    Route::get('/', [App\Http\Controllers\SafetyController::class, 'index'])->name('index');
+    Route::get('/destination/{slug}', [App\Http\Controllers\SafetyController::class, 'destination'])->name('destination');
+    Route::get('/incident/{id}', [App\Http\Controllers\SafetyController::class, 'incident'])->name('incident');
+});
+
 // Safety Search API (AJAX)
 Route::get('/safety/search', [App\Http\Controllers\SafetyController::class, 'searchDestination'])
     ->name('safety.search');

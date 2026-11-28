@@ -939,7 +939,7 @@
             <a href="{{ route('traveler.journey-replay') }}" class="tv2-sidebar-link">
                 <i class="fas fa-clock-rotate-left"></i><span>{{ __('messages.nav_journey_replay') ?? 'Journey Replay' }}</span>
             </a>
-            <a href="{{ route('safety.index') }}" class="tv2-sidebar-link">
+            <a href="{{ route('traveler.safety.index') }}" class="tv2-sidebar-link">
                 <i class="fas fa-shield-halved"></i><span>{{ __('messages.nav_safety_center') ?? 'Safety Center' }}</span>
             </a>
             <a href="#sos" class="tv2-sidebar-link is-danger">
@@ -1025,7 +1025,7 @@
         <a href="{{ route('traveler.journey-replay') }}" class="tv2-sidebar-link">
             <i class="fas fa-clock-rotate-left"></i><span>{{ __('messages.nav_journey_replay') ?? 'Journey Replay' }}</span>
         </a>
-        <a href="{{ route('safety.index') }}" class="tv2-sidebar-link">
+        <a href="{{ route('traveler.safety.index') }}" class="tv2-sidebar-link">
             <i class="fas fa-shield-halved"></i><span>{{ __('messages.nav_safety_center') ?? 'Safety Center' }}</span>
         </a>
         <a href="#sos" class="tv2-sidebar-link is-danger">

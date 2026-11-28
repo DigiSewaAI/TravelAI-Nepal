@@ -1,4 +1,4 @@
-@extends('layouts.traveler-v2')
+@extends($layout ?? 'layouts.public')
 
 @section('title', $incident->title . ' — Safety Incident | TravelAI Nepal')
 @section('meta_description', 'Safety incident report: ' . Str::limit(strip_tags($incident->description ?? $incident->title), 150))
@@ -50,7 +50,7 @@
             <li>
                 <div class="flex items-center">
                     <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                    <a href="{{ route('safety.index') }}" class="hover:text-blue-600 transition-colors">{{ __('messages.travel_safety') }}</a>
+                    <a href="{{ route($routePrefix . 'index') }}" class="hover:text-blue-600 transition-colors">{{ __('messages.travel_safety') }}</a>
                 </div>
             </li>
             <li aria-current="page">
@@ -287,7 +287,7 @@
                     <i class="fas fa-bolt text-amber-500"></i> {{ __('messages.quick_actions') }}
                 </h3>
                 <div class="space-y-3">
-                    <a href="{{ route('safety.index') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-blue-50 text-blue-700 font-semibold rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
+                    <a href="{{ route($routePrefix . 'index') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-blue-50 text-blue-700 font-semibold rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
                         <i class="fas fa-shield-alt"></i> {{ __('messages.safety_overview') }}
                     </a>
                     

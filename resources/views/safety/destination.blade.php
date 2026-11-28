@@ -1,4 +1,4 @@
-@extends('layouts.traveler-v2')
+@extends($layout ?? 'layouts.public')
 
 @section('title', $entity->name . ' — Travel Safety & Weather | TravelAI Nepal')
 @section('meta_description', 'Real-time safety status, weather, and incident updates for ' . $entity->name . ' in Nepal. Check advisory level, risk score, and trekking safety tips.')
@@ -68,7 +68,7 @@
             <i class="fas fa-home"></i> {{ __('messages.home') }}
         </a>
         <span class="text-gray-300">›</span>
-        <a href="{{ route('safety.index') }}" class="hover:text-blue-600 transition-colors">
+        <a href="{{ route($routePrefix . 'index') }}" class="hover:text-blue-600 transition-colors">
             <i class="fas fa-shield-alt"></i> {{ __('messages.travel_safety') }}
         </a>
         <span class="text-gray-300">›</span>
@@ -113,7 +113,7 @@
                             @endif
                         </div>
                     </div>
-                    <a href="{{ route('safety.index') }}" 
+                    <a href="{{ route($routePrefix . 'index') }}" 
                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-700 transition-colors">
                         <i class="fas fa-arrow-left"></i> {{ __('messages.back_to_safety') }}
                     </a>
@@ -267,7 +267,7 @@
                                     <div class="flex items-start gap-3">
                                         <span class="text-2xl">{{ $severityIcon }}</span>
                                         <div class="flex-1 min-w-0">
-                                            <a href="{{ route('safety.incident', $inc->id) }}" 
+                                            <a href="{{ route($routePrefix . 'incident', $inc->id) }}" 
                                                class="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors">
                                                 {{ $inc->title }}
                                             </a>
@@ -287,7 +287,7 @@
                                                 <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ Str::limit($inc->description, 120) }}</p>
                                             @endif
                                         </div>
-                                        <a href="{{ route('safety.incident', $inc->id) }}" 
+                                        <a href="{{ route($routePrefix . 'incident', $inc->id) }}" 
                                            class="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                                             {{ __('messages.view_details') }} <i class="fas fa-arrow-right text-xs"></i>
                                         </a>
@@ -415,7 +415,7 @@
                     </h3>
                 </div>
                 <div class="p-4 space-y-1.5">
-                    <a href="{{ route('safety.index') }}" 
+                    <a href="{{ route($routePrefix . 'index') }}" 
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-gray-700 text-sm">
                         <i class="fas fa-shield-alt text-blue-500 w-5 text-center"></i>
                         {{ __('messages.safety_overview') }}

@@ -63,13 +63,13 @@ class SafetyController extends Controller
         // ✅ Weather Strip for major trekking nodes
         $weatherStrip = $this->getWeatherStrip();
 
-        return view('safety.index', compact(
+        return view('safety.index', array_merge(compact(
             'summary',
             'incidents',
             'affectedWaypoints',
             'affectedTreks',
             'weatherStrip'
-        ));
+        ), $this->layoutContext()));
     }
 
     /**
@@ -114,7 +114,10 @@ public function destination(Request $request, string $slug)
         $weather = $this->getWeatherForDestination($entity);
     }
 
-    return view('safety.destination', compact('entity', 'status', 'incidents', 'weather'));
+            return view('safety.destination', array_merge(
+            compact('entity', 'status', 'incidents', 'weather'),
+            $this->layoutContext()
+        ));
 }
 
     /**
@@ -148,13 +151,13 @@ public function destination(Request $request, string $slug)
             }
         }
 
-        return view('safety.incident', compact(
+        return view('safety.incident', array_merge(compact(
             'incident',
             'affectedWaypoints',
             'affectedRoutes',
             'affectedTreks',
             'weather'
-        ));
+        ), $this->layoutContext()));
     }
 
     /**
@@ -352,5 +355,18 @@ public function destination(Request $request, string $slug)
             'low' => '#28a745',
             default => '#6c757d',
         };
+    }
+        /**
+     * Detect context (public vs traveler dashboard) and return
+     * layout, route prefix, and base URL for views.
+     */
+    protected function layoutContext(): array
+    {
+        $isTraveler = request()->routeIs('traveler.safety.*');
+        return [
+            'layout'       => $isTraveler ? 'layouts.traveler-v2' : 'layouts.public',
+            'routePrefix'  => $isTraveler ? 'traveler.safety.' : 'safety.',
+            'safetyBase'   => $isTraveler ? '/traveler/safety' : '/travel-safety',
+        ];
     }
 }

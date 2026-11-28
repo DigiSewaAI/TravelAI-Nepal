@@ -1,4 +1,4 @@
-@extends('layouts.traveler-v2')
+@extends($layout ?? 'layouts.public')
 
 @section('title', 'Travel Safety — Nepal | Real-Time Updates & Weather | TravelAI Nepal')
 @section('meta_description', 'Real-time safety updates, weather intelligence, and live incident tracking across Nepal. Check destination safety status, advisory level, and trek safety tips.')
@@ -218,7 +218,8 @@
 
                     <!-- Map Container -->
                     <div id="safetyMap" class="w-full h-[500px] rounded-xl z-0 border border-gray-200 relative"
-                         data-i18n='@json($safetyI18n)'>
+                         data-i18n='@json($safetyI18n)'
+                         data-safety-base="{{ $safetyBase }}">
                         <!-- Loading State -->
                         <div id="mapLoader" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-[1000] flex items-center justify-center rounded-xl">
                             <div class="flex flex-col items-center gap-3">
@@ -351,7 +352,7 @@
                     </div>
 
                     <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
-                        <a href="{{ route('safety.incident', $incident->id) }}" class="hover:text-blue-600 transition-colors">
+                        <a href="{{ route($routePrefix . 'incident', $incident->id) }}" class="hover:text-blue-600 transition-colors">
                             {{ $incident->title }}
                         </a>
                     </h3>
@@ -367,7 +368,7 @@
                         </p>
                     @endif
 
-                    <a href="{{ route('safety.incident', $incident->id) }}" class="mt-auto inline-flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+                    <a href="{{ route($routePrefix . 'incident', $incident->id) }}" class="mt-auto inline-flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
                         {{ __('messages.view_details') }} <i class="fas fa-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -390,6 +391,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // ---------- i18n strings from data attribute ----------
         const i18n = JSON.parse(document.getElementById('safetyMap').dataset.i18n);
+        const safetyBase = document.getElementById('safetyMap').dataset.safetyBase;
 
         // ---------- Map ----------
         fetch('{{ route("api.safety.markers") }}')
@@ -483,7 +485,7 @@
                             const incidentInfo = item.incident ? `<div class="text-xs text-red-600 mt-1">⚠️ ${item.incident.title}</div>` : '';
 
                             html += `
-                                <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition" onclick="window.location.href='/travel-safety/destination/${item.slug}'">
+                                <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition" onclick="window.location.href='${safetyBase}/destination/${item.slug}'">
                                     <div class="flex justify-between items-start">
                                         <div>
                                             <h4 class="font-bold text-gray-800">${item.name}</h4>
